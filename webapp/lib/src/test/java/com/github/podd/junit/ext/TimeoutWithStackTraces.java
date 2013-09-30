@@ -35,13 +35,14 @@ public class TimeoutWithStackTraces implements TestRule
      * @param millis
      *            the millisecond timeout
      */
-    public TimeoutWithStackTraces(long millis)
+    public TimeoutWithStackTraces(final long millis)
     {
-        fMillis = millis;
+        this.fMillis = millis;
     }
     
-    public Statement apply(Statement base, Description description)
+    @Override
+    public Statement apply(final Statement base, final Description description)
     {
-        return new FailOnTimeoutWithStackTraces(base, fMillis);
+        return new FailOnTimeoutWithStackTraces(base, this.fMillis);
     }
 }

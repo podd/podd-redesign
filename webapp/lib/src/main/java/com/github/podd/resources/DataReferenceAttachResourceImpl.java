@@ -20,7 +20,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Map;
 
 import org.openrdf.OpenRDFException;
@@ -40,15 +39,12 @@ import org.restlet.resource.ResourceException;
 import org.restlet.security.User;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.github.podd.api.DataReferenceVerificationPolicy;
 import com.github.podd.exception.FileReferenceVerificationFailureException;
 import com.github.podd.exception.OntologyNotInProfileException;
 import com.github.podd.exception.PoddException;
 import com.github.podd.exception.UnmanagedArtifactIRIException;
-import com.github.podd.exception.UnmanagedArtifactVersionException;
 import com.github.podd.restlet.PoddAction;
 import com.github.podd.restlet.RestletUtils;
 import com.github.podd.utils.InferredOWLOntologyID;
@@ -66,6 +62,60 @@ import com.github.podd.utils.PoddWebConstants;
  */
 public class DataReferenceAttachResourceImpl extends AbstractPoddResourceImpl
 {
+    /**
+     * @param entity
+     * @param artifactUri
+     * @param versionUri
+     * @param verificationPolicy
+     * @return
+     * @throws ResourceException
+     */
+    private InferredOWLOntologyID attachDataReference(final Representation entity, final String artifactUri,
+            final String versionUri, final DataReferenceVerificationPolicy verificationPolicy) throws ResourceException
+    {
+        // get input stream containing RDF statements
+        InputStream inputStream = null;
+        try
+        {
+            inputStream = entity.getStream();
+        }
+        catch(final IOException e)
+        {
+            throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "There was a problem with the input", e);
+        }
+        final RDFFormat inputFormat = Rio.getParserFormatForMIMEType(entity.getMediaType().getName(), RDFFormat.RDFXML);
+        
+        InferredOWLOntologyID artifactMap = null;
+        try
+        {
+            artifactMap =
+                    this.getPoddArtifactManager().attachDataReferences(
+                            ValueFactoryImpl.getInstance().createURI(artifactUri),
+                            ValueFactoryImpl.getInstance().createURI(versionUri), inputStream, inputFormat,
+                            verificationPolicy);
+        }
+        catch(final FileReferenceVerificationFailureException e)
+        {
+            this.log.error("File reference validation errors: {}", e.getValidationFailures());
+            throw new ResourceException(Status.SERVER_ERROR_BAD_GATEWAY, "File reference(s) failed verification", e);
+        }
+        catch(final OntologyNotInProfileException e)
+        {
+            this.log.error("The ontology was not suitable for our reasoner after the changes: {}", e.getProfileReport());
+            throw new ResourceException(
+                    Status.CLIENT_ERROR_BAD_REQUEST,
+                    "Ontology was not consistent after the changes. Was the parent object correct before the submission.",
+                    e);
+        }
+        catch(OpenRDFException | PoddException | IOException | OWLException e)
+        {
+            throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Could not attach file references", e);
+        }
+        
+        this.log.info("Successfully attached file reference to artifact {}", artifactMap);
+        return artifactMap;
+    }
+    
     @Get
     public Representation attachDataReferencePageHtml(final Representation entity) throws ResourceException
     {
@@ -93,7 +143,7 @@ public class DataReferenceAttachResourceImpl extends AbstractPoddResourceImpl
         {
             artifact = this.getPoddArtifactManager().getArtifact(IRI.create(artifactUri));
         }
-        catch(UnmanagedArtifactIRIException e)
+        catch(final UnmanagedArtifactIRIException e)
         {
             this.log.error("Artifact IRI not recognised");
             throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Artifact IRI not recognised");
@@ -107,9 +157,9 @@ public class DataReferenceAttachResourceImpl extends AbstractPoddResourceImpl
         PoddObjectLabel parentDetails;
         try
         {
-            parentDetails = RestletUtils.getParentDetails(getPoddArtifactManager(), artifact, objectUri);
+            parentDetails = RestletUtils.getParentDetails(this.getPoddArtifactManager(), artifact, objectUri);
         }
-        catch(OpenRDFException e)
+        catch(final OpenRDFException e)
         {
             this.log.error("Could not find parent details", e);
             throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Could not find parent details", e);
@@ -159,7 +209,8 @@ public class DataReferenceAttachResourceImpl extends AbstractPoddResourceImpl
         
         this.log.info("@Post attachFileReference ({})", entity.getMediaType().getName());
         
-        InferredOWLOntologyID artifactMap = attachDataReference(entity, artifactUri, versionUri, verificationPolicy);
+        final InferredOWLOntologyID artifactMap =
+                this.attachDataReference(entity, artifactUri, versionUri, verificationPolicy);
         
         // prepare output: Artifact ID, object URI, file reference URI
         final ByteArrayOutputStream output = new ByteArrayOutputStream(8096);
@@ -180,60 +231,6 @@ public class DataReferenceAttachResourceImpl extends AbstractPoddResourceImpl
         
         return new ByteArrayRepresentation(output.toByteArray(), MediaType.valueOf(writer.getRDFFormat()
                 .getDefaultMIMEType()));
-    }
-    
-    /**
-     * @param entity
-     * @param artifactUri
-     * @param versionUri
-     * @param verificationPolicy
-     * @return
-     * @throws ResourceException
-     */
-    private InferredOWLOntologyID attachDataReference(final Representation entity, final String artifactUri,
-            final String versionUri, DataReferenceVerificationPolicy verificationPolicy) throws ResourceException
-    {
-        // get input stream containing RDF statements
-        InputStream inputStream = null;
-        try
-        {
-            inputStream = entity.getStream();
-        }
-        catch(final IOException e)
-        {
-            throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "There was a problem with the input", e);
-        }
-        final RDFFormat inputFormat = Rio.getParserFormatForMIMEType(entity.getMediaType().getName(), RDFFormat.RDFXML);
-        
-        InferredOWLOntologyID artifactMap = null;
-        try
-        {
-            artifactMap =
-                    this.getPoddArtifactManager().attachDataReferences(
-                            ValueFactoryImpl.getInstance().createURI(artifactUri),
-                            ValueFactoryImpl.getInstance().createURI(versionUri), inputStream, inputFormat,
-                            verificationPolicy);
-        }
-        catch(final FileReferenceVerificationFailureException e)
-        {
-            this.log.error("File reference validation errors: {}", e.getValidationFailures());
-            throw new ResourceException(Status.SERVER_ERROR_BAD_GATEWAY, "File reference(s) failed verification", e);
-        }
-        catch(final OntologyNotInProfileException e)
-        {
-            this.log.error("The ontology was not suitable for our reasoner after the changes: {}", e.getProfileReport());
-            throw new ResourceException(
-                    Status.CLIENT_ERROR_BAD_REQUEST,
-                    "Ontology was not consistent after the changes. Was the parent object correct before the submission.",
-                    e);
-        }
-        catch(OpenRDFException | PoddException | IOException | OWLException e)
-        {
-            throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Could not attach file references", e);
-        }
-        
-        this.log.info("Successfully attached file reference to artifact {}", artifactMap);
-        return artifactMap;
     }
     
 }

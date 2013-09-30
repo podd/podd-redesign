@@ -57,7 +57,7 @@ public class DeleteArtifactResourceImplTest extends AbstractResourceImplTest
         }
         finally
         {
-            releaseClient(deleteArtifactClientResource);
+            this.releaseClient(deleteArtifactClientResource);
         }
         
         // verify: try to retrieve deleted artifact
@@ -72,13 +72,13 @@ public class DeleteArtifactResourceImplTest extends AbstractResourceImplTest
                     MediaType.APPLICATION_RDF_XML, Status.CLIENT_ERROR_NOT_FOUND, this.testWithAdminPrivileges);
             Assert.fail("Should have failed with a NOT_FOUND error");
         }
-        catch(ResourceException e)
+        catch(final ResourceException e)
         {
             // TODO: Test the exception
         }
         finally
         {
-            releaseClient(getArtifactClientResource);
+            this.releaseClient(getArtifactClientResource);
         }
     }
     

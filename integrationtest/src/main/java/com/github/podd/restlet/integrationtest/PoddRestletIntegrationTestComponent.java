@@ -133,7 +133,7 @@ public class PoddRestletIntegrationTestComponent extends Component
         
         final String resourcesPath = PoddWebConstants.PATH_RESOURCES;
         
-        this.log.info("attaching resource handler to path={}", resourcesPath);
+        PoddRestletIntegrationTestComponent.log.info("attaching resource handler to path={}", resourcesPath);
         
         // attach the resources first
         this.getDefaultHost().attach(resourcesPath, directory);
@@ -147,7 +147,7 @@ public class PoddRestletIntegrationTestComponent extends Component
                     nextApplication.getPropertyUtil().get(PoddWebConstants.PROPERTY_TEST_WEBSERVICE_RESET_KEY, "");
             // Add a route for the reset service.
             final String resetPath = "/reset/" + resetKey;
-            this.log.info("attaching reset service to path={}", resetPath);
+            PoddRestletIntegrationTestComponent.log.info("attaching reset service to path={}", resetPath);
             final TestResetResourceImpl reset = new TestResetResourceImpl(nextApplication);
             this.setResetKey(resetKey);
             
@@ -169,7 +169,7 @@ public class PoddRestletIntegrationTestComponent extends Component
             throw new RuntimeException("Could not setup application", e);
         }
         
-        this.log.info("routes={}", this.getDefaultHost().getRoutes().toString());
+        PoddRestletIntegrationTestComponent.log.info("routes={}", this.getDefaultHost().getRoutes().toString());
     }
     
     /**

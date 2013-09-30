@@ -39,8 +39,6 @@ import org.restlet.resource.Get;
 import org.restlet.resource.ResourceException;
 import org.restlet.security.Role;
 import org.restlet.security.User;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.github.ansell.restletutils.RestletUtilRole;
 import com.github.ansell.restletutils.SesameRealmConstants;
@@ -51,7 +49,6 @@ import com.github.podd.restlet.RestletUtils;
 import com.github.podd.utils.PoddRdfConstants;
 import com.github.podd.utils.PoddRoles;
 import com.github.podd.utils.PoddUser;
-import com.github.podd.utils.PoddUserStatus;
 import com.github.podd.utils.PoddWebConstants;
 
 /**
@@ -69,7 +66,7 @@ public class UserDetailsResourceImpl extends AbstractUserResourceImpl
         this.log.info("getUserDetailsHtml");
         
         final String requestedUserIdentifier = this.getUserParameter();
-        PoddAction action =
+        final PoddAction action =
                 this.getAction(requestedUserIdentifier, PoddAction.OTHER_USER_READ, PoddAction.CURRENT_USER_READ);
         
         this.log.info("requesting details of user: {}", requestedUserIdentifier);
@@ -92,7 +89,7 @@ public class UserDetailsResourceImpl extends AbstractUserResourceImpl
         dataModel.put("authenticatedUsername", user.getIdentifier());
         
         final PoddSesameRealm realm = ((PoddWebServiceApplication)this.getApplication()).getRealm();
-        final PoddUser poddUser = (PoddUser)realm.findUser(requestedUserIdentifier);
+        final PoddUser poddUser = realm.findUser(requestedUserIdentifier);
         
         if(poddUser == null)
         {
@@ -118,13 +115,13 @@ public class UserDetailsResourceImpl extends AbstractUserResourceImpl
         this.log.info("getUserRdf");
         
         final String requestedUserIdentifier = this.getUserParameter();
-        PoddAction action =
+        final PoddAction action =
                 this.getAction(requestedUserIdentifier, PoddAction.OTHER_USER_READ, PoddAction.CURRENT_USER_READ);
         
         this.log.info("requesting details of user: {}", requestedUserIdentifier);
         if(requestedUserIdentifier == null)
         {
-            log.info("Could not find user identifier parameter");
+            this.log.info("Could not find user identifier parameter");
             // no identifier specified.
             throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Did not specify user to view");
         }
@@ -135,7 +132,7 @@ public class UserDetailsResourceImpl extends AbstractUserResourceImpl
         this.checkAuthentication(action);
         
         final PoddSesameRealm realm = ((PoddWebServiceApplication)this.getApplication()).getRealm();
-        final PoddUser poddUser = (PoddUser)realm.findUser(requestedUserIdentifier);
+        final PoddUser poddUser = realm.findUser(requestedUserIdentifier);
         
         if(poddUser == null)
         {

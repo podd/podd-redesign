@@ -76,7 +76,7 @@ public enum PoddRoles implements RestletUtilRole
     
     static
     {
-        Set<RestletUtilRole> tempRepositoryRoles = new HashSet<>();
+        final Set<RestletUtilRole> tempRepositoryRoles = new HashSet<>();
         tempRepositoryRoles.add(ADMIN);
         tempRepositoryRoles.add(PROJECT_CREATOR);
         
@@ -223,7 +223,7 @@ public enum PoddRoles implements RestletUtilRole
      */
     public static Set<RestletUtilRole> getRepositoryRoles()
     {
-        return INTERNAL_REPOSITORY_ROLES;
+        return PoddRoles.INTERNAL_REPOSITORY_ROLES;
     }
     
     public static RestletUtilRole getRoleByName(final String name)
@@ -254,7 +254,7 @@ public enum PoddRoles implements RestletUtilRole
     
     public static Set<Role> getRoles()
     {
-        return INTERNAL_RESTLET_ROLES;
+        return PoddRoles.INTERNAL_RESTLET_ROLES;
     }
     
     private final Role role;

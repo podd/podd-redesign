@@ -77,20 +77,6 @@ public class DebugUtils
     }
     
     /**
-     * Helper method prints the contents of the given context of a Repository
-     */
-    public static void printContexts(final RepositoryConnection conn) throws RepositoryException
-    {
-        System.out.println("==================================================");
-        System.out.println("Contexts in Repository:  ");
-        for(final Resource context : Iterations.asSet(conn.getContextIDs()))
-        {
-            System.out.println(context);
-        }
-        System.out.println("==================================================");
-    }
-    
-    /**
      * Helper method prints the contents of the given context of a Model
      */
     public static void printContexts(final Model model) throws RepositoryException
@@ -98,6 +84,20 @@ public class DebugUtils
         System.out.println("==================================================");
         System.out.println("Contexts in Model:  ");
         for(final Resource context : model.contexts())
+        {
+            System.out.println(context);
+        }
+        System.out.println("==================================================");
+    }
+    
+    /**
+     * Helper method prints the contents of the given context of a Repository
+     */
+    public static void printContexts(final RepositoryConnection conn) throws RepositoryException
+    {
+        System.out.println("==================================================");
+        System.out.println("Contexts in Repository:  ");
+        for(final Resource context : Iterations.asSet(conn.getContextIDs()))
         {
             System.out.println(context);
         }

@@ -83,7 +83,7 @@ public class EditArtifactResourceImplTest extends AbstractResourceImplTest
                     RestletTestUtils.doTestAuthenticatedRequest(editArtifactClientResource, Method.POST, input,
                             MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
             
-            final String body = getText(results);
+            final String body = this.getText(results);
             
             // verify: Inferred Ontology ID is received in RDF format
             Assert.assertTrue("Response not in RDF format", body.contains("<rdf:RDF"));
@@ -99,7 +99,7 @@ public class EditArtifactResourceImplTest extends AbstractResourceImplTest
         }
         finally
         {
-            releaseClient(editArtifactClientResource);
+            this.releaseClient(editArtifactClientResource);
         }
     }
     
@@ -132,7 +132,7 @@ public class EditArtifactResourceImplTest extends AbstractResourceImplTest
                     RestletTestUtils.doTestAuthenticatedRequest(editArtifactClientResource, Method.POST, input,
                             MediaType.APPLICATION_RDF_TURTLE, Status.SUCCESS_OK, this.testWithAdminPrivileges);
             
-            final String updatedArtifactDetails = getText(results);
+            final String updatedArtifactDetails = this.getText(results);
             
             // verify: Inferred Ontology ID is NOT in RDF format
             Assert.assertFalse("Response should not be in RDF format", updatedArtifactDetails.contains("<rdf:RDF"));
@@ -150,7 +150,7 @@ public class EditArtifactResourceImplTest extends AbstractResourceImplTest
         }
         finally
         {
-            releaseClient(editArtifactClientResource);
+            this.releaseClient(editArtifactClientResource);
         }
     }
     
@@ -184,7 +184,7 @@ public class EditArtifactResourceImplTest extends AbstractResourceImplTest
                     RestletTestUtils.doTestAuthenticatedRequest(editArtifactClientResource, Method.POST, input,
                             MediaType.APPLICATION_RDF_TURTLE, Status.SUCCESS_OK, this.testWithAdminPrivileges);
             
-            final String updatedArtifactDetails = getText(results);
+            final String updatedArtifactDetails = this.getText(results);
             
             // verify: Inferred Ontology ID is NOT in RDF format
             Assert.assertFalse("Response should not be in RDF format", updatedArtifactDetails.contains("<rdf:RDF"));
@@ -207,7 +207,7 @@ public class EditArtifactResourceImplTest extends AbstractResourceImplTest
         }
         finally
         {
-            releaseClient(editArtifactClientResource);
+            this.releaseClient(editArtifactClientResource);
         }
     }
     
@@ -249,7 +249,7 @@ public class EditArtifactResourceImplTest extends AbstractResourceImplTest
                     RestletTestUtils.doTestAuthenticatedRequest(editArtifactClientResource, Method.POST, input,
                             MediaType.APPLICATION_RDF_TURTLE, Status.SUCCESS_OK, this.testWithAdminPrivileges);
             
-            final String updatedArtifactDetails = getText(results);
+            final String updatedArtifactDetails = this.getText(results);
             
             // verify: Inferred Ontology ID is NOT in RDF format
             Assert.assertFalse("Response should not be in RDF format", updatedArtifactDetails.contains("<rdf:RDF"));
@@ -285,7 +285,7 @@ public class EditArtifactResourceImplTest extends AbstractResourceImplTest
         }
         finally
         {
-            releaseClient(editArtifactClientResource);
+            this.releaseClient(editArtifactClientResource);
         }
     }
     
@@ -326,7 +326,7 @@ public class EditArtifactResourceImplTest extends AbstractResourceImplTest
             Assert.assertEquals(Status.CLIENT_ERROR_NOT_FOUND, e.getStatus());
             
             // TODO: verify the cause and details (as in UploadArtifactResourceImplTest)
-            final String body = getText(editArtifactClientResource.getResponseEntity());
+            final String body = this.getText(editArtifactClientResource.getResponseEntity());
             final ByteArrayInputStream inputStream = new ByteArrayInputStream(body.getBytes(StandardCharsets.UTF_8));
             final Model model = Rio.parse(inputStream, "", RDFFormat.RDFXML);
             
@@ -335,7 +335,7 @@ public class EditArtifactResourceImplTest extends AbstractResourceImplTest
         }
         finally
         {
-            releaseClient(editArtifactClientResource);
+            this.releaseClient(editArtifactClientResource);
         }
     }
     
@@ -376,7 +376,7 @@ public class EditArtifactResourceImplTest extends AbstractResourceImplTest
             Assert.assertEquals(Status.CLIENT_ERROR_CONFLICT, e.getStatus());
             
             // verify the source of error
-            final String body = getText(editArtifactClientResource.getResponseEntity());
+            final String body = this.getText(editArtifactClientResource.getResponseEntity());
             final ByteArrayInputStream inputStream = new ByteArrayInputStream(body.getBytes(StandardCharsets.UTF_8));
             final Model model = Rio.parse(inputStream, "", RDFFormat.RDFXML);
             
@@ -385,7 +385,7 @@ public class EditArtifactResourceImplTest extends AbstractResourceImplTest
         }
         finally
         {
-            releaseClient(editArtifactClientResource);
+            this.releaseClient(editArtifactClientResource);
         }
     }
     
@@ -407,7 +407,7 @@ public class EditArtifactResourceImplTest extends AbstractResourceImplTest
         }
         finally
         {
-            releaseClient(editArtifactClientResource);
+            this.releaseClient(editArtifactClientResource);
         }
     }
     
@@ -438,7 +438,7 @@ public class EditArtifactResourceImplTest extends AbstractResourceImplTest
         }
         finally
         {
-            releaseClient(editArtifactClientResource);
+            this.releaseClient(editArtifactClientResource);
         }
     }
     
@@ -482,7 +482,7 @@ public class EditArtifactResourceImplTest extends AbstractResourceImplTest
         }
         finally
         {
-            releaseClient(editArtifactClientResource);
+            this.releaseClient(editArtifactClientResource);
         }
     }
     
@@ -509,7 +509,7 @@ public class EditArtifactResourceImplTest extends AbstractResourceImplTest
                     RestletTestUtils.doTestAuthenticatedRequest(editArtifactClientResource, Method.GET, null,
                             MediaType.TEXT_HTML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
             
-            final String body = getText(results);
+            final String body = this.getText(results);
             
             // verify:
             // System.out.println(body);
@@ -517,7 +517,7 @@ public class EditArtifactResourceImplTest extends AbstractResourceImplTest
         }
         finally
         {
-            releaseClient(editArtifactClientResource);
+            this.releaseClient(editArtifactClientResource);
         }
     }
     
@@ -542,7 +542,7 @@ public class EditArtifactResourceImplTest extends AbstractResourceImplTest
                     RestletTestUtils.doTestAuthenticatedRequest(editArtifactClientResource, Method.GET, null,
                             MediaType.TEXT_HTML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
             
-            final String body = getText(results);
+            final String body = this.getText(results);
             
             // verify:
             // System.out.println(body);
@@ -550,7 +550,7 @@ public class EditArtifactResourceImplTest extends AbstractResourceImplTest
         }
         finally
         {
-            releaseClient(editArtifactClientResource);
+            this.releaseClient(editArtifactClientResource);
         }
     }
     

@@ -125,13 +125,6 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
     }
     
     @Override
-    public InferredOWLOntologyID attachFileReference(final InferredOWLOntologyID artifactId, final URI objectUri,
-            final DataReference dataReference) throws OpenRDFException, PoddException
-    {
-        throw new RuntimeException("TODO: Implement attachFileReference");
-    }
-    
-    @Override
     public InferredOWLOntologyID attachDataReferences(final URI artifactUri, final URI versionUri,
             final InputStream inputStream, final RDFFormat format,
             final DataReferenceVerificationPolicy dataReferenceVerificationPolicy) throws OpenRDFException,
@@ -165,6 +158,13 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
                         new ByteArrayInputStream(output.toByteArray()), RDFFormat.RDFJSON,
                         UpdatePolicy.MERGE_WITH_EXISTING, DanglingObjectPolicy.REPORT, dataReferenceVerificationPolicy);
         return OntologyUtils.modelToOntologyIDs(resultModel).get(0);
+    }
+    
+    @Override
+    public InferredOWLOntologyID attachFileReference(final InferredOWLOntologyID artifactId, final URI objectUri,
+            final DataReference dataReference) throws OpenRDFException, PoddException
+    {
+        throw new RuntimeException("TODO: Implement attachFileReference");
     }
     
     @Override
@@ -207,9 +207,9 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             this.getSesameManager().deleteOntologies(requestedArtifactIds, connection,
                     this.getRepositoryManager().getArtifactManagementGraph());
             connection.commit();
-
+            
             // - ensure deleted ontologies are removed from the OWLOntologyManager's cache
-            for (InferredOWLOntologyID deletedOntologyId : requestedArtifactIds)
+            for(final InferredOWLOntologyID deletedOntologyId : requestedArtifactIds)
             {
                 this.getOWLManager().removeCache(deletedOntologyId.getBaseOWLOntologyID());
                 this.getOWLManager().removeCache(deletedOntologyId.getInferredOWLOntologyID());
@@ -469,9 +469,9 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         {
             return this.getArtifact(artifactIRI, null);
         }
-        catch(UnmanagedArtifactVersionException e)
+        catch(final UnmanagedArtifactVersionException e)
         {
-            log.error("Null artifact version not recognised, this should not happen");
+            this.log.error("Null artifact version not recognised, this should not happen");
             return null;
         }
     }
@@ -1145,10 +1145,10 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
     }
     
     @Override
-    public InferredOWLOntologyID loadArtifact(final InputStream inputStream, RDFFormat format) throws OpenRDFException,
-        PoddException, IOException, OWLException
+    public InferredOWLOntologyID loadArtifact(final InputStream inputStream, final RDFFormat format)
+        throws OpenRDFException, PoddException, IOException, OWLException
     {
-        return loadArtifact(inputStream, format, DanglingObjectPolicy.REPORT,
+        return this.loadArtifact(inputStream, format, DanglingObjectPolicy.REPORT,
                 DataReferenceVerificationPolicy.DO_NOT_VERIFY);
     }
     
@@ -1160,8 +1160,9 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
      */
     @Override
     public InferredOWLOntologyID loadArtifact(final InputStream inputStream, RDFFormat format,
-            DanglingObjectPolicy danglingObjectPolicy, DataReferenceVerificationPolicy dataReferenceVerificationPolicy)
-        throws OpenRDFException, PoddException, IOException, OWLException
+            final DanglingObjectPolicy danglingObjectPolicy,
+            final DataReferenceVerificationPolicy dataReferenceVerificationPolicy) throws OpenRDFException,
+        PoddException, IOException, OWLException
     {
         if(inputStream == null)
         {
@@ -1223,7 +1224,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
                             this.getSesameManager().getCurrentArtifactVersion(ontologyIRI,
                                     permanentRepositoryConnection,
                                     this.getRepositoryManager().getArtifactManagementGraph());
-                    if (currentManagedArtifactID != null)
+                    if(currentManagedArtifactID != null)
                     {
                         throw new DuplicateArtifactIRIException(ontologyIRI, "This artifact is already managed");
                     }

@@ -3,8 +3,6 @@
  */
 package com.github.podd.resources.test;
 
-import java.io.ByteArrayInputStream;
-import java.nio.charset.StandardCharsets;
 import java.util.AbstractMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -70,7 +68,7 @@ public class UserSearchResourceImplTest extends AbstractResourceImplTest
         }
         finally
         {
-            releaseClient(userSearchClientResource);
+            this.releaseClient(userSearchClientResource);
         }
     }
     

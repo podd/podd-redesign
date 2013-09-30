@@ -48,8 +48,6 @@ import org.slf4j.LoggerFactory;
 import com.github.ansell.propertyutil.PropertyUtil;
 import com.github.ansell.restletutils.CrossOriginResourceSharingFilter;
 import com.github.ansell.restletutils.RestletUtilMediaType;
-import com.github.ansell.restletutils.RestletUtilSesameRealm;
-import com.github.ansell.restletutils.RestletUtilUser;
 import com.github.podd.api.PoddArtifactManager;
 import com.github.podd.api.PoddRepositoryManager;
 import com.github.podd.api.PoddSchemaManager;
@@ -59,10 +57,10 @@ import com.github.podd.resources.AboutResourceImpl;
 import com.github.podd.resources.AddObjectResourceImpl;
 import com.github.podd.resources.ArtifactRolesResourceImpl;
 import com.github.podd.resources.CookieLoginResourceImpl;
+import com.github.podd.resources.DataReferenceAttachResourceImpl;
 import com.github.podd.resources.DeleteArtifactResourceImpl;
 import com.github.podd.resources.DeleteObjectResourceImpl;
 import com.github.podd.resources.EditArtifactResourceImpl;
-import com.github.podd.resources.DataReferenceAttachResourceImpl;
 import com.github.podd.resources.GetArtifactResourceImpl;
 import com.github.podd.resources.GetMetadataResourceImpl;
 import com.github.podd.resources.GetSchemaResourceImpl;
@@ -229,7 +227,7 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
             final Map<String, Collection<Role>> rolesForObjectMap =
                     this.getRealm().getRolesForObjectAlternate(request.getClientInfo().getUser().getIdentifier(),
                             optionalObjectUri);
-            Collection<Role> rolesCommonAcrossGivenObjects =
+            final Collection<Role> rolesCommonAcrossGivenObjects =
                     rolesForObjectMap.get(request.getClientInfo().getUser().getIdentifier());
             
             if(rolesCommonAcrossGivenObjects == null || !action.matchesForRoles(rolesCommonAcrossGivenObjects))
@@ -409,9 +407,9 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
         // Add a route for the Schema retrieval service.
         final String getSchemaService = PoddWebConstants.PATH_GET_SCHEMA;
         this.log.debug("attaching Schema service to path={}", getSchemaService);
-        TemplateRoute schemaService = router.attach(getSchemaService, GetSchemaResourceImpl.class);
+        final TemplateRoute schemaService = router.attach(getSchemaService, GetSchemaResourceImpl.class);
         schemaService.getTemplate().setMatchingMode(Template.MODE_STARTS_WITH);
-        Map<String, Variable> routeVariables = schemaService.getTemplate().getVariables();
+        final Map<String, Variable> routeVariables = schemaService.getTemplate().getVariables();
         routeVariables.put("schemaPath", new Variable(Variable.TYPE_URI_PATH));
         
         // Add a route for Logout service
@@ -442,7 +440,7 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
         // If the aliasConfiguration is empty then populate it with the default aliases here
         if(this.aliasesConfiguration.isEmpty())
         {
-            String aliasesFile =
+            final String aliasesFile =
                     propertyUtil.get(PoddRdfConstants.KEY_ALIASES, PoddRdfConstants.PATH_DEFAULT_ALIASES_FILE);
             try (final InputStream input = ApplicationUtils.class.getResourceAsStream(aliasesFile);)
             {

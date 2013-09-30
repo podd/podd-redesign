@@ -71,13 +71,13 @@ public class SearchOntologyResourceImplTest extends AbstractResourceImplTest
                     RestletTestUtils.doTestAuthenticatedRequest(searchClientResource, Method.GET, null,
                             requestMediaType, Status.SUCCESS_OK, this.testWithAdminPrivileges);
             
-            RDFFormat format = Rio.getParserFormatForMIMEType(requestMediaType.getName(), RDFFormat.RDFXML);
+            final RDFFormat format = Rio.getParserFormatForMIMEType(requestMediaType.getName(), RDFFormat.RDFXML);
             // construct a Model out of the result
             return Rio.parse(new StringReader(this.getText(results)), "", format);
         }
         finally
         {
-            releaseClient(searchClientResource);
+            this.releaseClient(searchClientResource);
         }
     }
     
@@ -105,7 +105,7 @@ public class SearchOntologyResourceImplTest extends AbstractResourceImplTest
         }
         finally
         {
-            releaseClient(searchClientResource);
+            this.releaseClient(searchClientResource);
         }
     }
     
@@ -122,8 +122,8 @@ public class SearchOntologyResourceImplTest extends AbstractResourceImplTest
         try
         {
             searchClientResource.addQueryParameter(PoddWebConstants.KEY_SEARCHTERM, "Scan");
-            searchClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, testArtifact.getOntologyIRI()
-                    .toString());
+            searchClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, testArtifact
+                    .getOntologyIRI().toString());
             searchClientResource.addQueryParameter(PoddWebConstants.KEY_SEARCH_TYPES,
                     "http://purl.org/podd/ns/poddScience#Platform");
             
@@ -136,7 +136,7 @@ public class SearchOntologyResourceImplTest extends AbstractResourceImplTest
         }
         finally
         {
-            releaseClient(searchClientResource);
+            this.releaseClient(searchClientResource);
         }
     }
     
@@ -154,8 +154,8 @@ public class SearchOntologyResourceImplTest extends AbstractResourceImplTest
         try
         {
             // no search term!
-            searchClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, testArtifact.getOntologyIRI()
-                    .toString());
+            searchClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, testArtifact
+                    .getOntologyIRI().toString());
             searchClientResource.addQueryParameter(PoddWebConstants.KEY_SEARCH_TYPES,
                     "http://purl.org/podd/ns/poddScience#Platform");
             
@@ -168,7 +168,7 @@ public class SearchOntologyResourceImplTest extends AbstractResourceImplTest
         }
         finally
         {
-            releaseClient(searchClientResource);
+            this.releaseClient(searchClientResource);
         }
     }
     
@@ -232,7 +232,7 @@ public class SearchOntologyResourceImplTest extends AbstractResourceImplTest
         }
         finally
         {
-            releaseClient(searchClientResource);
+            this.releaseClient(searchClientResource);
         }
     }
     

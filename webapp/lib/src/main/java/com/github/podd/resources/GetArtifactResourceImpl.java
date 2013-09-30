@@ -78,7 +78,7 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
         
         this.log.debug("requesting get artifact (HTML): {}, {}, {}", artifactString, versionString, objectToView);
         
-        UnmanagedArtifactIRIException foundException = null;
+        final UnmanagedArtifactIRIException foundException = null;
         
         InferredOWLOntologyID ontologyID = null;
         try
@@ -124,7 +124,7 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
                 isPublished = this.getPoddArtifactManager().isPublished(ontologyID);
             }
         }
-        catch(OpenRDFException e)
+        catch(final OpenRDFException e)
         {
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Repository exception", e);
         }
@@ -255,7 +255,7 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
         dataModel.put("poddObject", theObject);
         final URI objectUri = theObject.getObjectURI();
         
-        Map<String, String> parentMap =
+        final Map<String, String> parentMap =
                 RestletUtils.populateParentDetails(this.getPoddArtifactManager(), ontologyID, objectUri);
         dataModel.put("parentObject", parentMap);
         

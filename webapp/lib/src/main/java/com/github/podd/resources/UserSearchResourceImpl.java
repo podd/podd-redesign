@@ -21,8 +21,6 @@ import org.restlet.representation.Variant;
 import org.restlet.resource.Get;
 import org.restlet.resource.ResourceException;
 import org.restlet.security.User;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.github.ansell.restletutils.SesameRealmConstants;
 import com.github.podd.restlet.PoddAction;

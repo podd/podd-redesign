@@ -16,10 +16,6 @@
  */
 package com.github.podd.resources.test;
 
-import java.io.ByteArrayInputStream;
-import java.io.StringReader;
-import java.nio.charset.StandardCharsets;
-
 import org.junit.Assert;
 import org.junit.Test;
 import org.openrdf.model.Model;
@@ -43,6 +39,29 @@ import com.github.podd.utils.PoddWebConstants;
  */
 public class DeleteObjectResourceImplTest extends AbstractResourceImplTest
 {
+    private Model getArtifact(final String artifactUri, final int expectedStatementCount) throws Exception
+    {
+        final ClientResource getArtifactClientResource =
+                new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_GET_BASE));
+        
+        try
+        {
+            getArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactUri);
+            
+            final Representation getArtifactResult =
+                    RestletTestUtils.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null,
+                            MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
+            
+            final Model model = this.assertRdf(getArtifactResult, RDFFormat.RDFXML, expectedStatementCount);
+            
+            return model;
+        }
+        finally
+        {
+            this.releaseClient(getArtifactClientResource);
+        }
+    }
+    
     @Test
     public void testDeleteObjectBasicRdf() throws Exception
     {
@@ -63,12 +82,12 @@ public class DeleteObjectResourceImplTest extends AbstractResourceImplTest
             deleteObjectClientResource.addQueryParameter(PoddWebConstants.KEY_OBJECT_IDENTIFIER, objectToDelete);
             deleteObjectClientResource.addQueryParameter(PoddWebConstants.KEY_CASCADE, Boolean.toString(false));
             
-            Representation results =
+            final Representation results =
                     RestletTestUtils.doTestAuthenticatedRequest(deleteObjectClientResource, Method.DELETE, null,
                             MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
             
             // verify: response contains updated artifact's ID
-            final String updatedArtifactDetails = getText(results);
+            final String updatedArtifactDetails = this.getText(results);
             Assert.assertTrue("Artifact version has not been updated properly",
                     updatedArtifactDetails.contains("artifact:1:version:2"));
             
@@ -80,30 +99,7 @@ public class DeleteObjectResourceImplTest extends AbstractResourceImplTest
         }
         finally
         {
-            releaseClient(deleteObjectClientResource);
-        }
-    }
-    
-    private Model getArtifact(final String artifactUri, final int expectedStatementCount) throws Exception
-    {
-        final ClientResource getArtifactClientResource =
-                new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_GET_BASE));
-        
-        try
-        {
-            getArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactUri);
-            
-            final Representation getArtifactResult =
-                    RestletTestUtils.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null,
-                            MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
-            
-            final Model model = this.assertRdf(getArtifactResult, RDFFormat.RDFXML, expectedStatementCount);
-            
-            return model;
-        }
-        finally
-        {
-            releaseClient(getArtifactClientResource);
+            this.releaseClient(deleteObjectClientResource);
         }
     }
 }

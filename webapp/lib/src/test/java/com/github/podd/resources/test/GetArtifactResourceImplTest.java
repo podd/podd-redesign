@@ -16,9 +16,7 @@
  */
 package com.github.podd.resources.test;
 
-import java.io.ByteArrayInputStream;
 import java.io.StringReader;
-import java.nio.charset.StandardCharsets;
 
 import org.junit.Assert;
 import org.junit.Ignore;
@@ -77,7 +75,7 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
         }
         finally
         {
-            releaseClient(getArtifactClientResource);
+            this.releaseClient(getArtifactClientResource);
         }
     }
     
@@ -105,7 +103,7 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
         }
         finally
         {
-            releaseClient(getArtifactClientResource);
+            this.releaseClient(getArtifactClientResource);
         }
     }
     
@@ -133,7 +131,7 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
         }
         finally
         {
-            releaseClient(getArtifactClientResource);
+            this.releaseClient(getArtifactClientResource);
         }
     }
     
@@ -159,7 +157,7 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
         }
         finally
         {
-            releaseClient(getArtifactClientResource);
+            this.releaseClient(getArtifactClientResource);
         }
     }
     
@@ -183,7 +181,7 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
         }
         finally
         {
-            releaseClient(getArtifactClientResource);
+            this.releaseClient(getArtifactClientResource);
         }
     }
     
@@ -207,7 +205,7 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
                     RestletTestUtils.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null,
                             MediaType.TEXT_HTML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
             
-            final String body = getText(results);
+            final String body = this.getText(results);
             
             // verify:
             Assert.assertTrue("Page does not identify Administrator", body.contains("Administrator"));
@@ -221,7 +219,7 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
         }
         finally
         {
-            releaseClient(getArtifactClientResource);
+            this.releaseClient(getArtifactClientResource);
         }
     }
     
@@ -246,7 +244,7 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
                     RestletTestUtils.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null,
                             MediaType.TEXT_HTML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
             
-            final String body = getText(results);
+            final String body = this.getText(results);
             
             // verify:
             Assert.assertTrue("Page does not identify Administrator", body.contains("Administrator"));
@@ -273,7 +271,7 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
         }
         finally
         {
-            releaseClient(getArtifactClientResource);
+            this.releaseClient(getArtifactClientResource);
         }
         
     }
@@ -298,7 +296,7 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
                     RestletTestUtils.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null,
                             RestletUtilMediaType.APPLICATION_RDF_JSON, Status.SUCCESS_OK, this.testWithAdminPrivileges);
             
-            final String body = getText(results);
+            final String body = this.getText(results);
             
             // verify: received contents are in RDF/JSON
             // Assert.assertTrue("Result does not have @prefix", body.contains("@prefix"));
@@ -319,7 +317,7 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
         }
         finally
         {
-            releaseClient(getArtifactClientResource);
+            this.releaseClient(getArtifactClientResource);
         }
     }
     
@@ -343,7 +341,7 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
                     RestletTestUtils.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null,
                             MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
             
-            final String body = getText(results);
+            final String body = this.getText(results);
             
             // verify: received contents are in RDF
             Assert.assertTrue("Result does not have RDF", body.contains("<rdf:RDF"));
@@ -365,7 +363,7 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
         }
         finally
         {
-            releaseClient(getArtifactClientResource);
+            this.releaseClient(getArtifactClientResource);
         }
     }
     
@@ -389,7 +387,7 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
                     RestletTestUtils.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null,
                             MediaType.APPLICATION_RDF_TURTLE, Status.SUCCESS_OK, this.testWithAdminPrivileges);
             
-            final String body = getText(results).trim();
+            final String body = this.getText(results).trim();
             
             // verify: received contents are in Turtle
             Assert.assertTrue("Turtle result did not have namespaces", body.contains("@prefix"));
@@ -411,7 +409,7 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
         }
         finally
         {
-            releaseClient(getArtifactClientResource);
+            this.releaseClient(getArtifactClientResource);
         }
     }
     
@@ -438,7 +436,7 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
                     RestletTestUtils.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null,
                             MediaType.TEXT_HTML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
             
-            final String body = getText(results);
+            final String body = this.getText(results);
             
             // verify:
             Assert.assertTrue("Page does not identify Administrator", body.contains("Administrator"));
@@ -451,7 +449,7 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
         }
         finally
         {
-            releaseClient(getArtifactClientResource);
+            this.releaseClient(getArtifactClientResource);
         }
     }
     
@@ -477,7 +475,7 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
                     RestletTestUtils.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null,
                             MediaType.TEXT_HTML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
             
-            final String body = getText(results);
+            final String body = this.getText(results);
             
             // verify:
             Assert.assertTrue("Page does not identify Administrator", body.contains("Administrator"));
@@ -493,92 +491,7 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
         }
         finally
         {
-            releaseClient(getArtifactClientResource);
-        }
-    }
-    
-    /**
-     * Test authenticated access to get Artifact in HTML by a non Repository Admin User
-     */
-    @Test
-    public void testGetArtifactWithProjectAdminUserHtml() throws Exception
-    {
-        // prepare: add an artifact
-        final String artifactUri = this.loadTestArtifact(TestConstants.TEST_ARTIFACT_BASIC_1_INTERNAL_OBJECT);
-        
-        this.mapUserToRole("anotherUser", PoddRoles.PROJECT_ADMIN, artifactUri);
-        
-        final ClientResource getArtifactClientResource =
-                new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_GET_BASE));
-        
-        try
-        {
-            getArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactUri);
-            
-            final Representation results =
-                    RestletTestUtils.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null,
-                            MediaType.TEXT_HTML, Status.SUCCESS_OK, this.testNoAdminPrivileges);
-            
-            final String body = getText(results);
-            
-            // verify:
-            Assert.assertFalse("Page contained a 404 error", body.contains("ERROR: 404"));
-            
-            Assert.assertTrue("Missing: Project Details", body.contains("Project Details"));
-            Assert.assertTrue("Missng: ANZSRC FOR Code", body.contains("ANZSRC FOR Code:"));
-            Assert.assertTrue("Missng: Project#2012...", body.contains("Project#2012-0006_ Cotton Leaf Morphology"));
-            Assert.assertTrue("Missing: Edit Participants button", body.contains("Edit Participants"));
-            Assert.assertTrue("Missing: Add Child Object button", body.contains("Add Child Object"));
-            Assert.assertTrue("Missing: Delete Project button", body.contains("id=\"deleteProject\""));
-            
-            this.assertFreemarker(body);
-        }
-        finally
-        {
-            releaseClient(getArtifactClientResource);
-        }
-    }
-    
-    /**
-     * Test authenticated access to get Artifact in HTML by a non Repository Admin User
-     */
-    @Test
-    public void testGetArtifactWithProjectObserverUserHtml() throws Exception
-    {
-        // prepare: add an artifact
-        final String artifactUri = this.loadTestArtifact(TestConstants.TEST_ARTIFACT_BASIC_1_INTERNAL_OBJECT);
-        
-        this.mapUserToRole("anotherUser", PoddRoles.PROJECT_OBSERVER, artifactUri);
-        
-        final ClientResource getArtifactClientResource =
-                new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_GET_BASE));
-        
-        try
-        {
-            getArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactUri);
-            
-            final Representation results =
-                    RestletTestUtils.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null,
-                            MediaType.TEXT_HTML, Status.SUCCESS_OK, this.testNoAdminPrivileges);
-            
-            final String body = getText(results);
-            
-            // verify:
-            Assert.assertFalse("Page contained a 404 error", body.contains("ERROR: 404"));
-            
-            Assert.assertTrue("Missing: Project Details", body.contains("Project Details"));
-            Assert.assertTrue("Missng: ANZSRC FOR Code", body.contains("ANZSRC FOR Code:"));
-            Assert.assertTrue("Missng: Project#2012...", body.contains("Project#2012-0006_ Cotton Leaf Morphology"));
-            
-            Assert.assertFalse("Edit Participants button should NOT be present", body.contains("Edit Participants"));
-            Assert.assertFalse("Add Child Object button should NOT be present", body.contains("Add Child Object"));
-            Assert.assertFalse("Delete button should NOT be present", body.contains("id=\"deleteObject\""));
-            
-            this.assertFreemarker(body);
-        }
-        finally
-        {
-            releaseClient(getArtifactClientResource);
+            this.releaseClient(getArtifactClientResource);
         }
     }
     
@@ -604,7 +517,7 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
                     RestletTestUtils.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null,
                             MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK, this.testNoAdminPrivileges);
             
-            final String body = getText(results);
+            final String body = this.getText(results);
             
             // verify: received contents are in RDF
             Assert.assertTrue("Result does not have RDF", body.contains("<rdf:RDF"));
@@ -626,7 +539,92 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
         }
         finally
         {
-            releaseClient(getArtifactClientResource);
+            this.releaseClient(getArtifactClientResource);
+        }
+    }
+    
+    /**
+     * Test authenticated access to get Artifact in HTML by a non Repository Admin User
+     */
+    @Test
+    public void testGetArtifactWithProjectAdminUserHtml() throws Exception
+    {
+        // prepare: add an artifact
+        final String artifactUri = this.loadTestArtifact(TestConstants.TEST_ARTIFACT_BASIC_1_INTERNAL_OBJECT);
+        
+        this.mapUserToRole("anotherUser", PoddRoles.PROJECT_ADMIN, artifactUri);
+        
+        final ClientResource getArtifactClientResource =
+                new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_GET_BASE));
+        
+        try
+        {
+            getArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactUri);
+            
+            final Representation results =
+                    RestletTestUtils.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null,
+                            MediaType.TEXT_HTML, Status.SUCCESS_OK, this.testNoAdminPrivileges);
+            
+            final String body = this.getText(results);
+            
+            // verify:
+            Assert.assertFalse("Page contained a 404 error", body.contains("ERROR: 404"));
+            
+            Assert.assertTrue("Missing: Project Details", body.contains("Project Details"));
+            Assert.assertTrue("Missng: ANZSRC FOR Code", body.contains("ANZSRC FOR Code:"));
+            Assert.assertTrue("Missng: Project#2012...", body.contains("Project#2012-0006_ Cotton Leaf Morphology"));
+            Assert.assertTrue("Missing: Edit Participants button", body.contains("Edit Participants"));
+            Assert.assertTrue("Missing: Add Child Object button", body.contains("Add Child Object"));
+            Assert.assertTrue("Missing: Delete Project button", body.contains("id=\"deleteProject\""));
+            
+            this.assertFreemarker(body);
+        }
+        finally
+        {
+            this.releaseClient(getArtifactClientResource);
+        }
+    }
+    
+    /**
+     * Test authenticated access to get Artifact in HTML by a non Repository Admin User
+     */
+    @Test
+    public void testGetArtifactWithProjectObserverUserHtml() throws Exception
+    {
+        // prepare: add an artifact
+        final String artifactUri = this.loadTestArtifact(TestConstants.TEST_ARTIFACT_BASIC_1_INTERNAL_OBJECT);
+        
+        this.mapUserToRole("anotherUser", PoddRoles.PROJECT_OBSERVER, artifactUri);
+        
+        final ClientResource getArtifactClientResource =
+                new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_GET_BASE));
+        
+        try
+        {
+            getArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactUri);
+            
+            final Representation results =
+                    RestletTestUtils.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null,
+                            MediaType.TEXT_HTML, Status.SUCCESS_OK, this.testNoAdminPrivileges);
+            
+            final String body = this.getText(results);
+            
+            // verify:
+            Assert.assertFalse("Page contained a 404 error", body.contains("ERROR: 404"));
+            
+            Assert.assertTrue("Missing: Project Details", body.contains("Project Details"));
+            Assert.assertTrue("Missng: ANZSRC FOR Code", body.contains("ANZSRC FOR Code:"));
+            Assert.assertTrue("Missng: Project#2012...", body.contains("Project#2012-0006_ Cotton Leaf Morphology"));
+            
+            Assert.assertFalse("Edit Participants button should NOT be present", body.contains("Edit Participants"));
+            Assert.assertFalse("Add Child Object button should NOT be present", body.contains("Add Child Object"));
+            Assert.assertFalse("Delete button should NOT be present", body.contains("id=\"deleteObject\""));
+            
+            this.assertFreemarker(body);
+        }
+        finally
+        {
+            this.releaseClient(getArtifactClientResource);
         }
     }
     

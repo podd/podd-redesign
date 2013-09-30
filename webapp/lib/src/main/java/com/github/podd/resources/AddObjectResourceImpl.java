@@ -29,8 +29,6 @@ import org.restlet.resource.Get;
 import org.restlet.resource.Post;
 import org.restlet.resource.ResourceException;
 import org.semanticweb.owlapi.model.IRI;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.github.podd.exception.UnmanagedArtifactIRIException;
 import com.github.podd.exception.UnmanagedSchemaIRIException;

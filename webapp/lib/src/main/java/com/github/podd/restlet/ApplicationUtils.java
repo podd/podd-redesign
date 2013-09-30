@@ -48,7 +48,6 @@ import org.restlet.security.ChallengeAuthenticator;
 import org.restlet.security.LocalVerifier;
 import org.restlet.security.Realm;
 import org.restlet.security.Role;
-import org.restlet.security.User;
 import org.semanticweb.owlapi.model.OWLException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.OWLOntologyManagerFactoryRegistry;
@@ -209,7 +208,7 @@ public class ApplicationUtils
         return result;
     }
     
-    public static Repository getNewRepository(PropertyUtil props) throws RepositoryException
+    public static Repository getNewRepository(final PropertyUtil props) throws RepositoryException
     {
         final String repositoryUrl =
                 props.get(PoddWebConstants.PROPERTY_SESAME_URL, PoddWebConstants.DEFAULT_SESAME_URL);
@@ -408,7 +407,7 @@ public class ApplicationUtils
         // Check if there is a current admin, and only add our test admin user if there is no admin
         // in the system
         boolean foundCurrentAdmin = false;
-        for(RestletUtilUser nextUser : nextRealm.getUsers())
+        for(final RestletUtilUser nextUser : nextRealm.getUsers())
         {
             if(nextRealm.findRoles(nextUser).contains(PoddRoles.ADMIN.getRole()))
             {
@@ -420,10 +419,10 @@ public class ApplicationUtils
         if(!foundCurrentAdmin)
         {
             final URI testAdminUserHomePage = PoddRdfConstants.VF.createURI("http://www.example.com/testAdmin");
-            String username =
+            final String username =
                     props.get(PoddWebConstants.PROPERTY_INITIAL_ADMIN_USERNAME,
                             PoddWebConstants.DEFAULT_INITIAL_ADMIN_USERNAME);
-            char[] password =
+            final char[] password =
                     props.get(PoddWebConstants.PROPERTY_INITIAL_ADMIN_PASSWORD,
                             PoddWebConstants.DEFAULT_INITIAL_ADMIN_PASSWORD).toCharArray();
             final PoddUser testAdminUser =

@@ -16,9 +16,7 @@
  */
 package com.github.podd.resources.test;
 
-import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
@@ -34,7 +32,6 @@ import org.openrdf.model.Resource;
 import org.openrdf.model.vocabulary.RDF;
 import org.openrdf.model.vocabulary.RDFS;
 import org.openrdf.rio.RDFFormat;
-import org.openrdf.rio.Rio;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Status;
@@ -86,7 +83,7 @@ public class UploadArtifactResourceImplTest extends AbstractResourceImplTest
             // verify: error details
             Assert.assertEquals("Not the expected HTTP status code", Status.SERVER_ERROR_INTERNAL, e.getStatus());
             
-            final Model model = assertRdf(uploadArtifactClientResource.getResponseEntity(), responseFormat, 13);
+            final Model model = this.assertRdf(uploadArtifactClientResource.getResponseEntity(), responseFormat, 13);
             
             final Set<Resource> errors = model.filter(null, RDF.TYPE, PoddRdfConstants.ERR_TYPE_TOP_ERROR).subjects();
             Assert.assertEquals("Not the expected number of Errors", 1, errors.size());
@@ -113,7 +110,7 @@ public class UploadArtifactResourceImplTest extends AbstractResourceImplTest
         }
         finally
         {
-            releaseClient(uploadArtifactClientResource);
+            this.releaseClient(uploadArtifactClientResource);
         }
     }
     
@@ -144,7 +141,7 @@ public class UploadArtifactResourceImplTest extends AbstractResourceImplTest
             // verify: error details
             Assert.assertEquals("Not the expected HTTP status code", Status.SERVER_ERROR_INTERNAL, e.getStatus());
             
-            final Model model = assertRdf(uploadArtifactClientResource.getResponseEntity(), responseFormat, 18);
+            final Model model = this.assertRdf(uploadArtifactClientResource.getResponseEntity(), responseFormat, 18);
             
             final Set<Resource> errors = model.filter(null, RDF.TYPE, PoddRdfConstants.ERR_TYPE_TOP_ERROR).subjects();
             Assert.assertEquals("Not the expected number of Errors", 1, errors.size());
@@ -174,7 +171,7 @@ public class UploadArtifactResourceImplTest extends AbstractResourceImplTest
         }
         finally
         {
-            releaseClient(uploadArtifactClientResource);
+            this.releaseClient(uploadArtifactClientResource);
         }
     }
     
@@ -206,7 +203,7 @@ public class UploadArtifactResourceImplTest extends AbstractResourceImplTest
         }
         finally
         {
-            releaseClient(uploadArtifactClientResource);
+            this.releaseClient(uploadArtifactClientResource);
         }
     }
     
@@ -234,7 +231,7 @@ public class UploadArtifactResourceImplTest extends AbstractResourceImplTest
         }
         finally
         {
-            releaseClient(uploadArtifactClientResource);
+            this.releaseClient(uploadArtifactClientResource);
         }
     }
     
@@ -254,7 +251,7 @@ public class UploadArtifactResourceImplTest extends AbstractResourceImplTest
                     RestletTestUtils.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null,
                             MediaType.TEXT_HTML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
             
-            final String body = getText(results);
+            final String body = this.getText(results);
             Assert.assertTrue(body.contains("Upload new artifact"));
             Assert.assertTrue(body.contains("type=\"file\""));
             
@@ -262,7 +259,7 @@ public class UploadArtifactResourceImplTest extends AbstractResourceImplTest
         }
         finally
         {
-            releaseClient(getArtifactClientResource);
+            this.releaseClient(getArtifactClientResource);
         }
     }
     
@@ -326,7 +323,7 @@ public class UploadArtifactResourceImplTest extends AbstractResourceImplTest
                                                     UploadArtifactResourceImplTest.this.testWithAdminPrivileges);
                                     
                                     // verify: results (expecting the added artifact's ontology IRI)
-                                    final String body = getText(results);
+                                    final String body = UploadArtifactResourceImplTest.this.getText(results);
                                     
                                     final Collection<InferredOWLOntologyID> ontologyIDs =
                                             OntologyUtils.stringToOntologyID(body, RDFFormat.RDFXML);
@@ -339,7 +336,7 @@ public class UploadArtifactResourceImplTest extends AbstractResourceImplTest
                                 }
                                 finally
                                 {
-                                    releaseClient(uploadArtifactClientResource);
+                                    UploadArtifactResourceImplTest.this.releaseClient(uploadArtifactClientResource);
                                 }
                             }
                             threadSuccessCount.incrementAndGet();
@@ -397,13 +394,13 @@ public class UploadArtifactResourceImplTest extends AbstractResourceImplTest
                             MediaType.TEXT_HTML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
             
             // TODO: verify results once a proper success page is incorporated.
-            final String body = getText(results);
+            final String body = this.getText(results);
             Assert.assertTrue(body.contains("Project successfully uploaded"));
             this.assertFreemarker(body);
         }
         finally
         {
-            releaseClient(uploadArtifactClientResource);
+            this.releaseClient(uploadArtifactClientResource);
         }
     }
     
@@ -427,14 +424,14 @@ public class UploadArtifactResourceImplTest extends AbstractResourceImplTest
                             MediaType.TEXT_PLAIN, Status.SUCCESS_OK, this.testWithAdminPrivileges);
             
             // verify: results (expecting the added artifact's ontology IRI)
-            final String body = getText(results);
+            final String body = this.getText(results);
             Assert.assertTrue(body.contains("http://"));
             Assert.assertFalse(body.contains("html"));
             Assert.assertFalse(body.contains("\n"));
         }
         finally
         {
-            releaseClient(uploadArtifactClientResource);
+            this.releaseClient(uploadArtifactClientResource);
         }
     }
     
@@ -463,14 +460,14 @@ public class UploadArtifactResourceImplTest extends AbstractResourceImplTest
                             MediaType.TEXT_PLAIN, Status.SUCCESS_OK, this.testWithAdminPrivileges);
             
             // verify: results (expecting the added artifact's ontology IRI)
-            final String body = getText(results);
+            final String body = this.getText(results);
             Assert.assertTrue(body.contains("http://"));
             Assert.assertFalse(body.contains("html"));
             Assert.assertFalse(body.contains("\n"));
         }
         finally
         {
-            releaseClient(uploadArtifactClientResource);
+            this.releaseClient(uploadArtifactClientResource);
         }
     }
     
@@ -495,7 +492,7 @@ public class UploadArtifactResourceImplTest extends AbstractResourceImplTest
                             MediaType.APPLICATION_RDF_TURTLE, Status.SUCCESS_OK, this.testWithAdminPrivileges);
             
             // verify: results (expecting the added artifact's ontology IRI)
-            final String body = getText(results);
+            final String body = this.getText(results);
             
             final Collection<InferredOWLOntologyID> ontologyIDs =
                     OntologyUtils.stringToOntologyID(body, RDFFormat.TURTLE);
@@ -507,7 +504,7 @@ public class UploadArtifactResourceImplTest extends AbstractResourceImplTest
         }
         finally
         {
-            releaseClient(uploadArtifactClientResource);
+            this.releaseClient(uploadArtifactClientResource);
         }
     }
     

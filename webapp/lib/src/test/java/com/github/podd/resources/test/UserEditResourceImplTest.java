@@ -16,10 +16,8 @@
  */
 package com.github.podd.resources.test;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.StringWriter;
-import java.nio.charset.StandardCharsets;
 import java.util.AbstractMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -73,7 +71,7 @@ public class UserEditResourceImplTest extends AbstractResourceImplTest
                     RestletTestUtils.doTestAuthenticatedRequest(userEditClientResource, Method.GET, null,
                             MediaType.TEXT_HTML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
             
-            final String body = getText(results);
+            final String body = this.getText(results);
             System.out.println(body);
             this.assertFreemarker(body);
             
@@ -86,7 +84,7 @@ public class UserEditResourceImplTest extends AbstractResourceImplTest
         }
         finally
         {
-            releaseClient(userEditClientResource);
+            this.releaseClient(userEditClientResource);
         }
     }
     
@@ -176,17 +174,17 @@ public class UserEditResourceImplTest extends AbstractResourceImplTest
                 }
                 finally
                 {
-                    releaseClient(userDetailsClientResource2);
+                    this.releaseClient(userDetailsClientResource2);
                 }
             }
             finally
             {
-                releaseClient(userEditClientResource);
+                this.releaseClient(userEditClientResource);
             }
         }
         finally
         {
-            releaseClient(userDetailsClientResource);
+            this.releaseClient(userDetailsClientResource);
         }
         
     }
@@ -224,7 +222,7 @@ public class UserEditResourceImplTest extends AbstractResourceImplTest
                     RestletTestUtils.doTestAuthenticatedRequest(userEditClientResource, Method.GET, null,
                             MediaType.TEXT_HTML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
             
-            final String body = getText(results);
+            final String body = this.getText(results);
             // System.out.println(body);
             this.assertFreemarker(body);
             
@@ -241,7 +239,7 @@ public class UserEditResourceImplTest extends AbstractResourceImplTest
         }
         finally
         {
-            releaseClient(userEditClientResource);
+            this.releaseClient(userEditClientResource);
         }
     }
     
@@ -343,17 +341,17 @@ public class UserEditResourceImplTest extends AbstractResourceImplTest
                 }
                 finally
                 {
-                    releaseClient(userDetailsClientResource2);
+                    this.releaseClient(userDetailsClientResource2);
                 }
             }
             finally
             {
-                releaseClient(userEditClientResource);
+                this.releaseClient(userEditClientResource);
             }
         }
         finally
         {
-            releaseClient(userDetailsClientResource);
+            this.releaseClient(userDetailsClientResource);
         }
     }
     
@@ -415,12 +413,12 @@ public class UserEditResourceImplTest extends AbstractResourceImplTest
             }
             finally
             {
-                releaseClient(userDetailsClientResource2);
+                this.releaseClient(userDetailsClientResource2);
             }
         }
         finally
         {
-            releaseClient(userEditClientResource);
+            this.releaseClient(userEditClientResource);
         }
     }
     
@@ -451,7 +449,7 @@ public class UserEditResourceImplTest extends AbstractResourceImplTest
         }
         finally
         {
-            releaseClient(userEditClientResource);
+            this.releaseClient(userEditClientResource);
         }
     }
     
@@ -477,7 +475,7 @@ public class UserEditResourceImplTest extends AbstractResourceImplTest
         }
         finally
         {
-            releaseClient(userEditClientResource);
+            this.releaseClient(userEditClientResource);
         }
     }
     
@@ -549,12 +547,12 @@ public class UserEditResourceImplTest extends AbstractResourceImplTest
             }
             finally
             {
-                releaseClient(userEditClientResource);
+                this.releaseClient(userEditClientResource);
             }
         }
         finally
         {
-            releaseClient(userDetailsClientResource);
+            this.releaseClient(userDetailsClientResource);
         }
     }
 }

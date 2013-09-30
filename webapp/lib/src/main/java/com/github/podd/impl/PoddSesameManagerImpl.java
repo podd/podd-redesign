@@ -38,7 +38,6 @@ import org.openrdf.model.URI;
 import org.openrdf.model.Value;
 import org.openrdf.model.impl.LinkedHashModel;
 import org.openrdf.model.impl.LiteralImpl;
-import org.openrdf.model.impl.ValueFactoryImpl;
 import org.openrdf.model.vocabulary.OWL;
 import org.openrdf.model.vocabulary.RDF;
 import org.openrdf.model.vocabulary.RDFS;
@@ -53,9 +52,7 @@ import org.openrdf.query.impl.DatasetImpl;
 import org.openrdf.query.resultio.helpers.QueryResultCollector;
 import org.openrdf.queryrender.RenderUtils;
 import org.openrdf.repository.RepositoryConnection;
-import org.openrdf.repository.RepositoryResult;
 import org.semanticweb.owlapi.model.IRI;
-import org.semanticweb.owlapi.model.OWLOntologyID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -63,7 +60,6 @@ import com.github.podd.api.MetadataPolicy;
 import com.github.podd.api.PoddSesameManager;
 import com.github.podd.exception.UnmanagedArtifactIRIException;
 import com.github.podd.exception.UnmanagedSchemaIRIException;
-import com.github.podd.utils.DebugUtils;
 import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.PoddObjectLabel;
 import com.github.podd.utils.PoddObjectLabelImpl;
@@ -162,7 +158,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
     public Model fillMissingLabels(final Model inputModel, final RepositoryConnection repositoryConnection,
             final URI... contexts) throws OpenRDFException
     {
-        Set<URI> missingLabelUris = new LinkedHashSet<>();
+        final Set<URI> missingLabelUris = new LinkedHashSet<>();
         for(final Statement statement : inputModel)
         {
             if(statement.getSubject() instanceof URI
@@ -191,7 +187,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         graphQuery.append("}");
         
         graphQuery.append(" VALUES (?subject) { ");
-        for(URI nextMissingLabelUri : missingLabelUris)
+        for(final URI nextMissingLabelUri : missingLabelUris)
         {
             graphQuery.append(" ( ");
             graphQuery.append(RenderUtils.getSPARQLQueryString(nextMissingLabelUri));
@@ -205,14 +201,6 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         this.log.debug("Created SPARQL {}.", graphQuery);
         
         return RdfUtility.executeGraphQuery(rdfsGraphQuery, contexts);
-    }
-    
-    @Override
-    public List<InferredOWLOntologyID> getAllOntologyVersions(final IRI ontologyIRI,
-            final RepositoryConnection repositoryConnection, final URI ontologyManagementGraph) throws OpenRDFException
-    {
-        // FIXME: This implementation doesn't seem correct. Verify with tests.
-        return this.getCurrentVersionsInternal(ontologyIRI, repositoryConnection, ontologyManagementGraph);
     }
     
     @Override
@@ -245,6 +233,14 @@ public class PoddSesameManagerImpl implements PoddSesameManager
                     .create(nextInferredIRI)));
         }
         return returnList;
+    }
+    
+    @Override
+    public List<InferredOWLOntologyID> getAllOntologyVersions(final IRI ontologyIRI,
+            final RepositoryConnection repositoryConnection, final URI ontologyManagementGraph) throws OpenRDFException
+    {
+        // FIXME: This implementation doesn't seem correct. Verify with tests.
+        return this.getCurrentVersionsInternal(ontologyIRI, repositoryConnection, ontologyManagementGraph);
     }
     
     @Override
@@ -397,7 +393,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         {
             sb.append(" VALUES (?propertyUri) { ");
             
-            for(URI nextProperty : propertyUris)
+            for(final URI nextProperty : propertyUris)
             {
                 sb.append(" ( ");
                 sb.append(RenderUtils.getSPARQLQueryString(nextProperty));
@@ -426,10 +422,10 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         
         for(final BindingSet next : queryResults.getBindingSets())
         {
-            Value nextProperty = next.getValue("propertyUri");
+            final Value nextProperty = next.getValue("propertyUri");
             if(nextProperty instanceof URI)
             {
-                URI nextPropertyURI = (URI)nextProperty;
+                final URI nextPropertyURI = (URI)nextProperty;
                 URI nextCardinality = PoddRdfConstants.PODD_BASE_CARDINALITY_ZERO_OR_MANY;
                 
                 final Value qualifiedCardinalityValue = next.getValue("qualifiedCardinality");
@@ -462,18 +458,18 @@ public class PoddSesameManagerImpl implements PoddSesameManager
                     nextCardinality = PoddRdfConstants.PODD_BASE_CARDINALITY_ONE_OR_MANY;
                 }
                 
-                URI putIfAbsent = resultMap.putIfAbsent(nextPropertyURI, nextCardinality);
+                final URI putIfAbsent = resultMap.putIfAbsent(nextPropertyURI, nextCardinality);
                 
                 if(putIfAbsent != null && !nextCardinality.equals(putIfAbsent))
                 {
-                    log.warn(
+                    this.log.warn(
                             "Found duplicate cardinality constraints for {} : original constraint : {} ignored constraint {}",
                             nextPropertyURI, putIfAbsent, nextCardinality);
                 }
             }
             else
             {
-                log.warn("Property was not bound to a URI: {}", nextProperty);
+                this.log.warn("Property was not bound to a URI: {}", nextProperty);
             }
         }
         
@@ -746,7 +742,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         
         instanceQuery.append(" VALUES (?rangeClass) { ");
         
-        for(URI nextRangeType : nextRangeTypes)
+        for(final URI nextRangeType : nextRangeTypes)
         {
             instanceQuery.append(" ( ");
             instanceQuery.append(RenderUtils.getSPARQLQueryString(nextRangeType));
@@ -1022,7 +1018,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
                         // Add warning... If we need to support blank nodes here we will need to
                         // switch to a different type of query, as SPARQL-1.1 VALUES doesn't support
                         // blank nodes
-                        log.warn("FIXME: restriction pointed to a non-URI property or allvaluesfrom : {} {} {}",
+                        this.log.warn("FIXME: restriction pointed to a non-URI property or allvaluesfrom : {} {} {}",
                                 onProperty, onRange, objectType);
                     }
                 }
@@ -1063,7 +1059,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         {
             this.log.info("Object type <{}> does not exist", objectType);
             return results;
-        }        
+        }
         
         // - identify it as an owl:Class
         results.add(objectType, RDF.TYPE, OWL.CLASS);
@@ -1208,7 +1204,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
             {
                 annotationQuery.append(" VALUES (?annotationProperty) { ");
                 
-                for(URI nextAnnotationPropertyURI : commonAnnotationProperties)
+                for(final URI nextAnnotationPropertyURI : commonAnnotationProperties)
                 {
                     annotationQuery.append(" ( ");
                     annotationQuery.append(RenderUtils.getSPARQLQueryString(nextAnnotationPropertyURI));
@@ -1228,8 +1224,8 @@ public class PoddSesameManagerImpl implements PoddSesameManager
             results.addAll(annotationQueryResults);
             properties.addAll(annotationQueryResults.filter(null, OWL.ONPROPERTY, null).objects());
         }
-
-        Set<URI> propertyUris = new LinkedHashSet<>();
+        
+        final Set<URI> propertyUris = new LinkedHashSet<>();
         for(final Value property : properties)
         {
             if(property instanceof URI)
@@ -1275,7 +1271,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
             
             sb2.append(" VALUES (?propertyUri) { ");
             
-            for(URI nextProperty : propertyUris)
+            for(final URI nextProperty : propertyUris)
             {
                 sb2.append(" ( ");
                 sb2.append(RenderUtils.getSPARQLQueryString(nextProperty));
@@ -1283,7 +1279,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
             }
             sb2.append(" } ");
             
-            String sb2String = sb2.toString();
+            final String sb2String = sb2.toString();
             
             final GraphQuery graphQuery2 = repositoryConnection.prepareGraphQuery(QueryLanguage.SPARQL, sb2String);
             final Model queryResults2 = RdfUtility.executeGraphQuery(graphQuery2, contexts);
@@ -1293,7 +1289,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         // - add cardinality value
         final Map<URI, URI> cardinalityValues =
                 this.getCardinalityValues(objectType, propertyUris, true, repositoryConnection, contexts);
-        for(URI nextProperty : propertyUris)
+        for(final URI nextProperty : propertyUris)
         {
             URI cardinalityValue = null;
             
@@ -1304,18 +1300,18 @@ public class PoddSesameManagerImpl implements PoddSesameManager
             
             if(cardinalityValue != null)
             {
-                results.add((URI)nextProperty, PoddRdfConstants.PODD_BASE_HAS_CARDINALITY, cardinalityValue);
+                results.add(nextProperty, PoddRdfConstants.PODD_BASE_HAS_CARDINALITY, cardinalityValue);
             }
             else if(nextProperty.equals(RDFS.LABEL))
             {
-                results.add((URI)nextProperty, PoddRdfConstants.PODD_BASE_HAS_CARDINALITY,
+                results.add(nextProperty, PoddRdfConstants.PODD_BASE_HAS_CARDINALITY,
                         PoddRdfConstants.PODD_BASE_CARDINALITY_EXACTLY_ONE);
             }
         }
         
-        Collection<URI> nextRangeTypeURIs = new LinkedHashSet<>();
+        final Collection<URI> nextRangeTypeURIs = new LinkedHashSet<>();
         
-        for(URI property : propertyUris)
+        for(final URI property : propertyUris)
         {
             // - find property: type (e.g. object/datatype/annotation), label, display-type,
             // weight
@@ -1349,7 +1345,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
                         }
                         else
                         {
-                            log.warn("Restriction was on a class that did not have a URI: property={}", property);
+                            this.log.warn("Restriction was on a class that did not have a URI: property={}", property);
                         }
                     }
                 }
@@ -1357,7 +1353,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         }
         
         results.addAll(this.getInstancesOf(nextRangeTypeURIs, repositoryConnection, contexts));
-
+        
         return results;
     }
     

@@ -42,8 +42,6 @@ import org.restlet.resource.ResourceException;
 import org.restlet.security.User;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.github.podd.api.DanglingObjectPolicy;
 import com.github.podd.api.DataReferenceVerificationPolicy;
@@ -256,8 +254,8 @@ public class EditArtifactResourceImpl extends AbstractPoddResourceImpl
             }
             // TODO: handle case where more than 1 type is found
             dataModel.put("objectType", objectTypes.get(0));
-
-            if (objectToEdit == null)
+            
+            if(objectToEdit == null)
             {
                 dataModel.put("title", "Edit Project Object");
             }

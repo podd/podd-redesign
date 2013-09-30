@@ -101,7 +101,7 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
             throw new PoddRuntimeException("Ontology IRI and Version IRI cannot be null");
         }
         
-        InferredOWLOntologyID schemaOntologyID = this.getSchemaOntologyID(ontologyId);
+        final InferredOWLOntologyID schemaOntologyID = this.getSchemaOntologyID(ontologyId);
         
         if(includeInferred && schemaOntologyID.getInferredOntologyIRI() == null)
         {
@@ -127,11 +127,11 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
         {
             connection = this.repositoryManager.getRepository().getConnection();
             
-            RepositoryResult<Statement> statements =
+            final RepositoryResult<Statement> statements =
                     connection.getStatements(null, null, null, includeInferred, contexts.toArray(new Resource[] {}));
-            Model model = new LinkedHashModel(Iterations.asList(statements));
-            RepositoryResult<Namespace> namespaces = connection.getNamespaces();
-            for(Namespace nextNs : Iterations.asSet(namespaces))
+            final Model model = new LinkedHashModel(Iterations.asList(statements));
+            final RepositoryResult<Namespace> namespaces = connection.getNamespaces();
+            for(final Namespace nextNs : Iterations.asSet(namespaces))
             {
                 model.setNamespace(nextNs);
             }

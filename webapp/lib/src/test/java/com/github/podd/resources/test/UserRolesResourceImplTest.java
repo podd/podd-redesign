@@ -16,9 +16,7 @@
  */
 package com.github.podd.resources.test;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.nio.charset.StandardCharsets;
 import java.util.AbstractMap;
 import java.util.Collection;
 import java.util.LinkedList;
@@ -150,12 +148,12 @@ public class UserRolesResourceImplTest extends AbstractResourceImplTest
             }
             finally
             {
-                releaseClient(userDetailsClientResource);
+                this.releaseClient(userDetailsClientResource);
             }
         }
         finally
         {
-            releaseClient(userRolesClientResource);
+            this.releaseClient(userRolesClientResource);
         }
     }
     
@@ -239,12 +237,12 @@ public class UserRolesResourceImplTest extends AbstractResourceImplTest
             }
             finally
             {
-                releaseClient(userDetailsClientResource);
+                this.releaseClient(userDetailsClientResource);
             }
         }
         finally
         {
-            releaseClient(userRolesClientResource);
+            this.releaseClient(userRolesClientResource);
         }
     }
     
@@ -337,12 +335,12 @@ public class UserRolesResourceImplTest extends AbstractResourceImplTest
             }
             finally
             {
-                releaseClient(userDetailsClientResource);
+                this.releaseClient(userDetailsClientResource);
             }
         }
         finally
         {
-            releaseClient(userRolesClientResource);
+            this.releaseClient(userRolesClientResource);
         }
     }
     
@@ -405,7 +403,7 @@ public class UserRolesResourceImplTest extends AbstractResourceImplTest
         }
         finally
         {
-            releaseClient(userRolesClientResource);
+            this.releaseClient(userRolesClientResource);
         }
         
         // verify: No change to Roles
@@ -431,7 +429,7 @@ public class UserRolesResourceImplTest extends AbstractResourceImplTest
         }
         finally
         {
-            releaseClient(userDetailsClientResource);
+            this.releaseClient(userDetailsClientResource);
         }
     }
     
@@ -453,7 +451,7 @@ public class UserRolesResourceImplTest extends AbstractResourceImplTest
         }
         finally
         {
-            releaseClient(userRolesClientResource);
+            this.releaseClient(userRolesClientResource);
         }
     }
     
@@ -500,7 +498,7 @@ public class UserRolesResourceImplTest extends AbstractResourceImplTest
         }
         finally
         {
-            releaseClient(userRolesClientResource);
+            this.releaseClient(userRolesClientResource);
         }
     }
     

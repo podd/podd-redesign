@@ -16,9 +16,7 @@
  */
 package com.github.podd.resources.test;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -46,7 +44,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.rules.TemporaryFolder;
-import org.junit.rules.Timeout;
 import org.openrdf.model.Model;
 import org.openrdf.model.Resource;
 import org.openrdf.model.URI;
@@ -212,12 +209,6 @@ public class AbstractResourceImplTest
         return this.assertRdf(new InputStreamReader(inputStream), format, expectedStatements);
     }
     
-    protected Model assertRdf(final Representation representation, final RDFFormat format, final int expectedStatements)
-        throws RDFParseException, RDFHandlerException, IOException
-    {
-        return this.assertRdf(new StringReader(getText(representation)), format, expectedStatements);
-    }
-    
     /**
      * Utility method to verify that RDF documents can be parsed and the resulting number of
      * statements is as expected.
@@ -245,6 +236,12 @@ public class AbstractResourceImplTest
         Assert.assertEquals("Unexpected number of statements", expectedStatements, model.size());
         
         return model;
+    }
+    
+    protected Model assertRdf(final Representation representation, final RDFFormat format, final int expectedStatements)
+        throws RDFParseException, RDFHandlerException, IOException
+    {
+        return this.assertRdf(new StringReader(this.getText(representation)), format, expectedStatements);
     }
     
     /**
@@ -293,11 +290,11 @@ public class AbstractResourceImplTest
                     RestletTestUtils.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null, mediaType,
                             Status.SUCCESS_OK, this.testWithAdminPrivileges);
             
-            return getText(results);
+            return this.getText(results);
         }
         finally
         {
-            releaseClient(getArtifactClientResource);
+            this.releaseClient(getArtifactClientResource);
         }
     }
     
@@ -315,6 +312,27 @@ public class AbstractResourceImplTest
                 IOUtils.toString(this.getClass().getResourceAsStream("/test/test-alias.ttl"), StandardCharsets.UTF_8);
         
         return Rio.parse(new StringReader(configuration), "", RDFFormat.TURTLE);
+    }
+    
+    protected String getText(final Representation representation) throws IOException
+    {
+        final StringWriter result = new StringWriter();
+        try
+        {
+            IOUtils.copy(representation.getStream(), result, StandardCharsets.UTF_8);
+        }
+        finally
+        {
+            try
+            {
+                representation.exhaust();
+            }
+            finally
+            {
+                representation.release();
+            }
+        }
+        return result.toString();
     }
     
     /**
@@ -371,7 +389,7 @@ public class AbstractResourceImplTest
             final Representation results =
                     RestletTestUtils.doTestAuthenticatedRequest(uploadArtifactClientResource, Method.POST, input,
                             MediaType.APPLICATION_RDF_TURTLE, Status.SUCCESS_OK, this.testWithAdminPrivileges);
-            String body = getText(results);
+            final String body = this.getText(results);
             // this.log.info(body);
             this.assertFreemarker(body);
             
@@ -383,38 +401,8 @@ public class AbstractResourceImplTest
         }
         finally
         {
-            releaseClient(uploadArtifactClientResource);
+            this.releaseClient(uploadArtifactClientResource);
         }
-    }
-    
-    protected void releaseClient(ClientResource clientResource) throws Exception
-    {
-        if(clientResource != null && clientResource.getNext() != null && clientResource.getNext() instanceof Client)
-        {
-            Client c = (Client)clientResource.getNext();
-            c.stop();
-        }
-    }
-    
-    protected String getText(Representation representation) throws IOException
-    {
-        StringWriter result = new StringWriter();
-        try
-        {
-            IOUtils.copy(representation.getStream(), result, StandardCharsets.UTF_8);
-        }
-        finally
-        {
-            try
-            {
-                representation.exhaust();
-            }
-            finally
-            {
-                representation.release();
-            }
-        }
-        return result.toString();
     }
     
     /**
@@ -525,7 +513,7 @@ public class AbstractResourceImplTest
         
         try
         {
-            StringWriter out = new StringWriter();
+            final StringWriter out = new StringWriter();
             Rio.write(userInfoModel, out, format);
             final Representation input = new StringRepresentation(out.toString(), mediaType);
             
@@ -545,7 +533,7 @@ public class AbstractResourceImplTest
         }
         finally
         {
-            releaseClient(userAddClientResource);
+            this.releaseClient(userAddClientResource);
         }
     }
     
@@ -594,7 +582,16 @@ public class AbstractResourceImplTest
         }
         finally
         {
-            releaseClient(userRolesClientResource);
+            this.releaseClient(userRolesClientResource);
+        }
+    }
+    
+    protected void releaseClient(final ClientResource clientResource) throws Exception
+    {
+        if(clientResource != null && clientResource.getNext() != null && clientResource.getNext() instanceof Client)
+        {
+            final Client c = (Client)clientResource.getNext();
+            c.stop();
         }
     }
     

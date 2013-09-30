@@ -16,8 +16,6 @@
  */
 package com.github.podd.resources.test;
 
-import java.io.ByteArrayInputStream;
-import java.nio.charset.StandardCharsets;
 import java.util.AbstractMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -77,7 +75,7 @@ public class UserDetailsResourceImplTest extends AbstractResourceImplTest
         }
         finally
         {
-            releaseClient(userDetailsClientResource);
+            this.releaseClient(userDetailsClientResource);
         }
     }
     
@@ -104,7 +102,7 @@ public class UserDetailsResourceImplTest extends AbstractResourceImplTest
         }
         finally
         {
-            releaseClient(userDetailsClientResource);
+            this.releaseClient(userDetailsClientResource);
         }
     }
     
@@ -131,7 +129,7 @@ public class UserDetailsResourceImplTest extends AbstractResourceImplTest
         }
         finally
         {
-            releaseClient(userDetailsClientResource);
+            this.releaseClient(userDetailsClientResource);
         }
     }
     
@@ -161,14 +159,14 @@ public class UserDetailsResourceImplTest extends AbstractResourceImplTest
                     RestletTestUtils.doTestAuthenticatedRequest(userDetailsClientResource, Method.GET, null,
                             MediaType.TEXT_HTML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
             
-            final String body = getText(results);
+            final String body = this.getText(results);
             Assert.assertTrue(body.contains("User Name: "));
             Assert.assertTrue(body.contains("testuser@podd.com"));
             this.assertFreemarker(body);
         }
         finally
         {
-            releaseClient(userDetailsClientResource);
+            this.releaseClient(userDetailsClientResource);
         }
     }
     
@@ -189,7 +187,7 @@ public class UserDetailsResourceImplTest extends AbstractResourceImplTest
                     RestletTestUtils.doTestAuthenticatedRequest(userDetailsClientResource, Method.GET, null,
                             MediaType.TEXT_HTML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
             
-            final String body = getText(results);
+            final String body = this.getText(results);
             Assert.assertTrue(body.contains("Personal Details"));
             Assert.assertTrue(body.contains("User Name: "));
             Assert.assertTrue(body.contains("initial.admin.user@example.com"));
@@ -197,7 +195,7 @@ public class UserDetailsResourceImplTest extends AbstractResourceImplTest
         }
         finally
         {
-            releaseClient(userDetailsClientResource);
+            this.releaseClient(userDetailsClientResource);
         }
     }
     
@@ -241,7 +239,7 @@ public class UserDetailsResourceImplTest extends AbstractResourceImplTest
         }
         finally
         {
-            releaseClient(userDetailsClientResource);
+            this.releaseClient(userDetailsClientResource);
         }
     }
     
@@ -285,7 +283,7 @@ public class UserDetailsResourceImplTest extends AbstractResourceImplTest
         }
         finally
         {
-            releaseClient(userDetailsClientResource);
+            this.releaseClient(userDetailsClientResource);
         }
     }
     

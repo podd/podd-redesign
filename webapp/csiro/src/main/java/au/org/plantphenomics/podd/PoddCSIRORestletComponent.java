@@ -130,7 +130,7 @@ public class PoddCSIRORestletComponent extends Component
         
         final String resourcesPath = PoddWebConstants.PATH_RESOURCES;
         
-        this.log.info("attaching resource handler to path={}", resourcesPath);
+        PoddCSIRORestletComponent.log.info("attaching resource handler to path={}", resourcesPath);
         
         // attach the resources first
         this.getDefaultHost().attach(resourcesPath, directory);
@@ -155,7 +155,7 @@ public class PoddCSIRORestletComponent extends Component
             throw new RuntimeException("Could not setup application", e);
         }
         
-        this.log.info("routes={}", this.getDefaultHost().getRoutes().toString());
+        PoddCSIRORestletComponent.log.info("routes={}", this.getDefaultHost().getRoutes().toString());
     }
     
 }

@@ -3,8 +3,6 @@
  */
 package com.github.podd.resources.test;
 
-import java.io.ByteArrayInputStream;
-import java.nio.charset.StandardCharsets;
 import java.util.Set;
 
 import org.junit.Assert;
@@ -22,7 +20,6 @@ import org.restlet.resource.ResourceException;
 
 import com.github.ansell.restletutils.SesameRealmConstants;
 import com.github.ansell.restletutils.test.RestletTestUtils;
-import com.github.podd.utils.DebugUtils;
 import com.github.podd.utils.PoddRdfConstants;
 import com.github.podd.utils.PoddWebConstants;
 
@@ -49,7 +46,7 @@ public class UserListResourceImplTest extends AbstractResourceImplTest
         }
         finally
         {
-            releaseClient(userListClientResource);
+            this.releaseClient(userListClientResource);
         }
     }
     
@@ -64,13 +61,13 @@ public class UserListResourceImplTest extends AbstractResourceImplTest
                     RestletTestUtils.doTestAuthenticatedRequest(userListClientResource, Method.GET, null,
                             MediaType.TEXT_HTML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
             
-            final String body = getText(results);
+            final String body = this.getText(results);
             System.out.println(body);
             this.assertFreemarker(body);
         }
         finally
         {
-            releaseClient(userListClientResource);
+            this.releaseClient(userListClientResource);
         }
     }
     
@@ -110,7 +107,7 @@ public class UserListResourceImplTest extends AbstractResourceImplTest
         }
         finally
         {
-            releaseClient(userListClientResource);
+            this.releaseClient(userListClientResource);
         }
     }
     

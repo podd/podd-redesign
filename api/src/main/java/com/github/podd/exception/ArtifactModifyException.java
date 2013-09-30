@@ -48,7 +48,8 @@ public class ArtifactModifyException extends PoddException
      * @param msg
      * @param throwable
      */
-    public ArtifactModifyException(final String msg, final Throwable throwable, final OWLOntologyID artifactId, final URI objectUri)
+    public ArtifactModifyException(final String msg, final Throwable throwable, final OWLOntologyID artifactId,
+            final URI objectUri)
     {
         super(msg, throwable);
         this.artifactId = artifactId;

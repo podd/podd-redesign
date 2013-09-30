@@ -84,7 +84,6 @@ public class PoddSchemaManagerImplTest extends AbstractPoddSchemaManagerTest
     {
         return OWLReasonerFactoryRegistry.getInstance().getReasonerFactory("Pellet");
     }
-   
     
     @Test
     public void testUploadSchemaOntologiesInOrder() throws Exception
@@ -99,27 +98,21 @@ public class PoddSchemaManagerImplTest extends AbstractPoddSchemaManagerTest
         }
         
         // prepare: order of imports
-        final String[] testImportOrderArray = {
-                "http://example.org/podd/ns/version/poddA/1", 
-                "http://example.org/podd/ns/version/poddB/2",
-                "http://example.org/podd/ns/version/poddB/1",
-                "http://example.org/podd/ns/version/poddC/3", 
-                "http://example.org/podd/ns/version/poddC/1", 
-            };
-
+        final String[] testImportOrderArray =
+                { "http://example.org/podd/ns/version/poddA/1", "http://example.org/podd/ns/version/poddB/2",
+                        "http://example.org/podd/ns/version/poddB/1", "http://example.org/podd/ns/version/poddC/3",
+                        "http://example.org/podd/ns/version/poddC/1", };
+        
         final List<URI> testImportOrder = new ArrayList<>();
-        for (final String s : testImportOrderArray)
+        for(final String s : testImportOrderArray)
         {
             testImportOrder.add(PoddRdfConstants.VF.createURI(s));
         }
         
-        
         ((PoddSchemaManagerImpl)this.testSchemaManager).uploadSchemaOntologiesInOrder(model, testImportOrder);
         
-        
         // verify: schemas successfully loaded
-        Assert.assertEquals("Expected 3 current schemas", 3, this.testSchemaManager.getCurrentSchemaOntologies()
-                .size());
+        Assert.assertEquals("Expected 3 current schemas", 3, this.testSchemaManager.getCurrentSchemaOntologies().size());
         Assert.assertEquals("Expected 5 schema ontology versions", 5, this.testSchemaManager.getSchemaOntologies()
                 .size());
     }
@@ -137,16 +130,13 @@ public class PoddSchemaManagerImplTest extends AbstractPoddSchemaManagerTest
         }
         
         // prepare: order of imports
-        final String[] testImportOrderArray = {
-                "http://example.org/podd/ns/version/poddA/1", 
-                "http://example.org/podd/ns/version/poddB/2",
-                "http://example.org/podd/ns/version/poddC/1", // needs B/1 to be loaded! 
-                "http://example.org/podd/ns/version/poddB/1",
-                "http://example.org/podd/ns/version/poddC/3", 
-            };
-
+        final String[] testImportOrderArray =
+                { "http://example.org/podd/ns/version/poddA/1", "http://example.org/podd/ns/version/poddB/2",
+                        "http://example.org/podd/ns/version/poddC/1", // needs B/1 to be loaded!
+                        "http://example.org/podd/ns/version/poddB/1", "http://example.org/podd/ns/version/poddC/3", };
+        
         final List<URI> testImportOrder = new ArrayList<>();
-        for (final String s : testImportOrderArray)
+        for(final String s : testImportOrderArray)
         {
             testImportOrder.add(PoddRdfConstants.VF.createURI(s));
         }
@@ -156,15 +146,14 @@ public class PoddSchemaManagerImplTest extends AbstractPoddSchemaManagerTest
             ((PoddSchemaManagerImpl)this.testSchemaManager).uploadSchemaOntologiesInOrder(model, testImportOrder);
             Assert.fail("Should have failed loading due to incorrect import order");
         }
-        catch (UnloadableImportException e)
+        catch(final UnloadableImportException e)
         {
             Assert.assertTrue("Not the expected error message",
                     e.getMessage().contains("http://example.org/podd/ns/version/poddB/1"));
         }
         
         // verify: schemas successfully loaded
-        Assert.assertEquals("Expected 2 current schemas", 2, this.testSchemaManager.getCurrentSchemaOntologies()
-                .size());
+        Assert.assertEquals("Expected 2 current schemas", 2, this.testSchemaManager.getCurrentSchemaOntologies().size());
         Assert.assertEquals("Expected 2 schema ontology versions", 2, this.testSchemaManager.getSchemaOntologies()
                 .size());
     }

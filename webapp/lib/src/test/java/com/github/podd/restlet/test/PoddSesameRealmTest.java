@@ -28,7 +28,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.openrdf.model.Model;
-import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.openrdf.model.Value;
 import org.openrdf.model.impl.LinkedHashModel;
@@ -76,7 +75,7 @@ public class PoddSesameRealmTest
         // PoddRdfConstants.VF.createURI("urn:oas:user:" + userId + ":" +
         // UUID.randomUUID().toString());
         // testUser.setUri(testUserUri);
-        URI addUserUri = this.testRealm.addUser(testUser);
+        final URI addUserUri = this.testRealm.addUser(testUser);
         Assert.assertNotNull("Test user was not added correctly", addUserUri);
         return testUser;
     }

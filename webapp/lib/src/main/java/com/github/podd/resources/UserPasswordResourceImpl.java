@@ -43,8 +43,6 @@ import org.restlet.security.Role;
 import org.restlet.security.SecretVerifier;
 import org.restlet.security.User;
 import org.restlet.security.Verifier;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.github.ansell.restletutils.RestletUtilUser;
 import com.github.ansell.restletutils.SesameRealmConstants;
@@ -126,7 +124,7 @@ public class UserPasswordResourceImpl extends AbstractUserResourceImpl
         this.log.info("changePasswordRdf");
         
         final String requestedUserIdentifier = this.getUserParameter();
-        PoddAction action =
+        final PoddAction action =
                 this.getAction(requestedUserIdentifier, PoddAction.OTHER_USER_EDIT, PoddAction.CURRENT_USER_EDIT);
         
         final boolean changeOwnPassword = (action == PoddAction.CURRENT_USER_EDIT);
@@ -209,7 +207,7 @@ public class UserPasswordResourceImpl extends AbstractUserResourceImpl
         this.log.info("getUserPasswordHtml");
         
         final String requestedUserIdentifier = this.getUserParameter();
-        PoddAction action =
+        final PoddAction action =
                 this.getAction(requestedUserIdentifier, PoddAction.OTHER_USER_EDIT, PoddAction.CURRENT_USER_EDIT);
         
         final boolean changeOwnPassword = (action == PoddAction.CURRENT_USER_EDIT);
@@ -235,7 +233,7 @@ public class UserPasswordResourceImpl extends AbstractUserResourceImpl
         dataModel.put("authenticatedUserIdentifier", user.getIdentifier());
         
         final PoddSesameRealm realm = ((PoddWebServiceApplication)this.getApplication()).getRealm();
-        final PoddUser poddUser = (PoddUser)realm.findUser(requestedUserIdentifier);
+        final PoddUser poddUser = realm.findUser(requestedUserIdentifier);
         
         if(poddUser == null)
         {

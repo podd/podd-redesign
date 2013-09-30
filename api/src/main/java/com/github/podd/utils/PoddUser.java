@@ -39,6 +39,102 @@ import com.github.podd.api.purl.PoddPurlProcessorPrefixes;
 public class PoddUser extends RestletUtilUser
 {
     /**
+     * Creates a PoddUser object from statements in the given {@link Model}, without setting the
+     * password.
+     * 
+     * @param model
+     * @return A PoddUser object created from the given model.
+     * @throws ResourceException
+     *             If there are errors in the process.
+     */
+    public static final PoddUser fromModel(final Model model)
+    {
+        return PoddUser.fromModel(model, false, false, false);
+    }
+    
+    /**
+     * Creates a PoddUser object from statements in the given {@link Model}.
+     * 
+     * @param model
+     * @param allowSecret
+     *            If true, the password will be searched for.
+     * @param failIfSecretFound
+     *            If true, and if allowSecret is true, will fail if secret is found.
+     * @param requireSecret
+     *            If true, and if allowSecret is true, will fail if the secret is not found.
+     * @return A PoddUser object created from the given model.
+     * @throws ResourceException
+     *             If there are errors in the process.
+     */
+    public static final PoddUser fromModel(final Model model, final boolean allowSecret,
+            final boolean failIfSecretFound, final boolean requireSecret)
+    {
+        final String identifier = model.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).objectString();
+        if(identifier == null || identifier.trim().length() == 0)
+        {
+            // FIXME: Convert this to a PoddException
+            throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "User Identifier cannot be empty");
+        }
+        char[] secret = null;
+        if(allowSecret)
+        {
+            final String password = model.filter(null, SesameRealmConstants.OAS_USERSECRET, null).objectString();
+            if(failIfSecretFound && password != null)
+            {
+                // FIXME: Convert this to a PoddException
+                throw new ResourceException(Status.CLIENT_ERROR_UNAUTHORIZED, "User Password must not be present");
+            }
+            if(requireSecret && (password == null || password.trim().length() == 0))
+            {
+                // FIXME: Convert this to a PoddException
+                throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "User Password cannot be empty");
+            }
+            if(password != null)
+            {
+                secret = password.toCharArray();
+            }
+        }
+        
+        final String firstName = model.filter(null, SesameRealmConstants.OAS_USERFIRSTNAME, null).objectString();
+        final String lastName = model.filter(null, SesameRealmConstants.OAS_USERLASTNAME, null).objectString();
+        // PODD-specific requirement. First/Last names are mandatory.
+        if(firstName == null || lastName == null)
+        {
+            // FIXME: Convert this to a PoddException
+            throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "User First/Last name cannot be empty");
+        }
+        
+        // PODD-specific requirement. Email has to be present and equal to the user Identifier.
+        final String email = model.filter(null, SesameRealmConstants.OAS_USEREMAIL, null).objectString();
+        if(email == null)
+        {
+            // FIXME: Convert this to a PoddException
+            throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "User Email cannot be empty");
+        }
+        
+        PoddUserStatus status = PoddUserStatus.INACTIVE;
+        final URI statusUri = model.filter(null, PoddRdfConstants.PODD_USER_STATUS, null).objectURI();
+        if(statusUri != null)
+        {
+            status = PoddUserStatus.getUserStatusByUri(statusUri);
+        }
+        
+        final URI homePage = model.filter(null, PoddRdfConstants.PODD_USER_HOMEPAGE, null).objectURI();
+        final String organization = model.filter(null, PoddRdfConstants.PODD_USER_ORGANIZATION, null).objectString();
+        final String orcidID = model.filter(null, PoddRdfConstants.PODD_USER_ORCID, null).objectString();
+        final String title = model.filter(null, PoddRdfConstants.PODD_USER_TITLE, null).objectString();
+        final String phone = model.filter(null, PoddRdfConstants.PODD_USER_PHONE, null).objectString();
+        final String address = model.filter(null, PoddRdfConstants.PODD_USER_ADDRESS, null).objectString();
+        final String position = model.filter(null, PoddRdfConstants.PODD_USER_POSITION, null).objectString();
+        
+        final PoddUser user =
+                new PoddUser(identifier, secret, firstName, lastName, email, status, homePage, organization, orcidID,
+                        title, phone, address, position);
+        
+        return user;
+    }
+    
+    /**
      * The ORCID (see {@link http://orcid.org}) identifier of the user.
      */
     private volatile String orcid;
@@ -259,32 +355,7 @@ public class PoddUser extends RestletUtilUser
         this.userStatus = userStatus;
     }
     
-    @Override
-    public String toString()
-    {
-        final StringBuilder b = new StringBuilder();
-        b.append(super.toString());
-        b.append(":");
-        b.append(this.getUserStatus());
-        b.append(":");
-        b.append(this.getOrganization());
-        b.append(":");
-        b.append(this.getOrcid());
-        b.append(":");
-        b.append(this.getHomePage());
-        b.append(":");
-        b.append(this.getTitle());
-        b.append(":");
-        b.append(this.getPhone());
-        b.append(":");
-        b.append(this.getAddress());
-        b.append(":");
-        b.append(this.getPosition());
-        
-        return b.toString();
-    }
-    
-    public void toModel(Model model, boolean includeSecret)
+    public void toModel(final Model model, final boolean includeSecret)
     {
         URI userUri = this.getUri();
         
@@ -359,99 +430,28 @@ public class PoddUser extends RestletUtilUser
         
     }
     
-    /**
-     * Creates a PoddUser object from statements in the given {@link Model}, without setting the
-     * password.
-     * 
-     * @param model
-     * @return A PoddUser object created from the given model.
-     * @throws ResourceException
-     *             If there are errors in the process.
-     */
-    public static final PoddUser fromModel(Model model)
+    @Override
+    public String toString()
     {
-        return fromModel(model, false, false, false);
-    }
-    
-    /**
-     * Creates a PoddUser object from statements in the given {@link Model}.
-     * 
-     * @param model
-     * @param allowSecret
-     *            If true, the password will be searched for.
-     * @param failIfSecretFound
-     *            If true, and if allowSecret is true, will fail if secret is found.
-     * @param requireSecret
-     *            If true, and if allowSecret is true, will fail if the secret is not found.
-     * @return A PoddUser object created from the given model.
-     * @throws ResourceException
-     *             If there are errors in the process.
-     */
-    public static final PoddUser fromModel(Model model, boolean allowSecret, boolean failIfSecretFound,
-            boolean requireSecret)
-    {
-        final String identifier = model.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).objectString();
-        if(identifier == null || identifier.trim().length() == 0)
-        {
-            // FIXME: Convert this to a PoddException
-            throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "User Identifier cannot be empty");
-        }
-        char[] secret = null;
-        if(allowSecret)
-        {
-            final String password = model.filter(null, SesameRealmConstants.OAS_USERSECRET, null).objectString();
-            if(failIfSecretFound && password != null)
-            {
-                // FIXME: Convert this to a PoddException
-                throw new ResourceException(Status.CLIENT_ERROR_UNAUTHORIZED, "User Password must not be present");
-            }
-            if(requireSecret && (password == null || password.trim().length() == 0))
-            {
-                // FIXME: Convert this to a PoddException
-                throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "User Password cannot be empty");
-            }
-            if(password != null)
-            {
-                secret = password.toCharArray();
-            }
-        }
+        final StringBuilder b = new StringBuilder();
+        b.append(super.toString());
+        b.append(":");
+        b.append(this.getUserStatus());
+        b.append(":");
+        b.append(this.getOrganization());
+        b.append(":");
+        b.append(this.getOrcid());
+        b.append(":");
+        b.append(this.getHomePage());
+        b.append(":");
+        b.append(this.getTitle());
+        b.append(":");
+        b.append(this.getPhone());
+        b.append(":");
+        b.append(this.getAddress());
+        b.append(":");
+        b.append(this.getPosition());
         
-        final String firstName = model.filter(null, SesameRealmConstants.OAS_USERFIRSTNAME, null).objectString();
-        final String lastName = model.filter(null, SesameRealmConstants.OAS_USERLASTNAME, null).objectString();
-        // PODD-specific requirement. First/Last names are mandatory.
-        if(firstName == null || lastName == null)
-        {
-            // FIXME: Convert this to a PoddException
-            throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "User First/Last name cannot be empty");
-        }
-        
-        // PODD-specific requirement. Email has to be present and equal to the user Identifier.
-        final String email = model.filter(null, SesameRealmConstants.OAS_USEREMAIL, null).objectString();
-        if(email == null)
-        {
-            // FIXME: Convert this to a PoddException
-            throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "User Email cannot be empty");
-        }
-        
-        PoddUserStatus status = PoddUserStatus.INACTIVE;
-        final URI statusUri = model.filter(null, PoddRdfConstants.PODD_USER_STATUS, null).objectURI();
-        if(statusUri != null)
-        {
-            status = PoddUserStatus.getUserStatusByUri(statusUri);
-        }
-        
-        final URI homePage = model.filter(null, PoddRdfConstants.PODD_USER_HOMEPAGE, null).objectURI();
-        final String organization = model.filter(null, PoddRdfConstants.PODD_USER_ORGANIZATION, null).objectString();
-        final String orcidID = model.filter(null, PoddRdfConstants.PODD_USER_ORCID, null).objectString();
-        final String title = model.filter(null, PoddRdfConstants.PODD_USER_TITLE, null).objectString();
-        final String phone = model.filter(null, PoddRdfConstants.PODD_USER_PHONE, null).objectString();
-        final String address = model.filter(null, PoddRdfConstants.PODD_USER_ADDRESS, null).objectString();
-        final String position = model.filter(null, PoddRdfConstants.PODD_USER_POSITION, null).objectString();
-        
-        final PoddUser user =
-                new PoddUser(identifier, secret, firstName, lastName, email, status, homePage, organization, orcidID,
-                        title, phone, address, position);
-        
-        return user;
+        return b.toString();
     }
 }

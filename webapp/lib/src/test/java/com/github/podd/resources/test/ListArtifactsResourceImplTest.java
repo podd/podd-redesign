@@ -16,9 +16,6 @@
  */
 package com.github.podd.resources.test;
 
-import java.io.ByteArrayInputStream;
-import java.nio.charset.StandardCharsets;
-
 import org.junit.Assert;
 import org.junit.Test;
 import org.openrdf.rio.RDFFormat;
@@ -60,7 +57,7 @@ public class ListArtifactsResourceImplTest extends AbstractResourceImplTest
                     RestletTestUtils.doTestAuthenticatedRequest(listArtifactsClientResource, Method.GET, null,
                             MediaType.TEXT_HTML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
             
-            final String body = getText(results);
+            final String body = this.getText(results);
             
             // verify:
             // System.out.println("results:" + body);
@@ -72,7 +69,7 @@ public class ListArtifactsResourceImplTest extends AbstractResourceImplTest
         }
         finally
         {
-            releaseClient(listArtifactsClientResource);
+            this.releaseClient(listArtifactsClientResource);
         }
     }
     
@@ -99,7 +96,7 @@ public class ListArtifactsResourceImplTest extends AbstractResourceImplTest
                     RestletTestUtils.doTestAuthenticatedRequest(listArtifactsClientResource, Method.GET, null,
                             MediaType.TEXT_HTML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
             
-            final String body = getText(results);
+            final String body = this.getText(results);
             
             // verify:
             // System.out.println("results:" + body);
@@ -115,7 +112,7 @@ public class ListArtifactsResourceImplTest extends AbstractResourceImplTest
         }
         finally
         {
-            releaseClient(listArtifactsClientResource);
+            this.releaseClient(listArtifactsClientResource);
         }
     }
     
@@ -143,7 +140,7 @@ public class ListArtifactsResourceImplTest extends AbstractResourceImplTest
         }
         finally
         {
-            releaseClient(listArtifactsClientResource);
+            this.releaseClient(listArtifactsClientResource);
         }
     }
     
@@ -176,7 +173,7 @@ public class ListArtifactsResourceImplTest extends AbstractResourceImplTest
         }
         finally
         {
-            releaseClient(listArtifactsClientResource);
+            this.releaseClient(listArtifactsClientResource);
         }
     }
     

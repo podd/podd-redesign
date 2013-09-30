@@ -61,12 +61,22 @@ public interface PoddSchemaManager
      * @param includeInferences
      *            If true, inferred statements are also returned. If false, only the concrete RDF
      *            triples are returned.
-     * @throws UnmanagedSchemaException If the schema is not managed
-     * @throws OpenRDFException 
-     * @throws RepositoryException 
+     * @throws UnmanagedSchemaException
+     *             If the schema is not managed
+     * @throws OpenRDFException
+     * @throws RepositoryException
      */
     void downloadSchemaOntology(InferredOWLOntologyID schemaOntologyID, OutputStream outputStream, RDFFormat format,
             boolean includeInferences) throws UnmanagedSchemaException, RepositoryException, OpenRDFException;
+    
+    /**
+     * Gets the complete set of current PODD Schema Ontologies. That is, for each schema ontology,
+     * its current version is included.
+     * 
+     * @return The set of current schema ontologies.
+     * @throws OpenRDFException
+     */
+    Set<InferredOWLOntologyID> getCurrentSchemaOntologies() throws OpenRDFException;
     
     /**
      * Get the most current version of a managed Schema Ontology that contains the given
@@ -86,15 +96,6 @@ public interface PoddSchemaManager
      */
     InferredOWLOntologyID getCurrentSchemaOntologyVersion(IRI schemaOntologyIRI) throws UnmanagedSchemaIRIException,
         OpenRDFException;
-    
-    /**
-     * Gets the complete set of current PODD Schema Ontologies. That is, for each schema ontology,
-     * its current version is included.
-     * 
-     * @return The set of current schema ontologies.
-     * @throws OpenRDFException
-     */
-    Set<InferredOWLOntologyID> getCurrentSchemaOntologies() throws OpenRDFException;
     
     /**
      * Gets the complete set of PODD Schema Ontologies, including previous versions.
@@ -138,6 +139,22 @@ public interface PoddSchemaManager
     OWLOntology getSchemaOntology(OWLOntologyID schemaOntologyID) throws UnmanagedSchemaOntologyIDException;
     
     /**
+     * Gets the exact schema ontology version specified by the parameter if it exists, or throws an
+     * exception.
+     * 
+     * @param owlOntologyID
+     *            The schema ontology to fetch.
+     * @return An {@link InferredOWLOntologyID} representing the ontology IRI and version IRI for
+     *         the schema ontology as managed by the system.
+     * @throws UnmanagedSchemaIRIException
+     *             If the schema identified by the parameter is not currently managed by the system.
+     * @throws OpenRDFException
+     *             If there was a problem with resolving or parsing the schema.
+     */
+    InferredOWLOntologyID getSchemaOntologyID(OWLOntologyID owlOntologyID) throws UnmanagedSchemaOntologyIDException,
+        OpenRDFException;
+    
+    /**
      * If the given IRI is the version IRI of a managed Schema Ontology, return its Ontology ID. If
      * the given IRI is an ontology IRI of a managed Schema Ontology, return the Ontology ID of its
      * most current version.
@@ -179,6 +196,7 @@ public interface PoddSchemaManager
      *            The PoddOWLManager
      * @deprecated We should not be passing across references to a shared PoddOWLManager.
      */
+    @Deprecated
     void setOwlManager(PoddOWLManager owlManager);
     
     /**
@@ -259,21 +277,5 @@ public interface PoddSchemaManager
      */
     InferredOWLOntologyID uploadSchemaOntology(OWLOntologyID schemaOntologyID, InputStream inputStream,
             RDFFormat fileFormat) throws OpenRDFException, IOException, OWLException, PoddException;
-    
-    /**
-     * Gets the exact schema ontology version specified by the parameter if it exists, or throws an
-     * exception.
-     * 
-     * @param owlOntologyID
-     *            The schema ontology to fetch.
-     * @return An {@link InferredOWLOntologyID} representing the ontology IRI and version IRI for
-     *         the schema ontology as managed by the system.
-     * @throws UnmanagedSchemaIRIException
-     *             If the schema identified by the parameter is not currently managed by the system.
-     * @throws OpenRDFException
-     *             If there was a problem with resolving or parsing the schema.
-     */
-    InferredOWLOntologyID getSchemaOntologyID(OWLOntologyID owlOntologyID) throws UnmanagedSchemaOntologyIDException,
-        OpenRDFException;
     
 }

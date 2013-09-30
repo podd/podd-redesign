@@ -322,14 +322,13 @@ public abstract class AbstractPoddArtifactManagerTest
                                 MetadataPolicy.ONLY_CONTAINS, 27, 5, 0 },
                         { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Process"), false,
                                 MetadataPolicy.EXCLUDE_CONTAINS, 18, 3, 0 },
-                                
+                        
                         { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_PLANT, "FieldConditions"), false,
                                 MetadataPolicy.INCLUDE_ALL, 89, 12, 0 },
                         { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_PLANT, "FieldConditions"), true,
                                 MetadataPolicy.INCLUDE_ALL, 115, 16, 3 },
                         { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_PLANT, "FieldConditions"), false,
-                                MetadataPolicy.ONLY_CONTAINS, 33, 6, 0 }, 
-                                };
+                                MetadataPolicy.ONLY_CONTAINS, 33, 6, 0 }, };
         
         for(final Object[] element : testData)
         {
@@ -734,7 +733,8 @@ public abstract class AbstractPoddArtifactManagerTest
                     resultArtifactId.getOntologyIRI(), e.getUnmanagedOntologyIRI());
         }
         
-        // try to load same artifact again. will fail if the OWLOntologyManager's cache was not cleared
+        // try to load same artifact again. will fail if the OWLOntologyManager's cache was not
+        // cleared
         final InputStream inputStream2 = this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_20130206);
         
         final InferredOWLOntologyID resultArtifactId2 =
@@ -742,7 +742,7 @@ public abstract class AbstractPoddArtifactManagerTest
         this.verifyLoadedArtifact(resultArtifactId2, 7, TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES,
                 TestConstants.TEST_ARTIFACT_BASIC_1_20130206_INFERRED_TRIPLES, false);
     }
-
+    
     /**
      * Test method for
      * {@link com.github.podd.api.PoddArtifactManager#deleteArtifact(org.semanticweb.owlapi.model.OWLOntologyID)}
@@ -802,7 +802,7 @@ public abstract class AbstractPoddArtifactManagerTest
         final String mimeType = "application/rdf+xml";
         final RDFFormat format = Rio.getParserFormatForMIMEType(mimeType, RDFFormat.RDFXML);
         
-        InferredOWLOntologyID resultArtifactId = this.testArtifactManager.loadArtifact(inputStream, format);
+        final InferredOWLOntologyID resultArtifactId = this.testArtifactManager.loadArtifact(inputStream, format);
         
         // verify:
         this.verifyLoadedArtifact(resultArtifactId, 7,
@@ -1103,8 +1103,8 @@ public abstract class AbstractPoddArtifactManagerTest
         
         final URI objectType = PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Process");
         
-        this.testArtifactManager.exportObjectMetadata(objectType, output, RDFFormat.TURTLE,
-                false, MetadataPolicy.EXCLUDE_CONTAINS, null);
+        this.testArtifactManager.exportObjectMetadata(objectType, output, RDFFormat.TURTLE, false,
+                MetadataPolicy.EXCLUDE_CONTAINS, null);
         
         // parse output into a Model
         final ByteArrayInputStream bin = new ByteArrayInputStream(output.toByteArray());
@@ -1112,14 +1112,14 @@ public abstract class AbstractPoddArtifactManagerTest
         final Model model = new LinkedHashModel();
         rdfParser.setRDFHandler(new StatementCollector(model));
         rdfParser.parse(bin, "");
-
+        
         // verify:
         Assert.assertEquals("Not the expected number of statements", 18, model.size());
         Assert.assertTrue("Missing statement: 'Process a OWL:Class'", model.contains(objectType, RDF.TYPE, OWL.CLASS));
         Assert.assertTrue("No label for rdfs:label", model.contains(RDFS.LABEL, RDFS.LABEL, null));
         Assert.assertTrue("No label for rdfs:comment", model.contains(RDFS.COMMENT, RDFS.LABEL, null));
     }
-
+    
     /**
      * Test method for
      * {@link com.github.podd.api.PoddArtifactManager#exportObjectMetadata(URI, java.io.OutputStream, RDFFormat, boolean, MetadataPolicy, InferredOWLOntologyID)}
@@ -1787,6 +1787,46 @@ public abstract class AbstractPoddArtifactManagerTest
      * {@link com.github.podd.api.PoddArtifactManager#loadArtifact(java.io.InputStream, org.openrdf.rio.RDFFormat)}
      * .
      * 
+     * Tests loading two versions of the same artifact one after the other. This fails as the
+     * modified version should be "updated" and not "loaded".
+     * 
+     * The two source RDF files have PURLs instead of temporary URIs since they both need to be
+     * identified as the same artifact.
+     */
+    @Test
+    public final void testLoadArtifactWithSameArtifactTwiceFails() throws Exception
+    {
+        this.loadSchemaOntologies();
+        
+        // load 1st artifact
+        final InputStream inputStream4FirstArtifact =
+                this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_PURLS_v1);
+        final InferredOWLOntologyID firstArtifactId =
+                this.testArtifactManager.loadArtifact(inputStream4FirstArtifact, RDFFormat.RDFXML);
+        
+        this.verifyLoadedArtifact(firstArtifactId, 7, TestConstants.TEST_ARTIFACT_PURLS_v1_CONCRETE_TRIPLES,
+                TestConstants.TEST_ARTIFACT_PURLS_v1_INFERRED_TRIPLES, false);
+        
+        // load 2nd artifact
+        final InputStream inputStream4SecondArtifact =
+                this.getClass().getResourceAsStream("/test/artifacts/project-with-purls-v2.rdf");
+        try
+        {
+            this.testArtifactManager.loadArtifact(inputStream4SecondArtifact, RDFFormat.RDFXML);
+            Assert.fail("Should not allow a duplicate artifact to be loaded");
+        }
+        catch(final DuplicateArtifactIRIException e)
+        {
+            Assert.assertEquals("Duplicate does not have expected ontology IRI", firstArtifactId.getOntologyIRI(),
+                    e.getDuplicateOntologyIRI());
+        }
+    }
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddArtifactManager#loadArtifact(java.io.InputStream, org.openrdf.rio.RDFFormat)}
+     * .
+     * 
      * Tests loading two artifacts one after the other.
      * 
      */
@@ -1816,46 +1856,6 @@ public abstract class AbstractPoddArtifactManagerTest
                 TestConstants.TEST_ARTIFACT_BASIC_1_INTERNAL_OBJECT_INFERRED_TRIPLES, false);
         this.verifyLoadedArtifact(secondArtifactId, 14, TestConstants.TEST_ARTIFACT_BASIC_PROJECT_2_CONCRETE_TRIPLES,
                 TestConstants.TEST_ARTIFACT_BASIC_PROJECT_2_INFERRED_TRIPLES, true);
-    }
-    
-    /**
-     * Test method for
-     * {@link com.github.podd.api.PoddArtifactManager#loadArtifact(java.io.InputStream, org.openrdf.rio.RDFFormat)}
-     * .
-     * 
-     * Tests loading two versions of the same artifact one after the other. This fails as the modified version
-     * should be "updated" and not "loaded". 
-     *  
-     * The two source RDF files have PURLs instead of temporary URIs since they both need to be
-     * identified as the same artifact.
-     */
-    @Test
-    public final void testLoadArtifactWithSameArtifactTwiceFails() throws Exception
-    {
-        this.loadSchemaOntologies();
-        
-        // load 1st artifact
-        final InputStream inputStream4FirstArtifact =
-                this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_PURLS_v1);
-        final InferredOWLOntologyID firstArtifactId =
-                this.testArtifactManager.loadArtifact(inputStream4FirstArtifact, RDFFormat.RDFXML);
-        
-        this.verifyLoadedArtifact(firstArtifactId, 7, TestConstants.TEST_ARTIFACT_PURLS_v1_CONCRETE_TRIPLES,
-                TestConstants.TEST_ARTIFACT_PURLS_v1_INFERRED_TRIPLES, false);
-        
-        // load 2nd artifact
-        final InputStream inputStream4SecondArtifact =
-                this.getClass().getResourceAsStream("/test/artifacts/project-with-purls-v2.rdf");
-        try
-        {
-            this.testArtifactManager.loadArtifact(inputStream4SecondArtifact, RDFFormat.RDFXML);
-            Assert.fail("Should not allow a duplicate artifact to be loaded");
-        }
-        catch (DuplicateArtifactIRIException e)
-        {
-            Assert.assertEquals("Duplicate does not have expected ontology IRI", firstArtifactId.getOntologyIRI(),
-                    e.getDuplicateOntologyIRI());
-        }
     }
     
     /**
@@ -2499,10 +2499,11 @@ public abstract class AbstractPoddArtifactManagerTest
         
         // upload another version of artifact
         final InputStream inputStream2 = this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_20130206);
-        final Model model = this.testArtifactManager.updateArtifact(artifactIDv1.getOntologyIRI().toOpenRDFURI(), artifactIDv1
-                .getVersionIRI().toOpenRDFURI(), Collections.<URI> emptyList(), inputStream2, RDFFormat.TURTLE,
-                UpdatePolicy.REPLACE_EXISTING, DanglingObjectPolicy.FORCE_CLEAN,
-                DataReferenceVerificationPolicy.DO_NOT_VERIFY);
+        final Model model =
+                this.testArtifactManager.updateArtifact(artifactIDv1.getOntologyIRI().toOpenRDFURI(), artifactIDv1
+                        .getVersionIRI().toOpenRDFURI(), Collections.<URI> emptyList(), inputStream2, RDFFormat.TURTLE,
+                        UpdatePolicy.REPLACE_EXISTING, DanglingObjectPolicy.FORCE_CLEAN,
+                        DataReferenceVerificationPolicy.DO_NOT_VERIFY);
         final InferredOWLOntologyID artifactIDv2 = OntologyUtils.modelToOntologyIDs(model).get(0);
         
         this.verifyLoadedArtifact(artifactIDv2, 7, TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES,
@@ -2526,6 +2527,88 @@ public abstract class AbstractPoddArtifactManagerTest
             Assert.assertEquals("Exception not due to the expected artifact version", artifactIDv1.getVersionIRI(),
                     e.getUnmanagedVersionIRI());
         }
+    }
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddArtifactManager#updateSchemaImports(InferredOWLOntologyID, Set, Set)}
+     * .
+     */
+    @Test
+    public final void testUpdateSchemaImportsEmptyNewSchemas() throws Exception
+    {
+        final List<InferredOWLOntologyID> schemaOntologies = this.loadSchemaOntologies();
+        
+        // upload artifact
+        final InputStream inputStream1 = this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_20130206);
+        final InferredOWLOntologyID artifactIDv1 =
+                this.testArtifactManager.loadArtifact(inputStream1, RDFFormat.TURTLE);
+        this.verifyLoadedArtifact(artifactIDv1, 7, TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES,
+                TestConstants.TEST_ARTIFACT_BASIC_1_20130206_INFERRED_TRIPLES, false);
+        
+        try
+        {
+            this.testArtifactManager.updateSchemaImports(new InferredOWLOntologyID(artifactIDv1.getOntologyIRI(),
+                    artifactIDv1.getVersionIRI(), artifactIDv1.getInferredOntologyIRI()),
+                    new LinkedHashSet<OWLOntologyID>(schemaOntologies), new HashSet<OWLOntologyID>());
+            Assert.fail("Removing essential ontologies should generate an OWL-related exception");
+        }
+        catch(final OntologyNotInProfileException e)
+        {
+            Assert.assertEquals(artifactIDv1.getOntologyIRI(), e.getOntology().getOntologyID().getOntologyIRI());
+        }
+    }
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddArtifactManager#updateSchemaImports(InferredOWLOntologyID, Set, Set)}
+     * .
+     */
+    @Test
+    public final void testUpdateSchemaImportsEmptyOldSchemas() throws Exception
+    {
+        final List<InferredOWLOntologyID> schemaOntologies = this.loadSchemaOntologies();
+        
+        // upload artifact
+        final InputStream inputStream1 = this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_20130206);
+        final InferredOWLOntologyID artifactIDv1 =
+                this.testArtifactManager.loadArtifact(inputStream1, RDFFormat.TURTLE);
+        this.verifyLoadedArtifact(artifactIDv1, 7, TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES,
+                TestConstants.TEST_ARTIFACT_BASIC_1_20130206_INFERRED_TRIPLES, false);
+        
+        final InferredOWLOntologyID updateSchemaImports =
+                this.testArtifactManager.updateSchemaImports(new InferredOWLOntologyID(artifactIDv1.getOntologyIRI(),
+                        artifactIDv1.getVersionIRI(), artifactIDv1.getInferredOntologyIRI()),
+                        new HashSet<OWLOntologyID>(), new LinkedHashSet<OWLOntologyID>(schemaOntologies));
+        
+        Assert.assertEquals(updateSchemaImports.getOntologyIRI(), artifactIDv1.getOntologyIRI());
+        Assert.assertNotEquals(updateSchemaImports.getVersionIRI(), artifactIDv1.getVersionIRI());
+    }
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddArtifactManager#updateSchemaImports(InferredOWLOntologyID, Set, Set)}
+     * .
+     */
+    @Test
+    public final void testUpdateSchemaImportsEmptySchemas() throws Exception
+    {
+        final List<InferredOWLOntologyID> schemaOntologies = this.loadSchemaOntologies();
+        
+        // upload artifact
+        final InputStream inputStream1 = this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_20130206);
+        final InferredOWLOntologyID artifactIDv1 =
+                this.testArtifactManager.loadArtifact(inputStream1, RDFFormat.TURTLE);
+        this.verifyLoadedArtifact(artifactIDv1, 7, TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES,
+                TestConstants.TEST_ARTIFACT_BASIC_1_20130206_INFERRED_TRIPLES, false);
+        
+        final InferredOWLOntologyID updateSchemaImports =
+                this.testArtifactManager.updateSchemaImports(new InferredOWLOntologyID(artifactIDv1.getOntologyIRI(),
+                        artifactIDv1.getVersionIRI(), artifactIDv1.getInferredOntologyIRI()),
+                        new HashSet<OWLOntologyID>(), new HashSet<OWLOntologyID>());
+        
+        Assert.assertEquals(updateSchemaImports.getOntologyIRI(), artifactIDv1.getOntologyIRI());
+        Assert.assertNotEquals(updateSchemaImports.getVersionIRI(), artifactIDv1.getVersionIRI());
     }
     
     /**
@@ -2602,88 +2685,6 @@ public abstract class AbstractPoddArtifactManagerTest
             Assert.assertEquals("Exception not due to the expected artifact version",
                     IRI.create("urn:test:ontology:version:nonexistent"), e.getUnmanagedVersionIRI());
         }
-    }
-    
-    /**
-     * Test method for
-     * {@link com.github.podd.api.PoddArtifactManager#updateSchemaImports(InferredOWLOntologyID, Set, Set)}
-     * .
-     */
-    @Test
-    public final void testUpdateSchemaImportsEmptySchemas() throws Exception
-    {
-        final List<InferredOWLOntologyID> schemaOntologies = this.loadSchemaOntologies();
-        
-        // upload artifact
-        final InputStream inputStream1 = this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_20130206);
-        final InferredOWLOntologyID artifactIDv1 =
-                this.testArtifactManager.loadArtifact(inputStream1, RDFFormat.TURTLE);
-        this.verifyLoadedArtifact(artifactIDv1, 7, TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES,
-                TestConstants.TEST_ARTIFACT_BASIC_1_20130206_INFERRED_TRIPLES, false);
-        
-        final InferredOWLOntologyID updateSchemaImports =
-                this.testArtifactManager.updateSchemaImports(new InferredOWLOntologyID(artifactIDv1.getOntologyIRI(),
-                        artifactIDv1.getVersionIRI(), artifactIDv1.getInferredOntologyIRI()),
-                        new HashSet<OWLOntologyID>(), new HashSet<OWLOntologyID>());
-        
-        Assert.assertEquals(updateSchemaImports.getOntologyIRI(), artifactIDv1.getOntologyIRI());
-        Assert.assertNotEquals(updateSchemaImports.getVersionIRI(), artifactIDv1.getVersionIRI());
-    }
-    
-    /**
-     * Test method for
-     * {@link com.github.podd.api.PoddArtifactManager#updateSchemaImports(InferredOWLOntologyID, Set, Set)}
-     * .
-     */
-    @Test
-    public final void testUpdateSchemaImportsEmptyNewSchemas() throws Exception
-    {
-        final List<InferredOWLOntologyID> schemaOntologies = this.loadSchemaOntologies();
-        
-        // upload artifact
-        final InputStream inputStream1 = this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_20130206);
-        final InferredOWLOntologyID artifactIDv1 =
-                this.testArtifactManager.loadArtifact(inputStream1, RDFFormat.TURTLE);
-        this.verifyLoadedArtifact(artifactIDv1, 7, TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES,
-                TestConstants.TEST_ARTIFACT_BASIC_1_20130206_INFERRED_TRIPLES, false);
-        
-        try
-        {
-            this.testArtifactManager.updateSchemaImports(new InferredOWLOntologyID(artifactIDv1.getOntologyIRI(),
-                    artifactIDv1.getVersionIRI(), artifactIDv1.getInferredOntologyIRI()),
-                    new LinkedHashSet<OWLOntologyID>(schemaOntologies), new HashSet<OWLOntologyID>());
-            Assert.fail("Removing essential ontologies should generate an OWL-related exception");
-        }
-        catch(final OntologyNotInProfileException e)
-        {
-            Assert.assertEquals(artifactIDv1.getOntologyIRI(), e.getOntology().getOntologyID().getOntologyIRI());
-        }
-    }
-    
-    /**
-     * Test method for
-     * {@link com.github.podd.api.PoddArtifactManager#updateSchemaImports(InferredOWLOntologyID, Set, Set)}
-     * .
-     */
-    @Test
-    public final void testUpdateSchemaImportsEmptyOldSchemas() throws Exception
-    {
-        final List<InferredOWLOntologyID> schemaOntologies = this.loadSchemaOntologies();
-        
-        // upload artifact
-        final InputStream inputStream1 = this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_20130206);
-        final InferredOWLOntologyID artifactIDv1 =
-                this.testArtifactManager.loadArtifact(inputStream1, RDFFormat.TURTLE);
-        this.verifyLoadedArtifact(artifactIDv1, 7, TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES,
-                TestConstants.TEST_ARTIFACT_BASIC_1_20130206_INFERRED_TRIPLES, false);
-        
-        final InferredOWLOntologyID updateSchemaImports =
-                this.testArtifactManager.updateSchemaImports(new InferredOWLOntologyID(artifactIDv1.getOntologyIRI(),
-                        artifactIDv1.getVersionIRI(), artifactIDv1.getInferredOntologyIRI()),
-                        new HashSet<OWLOntologyID>(), new LinkedHashSet<OWLOntologyID>(schemaOntologies));
-        
-        Assert.assertEquals(updateSchemaImports.getOntologyIRI(), artifactIDv1.getOntologyIRI());
-        Assert.assertNotEquals(updateSchemaImports.getVersionIRI(), artifactIDv1.getVersionIRI());
     }
     
     /**

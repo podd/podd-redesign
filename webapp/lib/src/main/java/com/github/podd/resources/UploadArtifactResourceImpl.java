@@ -360,8 +360,8 @@ public class UploadArtifactResourceImpl extends AbstractPoddResourceImpl
      * @throws ResourceException
      */
     private InferredOWLOntologyID uploadFileAndLoadArtifactIntoPodd(final InputStream inputStream,
-            final RDFFormat format, DanglingObjectPolicy danglingObjectPolicy,
-            DataReferenceVerificationPolicy dataReferenceVerificationPolicy) throws ResourceException
+            final RDFFormat format, final DanglingObjectPolicy danglingObjectPolicy,
+            final DataReferenceVerificationPolicy dataReferenceVerificationPolicy) throws ResourceException
     {
         final PoddArtifactManager artifactManager =
                 ((PoddWebServiceApplication)this.getApplication()).getPoddArtifactManager();
@@ -380,7 +380,7 @@ public class UploadArtifactResourceImpl extends AbstractPoddResourceImpl
                         "Could not find PODD Artifact Manager");
             }
         }
-        catch (DuplicateArtifactIRIException e)
+        catch(final DuplicateArtifactIRIException e)
         {
             this.log.warn("Attempting to load duplicate artifact {}", e);
             throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Failed loading duplicate artifact to PODD", e);
@@ -432,7 +432,7 @@ public class UploadArtifactResourceImpl extends AbstractPoddResourceImpl
                         props.put("Content-Type", fi.getContentType());
                         
                         filePath = Files.createTempFile(this.tempDirectory, "ontologyupload-", name);
-                        File file = filePath.toFile();
+                        final File file = filePath.toFile();
                         file.deleteOnExit();
                         fi.write(file);
                     }

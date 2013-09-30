@@ -63,6 +63,74 @@ public class RdfUtility
     private final static Logger log = LoggerFactory.getLogger(RdfUtility.class);
     
     /**
+     * Helper method to execute a given SPARQL Graph query.
+     * 
+     * @param graphQuery
+     * @param contexts
+     * @return
+     * @throws OpenRDFException
+     */
+    public static Model executeGraphQuery(final GraphQuery graphQuery, final URI... contexts) throws OpenRDFException
+    {
+        final DatasetImpl dataset = new DatasetImpl();
+        for(final URI uri : contexts)
+        {
+            dataset.addDefaultGraph(uri);
+        }
+        graphQuery.setDataset(dataset);
+        final Model results = new LinkedHashModel();
+        final long before = System.currentTimeMillis();
+        graphQuery.evaluate(new StatementCollector(results));
+        final long total = System.currentTimeMillis() - before;
+        RdfUtility.log.debug("graph query took {}", Long.toString(total));
+        if(total > 50 && RdfUtility.log.isDebugEnabled())
+        {
+            new Throwable().printStackTrace();
+        }
+        else if(total > 30 && RdfUtility.log.isTraceEnabled())
+        {
+            new Throwable().printStackTrace();
+        }
+        
+        return results;
+    }
+    
+    /**
+     * Helper method to execute a given SPARQL Tuple query, which may have had bindings attached.
+     * 
+     * @param tupleQuery
+     * @param contexts
+     * @return
+     * @throws OpenRDFException
+     */
+    public static QueryResultCollector executeTupleQuery(final TupleQuery tupleQuery, final URI... contexts)
+        throws OpenRDFException
+    {
+        final DatasetImpl dataset = new DatasetImpl();
+        for(final URI uri : contexts)
+        {
+            dataset.addDefaultGraph(uri);
+        }
+        tupleQuery.setDataset(dataset);
+        
+        final QueryResultCollector results = new QueryResultCollector();
+        final long before = System.currentTimeMillis();
+        QueryResults.report(tupleQuery.evaluate(), results);
+        final long total = System.currentTimeMillis() - before;
+        RdfUtility.log.debug("tuple query took {}", Long.toString(total));
+        if(total > 50 && RdfUtility.log.isDebugEnabled())
+        {
+            new Throwable().printStackTrace();
+        }
+        else if(total > 30 && RdfUtility.log.isTraceEnabled())
+        {
+            new Throwable().printStackTrace();
+        }
+        
+        return results;
+    }
+    
+    /**
      * Given a set of RDF Statements, and a Root node, this method finds any nodes that are not
      * connected to the Root node.
      * 
@@ -301,74 +369,6 @@ public class RdfUtility
         {
             return false;
         }
-    }
-    
-    /**
-     * Helper method to execute a given SPARQL Graph query.
-     * 
-     * @param graphQuery
-     * @param contexts
-     * @return
-     * @throws OpenRDFException
-     */
-    public static Model executeGraphQuery(final GraphQuery graphQuery, final URI... contexts) throws OpenRDFException
-    {
-        final DatasetImpl dataset = new DatasetImpl();
-        for(final URI uri : contexts)
-        {
-            dataset.addDefaultGraph(uri);
-        }
-        graphQuery.setDataset(dataset);
-        final Model results = new LinkedHashModel();
-        long before = System.currentTimeMillis();
-        graphQuery.evaluate(new StatementCollector(results));
-        long total = System.currentTimeMillis() - before;
-        log.debug("graph query took {}", Long.toString(total));
-        if(total > 50 && log.isDebugEnabled())
-        {
-            new Throwable().printStackTrace();
-        }
-        else if(total > 30 && log.isTraceEnabled())
-        {
-            new Throwable().printStackTrace();
-        }
-        
-        return results;
-    }
-    
-    /**
-     * Helper method to execute a given SPARQL Tuple query, which may have had bindings attached.
-     * 
-     * @param tupleQuery
-     * @param contexts
-     * @return
-     * @throws OpenRDFException
-     */
-    public static QueryResultCollector executeTupleQuery(final TupleQuery tupleQuery, final URI... contexts)
-        throws OpenRDFException
-    {
-        final DatasetImpl dataset = new DatasetImpl();
-        for(final URI uri : contexts)
-        {
-            dataset.addDefaultGraph(uri);
-        }
-        tupleQuery.setDataset(dataset);
-        
-        final QueryResultCollector results = new QueryResultCollector();
-        long before = System.currentTimeMillis();
-        QueryResults.report(tupleQuery.evaluate(), results);
-        long total = System.currentTimeMillis() - before;
-        log.debug("tuple query took {}", Long.toString(total));
-        if(total > 50 && log.isDebugEnabled())
-        {
-            new Throwable().printStackTrace();
-        }
-        else if(total > 30 && log.isTraceEnabled())
-        {
-            new Throwable().printStackTrace();
-        }
-        
-        return results;
     }
     
 }

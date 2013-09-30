@@ -36,8 +36,6 @@ import org.restlet.resource.Get;
 import org.restlet.resource.Post;
 import org.restlet.resource.ResourceException;
 import org.restlet.security.User;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.github.ansell.restletutils.RestletUtilUser;
 import com.github.ansell.restletutils.SesameRealmConstants;
@@ -69,7 +67,7 @@ public class UserEditResourceImpl extends AbstractUserResourceImpl
         this.log.info("editUserRdf");
         
         final String requestedUserIdentifier = this.getUserParameter();
-        PoddAction action =
+        final PoddAction action =
                 this.getAction(requestedUserIdentifier, PoddAction.OTHER_USER_EDIT, PoddAction.CURRENT_USER_EDIT);
         
         if(requestedUserIdentifier == null)
@@ -157,7 +155,7 @@ public class UserEditResourceImpl extends AbstractUserResourceImpl
         this.log.info("editUserHtml");
         
         final String requestedUserIdentifier = this.getUserParameter();
-        PoddAction action =
+        final PoddAction action =
                 this.getAction(requestedUserIdentifier, PoddAction.OTHER_USER_EDIT, PoddAction.CURRENT_USER_EDIT);
         
         if(requestedUserIdentifier == null)
@@ -181,7 +179,7 @@ public class UserEditResourceImpl extends AbstractUserResourceImpl
         dataModel.put("authenticatedUsername", user.getIdentifier());
         
         final PoddSesameRealm realm = ((PoddWebServiceApplication)this.getApplication()).getRealm();
-        final PoddUser poddUser = (PoddUser)realm.findUser(requestedUserIdentifier);
+        final PoddUser poddUser = realm.findUser(requestedUserIdentifier);
         
         if(poddUser == null)
         {

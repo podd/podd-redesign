@@ -67,7 +67,7 @@ public class AddObjectResourceImplTest extends AbstractResourceImplTest
                     RestletTestUtils.doTestAuthenticatedRequest(addObjectClientResource, Method.GET, null,
                             MediaType.TEXT_HTML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
             
-            final String body = getText(results);
+            final String body = this.getText(results);
             
             // verify:
             // System.out.println(body);
@@ -83,7 +83,7 @@ public class AddObjectResourceImplTest extends AbstractResourceImplTest
         }
         finally
         {
-            releaseClient(addObjectClientResource);
+            this.releaseClient(addObjectClientResource);
         }
     }
     
@@ -106,7 +106,7 @@ public class AddObjectResourceImplTest extends AbstractResourceImplTest
                     RestletTestUtils.doTestAuthenticatedRequest(addObjectClientResource, Method.GET, null,
                             MediaType.TEXT_HTML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
             
-            final String body = getText(results);
+            final String body = this.getText(results);
             
             // verify:
             // System.out.println(body);
@@ -118,7 +118,7 @@ public class AddObjectResourceImplTest extends AbstractResourceImplTest
         }
         finally
         {
-            releaseClient(addObjectClientResource);
+            this.releaseClient(addObjectClientResource);
         }
     }
     

@@ -16,10 +16,8 @@
  */
 package com.github.podd.resources.test;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.StringReader;
-import java.nio.charset.StandardCharsets;
 import java.util.AbstractMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -126,13 +124,13 @@ public class UserAddResourceImplTest extends AbstractResourceImplTest
                             Status.SUCCESS_OK, this.testWithAdminPrivileges);
             
             // verify: response has same correct identifier
-            final Model model = this.assertRdf(new StringReader(getText(results)), RDFFormat.RDFXML, 1);
+            final Model model = this.assertRdf(new StringReader(this.getText(results)), RDFFormat.RDFXML, 1);
             Assert.assertEquals("Unexpected user identifier", testEmail,
                     model.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).objectString());
         }
         finally
         {
-            releaseClient(userAddClientResource);
+            this.releaseClient(userAddClientResource);
         }
     }
     
@@ -150,7 +148,7 @@ public class UserAddResourceImplTest extends AbstractResourceImplTest
                     RestletTestUtils.doTestAuthenticatedRequest(userAddClientResource, Method.GET, null,
                             MediaType.TEXT_HTML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
             
-            final String body = getText(results);
+            final String body = this.getText(results);
             this.assertFreemarker(body);
             
             System.out.println(body);
@@ -160,7 +158,7 @@ public class UserAddResourceImplTest extends AbstractResourceImplTest
         }
         finally
         {
-            releaseClient(userAddClientResource);
+            this.releaseClient(userAddClientResource);
         }
     }
     
@@ -193,7 +191,7 @@ public class UserAddResourceImplTest extends AbstractResourceImplTest
                     RestletTestUtils.doTestAuthenticatedRequest(userDetailsClientResource, Method.GET, null, mediaType,
                             Status.SUCCESS_OK, this.testWithAdminPrivileges);
             
-            final Model resultsModel = this.assertRdf(new StringReader(getText(results)), format, 19);
+            final Model resultsModel = this.assertRdf(new StringReader(this.getText(results)), format, 19);
             
             com.github.podd.utils.DebugUtils.printContents(resultsModel);
             Assert.assertEquals("Unexpected user identifier", testIdentifier,
@@ -206,7 +204,7 @@ public class UserAddResourceImplTest extends AbstractResourceImplTest
         }
         finally
         {
-            releaseClient(userDetailsClientResource);
+            this.releaseClient(userDetailsClientResource);
         }
         
     }
@@ -259,7 +257,7 @@ public class UserAddResourceImplTest extends AbstractResourceImplTest
         }
         finally
         {
-            releaseClient(userDetailsClientResource);
+            this.releaseClient(userDetailsClientResource);
         }
     }
     
@@ -303,7 +301,7 @@ public class UserAddResourceImplTest extends AbstractResourceImplTest
         }
         finally
         {
-            releaseClient(userDetailsClientResource);
+            this.releaseClient(userDetailsClientResource);
         }
     }
     
@@ -359,13 +357,13 @@ public class UserAddResourceImplTest extends AbstractResourceImplTest
         {
             // verify: the cause (simple string matching, not checking for valid RDF content)
             Assert.assertEquals(Status.CLIENT_ERROR_CONFLICT, e.getStatus());
-            final String body = getText(userAddClientResource.getResponseEntity());
+            final String body = this.getText(userAddClientResource.getResponseEntity());
             System.out.println(body);
             Assert.assertTrue("Expected cause is missing", body.contains("User already exists"));
         }
         finally
         {
-            releaseClient(userAddClientResource);
+            this.releaseClient(userAddClientResource);
         }
     }
     
@@ -389,7 +387,7 @@ public class UserAddResourceImplTest extends AbstractResourceImplTest
         }
         finally
         {
-            releaseClient(userAddClientResource);
+            this.releaseClient(userAddClientResource);
         }
     }
     
@@ -439,12 +437,12 @@ public class UserAddResourceImplTest extends AbstractResourceImplTest
         {
             // verify: the cause (simple string matching, not checking for valid RDF content)
             Assert.assertEquals(Status.CLIENT_ERROR_BAD_REQUEST, e.getStatus());
-            final String body = getText(userAddClientResource.getResponseEntity());
+            final String body = this.getText(userAddClientResource.getResponseEntity());
             Assert.assertTrue("Expected cause is missing", body.contains("User Email cannot be empty"));
         }
         finally
         {
-            releaseClient(userAddClientResource);
+            this.releaseClient(userAddClientResource);
         }
     }
     

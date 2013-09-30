@@ -22,16 +22,16 @@ import org.semanticweb.owlapi.model.IRI;
  * An exception indicating that the Schema-Manifest file contained an error.
  * 
  * @author kutila
- *
+ * 
  */
 public class SchemaManifestException extends PoddException
 {
-
+    
     private static final long serialVersionUID = -714384727722988506L;
-
+    
     private final IRI schemaOntologyIRI;
     
-    public SchemaManifestException(final IRI schemaOntologyIRI, String msg)
+    public SchemaManifestException(final IRI schemaOntologyIRI, final String msg)
     {
         super(msg);
         this.schemaOntologyIRI = schemaOntologyIRI;

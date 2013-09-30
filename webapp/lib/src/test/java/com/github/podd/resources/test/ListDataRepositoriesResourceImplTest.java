@@ -16,8 +16,6 @@
  */
 package com.github.podd.resources.test;
 
-import java.io.StringReader;
-
 import org.junit.Assert;
 import org.junit.Test;
 import org.openrdf.model.Model;
@@ -53,7 +51,7 @@ public class ListDataRepositoriesResourceImplTest extends AbstractResourceImplTe
             final Representation result =
                     RestletTestUtils.doTestAuthenticatedRequest(dataRepositoriesClientResource, Method.GET, null,
                             MediaType.TEXT_HTML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
-            final String body = getText(result);
+            final String body = this.getText(result);
             
             // System.out.println(body);
             
@@ -66,7 +64,7 @@ public class ListDataRepositoriesResourceImplTest extends AbstractResourceImplTe
         }
         finally
         {
-            releaseClient(dataRepositoriesClientResource);
+            this.releaseClient(dataRepositoriesClientResource);
         }
     }
     
@@ -91,7 +89,7 @@ public class ListDataRepositoriesResourceImplTest extends AbstractResourceImplTe
         }
         finally
         {
-            releaseClient(dataRepositoriesClientResource);
+            this.releaseClient(dataRepositoriesClientResource);
         }
     }
     
@@ -115,7 +113,7 @@ public class ListDataRepositoriesResourceImplTest extends AbstractResourceImplTe
         }
         finally
         {
-            releaseClient(dataRepositoriesClientResource);
+            this.releaseClient(dataRepositoriesClientResource);
         }
     }
     
@@ -141,7 +139,7 @@ public class ListDataRepositoriesResourceImplTest extends AbstractResourceImplTe
         }
         finally
         {
-            releaseClient(dataRepositoriesClientResource);
+            this.releaseClient(dataRepositoriesClientResource);
         }
     }
     
@@ -166,7 +164,7 @@ public class ListDataRepositoriesResourceImplTest extends AbstractResourceImplTe
         }
         finally
         {
-            releaseClient(dataRepositoriesClientResource);
+            this.releaseClient(dataRepositoriesClientResource);
         }
     }
     
@@ -190,7 +188,7 @@ public class ListDataRepositoriesResourceImplTest extends AbstractResourceImplTe
         }
         finally
         {
-            releaseClient(dataRepositoriesClientResource);
+            this.releaseClient(dataRepositoriesClientResource);
         }
     }
     
@@ -216,7 +214,7 @@ public class ListDataRepositoriesResourceImplTest extends AbstractResourceImplTe
         }
         finally
         {
-            releaseClient(dataRepositoriesClientResource);
+            this.releaseClient(dataRepositoriesClientResource);
         }
     }
     
@@ -241,7 +239,7 @@ public class ListDataRepositoriesResourceImplTest extends AbstractResourceImplTe
         }
         finally
         {
-            releaseClient(dataRepositoriesClientResource);
+            this.releaseClient(dataRepositoriesClientResource);
         }
     }
     
@@ -265,7 +263,7 @@ public class ListDataRepositoriesResourceImplTest extends AbstractResourceImplTe
         }
         finally
         {
-            releaseClient(dataRepositoriesClientResource);
+            this.releaseClient(dataRepositoriesClientResource);
         }
     }
     

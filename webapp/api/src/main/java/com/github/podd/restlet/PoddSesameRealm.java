@@ -47,12 +47,8 @@ import org.openrdf.model.vocabulary.RDF;
 import org.openrdf.query.Binding;
 import org.openrdf.query.BindingSet;
 import org.openrdf.query.Dataset;
-import org.openrdf.query.MalformedQueryException;
-import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.query.QueryLanguage;
-import org.openrdf.query.QueryResultHandlerException;
 import org.openrdf.query.TupleQuery;
-import org.openrdf.query.TupleQueryResult;
 import org.openrdf.query.impl.DatasetImpl;
 import org.openrdf.query.resultio.helpers.QueryResultCollector;
 import org.openrdf.queryrender.RenderUtils;
@@ -1515,7 +1511,7 @@ public class PoddSesameRealm extends Realm
         try
         {
             conn = this.repository.getConnection();
-            return findRoles(user, conn);
+            return this.findRoles(user, conn);
         }
         catch(final OpenRDFException e)
         {
@@ -1542,9 +1538,9 @@ public class PoddSesameRealm extends Realm
     {
         final Set<Role> result = new HashSet<Role>();
         
-        Collection<Entry<Role, URI>> mappings = getRolesWithObjectMappings(user);
+        final Collection<Entry<Role, URI>> mappings = this.getRolesWithObjectMappings(user);
         
-        for(Entry<Role, URI> nextMapping : mappings)
+        for(final Entry<Role, URI> nextMapping : mappings)
         {
             result.add(nextMapping.getKey());
         }
@@ -1657,7 +1653,7 @@ public class PoddSesameRealm extends Realm
         try
         {
             conn = this.repository.getConnection();
-            return getRoleMappings(conn);
+            return this.getRoleMappings(conn);
         }
         catch(final OpenRDFException e)
         {
@@ -1681,11 +1677,11 @@ public class PoddSesameRealm extends Realm
         
     }
     
-    private List<RoleMapping> getRoleMappings(RepositoryConnection conn) throws OpenRDFException
+    private List<RoleMapping> getRoleMappings(final RepositoryConnection conn) throws OpenRDFException
     {
         final List<RoleMapping> results = new ArrayList<RoleMapping>();
         
-        Map<String, PoddUser> usersMapByIdentifier = this.getUsersMapByIdentifier(conn);
+        final Map<String, PoddUser> usersMapByIdentifier = this.getUsersMapByIdentifier(conn);
         
         final RepositoryResult<Statement> typeStatements =
                 conn.getStatements(null, RDF.TYPE, SesameRealmConstants.OAS_ROLEMAPPING, true, this.getContexts());
@@ -1850,7 +1846,7 @@ public class PoddSesameRealm extends Realm
         try
         {
             conn = this.getRepository().getConnection();
-            return getRolesForObjectAlternate(userIdentifier, objectUri, conn);
+            return this.getRolesForObjectAlternate(userIdentifier, objectUri, conn);
         }
         catch(final OpenRDFException e)
         {
@@ -1887,14 +1883,14 @@ public class PoddSesameRealm extends Realm
         
         final TupleQuery tupleQuery = conn.prepareTupleQuery(QueryLanguage.SPARQL, query);
         
-        QueryResultCollector resultCollector = RdfUtility.executeTupleQuery(tupleQuery, this.getContexts());
+        final QueryResultCollector resultCollector = RdfUtility.executeTupleQuery(tupleQuery, this.getContexts());
         
         if(!resultCollector.getHandledTuple() || resultCollector.getBindingSets().isEmpty())
         {
             this.log.warn("Could not find role with mappings for user: {}", userIdentifier);
         }
         
-        for(BindingSet bindingSet : resultCollector.getBindingSets())
+        for(final BindingSet bindingSet : resultCollector.getBindingSets())
         {
             final Role role = this.buildRoleFromSparqlResult(bindingSet);
             
@@ -1941,14 +1937,14 @@ public class PoddSesameRealm extends Realm
             
             final TupleQuery tupleQuery = conn.prepareTupleQuery(QueryLanguage.SPARQL, query);
             
-            QueryResultCollector resultCollector = RdfUtility.executeTupleQuery(tupleQuery, this.getContexts());
+            final QueryResultCollector resultCollector = RdfUtility.executeTupleQuery(tupleQuery, this.getContexts());
             
             if(!resultCollector.getHandledTuple() || resultCollector.getBindingSets().isEmpty())
             {
                 this.log.warn("Could not find role with mappings for user: {}", user);
             }
             
-            for(BindingSet bindingSet : resultCollector.getBindingSets())
+            for(final BindingSet bindingSet : resultCollector.getBindingSets())
             {
                 final URI roleUri = (URI)bindingSet.getValue(PoddSesameRealm.PARAM_ROLE);
                 final Role role = PoddRoles.getRoleByUri(roleUri).getRole();
@@ -2106,9 +2102,9 @@ public class PoddSesameRealm extends Realm
             
             final TupleQuery tupleQuery = conn.prepareTupleQuery(QueryLanguage.SPARQL, query);
             
-            QueryResultCollector resultCollector = RdfUtility.executeTupleQuery(tupleQuery, this.getContexts());
+            final QueryResultCollector resultCollector = RdfUtility.executeTupleQuery(tupleQuery, this.getContexts());
             
-            for(BindingSet bindingSet : resultCollector.getBindingSets())
+            for(final BindingSet bindingSet : resultCollector.getBindingSets())
             {
                 final Binding binding = bindingSet.getBinding("userIdentifier");
                 result.add(this.buildRestletUserFromSparqlResult(binding.getValue().stringValue(), bindingSet));
@@ -2269,7 +2265,7 @@ public class PoddSesameRealm extends Realm
             
             final Collection<String> keySet = participantMap.keySet();
             
-            Map<String, PoddUser> usersMapByIdentifier = this.getUsersMapByIdentifier(conn);
+            final Map<String, PoddUser> usersMapByIdentifier = this.getUsersMapByIdentifier(conn);
             
             for(final String userIdentifier : keySet)
             {

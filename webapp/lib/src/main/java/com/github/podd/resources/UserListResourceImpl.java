@@ -4,13 +4,11 @@
 package com.github.podd.resources;
 
 import java.io.ByteArrayOutputStream;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.Model;
-import org.openrdf.model.URI;
 import org.openrdf.model.impl.LinkedHashModel;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.Rio;
@@ -23,16 +21,11 @@ import org.restlet.representation.Variant;
 import org.restlet.resource.Get;
 import org.restlet.resource.ResourceException;
 import org.restlet.security.User;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import com.github.ansell.restletutils.RestletUtilUser;
-import com.github.ansell.restletutils.SesameRealmConstants;
 import com.github.podd.restlet.PoddAction;
 import com.github.podd.restlet.PoddSesameRealm;
 import com.github.podd.restlet.PoddWebServiceApplication;
 import com.github.podd.restlet.RestletUtils;
-import com.github.podd.utils.PoddRdfConstants;
 import com.github.podd.utils.PoddRoles;
 import com.github.podd.utils.PoddUser;
 import com.github.podd.utils.PoddUserStatus;

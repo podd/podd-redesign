@@ -47,13 +47,13 @@ public class IndexResourceImplTest extends AbstractResourceImplTest
                     PoddRestletTestUtils.doTestUnAuthenticatedRequest(indexClientResource, Method.GET, null,
                             MediaType.TEXT_HTML, Status.SUCCESS_OK);
             
-            final String body = getText(results);
+            final String body = this.getText(results);
             Assert.assertTrue(body.contains("Welcome to PODD, please"));
             this.assertFreemarker(body);
         }
         finally
         {
-            releaseClient(indexClientResource);
+            this.releaseClient(indexClientResource);
         }
     }
     

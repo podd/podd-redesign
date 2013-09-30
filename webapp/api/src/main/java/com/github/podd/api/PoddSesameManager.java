@@ -29,7 +29,6 @@ import org.openrdf.model.Model;
 import org.openrdf.model.URI;
 import org.openrdf.repository.RepositoryConnection;
 import org.semanticweb.owlapi.model.IRI;
-import org.semanticweb.owlapi.model.OWLOntologyID;
 
 import com.github.podd.exception.UnmanagedArtifactIRIException;
 import com.github.podd.exception.UnmanagedSchemaIRIException;
@@ -79,6 +78,19 @@ public interface PoddSesameManager
         throws OpenRDFException;
     
     /**
+     * Gets all current versions of schema ontologies configured in this PODD server.
+     * 
+     * @param repositoryConnection
+     * @param schemaManagementGraph
+     * @return
+     * @throws OpenRDFException
+     * 
+     * @since 14/05/2013
+     */
+    Set<InferredOWLOntologyID> getAllCurrentSchemaOntologyVersions(RepositoryConnection repositoryConnection,
+            URI schemaManagementGraph) throws OpenRDFException;
+    
+    /**
      * Get all versions of the ontology with the given IRI that are managed in the given context in
      * the given repository connection.
      * <p>
@@ -95,19 +107,6 @@ public interface PoddSesameManager
      */
     List<InferredOWLOntologyID> getAllOntologyVersions(IRI ontologyIRI, RepositoryConnection connection,
             URI ontologyManagementGraph) throws OpenRDFException;
-    
-    /**
-     * Gets all current versions of schema ontologies configured in this PODD server.
-     * 
-     * @param repositoryConnection
-     * @param schemaManagementGraph
-     * @return
-     * @throws OpenRDFException
-     * 
-     * @since 14/05/2013
-     */
-    Set<InferredOWLOntologyID> getAllCurrentSchemaOntologyVersions(RepositoryConnection repositoryConnection,
-            URI schemaManagementGraph) throws OpenRDFException;
     
     /**
      * Gets all schema ontologies configured in this PODD server. This includes current as well as
@@ -169,6 +168,19 @@ public interface PoddSesameManager
             RepositoryConnection repositoryConnection, URI... contexts) throws OpenRDFException;
     
     /**
+     * Returns a {@link Set} containing the Object URIs of the given object's children. An empty Set
+     * is returned if the given object does not have any children.
+     * 
+     * @param objectUri
+     *            The object whose children are sought.
+     * @param conn
+     * @param contexts
+     * @return
+     * @throws OpenRDFException
+     */
+    Set<URI> getChildObjects(URI objectUri, RepositoryConnection conn, URI... contexts) throws OpenRDFException;
+    
+    /**
      * Returns current version details of an artifact ontology which has the given IRI as the
      * Ontology IRI or Version IRI.
      * 
@@ -188,19 +200,6 @@ public interface PoddSesameManager
     InferredOWLOntologyID getCurrentArtifactVersion(final IRI ontologyIRI,
             final RepositoryConnection repositoryConnection, final URI managementGraph) throws OpenRDFException,
         UnmanagedArtifactIRIException;
-    
-    /**
-     * Returns a {@link Set} containing the Object URIs of the given object's children. An empty Set
-     * is returned if the given object does not have any children.
-     * 
-     * @param objectUri
-     *            The object whose children are sought.
-     * @param conn
-     * @param contexts
-     * @return
-     * @throws OpenRDFException
-     */
-    Set<URI> getChildObjects(URI objectUri, RepositoryConnection conn, URI... contexts) throws OpenRDFException;
     
     /**
      * Returns current version details of an ontology which has the given IRI as the Ontology IRI or

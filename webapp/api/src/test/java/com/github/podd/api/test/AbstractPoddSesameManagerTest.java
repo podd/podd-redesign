@@ -30,7 +30,6 @@ import java.util.Set;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.openrdf.model.Model;
 import org.openrdf.model.URI;
@@ -107,8 +106,8 @@ public abstract class AbstractPoddSesameManagerTest
         this.testRepositoryConnection.add(ontologyIRI.toOpenRDFURI(), OWL.VERSIONIRI, contextCumVersionURI,
                 managementGraph);
         
-        InferredOWLOntologyID publishedOntologyID =
-                this.testPoddSesameManager.setPublished(isPublished, ontologyID, testRepositoryConnection,
+        final InferredOWLOntologyID publishedOntologyID =
+                this.testPoddSesameManager.setPublished(isPublished, ontologyID, this.testRepositoryConnection,
                         managementGraph);
         
         return this.testPoddSesameManager.isPublished(publishedOntologyID, this.testRepositoryConnection,
@@ -464,7 +463,7 @@ public abstract class AbstractPoddSesameManagerTest
     @Test
     public void testGetAllValidMembers() throws Exception
     {
-        ValueFactory vf = PoddRdfConstants.VF;
+        final ValueFactory vf = PoddRdfConstants.VF;
         // prepare: load schema ontologies and test artifact
         this.loadSchemaOntologies();
         final InferredOWLOntologyID ontologyID =
@@ -581,7 +580,7 @@ public abstract class AbstractPoddSesameManagerTest
         
         for(final URI[] element : testData)
         {
-            Collection<URI> nextProperty = Arrays.asList(element[1]);
+            final Collection<URI> nextProperty = Arrays.asList(element[1]);
             final Map<URI, URI> cardinalityValue =
                     this.testPoddSesameManager.getCardinalityValues(ontologyID, element[0], nextProperty,
                             this.testRepositoryConnection);
@@ -635,7 +634,7 @@ public abstract class AbstractPoddSesameManagerTest
         
         for(final URI[] element : testData)
         {
-            Collection<URI> nextProperty = Arrays.asList(element[1]);
+            final Collection<URI> nextProperty = Arrays.asList(element[1]);
             final Map<URI, URI> cardinalityValue =
                     this.testPoddSesameManager.getCardinalityValues(element[0], nextProperty, true,
                             this.testRepositoryConnection, contexts.toArray(new URI[0]));

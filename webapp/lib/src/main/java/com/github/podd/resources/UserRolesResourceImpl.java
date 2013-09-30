@@ -42,8 +42,6 @@ import org.restlet.resource.Get;
 import org.restlet.resource.Post;
 import org.restlet.resource.ResourceException;
 import org.restlet.security.User;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.github.ansell.restletutils.RestletUtilRole;
 import com.github.ansell.restletutils.RestletUtilUser;
@@ -194,7 +192,7 @@ public class UserRolesResourceImpl extends AbstractUserResourceImpl
         this.log.debug("getRoleManagementHtml");
         
         final String requestedUserIdentifier = this.getUserParameter();
-        PoddAction action =
+        final PoddAction action =
                 this.getAction(requestedUserIdentifier, PoddAction.OTHER_USER_EDIT, PoddAction.CURRENT_USER_EDIT);
         
         this.log.debug("requesting role management for user: {}", requestedUserIdentifier);
@@ -208,7 +206,7 @@ public class UserRolesResourceImpl extends AbstractUserResourceImpl
         dataModel.put("authenticatedUserIdentifier", this.getRequest().getClientInfo().getUser().getIdentifier());
         
         final PoddSesameRealm realm = ((PoddWebServiceApplication)this.getApplication()).getRealm();
-        final PoddUser poddUser = (PoddUser)realm.findUser(requestedUserIdentifier);
+        final PoddUser poddUser = realm.findUser(requestedUserIdentifier);
         
         if(poddUser == null)
         {
@@ -243,7 +241,7 @@ public class UserRolesResourceImpl extends AbstractUserResourceImpl
         this.log.debug("getRoleManagementHtml");
         
         final String requestedUserIdentifier = this.getUserParameter();
-        PoddAction action =
+        final PoddAction action =
                 this.getAction(requestedUserIdentifier, PoddAction.OTHER_USER_EDIT, PoddAction.CURRENT_USER_EDIT);
         
         this.log.debug("requesting role management for user: {}", requestedUserIdentifier);
@@ -251,7 +249,7 @@ public class UserRolesResourceImpl extends AbstractUserResourceImpl
         
         // completed checking authorization
         final PoddSesameRealm realm = ((PoddWebServiceApplication)this.getApplication()).getRealm();
-        final PoddUser poddUser = (PoddUser)realm.findUser(requestedUserIdentifier);
+        final PoddUser poddUser = realm.findUser(requestedUserIdentifier);
         
         if(poddUser == null)
         {

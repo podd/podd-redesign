@@ -25,7 +25,6 @@ import org.restlet.Response;
 import org.restlet.security.ChallengeAuthenticator;
 
 import com.github.ansell.propertyutil.PropertyUtil;
-import com.github.ansell.restletutils.RestletUtilSesameRealm;
 import com.github.podd.api.PoddArtifactManager;
 import com.github.podd.api.PoddRepositoryManager;
 import com.github.podd.api.PoddSchemaManager;

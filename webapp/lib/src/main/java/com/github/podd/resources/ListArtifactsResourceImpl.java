@@ -17,7 +17,6 @@
 package com.github.podd.resources;
 
 import java.io.ByteArrayOutputStream;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -35,8 +34,6 @@ import org.restlet.representation.Representation;
 import org.restlet.representation.Variant;
 import org.restlet.resource.Get;
 import org.restlet.resource.ResourceException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.github.podd.restlet.PoddAction;
 import com.github.podd.restlet.RestletUtils;

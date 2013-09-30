@@ -170,7 +170,7 @@ public class FileReferenceAttachResourceImplTest extends AbstractResourceImplTes
                     RestletTestUtils.doTestAuthenticatedRequest(fileRefAttachClientResource, Method.POST, input,
                             MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
             
-            final String body = getText(results);
+            final String body = this.getText(results);
             
             // verify: Inferred Ontology ID is received in RDF format
             Assert.assertTrue("Response not in RDF format", body.contains("<rdf:RDF"));
@@ -186,7 +186,7 @@ public class FileReferenceAttachResourceImplTest extends AbstractResourceImplTes
         }
         finally
         {
-            releaseClient(fileRefAttachClientResource);
+            this.releaseClient(fileRefAttachClientResource);
         }
     }
     
@@ -230,7 +230,7 @@ public class FileReferenceAttachResourceImplTest extends AbstractResourceImplTes
                         RestletTestUtils.doTestAuthenticatedRequest(fileRefAttachClientResource, Method.POST, input,
                                 MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
                 
-                final String body = getText(results);
+                final String body = this.getText(results);
                 
                 // verify: Inferred Ontology ID is received in RDF format
                 Assert.assertTrue("Response not in RDF format", body.contains("<rdf:RDF"));
@@ -249,7 +249,7 @@ public class FileReferenceAttachResourceImplTest extends AbstractResourceImplTes
             }
             finally
             {
-                releaseClient(fileRefAttachClientResource);
+                this.releaseClient(fileRefAttachClientResource);
             }
         }
         finally
@@ -287,7 +287,7 @@ public class FileReferenceAttachResourceImplTest extends AbstractResourceImplTes
                     RestletTestUtils.doTestAuthenticatedRequest(fileRefAttachClientResource, Method.POST, input,
                             MediaType.APPLICATION_RDF_TURTLE, Status.SUCCESS_OK, this.testWithAdminPrivileges);
             
-            final String body = getText(results);
+            final String body = this.getText(results);
             
             // verify: An updated Inferred Ontology ID is received
             Assert.assertTrue("Artifact version has not been updated properly", body.contains("artifact:1:version:2"));
@@ -302,7 +302,7 @@ public class FileReferenceAttachResourceImplTest extends AbstractResourceImplTes
         }
         finally
         {
-            releaseClient(fileRefAttachClientResource);
+            this.releaseClient(fileRefAttachClientResource);
         }
     }
     
@@ -346,7 +346,7 @@ public class FileReferenceAttachResourceImplTest extends AbstractResourceImplTes
                         RestletTestUtils.doTestAuthenticatedRequest(fileRefAttachClientResource, Method.POST, input,
                                 MediaType.APPLICATION_RDF_TURTLE, Status.SUCCESS_OK, this.testWithAdminPrivileges);
                 
-                final String body = getText(results);
+                final String body = this.getText(results);
                 
                 // verify: Inferred Ontology ID is received in RDF format
                 Assert.assertTrue("Artifact version has not been updated properly",
@@ -364,7 +364,7 @@ public class FileReferenceAttachResourceImplTest extends AbstractResourceImplTes
             }
             finally
             {
-                releaseClient(fileRefAttachClientResource);
+                this.releaseClient(fileRefAttachClientResource);
             }
         }
         finally
@@ -410,11 +410,11 @@ public class FileReferenceAttachResourceImplTest extends AbstractResourceImplTes
         {
             Assert.assertEquals(Status.SERVER_ERROR_BAD_GATEWAY, e.getStatus());
             final Representation responseEntity = fileRefAttachClientResource.getResponseEntity();
-            Assert.assertTrue(getText(responseEntity).contains("File Reference validation resulted in failures"));
+            Assert.assertTrue(this.getText(responseEntity).contains("File Reference validation resulted in failures"));
         }
         finally
         {
-            releaseClient(fileRefAttachClientResource);
+            this.releaseClient(fileRefAttachClientResource);
         }
     }
     
@@ -450,7 +450,7 @@ public class FileReferenceAttachResourceImplTest extends AbstractResourceImplTes
         }
         finally
         {
-            releaseClient(fileRefAttachClientResource);
+            this.releaseClient(fileRefAttachClientResource);
         }
     }
     
@@ -488,7 +488,7 @@ public class FileReferenceAttachResourceImplTest extends AbstractResourceImplTes
         }
         finally
         {
-            releaseClient(fileRefAttachClientResource);
+            this.releaseClient(fileRefAttachClientResource);
         }
     }
     
@@ -523,7 +523,7 @@ public class FileReferenceAttachResourceImplTest extends AbstractResourceImplTes
         }
         finally
         {
-            releaseClient(fileRefAttachClientResource);
+            this.releaseClient(fileRefAttachClientResource);
         }
     }
     

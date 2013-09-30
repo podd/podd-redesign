@@ -196,6 +196,48 @@ public final class RestletUtils
         return new TemplateRepresentation(templateName, freemarkerConfiguration, dataModel, mediaType);
     }
     
+    /**
+     * Finds the parent details given an object, which may be null, and the artifact that it
+     * expected to be found in.
+     * 
+     * @param artifactManager
+     *            The artifact manager.
+     * @param ontologyID
+     *            The details of the artifact.
+     * @param objectToView
+     *            If this is null, the top object will be found, otherwise, the details for this
+     *            object will be found if possible.
+     * @return The details for the parent object, including a label if possible and its URI.
+     * @throws OpenRDFException
+     *             If there are errors getting the labels
+     * @throws ResourceException
+     *             If there is more than one top object.
+     */
+    public static PoddObjectLabel getParentDetails(final PoddArtifactManager artifactManager,
+            final InferredOWLOntologyID ontologyID, final String objectToView) throws OpenRDFException,
+        ResourceException
+    {
+        PoddObjectLabel theObject = null;
+        
+        if(objectToView != null && !objectToView.trim().isEmpty())
+        {
+            theObject = artifactManager.getObjectLabel(ontologyID, PoddRdfConstants.VF.createURI(objectToView));
+        }
+        else
+        {
+            // find and set top-object of this artifact as the object to display
+            final List<PoddObjectLabel> topObjectLabels = artifactManager.getTopObjectLabels(Arrays.asList(ontologyID));
+            if(topObjectLabels == null || topObjectLabels.size() != 1)
+            {
+                throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "There should be only 1 top object");
+            }
+            
+            theObject = topObjectLabels.get(0);
+        }
+        
+        return theObject;
+    }
+    
     public static Map<RestletUtilRole, Collection<URI>> getUsersRoles(final PoddSesameRealm realm,
             final PoddUser poddUser)
     {
@@ -274,58 +316,6 @@ public final class RestletUtils
     }
     
     /**
-     * Serialises part or all of a repository into RDF, depending on which contexts are provided.
-     * 
-     * @param mimeType
-     *            The MIME type of the serialised RDF statements.
-     * @param myRepository
-     *            The repository containing the RDF statements to serialise.
-     * @param contexts
-     *            0 or more Resources identifying contexts in the repository to serialise.
-     * @return A Restlet Representation containing the
-     * @throws RepositoryException
-     * @throws RDFHandlerException
-     */
-    public static Representation toRDFSerialisation(final String mimeType, final Repository myRepository,
-            final Resource... contexts) throws RepositoryException, RDFHandlerException
-    {
-        if(myRepository == null)
-        {
-            throw new IllegalArgumentException("Repository cannot be null");
-        }
-        
-        // Attempt to find a writer format based on their requested mime type, or if that fails,
-        // give them RDF/XML that every RDF library can process.
-        final RDFFormat outputFormat = Rio.getWriterFormatForMIMEType(mimeType, RDFFormat.RDFXML);
-        
-        final StringWriter writer = new StringWriter();
-        
-        RepositoryConnection conn = null;
-        
-        conn = myRepository.getConnection();
-        
-        final RDFHandler output = Rio.createWriter(outputFormat, writer);
-        
-        conn.export(output, contexts);
-        
-        // TODO: find a subclass of Representation that accepts a writer directly, without having to
-        // serialise it to a string, to improve performance for large results sets.
-        final Representation result =
-                new AppendableRepresentation(writer.toString(), MediaType.valueOf(outputFormat.getDefaultMIMEType()),
-                        Language.DEFAULT, CharacterSet.UTF_8);
-        
-        return result;
-        
-    }
-    
-    /**
-     * Private default constructor
-     */
-    private RestletUtils()
-    {
-    }
-    
-    /**
      * Populate the data model with info about the parent of the current object. If the given object
      * does not have a parent (i.e. is a Top Object) the data model remains unchanged.
      * 
@@ -386,45 +376,55 @@ public final class RestletUtils
     }
     
     /**
-     * Finds the parent details given an object, which may be null, and the artifact that it
-     * expected to be found in.
+     * Serialises part or all of a repository into RDF, depending on which contexts are provided.
      * 
-     * @param artifactManager
-     *            The artifact manager.
-     * @param ontologyID
-     *            The details of the artifact.
-     * @param objectToView
-     *            If this is null, the top object will be found, otherwise, the details for this
-     *            object will be found if possible.
-     * @return The details for the parent object, including a label if possible and its URI.
-     * @throws OpenRDFException
-     *             If there are errors getting the labels
-     * @throws ResourceException
-     *             If there is more than one top object.
+     * @param mimeType
+     *            The MIME type of the serialised RDF statements.
+     * @param myRepository
+     *            The repository containing the RDF statements to serialise.
+     * @param contexts
+     *            0 or more Resources identifying contexts in the repository to serialise.
+     * @return A Restlet Representation containing the
+     * @throws RepositoryException
+     * @throws RDFHandlerException
      */
-    public static PoddObjectLabel getParentDetails(final PoddArtifactManager artifactManager,
-            final InferredOWLOntologyID ontologyID, final String objectToView) throws OpenRDFException,
-        ResourceException
+    public static Representation toRDFSerialisation(final String mimeType, final Repository myRepository,
+            final Resource... contexts) throws RepositoryException, RDFHandlerException
     {
-        PoddObjectLabel theObject = null;
-        
-        if(objectToView != null && !objectToView.trim().isEmpty())
+        if(myRepository == null)
         {
-            theObject = artifactManager.getObjectLabel(ontologyID, PoddRdfConstants.VF.createURI(objectToView));
-        }
-        else
-        {
-            // find and set top-object of this artifact as the object to display
-            final List<PoddObjectLabel> topObjectLabels = artifactManager.getTopObjectLabels(Arrays.asList(ontologyID));
-            if(topObjectLabels == null || topObjectLabels.size() != 1)
-            {
-                throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "There should be only 1 top object");
-            }
-            
-            theObject = topObjectLabels.get(0);
+            throw new IllegalArgumentException("Repository cannot be null");
         }
         
-        return theObject;
+        // Attempt to find a writer format based on their requested mime type, or if that fails,
+        // give them RDF/XML that every RDF library can process.
+        final RDFFormat outputFormat = Rio.getWriterFormatForMIMEType(mimeType, RDFFormat.RDFXML);
+        
+        final StringWriter writer = new StringWriter();
+        
+        RepositoryConnection conn = null;
+        
+        conn = myRepository.getConnection();
+        
+        final RDFHandler output = Rio.createWriter(outputFormat, writer);
+        
+        conn.export(output, contexts);
+        
+        // TODO: find a subclass of Representation that accepts a writer directly, without having to
+        // serialise it to a string, to improve performance for large results sets.
+        final Representation result =
+                new AppendableRepresentation(writer.toString(), MediaType.valueOf(outputFormat.getDefaultMIMEType()),
+                        Language.DEFAULT, CharacterSet.UTF_8);
+        
+        return result;
+        
+    }
+    
+    /**
+     * Private default constructor
+     */
+    private RestletUtils()
+    {
     }
     
 }

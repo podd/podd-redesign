@@ -19,7 +19,6 @@ package com.github.podd.resources;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Iterator;
 import java.util.Map;
 
 import org.openrdf.OpenRDFException;
@@ -39,11 +38,8 @@ import org.restlet.resource.Get;
 import org.restlet.resource.Post;
 import org.restlet.resource.ResourceException;
 import org.restlet.security.User;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.github.ansell.restletutils.RestletUtilRole;
-import com.github.ansell.restletutils.RestletUtilUser;
 import com.github.ansell.restletutils.SesameRealmConstants;
 import com.github.podd.restlet.PoddAction;
 import com.github.podd.restlet.PoddSesameRealm;
@@ -118,7 +114,7 @@ public class UserAddResourceImpl extends AbstractUserResourceImpl
                 nextRealm.map(newUser, PoddRoles.PROJECT_CREATOR.getRole());
             }
             
-            for(Resource mappingUri : newUserModel.filter(null, RDF.TYPE, SesameRealmConstants.OAS_ROLEMAPPING)
+            for(final Resource mappingUri : newUserModel.filter(null, RDF.TYPE, SesameRealmConstants.OAS_ROLEMAPPING)
                     .subjects())
             {
                 final URI roleUri =
@@ -141,7 +137,7 @@ public class UserAddResourceImpl extends AbstractUserResourceImpl
             }
             
             // - check the User was successfully added to the Realm
-            final PoddUser findUser = (PoddUser)nextRealm.findUser(newUser.getIdentifier());
+            final PoddUser findUser = nextRealm.findUser(newUser.getIdentifier());
             if(findUser == null)
             {
                 throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Failed to add user");

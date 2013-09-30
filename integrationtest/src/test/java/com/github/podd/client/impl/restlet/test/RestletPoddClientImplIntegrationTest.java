@@ -125,7 +125,7 @@ public class RestletPoddClientImplIntegrationTest extends AbstractPoddClientTest
         final ClientResource clientResource = new ClientResource(this.getTestPoddServerUrl() + "/reset/r3set");
         try
         {
-            Representation representation = clientResource.get();
+            final Representation representation = clientResource.get();
             try
             {
                 representation.exhaust();
@@ -139,16 +139,16 @@ public class RestletPoddClientImplIntegrationTest extends AbstractPoddClientTest
         {
             if(clientResource.getNext() != null && clientResource.getNext() instanceof Client)
             {
-                Client c = (Client)clientResource.getNext();
+                final Client c = (Client)clientResource.getNext();
                 try
                 {
                     c.stop();
                 }
-                catch(IOException e)
+                catch(final IOException e)
                 {
                     throw e;
                 }
-                catch(Exception e)
+                catch(final Exception e)
                 {
                     throw new IOException(e);
                 }
