@@ -292,7 +292,7 @@ podd.createDataRepositoriesList = function(nextDatabank, propertyUri, currentVal
     var myQuery = $.rdf({
         databank : nextDatabank
     })
-    // TODO: Get relevant metadata to reduce the number of repositories 
+    // TODO: Get relevant metadata to reduce the number of repositories
     // based on the range and restrictions on propertyUri
     // Find the class
     .where('?pRepository rdf:type poddData:DataRepository')
@@ -305,9 +305,9 @@ podd.createDataRepositoriesList = function(nextDatabank, propertyUri, currentVal
     if (bindings.length === 0) {
         podd.debug('Did not find any data repositories');
     }
-    
+
     podd.debug(bindings);
-    
+
     $.each(bindings, function(index, value) {
 
         var optionValue = value.pAlias.value;
@@ -334,6 +334,106 @@ podd.createDataRepositoriesList = function(nextDatabank, propertyUri, currentVal
     });
     podd.debug(select);
     return select;
+};
+
+/**
+ * Add handlers for the Child Object Drop Down list and the "Continue" link.
+ * 
+ * @param theLink
+ *            The link to click after child object type has been selected
+ * @param dropDown
+ *            Drop Down list to select the child object type and relationship
+ * @param hiddenChildType
+ *            Hidden input where the selected child object type is set
+ * @param hiddenRelationsip
+ *            Hidden input where the selected child relationship is set
+ */
+podd.addDataRepositoryHandler = function(dropDown, detailsDiv, verifyButton, saveButton, nextDatabank) {
+
+    dropDown.change(function(event) {
+        var option = $('option:selected', this);
+
+        if (typeof option !== 'undefined') {
+            var aliasString = '' + option.val();
+
+            podd.debug('Selected alias' + aliasString);
+
+            var myQuery = $.rdf({
+                databank : nextDatabank
+            })
+            // TODO: Get relevant metadata to reduce the number of repositories
+            // based on the range and restrictions on propertyUri
+            // Find the class
+            .where('?pRepository rdf:type ?type')
+            //
+            .where('?pRepository poddBase:hasAlias "' + aliasString + '"');
+
+            var bindings = myQuery.select();
+
+            if (bindings.length === 0) {
+                podd.debug('Did not find any data repositories');
+            }
+
+            podd.debug(bindings);
+
+            $.each(bindings, function(index, value) {
+                if (value.type.value == TYPE_SSH_DATA_REPOSITORY) {
+                    podd.createSSHFileReferenceForm(detailsDiv, verifyButton, saveButton);
+                }
+                else if (value.type.value == TYPE_DATA_REPOSITORY) {
+                    // Ignore, as this is just the base type and is not valuable
+                    // at this stage
+                }
+                else {
+                    podd.debug("TODO: Support data repository type : " + value.type.value);
+                    podd.debug(value);
+                }
+            });
+        }
+        else {
+            podd.debug('option was undefined');
+        }
+    });
+
+};
+
+podd.createSSHFileReferenceForm = function(detailsDiv, verifyButton, saveButton) {
+    // Clear any previous details in the div
+    detailsDiv.empty();
+
+    // TODO: Support verification without saving
+    verifyButton.click(function(event) {
+        podd.debug("Clicked on verify SSH File Reference button");
+        podd.debug("TODO: Implement me");
+    });
+
+    saveButton.click(function(event) {
+        podd.debug("Clicked on save SSH File Reference button");
+        var detailsDatabank = podd.newDatabank();
+        detailsDatabank.add('<urn:temp:uuid:dataReference> a poddBase:DataReference');
+        detailsDatabank.add('<urn:temp:uuid:dataReference> a poddBase:SSHFileReference');
+        detailsDatabank.add(podd.getCurrentObjectUri() + ' poddBase:hasDataReference <urn:temp:uuid:dataReference>');
+
+        var errors = [];
+        if (typeof propertyUri === 'undefined' || propertyUri.length === 0) {
+            errors.push('<p>A Parent-Child relationship should be selected</p>');
+        }
+        if (typeof targetObjectType === 'undefined' || targetObjectType.length === 0) {
+            errors.push('<p>A child type should be selected</p>');
+        }
+
+        if (errors.length > 0) {
+            $.each(errors, function(index, value) {
+                podd.updateErrorMessageList(value);
+            });
+        }
+        else {
+            // TODO: Hide the save button temporarily to avoid multiple
+            // submissions, display again if the create fails
+            podd.submitDataReferenceCreate(saveButton, detailsDatabank);
+        }
+    });
+
 };
 
 /**
@@ -1814,25 +1914,25 @@ podd.initialiseNewTopObject = function(nextDatabank, artifactUri, objectUri) {
 podd.isValidObject = function(objectUri, nextDatabank) {
     var valid = true;
 
-	    $
-			.each(
-					podd.cardinalityList,
-					function(index, value) {
+    $
+            .each(
+                    podd.cardinalityList,
+                    function(index, value) {
 
-						if (typeof value.cardinality !== 'undefined'
-								&& (value.cardinality.toString() === CARD_ExactlyOne || value.cardinality.toString() === CARD_OneOrMany)) {
+                        if (typeof value.cardinality !== 'undefined'
+                                && (value.cardinality.toString() === CARD_ExactlyOne || value.cardinality.toString() === CARD_OneOrMany)) {
 
-							var myQuery = $.rdf({
-								databank : nextDatabank
-							}).where(objectUri + ' <' + value.propertyUri + '> ?someValue');
-							var bindings = myQuery.select();
-							if (bindings.length === 0) {
-								podd.updateErrorMessageList('Mandatory property ' + value.propertyLabel + ' is empty.');
-								// TODO: display error next to the erroneous
-								valid = false;
-							}
-						}
-					});
+                            var myQuery = $.rdf({
+                                databank : nextDatabank
+                            }).where(objectUri + ' <' + value.propertyUri + '> ?someValue');
+                            var bindings = myQuery.select();
+                            if (bindings.length === 0) {
+                                podd.updateErrorMessageList('Mandatory property ' + value.propertyLabel + ' is empty.');
+                                // TODO: display error next to the erroneous
+                                valid = false;
+                            }
+                        }
+                    });
     return valid;
 };
 
@@ -2988,17 +3088,16 @@ podd.updateErrorTable = function(column1, column2) {
  * properties without labels should have them added.
  */
 podd.updateInterface = function(objectType, nextSchemaDatabank, nextArtifactDatabank) {
-	
+
     // check objectType is an owl:Class and print a warning otherwise
     var classQuery = $.rdf({
         databank : nextSchemaDatabank
-    })
-    .where('<' + objectType + '> rdf:type owl:Class');
+    }).where('<' + objectType + '> rdf:type owl:Class');
     var classBindings = classQuery.select();
     if (classBindings.length == 0) {
-    	podd.debug('WARNING: <' + objectType + '> is NOT an owl:Class');
+        podd.debug('WARNING: <' + objectType + '> is NOT an owl:Class');
     }
-	
+
     // retrieve weighted property list
     var myQuery = $.rdf({
         databank : nextSchemaDatabank
