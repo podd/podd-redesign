@@ -52,8 +52,7 @@ public class SSHFileRepositoryImplFactory implements PoddDataRepositoryFactory
             return new SSHFileRepositoryImpl(statements);
         }
         
-        throw new FileRepositoryIncompleteException(statements,
-                "Could not create SSH file repository from this configuration");
+        throw new FileRepositoryIncompleteException("Could not create SSH file repository from this configuration");
     }
     
     @Override

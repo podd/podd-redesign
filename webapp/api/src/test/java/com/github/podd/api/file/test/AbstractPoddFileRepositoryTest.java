@@ -145,7 +145,6 @@ public abstract class AbstractPoddFileRepositoryTest<T extends DataReference>
             }
             catch(final FileRepositoryIncompleteException e)
             {
-                Assert.assertNotNull(e.getModel());
                 Assert.assertTrue(e.getMessage().contains("repository configuration incomplete"));
             }
         }

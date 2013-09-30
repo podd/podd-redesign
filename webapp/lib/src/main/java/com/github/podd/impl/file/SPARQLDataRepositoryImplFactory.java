@@ -52,8 +52,7 @@ public class SPARQLDataRepositoryImplFactory implements PoddDataRepositoryFactor
             return new SPARQLDataRepositoryImpl(statements);
         }
         
-        throw new FileRepositoryIncompleteException(statements,
-                "Could not create SPARQL data repository from this configuration");
+        throw new FileRepositoryIncompleteException("Could not create SPARQL data repository from this configuration");
     }
     
     @Override

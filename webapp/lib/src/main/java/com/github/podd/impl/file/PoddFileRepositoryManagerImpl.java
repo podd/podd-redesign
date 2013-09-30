@@ -174,8 +174,7 @@ public class PoddFileRepositoryManagerImpl implements PoddDataRepositoryManager
                 final Model model = repositoryConfiguration.getAsModel();
                 if(model == null || model.isEmpty())
                 {
-                    throw new FileRepositoryIncompleteException(model,
-                            "Incomplete File Repository since Model is empty");
+                    throw new FileRepositoryIncompleteException("Incomplete File Repository since Model is empty");
                 }
                 
                 // check that the subject URIs used in the repository configuration are not already
@@ -186,8 +185,8 @@ public class PoddFileRepositoryManagerImpl implements PoddDataRepositoryManager
                 {
                     if(conn.hasStatement(subjectUri, null, null, false, context))
                     {
-                        throw new FileRepositoryIncompleteException(model,
-                                "Subject URIs used in Model already exist in Management Graph");
+                        throw new FileRepositoryIncompleteException(
+                                "Subject URIs used in Model already exist in Management Graph: uri=" + subjectUri);
                     }
                 }
                 
@@ -714,7 +713,7 @@ public class PoddFileRepositoryManagerImpl implements PoddDataRepositoryManager
         {
             final String msg = "Failed verification of the DataRepsitory against poddDataRepository.owl";
             this.log.error(msg, e);
-            throw new FileRepositoryIncompleteException(schemaModel, msg, e);
+            throw new FileRepositoryIncompleteException(msg, e);
         }
         finally
         {

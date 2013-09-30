@@ -67,14 +67,14 @@ abstract class PoddFileRepositoryImpl<T extends DataReference> implements PoddDa
         
         if(aliasModel.isEmpty())
         {
-            throw new FileRepositoryIncompleteException(this.model, "Model did not contain any aliases");
+            throw new FileRepositoryIncompleteException("Model did not contain any aliases");
         }
         
         // alias
         this.alias = ((Literal)aliasModel.objects().iterator().next()).getLabel();
         if(this.alias.trim().isEmpty())
         {
-            throw new FileRepositoryIncompleteException(this.model, "File Repository Alias cannot be empty");
+            throw new FileRepositoryIncompleteException("File Repository Alias cannot be empty");
         }
         
         this.aliasUri = aliasModel.subjects().iterator().next();
@@ -90,7 +90,8 @@ abstract class PoddFileRepositoryImpl<T extends DataReference> implements PoddDa
         }
         if(this.types.isEmpty())
         {
-            throw new FileRepositoryIncompleteException(this.model, "No File Repository type information found");
+            throw new FileRepositoryIncompleteException("No File Repository type information found: alias="
+                    + this.alias + " aliasUri=" + this.aliasUri);
         }
     }
     

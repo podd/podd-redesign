@@ -63,12 +63,12 @@ public class SSHFileRepositoryImpl extends PoddFileRepositoryImpl<SSHFileReferen
         if(protocol == null || host == null || port == null || fingerprint == null || username == null
                 || secret == null)
         {
-            throw new FileRepositoryIncompleteException(model, "SSH repository configuration incomplete");
+            throw new FileRepositoryIncompleteException("SSH repository configuration incomplete");
         }
         
         if(!PoddDataRepository.PROTOCOL_SSH.equalsIgnoreCase(protocol))
         {
-            throw new FileRepositoryIncompleteException(model, "Protocol needs to be SSH");
+            throw new FileRepositoryIncompleteException("Protocol needs to be SSH");
         }
     }
     

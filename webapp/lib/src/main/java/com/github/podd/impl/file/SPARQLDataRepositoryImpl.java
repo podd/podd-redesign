@@ -54,12 +54,12 @@ public class SPARQLDataRepositoryImpl extends PoddFileRepositoryImpl<SPARQLDataR
         
         if(protocol == null || host == null || port == null || path == null)
         {
-            throw new FileRepositoryIncompleteException(model, "SPARQL repository configuration incomplete");
+            throw new FileRepositoryIncompleteException("SPARQL repository configuration incomplete");
         }
         
         if(!PoddDataRepository.PROTOCOL_HTTP.equalsIgnoreCase(protocol))
         {
-            throw new FileRepositoryIncompleteException(model, "Protocol needs to be HTTP for SPARQL Repository");
+            throw new FileRepositoryIncompleteException("Protocol needs to be HTTP for SPARQL Repository");
         }
     }
     
