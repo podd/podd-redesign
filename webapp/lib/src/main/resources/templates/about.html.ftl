@@ -71,7 +71,7 @@
         <p>Implementation information can be found at the <a href="http://projects.arcs.org.au/trac/podd/">PODD project
             management website</a>.</p>
 
-        <p>If you have any queries regarding PODD please email <a href="mailto:g.kennedy1@uq.edu.au">g.kennedy1@uq.edu.au</a>.
+        <p>If you have any queries regarding PODD please email peter.ansell at csiro.au.
         </p>
 
         <p>PODD is a data repository project supported by:</p>
