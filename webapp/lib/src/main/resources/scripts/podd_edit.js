@@ -42,6 +42,7 @@ var PROPERTY_HAS_PI = 'http://purl.org/podd/ns/poddBase#hasPrincipalInvestigator
 
 var TYPE_DATA_REPOSITORY = 'http://purl.org/podd/ns/dataRepository#DataRepository';
 var TYPE_SSH_DATA_REPOSITORY = 'http://purl.org/podd/ns/dataRepository#SSHFileRepository';
+var TYPE_SPARQL_DATA_REPOSITORY = 'http://purl.org/podd/ns/dataRepository#SPARQLDataRepository';
 
 // --------------------------------
 
@@ -344,7 +345,7 @@ podd.addDataRepositoryHandler = function(dropDown, detailsDiv, verifyButton, sav
         if (typeof option !== 'undefined') {
             var aliasString = '' + option.val();
 
-            podd.debug('Selected alias' + aliasString);
+            podd.debug('Selected alias : {' + aliasString+"}");
 
             var myQuery = $.rdf({
                 databank : nextDatabank
@@ -359,22 +360,32 @@ podd.addDataRepositoryHandler = function(dropDown, detailsDiv, verifyButton, sav
             var bindings = myQuery.select();
 
             if (bindings.length === 0) {
-                podd.debug('Did not find any data repositories');
+                podd.debug('Did not find any data repositories for the given alias');
             }
 
             podd.debug(bindings);
 
+            var found = false;
             $.each(bindings, function(index, value) {
-                if (value.type.value == TYPE_SSH_DATA_REPOSITORY) {
-                    podd.createSSHFileReferenceForm(aliasString, detailsDiv, verifyButton, saveButton);
-                }
-                else if (value.type.value == TYPE_DATA_REPOSITORY) {
-                    // Ignore, as this is just the base type and is not valuable
-                    // at this stage
-                }
-                else {
-                    podd.debug("TODO: Support data repository type : " + value.type.value);
-                    podd.debug(value);
+                if(!found) {
+                    if (value.type.value == TYPE_SSH_DATA_REPOSITORY) {
+                        found = true;
+                        detailsDiv.empty();
+                        podd.createSSHFileReferenceForm(aliasString, detailsDiv, verifyButton, saveButton);
+                    }
+                    else if (value.type.value == TYPE_SPARQL_DATA_REPOSITORY) {
+                        found = true;
+                        detailsDiv.empty();
+                        podd.createSPARQLDataReferenceForm(aliasString, detailsDiv, verifyButton, saveButton);
+                    }
+                    else if (value.type.value == TYPE_DATA_REPOSITORY) {
+                        // Ignore, as this is just the base type and is not valuable
+                        // at this stage
+                    }
+                    else {
+                        podd.debug("TODO: Support data repository type : " + value.type.value);
+                        podd.debug(value);
+                    }
                 }
             });
         }
@@ -386,8 +397,6 @@ podd.addDataRepositoryHandler = function(dropDown, detailsDiv, verifyButton, sav
 };
 
 podd.createSSHFileReferenceForm = function(aliasString, detailsDiv, verifyButton, saveButton) {
-    // Clear any previous details in the div
-    detailsDiv.empty();
 
     var fileName = $('<input name="filename"></input>');
 
@@ -443,8 +452,14 @@ podd.createSSHFileReferenceForm = function(aliasString, detailsDiv, verifyButton
 
 };
 
-podd.submitDataReferenceCreate = function(saveButton, detailsDatabank) {
+podd.createSPARQLDataReferenceForm = function(aliasString, detailsDiv, verifyButton, saveButton) {
+    podd.debug("TODO: Implement createSSHFileReferenceForm");
+};
 
+podd.submitDataReferenceCreate = function(saveButton, detailsDatabank) {
+    podd.debug("TODO: Implement submitDataReferenceCreate");
+    podd.debug(saveButton);
+    podd.debug(detailsDatabank);
 };
 
 /**
