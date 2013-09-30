@@ -168,7 +168,8 @@ public class DataReferenceAttachResourceImpl extends AbstractPoddResourceImpl
         final Map<String, Object> dataModel = RestletUtils.getBaseDataModel(this.getRequest());
         dataModel.put("contentTemplate", "attachDataReference.html.ftl");
         dataModel.put("pageTitle", "Attach Data Reference");
-        dataModel.put("artifact", artifact);
+        dataModel.put("artifactIri", artifact.getOntologyIRI().toString());
+        dataModel.put("versionIri", artifact.getVersionIRI().toString());
         dataModel.put("parentObject", parentDetails);
         
         // Output the base template, with contentTemplate from the dataModel defining the

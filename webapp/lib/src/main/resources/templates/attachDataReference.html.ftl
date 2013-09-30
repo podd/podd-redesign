@@ -26,6 +26,10 @@
 
 <script type="text/javascript">
 	$(document).ready(function() {
+		podd.objectUri = '${parentObject.uri!"undefined"}';
+		podd.artifactIri = '${artifactIri!"undefined"}';
+		podd.versionIri = '${versionIri!"undefined"}';
+		
 		podd.getDataRepositories(function(databank) {
 			podd.dataRepositoryDatabank = databank;
 			var select = podd.createDataRepositoriesList(podd.dataRepositoryDatabank, undefined, undefined, true)

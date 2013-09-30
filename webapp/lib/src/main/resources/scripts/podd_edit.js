@@ -416,7 +416,7 @@ podd.createSSHFileReferenceForm = function(aliasString, detailsDiv) {
     var saveButton = $('<button></button>');
     saveButton.text("Save");
     buttonDiv.append(verifyButton, saveButton);
-    
+
     detailsDiv.append(fileNameLabel, fileName, pathLabel, path, buttonDiv);
     // detailsDiv.append(path);
     // detailsDiv.append(verifyButton);
@@ -460,7 +460,7 @@ podd.createSSHFileReferenceForm = function(aliasString, detailsDiv) {
         else {
             // TODO: Hide the save button temporarily to avoid multiple
             // submissions, display again if the create fails
-            podd.submitDataReferenceCreate(saveButton, detailsDatabank);
+            podd.submitDataReferenceCreate(detailsDatabank);
         }
     });
 
@@ -476,10 +476,41 @@ podd.createSPARQLDataReferenceForm = function(aliasString, detailsDiv) {
     podd.debug("TODO: Implement createSSHFileReferenceForm");
 };
 
-podd.submitDataReferenceCreate = function(saveButton, detailsDatabank) {
+podd.submitDataReferenceCreate = function(databank) {
     podd.debug("TODO: Implement submitDataReferenceCreate");
-    podd.debug(saveButton);
-    podd.debug(detailsDatabank);
+    podd.debug(databank);
+
+    var modifiedTriples = $.toJSON(databank.dump({
+        format : 'application/json'
+    }));
+    podd.debug("As JSON: " + modifiedTriples);
+
+    var requestUrl = podd.baseUrl + "/artifact/attachdataref?artifactUri=" + encodeUriComponent(podd.artifactIri)
+            + "&versionUri=" + encodeUriComponent(podd.versionIri) + "&objectUri=" + encodeUriComponent(podd.objectUri);
+
+    var redirectUrl = podd.baseUrl + "/artifact/base?artifactUri=" + encodeUriComponent(podd.artifactIri)
+            + "&objectUri=" + encodeUriComponent(podd.objectUri);
+
+    $.ajax({
+        url : requestUrl,
+        type : 'POST',
+        data : modifiedTriples,
+        contentType : 'application/rdf+json', // what we're sending
+        beforeSend : function(xhr) {
+            xhr.setRequestHeader("Accept", "application/rdf+json");
+        },
+        success : function(resultData, status, xhr) {
+            podd.debug('[submitUserData] ### SUCCESS ### ' + resultData);
+            window.location.href = redirectUrl;
+        },
+        error : function(xhr, status, error) {
+            podd.debug('[submitUserData] $$$ ERROR $$$ ' + error);
+            podd.debug(xhr.statusText);
+
+            podd.displaySummaryErrorMessage(xhr.responseText);
+        }
+    });
+
 };
 
 /**
