@@ -450,13 +450,13 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
                 }
                 else
                 {
-                    this.log.error("Could not find default aliases resource: {}", aliasesFile);
+                    this.log.error("Could not find data repository configuration resource: {}", aliasesFile);
                 }
             }
             catch(IOException | RDFParseException | UnsupportedRDFormatException e)
             {
-                this.log.error("Could not load default aliases");
-                throw new PoddRuntimeException("Could not load default aliases", e);
+                this.log.error("Could not load data repository configuration");
+                throw new PoddRuntimeException("Could not load data repository configuration", e);
             }
         }
         
