@@ -64,7 +64,7 @@ public class ListDataRepositoriesResourceImpl extends AbstractPoddResourceImpl
     {
         this.log.info("@Get list data repositories Page");
         
-        this.checkAuthentication(PoddAction.DATA_REPOSITORY_READ);
+        this.checkAuthentication(PoddAction.DATA_REPOSITORY_LIST);
         
         final Map<String, Object> dataModel = RestletUtils.getBaseDataModel(this.getRequest());
         dataModel.put("contentTemplate", "datarepositories.html.ftl");
@@ -93,7 +93,7 @@ public class ListDataRepositoriesResourceImpl extends AbstractPoddResourceImpl
     {
         this.log.info("@Get list data repositories RDF");
         
-        this.checkAuthentication(PoddAction.DATA_REPOSITORY_READ);
+        this.checkAuthentication(PoddAction.DATA_REPOSITORY_LIST);
         
         final RDFFormat resultFormat = Rio.getWriterFormatForMIMEType(variant.getMediaType().getName());
         

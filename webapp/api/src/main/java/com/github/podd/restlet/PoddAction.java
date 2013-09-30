@@ -172,11 +172,21 @@ public enum PoddAction
     /**
      * An action by a user asking to fetch information about a data repository.
      * 
-     * By default if they are not administrators, they will not be able to see information about
-     * other data repositories.
+     * By default if they are not administrators, they will not be able to see specific information
+     * about data repositories.
      */
     DATA_REPOSITORY_READ(true, "Could not retrieve data repository details", Collections.singleton(PoddRoles.ADMIN
             .getRole()), false),
+    
+    /**
+     * An action by a user asking to fetch information about a data repository.
+     * 
+     * By default all users can list data repositories, although specific configuration information
+     * is not provided, only labels, aliases, and types are provided.
+     */
+    DATA_REPOSITORY_LIST(true, "Could not list data repository details", new HashSet<Role>(Arrays.asList(
+            PoddRoles.PROJECT_OBSERVER.getRole(), PoddRoles.PROJECT_ADMIN.getRole(),
+            PoddRoles.PROJECT_MEMBER.getRole(), PoddRoles.ADMIN.getRole())), false),
     
     ;
     
