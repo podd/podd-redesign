@@ -336,18 +336,6 @@ podd.createDataRepositoriesList = function(nextDatabank, propertyUri, currentVal
     return select;
 };
 
-/**
- * Add handlers for the Child Object Drop Down list and the "Continue" link.
- * 
- * @param theLink
- *            The link to click after child object type has been selected
- * @param dropDown
- *            Drop Down list to select the child object type and relationship
- * @param hiddenChildType
- *            Hidden input where the selected child object type is set
- * @param hiddenRelationsip
- *            Hidden input where the selected child relationship is set
- */
 podd.addDataRepositoryHandler = function(dropDown, detailsDiv, verifyButton, saveButton, nextDatabank) {
 
     dropDown.change(function(event) {
