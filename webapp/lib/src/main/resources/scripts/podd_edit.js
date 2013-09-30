@@ -366,7 +366,7 @@ podd.addDataRepositoryHandler = function(dropDown, detailsDiv, verifyButton, sav
 
             $.each(bindings, function(index, value) {
                 if (value.type.value == TYPE_SSH_DATA_REPOSITORY) {
-                    podd.createSSHFileReferenceForm(detailsDiv, verifyButton, saveButton);
+                    podd.createSSHFileReferenceForm(aliasString, detailsDiv, verifyButton, saveButton);
                 }
                 else if (value.type.value == TYPE_DATA_REPOSITORY) {
                     // Ignore, as this is just the base type and is not valuable
@@ -385,9 +385,16 @@ podd.addDataRepositoryHandler = function(dropDown, detailsDiv, verifyButton, sav
 
 };
 
-podd.createSSHFileReferenceForm = function(detailsDiv, verifyButton, saveButton) {
+podd.createSSHFileReferenceForm = function(aliasString, detailsDiv, verifyButton, saveButton) {
     // Clear any previous details in the div
     detailsDiv.empty();
+
+    var fileName = $('<input name="filename"></input>');
+
+    var path = $('<input name="path"></input>');
+
+    detailsDiv.append(fileName);
+    detailsDiv.append(path);
 
     // TODO: Support verification without saving
     verifyButton.click(function(event) {
@@ -398,16 +405,28 @@ podd.createSSHFileReferenceForm = function(detailsDiv, verifyButton, saveButton)
     saveButton.click(function(event) {
         podd.debug("Clicked on save SSH File Reference button");
         var detailsDatabank = podd.newDatabank();
+
+        detailsDatabank.add(podd.getCurrentObjectUri() + ' poddBase:hasDataReference <urn:temp:uuid:dataReference>');
         detailsDatabank.add('<urn:temp:uuid:dataReference> a poddBase:DataReference');
         detailsDatabank.add('<urn:temp:uuid:dataReference> a poddBase:SSHFileReference');
-        detailsDatabank.add(podd.getCurrentObjectUri() + ' poddBase:hasDataReference <urn:temp:uuid:dataReference>');
+        detailsDatabank.add('<urn:temp:uuid:dataReference> poddBase:hasAlias "' + aliasString + '"');
+
+        var fileNameString = fileName.val();
+        var pathString = path.val();
 
         var errors = [];
-        if (typeof propertyUri === 'undefined' || propertyUri.length === 0) {
-            errors.push('<p>A Parent-Child relationship should be selected</p>');
+        if (typeof fileNameString === 'undefined' || fileNameString.length === 0) {
+            errors.push('<p>A file name must be entered</p>');
         }
-        if (typeof targetObjectType === 'undefined' || targetObjectType.length === 0) {
-            errors.push('<p>A child type should be selected</p>');
+        else {
+            detailsDatabank.add('<urn:temp:uuid:dataReference> poddBase:hasFileName "' + fileNameString + '"');
+        }
+
+        if (typeof pathString === 'undefined' || pathString.length === 0) {
+            errors.push('<p>A file path must be entered</p>');
+        }
+        else {
+            detailsDatabank.add('<urn:temp:uuid:dataReference> poddBase:hasPath "' + pathString + '"');
         }
 
         if (errors.length > 0) {
@@ -421,6 +440,10 @@ podd.createSSHFileReferenceForm = function(detailsDiv, verifyButton, saveButton)
             podd.submitDataReferenceCreate(saveButton, detailsDatabank);
         }
     });
+
+};
+
+podd.submitDataReferenceCreate = function(saveButton, detailsDatabank) {
 
 };
 

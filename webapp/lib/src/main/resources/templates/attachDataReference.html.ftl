@@ -21,7 +21,7 @@
 			var select = podd.createDataRepositoriesList(podd.dataRepositoryDatabank, undefined, undefined, true)
 			$("#dataReferenceRepositoryList").append(select);
 			// Update details when selection changes
-			podd.addDataRepositoryHandler(select, $("#dataReferenceRepositoryDetails"), $("#verifyDataReferenceDetails), $("saveDataReferenceDetails"), podd.dataRepositoryDatabank);
+			podd.addDataRepositoryHandler(select, $("#dataReferenceRepositoryDetails"), $("#verifyDataReferenceDetails"), $("saveDataReferenceDetails"), podd.dataRepositoryDatabank);
 		});
 		
 	});
