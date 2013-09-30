@@ -143,7 +143,9 @@ public class PoddCSIRORestletComponent extends Component
             // attach the web services application
             this.getDefaultHost().attach("/", nextApplication);
             
-            nextApplication.setAliasesConfiguration(Rio.parse(this.getClass().getResourceAsStream("/csiro-alias.ttl"),
+            nextApplication.setAliasesConfiguration(Rio.parse(
+                    this.getClass().getResourceAsStream(
+                            nextApplication.getPropertyUtil().get("podd.datarepository.aliases", "/csiro-alias.ttl")),
                     "", RDFFormat.TURTLE));
             
             // setup the application after attaching it, as it requires Application.getContext() to
