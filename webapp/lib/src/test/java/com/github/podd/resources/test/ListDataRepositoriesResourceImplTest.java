@@ -82,13 +82,19 @@ public class ListDataRepositoriesResourceImplTest extends AbstractResourceImplTe
         
         try
         {
-            RestletTestUtils.doTestAuthenticatedRequest(dataRepositoriesClientResource, Method.GET, null,
-                    MediaType.TEXT_HTML, Status.SUCCESS_OK, this.testNoAdminPrivileges);
-            Assert.fail("Did not find expected exception");
-        }
-        catch(final ResourceException e)
-        {
-            Assert.assertEquals("Not the expected HTTP status code", Status.CLIENT_ERROR_UNAUTHORIZED, e.getStatus());
+            final Representation result =
+                    RestletTestUtils.doTestAuthenticatedRequest(dataRepositoriesClientResource, Method.GET, null,
+                            MediaType.TEXT_HTML, Status.SUCCESS_OK, this.testNoAdminPrivileges);
+            final String body = this.getText(result);
+            
+            // System.out.println(body);
+            
+            // verify:
+            this.assertFreemarker(body);
+            
+            Assert.assertFalse(body.contains("No data repositories currently available"));
+            
+            Assert.assertTrue(body.contains("alias_local_ssh"));
         }
         finally
         {
@@ -160,13 +166,16 @@ public class ListDataRepositoriesResourceImplTest extends AbstractResourceImplTe
         
         try
         {
-            RestletTestUtils.doTestAuthenticatedRequest(dataRepositoriesClientResource, Method.GET, null,
-                    RestletUtilMediaType.APPLICATION_RDF_JSON, Status.SUCCESS_OK, this.testNoAdminPrivileges);
-            Assert.fail("Did not find expected exception");
-        }
-        catch(final ResourceException e)
-        {
-            Assert.assertEquals("Not the expected HTTP status code", Status.CLIENT_ERROR_UNAUTHORIZED, e.getStatus());
+            final Representation results =
+                    RestletTestUtils.doTestAuthenticatedRequest(dataRepositoriesClientResource, Method.GET, null,
+                            RestletUtilMediaType.APPLICATION_RDF_JSON, Status.SUCCESS_OK, this.testNoAdminPrivileges);
+            final Model model = this.assertRdf(results, RDFFormat.RDFJSON, 4);
+            
+            Assert.assertEquals(2, model.filter(null, RDF.TYPE, null).size());
+            Assert.assertEquals(1, model.filter(null, PoddRdfConstants.PODD_BASE_HAS_ALIAS, null).size());
+            Assert.assertEquals(1, model.filter(null, RDFS.LABEL, null).size());
+            
+            // DebugUtils.printContents(model);
         }
         finally
         {
@@ -229,7 +238,7 @@ public class ListDataRepositoriesResourceImplTest extends AbstractResourceImplTe
     }
     
     /**
-     * Test requesting data repositories as administrator.
+     * Test requesting data repositories as non-administrator.
      */
     @Test
     public void testRdfXmlAuthenticatedNonAdmin() throws Exception
@@ -239,13 +248,16 @@ public class ListDataRepositoriesResourceImplTest extends AbstractResourceImplTe
         
         try
         {
-            RestletTestUtils.doTestAuthenticatedRequest(dataRepositoriesClientResource, Method.GET, null,
-                    MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK, this.testNoAdminPrivileges);
-            Assert.fail("Did not find expected exception");
-        }
-        catch(final ResourceException e)
-        {
-            Assert.assertEquals("Not the expected HTTP status code", Status.CLIENT_ERROR_UNAUTHORIZED, e.getStatus());
+            final Representation results =
+                    RestletTestUtils.doTestAuthenticatedRequest(dataRepositoriesClientResource, Method.GET, null,
+                            MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK, this.testNoAdminPrivileges);
+            final Model model = this.assertRdf(results, RDFFormat.RDFXML, 4);
+            
+            Assert.assertEquals(2, model.filter(null, RDF.TYPE, null).size());
+            Assert.assertEquals(1, model.filter(null, PoddRdfConstants.PODD_BASE_HAS_ALIAS, null).size());
+            Assert.assertEquals(1, model.filter(null, RDFS.LABEL, null).size());
+            
+            // DebugUtils.printContents(model);
         }
         finally
         {
