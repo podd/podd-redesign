@@ -26,7 +26,7 @@
 
 <script type="text/javascript">
 	$(document).ready(function() {
-		podd.objectUri = '${parentObject.uri!"undefined"}';
+		podd.objectUri = '${objectUri!"undefined"}';
 		podd.artifactIri = '${artifactIri!"undefined"}';
 		podd.versionIri = '${versionIri!"undefined"}';
 		

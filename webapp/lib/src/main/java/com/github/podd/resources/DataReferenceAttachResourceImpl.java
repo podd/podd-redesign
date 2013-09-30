@@ -171,6 +171,7 @@ public class DataReferenceAttachResourceImpl extends AbstractPoddResourceImpl
         dataModel.put("artifactIri", artifact.getOntologyIRI().toString());
         dataModel.put("versionIri", artifact.getVersionIRI().toString());
         dataModel.put("parentObject", parentDetails);
+        dataModel.put("objectUri", objectUri);
         
         // Output the base template, with contentTemplate from the dataModel defining the
         // template to use for the content in the body of the page
