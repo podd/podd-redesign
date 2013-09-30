@@ -19,6 +19,8 @@ package com.github.podd.resources.test;
 import org.junit.Assert;
 import org.junit.Test;
 import org.openrdf.model.Model;
+import org.openrdf.model.vocabulary.RDF;
+import org.openrdf.model.vocabulary.RDFS;
 import org.openrdf.rio.RDFFormat;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
@@ -29,6 +31,7 @@ import org.restlet.resource.ResourceException;
 
 import com.github.ansell.restletutils.RestletUtilMediaType;
 import com.github.ansell.restletutils.test.RestletTestUtils;
+import com.github.podd.utils.PoddRdfConstants;
 import com.github.podd.utils.PoddWebConstants;
 
 /**
@@ -133,8 +136,11 @@ public class ListDataRepositoriesResourceImplTest extends AbstractResourceImplTe
                             RestletUtilMediaType.APPLICATION_RDF_JSON, Status.SUCCESS_OK, this.testWithAdminPrivileges);
             
             // verify:
-            final Model model = this.assertRdf(results, RDFFormat.RDFJSON, 3);
+            final Model model = this.assertRdf(results, RDFFormat.RDFJSON, 4);
             
+            Assert.assertEquals(2, model.filter(null, RDF.TYPE, null).size());
+            Assert.assertEquals(1, model.filter(null, PoddRdfConstants.PODD_BASE_HAS_ALIAS, null).size());
+            Assert.assertEquals(1, model.filter(null, RDFS.LABEL, null).size());
             // DebugUtils.printContents(model);
         }
         finally
@@ -208,7 +214,11 @@ public class ListDataRepositoriesResourceImplTest extends AbstractResourceImplTe
                             MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
             
             // verify:
-            final Model model = this.assertRdf(results, RDFFormat.RDFXML, 3);
+            final Model model = this.assertRdf(results, RDFFormat.RDFXML, 4);
+            
+            Assert.assertEquals(2, model.filter(null, RDF.TYPE, null).size());
+            Assert.assertEquals(1, model.filter(null, PoddRdfConstants.PODD_BASE_HAS_ALIAS, null).size());
+            Assert.assertEquals(1, model.filter(null, RDFS.LABEL, null).size());
             
             // DebugUtils.printContents(model);
         }
