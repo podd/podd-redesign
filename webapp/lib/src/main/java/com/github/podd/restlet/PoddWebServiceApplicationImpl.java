@@ -446,7 +446,7 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
             {
                 if(input != null)
                 {
-                    this.setAliasesConfiguration(Rio.parse(input, "", RDFFormat.TURTLE));
+                    this.aliasesConfiguration = Rio.parse(input, "", RDFFormat.TURTLE);
                 }
                 else
                 {

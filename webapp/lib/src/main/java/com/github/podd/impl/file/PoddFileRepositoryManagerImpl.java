@@ -86,6 +86,7 @@ import com.github.podd.exception.InconsistentOntologyException;
 import com.github.podd.exception.OntologyNotInProfileException;
 import com.github.podd.exception.PoddException;
 import com.github.podd.utils.PoddRdfConstants;
+import com.github.podd.utils.RdfUtility;
 
 /**
  * An implementation of FileRepositoryManager which uses an RDF repository graph as the back-end
@@ -301,52 +302,6 @@ public class PoddFileRepositoryManagerImpl implements PoddDataRepositoryManager
         throw new RuntimeException("TODO: Implement me");
     }
     
-    /**
-     * Helper method to execute a given SPARQL Graph query.
-     * 
-     * @param sparqlQuery
-     * @param contexts
-     * @return
-     * @throws OpenRDFException
-     */
-    private Model executeGraphQuery(final GraphQuery sparqlQuery, final URI... contexts) throws OpenRDFException
-    {
-        final DatasetImpl dataset = new DatasetImpl();
-        for(final URI uri : contexts)
-        {
-            dataset.addDefaultGraph(uri);
-        }
-        sparqlQuery.setDataset(dataset);
-        final Model results = new LinkedHashModel();
-        sparqlQuery.evaluate(new StatementCollector(results));
-        
-        return results;
-    }
-    
-    /**
-     * Helper method to execute a given SPARQL Tuple query, which may have had bindings attached.
-     * 
-     * @param sparqlQuery
-     * @param contexts
-     * @return
-     * @throws OpenRDFException
-     */
-    private QueryResultCollector executeSparqlQuery(final TupleQuery sparqlQuery, final URI... contexts)
-        throws OpenRDFException
-    {
-        final DatasetImpl dataset = new DatasetImpl();
-        for(final URI uri : contexts)
-        {
-            dataset.addDefaultGraph(uri);
-        }
-        sparqlQuery.setDataset(dataset);
-        
-        final QueryResultCollector results = new QueryResultCollector();
-        QueryResults.report(sparqlQuery.evaluate(), results);
-        
-        return results;
-    }
-    
     @Override
     public List<String> getAllAliases() throws DataRepositoryException, OpenRDFException
     {
@@ -370,7 +325,7 @@ public class PoddFileRepositoryManagerImpl implements PoddDataRepositoryManager
             
             final TupleQuery query = conn.prepareTupleQuery(QueryLanguage.SPARQL, sb.toString());
             
-            final QueryResultCollector queryResults = this.executeSparqlQuery(query, context);
+            final QueryResultCollector queryResults = RdfUtility.executeTupleQuery(query, context);
             for(final BindingSet binding : queryResults.getBindingSets())
             {
                 final Value member = binding.getValue("alias");
@@ -418,7 +373,7 @@ public class PoddFileRepositoryManagerImpl implements PoddDataRepositoryManager
             final TupleQuery query = conn.prepareTupleQuery(QueryLanguage.SPARQL, sb.toString());
             query.setBinding("alias", ValueFactoryImpl.getInstance().createLiteral(aliasInLowerCase));
             
-            final QueryResultCollector queryResults = this.executeSparqlQuery(query, context);
+            final QueryResultCollector queryResults = RdfUtility.executeTupleQuery(query, context);
             for(final BindingSet binding : queryResults.getBindingSets())
             {
                 final Value member = binding.getValue("otherAlias");
@@ -520,7 +475,7 @@ public class PoddFileRepositoryManagerImpl implements PoddDataRepositoryManager
     }
     
     @Override
-    public void init(final Model defaultAliasConfiguration) throws OpenRDFException, DataRepositoryException,
+    public void initialise(final Model defaultAliasConfiguration) throws OpenRDFException, DataRepositoryException,
         IOException
     {
         if(this.repositoryManager == null)

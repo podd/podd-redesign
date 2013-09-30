@@ -329,7 +329,7 @@ public class ApplicationUtils
         try
         {
             final Model aliasConfiguration = application.getAliasesConfiguration(props);
-            nextDataRepositoryManager.init(aliasConfiguration);
+            nextDataRepositoryManager.initialise(aliasConfiguration);
         }
         catch(PoddException | IOException e)
         {

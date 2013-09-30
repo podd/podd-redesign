@@ -443,7 +443,7 @@ public abstract class AbstractPoddFileRepositoryManagerTest
         
         try (final InputStream input = this.getClass().getResourceAsStream(PoddRdfConstants.PATH_DEFAULT_ALIASES_FILE))
         {
-            this.testFileRepositoryManager.init(Rio.parse(input, "", RDFFormat.TURTLE));
+            this.testFileRepositoryManager.initialise(Rio.parse(input, "", RDFFormat.TURTLE));
         }
         
         // verify:
@@ -464,7 +464,7 @@ public abstract class AbstractPoddFileRepositoryManagerTest
         
         try (final InputStream input = this.getClass().getResourceAsStream("/test/test-alias.ttl"))
         {
-            this.testFileRepositoryManager.init(Rio.parse(input, "", RDFFormat.TURTLE));
+            this.testFileRepositoryManager.initialise(Rio.parse(input, "", RDFFormat.TURTLE));
         }
         
         // verify:
@@ -490,7 +490,7 @@ public abstract class AbstractPoddFileRepositoryManagerTest
         {
             Assert.assertNotNull("Could not find test resource", input);
             // initializing with a Turtle file which is an inconsistent "alias" file
-            this.testFileRepositoryManager.init(Rio.parse(input, "", RDFFormat.TURTLE));
+            this.testFileRepositoryManager.initialise(Rio.parse(input, "", RDFFormat.TURTLE));
         }
         
         // verify:
@@ -513,7 +513,7 @@ public abstract class AbstractPoddFileRepositoryManagerTest
         
         try (final InputStream input = this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_20130206 + "aa"))
         {
-            this.testFileRepositoryManager.init(Rio.parse(input, "", RDFFormat.TURTLE));
+            this.testFileRepositoryManager.initialise(Rio.parse(input, "", RDFFormat.TURTLE));
             Assert.fail("Should have thrown an Exception here");
         }
         catch(final Exception e)
