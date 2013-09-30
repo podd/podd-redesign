@@ -20,6 +20,7 @@ import java.util.Set;
 
 import org.kohsuke.MetaInfServices;
 import org.openrdf.model.Model;
+import org.openrdf.model.Resource;
 import org.openrdf.model.URI;
 import org.openrdf.model.vocabulary.RDF;
 
@@ -45,11 +46,11 @@ public class SPARQLDataRepositoryImplFactory implements PoddDataRepositoryFactor
     }
     
     @Override
-    public PoddDataRepository<?> createDataRepository(final Model statements) throws DataRepositoryException
+    public PoddDataRepository<?> createDataRepository(final Resource nextDataRepository, final Model statements) throws DataRepositoryException
     {
         if(statements.contains(null, RDF.TYPE, PoddRdfConstants.PODD_SPARQL_DATA_REPOSITORY))
         {
-            return new SPARQLDataRepositoryImpl(statements);
+            return new SPARQLDataRepositoryImpl(nextDataRepository, statements);
         }
         
         throw new FileRepositoryIncompleteException("Could not create SPARQL data repository from this configuration");

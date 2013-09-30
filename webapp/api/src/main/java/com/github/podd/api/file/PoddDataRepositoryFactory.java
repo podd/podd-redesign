@@ -19,6 +19,7 @@ package com.github.podd.api.file;
 import java.util.Set;
 
 import org.openrdf.model.Model;
+import org.openrdf.model.Resource;
 import org.openrdf.model.URI;
 
 import com.github.podd.exception.DataRepositoryException;
@@ -39,13 +40,17 @@ public interface PoddDataRepositoryFactory
     
     /**
      * 
+     * @param nextMatchingRepository
+     *            The {@link Resource} identifying the root of the description for the data
+     *            repository to create.
      * @param statements
      *            The RDF statements defining the repository configuration.
      * @return A new instance of the repository.
      * @throws DataRepositoryException
      *             If there was an error creating the repository.
      */
-    PoddDataRepository<?> createDataRepository(Model statements) throws DataRepositoryException;
+    PoddDataRepository<?> createDataRepository(Resource nextMatchingRepository, Model statements)
+        throws DataRepositoryException;
     
     /**
      * @return A Unique identifying string for this instance of this factory.

@@ -54,16 +54,20 @@ abstract class PoddFileRepositoryImpl<T extends DataReference> implements PoddDa
      * Sub-classes should first invoke this from their constructors and subsequently validate
      * sub-class specific attributes exist in the {@link Model}.
      * 
+     * @param nextDataRepository
+     *            The {@link Resource} identifying the data repository.
      * @param model
      *            A {@link Model} containing data to construct a File Repository configuration.
      * @throws FileRepositoryIncompleteException
      */
-    protected PoddFileRepositoryImpl(final Model model) throws FileRepositoryIncompleteException
+    protected PoddFileRepositoryImpl(Resource nextDataRepository, final Model model)
+        throws FileRepositoryIncompleteException
     {
-        this.model = new LinkedHashModel(model);
+        this.aliasUri = nextDataRepository;
+        this.model = new LinkedHashModel(model.filter(nextDataRepository, null, null));
         
         // check that the model contains an "alias" and at least one "type"
-        final Model aliasModel = this.model.filter(null, PoddRdfConstants.PODD_DATA_REPOSITORY_ALIAS, null);
+        final Model aliasModel = this.model.filter(nextDataRepository, PoddRdfConstants.PODD_DATA_REPOSITORY_ALIAS, null);
         
         if(aliasModel.isEmpty())
         {
@@ -76,8 +80,6 @@ abstract class PoddFileRepositoryImpl<T extends DataReference> implements PoddDa
         {
             throw new FileRepositoryIncompleteException("File Repository Alias cannot be empty");
         }
-        
-        this.aliasUri = aliasModel.subjects().iterator().next();
         
         // types
         final Set<Value> typeValues = this.model.filter(this.aliasUri, RDF.TYPE, null).objects();

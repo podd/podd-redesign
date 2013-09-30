@@ -19,6 +19,7 @@ package com.github.podd.impl.file;
 import java.io.IOException;
 
 import org.openrdf.model.Model;
+import org.openrdf.model.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,9 +38,9 @@ public class SPARQLDataRepositoryImpl extends PoddFileRepositoryImpl<SPARQLDataR
 {
     protected final Logger log = LoggerFactory.getLogger(this.getClass());
     
-    public SPARQLDataRepositoryImpl(final Model model) throws FileRepositoryIncompleteException
+    public SPARQLDataRepositoryImpl(Resource nextDataRepository, final Model model) throws FileRepositoryIncompleteException
     {
-        super(model);
+        super(nextDataRepository, model);
         
         // check that the model contains values for protocol, host, port, fingerprint, username, and
         // secret

@@ -483,8 +483,8 @@ public class PoddFileRepositoryManagerImpl implements PoddDataRepositoryManager
             for(final Resource nextMatchingRepository : matchingRepositories)
             {
                 final PoddDataRepository<?> repository =
-                        PoddDataRepositoryRegistry.getInstance().createDataRepository(
-                                repositories.filter(nextMatchingRepository, null, null));
+                        PoddDataRepositoryRegistry.getInstance().createDataRepository(nextMatchingRepository,
+                                repositories);
                 
                 if(repository != null)
                 {
@@ -547,8 +547,8 @@ public class PoddFileRepositoryManagerImpl implements PoddDataRepositoryManager
                 try
                 {
                     final PoddDataRepository<?> dataRepository =
-                            PoddDataRepositoryRegistry.getInstance().createDataRepository(
-                                    defaultAliasConfiguration.filter(stmt.getSubject(), null, null));
+                            PoddDataRepositoryRegistry.getInstance().createDataRepository(stmt.getSubject(),
+                                    defaultAliasConfiguration);
                     
                     if(dataRepository != null)
                     {

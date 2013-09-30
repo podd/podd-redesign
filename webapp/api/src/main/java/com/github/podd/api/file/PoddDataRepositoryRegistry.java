@@ -52,27 +52,23 @@ public class PoddDataRepositoryRegistry extends AbstractServiceLoader<String, Po
         super(PoddDataRepositoryFactory.class);
     }
     
-    public PoddDataRepository<?> createDataRepository(final Model model) throws DataRepositoryException
+    public PoddDataRepository<?> createDataRepository(final Resource nextMatchingRepository, final Model model) throws DataRepositoryException
     {
-        for(final Resource nextMatchingRepository : model.filter(null, RDF.TYPE, PoddRdfConstants.PODD_DATA_REPOSITORY)
-                .subjects())
+        final Set<Value> types = model.filter(nextMatchingRepository, RDF.TYPE, null).objects();
+        final Set<URI> uriTypes = new HashSet<URI>();
+        for(final Value nextType : types)
         {
-            final Set<Value> types = model.filter(nextMatchingRepository, RDF.TYPE, null).objects();
-            final Set<URI> uriTypes = new HashSet<URI>();
-            for(final Value nextType : types)
+            if(nextType instanceof URI)
             {
-                if(nextType instanceof URI)
-                {
-                    uriTypes.add((URI)nextType);
-                }
+                uriTypes.add((URI)nextType);
             }
-            
-            for(final PoddDataRepositoryFactory factory : PoddDataRepositoryRegistry.getInstance().getAll())
+        }
+        
+        for(final PoddDataRepositoryFactory factory : PoddDataRepositoryRegistry.getInstance().getAll())
+        {
+            if(factory.canCreate(uriTypes))
             {
-                if(factory.canCreate(uriTypes))
-                {
-                    return factory.createDataRepository(model.filter(nextMatchingRepository, null, null));
-                }
+                return factory.createDataRepository(nextMatchingRepository, model);
             }
         }
         

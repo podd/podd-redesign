@@ -17,6 +17,7 @@
 package com.github.podd.api.file.test;
 
 import java.util.Collection;
+import java.util.Map;
 import java.util.Set;
 
 import org.junit.After;
@@ -24,6 +25,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.openrdf.model.Model;
+import org.openrdf.model.Resource;
 import org.openrdf.model.URI;
 import org.openrdf.model.impl.ValueFactoryImpl;
 
@@ -40,8 +42,6 @@ public abstract class AbstractPoddFileRepositoryTest<T extends DataReference>
 {
     private final String testAliasGood = "test_alias";
     private final String testAliasBad = "no_such_alias";
-    protected static final URI TEST_ALIAS_URI = ValueFactoryImpl.getInstance().createURI(
-            "http://purl.org/podd/test_alias");
     
     protected PoddDataRepository<T> testFileRepository;
     
@@ -60,7 +60,7 @@ public abstract class AbstractPoddFileRepositoryTest<T extends DataReference>
      * @return A Collection of Models that do not contain sufficient information to create a
      *         FileRepository object
      */
-    protected abstract Collection<Model> getIncompleteModels();
+    protected abstract Map<Resource, Model> getIncompleteModels();
     
     /**
      * @return A new DataReference instance that must not be validated.
@@ -70,7 +70,8 @@ public abstract class AbstractPoddFileRepositoryTest<T extends DataReference>
     /**
      * @return A new {@link PoddDataRepository} instance for use by the test
      */
-    protected abstract PoddDataRepository<T> getNewPoddDataRepository(final Model model) throws Exception;
+    protected abstract PoddDataRepository<T> getNewPoddDataRepository(final Resource nextDataRepository,
+            final Model model) throws Exception;
     
     /**
      * @return A new {@link PoddDataRepository} instance for use by the test
@@ -134,13 +135,13 @@ public abstract class AbstractPoddFileRepositoryTest<T extends DataReference>
     @Test
     public void testCreateFileRepositoryWithIncompleteModel() throws Exception
     {
-        final Collection<Model> incompleteModels = this.getIncompleteModels();
+        final Map<Resource, Model> incompleteModels = this.getIncompleteModels();
         
-        for(final Model nextModel : incompleteModels)
+        for(final Resource nextDataRepository : incompleteModels.keySet())
         {
             try
             {
-                this.getNewPoddDataRepository(nextModel);
+                this.getNewPoddDataRepository(nextDataRepository, incompleteModels.get(nextDataRepository));
                 Assert.fail("Should have thrown an IncompleteFileRepositoryException");
             }
             catch(final FileRepositoryIncompleteException e)

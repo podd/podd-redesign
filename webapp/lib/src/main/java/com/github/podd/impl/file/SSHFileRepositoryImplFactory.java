@@ -20,6 +20,7 @@ import java.util.Set;
 
 import org.kohsuke.MetaInfServices;
 import org.openrdf.model.Model;
+import org.openrdf.model.Resource;
 import org.openrdf.model.URI;
 import org.openrdf.model.vocabulary.RDF;
 
@@ -45,11 +46,11 @@ public class SSHFileRepositoryImplFactory implements PoddDataRepositoryFactory
     }
     
     @Override
-    public PoddDataRepository<?> createDataRepository(final Model statements) throws DataRepositoryException
+    public PoddDataRepository<?> createDataRepository(final Resource nextDataRepository, final Model statements) throws DataRepositoryException
     {
         if(statements.contains(null, RDF.TYPE, PoddRdfConstants.PODD_SSH_FILE_REPOSITORY))
         {
-            return new SSHFileRepositoryImpl(statements);
+            return new SSHFileRepositoryImpl(nextDataRepository, statements);
         }
         
         throw new FileRepositoryIncompleteException("Could not create SSH file repository from this configuration");
