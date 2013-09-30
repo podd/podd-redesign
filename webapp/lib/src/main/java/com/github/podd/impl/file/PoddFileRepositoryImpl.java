@@ -25,6 +25,7 @@ import org.openrdf.model.Model;
 import org.openrdf.model.Resource;
 import org.openrdf.model.URI;
 import org.openrdf.model.Value;
+import org.openrdf.model.impl.LinkedHashModel;
 import org.openrdf.model.vocabulary.RDF;
 
 import com.github.podd.api.file.DataReference;
@@ -59,25 +60,27 @@ abstract class PoddFileRepositoryImpl<T extends DataReference> implements PoddDa
      */
     protected PoddFileRepositoryImpl(final Model model) throws FileRepositoryIncompleteException
     {
+        this.model = new LinkedHashModel(model);
+        
         // check that the model contains an "alias" and at least one "type"
-        final Model aliasModel = model.filter(null, PoddRdfConstants.PODD_DATA_REPOSITORY_ALIAS, null);
+        final Model aliasModel = this.model.filter(null, PoddRdfConstants.PODD_DATA_REPOSITORY_ALIAS, null);
         
         if(aliasModel.isEmpty())
         {
-            throw new FileRepositoryIncompleteException(model, "Model did not contain any aliases");
+            throw new FileRepositoryIncompleteException(this.model, "Model did not contain any aliases");
         }
         
         // alias
         this.alias = ((Literal)aliasModel.objects().iterator().next()).getLabel();
         if(this.alias.trim().isEmpty())
         {
-            throw new FileRepositoryIncompleteException(model, "File Repository Alias cannot be empty");
+            throw new FileRepositoryIncompleteException(this.model, "File Repository Alias cannot be empty");
         }
         
         this.aliasUri = aliasModel.subjects().iterator().next();
         
         // types
-        final Set<Value> typeValues = model.filter(this.aliasUri, RDF.TYPE, null).objects();
+        final Set<Value> typeValues = this.model.filter(this.aliasUri, RDF.TYPE, null).objects();
         for(final Value value : typeValues)
         {
             if(value instanceof URI)
@@ -87,10 +90,8 @@ abstract class PoddFileRepositoryImpl<T extends DataReference> implements PoddDa
         }
         if(this.types.isEmpty())
         {
-            throw new FileRepositoryIncompleteException(model, "No File Repository type information found");
+            throw new FileRepositoryIncompleteException(this.model, "No File Repository type information found");
         }
-        
-        this.model = model;
     }
     
     @Override
