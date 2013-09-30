@@ -284,7 +284,7 @@ public abstract class AbstractPoddClientTest
             Assert.assertNotEquals(newArtifact.getVersionIRI(), afterFileAttachment.getVersionIRI());
             
             final ByteArrayOutputStream afterOutputStream = new ByteArrayOutputStream(8096);
-            this.testClient.downloadArtifact(newArtifact, afterOutputStream, RDFFormat.RDFJSON);
+            this.testClient.downloadArtifact(afterFileAttachment, afterOutputStream, RDFFormat.RDFJSON);
             final Model afterParseRdf =
                     this.parseRdf(new ByteArrayInputStream(afterOutputStream.toByteArray()), RDFFormat.RDFJSON, 32);
             
