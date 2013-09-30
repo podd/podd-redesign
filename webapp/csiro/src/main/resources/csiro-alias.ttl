@@ -68,7 +68,7 @@
           
           dataRepository:hasDataRepositoryPort "9856" ;
           
-          dataRepository:hasDataRepositoryAlias "alias_local_ssh" .
+          dataRepository:hasDataRepositoryAlias "csiro_ssh" .
           
 
 ###  http://test.example.org/filerepositoryaliases#localsparql
@@ -86,7 +86,7 @@
           
           dataRepository:hasDataRepositoryPath "/openrdf-sesame/repositories/podd-bio2rdf" ;
           
-          dataRepository:hasDataRepositoryAlias "alias_local_sparql" .
+          dataRepository:hasDataRepositoryAlias "csiro_sparql" .
           
 
 
