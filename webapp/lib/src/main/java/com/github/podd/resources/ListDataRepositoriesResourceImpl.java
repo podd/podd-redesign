@@ -23,8 +23,10 @@ import org.openrdf.OpenRDFException;
 import org.openrdf.model.BNode;
 import org.openrdf.model.Model;
 import org.openrdf.model.URI;
+import org.openrdf.model.Value;
 import org.openrdf.model.impl.LinkedHashModel;
 import org.openrdf.model.vocabulary.RDF;
+import org.openrdf.model.vocabulary.RDFS;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.Rio;
 import org.restlet.data.MediaType;
@@ -126,6 +128,11 @@ public class ListDataRepositoriesResourceImpl extends AbstractPoddResourceImpl
                 for(final URI nextType : dataRepository.getTypes())
                 {
                     results.add(resourceNode, RDF.TYPE, nextType);
+                }
+                
+                for(final Value nextLabel : dataRepository.getAsModel().filter(null, RDFS.LABEL, null).objects())
+                {
+                    results.add(resourceNode, RDFS.LABEL, nextLabel);
                 }
             }
             
