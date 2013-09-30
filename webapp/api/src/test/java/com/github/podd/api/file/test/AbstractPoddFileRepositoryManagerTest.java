@@ -210,8 +210,8 @@ public abstract class AbstractPoddFileRepositoryManagerTest
         }
         catch(final FileRepositoryIncompleteException e)
         {
-            Assert.assertEquals("Not the expected error message",
-                    "Subject URIs used in Model already exist in Management Graph", e.getMessage());
+            Assert.assertTrue("Not the expected error message",
+                    e.getMessage().contains("Subject URIs used in Model already exist in Management Graph"));
         }
     }
     
