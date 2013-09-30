@@ -345,7 +345,7 @@ podd.addDataRepositoryHandler = function(dropDown, detailsDiv, nextDatabank) {
         if (typeof option !== 'undefined') {
             var aliasString = '' + option.val();
 
-            podd.debug('Selected alias : {' + aliasString+"}");
+            podd.debug('Selected alias : {' + aliasString + "}");
 
             var myQuery = $.rdf({
                 databank : nextDatabank
@@ -367,19 +367,24 @@ podd.addDataRepositoryHandler = function(dropDown, detailsDiv, nextDatabank) {
 
             var found = false;
             $.each(bindings, function(index, value) {
-                if(!found) {
+                if (!found) {
                     if (value.type.value == TYPE_SSH_DATA_REPOSITORY) {
                         found = true;
                         detailsDiv.empty();
+                        podd.emptyErrorMessages();
+
                         podd.createSSHFileReferenceForm(aliasString, detailsDiv);
                     }
                     else if (value.type.value == TYPE_SPARQL_DATA_REPOSITORY) {
                         found = true;
                         detailsDiv.empty();
+                        podd.emptyErrorMessages();
+
                         podd.createSPARQLDataReferenceForm(aliasString, detailsDiv);
                     }
                     else if (value.type.value == TYPE_DATA_REPOSITORY) {
-                        // Ignore, as this is just the base type and is not valuable
+                        // Ignore, as this is just the base type and is not
+                        // valuable
                         // at this stage
                     }
                     else {
@@ -398,20 +403,30 @@ podd.addDataRepositoryHandler = function(dropDown, detailsDiv, nextDatabank) {
 
 podd.createSSHFileReferenceForm = function(aliasString, detailsDiv) {
 
-    var fileName = $('<input name="filename"></input>');
+    var fileName = $('<input name="input_filename"></input>');
+    var fileNameLabel = $('<label for="input_filename">Filename : </label>');
 
-    var path = $('<input name="path"></input>');
-    
+    var path = $('<input name="input_path"></input>');
+    var pathLabel = $('<label for="input_path">Path : </label>');
+
+    var buttonDiv = $("<div></div>");
     var verifyButton = $('<button></button>');
+    verifyButton.text("Verify");
+
     var saveButton = $('<button></button>');
+    saveButton.text("Save");
+    buttonDiv.append(verifyButton, saveButton);
     
-    detailsDiv.append(fileName);
-    detailsDiv.append(path);
-    detailsDiv.append(verifyButton);
-    detailsDiv.append(saveButton);
-    
+    detailsDiv.append(fileNameLabel, fileName, pathLabel, path, buttonDiv);
+    // detailsDiv.append(path);
+    // detailsDiv.append(verifyButton);
+    // detailsDiv.append(saveButton);
+
     saveButton.click(function(event) {
         podd.debug("Clicked on save SSH File Reference button");
+
+        podd.emptyErrorMessages();
+
         var detailsDatabank = podd.newDatabank();
 
         detailsDatabank.add(podd.getCurrentObjectUri() + ' poddBase:hasDataReference <urn:temp:uuid:dataReference>');
