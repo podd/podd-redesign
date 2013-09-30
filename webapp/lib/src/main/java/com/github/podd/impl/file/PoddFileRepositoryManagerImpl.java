@@ -480,12 +480,12 @@ public class PoddFileRepositoryManagerImpl implements PoddDataRepositoryManager
     {
         if(this.repositoryManager == null)
         {
-            throw new NullPointerException("A RepositoryManager should be set before calling init()");
+            throw new NullPointerException("A RepositoryManager should be set before calling initialise()");
         }
         
         if(this.getAllAliases().size() == 0)
         {
-            this.log.warn("File Repository Graph is empty. Loading default configurations...");
+            this.log.info("File Repository Graph is empty. Loading default configurations...");
             
             // validate the default alias file against the File Repository configuration schema
             this.verifyFileRepositoryAgainstSchema(defaultAliasConfiguration);
@@ -493,7 +493,7 @@ public class PoddFileRepositoryManagerImpl implements PoddDataRepositoryManager
             final Model allAliases =
                     defaultAliasConfiguration.filter(null, PoddRdfConstants.PODD_DATA_REPOSITORY_ALIAS, null);
             
-            this.log.warn("Found {} default aliases to add", allAliases.size());
+            this.log.info("Found {} default aliases to add", allAliases.size());
             
             for(final Statement stmt : allAliases)
             {
@@ -649,15 +649,10 @@ public class PoddFileRepositoryManagerImpl implements PoddDataRepositoryManager
         OWLOntology dataRepositoryOntology = null;
         OWLOntology defaultAliasOntology = null;
         
-        final Model schemaModel = new LinkedHashModel();
-        try
+        try (final InputStream inputA = this.getClass().getResourceAsStream(PoddRdfConstants.PATH_PODD_DATA_REPOSITORY);)
         {
             // load poddDataRepository.owl into a Model
-            final InputStream inputA = this.getClass().getResourceAsStream(PoddRdfConstants.PATH_PODD_DATA_REPOSITORY);
-            final RDFParser rdfParserA = Rio.createParser(RDFFormat.RDFXML);
-            final StatementCollector collectorA = new StatementCollector(schemaModel);
-            rdfParserA.setRDFHandler(collectorA);
-            rdfParserA.parse(inputA, "");
+            Model schemaModel = Rio.parse(inputA, "", RDFFormat.RDFXML);
             
             // verify & load poddDataRepository.owl into OWLAPI
             dataRepositoryOntology = this.checkForConsistentOwlDlOntology(schemaModel);
