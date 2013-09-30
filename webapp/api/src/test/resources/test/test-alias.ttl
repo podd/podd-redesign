@@ -54,6 +54,8 @@
 :localssh rdf:type dataRepository:DataRepository ,
                    dataRepository:SSHFileRepository ;
           
+          rdfs:label "Test SSH data repository" ;
+          
           dataRepository:hasDataRepositoryUsername "salt" ;
           
           dataRepository:hasDataRepositoryHost "localhost" ;
