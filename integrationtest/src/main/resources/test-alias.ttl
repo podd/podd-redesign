@@ -41,14 +41,6 @@
 #################################################################
 
 
-###  http://test.example.org/filerepositoryaliases#defaultaliasfile
-
-<http://test.example.org/filerepositoryaliases#defaultaliasfile> rdf:type owl:NamedIndividual ;
-                                                                 
-                                                                 dataRepository:hasRepositoryConfiguration :localssh .
-
-
-
 ###  http://test.example.org/filerepositoryaliases#localssh
 
 :localssh rdf:type dataRepository:DataRepository ,
