@@ -154,9 +154,9 @@
 
 </div>  <!-- content pane -->
 
-<script type="text/javascript" src="${baseUrl}/resources/scripts/jquery.tablesorter.js"></script>
-<script type="text/javascript" src="${baseUrl}/resources/scripts/jquery.tablesorter.pager.js"></script>
-<script type="text/javascript">
+<!-- script type="text/javascript" src="${baseUrl}/resources/scripts/jquery.tablesorter.js"></script -->
+<!-- script type="text/javascript" src="${baseUrl}/resources/scripts/jquery.tablesorter.pager.js"></script -->
+<!-- script type="text/javascript">
 	$(document).ready(function() { 
 		$("#table")
 		.tablesorter({
@@ -165,7 +165,7 @@
         })
 		.tablesorterPager({container: $("#pager"), positionFixed: false}); 
 	});
-</script>
+</script -->
 
 <script type="text/javascript" src="${baseUrl}/resources/scripts/animatedcollapse.js">
 /***********************************************
