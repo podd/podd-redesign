@@ -16,20 +16,24 @@
  */
 package com.github.podd.resources;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.openrdf.model.URI;
 import org.restlet.data.MediaType;
 import org.restlet.data.Status;
 import org.restlet.representation.Representation;
 import org.restlet.resource.Delete;
 import org.restlet.resource.Get;
 import org.restlet.resource.ResourceException;
+import org.restlet.security.Role;
 import org.restlet.security.User;
 import org.semanticweb.owlapi.model.IRI;
 
 import com.github.podd.exception.PoddException;
 import com.github.podd.restlet.PoddAction;
+import com.github.podd.restlet.PoddSesameRealm;
 import com.github.podd.restlet.RestletUtils;
 import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.PoddRdfConstants;
@@ -52,15 +56,17 @@ public class DeleteArtifactResourceImpl extends AbstractPoddResourceImpl
         boolean result;
         try
         {
-            final String artifactUri = this.getQueryValue(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER);
+            final String artifactUriString = this.getQueryValue(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER);
             
-            if(artifactUri == null)
+            if(artifactUriString == null)
             {
                 throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST,
                         "Did not find an artifacturi parameter in the request");
             }
             
-            this.checkAuthentication(PoddAction.UNPUBLISHED_ARTIFACT_DELETE, PoddRdfConstants.VF.createURI(artifactUri));
+            URI artifactUri = PoddRdfConstants.VF.createURI(artifactUriString);
+            
+            this.checkAuthentication(PoddAction.UNPUBLISHED_ARTIFACT_DELETE, artifactUri);
             
             final InferredOWLOntologyID currentVersion =
                     this.getPoddArtifactManager().getArtifact(IRI.create(artifactUri));
@@ -69,6 +75,24 @@ public class DeleteArtifactResourceImpl extends AbstractPoddResourceImpl
             
             if(result)
             {
+                PoddSesameRealm realm = this.getPoddApplication().getRealm();
+                Map<String, Collection<Role>> roleMap = realm.getRolesForObjectAlternate(null, artifactUri);
+                
+                for(String userIdentifier : roleMap.keySet())
+                {
+                    for(Role nextRole : roleMap.get(userIdentifier))
+                    {
+                        try
+                        {
+                            realm.unmap(nextRole, artifactUri, userIdentifier);
+                        }
+                        catch(RuntimeException e)
+                        {
+                            // Ignore errors during this process for now
+                        }
+                    }
+                }
+                
                 this.getResponse().setStatus(Status.SUCCESS_NO_CONTENT);
             }
             else
