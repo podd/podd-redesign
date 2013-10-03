@@ -102,7 +102,7 @@ No projects found
     Lead Institution: ${(aArtifact.getLeadInstitution())!" - "} <br>
 -->
     <script type="text/javascript">
-        writeAbstractWholeWords("${aArtifact.getDescription()?js_string!" - "}", 200);
+        writeAbstractWholeWords("${(aArtifact.getDescription()!" - ")?js_string}", 200);
     </script>
     <a href="${baseUrl}/artifact/base?artifacturi=${(aArtifact.getOntologyID().getVersionIRI().toString())!""}&amp;objectUri=${(aArtifact.getObjectURI())!""}">Browse Project</a>
     </p>
