@@ -190,7 +190,7 @@ public class AbstractResourceImplTest
     {
         Assert.assertFalse("Freemarker error.", body.contains("Java backtrace for programmers:"));
         Assert.assertFalse("Freemarker error.", body.contains("freemarker.core."));
-        Assert.assertFalse("Freemarker error.", body.contains("Error: Could not generate page"));
+        Assert.assertFalse("Freemarker error.", body.contains("Could not generate page"));
     }
     
     /**
