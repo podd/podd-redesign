@@ -53,6 +53,14 @@ var TYPE_SPARQL_DATA_REPOSITORY = 'http://purl.org/podd/ns/dataRepository#SPARQL
 jQuery.ajaxSettings.traditional = true;
 
 /**
+ * Work around the fact that older Javascript languages don't have a simple
+ * String.startsWith function.
+ */
+podd.startsWith = function(nextString, prefix) {
+    return typeof nextString !== 'undefined' && nextString.lastIndexOf(prefix, 0) === 0;
+};
+
+/**
  * Add autocompleteHandlers
  * 
  * @param autoComplete
