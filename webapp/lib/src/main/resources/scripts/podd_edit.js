@@ -1000,8 +1000,12 @@ podd.buildTriple = function(subjectUri, propertyUri, objectValue, propertyType, 
 
         // figure out if the object is a Resource or a Literal
         if (typeof propertyType !== 'undefined' && propertyType.toString() === OBJECT_PROPERTY) {
-
-            objectPart = $.rdf.resource('<' + objectValue + '>');
+            if (podd.startsWith('<', objectValue)) {
+                objectPart = $.rdf.resource(objectValue);
+            }
+            else {
+                objectPart = $.rdf.resource('<' + objectValue + '>');
+            }
         }
         else {
 
@@ -1011,7 +1015,9 @@ podd.buildTriple = function(subjectUri, propertyUri, objectValue, propertyType, 
         }
     }
     else {
-        objectPart = $.rdf.literal(objectValue);
+        objectPart = $.rdf.literal(objectValue, {
+            datatype : XSD_STRING
+        });
     }
 
     return $.rdf.triple(subjectUri, $.rdf.resource(propertyUri), objectPart);
