@@ -331,6 +331,7 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
                     || nextType.getObjectURI().equals(PoddRdfConstants.PODD_BASE_FILE_REFERENCE_TYPE_SSH))
             {
                 dataModel.put("canEditObject", false);
+                dataModel.put("canAddChildren", true);
             }
         }
         
