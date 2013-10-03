@@ -44,6 +44,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.rules.TemporaryFolder;
+import org.openrdf.OpenRDFException;
 import org.openrdf.model.Model;
 import org.openrdf.model.Resource;
 import org.openrdf.model.URI;
@@ -69,6 +70,7 @@ import org.restlet.resource.ClientResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.github.ansell.restletutils.RestletUtilMediaType;
 import com.github.ansell.restletutils.SesameRealmConstants;
 import com.github.ansell.restletutils.test.RestletTestUtils;
 import com.github.podd.junit.ext.TimeoutWithStackTraces;
@@ -299,6 +301,37 @@ public class AbstractResourceImplTest
     }
     
     /**
+     * Retrieves the asserted statements of a given artifact from the Server as a String.
+     * 
+     * @param artifactUri
+     *            The URI of the artifact requested
+     * @param mediaType
+     *            The format in which statements should be retrieved
+     * @return The artifact's asserted statements represented as a String
+     * @throws Exception
+     */
+    protected Model getArtifactAsModel(final String artifactUri) throws Exception
+    {
+        final ClientResource getArtifactClientResource =
+                new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_GET_BASE));
+        
+        try
+        {
+            getArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactUri);
+            
+            final Representation results =
+                    RestletTestUtils.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null,
+                            RestletUtilMediaType.APPLICATION_RDF_JSON, Status.SUCCESS_OK, this.testWithAdminPrivileges);
+            
+            return this.getModel(results);
+        }
+        finally
+        {
+            this.releaseClient(getArtifactClientResource);
+        }
+    }
+    
+    /**
      * Override this to change the test aliases for a given test.
      * 
      * @return A {@link Model} containing the statements relevant to test aliases.
@@ -333,6 +366,27 @@ public class AbstractResourceImplTest
             }
         }
         return result.toString();
+    }
+    
+    protected Model getModel(final Representation representation) throws OpenRDFException,
+        UnsupportedRDFormatException, IOException
+    {
+        try
+        {
+            return Rio.parse(representation.getStream(), "",
+                    Rio.getParserFormatForMIMEType(representation.getMediaType().getName(), RDFFormat.RDFXML));
+        }
+        finally
+        {
+            try
+            {
+                representation.exhaust();
+            }
+            finally
+            {
+                representation.release();
+            }
+        }
     }
     
     /**
