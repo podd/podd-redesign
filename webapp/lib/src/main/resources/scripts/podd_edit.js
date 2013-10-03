@@ -1000,12 +1000,16 @@ podd.buildTriple = function(subjectUri, propertyUri, objectValue, propertyType, 
 
         // figure out if the object is a Resource or a Literal
         if (typeof propertyType !== 'undefined' && propertyType.toString() === OBJECT_PROPERTY) {
-            if (podd.startsWith('<', objectValue)) {
-                objectPart = $.rdf.resource(objectValue);
-            }
-            else {
-                objectPart = $.rdf.resource('<' + objectValue + '>');
-            }
+
+            // FIXME: Some code currently relies on being able to send in
+            // objectValue as the empty string, which fails, where <> apparently
+            // succeeds
+            // if (podd.startsWith('<', objectValue)) {
+            // objectPart = $.rdf.resource(objectValue);
+            // }
+            // else {
+            objectPart = $.rdf.resource('<' + objectValue + '>');
+            // }
         }
         else {
 
