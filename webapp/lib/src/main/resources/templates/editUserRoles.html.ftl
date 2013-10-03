@@ -17,9 +17,9 @@
 		<#if repositoryRolesList?? && repositoryRolesList?has_content>
 		    <#list repositoryRolesList as role>
 		    	{ 
-		    	  uri : '${role.URI?js_string!'unknown'}',
-		    	  name : '${role.name?js_string!'unknown'}',
-		    	  description : '${role.description?js_string!'no description'}'
+		    	  uri : '${role.URI?js_string!"unknown"}',
+		    	  name : '${role.getName()?js_string!"unknown"}',
+		    	  description : '${role.description?js_string!"no description"}'
 		    	}<#if role_has_next>,</#if>
 		    </#list>
 		</#if>
