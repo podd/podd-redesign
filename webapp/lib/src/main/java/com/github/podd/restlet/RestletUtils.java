@@ -298,7 +298,8 @@ public final class RestletUtils
                         }
                         else
                         {
-                            RestletUtils.log.error("Failed to find label for artifact, returning URI as label");
+                            RestletUtils.log.error("Failed to find label for artifact, returning URI as label: {}",
+                                    artifact);
                             poddObjectLabel = new PoddObjectLabelImpl(artifact, artifactUri, artifactUri.stringValue());
                         }
                     }

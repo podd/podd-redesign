@@ -109,11 +109,11 @@
 				<#list userRoleList as role>
 					<tr>
 			    		<td>
-			    			<span class="role_span" value="${role.key.URI!""}">${role.key.getName()!""}</span>
+			    			<span class="role_span" value="${role.key.URI?html!""}">${role.key.getName()?html!""}</span>
 			    		</td>
 			    		<td>
 			    			<#if role.value?? >
-			    				<span><a href="${role.value.objectURI}">${role.value.label}</a></span>
+			    				<span><a href="${baseUrl}/artifact/base?artifactUri=${role.value.getOntologyID().getOntologyIRI()?html}">${role.value.label?html}</a></span>
 			    			<#else>
 			    				<span>Repository wide role</span>
 			    		 	</#if>
