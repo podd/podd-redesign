@@ -57,12 +57,13 @@ import com.github.podd.utils.PoddObjectLabel;
  */
 public interface PoddArtifactManager
 {
-    InferredOWLOntologyID attachDataReferences(URI artifactUri, URI versionUri, InputStream inputStream,
-            RDFFormat format, DataReferenceVerificationPolicy dataReferenceVerificationPolicy) throws OpenRDFException,
-        IOException, OWLException, PoddException;
+    InferredOWLOntologyID attachDataReference(InferredOWLOntologyID artifactId, URI objectUri,
+            DataReference dataReference, DataReferenceVerificationPolicy dataReferenceVerificationPolicy)
+        throws OpenRDFException, IOException, OWLException, PoddException;
     
-    InferredOWLOntologyID attachFileReference(InferredOWLOntologyID artifactId, URI objectUri,
-            DataReference dataReference) throws OpenRDFException, PoddException;
+    InferredOWLOntologyID attachDataReferences(InferredOWLOntologyID artifactId, Model model,
+            DataReferenceVerificationPolicy dataReferenceVerificationPolicy) throws OpenRDFException, IOException,
+        OWLException, PoddException;
     
     /**
      * Deletes the given artifact if and only if it is available and it is not currently published.

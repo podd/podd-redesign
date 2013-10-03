@@ -60,14 +60,15 @@ abstract class PoddFileRepositoryImpl<T extends DataReference> implements PoddDa
      *            A {@link Model} containing data to construct a File Repository configuration.
      * @throws FileRepositoryIncompleteException
      */
-    protected PoddFileRepositoryImpl(Resource nextDataRepository, final Model model)
+    protected PoddFileRepositoryImpl(final Resource nextDataRepository, final Model model)
         throws FileRepositoryIncompleteException
     {
         this.aliasUri = nextDataRepository;
         this.model = new LinkedHashModel(model.filter(nextDataRepository, null, null));
         
         // check that the model contains an "alias" and at least one "type"
-        final Model aliasModel = this.model.filter(nextDataRepository, PoddRdfConstants.PODD_DATA_REPOSITORY_ALIAS, null);
+        final Model aliasModel =
+                this.model.filter(nextDataRepository, PoddRdfConstants.PODD_DATA_REPOSITORY_ALIAS, null);
         
         if(aliasModel.isEmpty())
         {

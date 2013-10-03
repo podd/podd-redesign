@@ -23,11 +23,14 @@ import java.util.Arrays;
 import java.util.Map;
 
 import org.openrdf.OpenRDFException;
-import org.openrdf.model.impl.ValueFactoryImpl;
+import org.openrdf.model.Model;
+import org.openrdf.model.URI;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.RDFHandlerException;
+import org.openrdf.rio.RDFParseException;
 import org.openrdf.rio.RDFWriter;
 import org.openrdf.rio.Rio;
+import org.openrdf.rio.UnsupportedRDFormatException;
 import org.restlet.data.MediaType;
 import org.restlet.data.Status;
 import org.restlet.representation.ByteArrayRepresentation;
@@ -41,10 +44,12 @@ import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLException;
 
 import com.github.podd.api.DataReferenceVerificationPolicy;
+import com.github.podd.api.PoddArtifactManager;
 import com.github.podd.exception.FileReferenceVerificationFailureException;
 import com.github.podd.exception.OntologyNotInProfileException;
 import com.github.podd.exception.PoddException;
 import com.github.podd.exception.UnmanagedArtifactIRIException;
+import com.github.podd.exception.UnmanagedArtifactVersionException;
 import com.github.podd.restlet.PoddAction;
 import com.github.podd.restlet.RestletUtils;
 import com.github.podd.utils.InferredOWLOntologyID;
@@ -69,9 +74,15 @@ public class DataReferenceAttachResourceImpl extends AbstractPoddResourceImpl
      * @param verificationPolicy
      * @return
      * @throws ResourceException
+     * @throws IOException
+     * @throws UnsupportedRDFormatException
+     * @throws RDFParseException
+     * @throws UnmanagedArtifactIRIException
      */
-    private InferredOWLOntologyID attachDataReference(final Representation entity, final String artifactUri,
-            final String versionUri, final DataReferenceVerificationPolicy verificationPolicy) throws ResourceException
+    private InferredOWLOntologyID attachDataReference(final Representation entity, final String artifactUriString,
+            final String versionUriString, final DataReferenceVerificationPolicy verificationPolicy)
+        throws ResourceException, RDFParseException, UnsupportedRDFormatException, IOException,
+        UnmanagedArtifactIRIException
     {
         // get input stream containing RDF statements
         InputStream inputStream = null;
@@ -85,14 +96,27 @@ public class DataReferenceAttachResourceImpl extends AbstractPoddResourceImpl
         }
         final RDFFormat inputFormat = Rio.getParserFormatForMIMEType(entity.getMediaType().getName(), RDFFormat.RDFXML);
         
+        final Model model = Rio.parse(inputStream, "", inputFormat);
+        
+        final URI artifactUri = PoddRdfConstants.VF.createURI(artifactUriString);
+        final URI versionUri = PoddRdfConstants.VF.createURI(versionUriString);
+        
+        final PoddArtifactManager artifactManager = this.getPoddArtifactManager();
+        
+        InferredOWLOntologyID artifact;
+        try
+        {
+            artifact = artifactManager.getArtifact(IRI.create(artifactUri), IRI.create(versionUri));
+        }
+        catch(final UnmanagedArtifactVersionException e1)
+        {
+            artifact = artifactManager.getArtifact(IRI.create(artifactUri));
+        }
+        
         InferredOWLOntologyID artifactMap = null;
         try
         {
-            artifactMap =
-                    this.getPoddArtifactManager().attachDataReferences(
-                            ValueFactoryImpl.getInstance().createURI(artifactUri),
-                            ValueFactoryImpl.getInstance().createURI(versionUri), inputStream, inputFormat,
-                            verificationPolicy);
+            artifactMap = this.getPoddArtifactManager().attachDataReferences(artifact, model, verificationPolicy);
         }
         catch(final FileReferenceVerificationFailureException e)
         {
@@ -211,8 +235,32 @@ public class DataReferenceAttachResourceImpl extends AbstractPoddResourceImpl
         
         this.log.info("@Post attachFileReference ({})", entity.getMediaType().getName());
         
-        final InferredOWLOntologyID artifactMap =
-                this.attachDataReference(entity, artifactUri, versionUri, verificationPolicy);
+        InferredOWLOntologyID artifactMap;
+        try
+        {
+            artifactMap = this.attachDataReference(entity, artifactUri, versionUri, verificationPolicy);
+        }
+        catch(final UnmanagedArtifactIRIException e1)
+        {
+            this.log.error("Artifact IRI not managed");
+            throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Artifact IRI not managed");
+        }
+        catch(final UnsupportedRDFormatException e1)
+        {
+            this.log.error("Unsupported format: " + entity.getMediaType().getName());
+            throw new ResourceException(Status.CLIENT_ERROR_UNSUPPORTED_MEDIA_TYPE, "Cannot parse the given format: "
+                    + entity.getMediaType().getName());
+        }
+        catch(final RDFParseException e1)
+        {
+            this.log.error("Artifact not parsed correctly");
+            throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Artifact not parsed correctly");
+        }
+        catch(final IOException e1)
+        {
+            this.log.error("Artifact not parsed due to IO exception");
+            throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Artifact not parsed due to IO exception");
+        }
         
         // prepare output: Artifact ID, object URI, file reference URI
         final ByteArrayOutputStream output = new ByteArrayOutputStream(8096);

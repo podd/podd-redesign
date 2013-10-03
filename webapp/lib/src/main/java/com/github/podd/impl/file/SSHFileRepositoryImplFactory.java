@@ -46,7 +46,8 @@ public class SSHFileRepositoryImplFactory implements PoddDataRepositoryFactory
     }
     
     @Override
-    public PoddDataRepository<?> createDataRepository(final Resource nextDataRepository, final Model statements) throws DataRepositoryException
+    public PoddDataRepository<?> createDataRepository(final Resource nextDataRepository, final Model statements)
+        throws DataRepositoryException
     {
         if(statements.contains(null, RDF.TYPE, PoddRdfConstants.PODD_SSH_FILE_REPOSITORY))
         {

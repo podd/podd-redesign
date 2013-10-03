@@ -46,7 +46,8 @@ public class SPARQLDataRepositoryImplFactory implements PoddDataRepositoryFactor
     }
     
     @Override
-    public PoddDataRepository<?> createDataRepository(final Resource nextDataRepository, final Model statements) throws DataRepositoryException
+    public PoddDataRepository<?> createDataRepository(final Resource nextDataRepository, final Model statements)
+        throws DataRepositoryException
     {
         if(statements.contains(null, RDF.TYPE, PoddRdfConstants.PODD_SPARQL_DATA_REPOSITORY))
         {

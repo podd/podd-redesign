@@ -32,8 +32,6 @@ import org.openrdf.model.Resource;
 import org.openrdf.model.URI;
 import org.openrdf.model.ValueFactory;
 import org.openrdf.model.impl.LinkedHashModel;
-import org.openrdf.model.impl.StatementImpl;
-import org.openrdf.model.impl.ValueFactoryImpl;
 import org.openrdf.model.vocabulary.RDF;
 
 import com.github.podd.api.file.PoddDataRepository;
@@ -74,7 +72,7 @@ public class SSHFileRepositoryImplTest extends AbstractPoddFileRepositoryTest<SS
         
         // - no "protocol"
         final Model model1 = new LinkedHashModel();
-        BNode resource1 = vf.createBNode("incompleteModel:1");
+        final BNode resource1 = vf.createBNode("incompleteModel:1");
         model1.add(resource1, PoddRdfConstants.PODD_DATA_REPOSITORY_ALIAS, vf.createLiteral(this.getAliasGood()));
         model1.add(resource1, RDF.TYPE, PoddRdfConstants.PODD_DATA_REPOSITORY);
         model1.add(resource1, RDF.TYPE, PoddRdfConstants.PODD_SSH_FILE_REPOSITORY);
@@ -93,7 +91,7 @@ public class SSHFileRepositoryImplTest extends AbstractPoddFileRepositoryTest<SS
         
         // - no "host"
         final Model model2 = new LinkedHashModel();
-        BNode resource2 = vf.createBNode("incompleteModel:2");
+        final BNode resource2 = vf.createBNode("incompleteModel:2");
         model2.add(resource2, PoddRdfConstants.PODD_DATA_REPOSITORY_ALIAS, vf.createLiteral(this.getAliasGood()));
         model2.add(resource2, RDF.TYPE, PoddRdfConstants.PODD_DATA_REPOSITORY);
         model2.add(resource2, RDF.TYPE, PoddRdfConstants.PODD_SSH_FILE_REPOSITORY);
@@ -113,7 +111,7 @@ public class SSHFileRepositoryImplTest extends AbstractPoddFileRepositoryTest<SS
         
         // - no "fingerprint"
         final Model model3 = new LinkedHashModel();
-        BNode resource3 = vf.createBNode("incompleteModel:3");
+        final BNode resource3 = vf.createBNode("incompleteModel:3");
         model3.add(resource3, PoddRdfConstants.PODD_DATA_REPOSITORY_ALIAS, vf.createLiteral(this.getAliasGood()));
         model3.add(resource3, RDF.TYPE, PoddRdfConstants.PODD_DATA_REPOSITORY);
         model3.add(resource3, RDF.TYPE, PoddRdfConstants.PODD_SSH_FILE_REPOSITORY);
@@ -132,7 +130,7 @@ public class SSHFileRepositoryImplTest extends AbstractPoddFileRepositoryTest<SS
         
         // - no protocol, host, port, fingerprint, username, secret
         final Model model4 = new LinkedHashModel();
-        BNode resource4 = vf.createBNode("incompleteModel:4");
+        final BNode resource4 = vf.createBNode("incompleteModel:4");
         model4.add(resource4, PoddRdfConstants.PODD_DATA_REPOSITORY_ALIAS, vf.createLiteral(this.getAliasGood()));
         model4.add(resource4, RDF.TYPE, PoddRdfConstants.PODD_DATA_REPOSITORY);
         model4.add(resource4, RDF.TYPE, PoddRdfConstants.PODD_SSH_FILE_REPOSITORY);
@@ -169,7 +167,7 @@ public class SSHFileRepositoryImplTest extends AbstractPoddFileRepositoryTest<SS
     {
         final ValueFactory vf = PoddRdfConstants.VF;
         final Model model = new LinkedHashModel();
-        BNode bNode = vf.createBNode();
+        final BNode bNode = vf.createBNode();
         model.add(bNode, PoddRdfConstants.PODD_DATA_REPOSITORY_ALIAS, vf.createLiteral(this.getAliasGood()));
         model.add(bNode, RDF.TYPE, PoddRdfConstants.PODD_DATA_REPOSITORY);
         model.add(bNode, RDF.TYPE, PoddRdfConstants.PODD_SSH_FILE_REPOSITORY);

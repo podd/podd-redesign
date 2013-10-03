@@ -27,7 +27,6 @@ import org.openrdf.model.vocabulary.RDF;
 
 import com.github.ansell.abstractserviceloader.AbstractServiceLoader;
 import com.github.podd.exception.DataRepositoryException;
-import com.github.podd.utils.PoddRdfConstants;
 
 /**
  * A registry containing dynamically loaded instances of {@link DataReferenceProcessorFactory}.
@@ -52,7 +51,8 @@ public class PoddDataRepositoryRegistry extends AbstractServiceLoader<String, Po
         super(PoddDataRepositoryFactory.class);
     }
     
-    public PoddDataRepository<?> createDataRepository(final Resource nextMatchingRepository, final Model model) throws DataRepositoryException
+    public PoddDataRepository<?> createDataRepository(final Resource nextMatchingRepository, final Model model)
+        throws DataRepositoryException
     {
         final Set<Value> types = model.filter(nextMatchingRepository, RDF.TYPE, null).objects();
         final Set<URI> uriTypes = new HashSet<URI>();

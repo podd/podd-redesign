@@ -655,14 +655,16 @@ public abstract class AbstractPoddArtifactManagerTest
         this.verifyLoadedArtifact(artifactId, 7, TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES,
                 TestConstants.TEST_ARTIFACT_BASIC_1_20130206_INFERRED_TRIPLES, false);
         
-        final InputStream editInputStream =
-                this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_FRAGMENT_NEW_FILE_REF_OBJECT);
-        
-        final InferredOWLOntologyID updatedArtifact =
-                this.testArtifactManager.attachDataReferences(artifactId.getOntologyIRI().toOpenRDFURI(), artifactId
-                        .getVersionIRI().toOpenRDFURI(), editInputStream, RDFFormat.RDFXML,
-                        DataReferenceVerificationPolicy.DO_NOT_VERIFY);
-        
+        final InferredOWLOntologyID updatedArtifact;
+        try (final InputStream editInputStream =
+                this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_FRAGMENT_NEW_FILE_REF_OBJECT);)
+        {
+            
+            updatedArtifact =
+                    this.testArtifactManager.attachDataReferences(artifactId,
+                            Rio.parse(editInputStream, "", RDFFormat.RDFXML),
+                            DataReferenceVerificationPolicy.DO_NOT_VERIFY);
+        }
         // verify:
         RepositoryConnection nextRepositoryConnection = null;
         try

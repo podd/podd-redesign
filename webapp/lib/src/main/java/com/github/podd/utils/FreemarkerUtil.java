@@ -19,7 +19,6 @@ package com.github.podd.utils;
 import org.openrdf.model.Literal;
 import org.openrdf.model.URI;
 import org.openrdf.model.Value;
-import org.openrdf.model.vocabulary.XMLSchema;
 
 /**
  * @author kutila
@@ -103,14 +102,14 @@ public class FreemarkerUtil
         return null;
     }
     
-    public boolean isUri(final Value value)
-    {
-        return value instanceof URI;
-    }
-    
     public boolean isLiteral(final Value value)
     {
         return value instanceof Literal;
+    }
+    
+    public boolean isUri(final Value value)
+    {
+        return value instanceof URI;
     }
     
 }

@@ -27,7 +27,6 @@ import org.junit.Test;
 import org.openrdf.model.Model;
 import org.openrdf.model.Resource;
 import org.openrdf.model.URI;
-import org.openrdf.model.impl.ValueFactoryImpl;
 
 import com.github.podd.api.file.DataReference;
 import com.github.podd.api.file.PoddDataRepository;

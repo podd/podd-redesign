@@ -38,7 +38,8 @@ public class SPARQLDataRepositoryImpl extends PoddFileRepositoryImpl<SPARQLDataR
 {
     protected final Logger log = LoggerFactory.getLogger(this.getClass());
     
-    public SPARQLDataRepositoryImpl(Resource nextDataRepository, final Model model) throws FileRepositoryIncompleteException
+    public SPARQLDataRepositoryImpl(final Resource nextDataRepository, final Model model)
+        throws FileRepositoryIncompleteException
     {
         super(nextDataRepository, model);
         

@@ -18,8 +18,6 @@ package com.github.podd.impl;
 
 import info.aduna.iteration.Iterations;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -125,13 +123,18 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
     }
     
     @Override
-    public InferredOWLOntologyID attachDataReferences(final URI artifactUri, final URI versionUri,
-            final InputStream inputStream, final RDFFormat format,
+    public InferredOWLOntologyID attachDataReference(final InferredOWLOntologyID artifactId, final URI objectUri,
+            final DataReference dataReference, final DataReferenceVerificationPolicy dataReferenceVerificationPolicy)
+        throws OpenRDFException, PoddException, IOException, OWLException
+    {
+        return this.attachDataReferences(artifactId, dataReference.toRDF(), dataReferenceVerificationPolicy);
+    }
+    
+    @Override
+    public InferredOWLOntologyID attachDataReferences(final InferredOWLOntologyID ontologyId, final Model model,
             final DataReferenceVerificationPolicy dataReferenceVerificationPolicy) throws OpenRDFException,
         IOException, OWLException, PoddException
     {
-        final Model model = Rio.parse(inputStream, "", format);
-        
         model.removeAll(model.filter(null, PoddRdfConstants.PODD_BASE_INFERRED_VERSION, null));
         
         final Set<Resource> fileReferences =
@@ -149,22 +152,15 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             }
         }
         
-        final ByteArrayOutputStream output = new ByteArrayOutputStream(8192);
+        final Model exportArtifact = this.exportArtifact(ontologyId, false);
         
-        Rio.write(model, output, RDFFormat.RDFJSON);
+        exportArtifact.addAll(model);
         
         final Model resultModel =
-                this.updateArtifact(artifactUri, versionUri, fileReferenceObjects,
-                        new ByteArrayInputStream(output.toByteArray()), RDFFormat.RDFJSON,
-                        UpdatePolicy.MERGE_WITH_EXISTING, DanglingObjectPolicy.REPORT, dataReferenceVerificationPolicy);
+                this.updateArtifact(ontologyId.getOntologyIRI().toOpenRDFURI(), ontologyId.getVersionIRI()
+                        .toOpenRDFURI(), fileReferenceObjects, model, UpdatePolicy.MERGE_WITH_EXISTING,
+                        DanglingObjectPolicy.REPORT, dataReferenceVerificationPolicy);
         return OntologyUtils.modelToOntologyIDs(resultModel).get(0);
-    }
-    
-    @Override
-    public InferredOWLOntologyID attachFileReference(final InferredOWLOntologyID artifactId, final URI objectUri,
-            final DataReference dataReference) throws OpenRDFException, PoddException
-    {
-        throw new RuntimeException("TODO: Implement attachFileReference");
     }
     
     @Override

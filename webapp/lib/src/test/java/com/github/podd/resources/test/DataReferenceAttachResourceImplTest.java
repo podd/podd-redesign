@@ -29,7 +29,6 @@ import java.util.List;
 import org.apache.commons.io.IOUtils;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.openrdf.model.Model;
 import org.openrdf.model.Resource;
@@ -60,7 +59,7 @@ import com.github.podd.utils.PoddWebConstants;
  * 
  */
 // @Ignore("Tests fail sometimes with the SSH Service timing out due to lack of entropy. Should be run before releases.")
-public class FileReferenceAttachResourceImplTest extends AbstractResourceImplTest
+public class DataReferenceAttachResourceImplTest extends AbstractResourceImplTest
 {
     /** SSH File Repository server for tests */
     protected SSHService sshd;
@@ -173,17 +172,17 @@ public class FileReferenceAttachResourceImplTest extends AbstractResourceImplTes
                     RestletTestUtils.doTestAuthenticatedRequest(fileRefAttachClientResource, Method.POST, input,
                             MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
             
-            Model ontologyIDModel = this.assertRdf(results, RDFFormat.RDFXML, 5);
+            final Model ontologyIDModel = this.assertRdf(results, RDFFormat.RDFXML, 5);
             
             Assert.assertEquals(3, ontologyIDModel.subjects().size());
             Assert.assertEquals(3, ontologyIDModel.predicates().size());
             Assert.assertEquals(3, ontologyIDModel.objects().size());
             Assert.assertEquals(1, ontologyIDModel.contexts().size());
             
-            List<InferredOWLOntologyID> ontologyIDs = OntologyUtils.modelToOntologyIDs(ontologyIDModel);
+            final List<InferredOWLOntologyID> ontologyIDs = OntologyUtils.modelToOntologyIDs(ontologyIDModel);
             Assert.assertEquals(1, ontologyIDs.size());
             
-            Model artifactModel = this.getArtifactAsModel(artifactID.getOntologyIRI().toString());
+            final Model artifactModel = this.getArtifactAsModel(artifactID.getOntologyIRI().toString());
             
             DebugUtils.printContents(artifactModel);
             

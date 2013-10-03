@@ -39,18 +39,13 @@ import org.openrdf.model.impl.LinkedHashModel;
 import org.openrdf.model.impl.ValueFactoryImpl;
 import org.openrdf.model.vocabulary.RDF;
 import org.openrdf.query.BindingSet;
-import org.openrdf.query.GraphQuery;
 import org.openrdf.query.QueryLanguage;
-import org.openrdf.query.QueryResults;
 import org.openrdf.query.TupleQuery;
-import org.openrdf.query.impl.DatasetImpl;
 import org.openrdf.query.resultio.helpers.QueryResultCollector;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.rio.RDFFormat;
-import org.openrdf.rio.RDFParser;
 import org.openrdf.rio.Rio;
-import org.openrdf.rio.helpers.StatementCollector;
 import org.semanticweb.owlapi.formats.OWLOntologyFormatFactoryRegistry;
 import org.semanticweb.owlapi.formats.RioRDFOntologyFormatFactory;
 import org.semanticweb.owlapi.io.OWLParserException;
@@ -652,7 +647,7 @@ public class PoddFileRepositoryManagerImpl implements PoddDataRepositoryManager
         try (final InputStream inputA = this.getClass().getResourceAsStream(PoddRdfConstants.PATH_PODD_DATA_REPOSITORY);)
         {
             // load poddDataRepository.owl into a Model
-            Model schemaModel = Rio.parse(inputA, "", RDFFormat.RDFXML);
+            final Model schemaModel = Rio.parse(inputA, "", RDFFormat.RDFXML);
             
             // verify & load poddDataRepository.owl into OWLAPI
             dataRepositoryOntology = this.checkForConsistentOwlDlOntology(schemaModel);
