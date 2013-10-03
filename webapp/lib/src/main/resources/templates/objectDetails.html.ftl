@@ -169,7 +169,7 @@
         <a href="${baseUrl}/artifact/unpublish?artifacturi=${poddObject.objectURI!"unknown-pid"}">Unpublish Project</a>
         </#if>
         <#if objectType?? && objectType.label == 'Investigation'>
-        	<a href="${baseUrl}/services/getHierarchy?option=file&URI=http://www.podd.org/object%23${poddObject.objectURI!"unknown-pid"}">Download hierarchy attachments</a>
+        	<!-- <a href="${baseUrl}/services/getHierarchy?option=file&URI=http://www.podd.org/object%23${poddObject.objectURI!"unknown-pid"}">Download hierarchy attachments</a> -->
         </#if>        
         <#if canDelete?? && canDelete>
         	<#if isProject?? && isProject>
