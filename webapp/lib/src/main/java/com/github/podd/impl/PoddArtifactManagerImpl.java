@@ -1672,6 +1672,8 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
                             + "]. The current version is [" + artifactID.getVersionIRI().toString() + "]";
             
             this.log.error(message);
+            // TODO: UpdatePolicy.MERGE_WITH_EXISTING and UpdatePolicy.REPLACE_ALL should be fine to
+            // go on in most cases
             throw new UnmanagedArtifactVersionException(artifactID.getOntologyIRI(), artifactID.getVersionIRI(),
                     IRI.create(versionUri), message, e);
             // FIXME - handle this conflict intelligently instead of rejecting the update.
