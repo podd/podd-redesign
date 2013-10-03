@@ -13,19 +13,21 @@
 
 		podd.userName = '${requestedUser.identifier!""}';
 
-		podd.roles = [];
+		podd.roles = [
 		<#if repositoryRolesList?? && repositoryRolesList?has_content>
 		    <#list repositoryRolesList as role>
-		    	var aRole = {};
-		    	aRole.uri = '${role.URI!'unknown'}';
-		    	aRole.name = '${role.getName()!'unknown'}';
-		    	aRole.description = '${role.description!'no description'}';
-		    	podd.debug('The Role = ' + aRole.uri + ', ' + aRole.name + ', ' + aRole.description);
-		    	podd.roles.push(aRole);
+		    	{ 
+		    	  uri : '${role.URI?js_string!'unknown'}',
+		    	  name : '${role.name?js_string!'unknown'}',
+		    	  description : '${role.description?js_string!'no description'}'
+		    	}<#if role_has_next>,</#if>
 		    </#list>
 		</#if>
-		podd.debug('All Roles size = ' + podd.roles.length);
+		];
 		
+		podd.debug('All Roles size = ' + podd.roles.length);
+		podd.debug(podd.roles);
+				
 		// Add handler for deleting Roles populated at page load time
 	    $(".deleteLinkStatic").click(function() {
 	     	var tr = $(this).closest('tr');
