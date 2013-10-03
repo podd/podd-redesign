@@ -148,13 +148,14 @@
             <#if user??>
                 <li class="left_image float_right"><a href="${baseUrl}/logout">Logout</a></li>
                 <li class="left_image float_right"><a href="${baseUrl}/help">Help</a></li>
-                <li class="left_image float_right"><a href="${baseUrl}/supportDesk">Support</a></li>
+                <li class="no_image float_right"><a href="${baseUrl}/about">About</a></li>
+                <!-- <li class="left_image float_right"><a href="${baseUrl}/supportDesk">Support</a></li> -->
                 <li class="left_image float_right"><a href="${baseUrl}/user/details?userIdentifier=${user.identifier!"unknown-username"}">Settings</a></li>
                 <li class="no_image float_right"><i>${user.firstName!""} ${user.lastName!""}</i></li>
             <#else>
                 <li class="left_image float_right"><a href="${baseUrl}/loginpage">Login</a></li>
                 <li class="left_image float_right"><a href="${baseUrl}/help">Help</a></li>
-                <li class="no_image float_right"><a href="${baseUrl}/about">Support</a></li>
+                <li class="no_image float_right"><a href="${baseUrl}/about">About</a></li>
             </#if>
         </ul>
     </div>
