@@ -24,6 +24,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.util.List;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.Assert;
@@ -48,7 +49,9 @@ import org.restlet.resource.ResourceException;
 import com.github.ansell.restletutils.test.RestletTestUtils;
 import com.github.podd.api.test.TestConstants;
 import com.github.podd.impl.file.test.SSHService;
+import com.github.podd.utils.DebugUtils;
 import com.github.podd.utils.InferredOWLOntologyID;
+import com.github.podd.utils.OntologyUtils;
 import com.github.podd.utils.PoddRdfConstants;
 import com.github.podd.utils.PoddWebConstants;
 
@@ -56,7 +59,7 @@ import com.github.podd.utils.PoddWebConstants;
  * @author kutila
  * 
  */
-@Ignore("Tests fail sometimes with the SSH Service timing out due to lack of entropy. Should be run before releases.")
+// @Ignore("Tests fail sometimes with the SSH Service timing out due to lack of entropy. Should be run before releases.")
 public class FileReferenceAttachResourceImplTest extends AbstractResourceImplTest
 {
     /** SSH File Repository server for tests */
@@ -170,19 +173,42 @@ public class FileReferenceAttachResourceImplTest extends AbstractResourceImplTes
                     RestletTestUtils.doTestAuthenticatedRequest(fileRefAttachClientResource, Method.POST, input,
                             MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
             
-            final String body = this.getText(results);
+            Model ontologyIDModel = this.assertRdf(results, RDFFormat.RDFXML, 5);
+            
+            Assert.assertEquals(3, ontologyIDModel.subjects().size());
+            Assert.assertEquals(3, ontologyIDModel.predicates().size());
+            Assert.assertEquals(3, ontologyIDModel.objects().size());
+            Assert.assertEquals(1, ontologyIDModel.contexts().size());
+            
+            List<InferredOWLOntologyID> ontologyIDs = OntologyUtils.modelToOntologyIDs(ontologyIDModel);
+            Assert.assertEquals(1, ontologyIDs.size());
+            
+            Model artifactModel = this.getArtifactAsModel(artifactID.getOntologyIRI().toString());
+            
+            DebugUtils.printContents(artifactModel);
+            
+            Assert.assertEquals(98, artifactModel.size());
+            Assert.assertEquals(20, artifactModel.subjects().size());
+            Assert.assertEquals(33, artifactModel.predicates().size());
+            Assert.assertEquals(74, artifactModel.objects().size());
+            Assert.assertEquals(1, artifactModel.contexts().size());
+            
+            // final String body = this.getText(results);
             
             // verify: Inferred Ontology ID is received in RDF format
-            Assert.assertTrue("Response not in RDF format", body.contains("<rdf:RDF"));
-            Assert.assertTrue("Artifact version has not been updated properly", body.contains("artifact:1:version:2"));
-            Assert.assertTrue("Version IRI not in response", body.contains("versionIRI"));
-            Assert.assertTrue("Inferred version not in response", body.contains("inferredVersion"));
-            
-            // verify: new file reference has been added to the artifact
-            final String artifactBody =
-                    this.getArtifactAsString(artifactID.getOntologyIRI().toString(), MediaType.APPLICATION_RDF_XML);
-            Assert.assertTrue("New file ref not added to artifact", artifactBody.contains("Rice tree scan 003454-98"));
-            Assert.assertTrue("New file ref not added to artifact", artifactBody.contains("object-rice-scan-34343-a"));
+            // Assert.assertTrue("Response not in RDF format", body.contains("<rdf:RDF"));
+            // Assert.assertTrue("Artifact version has not been updated properly",
+            // body.contains("artifact:1:version:2"));
+            // Assert.assertTrue("Version IRI not in response", body.contains("versionIRI"));
+            // Assert.assertTrue("Inferred version not in response",
+            // body.contains("inferredVersion"));
+            //
+            // // verify: new file reference has been added to the artifact
+            // final String artifactBody =
+            // Assert.assertTrue("New file ref not added to artifact",
+            // artifactBody.contains("Rice tree scan 003454-98"));
+            // Assert.assertTrue("New file ref not added to artifact",
+            // artifactBody.contains("object-rice-scan-34343-a"));
         }
         finally
         {
