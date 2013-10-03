@@ -12,10 +12,10 @@
 <rdf:Description rdf:about="urn:temp:uuid:object-rice-scan-34343-a">
 	<rdf:type rdf:resource="http://purl.org/podd/ns/poddBase#DataReference"/>
 	<rdf:type rdf:resource="http://purl.org/podd/ns/poddBase#SSHFileReference"/>
-	<rdfs:label>Rice tree scan 003454-98</rdfs:label>
-	<poddBase:hasAlias>csiro_dap</poddBase:hasAlias>
-	<poddBase:hasFileName>plant_003456-233445.bag.zip</poddBase:hasFileName>
-	<poddBase:hasPath>/dap/plant/rice-34343/</poddBase:hasPath>
+	<rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Rice tree scan 003454-98</rdfs:label>
+	<poddBase:hasAlias rdf:datatype="http://www.w3.org/2001/XMLSchema#string">csiro_dap</poddBase:hasAlias>
+	<poddBase:hasFileName rdf:datatype="http://www.w3.org/2001/XMLSchema#string">plant_003456-233445.bag.zip</poddBase:hasFileName>
+	<poddBase:hasPath rdf:datatype="http://www.w3.org/2001/XMLSchema#string">/dap/plant/rice-34343/</poddBase:hasPath>
 </rdf:Description>
 
 <!-- owner of file reference -->
