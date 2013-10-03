@@ -144,7 +144,7 @@
 </#if>
 
 <br />
-<#include "attachedFilesDetails.html.ftl"/>
+<!-- include "attachedFilesDetails.html.ftl"/ -->
 
 <br />
 <!--#include "hierarchy.html.ftl"/-->
