@@ -209,8 +209,10 @@ Macro to display information about the PODD object being viewed
 						<#else>
 							<span><a property="${propertyUri}" href="${baseUrl}/artifact/base?artifacturi=${artifactUri?url}&amp;objecturi=${thisObject?url}">${util.clipProtocol(thisObject.stringValue())}</a></span>	
 						</#if>
-					<#else>
+					<#elseif util.isLiteral(thisObject)>
 						<span property="${propertyUri}" datatype="${util.getDatatype(thisObject)}"><@formatText textValue=thisObject.stringValue()!""/></span>
+					<#else>
+						<!-- Found non-URI and non-literal property value, not showing it in HTML as it is not useful <@formatText textValue=thisObject.stringValue()!""/> -->
 					</#if>
 				</li>
 			</#list>
@@ -226,8 +228,10 @@ Macro to display information about the PODD object being viewed
 					<#else>
 						<span><a property="${propertyUri}" href="${baseUrl}/artifact/base?artifacturi=${artifactUri?url}&amp;objecturi=${thisObject?url}">${util.clipProtocol(thisObject.stringValue())}</a></span>	
 					</#if>
-				<#else>
+				<#elseif util.isLiteral(thisObject)>
 					<span property="${propertyUri}" datatype="${util.getDatatype(thisObject)}"><@formatText textValue=thisObject.stringValue()!""/></span>
+				<#else>
+					<!-- Found non-URI and non-literal property value, not showing it in HTML as it is not useful <@formatText textValue=thisObject.stringValue()!""/> -->
 				</#if>
 			</#list>
 		</#if>

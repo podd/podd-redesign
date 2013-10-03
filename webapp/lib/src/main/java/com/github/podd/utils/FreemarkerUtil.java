@@ -19,6 +19,7 @@ package com.github.podd.utils;
 import org.openrdf.model.Literal;
 import org.openrdf.model.URI;
 import org.openrdf.model.Value;
+import org.openrdf.model.vocabulary.XMLSchema;
 
 /**
  * @author kutila
@@ -86,8 +87,11 @@ public class FreemarkerUtil
                 
                 return dataType.stringValue();
             }
+            // Default to xsd:string datatype if any value happens to get through without a datatype
+            // at this point
+            return "xsd:string";
         }
-        return "TODO";
+        return "NotALiteral:" + value.getClass().getName();
     }
     
     public URI getUri(final Value value)
@@ -102,6 +106,11 @@ public class FreemarkerUtil
     public boolean isUri(final Value value)
     {
         return value instanceof URI;
+    }
+    
+    public boolean isLiteral(final Value value)
+    {
+        return value instanceof Literal;
     }
     
 }
