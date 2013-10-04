@@ -106,7 +106,7 @@ public abstract class AbstractPoddFileRepositoryManagerTest
         this.testFileRepositoryManager = this.getNewPoddFileRepositoryManager();
         this.testRepositoryManager = this.testFileRepositoryManager.getRepositoryManager();
         
-        final RepositoryConnection conn = this.testRepositoryManager.getRepository().getConnection();
+        final RepositoryConnection conn = this.testRepositoryManager.getManagementRepository().getConnection();
         try
         {
             conn.begin();
@@ -141,7 +141,7 @@ public abstract class AbstractPoddFileRepositoryManagerTest
     @After
     public void tearDown() throws Exception
     {
-        final Repository repository = this.testRepositoryManager.getRepository();
+        final Repository repository = this.testRepositoryManager.getManagementRepository();
         repository.shutDown();
         
         this.testFileRepositoryManager = null;
@@ -294,7 +294,7 @@ public abstract class AbstractPoddFileRepositoryManagerTest
     public void testGetAllAliasesWhenEmpty() throws Exception
     {
         // prepare: clean up any aliases that already exist
-        final RepositoryConnection connection = this.testRepositoryManager.getRepository().getConnection();
+        final RepositoryConnection connection = this.testRepositoryManager.getManagementRepository().getConnection();
         final URI dataRepositoryManagementGraph = this.testRepositoryManager.getFileRepositoryManagementGraph();
         connection.clear(dataRepositoryManagementGraph);
         connection.close();
@@ -434,7 +434,7 @@ public abstract class AbstractPoddFileRepositoryManagerTest
     public void testInitSuccessDefault() throws Exception
     {
         // prepare: clean up any aliases that already exist
-        final RepositoryConnection connection = this.testRepositoryManager.getRepository().getConnection();
+        final RepositoryConnection connection = this.testRepositoryManager.getManagementRepository().getConnection();
         final URI dataRepositoryManagementGraph = this.testRepositoryManager.getFileRepositoryManagementGraph();
         connection.clear(dataRepositoryManagementGraph);
         connection.close();
@@ -455,7 +455,7 @@ public abstract class AbstractPoddFileRepositoryManagerTest
     public void testInitSuccessTest() throws Exception
     {
         // prepare: clean up any aliases that already exist
-        final RepositoryConnection connection = this.testRepositoryManager.getRepository().getConnection();
+        final RepositoryConnection connection = this.testRepositoryManager.getManagementRepository().getConnection();
         final URI dataRepositoryManagementGraph = this.testRepositoryManager.getFileRepositoryManagementGraph();
         connection.clear(dataRepositoryManagementGraph);
         connection.close();
@@ -477,7 +477,7 @@ public abstract class AbstractPoddFileRepositoryManagerTest
     public void testInitWithInvalidAliasFile() throws Exception
     {
         // prepare: clean up any aliases that already exist
-        final RepositoryConnection connection = this.testRepositoryManager.getRepository().getConnection();
+        final RepositoryConnection connection = this.testRepositoryManager.getManagementRepository().getConnection();
         final URI dataRepositoryManagementGraph = this.testRepositoryManager.getFileRepositoryManagementGraph();
         connection.begin();
         connection.clear(dataRepositoryManagementGraph);
@@ -502,7 +502,7 @@ public abstract class AbstractPoddFileRepositoryManagerTest
     public void testInitWithNonExistentAliasFile() throws Exception
     {
         // prepare: clean up any aliases that already exist
-        final RepositoryConnection connection = this.testRepositoryManager.getRepository().getConnection();
+        final RepositoryConnection connection = this.testRepositoryManager.getManagementRepository().getConnection();
         final URI dataRepositoryManagementGraph = this.testRepositoryManager.getFileRepositoryManagementGraph();
         connection.begin();
         connection.clear(dataRepositoryManagementGraph);
