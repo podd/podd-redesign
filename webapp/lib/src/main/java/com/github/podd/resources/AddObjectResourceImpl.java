@@ -16,6 +16,7 @@
  */
 package com.github.podd.resources;
 
+import java.util.Collection;
 import java.util.Map;
 
 import org.openrdf.OpenRDFException;
@@ -29,8 +30,10 @@ import org.restlet.resource.Get;
 import org.restlet.resource.Post;
 import org.restlet.resource.ResourceException;
 import org.semanticweb.owlapi.model.IRI;
+import org.semanticweb.owlapi.model.OWLOntologyID;
 
 import com.github.podd.exception.UnmanagedArtifactIRIException;
+import com.github.podd.exception.UnmanagedArtifactVersionException;
 import com.github.podd.exception.UnmanagedSchemaIRIException;
 import com.github.podd.restlet.PoddAction;
 import com.github.podd.restlet.RestletUtils;
@@ -145,22 +148,25 @@ public class AddObjectResourceImpl extends AbstractPoddResourceImpl
         PoddObjectLabel objectLabel;
         try
         {
-            final RepositoryConnection conn = this.getPoddRepositoryManager().getRepository().getConnection();
+            InferredOWLOntologyID ontologyID;
+            if(artifactUri == null)
+            {
+                // FIXME: Why is there a hack here???
+                ontologyID =
+                        this.getPoddSchemaManager().getCurrentSchemaOntologyVersion(
+                                IRI.create(PoddRdfConstants.PODD_SCIENCE.replace("#", "")));
+            }
+            else
+            {
+                ontologyID = this.getPoddArtifactManager().getArtifact(IRI.create(artifactUri));
+            }
+            
+            Collection<OWLOntologyID> schemaImports = this.getPoddArtifactManager().getSchemaImports(ontologyID);
+            final RepositoryConnection conn =
+                    this.getPoddRepositoryManager().getPermanentRepository(schemaImports).getConnection();
             conn.begin();
             try
             {
-                InferredOWLOntologyID ontologyID;
-                if(artifactUri == null)
-                {
-                    // FIXME: Why is there a hack here???
-                    ontologyID =
-                            this.getPoddSchemaManager().getCurrentSchemaOntologyVersion(
-                                    IRI.create(PoddRdfConstants.PODD_SCIENCE.replace("#", "")));
-                }
-                else
-                {
-                    ontologyID = this.getPoddArtifactManager().getArtifact(IRI.create(artifactUri));
-                }
                 objectLabel =
                         this.getPoddSesameManager().getObjectLabel(ontologyID,
                                 PoddRdfConstants.VF.createURI(objectType), conn);
@@ -174,7 +180,8 @@ public class AddObjectResourceImpl extends AbstractPoddResourceImpl
                 }
             }
         }
-        catch(UnmanagedArtifactIRIException | UnmanagedSchemaIRIException | OpenRDFException e)
+        catch(UnmanagedArtifactIRIException | UnmanagedSchemaIRIException | OpenRDFException
+                | UnmanagedArtifactVersionException e)
         {
             e.printStackTrace();
             // failed to find Label
