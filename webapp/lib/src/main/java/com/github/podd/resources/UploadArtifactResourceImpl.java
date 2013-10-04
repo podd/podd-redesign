@@ -28,6 +28,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -63,12 +64,15 @@ import org.restlet.resource.Post;
 import org.restlet.resource.ResourceException;
 import org.restlet.security.User;
 import org.semanticweb.owlapi.model.OWLException;
+import org.semanticweb.owlapi.model.OWLOntologyID;
 
 import com.github.podd.api.DanglingObjectPolicy;
 import com.github.podd.api.DataReferenceVerificationPolicy;
 import com.github.podd.api.PoddArtifactManager;
 import com.github.podd.exception.DuplicateArtifactIRIException;
 import com.github.podd.exception.PoddException;
+import com.github.podd.exception.UnmanagedArtifactIRIException;
+import com.github.podd.exception.UnmanagedArtifactVersionException;
 import com.github.podd.restlet.PoddAction;
 import com.github.podd.restlet.PoddSesameRealm;
 import com.github.podd.restlet.PoddWebServiceApplication;
@@ -281,7 +285,9 @@ public class UploadArtifactResourceImpl extends AbstractPoddResourceImpl
             
             try
             {
-                conn = this.getPoddRepositoryManager().getRepository().getConnection();
+                // FIXME: This should be a method inside of PoddArtifactManagerImpl
+                Collection<OWLOntologyID> schemaImports = this.getPoddArtifactManager().getSchemaImports(artifactId);
+                conn = this.getPoddRepositoryManager().getPermanentRepository(schemaImports).getConnection();
                 final URI topObjectIRI =
                         this.getPoddArtifactManager().getSesameManager().getTopObjectIRI(artifactId, conn);
                 
@@ -297,7 +303,7 @@ public class UploadArtifactResourceImpl extends AbstractPoddResourceImpl
                             nextTopObjectType.getPredicate(), nextTopObjectType.getObject()));
                 }
             }
-            catch(final OpenRDFException e)
+            catch(final OpenRDFException | UnmanagedArtifactIRIException | UnmanagedArtifactVersionException e)
             {
                 this.log.error("Failed to get top object URI", e);
             }
