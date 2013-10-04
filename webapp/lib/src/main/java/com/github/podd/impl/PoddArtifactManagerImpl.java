@@ -822,7 +822,8 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
     @Override
     public Collection<OWLOntologyID> getSchemaImports(final InferredOWLOntologyID artifactID)
     {
-        throw new RuntimeException("TODO: Implement getSchemaImports");
+        // FIXME: Implement me!
+        return null;
     }
     
     @Override
