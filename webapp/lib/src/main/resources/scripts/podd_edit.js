@@ -355,6 +355,13 @@ podd.addDataRepositoryHandler = function(dropDown, detailsDiv, nextDatabank) {
 
             podd.debug('Selected alias : {' + aliasString + "}");
 
+            // Clear details div if they select the default option
+            if (aliasString === '') {
+                detailsDiv.empty();
+                podd.emptyErrorMessages();
+                return;
+            }
+
             var myQuery = $.rdf({
                 databank : nextDatabank
             })
@@ -481,13 +488,10 @@ podd.createSSHFileReferenceForm = function(aliasString, detailsDiv) {
 };
 
 podd.createSPARQLDataReferenceForm = function(aliasString, detailsDiv) {
-    podd.debug("TODO: Implement createSSHFileReferenceForm");
+    podd.debug("TODO: Implement createSPARQLDataReferenceForm");
 };
 
 podd.submitDataReferenceCreate = function(databank) {
-    podd.debug("TODO: Implement submitDataReferenceCreate");
-    podd.debug(databank);
-
     var modifiedTriples = $.toJSON(databank.dump({
         format : 'application/json'
     }));
