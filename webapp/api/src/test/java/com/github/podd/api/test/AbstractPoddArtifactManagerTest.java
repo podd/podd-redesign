@@ -540,7 +540,7 @@ public abstract class AbstractPoddArtifactManagerTest
         this.testRepositoryManager.setSchemaManagementGraph(this.schemaGraph);
         this.testRepositoryManager.setArtifactManagementGraph(this.artifactGraph);
         
-        this.testRepositoryConnection = this.testRepositoryManager.getRepository().getConnection();
+        this.testRepositoryConnection = this.testRepositoryManager.getManagementRepository().getConnection();
         
         final DataReferenceProcessorRegistry testFileRegistry = new DataReferenceProcessorRegistry();
         // clear any automatically added entries that may come from META-INF/services entries on the
@@ -632,7 +632,7 @@ public abstract class AbstractPoddArtifactManagerTest
             }
             finally
             {
-                this.testRepositoryManager.getRepository().shutDown();
+                this.testRepositoryManager.getManagementRepository().shutDown();
                 this.testRepositoryManager = null;
                 this.testRepositoryConnection = null;
             }
@@ -669,7 +669,7 @@ public abstract class AbstractPoddArtifactManagerTest
         RepositoryConnection nextRepositoryConnection = null;
         try
         {
-            nextRepositoryConnection = this.testRepositoryManager.getRepository().getConnection();
+            nextRepositoryConnection = this.testRepositoryManager.getManagementRepository().getConnection();
             nextRepositoryConnection.begin();
             
             this.verifyUpdatedArtifact(updatedArtifact, "http://purl.org/podd/basic-2-20130206/artifact:1:version:2",
@@ -1718,7 +1718,7 @@ public abstract class AbstractPoddArtifactManagerTest
         RepositoryConnection nextRepositoryConnection = null;
         try
         {
-            nextRepositoryConnection = this.testRepositoryManager.getRepository().getConnection();
+            nextRepositoryConnection = this.testRepositoryManager.getManagementRepository().getConnection();
             nextRepositoryConnection.begin();
             
             final String[] expectedImports =
@@ -1918,7 +1918,7 @@ public abstract class AbstractPoddArtifactManagerTest
         RepositoryConnection nextRepositoryConnection = null;
         try
         {
-            nextRepositoryConnection = this.testRepositoryManager.getRepository().getConnection();
+            nextRepositoryConnection = this.testRepositoryManager.getManagementRepository().getConnection();
             nextRepositoryConnection.begin();
             
             // verify: a single PUBLICATION_STATUS in asserted ontology
@@ -2031,7 +2031,7 @@ public abstract class AbstractPoddArtifactManagerTest
         RepositoryConnection nextRepositoryConnection = null;
         try
         {
-            nextRepositoryConnection = this.testRepositoryManager.getRepository().getConnection();
+            nextRepositoryConnection = this.testRepositoryManager.getManagementRepository().getConnection();
             nextRepositoryConnection.begin();
             
             this.verifyUpdatedArtifact(updatedArtifact, "http://purl.org/podd/basic-2-20130206/artifact:1:version:2",
@@ -2093,7 +2093,7 @@ public abstract class AbstractPoddArtifactManagerTest
         RepositoryConnection nextRepositoryConnection = null;
         try
         {
-            nextRepositoryConnection = this.testRepositoryManager.getRepository().getConnection();
+            nextRepositoryConnection = this.testRepositoryManager.getManagementRepository().getConnection();
             nextRepositoryConnection.begin();
             
             this.verifyUpdatedArtifact(updatedArtifact, "http://purl.org/podd/basic-2-20130206/artifact:1:version:2",
@@ -2159,7 +2159,7 @@ public abstract class AbstractPoddArtifactManagerTest
         RepositoryConnection nextRepositoryConnection = null;
         try
         {
-            nextRepositoryConnection = this.testRepositoryManager.getRepository().getConnection();
+            nextRepositoryConnection = this.testRepositoryManager.getManagementRepository().getConnection();
             nextRepositoryConnection.begin();
             
             this.verifyUpdatedArtifact(updatedArtifact, "http://purl.org/podd/basic-2-20130206/artifact:1:version:2",
@@ -2210,7 +2210,7 @@ public abstract class AbstractPoddArtifactManagerTest
         RepositoryConnection nextRepositoryConnection = null;
         try
         {
-            nextRepositoryConnection = this.testRepositoryManager.getRepository().getConnection();
+            nextRepositoryConnection = this.testRepositoryManager.getManagementRepository().getConnection();
             nextRepositoryConnection.begin();
             
             this.verifyUpdatedArtifact(updatedArtifact, "http://purl.org/podd/basic-2-20130206/artifact:1:version:2",
@@ -2292,7 +2292,7 @@ public abstract class AbstractPoddArtifactManagerTest
         RepositoryConnection nextRepositoryConnection = null;
         try
         {
-            nextRepositoryConnection = this.testRepositoryManager.getRepository().getConnection();
+            nextRepositoryConnection = this.testRepositoryManager.getManagementRepository().getConnection();
             nextRepositoryConnection.begin();
             
             this.verifyUpdatedArtifact(updatedArtifact, "http://purl.org/podd/basic-2-20130206/artifact:1:version:2",
@@ -2349,7 +2349,7 @@ public abstract class AbstractPoddArtifactManagerTest
         RepositoryConnection nextRepositoryConnection = null;
         try
         {
-            nextRepositoryConnection = this.testRepositoryManager.getRepository().getConnection();
+            nextRepositoryConnection = this.testRepositoryManager.getManagementRepository().getConnection();
             nextRepositoryConnection.begin();
             
             this.verifyUpdatedArtifact(updatedArtifact, "http://purl.org/podd/basic-2-20130206/artifact:1:version:2",
@@ -2407,7 +2407,7 @@ public abstract class AbstractPoddArtifactManagerTest
         RepositoryConnection nextRepositoryConnection = null;
         try
         {
-            nextRepositoryConnection = this.testRepositoryManager.getRepository().getConnection();
+            nextRepositoryConnection = this.testRepositoryManager.getManagementRepository().getConnection();
             nextRepositoryConnection.begin();
             
             this.verifyUpdatedArtifact(updatedArtifact, "http://purl.org/podd/basic-2-20130206/artifact:1:version:2",
@@ -2827,7 +2827,7 @@ public abstract class AbstractPoddArtifactManagerTest
         RepositoryConnection nextRepositoryConnection = null;
         try
         {
-            nextRepositoryConnection = this.testRepositoryManager.getRepository().getConnection();
+            nextRepositoryConnection = this.testRepositoryManager.getManagementRepository().getConnection();
             nextRepositoryConnection.begin();
             
             if(nextRepositoryConnection.size(inferredOntologyId.getVersionIRI().toOpenRDFURI()) != assertedStatementCount)
