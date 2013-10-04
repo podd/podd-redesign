@@ -16,12 +16,15 @@
  */
 package com.github.podd.impl;
 
+import java.util.Collection;
+
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.URI;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.sail.SailRepository;
 import org.openrdf.sail.memory.MemoryStore;
+import org.semanticweb.owlapi.model.OWLOntologyID;
 
 import com.github.podd.api.PoddRepositoryManager;
 import com.github.podd.utils.PoddRdfConstants;
@@ -90,7 +93,13 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
     }
     
     @Override
-    public Repository getNewTemporaryRepository() throws OpenRDFException
+    public Repository getManagementRepository() throws OpenRDFException
+    {
+        return this.repository;
+    }
+    
+    @Override
+    public Repository getNewTemporaryRepository(final Collection<OWLOntologyID> ontologies) throws OpenRDFException
     {
         final Repository result = new SailRepository(new MemoryStore());
         result.initialize();
@@ -99,7 +108,7 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
     }
     
     @Override
-    public Repository getRepository() throws OpenRDFException
+    public Repository getPermanentRepository(final Collection<OWLOntologyID> ontologies) throws OpenRDFException
     {
         return this.repository;
     }
@@ -123,7 +132,7 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
     }
     
     @Override
-    public void setRepository(final Repository repository) throws OpenRDFException
+    public void setManagementRepository(final Repository repository) throws OpenRDFException
     {
         this.repository = repository;
     }
