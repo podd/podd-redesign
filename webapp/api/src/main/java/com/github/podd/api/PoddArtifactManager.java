@@ -361,6 +361,20 @@ public interface PoddArtifactManager
     PoddRepositoryManager getRepositoryManager();
     
     /**
+     * Returns the list of schema imports used by the given artifact.
+     * 
+     * @param artifactID
+     *            The artifact (and version) to get schema imports for.
+     * @return A list of schema imports used by the given artifact.
+     * @throws UnmanagedArtifactIRIException
+     *             If the artifact is not managed.
+     * @throws UnmanagedArtifactVersionException
+     *             If the artifact is managed, but the version was not recognised.
+     */
+    Collection<OWLOntologyID> getSchemaImports(InferredOWLOntologyID artifactID) throws UnmanagedArtifactIRIException,
+        UnmanagedArtifactVersionException;
+    
+    /**
      * 
      * @return The {@link PoddSchemaManager} used to access and verify versions of Schema Ontologies
      *         used in artifacts.
