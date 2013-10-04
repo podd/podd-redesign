@@ -152,7 +152,7 @@ public class PoddFileRepositoryManagerImplTest extends AbstractPoddFileRepositor
         testRepository.initialize();
         
         final PoddRepositoryManager repositoryManager = new PoddRepositoryManagerImpl();
-        repositoryManager.setRepository(testRepository);
+        repositoryManager.setManagementRepository(testRepository);
         repositoryManager.setFileRepositoryManagementGraph(PoddRdfConstants.DEFAULT_FILE_REPOSITORY_MANAGEMENT_GRAPH);
         
         // create an OWL Manager
