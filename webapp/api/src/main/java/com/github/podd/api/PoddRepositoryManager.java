@@ -19,10 +19,14 @@
  */
 package com.github.podd.api;
 
+import java.util.Collection;
+import java.util.List;
+
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.URI;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryException;
+import org.semanticweb.owlapi.model.OWLOntologyID;
 
 /**
  * Interface to manage the Sesame Repository used by PODD.
@@ -45,20 +49,35 @@ public interface PoddRepositoryManager
     URI getFileRepositoryManagementGraph();
     
     /**
+     * Gets a reference to the
+     * 
+     * @return A link to the initialised management repository managed by this manager.
+     * @throws OpenRDFException
+     *             If there are any errors with the repository at this stage.
+     */
+    Repository getManagementRepository() throws OpenRDFException;
+    
+    /**
+     * 
+     * @param schemaOntologies
+     *            A list of schema ontologies that must be supported by the temporary repository.
      * 
      * @return A new, initialized in-memory repository that can be used to store statements
      *         temporarily while validating them before uploading them to a permanent repository.
      * @throws OpenRDFException
      */
-    Repository getNewTemporaryRepository() throws OpenRDFException;
+    Repository getNewTemporaryRepository(Collection<OWLOntologyID> schemaOntologies) throws OpenRDFException;
     
     /**
+     * 
+     * @param schemaOntologies
+     *            A list of schema ontologies that must be supported by the permanent repository.
      * 
      * @return A link to the initialised repository managed by this manager.
      * @throws OpenRDFException
      *             If there are any errors with the repository at this stage.
      */
-    Repository getRepository() throws OpenRDFException;
+    Repository getPermanentRepository(Collection<OWLOntologyID> schemaOntologies) throws OpenRDFException;
     
     /**
      * 
@@ -88,7 +107,7 @@ public interface PoddRepositoryManager
      * @throws OpenRDFException
      *             If there are any errors with the repository at this stage.
      */
-    void setRepository(Repository repository) throws OpenRDFException;
+    void setManagementRepository(Repository repository) throws OpenRDFException;
     
     /**
      * Sets the schema management graph URI for use with this repository manager.
