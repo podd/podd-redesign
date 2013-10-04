@@ -125,7 +125,7 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
         
         try
         {
-            connection = this.repositoryManager.getRepository().getConnection();
+            connection = this.repositoryManager.getManagementRepository().getConnection();
             
             final RepositoryResult<Statement> statements =
                     connection.getStatements(null, null, null, includeInferred, contexts.toArray(new Resource[] {}));
@@ -153,7 +153,7 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
         
         try
         {
-            conn = this.repositoryManager.getRepository().getConnection();
+            conn = this.repositoryManager.getManagementRepository().getConnection();
             
             return this.sesameManager.getAllCurrentSchemaOntologyVersions(conn,
                     this.repositoryManager.getSchemaManagementGraph());
@@ -179,7 +179,7 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
         RepositoryConnection conn = null;
         try
         {
-            conn = this.repositoryManager.getRepository().getConnection();
+            conn = this.repositoryManager.getManagementRepository().getConnection();
             conn.begin();
             
             return this.sesameManager.getCurrentSchemaVersion(schemaOntologyIRI, conn,
@@ -205,7 +205,7 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
         
         try
         {
-            conn = this.repositoryManager.getRepository().getConnection();
+            conn = this.repositoryManager.getManagementRepository().getConnection();
             
             return this.sesameManager.getAllSchemaOntologyVersions(conn,
                     this.repositoryManager.getSchemaManagementGraph());
@@ -244,7 +244,7 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
         RepositoryConnection conn = null;
         try
         {
-            conn = this.repositoryManager.getRepository().getConnection();
+            conn = this.repositoryManager.getManagementRepository().getConnection();
             conn.begin();
             
             final InferredOWLOntologyID version =
@@ -292,7 +292,7 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
         RepositoryConnection conn = null;
         try
         {
-            conn = this.repositoryManager.getRepository().getConnection();
+            conn = this.repositoryManager.getManagementRepository().getConnection();
             conn.begin();
             
             return this.sesameManager.getSchemaVersion(schemaVersionIRI, conn,
@@ -632,11 +632,14 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
         
         try
         {
-            conn = this.repositoryManager.getRepository().getConnection();
+            // TODO: Should we store these copies in a separate repository again, to reduce bloat in
+            // the management repository??
+            conn = this.repositoryManager.getManagementRepository().getConnection();
             conn.begin();
             
             this.owlManager.dumpOntologyToRepository(ontology, conn);
             
+            // FIXME: Remove the following once it is not needed and OWL databases are being used
             final InferredOWLOntologyID nextInferredOntology = this.owlManager.inferStatements(ontology, conn);
             
             // update the link in the schema ontology management graph
