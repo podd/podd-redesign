@@ -21,16 +21,23 @@
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>com.github.podd</groupId>
-		<artifactId>podd-parent</artifactId>
+		<artifactId>podd-client-parent</artifactId>
 		<version>0.4-SNAPSHOT</version>
 	</parent>
-	<artifactId>podd-client-parent</artifactId>
-	<packaging>pom</packaging>
-	<name>PODD :: Client Parent POM</name>
-	<description>Parent pom for the PODD Client API and implementations.</description>
-	<modules>
-		<module>api</module>
-		<module>restlet</module>
-		<module>hrppc</module>
-	</modules>
+	<artifactId>podd-client-hrppc</artifactId>
+	<name>PODD :: Client for HRPPC purposes</name>
+	<description>Client enabling HRPPC specific operations</description>
+
+	<dependencies>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>podd-client-api</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>podd-client-restlet</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+	</dependencies>
 </project>
