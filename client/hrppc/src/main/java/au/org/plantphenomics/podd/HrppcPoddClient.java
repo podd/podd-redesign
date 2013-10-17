@@ -34,6 +34,18 @@ import com.github.podd.client.impl.restlet.RestletPoddClientImpl;
  */
 public class HrppcPoddClient extends RestletPoddClientImpl 
 {
+	private final Logger log = LoggerFactory.getLogger(this.getClass());
+    
+    	public static final int MIN_HEADERS_SIZE = 7;
+	
+	public static final String TRAY_ID = "TrayID";
+	public static final String TRAY_NOTES = "TrayNotes";
+	public static final String TRAY_TYPE_NAME = "TrayTypeName"
+	public static final String POSITION = "Position"
+	public static final String PLANT_ID = "PlantID"
+	public static final String PLANT_NAME = "PlantName";
+	public static final String PLANT_NOTES = "PlantNotes";
+	
 	public HrppcPoddClient()
 	{
 		super();
@@ -47,7 +59,7 @@ public class HrppcPoddClient extends RestletPoddClientImpl
 	/**
 	 * Parses the given project list and inserts the items into PODD where they do not exist.
 	 */
-	public void parseProjectList(InputStream in) throws IOException
+	public void parseProjectList(InputStream in) throws IOException, PoddClientException
 	{
 		List<String> headers = null;
                 CSVReader reader = new CSVReader(new InputStreamReader(in, Charset.forName("UTF-8")));
@@ -58,7 +70,15 @@ public class HrppcPoddClient extends RestletPoddClientImpl
                         {
                                 // header line is mandatory in PODD CSV
                                 headers = Arrays.asList(nextLine);
-                                verifyProjectListHeaders(headers);
+                                try
+                                {
+                                	verifyProjectListHeaders(headers);
+                                }
+                                catch(IllegalArgumentException e)
+                                {
+                                	this.log.error("Could not verify headers for project list: {}", e.getMessage());
+                                	throw new PoddClientException("Could not verify headers for project list", e);
+                                }
                         }
                         else 
                         {
@@ -75,5 +95,45 @@ public class HrppcPoddClient extends RestletPoddClientImpl
          */
         public void verifyProjectListHeaders(List<String> headers) throws IllegalArgumentException
         {
+        	if(headers == null || headers.size() < MIN_HEADERS_SIZE)
+        	{
+        		throw new IllegalArgumentException("Did not find valid headers");
+        	}
+        	
+        	if(!headers.contains(TRAY_ID))
+        	{
+        		throw new IllegalArgumentException("Did not find tray id header");
+        	}
+
+        	if(!headers.contains(TRAY_NOTES))
+        	{
+        		throw new IllegalArgumentException("Did not find tray notes header");
+        	}
+
+        	if(!headers.contains(TRAY_TYPE_NAME))
+        	{
+        		throw new IllegalArgumentException("Did not find tray type name header");
+        	}
+
+        	if(!headers.contains(POSITION))
+        	{
+        		throw new IllegalArgumentException("Did not find position header");
+        	}
+        	
+        	if(!headers.contains(PLANT_ID))
+        	{
+        		throw new IllegalArgumentException("Did not find plant id header");
+        	}
+        	
+        	if(!headers.contains(PLANT_NAME))
+        	{
+        		throw new IllegalArgumentException("Did not find plant name header");
+        	}
+        	
+        	if(!headers.contains(PLANT_NOTES))
+        	{
+        		throw new IllegalArgumentException("Did not find plant notes header");
+        	}
+        	
         }
 }
