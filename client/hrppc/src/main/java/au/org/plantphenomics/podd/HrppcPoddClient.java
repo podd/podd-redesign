@@ -25,7 +25,12 @@ import java.util.List;
 
 import au.com.bytecode.opencsv.CSVReader;
 
+import com.github.podd.client.api.PoddClientException;
 import com.github.podd.client.impl.restlet.RestletPoddClientImpl;
+import com.github.podd.utils.InferredOWLOntologyID;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Provides operations specific to HRPPC in relation to putting projects into PODD.
@@ -57,10 +62,19 @@ public class HrppcPoddClient extends RestletPoddClientImpl
 	}
     
 	/**
-	 * Parses the given project list and inserts the items into PODD where they do not exist.
+	 * Parses the given PlantScan project/experiment/tray/pot list and inserts the 
+	 * items into PODD where they do not exist.
 	 */
-	public void parseProjectList(InputStream in) throws IOException, PoddClientException
+	public void uploadPlantScanList(InputStream in) throws IOException, PoddClientException
 	{
+		List<InferredOWLOntologyID> currentUnpublishedArtifacts = this.listUnpublishedArtifacts();
+		
+		// TODO: Implement getTopObject(InferredOWLOntologyID) so that the top object for each can be 
+		// scanned easily to determine its name which is required, by convention, here
+		
+		// TODO: Implement getObjectsByType(InferredOWLOntology, URI) so that experiments etc can be found easily 
+		// and the identifier can be mapped as necessary to the identifier in the header
+		
 		List<String> headers = null;
                 CSVReader reader = new CSVReader(new InputStreamReader(in, Charset.forName("UTF-8")));
                 String[] nextLine;
@@ -134,6 +148,5 @@ public class HrppcPoddClient extends RestletPoddClientImpl
         	{
         		throw new IllegalArgumentException("Did not find plant notes header");
         	}
-        	
         }
 }
