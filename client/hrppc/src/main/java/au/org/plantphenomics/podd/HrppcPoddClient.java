@@ -96,7 +96,7 @@ public class HrppcPoddClient extends RestletPoddClientImpl
                         }
                         else 
                         {
-                        	
+                        	uploadPlantScanLine(headers, nextLine, currentUnpublishedArtifacts);
                         }
                 }
         }
