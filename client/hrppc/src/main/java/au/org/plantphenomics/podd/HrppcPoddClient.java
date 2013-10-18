@@ -51,6 +51,14 @@ public class HrppcPoddClient extends RestletPoddClientImpl
 	public static final String PLANT_NAME = "PlantName";
 	public static final String PLANT_NOTES = "PlantNotes";
 	
+	// PROJECT#YYYY-NNNN_EXPERIMENT#NNNN_GENUS.SPECIES_TRAY#NNNN
+	public static final Pattern REGEX_TRAY = Pattern.compile("PROJECT\#(\d{4})-(\d{4})_EXPERIMENT\#(\d{4})_(\w+)\.(\w+)_TRAY\#(\d{4})");
+	
+    	/**
+    	 * Number of groups matching in the tray id regex.
+    	 */
+    	public static final int TRAY_ID_SIZE = 6;
+	
 	public HrppcPoddClient()
 	{
 		super();
@@ -261,6 +269,31 @@ public class HrppcPoddClient extends RestletPoddClientImpl
 			else
 			{
 				this.log.error("Found unrecognised header: {} {}", nextHeader, nextField);
+			}
+		}
+		
+		Matcher trayMatcher = REGEX_TRAY.matcher(trayId);
+		
+		if(!trayMatcher.matches())
+		{
+			this.log.error("Tray ID did not match expected format: {}", trayId);
+		}
+		else
+		{
+			if(trayMatcher.groupCount() != TRAY_ID_SIZE)
+			{
+				this.log.error("Did not find the expected number of regex matches for Tray ID: {} {}", trayMatcher.groupCount(), TRAY_ID_SIZE);
+			}
+			else
+			{
+				String projectYear = trayMatcher.group(1);
+				String projectNumber = trayMatcher.group(2);
+				String experimentNumber = trayMatcher.group(3);
+				String genus = trayMatcher.group(4);
+				String species = trayMatcher.group(5);
+				String trayNumber = trayMatcher.group(6);
+				
+				
 			}
 		}
 		
