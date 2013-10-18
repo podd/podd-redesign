@@ -51,6 +51,8 @@ public class HrppcPoddClient extends RestletPoddClientImpl
 	public static final String PLANT_NAME = "PlantName";
 	public static final String PLANT_NOTES = "PlantNotes";
 	
+	public static final Pattern REGEX_PROJECT = Pattern.compile("^PROJECT\#(\\d{4})-(\\d{4})");
+	
 	// PROJECT#YYYY-NNNN_EXPERIMENT#NNNN_GENUS.SPECIES_TRAY#NNNNN
 	public static final Pattern REGEX_TRAY = Pattern.compile("PROJECT\#(\\d{4})-(\\d{4})_EXPERIMENT\#(\\d{4})_(\\w+)\.(\\w+)_TRAY\#(\\d{4,5})");
 	
@@ -204,6 +206,16 @@ public class HrppcPoddClient extends RestletPoddClientImpl
 							if(nextLabel instanceof Literal)
 							{
 								String nextLabelString = nextLabel.stringValue();
+								
+								if(!REGEX_PROJECT.matcher(nextLabelString).matches())
+								{
+									this.log.error("Found project label that did not start with expected format: {}", nextLabel);
+									continue;
+								}
+								
+								// take off any descriptions and leave the project number behind
+								nextLabelString = nextLabelString.split(" ")[0];
+								
 								ConcurrentMap<URI, InferredOWLOntologyID> labelMap = new ConcurrentHashMap<>();
 								ConcurrentMap<URI, InferredOWLOntologyID> putIfAbsent = projectUriMap.putIfAbsent(nextLabelString, labelMap);
 								if(putIfAbsent != null)
