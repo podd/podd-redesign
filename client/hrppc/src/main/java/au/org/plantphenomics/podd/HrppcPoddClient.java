@@ -69,6 +69,9 @@ public class HrppcPoddClient extends RestletPoddClientImpl
 	{
 		List<InferredOWLOntologyID> currentUnpublishedArtifacts = this.listUnpublishedArtifacts();
 		
+		// Keep a queue so that we only need to update each project once for this operation to succeed
+		ConcurrentMap<InferredOWLOntologyID, Model> uploadQueue = new ConcurrentLinkedHashMap<>();
+		
 		// TODO: Implement getTopObject(InferredOWLOntologyID) so that the top object for each can be 
 		// scanned easily to determine its name which is required, by convention, here
 		
@@ -96,9 +99,15 @@ public class HrppcPoddClient extends RestletPoddClientImpl
                         }
                         else 
                         {
-                        	uploadPlantScanLine(headers, nextLine, currentUnpublishedArtifacts);
+                        	// Process the next line and add it to the upload queue 
+                        	processPlantScanLine(headers, Arrays.asList(nextLine), currentUnpublishedArtifacts, uploadQueue);
                         }
                 }
+        }
+        
+        public void processPlantScanLine(List<String> headers, List<String> nextLine, List<InferredOWLOntologyID> currentUnpublishedArtifacts, ConcurrentMap<InferredOWLOntologyID, Model> uploadQueue)
+        {
+        	
         }
         
         /**
