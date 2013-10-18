@@ -59,6 +59,14 @@ public class HrppcPoddClient extends RestletPoddClientImpl
     	 */
     	public static final int TRAY_ID_SIZE = 6;
 	
+	// PROJECT#YYYY-NNNN_EXPERIMENT#NNNN_GENUS.SPECIES_TRAY#NNNN_POT#NNNNN
+	public static final Pattern REGEX_PLANT = Pattern.compile("PROJECT\#(\d{4})-(\d{4})_EXPERIMENT\#(\d{4})_(\w+)\.(\w+)_TRAY\#(\d{4})_POT\#(\d{5})");
+	
+    	/**
+    	 * Number of groups matching in the plant id regex.
+    	 */
+    	public static final int PLANT_ID_SIZE = 7;
+	
 	public HrppcPoddClient()
 	{
 		super();
@@ -272,6 +280,14 @@ public class HrppcPoddClient extends RestletPoddClientImpl
 			}
 		}
 		
+		String projectYear = null;
+		String projectNumber = null;
+		String experimentNumber = null;
+		String genus = null;
+		String species = null;
+		String trayNumber = null;
+		String potNumber = null;
+		
 		Matcher trayMatcher = REGEX_TRAY.matcher(trayId);
 		
 		if(!trayMatcher.matches())
@@ -286,14 +302,54 @@ public class HrppcPoddClient extends RestletPoddClientImpl
 			}
 			else
 			{
-				String projectYear = trayMatcher.group(1);
-				String projectNumber = trayMatcher.group(2);
-				String experimentNumber = trayMatcher.group(3);
-				String genus = trayMatcher.group(4);
-				String species = trayMatcher.group(5);
-				String trayNumber = trayMatcher.group(6);
-				
-				
+				projectYear = trayMatcher.group(1);
+				projectNumber = trayMatcher.group(2);
+				experimentNumber = trayMatcher.group(3);
+				genus = trayMatcher.group(4);
+				species = trayMatcher.group(5);
+				trayNumber = trayMatcher.group(6);
+			}
+		}
+		
+		Matcher plantMatcher = REGEX_PLANT.matcher(plantId);
+		
+		if(!plantMatcher.matches())
+		{
+			this.log.error("Plant ID did not match expected format: {}", trayId);
+		}
+		else
+		{
+			if(plantMatcher.groupCount() != PLANT_ID_SIZE)
+			{
+				this.log.error("Did not find the expected number of regex matches for Plant ID: {} {}", plantMatcher.groupCount(), PLANT_ID_SIZE);
+			}
+			else
+			{
+				if(projectYear == null)
+				{
+					projectYear = trayMatcher.group(1);
+				}
+				if(projectNumber == null)
+				{
+					projectNumber = trayMatcher.group(2);
+				}
+				if(experimentNumber == null)
+				{
+					experimentNumber = trayMatcher.group(3);
+				}
+				if(genus == null)
+				{
+					genus = trayMatcher.group(4);
+				}
+				if(species == null)
+				{
+					species = trayMatcher.group(5);
+				}
+				if(trayNumber == null)
+				{
+					trayNumber = trayMatcher.group(6);
+				}
+				potNumber = trayMatcher.group(7);
 			}
 		}
 		
