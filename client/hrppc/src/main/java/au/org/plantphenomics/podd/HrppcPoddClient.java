@@ -105,13 +105,45 @@ public class HrppcPoddClient extends RestletPoddClientImpl
                         }
                         else 
                         {
+				if(nextLine.length != headers.size())
+				{
+					this.log.error("Line and header sizes were different: {} {}", headers, nextLine);
+				}
+        	
                         	// Process the next line and add it to the upload queue 
                         	processPlantScanLine(headers, Arrays.asList(nextLine), projectNameMap, uploadQueue);
                         }
                 }
+                
+                if(headers == null)
+                {
+                	this.log.error("Document did not contain headers");
+                }
+                
+                if(uploadQueue.isEmpty())
+                {
+                	this.log.error("Document did not contain any rows");
+                }
+                
+                for(InferredOWLOntologyID nextUpload : uploadQueue.keySet())
+                {
+                	StringWriter writer = new StringWriter();
+                	Rio.write(uploadQueue.get(nextUpload), writer, RDFFormat.RDFJSON);
+                	InferredOWLOntologyID newID = this.appendArtifact(nextUpload, new ByteArrayInputStream(writer.toString().getBytes(Charset.forName("UTF-8"))), RDFFormat.RDFJSON);
+                	
+                	if(newID == null)
+                	{
+                		this.log.error("Did not find a valid result from append artifact: {}", nextUpload);
+                	}
+                	
+                	if(nextUpload.equals(newID))
+                	{
+                		this.log.error("Result from append artifact was not changed, as expected. {} {}", nextUpload, newID);
+                	}
+                }
         }
         
-        public void populateProjectUriMap(List<InferredOWLOntologyID> currentUnpublishedArtifacts, ConcurrentMap<String, ConcurrentMap<URI, InferredOWLOntologyID>> projectUriMap)
+        private void populateProjectUriMap(List<InferredOWLOntologyID> currentUnpublishedArtifacts, ConcurrentMap<String, ConcurrentMap<URI, InferredOWLOntologyID>> projectUriMap)
         {
 		for(InferredOWLOntologyID nextArtifact : currentUnpublishedArtifacts) 
 		{
@@ -183,9 +215,55 @@ public class HrppcPoddClient extends RestletPoddClientImpl
         /**
          * Process a single line from the input file, using the given headers as the definitions for the line. 
          */
-        public void processPlantScanLine(List<String> headers, List<String> nextLine, ConcurrentMap<String, ConcurrentMap<URI, InferredOWLOntologyID>> projectUriMap, ConcurrentMap<InferredOWLOntologyID, Model> uploadQueue)
+        private void processPlantScanLine(List<String> headers, List<String> nextLine, ConcurrentMap<String, ConcurrentMap<URI, InferredOWLOntologyID>> projectUriMap, ConcurrentMap<InferredOWLOntologyID, Model> uploadQueue)
         {
+        	String trayId = null;
+        	String trayNotes = null;
+        	String trayTypeName = null;
+        	String position = null;
+        	String plantId = null;
+        	String plantName = null;
+        	String plantNotes = null;
         	
+        	for(int i = 0; i < headers.size())
+        	{
+        		String nextHeader = headers.get(i);
+			String nextField = nextLine.get(i);
+        		
+			if(nextHeader.trim().equals(TRAY_ID))
+			{
+				trayId = nextField;
+			}
+			else if(nextHeader.trim().equals(TRAY_NOTES))
+			{
+				trayNotes = nextField;
+			}
+			else if(nextHeader.trim().equals(TRAY_TYPE_NAME))
+			{
+				trayTypeName = nextField;
+			}
+			else if(nextHeader.trim().equals(POSITION))
+			{
+				position = nextField;
+			}
+			else if(nextHeader.trim().equals(PLANT_ID))
+			{
+				plantId = nextField;
+			}
+			else if(nextHeader.trim().equals(PLANT_NAME))
+			{
+				plantName = nextField;
+			}
+			else if(nextHeader.trim().equals(PLANT_NOTES))
+			{
+				plantNotes = nextField;
+			}
+			else
+			{
+				this.log.error("Found unrecognised header: {} {}", nextHeader, nextField);
+			}
+		}
+		
         }
         
         /**
@@ -194,10 +272,11 @@ public class HrppcPoddClient extends RestletPoddClientImpl
          * 
          * @throws IllegalArgumentException If the headers are not verified correctly.
          */
-        public void verifyProjectListHeaders(List<String> headers) throws IllegalArgumentException
+        private void verifyProjectListHeaders(List<String> headers) throws IllegalArgumentException
         {
         	if(headers == null || headers.size() < MIN_HEADERS_SIZE)
         	{
+        		this.log.error("Did not find valid headers: {}", headers);
         		throw new IllegalArgumentException("Did not find valid headers");
         	}
         	
