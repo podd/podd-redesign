@@ -51,21 +51,28 @@ public class HrppcPoddClient extends RestletPoddClientImpl
 	public static final String PLANT_NAME = "PlantName";
 	public static final String PLANT_NOTES = "PlantNotes";
 	
-	// PROJECT#YYYY-NNNN_EXPERIMENT#NNNN_GENUS.SPECIES_TRAY#NNNN
-	public static final Pattern REGEX_TRAY = Pattern.compile("PROJECT\#(\\d{4})-(\\d{4})_EXPERIMENT\#(\\d{4})_(\\w+)\.(\\w+)_TRAY\#(\\d{4})");
+	// PROJECT#YYYY-NNNN_EXPERIMENT#NNNN_GENUS.SPECIES_TRAY#NNNNN
+	public static final Pattern REGEX_TRAY = Pattern.compile("PROJECT\#(\\d{4})-(\\d{4})_EXPERIMENT\#(\\d{4})_(\\w+)\.(\\w+)_TRAY\#(\\d{4,5})");
 	
     	/**
     	 * Number of groups matching in the tray id regex.
     	 */
     	public static final int TRAY_ID_SIZE = 6;
 	
-	// PROJECT#YYYY-NNNN_EXPERIMENT#NNNN_GENUS.SPECIES_TRAY#NNNN_POT#NNNNN
-	public static final Pattern REGEX_PLANT = Pattern.compile("PROJECT\#(\\d{4})-(\\d{4})_EXPERIMENT\#(\\d{4})_(\\w+)\.(\\w+)_TRAY\#(\\d{4})_POT\#(\\d{5})");
+	// PROJECT#YYYY-NNNN_EXPERIMENT#NNNN_GENUS.SPECIES_TRAY#NNNNN_POT#NNNNN
+	public static final Pattern REGEX_PLANT = Pattern.compile("PROJECT\#(\\d{4})-(\\d{4})_EXPERIMENT\#(\\d{4})_(\\w+)\.(\\w+)_TRAY\#(\\d{4,5})_POT\#(\\d{4,5})");
 	
     	/**
     	 * Number of groups matching in the plant id regex.
     	 */
     	public static final int PLANT_ID_SIZE = 7;
+	
+    	public static final Pattern REGEX_POSITION = Pattern.compile("([a-zA-Z]+)([0-9])");
+    	
+    	/**
+    	 * Number of groups matching in the position regex.
+    	 */
+    	public static final int POSITION_SIZE = 7;
 	
 	public HrppcPoddClient()
 	{
@@ -315,7 +322,7 @@ public class HrppcPoddClient extends RestletPoddClientImpl
 		
 		if(!plantMatcher.matches())
 		{
-			this.log.error("Plant ID did not match expected format: {}", trayId);
+			this.log.error("Plant ID did not match expected format: {}", plantId);
 		}
 		else
 		{
@@ -327,32 +334,53 @@ public class HrppcPoddClient extends RestletPoddClientImpl
 			{
 				if(projectYear == null)
 				{
-					projectYear = trayMatcher.group(1);
+					projectYear = plantMatcher.group(1);
 				}
 				if(projectNumber == null)
 				{
-					projectNumber = trayMatcher.group(2);
+					projectNumber = plantMatcher.group(2);
 				}
 				if(experimentNumber == null)
 				{
-					experimentNumber = trayMatcher.group(3);
+					experimentNumber = plantMatcher.group(3);
 				}
 				if(genus == null)
 				{
-					genus = trayMatcher.group(4);
+					genus = plantMatcher.group(4);
 				}
 				if(species == null)
 				{
-					species = trayMatcher.group(5);
+					species = plantMatcher.group(5);
 				}
 				if(trayNumber == null)
 				{
-					trayNumber = trayMatcher.group(6);
+					trayNumber = plantMatcher.group(6);
 				}
-				potNumber = trayMatcher.group(7);
+				potNumber = plantMatcher.group(7);
 			}
 		}
 		
+		String columnLetter = null;
+		String rowNumber = null;
+		
+		Matcher positionMatcher = REGEX_POSITION.matcher(position);
+		
+		if(!positionMatcher.matches())
+		{
+			this.log.error("Position did not match expected format: {}", position);
+		}
+		else
+		{
+			if(positionMatcher.groupCount() != POSITION_SIZE)
+			{
+				this.log.error("Did not find the expected number of regex matches for Position: {} {}", positionMatcher.groupCount(), POSITION_SIZE);
+			}
+			else
+			{
+				columnLetter = positionMatcher.group(1);
+				rowNumber = positionMatcher.group(2);
+			}
+		}
         }
         
         /**
