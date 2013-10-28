@@ -16,19 +16,35 @@
  */
 package au.org.plantphenomics.podd;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.StringWriter;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import au.com.bytecode.opencsv.CSVReader;
 
 import com.github.podd.client.api.PoddClientException;
 import com.github.podd.client.impl.restlet.RestletPoddClientImpl;
 import com.github.podd.utils.InferredOWLOntologyID;
+import com.github.podd.utils.PoddRdfConstants;
 
+import org.openrdf.model.Literal;
+import org.openrdf.model.Model;
+import org.openrdf.model.Resource;
+import org.openrdf.model.URI;
+import org.openrdf.model.Value;
+import org.openrdf.model.vocabulary.RDF;
+import org.openrdf.model.vocabulary.RDFS;
+import org.openrdf.rio.RDFFormat;
+import org.openrdf.rio.Rio;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,9 +61,9 @@ public class HrppcPoddClient extends RestletPoddClientImpl
 	
 	public static final String TRAY_ID = "TrayID";
 	public static final String TRAY_NOTES = "TrayNotes";
-	public static final String TRAY_TYPE_NAME = "TrayTypeName"
-	public static final String POSITION = "Position"
-	public static final String PLANT_ID = "PlantID"
+	public static final String TRAY_TYPE_NAME = "TrayTypeName";
+	public static final String POSITION = "Position";
+	public static final String PLANT_ID = "PlantID";
 	public static final String PLANT_NAME = "PlantName";
 	public static final String PLANT_NOTES = "PlantNotes";
 	
@@ -260,7 +276,7 @@ public class HrppcPoddClient extends RestletPoddClientImpl
         	String plantName = null;
         	String plantNotes = null;
         	
-        	for(int i = 0; i < headers.size())
+        	for(int i = 0; i < headers.size();i++)
         	{
         		String nextHeader = headers.get(i);
 			String nextField = nextLine.get(i);
