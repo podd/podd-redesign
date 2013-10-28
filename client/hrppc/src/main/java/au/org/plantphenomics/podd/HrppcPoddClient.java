@@ -263,7 +263,11 @@ public class HrppcPoddClient extends RestletPoddClientImpl
 		}
         }
         
-        /**
+        private Model getTopObject(InferredOWLOntologyID nextArtifact) {
+			throw new RuntimeException("TODO: Implement getTopObject");
+		}
+
+		/**
          * Process a single line from the input file, using the given headers as the definitions for the line. 
          */
         private void processPlantScanLine(List<String> headers, List<String> nextLine, ConcurrentMap<String, ConcurrentMap<URI, InferredOWLOntologyID>> projectUriMap, ConcurrentMap<InferredOWLOntologyID, Model> uploadQueue)
