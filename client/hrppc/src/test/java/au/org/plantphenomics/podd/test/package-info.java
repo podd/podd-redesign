@@ -20,4 +20,4 @@
  * @author Peter Ansell p_ansell@yahoo.com
  * 
  */
-package au.org.plantphenomics.podd;
+package au.org.plantphenomics.podd.test;
