@@ -64,7 +64,7 @@ public class DeleteArtifactResourceImpl extends AbstractPoddResourceImpl
                         "Did not find an artifacturi parameter in the request");
             }
             
-            URI artifactUri = PoddRdfConstants.VF.createURI(artifactUriString);
+            final URI artifactUri = PoddRdfConstants.VF.createURI(artifactUriString);
             
             this.checkAuthentication(PoddAction.UNPUBLISHED_ARTIFACT_DELETE, artifactUri);
             
@@ -75,18 +75,18 @@ public class DeleteArtifactResourceImpl extends AbstractPoddResourceImpl
             
             if(result)
             {
-                PoddSesameRealm realm = this.getPoddApplication().getRealm();
-                Map<String, Collection<Role>> roleMap = realm.getRolesForObjectAlternate(null, artifactUri);
+                final PoddSesameRealm realm = this.getPoddApplication().getRealm();
+                final Map<String, Collection<Role>> roleMap = realm.getRolesForObjectAlternate(null, artifactUri);
                 
-                for(String userIdentifier : roleMap.keySet())
+                for(final String userIdentifier : roleMap.keySet())
                 {
-                    for(Role nextRole : roleMap.get(userIdentifier))
+                    for(final Role nextRole : roleMap.get(userIdentifier))
                     {
                         try
                         {
                             realm.unmap(nextRole, artifactUri, userIdentifier);
                         }
-                        catch(RuntimeException e)
+                        catch(final RuntimeException e)
                         {
                             // Ignore errors during this process for now
                         }

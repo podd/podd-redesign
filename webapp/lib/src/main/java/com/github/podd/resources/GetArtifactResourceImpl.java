@@ -324,7 +324,7 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
         
         // FIXME: No support currently for interactive editing of data references, so hide the edit
         // button to avoid users clicking on it
-        for(PoddObjectLabel nextType : objectTypes)
+        for(final PoddObjectLabel nextType : objectTypes)
         {
             if(nextType.getObjectURI().equals(PoddRdfConstants.PODD_BASE_DATA_REFERENCE_TYPE)
                     || nextType.getObjectURI().equals(PoddRdfConstants.PODD_BASE_DATA_REFERENCE_TYPE_SPARQL)
