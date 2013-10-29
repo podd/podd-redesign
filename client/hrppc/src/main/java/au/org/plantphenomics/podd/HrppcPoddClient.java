@@ -22,6 +22,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringWriter;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -136,7 +137,8 @@ public class HrppcPoddClient extends RestletPoddClientImpl
         // the header
         
         List<String> headers = null;
-        try(final CSVReader reader = new CSVReader(new InputStreamReader(in, Charset.forName("UTF-8")));)
+        try (final InputStreamReader inputStreamReader = new InputStreamReader(in, StandardCharsets.UTF_8);
+                final CSVReader reader = new CSVReader(inputStreamReader);)
         {
             String[] nextLine;
             while((nextLine = reader.readNext()) != null)
