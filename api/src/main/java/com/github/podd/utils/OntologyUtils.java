@@ -60,6 +60,23 @@ public class OntologyUtils
      */
     public static List<InferredOWLOntologyID> modelToOntologyIDs(final Model input)
     {
+        return modelToOntologyIDs(input, false);
+    }
+    
+    /**
+     * Extracts the {@link InferredOWLOntologyID} instances that are represented as RDF
+     * {@link Statement}s in the given {@link Model}.
+     * 
+     * @param input
+     *            The input model containing RDF statements.
+     * @param allowVersionless
+     *            True if the algorithm should recognise versionless ontologies, and false to ignore
+     *            them.
+     * @return A Collection of {@link InferredOWLOntologyID} instances derived from the statements
+     *         in the model.
+     */
+    public static List<InferredOWLOntologyID> modelToOntologyIDs(final Model input, final boolean allowVersionless)
+    {
         final List<InferredOWLOntologyID> results = new ArrayList<InferredOWLOntologyID>();
         
         final Model typedOntologies = input.filter(null, RDF.TYPE, OWL.ONTOLOGY);
@@ -72,7 +89,11 @@ public class OntologyUtils
                 
                 if(versions.isEmpty())
                 {
-                    results.add(new InferredOWLOntologyID(IRI.create((URI)nextTypeStatement.getSubject()), null, null));
+                    if(allowVersionless)
+                    {
+                        results.add(new InferredOWLOntologyID(IRI.create((URI)nextTypeStatement.getSubject()), null,
+                                null));
+                    }
                 }
                 else
                 {
