@@ -316,5 +316,7 @@ public interface PoddWebConstants
     public static final String PURL_ORG_PODD_NS = "http://purl.org/podd/ns/";
 
     public static final String KEY_SPARQLQUERY = "query";
+
+    public static final String PATH_SPARQL = "sparql";
     
 }

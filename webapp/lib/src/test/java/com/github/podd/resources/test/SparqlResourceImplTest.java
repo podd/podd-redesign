@@ -52,7 +52,7 @@ public class SparqlResourceImplTest extends AbstractResourceImplTest
     public void testErrorSparqlWithInvalidArtifactID() throws Exception
     {
         // prepare:
-        final ClientResource searchClientResource = new ClientResource(this.getUrl(PoddWebConstants.PATH_SEARCH));
+        final ClientResource searchClientResource = new ClientResource(this.getUrl(PoddWebConstants.PATH_SPARQL));
         
         // there is no need to authenticate or have a test artifact as the artifact ID is checked
         // for first
@@ -81,7 +81,7 @@ public class SparqlResourceImplTest extends AbstractResourceImplTest
         final InferredOWLOntologyID testArtifact =
                 this.loadTestArtifact(TestConstants.TEST_ARTIFACT_20130206, MediaType.APPLICATION_RDF_TURTLE);
         
-        final ClientResource searchClientResource = new ClientResource(this.getUrl(PoddWebConstants.PATH_SEARCH));
+        final ClientResource searchClientResource = new ClientResource(this.getUrl(PoddWebConstants.PATH_SPARQL));
         
         // there is no need to authenticate or have a test artifact as the search term is checked
         // for first
@@ -113,7 +113,7 @@ public class SparqlResourceImplTest extends AbstractResourceImplTest
                 this.loadTestArtifact(TestConstants.TEST_ARTIFACT_20130206, MediaType.APPLICATION_RDF_TURTLE);
         
         // prepare:
-        final ClientResource searchClientResource = new ClientResource(this.getUrl(PoddWebConstants.PATH_SEARCH));
+        final ClientResource searchClientResource = new ClientResource(this.getUrl(PoddWebConstants.PATH_SPARQL));
         
         // there is no need to authenticate or have a test artifact as the artifact ID is checked
         // for first
