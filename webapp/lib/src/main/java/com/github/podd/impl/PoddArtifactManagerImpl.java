@@ -1196,6 +1196,14 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         final Model model = Rio.parse(inputStream, "", format, randomContext);
         
         final List<InferredOWLOntologyID> ontologyIDs = OntologyUtils.modelToOntologyIDs(model);
+        if(ontologyIDs.isEmpty())
+        {
+            throw new EmptyOntologyException(null, "Loaded ontology is empty");
+        }
+        else if(ontologyIDs.size() > 1)
+        {
+            this.log.warn("Found multiple ontologies when we were only expecting a single ontology: {}", ontologyIDs);
+        }
         
         // FIXME: This method only works if the imports are already in a repository somewhere, need
         // to fix the Sesame manager to look for imports in Models also
@@ -1238,45 +1246,42 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
              */
             final IRI ontologyIRI =
                     this.getSesameManager().getOntologyIRI(temporaryRepositoryConnection, randomContext);
-            if(ontologyIRI != null)
-            {
-                // check for managed version from artifact graph
-                OWLOntologyID currentManagedArtifactID = null;
-                
-                try
-                {
-                    currentManagedArtifactID =
-                            this.getSesameManager().getCurrentArtifactVersion(ontologyIRI,
-                                    permanentRepositoryConnection,
-                                    this.getRepositoryManager().getArtifactManagementGraph());
-                    if(currentManagedArtifactID != null)
-                    {
-                        throw new DuplicateArtifactIRIException(ontologyIRI, "This artifact is already managed");
-                    }
-                }
-                catch(final UnmanagedArtifactIRIException e)
-                {
-                    // ignore. indicates a new artifact is being uploaded
-                    this.log.info("This is an unmanaged artifact IRI {}", ontologyIRI);
-                }
-                
-                IRI newVersionIRI = null;
-                if(currentManagedArtifactID == null || currentManagedArtifactID.getVersionIRI() == null)
-                {
-                    newVersionIRI = IRI.create(ontologyIRI.toString() + ":version:1");
-                }
-                
-                // set version IRI in temporary repository
-                this.log.info("Setting version IRI to <{}>", newVersionIRI);
-                temporaryRepositoryConnection.remove(ontologyIRI.toOpenRDFURI(), PoddRdfConstants.OWL_VERSION_IRI,
-                        null, randomContext);
-                temporaryRepositoryConnection.add(ontologyIRI.toOpenRDFURI(), PoddRdfConstants.OWL_VERSION_IRI,
-                        newVersionIRI.toOpenRDFURI(), randomContext);
-            }
-            else
+            if(ontologyIRI == null)
             {
                 throw new EmptyOntologyException(null, "Loaded ontology is empty");
             }
+            
+            // check for managed version from artifact graph
+            OWLOntologyID currentManagedArtifactID = null;
+            
+            try
+            {
+                currentManagedArtifactID =
+                        this.getSesameManager().getCurrentArtifactVersion(ontologyIRI, permanentRepositoryConnection,
+                                this.getRepositoryManager().getArtifactManagementGraph());
+                if(currentManagedArtifactID != null)
+                {
+                    throw new DuplicateArtifactIRIException(ontologyIRI, "This artifact is already managed");
+                }
+            }
+            catch(final UnmanagedArtifactIRIException e)
+            {
+                // ignore. indicates a new artifact is being uploaded
+                this.log.info("This is an unmanaged artifact IRI {}", ontologyIRI);
+            }
+            
+            IRI newVersionIRI = null;
+            if(currentManagedArtifactID == null || currentManagedArtifactID.getVersionIRI() == null)
+            {
+                newVersionIRI = IRI.create(ontologyIRI.toString() + ":version:1");
+            }
+            
+            // set version IRI in temporary repository
+            this.log.info("Setting version IRI to <{}>", newVersionIRI);
+            temporaryRepositoryConnection.remove(ontologyIRI.toOpenRDFURI(), PoddRdfConstants.OWL_VERSION_IRI, null,
+                    randomContext);
+            temporaryRepositoryConnection.add(ontologyIRI.toOpenRDFURI(), PoddRdfConstants.OWL_VERSION_IRI,
+                    newVersionIRI.toOpenRDFURI(), randomContext);
             
             // check and update statements with default timestamp values
             final Value now = PoddRdfConstants.VF.createLiteral(new Date());
@@ -1319,36 +1324,53 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         }
         finally
         {
-            // release resources
-            if(inferredOWLOntologyID != null)
-            {
-                this.getOWLManager().removeCache(inferredOWLOntologyID.getBaseOWLOntologyID());
-                this.getOWLManager().removeCache(inferredOWLOntologyID.getInferredOWLOntologyID());
-            }
-            
             try
             {
-                if(permanentRepositoryConnection != null && permanentRepositoryConnection.isOpen())
+                // release resources
+                if(inferredOWLOntologyID != null)
                 {
-                    permanentRepositoryConnection.close();
+                    try
+                    {
+                        this.getOWLManager().removeCache(inferredOWLOntologyID.getBaseOWLOntologyID());
+                    }
+                    finally
+                    {
+                        this.getOWLManager().removeCache(inferredOWLOntologyID.getInferredOWLOntologyID());
+                    }
                 }
             }
-            catch(final RepositoryException e)
+            finally
             {
-                this.log.error("Found exception closing repository connection", e);
-            }
-            try
-            {
-                if(temporaryRepositoryConnection != null && temporaryRepositoryConnection.isOpen())
+                try
                 {
-                    temporaryRepositoryConnection.close();
+                    if(permanentRepositoryConnection != null && permanentRepositoryConnection.isOpen())
+                    {
+                        permanentRepositoryConnection.close();
+                    }
+                }
+                catch(final RepositoryException e)
+                {
+                    this.log.error("Found exception closing repository connection", e);
+                }
+                finally
+                {
+                    try
+                    {
+                        if(temporaryRepositoryConnection != null && temporaryRepositoryConnection.isOpen())
+                        {
+                            temporaryRepositoryConnection.close();
+                        }
+                    }
+                    catch(final RepositoryException e)
+                    {
+                        this.log.error("Found exception closing repository connection", e);
+                    }
+                    finally
+                    {
+                        tempRepository.shutDown();
+                    }
                 }
             }
-            catch(final RepositoryException e)
-            {
-                this.log.error("Found exception closing repository connection", e);
-            }
-            tempRepository.shutDown();
         }
     }
     
