@@ -845,20 +845,24 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         final List<PoddObjectLabel> results = new ArrayList<PoddObjectLabel>();
         RepositoryConnection conn = null;
         
-        try
+        for(final InferredOWLOntologyID artifactId : artifacts)
         {
-            for(final InferredOWLOntologyID artifactId : artifacts)
+            try
             {
                 final Collection<OWLOntologyID> schemaImports = this.getSchemaImports(artifactId);
+                // TODO: Should be a simple way to avoid creating multiple connections here
                 conn = this.getRepositoryManager().getPermanentRepository(schemaImports).getConnection();
                 
                 final URI objectIRI = this.getSesameManager().getTopObjectIRI(artifactId, conn);
                 results.add(this.getSesameManager().getObjectLabel(artifactId, objectIRI, conn));
             }
-        }
-        finally
-        {
-            conn.close();
+            finally
+            {
+                if(conn != null)
+                {
+                    conn.close();
+                }
+            }
         }
         return results;
     }
