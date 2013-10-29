@@ -17,11 +17,7 @@
 package com.github.podd.resources;
 
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
 
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.Model;
@@ -30,11 +26,9 @@ import org.openrdf.model.impl.LinkedHashModel;
 import org.openrdf.query.GraphQuery;
 import org.openrdf.query.QueryLanguage;
 import org.openrdf.query.impl.DatasetImpl;
-import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.Rio;
-import org.openrdf.rio.UnsupportedRDFormatException;
 import org.openrdf.rio.helpers.StatementCollector;
 import org.restlet.data.MediaType;
 import org.restlet.data.Status;
@@ -42,9 +36,7 @@ import org.restlet.representation.ByteArrayRepresentation;
 import org.restlet.representation.Representation;
 import org.restlet.representation.Variant;
 import org.restlet.resource.Get;
-import org.restlet.resource.Post;
 import org.restlet.resource.ResourceException;
-import org.restlet.security.User;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLOntologyID;
 
@@ -52,7 +44,6 @@ import com.github.podd.exception.UnmanagedArtifactIRIException;
 import com.github.podd.exception.UnmanagedArtifactVersionException;
 import com.github.podd.restlet.PoddAction;
 import com.github.podd.utils.InferredOWLOntologyID;
-import com.github.podd.utils.PoddRdfConstants;
 import com.github.podd.utils.PoddWebConstants;
 
 /**
@@ -87,12 +78,12 @@ public class SparqlResourceImpl extends AbstractPoddResourceImpl
             // not specify any artifacts
             throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "No artifacts specified in request");
         }
-        Model results = new LinkedHashModel();
+        final Model results = new LinkedHashModel();
         for(final String nextArtifactUri : artifactUris)
         {
             try
             {
-                InferredOWLOntologyID ontologyID =
+                final InferredOWLOntologyID ontologyID =
                         this.getPoddArtifactManager().getArtifact(IRI.create(nextArtifactUri));
                 
                 if(this.getPoddArtifactManager().isPublished(ontologyID))
@@ -109,19 +100,20 @@ public class SparqlResourceImpl extends AbstractPoddResourceImpl
                 RepositoryConnection conn = null;
                 try
                 {
-                    Collection<OWLOntologyID> schemaImports =
+                    final Collection<OWLOntologyID> schemaImports =
                             this.getPoddArtifactManager().getSchemaImports(ontologyID);
                     conn = this.getPoddRepositoryManager().getPermanentRepository(schemaImports).getConnection();
                     
-                    URI[] contexts = this.getPoddSesameManager().versionAndInferredAndSchemaContexts(ontologyID, conn);
+                    final URI[] contexts =
+                            this.getPoddSesameManager().versionAndInferredAndSchemaContexts(ontologyID, conn);
                     // Do not perform queries on all contexts
                     if(contexts != null && contexts.length >= 1)
                     {
-                        GraphQuery query = conn.prepareGraphQuery(QueryLanguage.SPARQL, sparqlQuery);
+                        final GraphQuery query = conn.prepareGraphQuery(QueryLanguage.SPARQL, sparqlQuery);
                         
-                        DatasetImpl dataset = new DatasetImpl();
+                        final DatasetImpl dataset = new DatasetImpl();
                         
-                        for(URI nextUri : contexts)
+                        for(final URI nextUri : contexts)
                         {
                             dataset.addDefaultGraph(nextUri);
                             dataset.addNamedGraph(nextUri);
@@ -143,7 +135,7 @@ public class SparqlResourceImpl extends AbstractPoddResourceImpl
                     // some results
                     throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Failed performing SPARQL query", e);
                 }
-                catch(UnmanagedArtifactVersionException e)
+                catch(final UnmanagedArtifactVersionException e)
                 {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
@@ -161,10 +153,10 @@ public class SparqlResourceImpl extends AbstractPoddResourceImpl
                 // TODO: May want to ignore this for stability of queries in the long term
                 throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Could not find a requested artifact", e);
             }
-            catch(OpenRDFException e1)
+            catch(final OpenRDFException e)
             {
-                // TODO Auto-generated catch block
-                e1.printStackTrace();
+                // TODO: May want to ignore this for stability of queries in the long term
+                throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Repository exception occurred", e);
             }
         }
         
