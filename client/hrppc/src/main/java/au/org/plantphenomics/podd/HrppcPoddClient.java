@@ -131,13 +131,15 @@ public class HrppcPoddClient extends RestletPoddClientImpl
         // create statements internally
         this.populateProjectUriMap(currentUnpublishedArtifacts, projectUriMap);
         
+        List<String> headers = null;
         // TODO: Implement getObjectsByType(InferredOWLOntology, URI) so that
         // experiments etc can be found easily
         // and the identifier can be mapped as necessary to the identifier in
         // the header
-        
-        List<String> headers = null;
-        try (final InputStreamReader inputStreamReader = new InputStreamReader(in, StandardCharsets.UTF_8);
+        // Supressing warning generated erroneously by Eclipse:
+        // https://bugs.eclipse.org/bugs/show_bug.cgi?id=371614
+        try (@SuppressWarnings("resource")
+        final InputStreamReader inputStreamReader = new InputStreamReader(in, StandardCharsets.UTF_8);
                 final CSVReader reader = new CSVReader(inputStreamReader);)
         {
             String[] nextLine;
