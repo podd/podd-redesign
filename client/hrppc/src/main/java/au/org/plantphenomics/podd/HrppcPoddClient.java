@@ -136,33 +136,35 @@ public class HrppcPoddClient extends RestletPoddClientImpl
         // the header
         
         List<String> headers = null;
-        final CSVReader reader = new CSVReader(new InputStreamReader(in, Charset.forName("UTF-8")));
-        String[] nextLine;
-        while((nextLine = reader.readNext()) != null)
+        try(final CSVReader reader = new CSVReader(new InputStreamReader(in, Charset.forName("UTF-8")));)
         {
-            if(headers == null)
+            String[] nextLine;
+            while((nextLine = reader.readNext()) != null)
             {
-                // header line is mandatory in PODD CSV
-                headers = Arrays.asList(nextLine);
-                try
+                if(headers == null)
                 {
-                    this.verifyProjectListHeaders(headers);
+                    // header line is mandatory in PODD CSV
+                    headers = Arrays.asList(nextLine);
+                    try
+                    {
+                        this.verifyProjectListHeaders(headers);
+                    }
+                    catch(final IllegalArgumentException e)
+                    {
+                        this.log.error("Could not verify headers for project list: {}", e.getMessage());
+                        throw new PoddClientException("Could not verify headers for project list", e);
+                    }
                 }
-                catch(final IllegalArgumentException e)
+                else
                 {
-                    this.log.error("Could not verify headers for project list: {}", e.getMessage());
-                    throw new PoddClientException("Could not verify headers for project list", e);
+                    if(nextLine.length != headers.size())
+                    {
+                        this.log.error("Line and header sizes were different: {} {}", headers, nextLine);
+                    }
+                    
+                    // Process the next line and add it to the upload queue
+                    this.processPlantScanLine(headers, Arrays.asList(nextLine), projectUriMap, uploadQueue);
                 }
-            }
-            else
-            {
-                if(nextLine.length != headers.size())
-                {
-                    this.log.error("Line and header sizes were different: {} {}", headers, nextLine);
-                }
-                
-                // Process the next line and add it to the upload queue
-                this.processPlantScanLine(headers, Arrays.asList(nextLine), projectUriMap, uploadQueue);
             }
         }
         
