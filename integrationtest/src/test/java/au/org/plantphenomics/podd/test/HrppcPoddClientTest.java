@@ -60,9 +60,11 @@ public class HrppcPoddClientTest extends RestletPoddClientImplIntegrationTest
     @Test
     public final void testRegexPosition() throws Exception
     {
-        Matcher matcher = HrppcPoddClient.REGEX_POSITION.matcher("B2");
-        assertTrue(matcher.matches());
+        Matcher matcher1 = HrppcPoddClient.REGEX_POSITION.matcher("B2");
+        assertTrue(matcher1.matches());
         
+        Matcher matcher2 = HrppcPoddClient.REGEX_POSITION.matcher("AB23454");
+        assertTrue(matcher2.matches());
     }
     
     @Test

@@ -23,6 +23,7 @@ import java.io.InputStreamReader;
 import java.io.StringWriter;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -322,10 +323,12 @@ public class HrppcPoddClient extends RestletPoddClientImpl
     /**
      * Process a single line from the input file, using the given headers as the definitions for the
      * line.
+     * 
+     * @throws PoddClientException
      */
     private void processPlantScanLine(final List<String> headers, final List<String> nextLine,
             final ConcurrentMap<String, ConcurrentMap<URI, InferredOWLOntologyID>> projectUriMap,
-            final ConcurrentMap<InferredOWLOntologyID, Model> uploadQueue)
+            final ConcurrentMap<InferredOWLOntologyID, Model> uploadQueue) throws PoddClientException
     {
         String trayId = null;
         String trayNotes = null;
@@ -457,19 +460,19 @@ public class HrppcPoddClient extends RestletPoddClientImpl
         if(!positionMatcher.matches())
         {
             this.log.error("Position did not match expected format: {}", position);
+            throw new PoddClientException(MessageFormat.format("Position did not match expected format: {0}", position));
+        }
+        else if(positionMatcher.groupCount() != HrppcPoddClient.POSITION_SIZE)
+        {
+            this.log.error("Did not find the expected number of regex matches for Position: {} {}",
+                    positionMatcher.groupCount(), HrppcPoddClient.POSITION_SIZE);
+            throw new PoddClientException(MessageFormat.format(
+                    "Did not find the expected number of regex matches for Position: {0}", position));
         }
         else
         {
-            if(positionMatcher.groupCount() != HrppcPoddClient.POSITION_SIZE)
-            {
-                this.log.error("Did not find the expected number of regex matches for Position: {} {}",
-                        positionMatcher.groupCount(), HrppcPoddClient.POSITION_SIZE);
-            }
-            else
-            {
-                columnLetter = positionMatcher.group(1);
-                rowNumber = positionMatcher.group(2);
-            }
+            columnLetter = positionMatcher.group(1);
+            rowNumber = positionMatcher.group(2);
         }
     }
     
