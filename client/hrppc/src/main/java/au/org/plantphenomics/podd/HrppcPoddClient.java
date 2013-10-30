@@ -69,11 +69,11 @@ public class HrppcPoddClient extends RestletPoddClientImpl
     public static final String PLANT_NAME = "PlantName";
     public static final String PLANT_NOTES = "PlantNotes";
     
-    public static final Pattern REGEX_PROJECT = Pattern.compile("^PROJECT#(\\d{4})-(\\d{4})");
+    public static final Pattern REGEX_PROJECT = Pattern.compile("^Project#(\\d{4})-(\\d{4})");
     
     // PROJECT#YYYY-NNNN_EXPERIMENT#NNNN_GENUS.SPECIES_TRAY#NNNNN
     public static final Pattern REGEX_TRAY = Pattern
-            .compile("PROJECT#(\\d{4})-(\\d{4})_EXPERIMENT#(\\d{4})_(\\w+).(\\w+)_TRAY#(\\d{4,5})");
+            .compile("Project#(\\d{4})-(\\d{4})_Experiment#(\\d{4})_(\\w+)\\.(\\w+)_Tray#(\\d{4,5})");
     
     /**
      * Number of groups matching in the tray id regex.
@@ -82,14 +82,14 @@ public class HrppcPoddClient extends RestletPoddClientImpl
     
     // PROJECT#YYYY-NNNN_EXPERIMENT#NNNN_GENUS.SPECIES_TRAY#NNNNN_POT#NNNNN
     public static final Pattern REGEX_PLANT = Pattern
-            .compile("PROJECT#(\\d{4})-(\\d{4})_EXPERIMENT#(\\d{4})_(\\w+).(\\w+)_TRAY#(\\d{4,5})_POT#(\\d{4,5})");
+            .compile("Project#(\\d{4})-(\\d{4})_Experiment#(\\d{4})_(\\w+)\\.(\\w+)_Tray#(\\d{4,5})_Pot#(\\d{4,5})");
     
     /**
      * Number of groups matching in the plant id regex.
      */
     public static final int PLANT_ID_SIZE = 7;
     
-    public static final Pattern REGEX_POSITION = Pattern.compile("([a-zA-Z]+)([0-9])");
+    public static final Pattern REGEX_POSITION = Pattern.compile("([a-zA-Z]+)([0-9]+)");
     
     /**
      * Number of groups matching in the position regex.

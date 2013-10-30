@@ -93,6 +93,13 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>podd-client-hrppc</artifactId>
+			<version>${project.version}</version>
+			<type>jar</type>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
 			<groupId>com.github.ansell.restlet-utils</groupId>
 			<artifactId>restlet-utils</artifactId>
 			<scope>compile</scope>
