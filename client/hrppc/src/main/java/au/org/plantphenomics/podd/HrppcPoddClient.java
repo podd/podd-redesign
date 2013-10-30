@@ -94,7 +94,7 @@ public class HrppcPoddClient extends RestletPoddClientImpl
     /**
      * Number of groups matching in the position regex.
      */
-    public static final int POSITION_SIZE = 7;
+    public static final int POSITION_SIZE = 2;
     
     public HrppcPoddClient()
     {
