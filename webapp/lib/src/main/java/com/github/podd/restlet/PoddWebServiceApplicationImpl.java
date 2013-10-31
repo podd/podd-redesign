@@ -69,6 +69,7 @@ import com.github.podd.resources.IndexResourceImpl;
 import com.github.podd.resources.ListArtifactsResourceImpl;
 import com.github.podd.resources.ListDataRepositoriesResourceImpl;
 import com.github.podd.resources.SearchOntologyResourceImpl;
+import com.github.podd.resources.SparqlResourceImpl;
 import com.github.podd.resources.UploadArtifactResourceImpl;
 import com.github.podd.resources.UserAddResourceImpl;
 import com.github.podd.resources.UserDetailsResourceImpl;
@@ -411,6 +412,11 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
         schemaService.getTemplate().setMatchingMode(Template.MODE_STARTS_WITH);
         final Map<String, Variable> routeVariables = schemaService.getTemplate().getVariables();
         routeVariables.put("schemaPath", new Variable(Variable.TYPE_URI_PATH));
+        
+        // Add a route for the SPARQL page.
+        final String sparqlService = PoddWebConstants.PATH_SPARQL;
+        this.log.debug("attaching SPARQL service to path={}", sparqlService);
+        router.attach(sparqlService, SparqlResourceImpl.class);
         
         // Add a route for Logout service
         // final String logout = "logout";

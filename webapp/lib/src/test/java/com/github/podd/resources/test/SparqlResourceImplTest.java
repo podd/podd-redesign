@@ -122,7 +122,13 @@ public class SparqlResourceImplTest extends AbstractResourceImplTest
             searchClientResource.addQueryParameter(PoddWebConstants.KEY_SPARQLQUERY, "CONSTRUCT { ?s a ?o } WHERE { ?s a ?o }");
             searchClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, testArtifact.getOntologyIRI().toString());
             
-            searchClientResource.get(MediaType.APPLICATION_RDF_XML);
+            // invoke service
+            final Representation results =
+                    RestletTestUtils.doTestAuthenticatedRequest(searchClientResource, Method.GET, null,
+                            MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
+            
+            // verify: response
+            final Model resultModel = this.assertRdf(results, RDFFormat.RDFXML, 835);
         }
         finally
         {
