@@ -126,6 +126,7 @@ public class SparqlResourceImpl extends AbstractPoddResourceImpl
                     this.checkAuthentication(PoddAction.UNPUBLISHED_ARTIFACT_READ, ontologyID.getOntologyIRI()
                             .toOpenRDFURI());
                 }
+                artifactIds.add(ontologyID);
             }
             catch(final UnmanagedArtifactIRIException e)
             {
