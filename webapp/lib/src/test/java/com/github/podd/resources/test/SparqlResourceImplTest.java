@@ -134,4 +134,119 @@ public class SparqlResourceImplTest extends AbstractResourceImplTest
         }
     }
     
+    @Test
+    public void testSparqlNoSchemaContexts() throws Exception
+    {
+        // prepare: add an artifact
+        final InferredOWLOntologyID testArtifact =
+                this.loadTestArtifact(TestConstants.TEST_ARTIFACT_20130206, MediaType.APPLICATION_RDF_TURTLE);
+        
+        // prepare:
+        final ClientResource searchClientResource = new ClientResource(this.getUrl(PoddWebConstants.PATH_SPARQL));
+        
+        // there is no need to authenticate or have a test artifact as the artifact ID is checked
+        // for first
+        try
+        {
+            searchClientResource.addQueryParameter(PoddWebConstants.KEY_SPARQLQUERY,
+                    "CONSTRUCT { ?s a ?o } WHERE { ?s a ?o }");
+            searchClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, testArtifact
+                    .getOntologyIRI().toString());
+            searchClientResource.addQueryParameter(PoddWebConstants.KEY_INCLUDE_SCHEMA, Boolean.toString(false));
+            
+            // invoke service
+            final Representation results =
+                    RestletTestUtils.doTestAuthenticatedRequest(searchClientResource, Method.GET, null,
+                            MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
+            
+            // verify: response
+            final Model resultModel = this.assertRdf(results, RDFFormat.RDFXML, 313);
+            // verify that only type statements have been returned
+            Assert.assertEquals(313, resultModel.filter(null, RDF.TYPE, null).size());
+            Assert.assertEquals(115, resultModel.filter(null, RDF.TYPE, null).subjects().size());
+            Assert.assertEquals(35, resultModel.filter(null, RDF.TYPE, null).objects().size());
+        }
+        finally
+        {
+            this.releaseClient(searchClientResource);
+        }
+    }
+    
+    @Test
+    public void testSparqlNoInferredContexts() throws Exception
+    {
+        // prepare: add an artifact
+        final InferredOWLOntologyID testArtifact =
+                this.loadTestArtifact(TestConstants.TEST_ARTIFACT_20130206, MediaType.APPLICATION_RDF_TURTLE);
+        
+        // prepare:
+        final ClientResource searchClientResource = new ClientResource(this.getUrl(PoddWebConstants.PATH_SPARQL));
+        
+        // there is no need to authenticate or have a test artifact as the artifact ID is checked
+        // for first
+        try
+        {
+            searchClientResource.addQueryParameter(PoddWebConstants.KEY_SPARQLQUERY,
+                    "CONSTRUCT { ?s a ?o } WHERE { ?s a ?o }");
+            searchClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, testArtifact
+                    .getOntologyIRI().toString());
+            searchClientResource.addQueryParameter(PoddWebConstants.KEY_INCLUDE_INFERRED, Boolean.toString(false));
+            
+            // invoke service
+            final Representation results =
+                    RestletTestUtils.doTestAuthenticatedRequest(searchClientResource, Method.GET, null,
+                            MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
+            
+            // verify: response
+            final Model resultModel = this.assertRdf(results, RDFFormat.RDFXML, 682);
+            // verify that only type statements have been returned
+            Assert.assertEquals(682, resultModel.filter(null, RDF.TYPE, null).size());
+            Assert.assertEquals(541, resultModel.filter(null, RDF.TYPE, null).subjects().size());
+            Assert.assertEquals(35, resultModel.filter(null, RDF.TYPE, null).objects().size());
+        }
+        finally
+        {
+            this.releaseClient(searchClientResource);
+        }
+    }
+    
+    @Test
+    public void testSparqlNoConcreteContexts() throws Exception
+    {
+        // prepare: add an artifact
+        final InferredOWLOntologyID testArtifact =
+                this.loadTestArtifact(TestConstants.TEST_ARTIFACT_20130206, MediaType.APPLICATION_RDF_TURTLE);
+        
+        // prepare:
+        final ClientResource searchClientResource = new ClientResource(this.getUrl(PoddWebConstants.PATH_SPARQL));
+        
+        // there is no need to authenticate or have a test artifact as the artifact ID is checked
+        // for first
+        try
+        {
+            searchClientResource.addQueryParameter(PoddWebConstants.KEY_SPARQLQUERY,
+                    "CONSTRUCT { ?s a ?o } WHERE { ?s a ?o }");
+            searchClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, testArtifact
+                    .getOntologyIRI().toString());
+            searchClientResource.addQueryParameter(PoddWebConstants.KEY_INCLUDE_CONCRETE, Boolean.toString(false));
+            
+            // invoke service
+            final Representation results =
+                    RestletTestUtils.doTestAuthenticatedRequest(searchClientResource, Method.GET, null,
+                            MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
+            
+            // verify: response
+            // TODO: Deduplicate statements so they don't appear in both the inferred and concrete
+            final Model resultModel = this.assertRdf(results, RDFFormat.RDFXML, 835);
+            // verify that only type statements have been returned
+            Assert.assertEquals(835, resultModel.filter(null, RDF.TYPE, null).size());
+            Assert.assertEquals(542, resultModel.filter(null, RDF.TYPE, null).subjects().size());
+            Assert.assertEquals(43, resultModel.filter(null, RDF.TYPE, null).objects().size());
+        }
+        finally
+        {
+            this.releaseClient(searchClientResource);
+        }
+    }
+    
 }
