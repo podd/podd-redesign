@@ -98,7 +98,7 @@ public class SparqlResourceImplTest extends AbstractResourceImplTest
     }
     
     @Test
-    public void testSparql() throws Exception
+    public void testSparqlAllContexts() throws Exception
     {
         // prepare: add an artifact
         final InferredOWLOntologyID testArtifact =

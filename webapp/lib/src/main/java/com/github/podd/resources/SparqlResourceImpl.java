@@ -20,6 +20,7 @@ import java.io.ByteArrayOutputStream;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 import org.openrdf.OpenRDFException;
@@ -31,6 +32,7 @@ import org.openrdf.query.GraphQuery;
 import org.openrdf.query.QueryLanguage;
 import org.openrdf.query.impl.DatasetImpl;
 import org.openrdf.repository.RepositoryConnection;
+import org.openrdf.repository.RepositoryException;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.Rio;
 import org.openrdf.rio.helpers.StatementCollector;
@@ -104,6 +106,8 @@ public class SparqlResourceImpl extends AbstractPoddResourceImpl
             includeSchema = Boolean.valueOf(includeSchemaStatements);
         }
         
+        final Set<InferredOWLOntologyID> artifactIds = new LinkedHashSet<>();
+        
         final Model results = new LinkedHashModel();
         for(final String nextArtifactUri : artifactUris)
         {
@@ -122,82 +126,93 @@ public class SparqlResourceImpl extends AbstractPoddResourceImpl
                     this.checkAuthentication(PoddAction.UNPUBLISHED_ARTIFACT_READ, ontologyID.getOntologyIRI()
                             .toOpenRDFURI());
                 }
-                
-                RepositoryConnection conn = null;
-                try
+            }
+            catch(final UnmanagedArtifactIRIException e)
+            {
+                throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Could not find a requested artifact", e);
+            }
+            catch(OpenRDFException e)
+            {
+                throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Repository exception occurred", e);
+            }
+        }
+        
+        for(final InferredOWLOntologyID ontologyID : artifactIds)
+        {
+            RepositoryConnection conn = null;
+            try
+            {
+                final Collection<OWLOntologyID> schemaImports =
+                        this.getPoddArtifactManager().getSchemaImports(ontologyID);
+                conn = this.getPoddRepositoryManager().getPermanentRepository(schemaImports).getConnection();
+                final Set<URI> contextSet = new HashSet<>();
+                if(includeConcrete)
                 {
-                    final Collection<OWLOntologyID> schemaImports =
-                            this.getPoddArtifactManager().getSchemaImports(ontologyID);
-                    conn = this.getPoddRepositoryManager().getPermanentRepository(schemaImports).getConnection();
-                    final Set<URI> contextSet = new HashSet<>();
-                    if(includeConcrete)
-                    {
-                        contextSet.addAll(Arrays.asList(this.getPoddSesameManager().versionContexts(ontologyID)));
-                    }
-                    if(includeInferred)
-                    {
-                        contextSet.addAll(Arrays.asList(this.getPoddSesameManager().inferredContexts(ontologyID)));
-                    }
-                    if(includeSchema)
-                    {
-                        contextSet.addAll(Arrays.asList(this.getPoddSesameManager().schemaContexts(ontologyID, conn,
-                                this.getPoddRepositoryManager().getSchemaManagementGraph())));
-                    }
-                    // TODO: Support cross-artifact queries if they all import the same schemas
-                    final URI[] contexts = contextSet.toArray(new URI[0]);
-                    // MUST not perform queries on all contexts
-                    if(this.getPoddRepositoryManager().safeContexts(contexts))
-                    {
-                        final GraphQuery query = conn.prepareGraphQuery(QueryLanguage.SPARQL, sparqlQuery);
-                        
-                        final DatasetImpl dataset = new DatasetImpl();
-                        
-                        for(final URI nextUri : contexts)
-                        {
-                            dataset.addDefaultGraph(nextUri);
-                            dataset.addNamedGraph(nextUri);
-                        }
-                        
-                        query.setDataset(dataset);
-                        
-                        query.evaluate(new StatementCollector(results));
-                    }
-                    else
-                    {
-                        this.log.error(
-                                "Could not determine contexts for artifact, or included an unsafe context: ontology=<{}> contexts=<{}>",
-                                ontologyID, contextSet);
-                    }
+                    contextSet.addAll(Arrays.asList(this.getPoddSesameManager().versionContexts(ontologyID)));
                 }
-                catch(final OpenRDFException e)
+                if(includeInferred)
                 {
-                    // TODO: May want to ignore these failures for stability, or wait until the end
-                    // and then throw an error if all sparql queries failed and otherwise return
-                    // some results
-                    throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Failed performing SPARQL query", e);
+                    contextSet.addAll(Arrays.asList(this.getPoddSesameManager().inferredContexts(ontologyID)));
                 }
-                catch(final UnmanagedArtifactVersionException e)
+                if(includeSchema)
                 {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
+                    contextSet.addAll(Arrays.asList(this.getPoddSesameManager().schemaContexts(ontologyID, conn,
+                            this.getPoddRepositoryManager().getSchemaManagementGraph())));
                 }
-                finally
+                // TODO: Support cross-artifact queries if they all import the same schemas
+                final URI[] contexts = contextSet.toArray(new URI[0]);
+                // MUST not perform queries on all contexts
+                if(this.getPoddRepositoryManager().safeContexts(contexts))
                 {
-                    if(conn != null)
+                    final GraphQuery query = conn.prepareGraphQuery(QueryLanguage.SPARQL, sparqlQuery);
+                    
+                    final DatasetImpl dataset = new DatasetImpl();
+                    
+                    for(final URI nextUri : contexts)
                     {
-                        conn.close();
+                        dataset.addDefaultGraph(nextUri);
+                        dataset.addNamedGraph(nextUri);
                     }
+                    
+                    query.setDataset(dataset);
+                    
+                    query.evaluate(new StatementCollector(results));
+                }
+                else
+                {
+                    this.log.error(
+                            "Could not determine contexts for artifact, or included an unsafe context: ontology=<{}> contexts=<{}>",
+                            ontologyID, contextSet);
                 }
             }
             catch(final UnmanagedArtifactIRIException e)
             {
-                // TODO: May want to ignore this for stability of queries in the long term
+                throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Could not find a requested artifact", e);
+            }
+            catch(final UnmanagedArtifactVersionException e)
+            {
                 throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Could not find a requested artifact", e);
             }
             catch(final OpenRDFException e)
             {
                 // TODO: May want to ignore this for stability of queries in the long term
                 throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Repository exception occurred", e);
+            }
+            finally
+            {
+                if(conn != null)
+                {
+                    try
+                    {
+                        conn.close();
+                    }
+                    catch(RepositoryException e)
+                    {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                        this.log.error("Could not close repository connection: ", e);
+                    }
+                }
             }
         }
         
