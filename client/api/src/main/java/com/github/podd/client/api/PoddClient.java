@@ -22,6 +22,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import org.openrdf.model.Model;
 import org.openrdf.model.URI;
 import org.openrdf.rio.RDFFormat;
 import org.semanticweb.owlapi.model.IRI;
@@ -346,5 +347,18 @@ public interface PoddClient
     InferredOWLOntologyID uploadNewArtifact(InputStream input, RDFFormat format,
             DanglingObjectPolicy danglingObjectPolicy, DataReferenceVerificationPolicy dataReferenceVerificationPolicy)
         throws PoddClientException;
+    
+    /**
+     * Performs a CONSTRUCT or DESCRIBE SPARQL query on the given artifact.
+     * 
+     * @param queryString
+     *            The CONSTRUCT or DESCRIBE SPARQL query on the given artifact.
+     * @param artifact
+     *            The PODD artifact to perform the query on.
+     * @return A {@link Model} containing the results of the SPARQL query.
+     * @throws PoddClientException
+     *             If an error occurred.
+     */
+    Model doSPARQL(String queryString, InferredOWLOntologyID artifact) throws PoddClientException;
     
 }

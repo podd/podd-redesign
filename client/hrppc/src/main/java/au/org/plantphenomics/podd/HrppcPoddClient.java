@@ -192,7 +192,7 @@ public class HrppcPoddClient extends RestletPoddClientImpl
         {
             try
             {
-                final StringWriter writer = new StringWriter();
+                final StringWriter writer = new StringWriter(4096);
                 Rio.write(uploadQueue.get(nextUpload), writer, RDFFormat.RDFJSON);
                 final InferredOWLOntologyID newID =
                         this.appendArtifact(nextUpload,
@@ -218,6 +218,7 @@ public class HrppcPoddClient extends RestletPoddClientImpl
     
     private void populateProjectUriMap(final List<InferredOWLOntologyID> currentUnpublishedArtifacts,
             final ConcurrentMap<String, ConcurrentMap<URI, InferredOWLOntologyID>> projectUriMap)
+        throws PoddClientException
     {
         for(final InferredOWLOntologyID nextArtifact : currentUnpublishedArtifacts)
         {
@@ -315,8 +316,10 @@ public class HrppcPoddClient extends RestletPoddClientImpl
         }
     }
     
-    private Model getTopObject(final InferredOWLOntologyID nextArtifact)
+    private Model getTopObject(final InferredOWLOntologyID nextArtifact) throws PoddClientException
     {
+        // FIXME: Create query to get Top Object 
+        //Model results = this.doSPARQL("CONSTRUCT { ?s ?p ?o . } WHERE { ?s ?p ?o . }", nextArtifact);
         throw new RuntimeException("TODO: Implement getTopObject");
     }
     

@@ -242,6 +242,44 @@ public class RestletPoddClientImpl implements PoddClient
     }
     
     @Override
+    public Model doSPARQL(String queryString, InferredOWLOntologyID artifactId) throws PoddClientException
+    {
+        this.log.info("cookies: {}", this.currentCookies);
+        
+        final ClientResource resource = new ClientResource(this.getUrl(PoddWebConstants.PATH_SPARQL));
+        resource.getCookies().addAll(this.currentCookies);
+        
+        resource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactId.getOntologyIRI().toString());
+        
+        // TODO: Parse query to make sure it is syntactically valid before sending query
+        resource.addQueryParameter(PoddWebConstants.KEY_SPARQLQUERY, queryString);
+        
+        if(artifactId.getVersionIRI() != null)
+        {
+            // FIXME: Versions are not supported in general by PODD, but they are important for
+            // verifying the state of the client to allow for early failure in cases where the
+            // client is out of date.
+            resource.addQueryParameter("versionUri", artifactId.getVersionIRI().toString());
+        }
+        
+        // Pass the desired format to the get method of the ClientResource
+        final Representation get = resource.get(RestletUtilMediaType.APPLICATION_RDF_JSON);
+        
+        StringWriter writer = new StringWriter(4096);
+        
+        try
+        {
+            get.write(writer);
+            return Rio.parse(new StringReader(writer.toString()), "", RDFFormat.RDFJSON);
+            
+        }
+        catch(final IOException | RDFParseException | UnsupportedRDFormatException e)
+        {
+            throw new PoddClientException("Could not process SPARQL query results", e);
+        }
+    }
+    
+    @Override
     public void downloadArtifact(final InferredOWLOntologyID artifactId, final OutputStream outputStream,
             final RDFFormat format) throws PoddClientException
     {
