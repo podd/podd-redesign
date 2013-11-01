@@ -20,7 +20,6 @@
 package com.github.podd.api;
 
 import java.util.Collection;
-import java.util.List;
 
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.URI;

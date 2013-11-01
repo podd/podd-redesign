@@ -68,6 +68,7 @@ import com.github.podd.utils.RdfUtility;
 
 /**
  * @author kutila
+ * @author Peter Ansell p_ansell@yahoo.com
  * 
  */
 public class PoddSesameManagerImpl implements PoddSesameManager
@@ -292,9 +293,8 @@ public class PoddSesameManagerImpl implements PoddSesameManager
      * @deprecated Unused. Somewhat similar functionality is available in {@link getInstancesOf()}.
      */
     @Deprecated
-    @Override
-    public List<URI> getAllValidMembers(final InferredOWLOntologyID artifactID, final URI propertyUri,
-            final RepositoryConnection repositoryConnection) throws OpenRDFException
+    private List<URI> getAllValidMembers(final InferredOWLOntologyID artifactID, final URI propertyUri,
+            final RepositoryConnection repositoryConnection, final URI schemaManagementGraph) throws OpenRDFException
     {
         /*
          * Example: Triples describing PlatformType enumeration consisting of 3 members.
@@ -331,8 +331,8 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         final TupleQuery tupleQuery = repositoryConnection.prepareTupleQuery(QueryLanguage.SPARQL, sb.toString());
         tupleQuery.setBinding("poddProperty", propertyUri);
         final QueryResultCollector queryResults =
-                RdfUtility.executeTupleQuery(tupleQuery,
-                        this.versionAndInferredAndSchemaContexts(artifactID, repositoryConnection));
+                RdfUtility.executeTupleQuery(tupleQuery, this.versionAndInferredAndSchemaContexts(artifactID,
+                        repositoryConnection, schemaManagementGraph));
         
         for(final BindingSet binding : queryResults.getBindingSets())
         {
@@ -344,11 +344,11 @@ public class PoddSesameManagerImpl implements PoddSesameManager
     
     @Override
     public Map<URI, URI> getCardinalityValues(final InferredOWLOntologyID artifactID, final URI objectUri,
-            final Collection<URI> propertyUris, final RepositoryConnection repositoryConnection)
-        throws OpenRDFException
+            final Collection<URI> propertyUris, final RepositoryConnection repositoryConnection,
+            final URI schemaManagementGraph) throws OpenRDFException
     {
         return this.getCardinalityValues(objectUri, propertyUris, false, repositoryConnection,
-                this.versionAndInferredAndSchemaContexts(artifactID, repositoryConnection));
+                this.versionAndInferredAndSchemaContexts(artifactID, repositoryConnection, schemaManagementGraph));
     }
     
     @Override
@@ -806,12 +806,13 @@ public class PoddSesameManagerImpl implements PoddSesameManager
      * @param objectUri
      * @param repositoryConnection
      * @param contexts
+     * 
      * @return
      * @throws OpenRDFException
      */
     @Override
     public Model getObjectDetailsForDisplay(final InferredOWLOntologyID artifactID, final URI objectUri,
-            final RepositoryConnection repositoryConnection) throws OpenRDFException
+            final RepositoryConnection repositoryConnection, final URI schemaManagementGraph) throws OpenRDFException
     {
         final StringBuilder sb = new StringBuilder(1024);
         
@@ -841,8 +842,8 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         graphQuery.setBinding("poddObject", objectUri);
         
         final Model queryResults =
-                RdfUtility.executeGraphQuery(graphQuery,
-                        this.versionAndInferredAndSchemaContexts(artifactID, repositoryConnection));
+                RdfUtility.executeGraphQuery(graphQuery, this.versionAndInferredAndSchemaContexts(artifactID,
+                        repositoryConnection, schemaManagementGraph));
         
         return queryResults;
     }
@@ -864,7 +865,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
      */
     @Override
     public PoddObjectLabel getObjectLabel(final InferredOWLOntologyID ontologyID, final URI objectUri,
-            final RepositoryConnection repositoryConnection) throws OpenRDFException
+            final RepositoryConnection repositoryConnection, final URI schemaManagementGraph) throws OpenRDFException
     {
         final StringBuilder sb = new StringBuilder(1024);
         sb.append("SELECT ?label ?description ");
@@ -878,8 +879,8 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         final TupleQuery tupleQuery = repositoryConnection.prepareTupleQuery(QueryLanguage.SPARQL, sb.toString());
         tupleQuery.setBinding("objectUri", objectUri);
         final QueryResultCollector queryResults =
-                RdfUtility.executeTupleQuery(tupleQuery,
-                        this.versionAndInferredAndSchemaContexts(ontologyID, repositoryConnection));
+                RdfUtility.executeTupleQuery(tupleQuery, this.versionAndInferredAndSchemaContexts(ontologyID,
+                        repositoryConnection, schemaManagementGraph));
         
         String label = null;
         String description = null;
@@ -1376,7 +1377,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
      */
     @Override
     public List<URI> getObjectTypes(final InferredOWLOntologyID ontologyID, final URI objectUri,
-            final RepositoryConnection repositoryConnection) throws OpenRDFException
+            final RepositoryConnection repositoryConnection, final URI schemaManagementGraph) throws OpenRDFException
     {
         final StringBuilder sb = new StringBuilder(1024);
         sb.append("SELECT DISTINCT ?poddTypeUri ");
@@ -1400,8 +1401,8 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         final TupleQuery tupleQuery = repositoryConnection.prepareTupleQuery(QueryLanguage.SPARQL, sb.toString());
         tupleQuery.setBinding("objectUri", objectUri);
         final QueryResultCollector queryResults =
-                RdfUtility.executeTupleQuery(tupleQuery,
-                        this.versionAndInferredAndSchemaContexts(ontologyID, repositoryConnection));
+                RdfUtility.executeTupleQuery(tupleQuery, this.versionAndInferredAndSchemaContexts(ontologyID,
+                        repositoryConnection, schemaManagementGraph));
         
         final List<URI> results = new ArrayList<URI>(queryResults.getBindingSets().size());
         
@@ -2130,22 +2131,19 @@ public class PoddSesameManagerImpl implements PoddSesameManager
      */
     @Override
     public URI[] versionAndInferredAndSchemaContexts(final InferredOWLOntologyID ontologyID,
-            final RepositoryConnection repositoryConnection) throws OpenRDFException
+            final RepositoryConnection repositoryConnection, final URI schemaManagementGraph) throws OpenRDFException
     {
-        // FIXME: Change this to use versionAndSchemaContexts as its basis, and then just add the
-        // inferred if available at the end.
-        final Set<IRI> directImports = this.getDirectImports(ontologyID, repositoryConnection);
-        
-        final List<URI> results = new ArrayList<URI>(directImports.size() + 2);
-        
-        results.addAll(Arrays.asList(this.versionAndInferredContexts(ontologyID)));
-        
-        for(final IRI nextDirectImport : directImports)
+        final Set<URI> contexts = new LinkedHashSet<URI>();
+        if(ontologyID != null)
         {
-            results.add(nextDirectImport.toOpenRDFURI());
+            contexts.add(ontologyID.getVersionIRI().toOpenRDFURI());
+            if(ontologyID.getInferredOntologyIRI() != null)
+            {
+                contexts.add(ontologyID.getInferredOntologyIRI().toOpenRDFURI());
+            }
         }
-        
-        return results.toArray(new URI[0]);
+        contexts.addAll(Arrays.asList(this.schemaContexts(ontologyID, repositoryConnection, schemaManagementGraph)));
+        return contexts.toArray(new URI[0]);
     }
     
     /**
@@ -2199,7 +2197,45 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         if(ontologyID != null)
         {
             contexts.add(ontologyID.getVersionIRI().toOpenRDFURI());
-            
+        }
+        contexts.addAll(Arrays.asList(this.schemaContexts(ontologyID, repositoryConnection, schemaManagementGraph)));
+        return contexts.toArray(new URI[0]);
+    }
+    
+    @Override
+    public URI[] inferredAndSchemaContexts(final InferredOWLOntologyID ontologyID,
+            final RepositoryConnection repositoryConnection, final URI schemaManagementGraph) throws OpenRDFException
+    {
+        final Set<URI> contexts = new LinkedHashSet<URI>();
+        if(ontologyID != null && ontologyID.getInferredOntologyIRI() != null)
+        {
+            contexts.add(ontologyID.getInferredOntologyIRI().toOpenRDFURI());
+        }
+        contexts.addAll(Arrays.asList(this.schemaContexts(ontologyID, repositoryConnection, schemaManagementGraph)));
+        return contexts.toArray(new URI[0]);
+    }
+    
+    @Override
+    public URI[] inferredContexts(final InferredOWLOntologyID ontologyID,
+            final RepositoryConnection repositoryConnection) throws OpenRDFException
+    {
+        if(ontologyID.getInferredOntologyIRI() != null)
+        {
+            return new URI[] { ontologyID.getInferredOntologyIRI().toOpenRDFURI() };
+        }
+        else
+        {
+            return new URI[] {};
+        }
+    }
+    
+    @Override
+    public URI[] schemaContexts(final InferredOWLOntologyID ontologyID,
+            final RepositoryConnection repositoryConnection, final URI schemaManagementGraph) throws OpenRDFException
+    {
+        final Set<URI> contexts = new LinkedHashSet<URI>();
+        if(ontologyID != null)
+        {
             final Set<IRI> directImports = this.getDirectImports(ontologyID, repositoryConnection);
             for(final IRI directImport : directImports)
             {

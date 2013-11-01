@@ -296,10 +296,22 @@ public interface PoddWebConstants
     public static final String KEY_METADATA_POLICY = "metadatapolicy";
     
     /**
-     * Key used in "get artifact" service to indicate whether inferred axioms should be included in
-     * the results.
+     * Key used in "get artifact" and "sparql" service to indicate whether inferred axioms should be
+     * included in the results.
      */
     public static final String KEY_INCLUDE_INFERRED = "includeInferred";
+    
+    /**
+     * Key used in "sparql" service to indicate whether concrete axioms should be included in the
+     * results.
+     */
+    public static final String KEY_INCLUDE_CONCRETE = "includeConcrete";
+    
+    /**
+     * Key used in "sparql" service to indicate whether schema axioms should be included in the
+     * results.
+     */
+    public static final String KEY_INCLUDE_SCHEMA = "includeSchema";
     
     public static final String METADATA_ALL = "all";
     
@@ -314,9 +326,9 @@ public interface PoddWebConstants
     public static final String KEY_SCHEMA_PATH = "schemaPath";
     
     public static final String PURL_ORG_PODD_NS = "http://purl.org/podd/ns/";
-
+    
     public static final String KEY_SPARQLQUERY = "query";
-
+    
     public static final String PATH_SPARQL = "sparql";
     
 }

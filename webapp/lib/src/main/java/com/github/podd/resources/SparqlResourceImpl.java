@@ -78,6 +78,28 @@ public class SparqlResourceImpl extends AbstractPoddResourceImpl
             // not specify any artifacts
             throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "No artifacts specified in request");
         }
+        
+        final String includeConcreteStatements =
+                this.getQuery().getFirstValue(PoddWebConstants.KEY_INCLUDE_CONCRETE, true);
+        boolean includeConcrete = true;
+        if(includeConcreteStatements != null)
+        {
+            includeConcrete = Boolean.valueOf(includeConcreteStatements);
+        }
+        final String includeInferredStatements =
+                this.getQuery().getFirstValue(PoddWebConstants.KEY_INCLUDE_INFERRED, true);
+        boolean includeInferred = true;
+        if(includeInferredStatements != null)
+        {
+            includeInferred = Boolean.valueOf(includeInferredStatements);
+        }
+        final String includeSchemaStatements = this.getQuery().getFirstValue(PoddWebConstants.KEY_INCLUDE_SCHEMA, true);
+        boolean includeSchema = true;
+        if(includeSchemaStatements != null)
+        {
+            includeSchema = Boolean.valueOf(includeSchemaStatements);
+        }
+        
         final Model results = new LinkedHashModel();
         for(final String nextArtifactUri : artifactUris)
         {
@@ -104,8 +126,10 @@ public class SparqlResourceImpl extends AbstractPoddResourceImpl
                             this.getPoddArtifactManager().getSchemaImports(ontologyID);
                     conn = this.getPoddRepositoryManager().getPermanentRepository(schemaImports).getConnection();
                     
+                    // TODO: Support cross-artifact queries if they all import the same schemas
                     final URI[] contexts =
-                            this.getPoddSesameManager().versionAndInferredAndSchemaContexts(ontologyID, conn);
+                            this.getPoddSesameManager().versionAndInferredAndSchemaContexts(ontologyID, conn,
+                                    this.getPoddRepositoryManager().getSchemaManagementGraph());
                     // Do not perform queries on all contexts
                     if(contexts != null && contexts.length >= 1)
                     {

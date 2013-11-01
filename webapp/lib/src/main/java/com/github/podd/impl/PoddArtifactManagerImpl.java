@@ -625,7 +625,8 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         {
             final Collection<OWLOntologyID> schemaImports = this.getSchemaImports(ontologyID);
             conn = this.getRepositoryManager().getPermanentRepository(schemaImports).getConnection();
-            return this.getSesameManager().getObjectDetailsForDisplay(ontologyID, objectUri, conn);
+            return this.getSesameManager().getObjectDetailsForDisplay(ontologyID, objectUri, conn,
+                    this.getRepositoryManager().getSchemaManagementGraph());
         }
         finally
         {
@@ -642,7 +643,8 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         {
             final Collection<OWLOntologyID> schemaImports = this.getSchemaImports(ontologyID);
             conn = this.getRepositoryManager().getPermanentRepository(schemaImports).getConnection();
-            return this.getSesameManager().getObjectLabel(ontologyID, objectUri, conn);
+            return this.getSesameManager().getObjectLabel(ontologyID, objectUri, conn,
+                    this.getRepositoryManager().getSchemaManagementGraph());
         }
         finally
         {
@@ -668,10 +670,13 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             final Collection<OWLOntologyID> schemaImports = this.getSchemaImports(artifactId);
             conn = this.getRepositoryManager().getPermanentRepository(schemaImports).getConnection();
             
-            final List<URI> typesList = this.getSesameManager().getObjectTypes(artifactId, objectUri, conn);
+            final List<URI> typesList =
+                    this.getSesameManager().getObjectTypes(artifactId, objectUri, conn,
+                            this.getRepositoryManager().getSchemaManagementGraph());
             for(final URI objectType : typesList)
             {
-                results.add(this.getSesameManager().getObjectLabel(artifactId, objectType, conn));
+                results.add(this.getSesameManager().getObjectLabel(artifactId, objectType, conn,
+                        this.getRepositoryManager().getSchemaManagementGraph()));
             }
         }
         finally
@@ -854,7 +859,8 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
                 conn = this.getRepositoryManager().getPermanentRepository(schemaImports).getConnection();
                 
                 final URI objectIRI = this.getSesameManager().getTopObjectIRI(artifactId, conn);
-                results.add(this.getSesameManager().getObjectLabel(artifactId, objectIRI, conn));
+                results.add(this.getSesameManager().getObjectLabel(artifactId, objectIRI, conn,
+                        this.getRepositoryManager().getSchemaManagementGraph()));
             }
             finally
             {

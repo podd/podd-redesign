@@ -16,29 +16,21 @@
  */
 package com.github.podd.resources.test;
 
-import java.io.ByteArrayOutputStream;
-import java.io.StringReader;
-
 import org.junit.Assert;
 import org.junit.Test;
 import org.openrdf.model.Model;
-import org.openrdf.model.impl.LinkedHashModel;
-import org.openrdf.model.vocabulary.OWL;
-import org.openrdf.model.vocabulary.RDFS;
+import org.openrdf.model.vocabulary.RDF;
 import org.openrdf.rio.RDFFormat;
-import org.openrdf.rio.Rio;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Status;
 import org.restlet.representation.Representation;
-import org.restlet.representation.StringRepresentation;
 import org.restlet.resource.ClientResource;
 import org.restlet.resource.ResourceException;
 
 import com.github.ansell.restletutils.test.RestletTestUtils;
 import com.github.podd.api.test.TestConstants;
 import com.github.podd.utils.InferredOWLOntologyID;
-import com.github.podd.utils.PoddRdfConstants;
 import com.github.podd.utils.PoddWebConstants;
 
 /**
@@ -58,7 +50,8 @@ public class SparqlResourceImplTest extends AbstractResourceImplTest
         // for first
         try
         {
-            searchClientResource.addQueryParameter(PoddWebConstants.KEY_SPARQLQUERY, "CONSTRUCT { ?s a ?o } WHERE { ?s a ?o }");
+            searchClientResource.addQueryParameter(PoddWebConstants.KEY_SPARQLQUERY,
+                    "CONSTRUCT { ?s a ?o } WHERE { ?s a ?o }");
             searchClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, "http://no.such.artifact");
             
             searchClientResource.get(MediaType.APPLICATION_RDF_XML);
@@ -104,7 +97,6 @@ public class SparqlResourceImplTest extends AbstractResourceImplTest
         }
     }
     
-    
     @Test
     public void testSparql() throws Exception
     {
@@ -119,8 +111,10 @@ public class SparqlResourceImplTest extends AbstractResourceImplTest
         // for first
         try
         {
-            searchClientResource.addQueryParameter(PoddWebConstants.KEY_SPARQLQUERY, "CONSTRUCT { ?s a ?o } WHERE { ?s a ?o }");
-            searchClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, testArtifact.getOntologyIRI().toString());
+            searchClientResource.addQueryParameter(PoddWebConstants.KEY_SPARQLQUERY,
+                    "CONSTRUCT { ?s a ?o } WHERE { ?s a ?o }");
+            searchClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, testArtifact
+                    .getOntologyIRI().toString());
             
             // invoke service
             final Representation results =
@@ -129,12 +123,15 @@ public class SparqlResourceImplTest extends AbstractResourceImplTest
             
             // verify: response
             final Model resultModel = this.assertRdf(results, RDFFormat.RDFXML, 835);
+            // verify that only type statements have been returned
+            Assert.assertEquals(835, resultModel.filter(null, RDF.TYPE, null).size());
+            Assert.assertEquals(542, resultModel.filter(null, RDF.TYPE, null).subjects().size());
+            Assert.assertEquals(43, resultModel.filter(null, RDF.TYPE, null).objects().size());
         }
         finally
         {
             this.releaseClient(searchClientResource);
         }
     }
-    
     
 }

@@ -60,7 +60,7 @@ public class OntologyUtils
      */
     public static List<InferredOWLOntologyID> modelToOntologyIDs(final Model input)
     {
-        return modelToOntologyIDs(input, false);
+        return OntologyUtils.modelToOntologyIDs(input, false);
     }
     
     /**

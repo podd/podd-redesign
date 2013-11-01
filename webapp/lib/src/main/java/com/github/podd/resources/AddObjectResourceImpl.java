@@ -161,7 +161,7 @@ public class AddObjectResourceImpl extends AbstractPoddResourceImpl
                 ontologyID = this.getPoddArtifactManager().getArtifact(IRI.create(artifactUri));
             }
             
-            Collection<OWLOntologyID> schemaImports = this.getPoddArtifactManager().getSchemaImports(ontologyID);
+            final Collection<OWLOntologyID> schemaImports = this.getPoddArtifactManager().getSchemaImports(ontologyID);
             final RepositoryConnection conn =
                     this.getPoddRepositoryManager().getPermanentRepository(schemaImports).getConnection();
             conn.begin();
@@ -169,7 +169,8 @@ public class AddObjectResourceImpl extends AbstractPoddResourceImpl
             {
                 objectLabel =
                         this.getPoddSesameManager().getObjectLabel(ontologyID,
-                                PoddRdfConstants.VF.createURI(objectType), conn);
+                                PoddRdfConstants.VF.createURI(objectType), conn,
+                                this.getPoddRepositoryManager().getSchemaManagementGraph());
             }
             finally
             {

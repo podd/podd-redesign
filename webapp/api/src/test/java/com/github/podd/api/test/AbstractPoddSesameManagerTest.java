@@ -30,6 +30,7 @@ import java.util.Set;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.openrdf.model.Model;
 import org.openrdf.model.URI;
@@ -460,6 +461,7 @@ public abstract class AbstractPoddSesameManagerTest
      * 
      * Tests retrieving all possible values for Collection types
      */
+    @Ignore("Method made private to remove it eventually")
     @Test
     public void testGetAllValidMembers() throws Exception
     {
@@ -524,24 +526,26 @@ public abstract class AbstractPoddSesameManagerTest
                 };
         
         // iterate through test data
-        for(int i = 0; i < collectionsToTest.length; i++)
+        for(final URI element : collectionsToTest)
         {
-            final List<URI> members =
-                    this.testPoddSesameManager.getAllValidMembers(ontologyID, collectionsToTest[i],
-                            this.testRepositoryConnection);
-            Assert.assertEquals("Not the expected number of members", expectedMembers[i].length, members.size());
+            // final List<URI> members =
+            // this.testPoddSesameManager.getAllValidMembers(ontologyID, collectionsToTest[i],
+            // this.testRepositoryConnection);
+            // Assert.assertEquals("Not the expected number of members", expectedMembers[i].length,
+            // members.size());
             
-            final List<URI> expectedMembersList = Arrays.asList(expectedMembers[i]);
-            for(final URI resultObject : members)
-            {
-                Assert.assertTrue("Unexpected member found", expectedMembersList.contains(resultObject));
-            }
+            // final List<URI> expectedMembersList = Arrays.asList(expectedMembers[i]);
+            // for(final URI resultObject : members)
+            // {
+            // Assert.assertTrue("Unexpected member found",
+            // expectedMembersList.contains(resultObject));
+            // }
         }
     }
     
     /**
      * Test method for
-     * {@link com.github.podd.api.PoddSesameManager#getCardinalityValues(InferredOWLOntologyID, URI, Collection, RepositoryConnection)}
+     * {@link com.github.podd.api.PoddSesameManager#getCardinalityValues(InferredOWLOntologyID, URI, Collection, RepositoryConnection, URI)}
      * .
      */
     @Test
@@ -583,7 +587,7 @@ public abstract class AbstractPoddSesameManagerTest
             final Collection<URI> nextProperty = Arrays.asList(element[1]);
             final Map<URI, URI> cardinalityValue =
                     this.testPoddSesameManager.getCardinalityValues(ontologyID, element[0], nextProperty,
-                            this.testRepositoryConnection);
+                            this.testRepositoryConnection, this.schemaGraph);
             Assert.assertEquals("Could not find cardinality for: " + nextProperty, 1, cardinalityValue.size());
             Assert.assertTrue("Did not find cardinality for: " + nextProperty, cardinalityValue.containsKey(element[1]));
             Assert.assertEquals("Not the expected cardinality value", element[2], cardinalityValue.get(element[1]));
@@ -980,7 +984,7 @@ public abstract class AbstractPoddSesameManagerTest
     
     /**
      * Test method for
-     * {@link com.github.podd.api.PoddSesameManager#getObjectDetailsForDisplay(InferredOWLOntologyID, URI, RepositoryConnection)}
+     * {@link com.github.podd.api.PoddSesameManager#getObjectDetailsForDisplay(InferredOWLOntologyID, URI, RepositoryConnection, URI)}
      * .
      */
     @Test
@@ -998,7 +1002,7 @@ public abstract class AbstractPoddSesameManagerTest
         
         final Model displayModel =
                 this.testPoddSesameManager.getObjectDetailsForDisplay(ontologyID, objectUri,
-                        this.testRepositoryConnection);
+                        this.testRepositoryConnection, this.schemaGraph);
         
         // verify:
         Assert.assertNotNull("Display Model is null", displayModel);
@@ -1014,7 +1018,7 @@ public abstract class AbstractPoddSesameManagerTest
     
     /**
      * Test method for
-     * {@link com.github.podd.api.PoddSesameManager#getObjectDetailsForDisplay(InferredOWLOntologyID, URI, RepositoryConnection)}
+     * {@link com.github.podd.api.PoddSesameManager#getObjectDetailsForDisplay(InferredOWLOntologyID, URI, RepositoryConnection, URI)}
      * .
      */
     @Test
@@ -1031,7 +1035,7 @@ public abstract class AbstractPoddSesameManagerTest
         
         final Model displayModel =
                 this.testPoddSesameManager.getObjectDetailsForDisplay(ontologyID, objectUri,
-                        this.testRepositoryConnection);
+                        this.testRepositoryConnection, this.schemaGraph);
         
         // verify:
         Assert.assertNotNull("Display Model is null", displayModel);
@@ -1064,7 +1068,7 @@ public abstract class AbstractPoddSesameManagerTest
     
     /**
      * Test method for
-     * {@link com.github.podd.api.PoddSesameManager#getObjectLabel(InferredOWLOntologyID, URI, RepositoryConnection)}
+     * {@link com.github.podd.api.PoddSesameManager#getObjectLabel(InferredOWLOntologyID, URI, RepositoryConnection, URI)}
      * .
      */
     @Test
@@ -1092,7 +1096,8 @@ public abstract class AbstractPoddSesameManagerTest
             final URI objectUri = ValueFactoryImpl.getInstance().createURI(objectUris[i]);
             
             final PoddObjectLabel objectLabel =
-                    this.testPoddSesameManager.getObjectLabel(ontologyID, objectUri, this.testRepositoryConnection);
+                    this.testPoddSesameManager.getObjectLabel(ontologyID, objectUri, this.testRepositoryConnection,
+                            this.schemaGraph);
             
             // verify:
             Assert.assertNotNull("PoddObjectLabel was null", objectLabel);
@@ -1252,7 +1257,7 @@ public abstract class AbstractPoddSesameManagerTest
     
     /**
      * Test method for
-     * {@link com.github.podd.api.PoddSesameManager#getObjectTypes(InferredOWLOntologyID, URI, RepositoryConnection)}
+     * {@link com.github.podd.api.PoddSesameManager#getObjectTypes(InferredOWLOntologyID, URI, RepositoryConnection, URI)}
      * .
      */
     @Test
@@ -1283,7 +1288,8 @@ public abstract class AbstractPoddSesameManagerTest
             final URI objectUri = ValueFactoryImpl.getInstance().createURI(objectUris[i]);
             
             final List<URI> objectTypes =
-                    this.testPoddSesameManager.getObjectTypes(ontologyID1, objectUri, this.testRepositoryConnection);
+                    this.testPoddSesameManager.getObjectTypes(ontologyID1, objectUri, this.testRepositoryConnection,
+                            this.schemaGraph);
             
             // verify:
             Assert.assertNotNull("Type was null", objectTypes);

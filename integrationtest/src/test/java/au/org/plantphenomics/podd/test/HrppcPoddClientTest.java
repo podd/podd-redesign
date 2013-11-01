@@ -16,26 +16,15 @@
  */
 package au.org.plantphenomics.podd.test;
 
-import static org.junit.Assert.*;
-
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.regex.Matcher;
 
-import org.junit.After;
-import org.junit.Before;
+import org.junit.Assert;
 import org.junit.Test;
 
-import com.github.podd.client.api.PoddClient;
-import com.github.podd.client.api.PoddClientException;
-import com.github.podd.client.api.test.AbstractPoddClientTest;
-import com.github.podd.client.impl.restlet.RestletPoddClientImpl;
-import com.github.podd.client.impl.restlet.test.RestletPoddClientImplIntegrationTest;
-import com.github.podd.utils.PoddWebConstants;
-
 import au.org.plantphenomics.podd.HrppcPoddClient;
+
+import com.github.podd.client.api.test.AbstractPoddClientTest;
+import com.github.podd.client.impl.restlet.test.RestletPoddClientImplIntegrationTest;
 
 /**
  * @author Peter Ansell p_ansell@yahoo.com
@@ -52,28 +41,28 @@ public class HrppcPoddClientTest extends RestletPoddClientImplIntegrationTest
     @Test
     public final void testRegexProject() throws Exception
     {
-        Matcher matcher = HrppcPoddClient.REGEX_PROJECT.matcher("Project#2014-0001");
-        assertTrue(matcher.matches());
+        final Matcher matcher = HrppcPoddClient.REGEX_PROJECT.matcher("Project#2014-0001");
+        Assert.assertTrue(matcher.matches());
         
     }
     
     @Test
     public final void testRegexPosition() throws Exception
     {
-        Matcher matcher1 = HrppcPoddClient.REGEX_POSITION.matcher("B2");
-        assertTrue(matcher1.matches());
+        final Matcher matcher1 = HrppcPoddClient.REGEX_POSITION.matcher("B2");
+        Assert.assertTrue(matcher1.matches());
         
-        Matcher matcher2 = HrppcPoddClient.REGEX_POSITION.matcher("AB23454");
-        assertTrue(matcher2.matches());
+        final Matcher matcher2 = HrppcPoddClient.REGEX_POSITION.matcher("AB23454");
+        Assert.assertTrue(matcher2.matches());
     }
     
     @Test
     public final void testRegexTray() throws Exception
     {
-        Matcher matcher =
+        final Matcher matcher =
                 HrppcPoddClient.REGEX_TRAY
                         .matcher("Project#2014-0001_Experiment#0001_IArabidopsis.thaliana_Tray#00009");
-        assertTrue(matcher.matches());
+        Assert.assertTrue(matcher.matches());
         
     }
     
@@ -87,8 +76,8 @@ public class HrppcPoddClientTest extends RestletPoddClientImplIntegrationTest
     @Test
     public final void testUploadPlantScanList() throws Exception
     {
-        HrppcPoddClient poddClient = this.getNewPoddClientInstance();
-        poddClient.setPoddServerUrl(getTestPoddServerUrl());
+        final HrppcPoddClient poddClient = this.getNewPoddClientInstance();
+        poddClient.setPoddServerUrl(this.getTestPoddServerUrl());
         poddClient.login(AbstractPoddClientTest.TEST_ADMIN_USER, AbstractPoddClientTest.TEST_ADMIN_PASSWORD);
         poddClient.uploadPlantScanList(this.getClass().getResourceAsStream("/test/hrppc/PlantScan-Template.csv"));
     }
