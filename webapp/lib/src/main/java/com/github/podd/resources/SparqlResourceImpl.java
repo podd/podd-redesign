@@ -27,7 +27,6 @@ import org.openrdf.OpenRDFException;
 import org.openrdf.model.Model;
 import org.openrdf.model.URI;
 import org.openrdf.model.impl.LinkedHashModel;
-import org.openrdf.model.vocabulary.SESAME;
 import org.openrdf.query.GraphQuery;
 import org.openrdf.query.QueryLanguage;
 import org.openrdf.query.impl.DatasetImpl;
@@ -55,6 +54,8 @@ import com.github.podd.utils.PoddWebConstants;
 /**
  * Service for executing SPARQL queries over specified artifacts (and their Schema ontologies) that
  * users have access to.
+ * 
+ * TODO: Support HTTP POST queries to allow for longer queries
  * 
  * @author Peter Ansell p_ansell@yahoo.com
  * 
@@ -132,7 +133,7 @@ public class SparqlResourceImpl extends AbstractPoddResourceImpl
             {
                 throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Could not find a requested artifact", e);
             }
-            catch(OpenRDFException e)
+            catch(final OpenRDFException e)
             {
                 throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Repository exception occurred", e);
             }
@@ -207,7 +208,7 @@ public class SparqlResourceImpl extends AbstractPoddResourceImpl
                     {
                         conn.close();
                     }
-                    catch(RepositoryException e)
+                    catch(final RepositoryException e)
                     {
                         // TODO Auto-generated catch block
                         e.printStackTrace();
