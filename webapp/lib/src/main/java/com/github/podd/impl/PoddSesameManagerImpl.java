@@ -2216,8 +2216,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
     }
     
     @Override
-    public URI[] inferredContexts(final InferredOWLOntologyID ontologyID,
-            final RepositoryConnection repositoryConnection) throws OpenRDFException
+    public URI[] inferredContexts(final InferredOWLOntologyID ontologyID) throws OpenRDFException
     {
         if(ontologyID.getInferredOntologyIRI() != null)
         {
@@ -2252,6 +2251,12 @@ public class PoddSesameManagerImpl implements PoddSesameManager
             }
         }
         return contexts.toArray(new URI[0]);
+    }
+    
+    @Override
+    public URI[] versionContexts(InferredOWLOntologyID ontologyID)
+    {
+        return new URI[] { ontologyID.getVersionIRI().toOpenRDFURI() };
     }
     
 }

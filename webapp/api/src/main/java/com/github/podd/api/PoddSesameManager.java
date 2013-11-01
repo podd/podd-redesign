@@ -536,11 +536,12 @@ public interface PoddSesameManager
     URI[] inferredAndSchemaContexts(InferredOWLOntologyID ontologyID, RepositoryConnection repositoryConnection,
             URI schemaManagementGraph) throws OpenRDFException;
     
-    URI[] inferredContexts(InferredOWLOntologyID ontologyID, RepositoryConnection repositoryConnection)
-        throws OpenRDFException;
+    URI[] inferredContexts(InferredOWLOntologyID ontologyID) throws OpenRDFException;
     
     URI[] schemaContexts(InferredOWLOntologyID ontologyID, RepositoryConnection repositoryConnection,
             URI schemaManagementGraph) throws OpenRDFException;
+    
+    URI[] versionContexts(InferredOWLOntologyID ontologyID);
     
     URI[] versionAndInferredContexts(InferredOWLOntologyID ontologyID);
     

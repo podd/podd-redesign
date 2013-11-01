@@ -123,4 +123,14 @@ public interface PoddRepositoryManager
      */
     void shutDown() throws RepositoryException;
     
+    /**
+     * Verifies that the context is not null, not the default graph (sesame:nil), and is not one of
+     * the management graphs.
+     * 
+     * @param contexts
+     *            The contexts to check.
+     * @return True if the contexts are not on the banned or protected list.
+     */
+    boolean safeContexts(URI... contexts);
+    
 }

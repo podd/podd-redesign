@@ -16,15 +16,19 @@
  */
 package com.github.podd.impl;
 
+import java.util.Arrays;
 import java.util.Collection;
 
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.URI;
+import org.openrdf.model.vocabulary.SESAME;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.sail.SailRepository;
 import org.openrdf.sail.memory.MemoryStore;
 import org.semanticweb.owlapi.model.OWLOntologyID;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.github.podd.api.PoddRepositoryManager;
 import com.github.podd.utils.PoddRdfConstants;
@@ -35,6 +39,7 @@ import com.github.podd.utils.PoddRdfConstants;
  */
 public class PoddRepositoryManagerImpl implements PoddRepositoryManager
 {
+    private final Logger log = LoggerFactory.getLogger(this.getClass());
     
     private Repository repository;
     
@@ -150,6 +155,53 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
         {
             this.repository.shutDown();
         }
+    }
+    
+    @Override
+    public boolean safeContexts(final URI... contexts)
+    {
+        boolean returnValue = true;
+        if(contexts == null)
+        {
+            returnValue = false;
+        }
+        else if(contexts.length == 0)
+        {
+            returnValue = false;
+        }
+        else
+        {
+            for(final URI nextContext : contexts)
+            {
+                if(nextContext == null)
+                {
+                    returnValue = false;
+                }
+                else if(nextContext.equals(SESAME.NIL))
+                {
+                    returnValue = false;
+                }
+                else if(nextContext.equals(getArtifactManagementGraph()))
+                {
+                    returnValue = false;
+                }
+                else if(nextContext.equals(getSchemaManagementGraph()))
+                {
+                    returnValue = false;
+                }
+                else if(nextContext.equals(getFileRepositoryManagementGraph()))
+                {
+                    returnValue = false;
+                }
+            }
+        }
+        
+        if(!returnValue)
+        {
+            this.log.warn("Found unsafe URI contexts: <{}>", Arrays.asList(contexts));
+        }
+        
+        return returnValue;
     }
     
 }

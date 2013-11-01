@@ -17,12 +17,16 @@
 package com.github.podd.resources;
 
 import java.io.ByteArrayOutputStream;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.Model;
 import org.openrdf.model.URI;
 import org.openrdf.model.impl.LinkedHashModel;
+import org.openrdf.model.vocabulary.SESAME;
 import org.openrdf.query.GraphQuery;
 import org.openrdf.query.QueryLanguage;
 import org.openrdf.query.impl.DatasetImpl;
@@ -125,13 +129,24 @@ public class SparqlResourceImpl extends AbstractPoddResourceImpl
                     final Collection<OWLOntologyID> schemaImports =
                             this.getPoddArtifactManager().getSchemaImports(ontologyID);
                     conn = this.getPoddRepositoryManager().getPermanentRepository(schemaImports).getConnection();
-                    
+                    final Set<URI> contextSet = new HashSet<>();
+                    if(includeConcrete)
+                    {
+                        contextSet.addAll(Arrays.asList(this.getPoddSesameManager().versionContexts(ontologyID)));
+                    }
+                    if(includeInferred)
+                    {
+                        contextSet.addAll(Arrays.asList(this.getPoddSesameManager().inferredContexts(ontologyID)));
+                    }
+                    if(includeSchema)
+                    {
+                        contextSet.addAll(Arrays.asList(this.getPoddSesameManager().schemaContexts(ontologyID, conn,
+                                this.getPoddRepositoryManager().getSchemaManagementGraph())));
+                    }
                     // TODO: Support cross-artifact queries if they all import the same schemas
-                    final URI[] contexts =
-                            this.getPoddSesameManager().versionAndInferredAndSchemaContexts(ontologyID, conn,
-                                    this.getPoddRepositoryManager().getSchemaManagementGraph());
-                    // Do not perform queries on all contexts
-                    if(contexts != null && contexts.length >= 1)
+                    final URI[] contexts = contextSet.toArray(new URI[0]);
+                    // MUST not perform queries on all contexts
+                    if(this.getPoddRepositoryManager().safeContexts(contexts))
                     {
                         final GraphQuery query = conn.prepareGraphQuery(QueryLanguage.SPARQL, sparqlQuery);
                         
@@ -149,7 +164,9 @@ public class SparqlResourceImpl extends AbstractPoddResourceImpl
                     }
                     else
                     {
-                        this.log.error("Could not determine contexts for artifact: {}", ontologyID);
+                        this.log.error(
+                                "Could not determine contexts for artifact, or included an unsafe context: ontology=<{}> contexts=<{}>",
+                                ontologyID, contextSet);
                     }
                 }
                 catch(final OpenRDFException e)
