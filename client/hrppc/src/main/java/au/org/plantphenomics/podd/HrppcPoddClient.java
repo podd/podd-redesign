@@ -236,6 +236,9 @@ public class HrppcPoddClient extends RestletPoddClientImpl
                     {
                         String name = nextSparqlResults.filter(nextExperiment, RDFS.LABEL, null).objectString();
                         
+                        this.log.info("Found experiment attached to project: {} {} {}", name, nextExperiment,
+                                projectUri);
+                        
                         ConcurrentMap<URI, URI> nextMap = new ConcurrentHashMap<>();
                         nextMap.put((URI)nextExperiment, projectUri);
                         experimentUriMap.put(name, nextMap);
