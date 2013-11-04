@@ -17,6 +17,7 @@
 package com.github.podd.utils;
 
 import org.openrdf.model.URI;
+import org.openrdf.model.Value;
 import org.openrdf.model.ValueFactory;
 import org.openrdf.model.impl.ValueFactoryImpl;
 import org.openrdf.model.vocabulary.OWL;
@@ -364,6 +365,10 @@ public interface PoddRdfConstants
     /** http://purl.org/podd/ns/poddScience#Project */
     public static final URI PODD_SCIENCE_PROJECT = PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE,
             "Project");
+    
+    /** http://purl.org/podd/ns/poddScience#Experiment */
+    public static final Value PODD_SCIENCE_EXPERIMENT = PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE,
+            "Experiment");
     
     /** http://purl.org/podd/ns/poddBase#SPARQLDataRepository */
     public static final URI PODD_SPARQL_DATA_REPOSITORY = PoddRdfConstants.VF.createURI(

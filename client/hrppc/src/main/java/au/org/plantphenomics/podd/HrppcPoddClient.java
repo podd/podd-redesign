@@ -25,7 +25,6 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
 import java.util.Arrays;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -41,6 +40,7 @@ import org.openrdf.model.Value;
 import org.openrdf.model.impl.LinkedHashModel;
 import org.openrdf.model.vocabulary.RDF;
 import org.openrdf.model.vocabulary.RDFS;
+import org.openrdf.queryrender.RenderUtils;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.RDFHandlerException;
 import org.openrdf.rio.Rio;
@@ -104,6 +104,9 @@ public class HrppcPoddClient extends RestletPoddClientImpl
      */
     public static final int POSITION_SIZE = 2;
     
+    private static final String TEMPLATE_SPARQL_ALL_EXPERIMENTS =
+            "CONSTRUCT { ?experiment a ?type } WHERE { ?experiment a ?type } VALUES (?type) { ( %s ) }";
+    
     public HrppcPoddClient()
     {
         super();
@@ -136,9 +139,15 @@ public class HrppcPoddClient extends RestletPoddClientImpl
         final ConcurrentMap<String, ConcurrentMap<URI, InferredOWLOntologyID>> projectUriMap =
                 new ConcurrentHashMap<>();
         
+        // Map starting at experiment name strings and ending with a mapping from the URI of
+        // the experiment to the URI of the project that contains the experiment
+        final ConcurrentMap<String, ConcurrentMap<URI, URI>> experimentUriMap = new ConcurrentHashMap<>();
+        
         // Map known project names to their URIs, as the URIs are needed to
         // create statements internally
         this.populateProjectUriMap(currentUnpublishedArtifacts, projectUriMap);
+        
+        this.populateExperimentUriMap(projectUriMap, experimentUriMap);
         
         List<String> headers = null;
         // TODO: Implement getObjectsByType(InferredOWLOntology, URI) so that
@@ -192,6 +201,47 @@ public class HrppcPoddClient extends RestletPoddClientImpl
         }
         
         this.uploadToPodd(uploadQueue);
+    }
+    
+    private void populateExperimentUriMap(
+            ConcurrentMap<String, ConcurrentMap<URI, InferredOWLOntologyID>> projectUriMap,
+            ConcurrentMap<String, ConcurrentMap<URI, URI>> experimentUriMap) throws PoddClientException
+    {
+        for(String nextProjectName : projectUriMap.keySet())
+        {
+            ConcurrentMap<URI, InferredOWLOntologyID> nextProjectNameMapping = projectUriMap.get(nextProjectName);
+            for(URI projectUri : nextProjectNameMapping.keySet())
+            {
+                InferredOWLOntologyID artifactId = nextProjectNameMapping.get(projectUri);
+                Model nextSparqlResults =
+                        this.doSPARQL(
+                                String.format(TEMPLATE_SPARQL_ALL_EXPERIMENTS,
+                                        RenderUtils.getSPARQLQueryString(projectUri)), artifactId);
+                
+                if(nextSparqlResults.isEmpty())
+                {
+                    this.log.info("Could not find any experiments for project: {}", projectUri);
+                }
+                
+                for(Resource nextExperiment : nextSparqlResults.filter(null, RDF.TYPE,
+                        PoddRdfConstants.PODD_SCIENCE_EXPERIMENT).subjects())
+                {
+                    if(!(nextExperiment instanceof URI))
+                    {
+                        this.log.error("Found experiment that was not assigned a URI: {} artifact={}", nextExperiment,
+                                artifactId);
+                    }
+                    else
+                    {
+                        String name = nextSparqlResults.filter(nextExperiment, RDFS.LABEL, null).objectString();
+                        
+                        ConcurrentMap<URI, URI> nextMap = new ConcurrentHashMap<>();
+                        nextMap.put((URI)nextExperiment, projectUri);
+                        experimentUriMap.put(name, nextMap);
+                    }
+                }
+            }
+        }
     }
     
     private void uploadToPodd(final ConcurrentMap<InferredOWLOntologyID, Model> uploadQueue) throws PoddClientException
