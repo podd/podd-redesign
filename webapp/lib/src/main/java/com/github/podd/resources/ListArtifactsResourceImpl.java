@@ -23,6 +23,12 @@ import java.util.List;
 import java.util.Map;
 
 import org.openrdf.OpenRDFException;
+import org.openrdf.model.Model;
+import org.openrdf.model.URI;
+import org.openrdf.model.ValueFactory;
+import org.openrdf.model.impl.LinkedHashModel;
+import org.openrdf.model.vocabulary.RDF;
+import org.openrdf.model.vocabulary.RDFS;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.RDFHandlerException;
 import org.openrdf.rio.RDFWriter;
@@ -40,6 +46,7 @@ import com.github.podd.restlet.RestletUtils;
 import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.OntologyUtils;
 import com.github.podd.utils.PoddObjectLabel;
+import com.github.podd.utils.PoddRdfConstants;
 import com.github.podd.utils.PoddWebConstants;
 
 /**
@@ -239,19 +246,37 @@ public class ListArtifactsResourceImpl extends AbstractPoddResourceImpl
         final MediaType resultMediaType = MediaType.valueOf(resultFormat.getDefaultMIMEType());
         
         final ByteArrayOutputStream out = new ByteArrayOutputStream(8096);
-        final RDFWriter writer = Rio.createWriter(resultFormat, out);
+        final Model model = new LinkedHashModel();
         
         try
         {
-            writer.startRDF();
             for(final String nextKey : artifactsInternal.keySet())
             {
                 // log.info("nextArtifact: {}", nextKey);
-                OntologyUtils.ontologyIDsToHandler(artifactsInternal.get(nextKey), writer);
+                List<InferredOWLOntologyID> nextArtifacts = artifactsInternal.get(nextKey);
+                OntologyUtils.ontologyIDsToModel(nextArtifacts, model);
+                
+                final List<PoddObjectLabel> results = this.getPoddArtifactManager().getTopObjectLabels(nextArtifacts);
+                
+                for(PoddObjectLabel nextResult : results)
+                {
+                    model.add(nextResult.getOntologyID().getOntologyIRI().toOpenRDFURI(),
+                            PoddRdfConstants.PODD_BASE_HAS_TOP_OBJECT, nextResult.getObjectURI());
+                    model.add(nextResult.getObjectURI(), RDFS.LABEL, nextResult.getLabelLiteral());
+                    
+                    final List<PoddObjectLabel> typesList =
+                            this.getPoddArtifactManager().getObjectTypes(nextResult.getOntologyID(),
+                                    nextResult.getObjectURI());
+                    for(final PoddObjectLabel objectType : typesList)
+                    {
+                        model.add(nextResult.getObjectURI(), RDF.TYPE, objectType.getObjectURI());
+                        model.add(objectType.getObjectURI(), RDFS.LABEL, objectType.getLabelLiteral());
+                    }
+                }
             }
-            writer.endRDF();
+            Rio.write(model, out, resultFormat);
         }
-        catch(final RDFHandlerException e)
+        catch(final OpenRDFException e)
         {
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL,
                     "Could not generate RDF output due to an exception in the writer", e);
@@ -263,5 +288,4 @@ public class ListArtifactsResourceImpl extends AbstractPoddResourceImpl
         
         return result;
     }
-    
 }

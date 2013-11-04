@@ -361,4 +361,19 @@ public interface PoddClient
      */
     Model doSPARQL(String queryString, InferredOWLOntologyID artifact) throws PoddClientException;
     
+    /**
+     * Lists the artifacts that are accessible and returns the details as a {@link Model}.
+     * 
+     * @param published
+     *            If true, requests are made for published artifacts. If this is false, unpublished
+     *            must NOT be false.
+     * @param unpublished
+     *            If true, requests are made for the unpublished artifacts accessible to the current
+     *            user. If this is false, published must NOT be false.
+     * @return A Model containing RDF statements describing the artifact.
+     * @throws PoddClientException
+     *             If an error occurred.
+     */
+    Model listArtifacts(boolean published, boolean unpublished) throws PoddClientException;
+    
 }

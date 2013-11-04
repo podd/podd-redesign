@@ -49,6 +49,7 @@ import au.com.bytecode.opencsv.CSVReader;
 import com.github.podd.client.api.PoddClientException;
 import com.github.podd.client.impl.restlet.RestletPoddClientImpl;
 import com.github.podd.utils.InferredOWLOntologyID;
+import com.github.podd.utils.OntologyUtils;
 import com.github.podd.utils.PoddRdfConstants;
 
 /**
@@ -117,7 +118,8 @@ public class HrppcPoddClient extends RestletPoddClientImpl
      */
     public void uploadPlantScanList(final InputStream in) throws IOException, PoddClientException
     {
-        final List<InferredOWLOntologyID> currentUnpublishedArtifacts = this.listUnpublishedArtifacts();
+        // Only select the unpublished artifacts, as we cannot edit published artifacts
+        final Model currentUnpublishedArtifacts = this.listArtifacts(false, true);
         
         // Keep a queue so that we only need to update each project once for
         // this operation to succeed
@@ -216,17 +218,17 @@ public class HrppcPoddClient extends RestletPoddClientImpl
         }
     }
     
-    private void populateProjectUriMap(final List<InferredOWLOntologyID> currentUnpublishedArtifacts,
+    private void populateProjectUriMap(final Model currentUnpublishedArtifacts,
             final ConcurrentMap<String, ConcurrentMap<URI, InferredOWLOntologyID>> projectUriMap)
         throws PoddClientException
     {
-        for(final InferredOWLOntologyID nextArtifact : currentUnpublishedArtifacts)
+        for(final InferredOWLOntologyID nextArtifact : OntologyUtils.modelToOntologyIDs(currentUnpublishedArtifacts))
         {
             // TODO: Implement getTopObject(InferredOWLOntologyID) so that the
             // top object for each can be
             // scanned easily to determine its name which is required, by
             // convention, here
-            final Model nextTopObject = this.getTopObject(nextArtifact);
+            final Model nextTopObject = this.getTopObject(nextArtifact, currentUnpublishedArtifacts);
             
             final Model types = nextTopObject.filter(null, RDF.TYPE, PoddRdfConstants.PODD_SCIENCE_PROJECT);
             if(types.isEmpty())
@@ -316,11 +318,12 @@ public class HrppcPoddClient extends RestletPoddClientImpl
         }
     }
     
-    private Model getTopObject(final InferredOWLOntologyID nextArtifact) throws PoddClientException
+    private Model getTopObject(final InferredOWLOntologyID nextArtifact, final Model artifactDetails)
+        throws PoddClientException
     {
-        // FIXME: Create query to get Top Object 
-        //Model results = this.doSPARQL("CONSTRUCT { ?s ?p ?o . } WHERE { ?s ?p ?o . }", nextArtifact);
-        throw new RuntimeException("TODO: Implement getTopObject");
+        return artifactDetails.filter(
+                artifactDetails.filter(nextArtifact.getOntologyIRI().toOpenRDFURI(),
+                        PoddRdfConstants.PODD_BASE_HAS_TOP_OBJECT, null).objectURI(), null, null);
     }
     
     /**

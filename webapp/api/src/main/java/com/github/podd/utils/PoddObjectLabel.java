@@ -16,6 +16,7 @@
  */
 package com.github.podd.utils;
 
+import org.openrdf.model.Literal;
 import org.openrdf.model.URI;
 
 /**
@@ -31,10 +32,14 @@ public interface PoddObjectLabel
      */
     String getDescription();
     
+    Literal getDescriptionLiteral();
+    
     /**
      * @return the label
      */
     String getLabel();
+    
+    Literal getLabelLiteral();
     
     /**
      * @return the objectID

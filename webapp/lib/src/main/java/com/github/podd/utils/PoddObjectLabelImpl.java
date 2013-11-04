@@ -16,6 +16,7 @@
  */
 package com.github.podd.utils;
 
+import org.openrdf.model.Literal;
 import org.openrdf.model.URI;
 import org.semanticweb.owlapi.model.IRI;
 
@@ -34,8 +35,10 @@ public class PoddObjectLabelImpl implements PoddObjectLabel
     
     private URI objectID;
     
+    // TODO: Migrate this to be Literal to preserve datatype and language where necessary
     private String label;
     
+    // TODO: Migrate this to be Literal to preserve datatype and language where necessary
     private String description;
     
     /**
@@ -159,5 +162,17 @@ public class PoddObjectLabelImpl implements PoddObjectLabel
         b.append(this.description);
         b.append("]");
         return b.toString();
+    }
+    
+    @Override
+    public Literal getDescriptionLiteral()
+    {
+        return PoddRdfConstants.VF.createLiteral(description);
+    }
+    
+    @Override
+    public Literal getLabelLiteral()
+    {
+        return PoddRdfConstants.VF.createLiteral(label);
     }
 }

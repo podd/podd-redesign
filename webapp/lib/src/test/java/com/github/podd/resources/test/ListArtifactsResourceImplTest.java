@@ -18,6 +18,8 @@ package com.github.podd.resources.test;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.openrdf.model.Model;
+import org.openrdf.model.URI;
 import org.openrdf.rio.RDFFormat;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
@@ -28,6 +30,7 @@ import org.restlet.resource.ClientResource;
 import com.github.ansell.restletutils.RestletUtilMediaType;
 import com.github.ansell.restletutils.test.RestletTestUtils;
 import com.github.podd.api.test.TestConstants;
+import com.github.podd.utils.PoddRdfConstants;
 import com.github.podd.utils.PoddWebConstants;
 
 /**
@@ -152,9 +155,10 @@ public class ListArtifactsResourceImplTest extends AbstractResourceImplTest
     public void testListArtifactsRdfJsonMultipleAllUnpublishedWithPublished() throws Exception
     {
         // prepare: add two artifacts
-        final String artifactUri1 = this.loadTestArtifact(TestConstants.TEST_ARTIFACT_BASIC_1_INTERNAL_OBJECT);
-        final String artifactUri2 = this.loadTestArtifact(TestConstants.TEST_ARTIFACT_BASIC_PROJECT_2);
-        
+        final String artifactUriString1 = this.loadTestArtifact(TestConstants.TEST_ARTIFACT_BASIC_1_INTERNAL_OBJECT);
+        final String artifactUriString2 = this.loadTestArtifact(TestConstants.TEST_ARTIFACT_BASIC_PROJECT_2);
+        final URI artifactUri1 = vf.createURI(artifactUriString1);
+        final URI artifactUri2 = vf.createURI(artifactUriString2);
         final ClientResource listArtifactsClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_LIST));
         
@@ -169,7 +173,10 @@ public class ListArtifactsResourceImplTest extends AbstractResourceImplTest
                             RestletUtilMediaType.APPLICATION_RDF_JSON, Status.SUCCESS_OK, this.testWithAdminPrivileges);
             
             // verify:
-            this.assertRdf(results, RDFFormat.RDFJSON, 10);
+            Model model = this.assertRdf(results, RDFFormat.RDFJSON, 17);
+            
+            Assert.assertTrue(model.contains(artifactUri1, PoddRdfConstants.PODD_BASE_HAS_TOP_OBJECT, null));
+            Assert.assertTrue(model.contains(artifactUri2, PoddRdfConstants.PODD_BASE_HAS_TOP_OBJECT, null));
         }
         finally
         {

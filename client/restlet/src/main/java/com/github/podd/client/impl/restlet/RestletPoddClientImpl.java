@@ -414,6 +414,12 @@ public class RestletPoddClientImpl implements PoddClient
     private List<InferredOWLOntologyID> listArtifactsInternal(final boolean published, final boolean unpublished)
         throws PoddClientException
     {
+        return OntologyUtils.modelToOntologyIDs(listArtifacts(published, unpublished));
+    }
+    
+    @Override
+    public Model listArtifacts(final boolean published, final boolean unpublished) throws PoddClientException
+    {
         this.log.info("cookies: {}", this.currentCookies);
         
         final ClientResource resource = new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_LIST));
@@ -442,7 +448,7 @@ public class RestletPoddClientImpl implements PoddClient
             final RDFFormat format =
                     Rio.getParserFormatForMIMEType(getResponse.getMediaType().getName(), RDFFormat.RDFXML);
             
-            return OntologyUtils.modelToOntologyIDs(Rio.parse(stream, "", format));
+            return Rio.parse(stream, "", format);
         }
         catch(final RDFParseException e)
         {

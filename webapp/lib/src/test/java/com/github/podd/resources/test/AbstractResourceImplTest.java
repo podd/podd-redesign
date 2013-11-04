@@ -48,6 +48,7 @@ import org.openrdf.OpenRDFException;
 import org.openrdf.model.Model;
 import org.openrdf.model.Resource;
 import org.openrdf.model.URI;
+import org.openrdf.model.ValueFactory;
 import org.openrdf.model.impl.LinkedHashModel;
 import org.openrdf.model.vocabulary.RDF;
 import org.openrdf.rio.RDFFormat;
@@ -158,6 +159,8 @@ public class AbstractResourceImplTest
     protected int testPort;
     
     protected final Logger log = LoggerFactory.getLogger(this.getClass());
+    
+    protected final ValueFactory vf = PoddRdfConstants.VF;
     
     /**
      * A constant used to make requests that require admin privileges easier to recognise inside
