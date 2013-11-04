@@ -105,7 +105,7 @@ public class HrppcPoddClient extends RestletPoddClientImpl
     public static final int POSITION_SIZE = 2;
     
     public static final String TEMPLATE_SPARQL_BY_TYPE =
-            "CONSTRUCT { ?object a ?type } WHERE { ?object a ?type } VALUES (?type) { ( %s ) }";
+            "CONSTRUCT { ?object a ?type . ?object <http://www.w3.org/2000/01/rdf-schema#label> ?label . } WHERE { ?object a ?type . OPTIONAL { ?object <http://www.w3.org/2000/01/rdf-schema#label> ?label . } } VALUES (?type) { ( %s ) }";
     
     public HrppcPoddClient()
     {
@@ -216,7 +216,8 @@ public class HrppcPoddClient extends RestletPoddClientImpl
                 Model nextSparqlResults =
                         this.doSPARQL(
                                 String.format(TEMPLATE_SPARQL_BY_TYPE,
-                                        RenderUtils.getSPARQLQueryString(projectUri)), artifactId);
+                                        RenderUtils.getSPARQLQueryString(PoddRdfConstants.PODD_SCIENCE_INVESTIGATION)),
+                                artifactId);
                 
                 if(nextSparqlResults.isEmpty())
                 {
@@ -224,7 +225,7 @@ public class HrppcPoddClient extends RestletPoddClientImpl
                 }
                 
                 for(Resource nextExperiment : nextSparqlResults.filter(null, RDF.TYPE,
-                        PoddRdfConstants.PODD_SCIENCE_EXPERIMENT).subjects())
+                        PoddRdfConstants.PODD_SCIENCE_INVESTIGATION).subjects())
                 {
                     if(!(nextExperiment instanceof URI))
                     {

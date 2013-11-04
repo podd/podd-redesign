@@ -366,9 +366,9 @@ public interface PoddRdfConstants
     public static final URI PODD_SCIENCE_PROJECT = PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE,
             "Project");
     
-    /** http://purl.org/podd/ns/poddScience#Experiment */
-    public static final Value PODD_SCIENCE_EXPERIMENT = PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE,
-            "Experiment");
+    /** http://purl.org/podd/ns/poddScience#Investigation */
+    public static final Value PODD_SCIENCE_INVESTIGATION = PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE,
+            "Investigation");
     
     /** http://purl.org/podd/ns/poddBase#SPARQLDataRepository */
     public static final URI PODD_SPARQL_DATA_REPOSITORY = PoddRdfConstants.VF.createURI(

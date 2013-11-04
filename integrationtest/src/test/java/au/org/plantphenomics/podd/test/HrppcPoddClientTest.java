@@ -84,10 +84,10 @@ public class HrppcPoddClientTest extends RestletPoddClientImplIntegrationTest
     {
         String formattedQueryString =
                 String.format(HrppcPoddClient.TEMPLATE_SPARQL_BY_TYPE,
-                        RenderUtils.getSPARQLQueryString(PoddRdfConstants.PODD_SCIENCE_EXPERIMENT));
+                        RenderUtils.getSPARQLQueryString(PoddRdfConstants.PODD_SCIENCE_INVESTIGATION));
         
         Assert.assertEquals(
-                "CONSTRUCT { ?object a ?type } WHERE { ?object a ?type } VALUES (?type) { ( <http://purl.org/podd/ns/poddScience#Experiment> ) }",
+                "CONSTRUCT { ?object a ?type . ?object <http://www.w3.org/2000/01/rdf-schema#label> ?label . } WHERE { ?object a ?type . OPTIONAL { ?object <http://www.w3.org/2000/01/rdf-schema#label> ?label . } } VALUES (?type) { ( <http://purl.org/podd/ns/poddScience#Investigation> ) }",
                 formattedQueryString);
     }
     
@@ -105,7 +105,7 @@ public class HrppcPoddClientTest extends RestletPoddClientImplIntegrationTest
         poddClient.setPoddServerUrl(this.getTestPoddServerUrl());
         poddClient.login(AbstractPoddClientTest.TEST_ADMIN_USER, AbstractPoddClientTest.TEST_ADMIN_PASSWORD);
         
-        final InputStream input = this.getClass().getResourceAsStream("/test/artifacts/basicProject-1.rdf");
+        final InputStream input = this.getClass().getResourceAsStream("/test/artifacts/basicProject-3.rdf");
         Assert.assertNotNull("Test resource missing", input);
         
         final InferredOWLOntologyID newArtifact = poddClient.uploadNewArtifact(input, RDFFormat.RDFXML);
