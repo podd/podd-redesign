@@ -27,6 +27,7 @@ import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.regex.Matcher;
@@ -506,8 +507,31 @@ public class HrppcPoddClient extends RestletPoddClientImpl
         // Reconstruct Project#0001-0002 structure
         String baseProjectName = String.format(HrppcPoddClient.TEMPLATE_PROJECT, projectYear, projectNumber);
         
-        Model nextResult = new LinkedHashModel();
-        
+        if(!projectUriMap.containsKey(baseProjectName))
+        {
+            this.log.error("Did not find an existing project for a line in the CSV file: {}", baseProjectName);
+        }
+        else
+        {
+            Map<URI, InferredOWLOntologyID> projectDetails = projectUriMap.get(baseProjectName);
+            
+            if(projectDetails.isEmpty())
+            {
+                this.log.error("Project mapping seemed to exist but it was empty: {}", baseProjectName);
+            }
+            else if(projectDetails.size() > 1)
+            {
+                this.log.error("Found multiple PODD Project name mappings : {} {}", baseProjectName, projectDetails);
+            }
+            else
+            {
+                this.log.info("Found unique PODD Project name to URI mapping: {} {}", baseProjectName, projectDetails);
+                
+                Model nextResult = new LinkedHashModel();
+                
+            }
+            
+        }
     }
     
     /**
