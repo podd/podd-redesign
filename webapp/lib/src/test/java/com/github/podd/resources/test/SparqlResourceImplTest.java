@@ -41,6 +41,32 @@ public class SparqlResourceImplTest extends AbstractResourceImplTest
 {
     
     @Test
+    public void testErrorSparqlWithNoArtifactID() throws Exception
+    {
+        // prepare:
+        final ClientResource searchClientResource = new ClientResource(this.getUrl(PoddWebConstants.PATH_SPARQL));
+        
+        // there is no need to authenticate or have a test artifact as the artifact ID is checked
+        // for first
+        try
+        {
+            searchClientResource.addQueryParameter(PoddWebConstants.KEY_SPARQLQUERY,
+                    "CONSTRUCT { ?s a ?o } WHERE { ?s a ?o }");
+            
+            searchClientResource.get(MediaType.APPLICATION_RDF_XML);
+            Assert.fail("Should have thrown a ResourceException");
+        }
+        catch(final ResourceException e)
+        {
+            Assert.assertEquals(Status.CLIENT_ERROR_BAD_REQUEST, e.getStatus());
+        }
+        finally
+        {
+            this.releaseClient(searchClientResource);
+        }
+    }
+    
+    @Test
     public void testErrorSparqlWithInvalidArtifactID() throws Exception
     {
         // prepare:
