@@ -77,7 +77,11 @@ public class HrppcPoddClient extends RestletPoddClientImpl
     
     public static final Pattern REGEX_PROJECT = Pattern.compile("^Project#(\\d{4})-(\\d{4}).*");
     
+    public static final Pattern REGEX_EXPERIMENT = Pattern.compile("^Project#(\\d{4})-(\\d{4})_Experiment#(\\d{4}).*");
+    
     public static final String TEMPLATE_PROJECT = "Project#%04d-%04d";
+    
+    public static final String TEMPLATE_EXPERIMENT = "Project#%04d-%04d_Experiment#%04d";
     
     // PROJECT#YYYY-NNNN_EXPERIMENT#NNNN_GENUS.SPECIES_TRAY#NNNNN
     public static final Pattern REGEX_TRAY = Pattern
