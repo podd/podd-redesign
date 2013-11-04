@@ -16,15 +16,18 @@
  */
 package au.org.plantphenomics.podd.test;
 
+import java.io.InputStream;
 import java.util.regex.Matcher;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.openrdf.rio.RDFFormat;
 
 import au.org.plantphenomics.podd.HrppcPoddClient;
 
 import com.github.podd.client.api.test.AbstractPoddClientTest;
 import com.github.podd.client.impl.restlet.test.RestletPoddClientImplIntegrationTest;
+import com.github.podd.utils.InferredOWLOntologyID;
 
 /**
  * @author Peter Ansell p_ansell@yahoo.com
@@ -79,6 +82,15 @@ public class HrppcPoddClientTest extends RestletPoddClientImplIntegrationTest
         final HrppcPoddClient poddClient = this.getNewPoddClientInstance();
         poddClient.setPoddServerUrl(this.getTestPoddServerUrl());
         poddClient.login(AbstractPoddClientTest.TEST_ADMIN_USER, AbstractPoddClientTest.TEST_ADMIN_PASSWORD);
+
+        final InputStream input = this.getClass().getResourceAsStream("/test/artifacts/basicProject-1.rdf");
+        Assert.assertNotNull("Test resource missing", input);
+        
+        final InferredOWLOntologyID newArtifact = poddClient.uploadNewArtifact(input, RDFFormat.RDFXML);
+        Assert.assertNotNull(newArtifact);
+        Assert.assertNotNull(newArtifact.getOntologyIRI());
+        Assert.assertNotNull(newArtifact.getVersionIRI());
+        
         poddClient.uploadPlantScanList(this.getClass().getResourceAsStream("/test/hrppc/PlantScan-Template.csv"));
     }
 }

@@ -71,7 +71,7 @@ public class HrppcPoddClient extends RestletPoddClientImpl
     public static final String PLANT_NAME = "PlantName";
     public static final String PLANT_NOTES = "PlantNotes";
     
-    public static final Pattern REGEX_PROJECT = Pattern.compile("^Project#(\\d{4})-(\\d{4})");
+    public static final Pattern REGEX_PROJECT = Pattern.compile("^Project#(\\d{4})-(\\d{4}).*");
     
     // PROJECT#YYYY-NNNN_EXPERIMENT#NNNN_GENUS.SPECIES_TRAY#NNNNN
     public static final Pattern REGEX_TRAY = Pattern
@@ -177,12 +177,12 @@ public class HrppcPoddClient extends RestletPoddClientImpl
         
         if(headers == null)
         {
-            this.log.error("Document did not contain headers");
+            this.log.error("Document did not contain a valid header line");
         }
         
         if(uploadQueue.isEmpty())
         {
-            this.log.error("Document did not contain any rows");
+            this.log.error("Document did not contain any valid rows");
         }
         
         this.uploadToPodd(uploadQueue);
@@ -248,7 +248,15 @@ public class HrppcPoddClient extends RestletPoddClientImpl
             {
                 final Resource project = types.subjects().iterator().next();
                 
-                if(project instanceof URI)
+                if(!(project instanceof URI))
+                {
+                    // We only map URI references, as blank nodes which are
+                    // allowable, cannot be reserialised to update the artifact,
+                    // and should not exist
+                    this.log.error("Found non-URI project reference for an artifact: {} {}", nextArtifact,
+                            types.subjects());
+                }
+                else
                 {
                     final Model label = nextTopObject.filter(project, RDFS.LABEL, null);
                     
@@ -260,9 +268,18 @@ public class HrppcPoddClient extends RestletPoddClientImpl
                     {
                         for(final Value nextLabel : label.objects())
                         {
-                            if(nextLabel instanceof Literal)
+                            if(!(nextLabel instanceof Literal))
+                            {
+                                this.log.error("Project had a non-literal label: {} {} {}", nextArtifact, project,
+                                        nextLabel);
+                            }
+                            else
                             {
                                 String nextLabelString = nextLabel.stringValue();
+                                
+                                // take off any descriptions and leave the
+                                // project number behind
+                                nextLabelString = nextLabelString.split(" ")[0];
                                 
                                 if(!HrppcPoddClient.REGEX_PROJECT.matcher(nextLabelString).matches())
                                 {
@@ -270,10 +287,6 @@ public class HrppcPoddClient extends RestletPoddClientImpl
                                             nextLabel);
                                     continue;
                                 }
-                                
-                                // take off any descriptions and leave the
-                                // project number behind
-                                nextLabelString = nextLabelString.split(" ")[0];
                                 
                                 ConcurrentMap<URI, InferredOWLOntologyID> labelMap = new ConcurrentHashMap<>();
                                 final ConcurrentMap<URI, InferredOWLOntologyID> putIfAbsent =
@@ -298,21 +311,8 @@ public class HrppcPoddClient extends RestletPoddClientImpl
                                             nextArtifact, existingArtifact, project, nextLabel);
                                 }
                             }
-                            else
-                            {
-                                this.log.error("Project had a non-literal label: {} {} {}", nextArtifact, project,
-                                        nextLabel);
-                            }
                         }
                     }
-                }
-                else
-                {
-                    // We only map URI references, as blank nodes which are
-                    // allowable, cannot be reserialised to update the artifact,
-                    // and should not exist
-                    this.log.error("Found non-URI project reference for an artifact: {} {}", nextArtifact,
-                            types.subjects());
                 }
             }
         }
