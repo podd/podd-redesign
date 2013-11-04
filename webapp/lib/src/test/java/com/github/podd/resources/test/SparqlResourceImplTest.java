@@ -24,6 +24,7 @@ import org.openrdf.rio.RDFFormat;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Status;
+import org.restlet.ext.html.FormDataSet;
 import org.restlet.representation.Representation;
 import org.restlet.resource.ClientResource;
 import org.restlet.resource.ResourceException;
@@ -145,6 +146,43 @@ public class SparqlResourceImplTest extends AbstractResourceImplTest
             // invoke service
             final Representation results =
                     RestletTestUtils.doTestAuthenticatedRequest(searchClientResource, Method.GET, null,
+                            MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
+            
+            // verify: response
+            final Model resultModel = this.assertRdf(results, RDFFormat.RDFXML, 835);
+            // verify that only type statements have been returned
+            Assert.assertEquals(835, resultModel.filter(null, RDF.TYPE, null).size());
+            Assert.assertEquals(542, resultModel.filter(null, RDF.TYPE, null).subjects().size());
+            Assert.assertEquals(43, resultModel.filter(null, RDF.TYPE, null).objects().size());
+        }
+        finally
+        {
+            this.releaseClient(searchClientResource);
+        }
+    }
+    
+    @Test
+    public void testSparqlAllContextsPost() throws Exception
+    {
+        // prepare: add an artifact
+        final InferredOWLOntologyID testArtifact =
+                this.loadTestArtifact(TestConstants.TEST_ARTIFACT_20130206, MediaType.APPLICATION_RDF_TURTLE);
+        
+        // prepare:
+        final ClientResource searchClientResource = new ClientResource(this.getUrl(PoddWebConstants.PATH_SPARQL));
+        
+        // there is no need to authenticate or have a test artifact as the artifact ID is checked
+        // for first
+        try
+        {
+            FormDataSet postQuery = new FormDataSet();
+            postQuery.setMediaType(MediaType.APPLICATION_WWW_FORM);
+            postQuery.add(PoddWebConstants.KEY_SPARQLQUERY, "CONSTRUCT { ?s a ?o } WHERE { ?s a ?o }");
+            postQuery.add(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, testArtifact.getOntologyIRI().toString());
+            
+            // invoke service
+            final Representation results =
+                    RestletTestUtils.doTestAuthenticatedRequest(searchClientResource, Method.POST, postQuery,
                             MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
             
             // verify: response

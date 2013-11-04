@@ -35,13 +35,18 @@ import org.openrdf.repository.RepositoryException;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.Rio;
 import org.openrdf.rio.helpers.StatementCollector;
+import org.restlet.data.Form;
 import org.restlet.data.MediaType;
 import org.restlet.data.Status;
+import org.restlet.ext.html.FormData;
+import org.restlet.ext.html.FormDataSet;
 import org.restlet.representation.ByteArrayRepresentation;
 import org.restlet.representation.Representation;
 import org.restlet.representation.Variant;
 import org.restlet.resource.Get;
+import org.restlet.resource.Post;
 import org.restlet.resource.ResourceException;
+import org.restlet.security.User;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLOntologyID;
 
@@ -62,51 +67,85 @@ import com.github.podd.utils.PoddWebConstants;
  */
 public class SparqlResourceImpl extends AbstractPoddResourceImpl
 {
-    @Get("rdf|rj|json|ttl")
+    @Get(":rdf|rj|json|ttl")
     public Representation getSparqlRdf(final Variant variant) throws ResourceException
     {
-        this.log.debug("getSparqlRdf");
+        throw new ResourceException(Status.SERVER_ERROR_NOT_IMPLEMENTED, "TODO: Implement HTTP GET for SPARQL Endpoint");
+    }
+    
+    @Post(":rdf|rj|json|ttl")
+    public Representation postSparqlRdf(final Representation entity, final Variant variant) throws ResourceException
+    {
+        this.log.debug("postSparqlRdf");
         
-        final ByteArrayOutputStream output = new ByteArrayOutputStream(8096);
+        final User user = this.getRequest().getClientInfo().getUser();
+        this.log.info("authenticated user: {}", user);
         
-        // sparql query - mandatory parameter
-        final String sparqlQuery = this.getQuery().getFirstValue(PoddWebConstants.KEY_SPARQLQUERY, true);
-        if(sparqlQuery == null)
+        if(entity == null)
         {
-            throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "SPARQL query not submitted");
+            // POST request with no entity.
+            throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Did not submit anything");
         }
         
-        // artifact ids to search across
-        final String[] artifactUris = this.getQuery().getValuesArray(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER);
+        this.log.info("media-type: {}", entity.getMediaType());
         
-        if(artifactUris == null || artifactUris.length == 0)
-        {
-            // TODO: Support execution of sparql queries over all accessible artifacts if they did
-            // not specify any artifacts
-            throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "No artifacts specified in request");
-        }
-        
-        final String includeConcreteStatements =
-                this.getQuery().getFirstValue(PoddWebConstants.KEY_INCLUDE_CONCRETE, true);
+        // variables for request parameters
+        String sparqlQuery = null;
         boolean includeConcrete = true;
-        if(includeConcreteStatements != null)
-        {
-            includeConcrete = Boolean.valueOf(includeConcreteStatements);
-        }
-        final String includeInferredStatements =
-                this.getQuery().getFirstValue(PoddWebConstants.KEY_INCLUDE_INFERRED, true);
         boolean includeInferred = true;
-        if(includeInferredStatements != null)
-        {
-            includeInferred = Boolean.valueOf(includeInferredStatements);
-        }
-        final String includeSchemaStatements = this.getQuery().getFirstValue(PoddWebConstants.KEY_INCLUDE_SCHEMA, true);
         boolean includeSchema = true;
-        if(includeSchemaStatements != null)
-        {
-            includeSchema = Boolean.valueOf(includeSchemaStatements);
-        }
+        String[] artifactUris;
         
+        if(MediaType.MULTIPART_FORM_DATA.equals(entity.getMediaType(), true))
+        {
+            throw new ResourceException(Status.SERVER_ERROR_NOT_IMPLEMENTED,
+                    "TODO: Implement support for HTTP POST using multipart/form-data content type");
+            
+        }
+        else
+        {
+            FormDataSet form = new FormDataSet(entity);
+            
+            // sparql query - mandatory parameter
+            sparqlQuery = form.getEntries().getFirstValue(PoddWebConstants.KEY_SPARQLQUERY, true);
+            if(sparqlQuery == null)
+            {
+                throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "SPARQL query not submitted");
+            }
+            
+            // artifact ids to search across
+            artifactUris = form.getEntries().getValuesArray(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER);
+            
+            if(artifactUris == null || artifactUris.length == 0)
+            {
+                // TODO: Support execution of sparql queries over all accessible artifacts if they
+                // did
+                // not specify any artifacts
+                throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "No artifacts specified in request");
+            }
+            
+            final String includeConcreteStatements =
+                    form.getEntries().getFirstValue(PoddWebConstants.KEY_INCLUDE_CONCRETE, true);
+            includeConcrete = true;
+            if(includeConcreteStatements != null)
+            {
+                includeConcrete = Boolean.valueOf(includeConcreteStatements);
+            }
+            
+            final String includeInferredStatements =
+                    form.getEntries().getFirstValue(PoddWebConstants.KEY_INCLUDE_INFERRED, true);
+            if(includeInferredStatements != null)
+            {
+                includeInferred = Boolean.valueOf(includeInferredStatements);
+            }
+            
+            final String includeSchemaStatements =
+                    form.getEntries().getFirstValue(PoddWebConstants.KEY_INCLUDE_SCHEMA, true);
+            if(includeSchemaStatements != null)
+            {
+                includeSchema = Boolean.valueOf(includeSchemaStatements);
+            }
+        }
         final Set<InferredOWLOntologyID> artifactIds = new LinkedHashSet<>();
         
         final Model results = new LinkedHashModel();
@@ -216,7 +255,11 @@ public class SparqlResourceImpl extends AbstractPoddResourceImpl
                     }
                 }
             }
+            
         }
+        
+        // container for results
+        final ByteArrayOutputStream output = new ByteArrayOutputStream(8096);
         
         final RDFFormat resultFormat =
                 Rio.getWriterFormatForMIMEType(variant.getMediaType().getName(), RDFFormat.RDFXML);
