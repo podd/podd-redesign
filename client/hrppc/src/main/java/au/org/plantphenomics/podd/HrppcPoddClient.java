@@ -104,8 +104,8 @@ public class HrppcPoddClient extends RestletPoddClientImpl
      */
     public static final int POSITION_SIZE = 2;
     
-    private static final String TEMPLATE_SPARQL_ALL_EXPERIMENTS =
-            "CONSTRUCT { ?experiment a ?type } WHERE { ?experiment a ?type } VALUES (?type) { ( %s ) }";
+    public static final String TEMPLATE_SPARQL_BY_TYPE =
+            "CONSTRUCT { ?object a ?type } WHERE { ?object a ?type } VALUES (?type) { ( %s ) }";
     
     public HrppcPoddClient()
     {
@@ -215,12 +215,12 @@ public class HrppcPoddClient extends RestletPoddClientImpl
                 InferredOWLOntologyID artifactId = nextProjectNameMapping.get(projectUri);
                 Model nextSparqlResults =
                         this.doSPARQL(
-                                String.format(TEMPLATE_SPARQL_ALL_EXPERIMENTS,
+                                String.format(TEMPLATE_SPARQL_BY_TYPE,
                                         RenderUtils.getSPARQLQueryString(projectUri)), artifactId);
                 
                 if(nextSparqlResults.isEmpty())
                 {
-                    this.log.info("Could not find any experiments for project: {}", projectUri);
+                    this.log.info("Could not find any experiments for project: {} {}", nextProjectName, projectUri);
                 }
                 
                 for(Resource nextExperiment : nextSparqlResults.filter(null, RDF.TYPE,

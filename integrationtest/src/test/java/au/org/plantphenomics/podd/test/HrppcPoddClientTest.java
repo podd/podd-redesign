@@ -21,6 +21,7 @@ import java.util.regex.Matcher;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.openrdf.queryrender.RenderUtils;
 import org.openrdf.rio.RDFFormat;
 
 import au.org.plantphenomics.podd.HrppcPoddClient;
@@ -28,6 +29,7 @@ import au.org.plantphenomics.podd.HrppcPoddClient;
 import com.github.podd.client.api.test.AbstractPoddClientTest;
 import com.github.podd.client.impl.restlet.test.RestletPoddClientImplIntegrationTest;
 import com.github.podd.utils.InferredOWLOntologyID;
+import com.github.podd.utils.PoddRdfConstants;
 
 /**
  * @author Peter Ansell p_ansell@yahoo.com
@@ -75,6 +77,18 @@ public class HrppcPoddClientTest extends RestletPoddClientImplIntegrationTest
         String formattedProject = String.format(HrppcPoddClient.TEMPLATE_PROJECT, 4, 6);
         
         Assert.assertEquals("Project#0004-0006", formattedProject);
+    }
+    
+    @Test
+    public final void testTemplateSparqlExperiments() throws Exception
+    {
+        String formattedQueryString =
+                String.format(HrppcPoddClient.TEMPLATE_SPARQL_BY_TYPE,
+                        RenderUtils.getSPARQLQueryString(PoddRdfConstants.PODD_SCIENCE_EXPERIMENT));
+        
+        Assert.assertEquals(
+                "CONSTRUCT { ?object a ?type } WHERE { ?object a ?type } VALUES (?type) { ( <http://purl.org/podd/ns/poddScience#Experiment> ) }",
+                formattedQueryString);
     }
     
     /**

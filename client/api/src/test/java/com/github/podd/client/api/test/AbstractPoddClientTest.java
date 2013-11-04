@@ -31,6 +31,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.openrdf.model.Model;
 import org.openrdf.model.URI;
+import org.openrdf.model.ValueFactory;
 import org.openrdf.model.vocabulary.OWL;
 import org.openrdf.model.vocabulary.RDF;
 import org.openrdf.rio.RDFFormat;
@@ -71,6 +72,8 @@ public abstract class AbstractPoddClientTest
     private PoddClient testClient;
     
     private static final int BASIC_PROJECT_1_EXPECTED_CONCRETE_TRIPLES = 24;
+    
+    protected static final ValueFactory vf = PoddRdfConstants.VF;
     
     /**
      * Instruct the implementors of this test to attempt to deploy a file reference that has the
