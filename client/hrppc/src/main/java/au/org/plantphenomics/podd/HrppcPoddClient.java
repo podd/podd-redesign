@@ -25,6 +25,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
 import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -36,6 +37,7 @@ import org.openrdf.model.Model;
 import org.openrdf.model.Resource;
 import org.openrdf.model.URI;
 import org.openrdf.model.Value;
+import org.openrdf.model.impl.LinkedHashModel;
 import org.openrdf.model.vocabulary.RDF;
 import org.openrdf.model.vocabulary.RDFS;
 import org.openrdf.rio.RDFFormat;
@@ -48,6 +50,7 @@ import au.com.bytecode.opencsv.CSVReader;
 
 import com.github.podd.client.api.PoddClientException;
 import com.github.podd.client.impl.restlet.RestletPoddClientImpl;
+import com.github.podd.utils.DebugUtils;
 import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.OntologyUtils;
 import com.github.podd.utils.PoddRdfConstants;
@@ -72,6 +75,8 @@ public class HrppcPoddClient extends RestletPoddClientImpl
     public static final String PLANT_NOTES = "PlantNotes";
     
     public static final Pattern REGEX_PROJECT = Pattern.compile("^Project#(\\d{4})-(\\d{4}).*");
+    
+    public static final String TEMPLATE_PROJECT = "Project#%04d-%04d";
     
     // PROJECT#YYYY-NNNN_EXPERIMENT#NNNN_GENUS.SPECIES_TRAY#NNNNN
     public static final Pattern REGEX_TRAY = Pattern
@@ -224,11 +229,9 @@ public class HrppcPoddClient extends RestletPoddClientImpl
     {
         for(final InferredOWLOntologyID nextArtifact : OntologyUtils.modelToOntologyIDs(currentUnpublishedArtifacts))
         {
-            // TODO: Implement getTopObject(InferredOWLOntologyID) so that the
-            // top object for each can be
-            // scanned easily to determine its name which is required, by
-            // convention, here
             final Model nextTopObject = this.getTopObject(nextArtifact, currentUnpublishedArtifacts);
+            
+            DebugUtils.printContents(nextTopObject);
             
             final Model types = nextTopObject.filter(null, RDF.TYPE, PoddRdfConstants.PODD_SCIENCE_PROJECT);
             if(types.isEmpty())
@@ -260,6 +263,8 @@ public class HrppcPoddClient extends RestletPoddClientImpl
                 {
                     final Model label = nextTopObject.filter(project, RDFS.LABEL, null);
                     
+                    DebugUtils.printContents(label);
+                    
                     if(label.isEmpty())
                     {
                         this.log.error("Project did not have a label: {} {}", nextArtifact, project);
@@ -281,34 +286,49 @@ public class HrppcPoddClient extends RestletPoddClientImpl
                                 // project number behind
                                 nextLabelString = nextLabelString.split(" ")[0];
                                 
-                                if(!HrppcPoddClient.REGEX_PROJECT.matcher(nextLabelString).matches())
+                                Matcher matcher = HrppcPoddClient.REGEX_PROJECT.matcher(nextLabelString);
+                                
+                                if(!matcher.matches())
                                 {
                                     this.log.error("Found project label that did not start with expected format: {}",
                                             nextLabel);
-                                    continue;
                                 }
-                                
-                                ConcurrentMap<URI, InferredOWLOntologyID> labelMap = new ConcurrentHashMap<>();
-                                final ConcurrentMap<URI, InferredOWLOntologyID> putIfAbsent =
-                                        projectUriMap.putIfAbsent(nextLabelString, labelMap);
-                                if(putIfAbsent != null)
+                                else
                                 {
-                                    this.log.error(
-                                            "Found duplicate project name, inconsistent results may follow: {} {} {}",
-                                            nextArtifact, project, nextLabel);
-                                    // Overwrite our reference with the one that
-                                    // already existed
-                                    labelMap = putIfAbsent;
-                                }
-                                final InferredOWLOntologyID existingArtifact =
-                                        labelMap.putIfAbsent((URI)project, nextArtifact);
-                                // Check for the case where project name maps to
-                                // different artifacts
-                                if(existingArtifact != null && !existingArtifact.equals(nextArtifact))
-                                {
-                                    this.log.error(
-                                            "Found duplicate project name across different projects, inconsistent results may follow: {} {} {} {}",
-                                            nextArtifact, existingArtifact, project, nextLabel);
+                                    this.log.info("Found project label with the expected format: '{}' original=<{}>",
+                                            nextLabelString, nextLabel);
+                                    
+                                    int nextProjectYear = Integer.parseInt(matcher.group(1));
+                                    int nextProjectNumber = Integer.parseInt(matcher.group(2));
+                                    
+                                    nextLabelString =
+                                            String.format(TEMPLATE_PROJECT, nextProjectYear, nextProjectNumber);
+                                    
+                                    this.log.info("Reformatted project label to: '{}' original=<{}>", nextLabelString,
+                                            nextLabel);
+                                    
+                                    ConcurrentMap<URI, InferredOWLOntologyID> labelMap = new ConcurrentHashMap<>();
+                                    final ConcurrentMap<URI, InferredOWLOntologyID> putIfAbsent =
+                                            projectUriMap.putIfAbsent(nextLabelString, labelMap);
+                                    if(putIfAbsent != null)
+                                    {
+                                        this.log.error(
+                                                "Found duplicate project name, inconsistent results may follow: {} {} {}",
+                                                nextArtifact, project, nextLabel);
+                                        // Overwrite our reference with the one that
+                                        // already existed
+                                        labelMap = putIfAbsent;
+                                    }
+                                    final InferredOWLOntologyID existingArtifact =
+                                            labelMap.putIfAbsent((URI)project, nextArtifact);
+                                    // Check for the case where project name maps to
+                                    // different artifacts
+                                    if(existingArtifact != null && !existingArtifact.equals(nextArtifact))
+                                    {
+                                        this.log.error(
+                                                "Found duplicate project name across different projects, inconsistent results may follow: {} {} {} {}",
+                                                nextArtifact, existingArtifact, project, nextLabel);
+                                    }
                                 }
                             }
                         }
@@ -336,6 +356,8 @@ public class HrppcPoddClient extends RestletPoddClientImpl
             final ConcurrentMap<String, ConcurrentMap<URI, InferredOWLOntologyID>> projectUriMap,
             final ConcurrentMap<InferredOWLOntologyID, Model> uploadQueue) throws PoddClientException
     {
+        this.log.info("About to process line: {}", nextLine);
+        
         String trayId = null;
         String trayNotes = null;
         String trayTypeName = null;
@@ -383,13 +405,13 @@ public class HrppcPoddClient extends RestletPoddClientImpl
             }
         }
         
-        String projectYear = null;
-        String projectNumber = null;
-        String experimentNumber = null;
+        int projectYear = 0;
+        int projectNumber = 0;
+        int experimentNumber = 0;
         String genus = null;
         String species = null;
-        String trayNumber = null;
-        String potNumber = null;
+        int trayNumber = 0;
+        int potNumber = 0;
         
         final Matcher trayMatcher = HrppcPoddClient.REGEX_TRAY.matcher(trayId);
         
@@ -406,12 +428,12 @@ public class HrppcPoddClient extends RestletPoddClientImpl
             }
             else
             {
-                projectYear = trayMatcher.group(1);
-                projectNumber = trayMatcher.group(2);
-                experimentNumber = trayMatcher.group(3);
-                genus = trayMatcher.group(4);
-                species = trayMatcher.group(5);
-                trayNumber = trayMatcher.group(6);
+                projectYear = Integer.parseInt(trayMatcher.group(1).trim());
+                projectNumber = Integer.parseInt(trayMatcher.group(2).trim());
+                experimentNumber = Integer.parseInt(trayMatcher.group(3).trim());
+                genus = trayMatcher.group(4).trim();
+                species = trayMatcher.group(5).trim();
+                trayNumber = Integer.parseInt(trayMatcher.group(6).trim());
             }
         }
         
@@ -430,31 +452,31 @@ public class HrppcPoddClient extends RestletPoddClientImpl
             }
             else
             {
-                if(projectYear == null)
-                {
-                    projectYear = plantMatcher.group(1);
-                }
-                if(projectNumber == null)
-                {
-                    projectNumber = plantMatcher.group(2);
-                }
-                if(experimentNumber == null)
-                {
-                    experimentNumber = plantMatcher.group(3);
-                }
+                // if(projectYear == null)
+                // {
+                // projectYear = plantMatcher.group(1).trim();
+                // }
+                // if(projectNumber == null)
+                // {
+                // projectNumber = plantMatcher.group(2);
+                // }
+                // if(experimentNumber == null)
+                // {
+                // experimentNumber = plantMatcher.group(3);
+                // }
                 if(genus == null)
                 {
-                    genus = plantMatcher.group(4);
+                    genus = plantMatcher.group(4).trim();
                 }
                 if(species == null)
                 {
-                    species = plantMatcher.group(5);
+                    species = plantMatcher.group(5).trim();
                 }
-                if(trayNumber == null)
-                {
-                    trayNumber = plantMatcher.group(6);
-                }
-                potNumber = plantMatcher.group(7);
+                // if(trayNumber == null)
+                // {
+                // trayNumber = plantMatcher.group(6);
+                // }
+                potNumber = Integer.parseInt(plantMatcher.group(7).trim());
             }
         }
         
@@ -477,9 +499,15 @@ public class HrppcPoddClient extends RestletPoddClientImpl
         }
         else
         {
-            columnLetter = positionMatcher.group(1);
-            rowNumber = positionMatcher.group(2);
+            columnLetter = positionMatcher.group(1).trim();
+            rowNumber = positionMatcher.group(2).trim();
         }
+        
+        // Reconstruct Project#0001-0002 structure
+        String baseProjectName = String.format(HrppcPoddClient.TEMPLATE_PROJECT, projectYear, projectNumber);
+        
+        Model nextResult = new LinkedHashModel();
+        
     }
     
     /**

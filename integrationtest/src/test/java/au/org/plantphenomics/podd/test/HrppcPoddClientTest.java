@@ -69,6 +69,14 @@ public class HrppcPoddClientTest extends RestletPoddClientImplIntegrationTest
         
     }
     
+    @Test
+    public final void testTemplateProject() throws Exception
+    {
+        String formattedProject = String.format(HrppcPoddClient.TEMPLATE_PROJECT, 4, 6);
+        
+        Assert.assertEquals("Project#0004-0006", formattedProject);
+    }
+    
     /**
      * Test method for
      * {@link au.org.plantphenomics.podd.HrppcPoddClient#uploadPlantScanList(java.io.InputStream)}.
@@ -82,7 +90,7 @@ public class HrppcPoddClientTest extends RestletPoddClientImplIntegrationTest
         final HrppcPoddClient poddClient = this.getNewPoddClientInstance();
         poddClient.setPoddServerUrl(this.getTestPoddServerUrl());
         poddClient.login(AbstractPoddClientTest.TEST_ADMIN_USER, AbstractPoddClientTest.TEST_ADMIN_PASSWORD);
-
+        
         final InputStream input = this.getClass().getResourceAsStream("/test/artifacts/basicProject-1.rdf");
         Assert.assertNotNull("Test resource missing", input);
         
