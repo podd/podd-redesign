@@ -175,7 +175,7 @@ public class SparqlResourceImplTest extends AbstractResourceImplTest
         // for first
         try
         {
-            FormDataSet postQuery = new FormDataSet();
+            final FormDataSet postQuery = new FormDataSet();
             postQuery.setMediaType(MediaType.APPLICATION_WWW_FORM);
             postQuery.add(PoddWebConstants.KEY_SPARQLQUERY, "CONSTRUCT { ?s a ?o } WHERE { ?s a ?o }");
             postQuery.add(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, testArtifact.getOntologyIRI().toString());

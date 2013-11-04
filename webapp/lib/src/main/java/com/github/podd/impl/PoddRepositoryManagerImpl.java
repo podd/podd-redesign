@@ -181,15 +181,15 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
                 {
                     returnValue = false;
                 }
-                else if(nextContext.equals(getArtifactManagementGraph()))
+                else if(nextContext.equals(this.getArtifactManagementGraph()))
                 {
                     returnValue = false;
                 }
-                else if(nextContext.equals(getSchemaManagementGraph()))
+                else if(nextContext.equals(this.getSchemaManagementGraph()))
                 {
                     returnValue = false;
                 }
-                else if(nextContext.equals(getFileRepositoryManagementGraph()))
+                else if(nextContext.equals(this.getFileRepositoryManagementGraph()))
                 {
                     returnValue = false;
                 }

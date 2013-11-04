@@ -2254,7 +2254,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
     }
     
     @Override
-    public URI[] versionContexts(InferredOWLOntologyID ontologyID)
+    public URI[] versionContexts(final InferredOWLOntologyID ontologyID)
     {
         return new URI[] { ontologyID.getVersionIRI().toOpenRDFURI() };
     }
