@@ -243,7 +243,8 @@ public final class RestletUtils
     {
         final ConcurrentMap<RestletUtilRole, Collection<URI>> results = new ConcurrentHashMap<>();
         
-        // extract Role Mapping info (User details are ignored as multiple users are not
+        // extract Role Mapping info (User details are ignored as multiple users
+        // are not
         // supported)
         final Collection<Entry<Role, URI>> rolesWithObjectMappings = realm.getRolesWithObjectMappings(poddUser);
         for(final Entry<Role, URI> entry : rolesWithObjectMappings)
@@ -305,7 +306,8 @@ public final class RestletUtils
                     }
                     catch(OpenRDFException | UnmanagedArtifactIRIException e)
                     {
-                        // either the artifact mapped to this Role does not exist, or a Label for it
+                        // either the artifact mapped to this Role does not
+                        // exist, or a Label for it
                         // could not be retrieved
                         RestletUtils.log.warn("Failed to retrieve Role Mapped Object [{}]", artifactUri);
                     }
@@ -397,7 +399,8 @@ public final class RestletUtils
             throw new IllegalArgumentException("Repository cannot be null");
         }
         
-        // Attempt to find a writer format based on their requested mime type, or if that fails,
+        // Attempt to find a writer format based on their requested mime type,
+        // or if that fails,
         // give them RDF/XML that every RDF library can process.
         final RDFFormat outputFormat = Rio.getWriterFormatForMIMEType(mimeType, RDFFormat.RDFXML);
         
@@ -411,8 +414,10 @@ public final class RestletUtils
         
         conn.export(output, contexts);
         
-        // TODO: find a subclass of Representation that accepts a writer directly, without having to
-        // serialise it to a string, to improve performance for large results sets.
+        // TODO: find a subclass of Representation that accepts a writer
+        // directly, without having to
+        // serialise it to a string, to improve performance for large results
+        // sets.
         final Representation result =
                 new AppendableRepresentation(writer.toString(), MediaType.valueOf(outputFormat.getDefaultMIMEType()),
                         Language.DEFAULT, CharacterSet.UTF_8);

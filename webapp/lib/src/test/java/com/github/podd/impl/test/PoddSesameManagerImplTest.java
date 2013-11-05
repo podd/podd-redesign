@@ -51,8 +51,8 @@ public class PoddSesameManagerImplTest extends AbstractPoddSesameManagerTest
     /*
      * (non-Javadoc)
      * 
-     * @see com.github.podd.api.test.AbstractPoddSesameManagerTest#loadSchemaOntologies(org.openrdf.
-     * repository.RepositoryConnection)
+     * @see com.github.podd.api.test.AbstractPoddSesameManagerTest#loadSchemaOntologies
+     * (org.openrdf. repository.RepositoryConnection)
      * 
      * NOTE: This test implementation creates a PoddOWLManager instance in order to dynamically
      * generate inferred statements for schema ontologies.
@@ -82,7 +82,8 @@ public class PoddSesameManagerImplTest extends AbstractPoddSesameManagerTest
         Assert.assertNotNull("Null implementation of OWLReasonerFactory", reasonerFactory);
         testPoddOWLManager.setReasonerFactory(reasonerFactory);
         
-        // - load each schema ontology (and its inferred ontology) to the RepositoryConnection
+        // - load each schema ontology (and its inferred ontology) to the
+        // RepositoryConnection
         for(final String schemaResourcePath : schemaResourcePaths)
         {
             this.log.debug("Next paths: {} ", schemaResourcePath);

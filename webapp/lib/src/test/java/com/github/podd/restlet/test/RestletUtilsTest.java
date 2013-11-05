@@ -63,7 +63,7 @@ public class RestletUtilsTest
     
     /**
      * Test method for
-     * {@link com.github.podd.restlet.RestletUtils#extractRoleMappings(org.openrdf.model.Model)}.
+     * {@link com.github.podd.restlet.RestletUtils#extractRoleMappings(org.openrdf.model.Model)} .
      */
     @Test
     public void testExtractRoleMappingsEmpty()
@@ -76,7 +76,7 @@ public class RestletUtilsTest
     
     /**
      * Test method for
-     * {@link com.github.podd.restlet.RestletUtils#extractRoleMappings(org.openrdf.model.Model)}.
+     * {@link com.github.podd.restlet.RestletUtils#extractRoleMappings(org.openrdf.model.Model)} .
      */
     @Test
     public void testExtractRoleMappingsProjectNoObject()
@@ -97,7 +97,7 @@ public class RestletUtilsTest
     
     /**
      * Test method for
-     * {@link com.github.podd.restlet.RestletUtils#extractRoleMappings(org.openrdf.model.Model)}.
+     * {@link com.github.podd.restlet.RestletUtils#extractRoleMappings(org.openrdf.model.Model)} .
      */
     @Test
     public void testExtractRoleMappingsProjectWithObject()
@@ -120,7 +120,7 @@ public class RestletUtilsTest
     
     /**
      * Test method for
-     * {@link com.github.podd.restlet.RestletUtils#extractRoleMappings(org.openrdf.model.Model)}.
+     * {@link com.github.podd.restlet.RestletUtils#extractRoleMappings(org.openrdf.model.Model)} .
      */
     @Test
     public void testExtractRoleMappingsRepositoryNoObject()
@@ -141,7 +141,7 @@ public class RestletUtilsTest
     
     /**
      * Test method for
-     * {@link com.github.podd.restlet.RestletUtils#extractRoleMappings(org.openrdf.model.Model)}.
+     * {@link com.github.podd.restlet.RestletUtils#extractRoleMappings(org.openrdf.model.Model)} .
      */
     @Test
     public void testExtractRoleMappingsRepositoryWithObject()
@@ -164,7 +164,7 @@ public class RestletUtilsTest
     
     /**
      * Test method for
-     * {@link com.github.podd.restlet.RestletUtils#getBaseDataModel(org.restlet.Request)}.
+     * {@link com.github.podd.restlet.RestletUtils#getBaseDataModel(org.restlet.Request)} .
      */
     @Ignore
     @Test

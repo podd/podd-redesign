@@ -208,18 +208,18 @@ public class HrppcPoddClient extends RestletPoddClientImpl
     }
     
     private void populateExperimentUriMap(
-            ConcurrentMap<String, ConcurrentMap<URI, InferredOWLOntologyID>> projectUriMap,
-            ConcurrentMap<String, ConcurrentMap<URI, URI>> experimentUriMap) throws PoddClientException
+            final ConcurrentMap<String, ConcurrentMap<URI, InferredOWLOntologyID>> projectUriMap,
+            final ConcurrentMap<String, ConcurrentMap<URI, URI>> experimentUriMap) throws PoddClientException
     {
-        for(String nextProjectName : projectUriMap.keySet())
+        for(final String nextProjectName : projectUriMap.keySet())
         {
-            ConcurrentMap<URI, InferredOWLOntologyID> nextProjectNameMapping = projectUriMap.get(nextProjectName);
-            for(URI projectUri : nextProjectNameMapping.keySet())
+            final ConcurrentMap<URI, InferredOWLOntologyID> nextProjectNameMapping = projectUriMap.get(nextProjectName);
+            for(final URI projectUri : nextProjectNameMapping.keySet())
             {
-                InferredOWLOntologyID artifactId = nextProjectNameMapping.get(projectUri);
-                Model nextSparqlResults =
+                final InferredOWLOntologyID artifactId = nextProjectNameMapping.get(projectUri);
+                final Model nextSparqlResults =
                         this.doSPARQL(
-                                String.format(TEMPLATE_SPARQL_BY_TYPE,
+                                String.format(HrppcPoddClient.TEMPLATE_SPARQL_BY_TYPE,
                                         RenderUtils.getSPARQLQueryString(PoddRdfConstants.PODD_SCIENCE_INVESTIGATION)),
                                 artifactId);
                 
@@ -228,7 +228,7 @@ public class HrppcPoddClient extends RestletPoddClientImpl
                     this.log.info("Could not find any experiments for project: {} {}", nextProjectName, projectUri);
                 }
                 
-                for(Resource nextExperiment : nextSparqlResults.filter(null, RDF.TYPE,
+                for(final Resource nextExperiment : nextSparqlResults.filter(null, RDF.TYPE,
                         PoddRdfConstants.PODD_SCIENCE_INVESTIGATION).subjects())
                 {
                     if(!(nextExperiment instanceof URI))
@@ -238,12 +238,12 @@ public class HrppcPoddClient extends RestletPoddClientImpl
                     }
                     else
                     {
-                        String name = nextSparqlResults.filter(nextExperiment, RDFS.LABEL, null).objectString();
+                        final String name = nextSparqlResults.filter(nextExperiment, RDFS.LABEL, null).objectString();
                         
                         this.log.info("Found experiment attached to project: {} {} {}", name, nextExperiment,
                                 projectUri);
                         
-                        ConcurrentMap<URI, URI> nextMap = new ConcurrentHashMap<>();
+                        final ConcurrentMap<URI, URI> nextMap = new ConcurrentHashMap<>();
                         nextMap.put((URI)nextExperiment, projectUri);
                         experimentUriMap.put(name, nextMap);
                     }
@@ -345,7 +345,7 @@ public class HrppcPoddClient extends RestletPoddClientImpl
                                 // project number behind
                                 nextLabelString = nextLabelString.split(" ")[0];
                                 
-                                Matcher matcher = HrppcPoddClient.REGEX_PROJECT.matcher(nextLabelString);
+                                final Matcher matcher = HrppcPoddClient.REGEX_PROJECT.matcher(nextLabelString);
                                 
                                 if(!matcher.matches())
                                 {
@@ -357,11 +357,12 @@ public class HrppcPoddClient extends RestletPoddClientImpl
                                     this.log.info("Found project label with the expected format: '{}' original=<{}>",
                                             nextLabelString, nextLabel);
                                     
-                                    int nextProjectYear = Integer.parseInt(matcher.group(1));
-                                    int nextProjectNumber = Integer.parseInt(matcher.group(2));
+                                    final int nextProjectYear = Integer.parseInt(matcher.group(1));
+                                    final int nextProjectNumber = Integer.parseInt(matcher.group(2));
                                     
                                     nextLabelString =
-                                            String.format(TEMPLATE_PROJECT, nextProjectYear, nextProjectNumber);
+                                            String.format(HrppcPoddClient.TEMPLATE_PROJECT, nextProjectYear,
+                                                    nextProjectNumber);
                                     
                                     this.log.info("Reformatted project label to: '{}' original=<{}>", nextLabelString,
                                             nextLabel);
@@ -563,7 +564,7 @@ public class HrppcPoddClient extends RestletPoddClientImpl
         }
         
         // Reconstruct Project#0001-0002 structure
-        String baseProjectName = String.format(HrppcPoddClient.TEMPLATE_PROJECT, projectYear, projectNumber);
+        final String baseProjectName = String.format(HrppcPoddClient.TEMPLATE_PROJECT, projectYear, projectNumber);
         
         if(!projectUriMap.containsKey(baseProjectName))
         {
@@ -571,7 +572,7 @@ public class HrppcPoddClient extends RestletPoddClientImpl
         }
         else
         {
-            Map<URI, InferredOWLOntologyID> projectDetails = projectUriMap.get(baseProjectName);
+            final Map<URI, InferredOWLOntologyID> projectDetails = projectUriMap.get(baseProjectName);
             
             if(projectDetails.isEmpty())
             {
@@ -585,7 +586,7 @@ public class HrppcPoddClient extends RestletPoddClientImpl
             {
                 this.log.info("Found unique PODD Project name to URI mapping: {} {}", baseProjectName, projectDetails);
                 
-                Model nextResult = new LinkedHashModel();
+                final Model nextResult = new LinkedHashModel();
                 
             }
             

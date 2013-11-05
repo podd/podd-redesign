@@ -68,7 +68,8 @@ public class GetMetadataResourceImpl extends AbstractPoddResourceImpl
                 this.getQuery().getFirstValue(PoddWebConstants.KEY_INCLUDE_DO_NOT_DISPLAY_PROPERTIES, true);
         final boolean includeDoNotDisplayProperties = Boolean.valueOf(includeDoNotDisplayPropertiesString);
         
-        // - metadata policy (optional, default is to exclude sub-properties of poddBase:contains)
+        // - metadata policy (optional, default is to exclude sub-properties of
+        // poddBase:contains)
         final String metadataPolicyString = this.getQuery().getFirstValue(PoddWebConstants.KEY_METADATA_POLICY, true);
         
         MetadataPolicy containsPropertyPolicy = MetadataPolicy.EXCLUDE_CONTAINS;

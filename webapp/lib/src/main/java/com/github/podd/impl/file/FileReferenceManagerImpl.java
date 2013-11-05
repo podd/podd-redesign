@@ -65,9 +65,8 @@ public class FileReferenceManagerImpl implements DataReferenceManager
     /*
      * (non-Javadoc)
      * 
-     * @see
-     * com.github.podd.api.file.PoddFileReferenceManager#extractFileReferences(org.openrdf.repository
-     * .RepositoryConnection, org.openrdf.model.URI[])
+     * @see com.github.podd.api.file.PoddFileReferenceManager#extractFileReferences
+     * (org.openrdf.repository .RepositoryConnection, org.openrdf.model.URI[])
      */
     @Override
     public Set<DataReference> extractDataReferences(final RepositoryConnection repositoryConnection,
@@ -85,26 +84,31 @@ public class FileReferenceManagerImpl implements DataReferenceManager
                 
                 final GraphQuery graphQuery = repositoryConnection.prepareGraphQuery(QueryLanguage.SPARQL, sparqlQuery);
                 
-                // Create a new dataset to specify contexts that the query will be allowed to access
+                // Create a new dataset to specify contexts that the query will
+                // be allowed to access
                 final DatasetImpl dataset = new DatasetImpl();
                 for(final URI artifactGraphUri : contexts)
                 {
                     dataset.addDefaultGraph(artifactGraphUri);
                 }
                 
-                // set the dataset for the query to be our artificially constructed dataset
+                // set the dataset for the query to be our artificially
+                // constructed dataset
                 graphQuery.setDataset(dataset);
                 
                 final GraphQueryResult queryResult = graphQuery.evaluate();
                 
-                // following contains statements for file references from the whole artifact
+                // following contains statements for file references from the
+                // whole artifact
                 final Model results = QueryResults.asModel(queryResult);
                 
                 if(!results.isEmpty())
                 {
-                    // This processor factory matches the graph that we wish to use, so we create a
+                    // This processor factory matches the graph that we wish to
+                    // use, so we create a
                     // processor instance now to create the File Reference
-                    // NOTE: This object cannot be shared as we do not specify that it needs to be
+                    // NOTE: This object cannot be shared as we do not specify
+                    // that it needs to be
                     // threadsafe
                     final DataReferenceProcessor<DataReference> processor = nextProcessorFactory.getProcessor();
                     
@@ -125,7 +129,7 @@ public class FileReferenceManagerImpl implements DataReferenceManager
     /*
      * (non-Javadoc)
      * 
-     * @see com.github.podd.api.file.PoddFileReferenceManager#getProcessorFactoryRegistry()
+     * @see com.github.podd.api.file.PoddFileReferenceManager#getProcessorFactoryRegistry ()
      */
     @Override
     public DataReferenceProcessorRegistry getDataProcessorRegistry()
@@ -136,9 +140,8 @@ public class FileReferenceManagerImpl implements DataReferenceManager
     /*
      * (non-Javadoc)
      * 
-     * @see
-     * com.github.podd.api.file.PoddFileReferenceManager#setProcessorFactoryRegistry(com.github.
-     * podd.api.file.PoddFileReferenceProcessorFactoryRegistry)
+     * @see com.github.podd.api.file.PoddFileReferenceManager#setProcessorFactoryRegistry
+     * (com.github. podd.api.file.PoddFileReferenceProcessorFactoryRegistry)
      */
     @Override
     public void setDataProcessorRegistry(final DataReferenceProcessorRegistry registry)

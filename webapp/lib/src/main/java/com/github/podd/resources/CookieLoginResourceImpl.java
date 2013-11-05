@@ -53,12 +53,14 @@ public class CookieLoginResourceImpl extends AbstractPoddResourceImpl implements
             
             dataModel.put("pageTitle", "PODD Login Page");
             
-            // FIXME: By default use the referrer to populate the redirectTo field internally for
+            // FIXME: By default use the referrer to populate the redirectTo
+            // field internally for
             // use after a successful login
             dataModel.put("referrerRef", this.getRequest().getReferrerRef());
             this.log.info("referrerRef={}", this.getRequest().getReferrerRef());
             
-            // Output the base template, with contentTemplate from the dataModel defining the
+            // Output the base template, with contentTemplate from the dataModel
+            // defining the
             // template to use for the content in the body of the page
             return RestletUtils.getHtmlRepresentation(PoddWebConstants.PROPERTY_TEMPLATE_BASE, dataModel,
                     MediaType.TEXT_HTML, this.getPoddApplication().getTemplateConfiguration());

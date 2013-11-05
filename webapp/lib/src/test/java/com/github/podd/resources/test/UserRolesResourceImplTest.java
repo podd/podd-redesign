@@ -88,14 +88,16 @@ public class UserRolesResourceImplTest extends AbstractResourceImplTest
         // prepare: modify Test User's Roles
         final Model newModel = new LinkedHashModel();
         
-        // prepare: additional Project Observer Role for Project "cotton-leaf-23567"
+        // prepare: additional Project Observer Role for Project
+        // "cotton-leaf-23567"
         final URI testProject1Uri = PoddRdfConstants.VF.createURI("urn:podd:project-cotton-leaf-23567");
         final URI roleMapping1Uri =
                 PoddRdfConstants.VF.createURI("urn:podd:rolemapping1:", UUID.randomUUID().toString());
         newModel.add(roleMapping1Uri, RDF.TYPE, SesameRealmConstants.OAS_ROLEMAPPING);
         newModel.add(roleMapping1Uri, SesameRealmConstants.OAS_ROLEMAPPEDROLE, PoddRoles.PROJECT_OBSERVER.getURI());
         newModel.add(roleMapping1Uri, PoddRdfConstants.PODD_ROLEMAPPEDOBJECT, testProject1Uri);
-        // NOTE: no need to specify ROLE_MAPPED_USER as User is identified from the request
+        // NOTE: no need to specify ROLE_MAPPED_USER as User is identified from
+        // the request
         
         // prepare: additional Project Observer Role for Project "tea-leaf-99"
         final URI testProject2Uri = PoddRdfConstants.VF.createURI("urn:podd:project-tea-leaf-99");
@@ -184,14 +186,16 @@ public class UserRolesResourceImplTest extends AbstractResourceImplTest
                 "http:///www.john.doe.com", "CSIRO", "john-orcid", "Mr", "000333434", "Some Address", "Researcher",
                 roles, PoddUserStatus.ACTIVE);
         
-        // prepare: Project Observer Role for Project "urn:podd:coconut-leaf-study" is to be deleted
+        // prepare: Project Observer Role for Project
+        // "urn:podd:coconut-leaf-study" is to be deleted
         final URI roleMapping1Uri =
                 PoddRdfConstants.VF.createURI("urn:podd:rolemapping1:", UUID.randomUUID().toString());
         final Model newModel = new LinkedHashModel();
         newModel.add(roleMapping1Uri, RDF.TYPE, SesameRealmConstants.OAS_ROLEMAPPING);
         newModel.add(roleMapping1Uri, SesameRealmConstants.OAS_ROLEMAPPEDROLE, PoddRoles.PROJECT_OBSERVER.getURI());
         newModel.add(roleMapping1Uri, PoddRdfConstants.PODD_ROLEMAPPEDOBJECT, testProject1Uri);
-        // NOTE: no need to specify ROLE_MAPPED_USER as User is identified from the request
+        // NOTE: no need to specify ROLE_MAPPED_USER as User is identified from
+        // the request
         
         // submit details of Role to delete to User Roles Service
         final ClientResource userRolesClientResource =
@@ -276,7 +280,8 @@ public class UserRolesResourceImplTest extends AbstractResourceImplTest
         newModel.add(roleMapping1Uri, RDF.TYPE, SesameRealmConstants.OAS_ROLEMAPPING);
         newModel.add(roleMapping1Uri, SesameRealmConstants.OAS_ROLEMAPPEDROLE, PoddRoles.PROJECT_OBSERVER.getURI());
         newModel.add(roleMapping1Uri, PoddRdfConstants.PODD_ROLEMAPPEDOBJECT, PoddRdfConstants.TEST_ARTIFACT);
-        // NOTE: no need to specify ROLE_MAPPED_USER as User is identified from the request
+        // NOTE: no need to specify ROLE_MAPPED_USER as User is identified from
+        // the request
         
         // prepare: additional Repository Admin Role (which should fail)
         final URI roleMapping2Uri =
@@ -489,12 +494,16 @@ public class UserRolesResourceImplTest extends AbstractResourceImplTest
             System.out.println(body);
             this.assertFreemarker(body);
             
-            // Assert.assertTrue("Page missing User identifier", body.contains(testIdentifier));
-            // Assert.assertTrue("Page missing old password", body.contains("Old Password"));
+            // Assert.assertTrue("Page missing User identifier",
+            // body.contains(testIdentifier));
+            // Assert.assertTrue("Page missing old password",
+            // body.contains("Old Password"));
             // Assert.assertTrue("Page missing confirm password",
             // body.contains("Confirm New Password"));
-            // Assert.assertTrue("Page missing save button", body.contains("Save Password"));
-            // Assert.assertTrue("Page missing cancel button", body.contains("Cancel"));
+            // Assert.assertTrue("Page missing save button",
+            // body.contains("Save Password"));
+            // Assert.assertTrue("Page missing cancel button",
+            // body.contains("Cancel"));
         }
         finally
         {

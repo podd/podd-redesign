@@ -58,7 +58,8 @@ public class UploadArtifactResourcePerformanceTest extends AbstractResourceImplT
     {
         final Object[][] data =
                 new Object[][] {
-                        // { "/test/artifacts/basic-20130206.ttl", MediaType.APPLICATION_RDF_TURTLE
+                        // { "/test/artifacts/basic-20130206.ttl",
+                        // MediaType.APPLICATION_RDF_TURTLE
                         // },
                         // { "/test/artifacts/project-temp-00010.ttl",
                         // MediaType.APPLICATION_RDF_TURTLE },
@@ -78,7 +79,8 @@ public class UploadArtifactResourcePerformanceTest extends AbstractResourceImplT
                         { "/test/artifacts/project-purl-10000.rdf", MediaType.APPLICATION_RDF_XML },
                 
                 // fails
-                // { "/test/artifacts/project-purl-20000.rdf", MediaType.APPLICATION_RDF_XML },
+                // { "/test/artifacts/project-purl-20000.rdf",
+                // MediaType.APPLICATION_RDF_XML },
                 
                 };
         return Arrays.asList(data);

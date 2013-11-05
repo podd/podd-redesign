@@ -281,7 +281,8 @@ public class UploadArtifactResourceImplTest extends AbstractResourceImplTest
         final AtomicInteger threadStartCount = new AtomicInteger(0);
         final AtomicInteger perThreadStartCount = new AtomicInteger(0);
         final CountDownLatch openLatch = new CountDownLatch(1);
-        // Changing this from 8 to 9 on my machine may be triggering a restlet bug
+        // Changing this from 8 to 9 on my machine may be triggering a restlet
+        // bug
         final int threadCount = 9;
         final int perThreadCount = 2;
         final CountDownLatch closeLatch = new CountDownLatch(threadCount);
@@ -322,7 +323,8 @@ public class UploadArtifactResourceImplTest extends AbstractResourceImplTest
                                                     Status.SUCCESS_OK,
                                                     UploadArtifactResourceImplTest.this.testWithAdminPrivileges);
                                     
-                                    // verify: results (expecting the added artifact's ontology IRI)
+                                    // verify: results (expecting the added
+                                    // artifact's ontology IRI)
                                     final String body = UploadArtifactResourceImplTest.this.getText(results);
                                     
                                     final Collection<InferredOWLOntologyID> ontologyIDs =
@@ -363,7 +365,8 @@ public class UploadArtifactResourceImplTest extends AbstractResourceImplTest
         Assert.assertEquals("Some threads did not all start successfully", threadCount, threadStartCount.get());
         Assert.assertEquals("Some thread loops did not start successfully", perThreadCount * threadCount,
                 perThreadStartCount.get());
-        // Verify that there were no failures, as the count is only incremented for successes, where
+        // Verify that there were no failures, as the count is only incremented
+        // for successes, where
         // the closeLatch must always be called, even for failures
         Assert.assertEquals("Some thread loops did not complete successfully", perThreadCount * threadCount,
                 perThreadSuccessCount.get());

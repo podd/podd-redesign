@@ -91,8 +91,10 @@ public class PoddSesameManagerImpl implements PoddSesameManager
             boolean updateCurrentVersion = false;
             InferredOWLOntologyID newCurrentVersion = null;
             
-            // If there were managed versions, and the head of the list, which is the current
-            // version by convention, is the same as out version, then we need to update it,
+            // If there were managed versions, and the head of the list, which
+            // is the current
+            // version by convention, is the same as out version, then we need
+            // to update it,
             // otherwise we don't need to update it.
             if(!versionInternal.isEmpty()
                     && versionInternal.get(0).getVersionIRI().equals(nextOntologyID.getVersionIRI()))
@@ -109,13 +111,15 @@ public class PoddSesameManagerImpl implements PoddSesameManager
             repositoryConnection.remove((URI)null, null, null, nextOntologyID.getInferredOntologyIRI().toOpenRDFURI());
             repositoryConnection.remove((URI)null, null, null, nextOntologyID.getVersionIRI().toOpenRDFURI());
             
-            // clear out references attached to the version and inferred IRIs in the management
+            // clear out references attached to the version and inferred IRIs in
+            // the management
             // graph
             repositoryConnection.remove(nextOntologyID.getVersionIRI().toOpenRDFURI(), null, null, managementGraph);
             repositoryConnection.remove(nextOntologyID.getInferredOntologyIRI().toOpenRDFURI(), null, null,
                     managementGraph);
             
-            // clear out references linked to the version and inferred IRIs in the management graph
+            // clear out references linked to the version and inferred IRIs in
+            // the management graph
             repositoryConnection
                     .remove((URI)null, null, nextOntologyID.getVersionIRI().toOpenRDFURI(), managementGraph);
             repositoryConnection.remove((URI)null, null, nextOntologyID.getInferredOntologyIRI().toOpenRDFURI(),
@@ -137,7 +141,8 @@ public class PoddSesameManagerImpl implements PoddSesameManager
                 // remove the current versions from the management graph
                 repositoryConnection.remove(asList, managementGraph);
                 
-                // If there is no replacement available, then wipe the slate clean in the management
+                // If there is no replacement available, then wipe the slate
+                // clean in the management
                 // graph
                 if(newCurrentVersion == null)
                 {
@@ -402,7 +407,8 @@ public class PoddSesameManagerImpl implements PoddSesameManager
             sb.append(" } ");
         }
         
-        // this.log.debug("Created SPARQL {} with propertyUri {} and poddObject {}", sb,
+        // this.log.debug("Created SPARQL {} with propertyUri {} and poddObject {}",
+        // sb,
         // propertyUri, objectUri);
         
         final TupleQuery query = repositoryConnection.prepareTupleQuery(QueryLanguage.SPARQL, sb.toString());
@@ -512,9 +518,9 @@ public class PoddSesameManagerImpl implements PoddSesameManager
     /*
      * (non-Javadoc)
      * 
-     * @see
-     * com.github.podd.api.PoddSesameManager#getCurrentArtifactVersion(org.semanticweb.owlapi.model
-     * .IRI, org.openrdf.repository.RepositoryConnection, org.openrdf.model.URI)
+     * @see com.github.podd.api.PoddSesameManager#getCurrentArtifactVersion(org.
+     * semanticweb.owlapi.model .IRI, org.openrdf.repository.RepositoryConnection,
+     * org.openrdf.model.URI)
      */
     @Override
     public InferredOWLOntologyID getCurrentArtifactVersion(final IRI ontologyIRI,
@@ -543,9 +549,8 @@ public class PoddSesameManagerImpl implements PoddSesameManager
     /*
      * (non-Javadoc)
      * 
-     * @see
-     * com.github.podd.api.PoddSesameManager#getCurrentSchemaVersion(org.semanticweb.owlapi.model
-     * .IRI, org.openrdf.repository.RepositoryConnection, org.openrdf.model.URI)
+     * @see com.github.podd.api.PoddSesameManager#getCurrentSchemaVersion(org.semanticweb
+     * .owlapi.model .IRI, org.openrdf.repository.RepositoryConnection, org.openrdf.model.URI)
      */
     @Override
     public InferredOWLOntologyID getCurrentSchemaVersion(final IRI ontologyIRI,
@@ -679,7 +684,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
     /*
      * (non-Javadoc)
      * 
-     * @see com.github.podd.api.PoddSesameManager#getDirectImports(org.openrdf.repository.
+     * @see com.github.podd.api.PoddSesameManager#getDirectImports(org.openrdf.repository .
      * RepositoryConnection, org.openrdf.model.URI)
      */
     @Override
@@ -754,7 +759,8 @@ public class PoddSesameManagerImpl implements PoddSesameManager
                 repositoryConnection.prepareGraphQuery(QueryLanguage.SPARQL, instanceQuery.toString());
         // rdfsGraphQuery.setBinding("rangeClass", nextRangeType);
         
-        // this.log.debug("Created SPARQL {} \n   with nextRangeType bound to {}", instanceQuery,
+        // this.log.debug("Created SPARQL {} \n   with nextRangeType bound to {}",
+        // instanceQuery,
         // nextRangeType);
         
         return RdfUtility.executeGraphQuery(rdfsGraphQuery, contexts);
@@ -893,8 +899,10 @@ public class PoddSesameManagerImpl implements PoddSesameManager
             }
             else
             {
-                // Disabled this method as it produces worse than useless results for the typical
-                // URIs that end in /UUID/object, and "object" is literally the word "object" and is
+                // Disabled this method as it produces worse than useless
+                // results for the typical
+                // URIs that end in /UUID/object, and "object" is literally the
+                // word "object" and is
                 // displayed as such.
                 // FIXME: This method may be worse than showing them a URI
                 // label = objectUri.getLocalName();
@@ -939,9 +947,11 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         
         owlRestrictionQuery.append("} WHERE {");
         
-        // TODO: The following seems to pick up restrictions that are put onto other types
+        // TODO: The following seems to pick up restrictions that are put onto
+        // other types
         owlRestrictionQuery.append(" ?objectType <" + RDFS.SUBCLASSOF.stringValue() + ">+ ?x . ");
-        // owlRestrictionQuery.append(" ?objectType <" + RDFS.SUBCLASSOF.stringValue() + "> ?x . ");
+        // owlRestrictionQuery.append(" ?objectType <" +
+        // RDFS.SUBCLASSOF.stringValue() + "> ?x . ");
         owlRestrictionQuery.append(" ?x <" + RDF.TYPE.stringValue() + "> <" + OWL.RESTRICTION.stringValue() + "> . ");
         owlRestrictionQuery.append(" ?x <" + OWL.ONPROPERTY.stringValue() + "> ?propertyUri . ");
         owlRestrictionQuery.append(" OPTIONAL { ?x <" + OWL.ALLVALUESFROM.stringValue() + "> ?rangeClass } . ");
@@ -1016,8 +1026,10 @@ public class PoddSesameManagerImpl implements PoddSesameManager
                     }
                     else
                     {
-                        // Add warning... If we need to support blank nodes here we will need to
-                        // switch to a different type of query, as SPARQL-1.1 VALUES doesn't support
+                        // Add warning... If we need to support blank nodes here
+                        // we will need to
+                        // switch to a different type of query, as SPARQL-1.1
+                        // VALUES doesn't support
                         // blank nodes
                         this.log.warn("FIXME: restriction pointed to a non-URI property or allvaluesfrom : {} {} {}",
                                 onProperty, onRange, objectType);
@@ -1052,7 +1064,8 @@ public class PoddSesameManagerImpl implements PoddSesameManager
             return results;
         }
         
-        // - check if the objectType is known at all (i.e. exists somewhere in the graphs)
+        // - check if the objectType is known at all (i.e. exists somewhere in
+        // the graphs)
         final boolean objectTypeExists =
                 repositoryConnection.getStatements(objectType, null, null, false, contexts).hasNext()
                         || repositoryConnection.getStatements(null, null, objectType, false, contexts).hasNext();
@@ -1085,9 +1098,11 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         
         owlRestrictionQuery.append("} WHERE {");
         
-        // TODO: The following seems to pick up restrictions that are put onto other types
+        // TODO: The following seems to pick up restrictions that are put onto
+        // other types
         owlRestrictionQuery.append(" ?objectType <" + RDFS.SUBCLASSOF.stringValue() + ">+ ?x . ");
-        // owlRestrictionQuery.append(" ?objectType <" + RDFS.SUBCLASSOF.stringValue() + "> ?x . ");
+        // owlRestrictionQuery.append(" ?objectType <" +
+        // RDFS.SUBCLASSOF.stringValue() + "> ?x . ");
         owlRestrictionQuery.append(" ?x <" + RDF.TYPE.stringValue() + "> <" + OWL.RESTRICTION.stringValue() + "> . ");
         owlRestrictionQuery.append(" ?x <" + OWL.ONPROPERTY.stringValue() + "> ?propertyUri . ");
         owlRestrictionQuery.append(" OPTIONAL { ?x <" + OWL.ALLVALUESFROM.stringValue() + "> ?rangeClass } . ");
@@ -1314,14 +1329,17 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         
         for(final URI property : propertyUris)
         {
-            // - find property: type (e.g. object/datatype/annotation), label, display-type,
+            // - find property: type (e.g. object/datatype/annotation), label,
+            // display-type,
             // weight
             // graphQuery2.setBinding("propertyUri", property);
             
-            // this.log.debug("Created SPARQL {} \n   with propertyUri bound to {}", sb2String,
+            // this.log.debug("Created SPARQL {} \n   with propertyUri bound to {}",
+            // sb2String,
             // property);
             
-            // --- for 'drop-down' type properties, add all possible options into Model
+            // --- for 'drop-down' type properties, add all possible options
+            // into Model
             if(results.contains(property, PoddRdfConstants.PODD_BASE_DISPLAY_TYPE,
                     PoddRdfConstants.PODD_BASE_DISPLAY_TYPE_DROPDOWN))
             {
@@ -1388,7 +1406,8 @@ public class PoddSesameManagerImpl implements PoddSesameManager
                 + "> true } ");
         sb.append(" FILTER isIRI(?poddTypeUri) ");
         
-        // filter out TYPE statements for OWL:Thing, OWL:Individual, OWL:NamedIndividual & OWL:Class
+        // filter out TYPE statements for OWL:Thing, OWL:Individual,
+        // OWL:NamedIndividual & OWL:Class
         sb.append("FILTER (?poddTypeUri != <" + OWL.THING.stringValue() + ">) ");
         sb.append("FILTER (?poddTypeUri != <" + OWL.INDIVIDUAL.stringValue() + ">) ");
         sb.append("FILTER (?poddTypeUri != <http://www.w3.org/2002/07/owl#NamedIndividual>) ");
@@ -1485,15 +1504,15 @@ public class PoddSesameManagerImpl implements PoddSesameManager
     /*
      * (non-Javadoc)
      * 
-     * @see
-     * com.github.podd.api.PoddSesameManager#getOntologyIRI(org.openrdf.repository.RepositoryConnection
-     * , org.openrdf.model.URI)
+     * @see com.github.podd.api.PoddSesameManager#getOntologyIRI(org.openrdf.repository
+     * .RepositoryConnection , org.openrdf.model.URI)
      */
     @Override
     public IRI getOntologyIRI(final RepositoryConnection repositoryConnection, final URI context)
         throws OpenRDFException
     {
-        // get ontology IRI from the RepositoryConnection using a SPARQL SELECT query
+        // get ontology IRI from the RepositoryConnection using a SPARQL SELECT
+        // query
         final String sparqlQuery =
                 "SELECT ?nextOntology WHERE { ?nextOntology <" + RDF.TYPE + "> <" + OWL.ONTOLOGY.stringValue()
                         + ">  . " + " ?nextOntology <" + PoddRdfConstants.PODD_BASE_HAS_TOP_OBJECT + "> ?y " + " }";
@@ -1527,9 +1546,8 @@ public class PoddSesameManagerImpl implements PoddSesameManager
     /*
      * (non-Javadoc)
      * 
-     * @see
-     * com.github.podd.api.PoddSesameManager#getOntologyVersion(org.semanticweb.owlapi.model.IRI,
-     * org.openrdf.repository.RepositoryConnection, org.openrdf.model.URI)
+     * @see com.github.podd.api.PoddSesameManager#getOntologyVersion(org.semanticweb
+     * .owlapi.model.IRI, org.openrdf.repository.RepositoryConnection, org.openrdf.model.URI)
      */
     @Override
     public InferredOWLOntologyID getOntologyVersion(final IRI versionIRI,
@@ -1562,7 +1580,8 @@ public class PoddSesameManagerImpl implements PoddSesameManager
             final String nextOntologyIRI = nextResult.getValue("ontologyIri").stringValue();
             final String nextInferredIRI = nextResult.getValue("inferredIri").stringValue();
             
-            // return the first solution since there should only be only one result
+            // return the first solution since there should only be only one
+            // result
             return new InferredOWLOntologyID(IRI.create(nextOntologyIRI), versionIRI, IRI.create(nextInferredIRI));
         }
         
@@ -1573,7 +1592,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
     /*
      * (non-Javadoc)
      * 
-     * @see com.github.podd.api.PoddSesameManager#getParentDetails(org.openrdf.model.URI,
+     * @see com.github.podd.api.PoddSesameManager#getParentDetails(org.openrdf.model .URI,
      * org.openrdf.repository.RepositoryConnection, org.openrdf.model.URI...)
      */
     @Override
@@ -1606,7 +1625,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
     /*
      * (non-Javadoc)
      * 
-     * @see com.github.podd.api.PoddSesameManager#getReferringObjectDetails(org.openrdf.model.URI,
+     * @see com.github.podd.api.PoddSesameManager#getReferringObjectDetails(org.openrdf .model.URI,
      * org.openrdf.repository.RepositoryConnection, org.openrdf.model.URI...)
      */
     @Override
@@ -1722,7 +1741,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
     /*
      * (non-Javadoc)
      * 
-     * @see com.github.podd.api.PoddSesameManager#getWeightedProperties(com.github.podd.utils.
+     * @see com.github.podd.api.PoddSesameManager#getWeightedProperties(com.github .podd.utils.
      * InferredOWLOntologyID, org.openrdf.model.URI, boolean,
      * org.openrdf.repository.RepositoryConnection)
      */
@@ -1747,7 +1766,8 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         sb.append("FILTER (?value != <http://www.w3.org/2002/07/owl#NamedIndividual>) ");
         sb.append("FILTER (?value != <" + OWL.CLASS.stringValue() + ">) ");
         
-        // Exclude as TYPE, Label (title) and Comment (description) are displayed separately
+        // Exclude as TYPE, Label (title) and Comment (description) are
+        // displayed separately
         sb.append("FILTER (?propertyUri != <" + RDF.TYPE.stringValue() + ">) ");
         sb.append("FILTER (?propertyUri != <" + RDFS.LABEL.stringValue() + ">) ");
         sb.append("FILTER (?propertyUri != <" + RDFS.COMMENT.stringValue() + ">) ");
@@ -1809,8 +1829,10 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         // final String sparqlQueryString =
         // "?artifact <" + PoddRdfConstants.OWL_VERSION_IRI.stringValue() + "> "
         // + ontologyID.getVersionIRI().toQuotedString() + " . " + "?artifact <"
-        // + PoddRdfConstants.PODD_BASE_HAS_TOP_OBJECT.stringValue() + "> ?top ." + " ?top <"
-        // + PoddRdfConstants.PODD_BASE_HAS_PUBLICATION_STATUS.stringValue() + "> <"
+        // + PoddRdfConstants.PODD_BASE_HAS_TOP_OBJECT.stringValue() +
+        // "> ?top ." + " ?top <"
+        // + PoddRdfConstants.PODD_BASE_HAS_PUBLICATION_STATUS.stringValue() +
+        // "> <"
         // + PoddRdfConstants.PODD_BASE_PUBLISHED.stringValue() + ">" + " }";
         
         final StringBuilder sparqlQuery = new StringBuilder(1024);
@@ -1857,7 +1879,8 @@ public class PoddSesameManagerImpl implements PoddSesameManager
             {
                 sb.append(" ?uri a <" + type.stringValue() + "> . ");
                 // sb.append(" ?uri a ?type . ");
-                // sb.append(" ?type rdfs:subClassOf+ <" + type.stringValue() + "> . ");
+                // sb.append(" ?type rdfs:subClassOf+ <" + type.stringValue() +
+                // "> . ");
             }
         }
         
@@ -1950,8 +1973,10 @@ public class PoddSesameManagerImpl implements PoddSesameManager
     {
         final URI nextOntologyUri = nextOntologyID.getOntologyIRI().toOpenRDFURI();
         final URI nextVersionUri = nextOntologyID.getVersionIRI().toOpenRDFURI();
-        // NOTE: The version is not used for the inferred ontology ID. A new ontology URI must
-        // be generated for each new inferred ontology generation. For reference though, the
+        // NOTE: The version is not used for the inferred ontology ID. A new
+        // ontology URI must
+        // be generated for each new inferred ontology generation. For reference
+        // though, the
         // version is equal to the ontology IRI in the prototype code. See
         // generateInferredOntologyID method for the corresponding code.
         final URI nextInferredOntologyUri = nextOntologyID.getInferredOntologyIRI().toOpenRDFURI();
@@ -1965,11 +1990,13 @@ public class PoddSesameManagerImpl implements PoddSesameManager
                 Iterations.asList(repositoryConnection.getStatements(nextOntologyUri,
                         PoddRdfConstants.OMV_CURRENT_VERSION, null, false, context));
         
-        // If there are no current versions, or we must update the current version, then do it
+        // If there are no current versions, or we must update the current
+        // version, then do it
         // here
         if(currentVersions.isEmpty() || updateCurrent)
         {
-            // remove whatever was previously there for the current version marker
+            // remove whatever was previously there for the current version
+            // marker
             repositoryConnection.remove(nextOntologyUri, PoddRdfConstants.OMV_CURRENT_VERSION, null, context);
             
             // then insert the new current version marker
@@ -1979,15 +2006,18 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         // then do a similar process with the inferred axioms ontology
         repositoryConnection.add(nextInferredOntologyUri, RDF.TYPE, OWL.ONTOLOGY, context);
         
-        // remove whatever was previously there for the current inferred version marker
+        // remove whatever was previously there for the current inferred version
+        // marker
         repositoryConnection
                 .remove(nextOntologyUri, PoddRdfConstants.PODD_BASE_CURRENT_INFERRED_VERSION, null, context);
         
-        // link from the ontology IRI to the current inferred axioms ontology version
+        // link from the ontology IRI to the current inferred axioms ontology
+        // version
         repositoryConnection.add(nextOntologyUri, PoddRdfConstants.PODD_BASE_CURRENT_INFERRED_VERSION,
                 nextInferredOntologyUri, context);
         
-        // link from the ontology version IRI to the matching inferred axioms ontology version
+        // link from the ontology version IRI to the matching inferred axioms
+        // ontology version
         repositoryConnection.add(nextVersionUri, PoddRdfConstants.PODD_BASE_INFERRED_VERSION, nextInferredOntologyUri,
                 context);
         
@@ -2000,8 +2030,10 @@ public class PoddSesameManagerImpl implements PoddSesameManager
     {
         final URI nextOntologyUri = nextOntologyID.getOntologyIRI().toOpenRDFURI();
         final URI nextVersionUri = nextOntologyID.getVersionIRI().toOpenRDFURI();
-        // NOTE: The version is not used for the inferred ontology ID. A new ontology URI must
-        // be generated for each new inferred ontology generation. For reference though, the
+        // NOTE: The version is not used for the inferred ontology ID. A new
+        // ontology URI must
+        // be generated for each new inferred ontology generation. For reference
+        // though, the
         // version is equal to the ontology IRI in the prototype code. See
         // generateInferredOntologyID method for the corresponding code.
         final URI nextInferredOntologyUri = nextOntologyID.getInferredOntologyIRI().toOpenRDFURI();
@@ -2022,14 +2054,16 @@ public class PoddSesameManagerImpl implements PoddSesameManager
             // then insert the new current version marker
             repositoryConnection.add(nextOntologyUri, PoddRdfConstants.OMV_CURRENT_VERSION, nextVersionUri,
                     managementGraph);
-            // link from the ontology IRI to the current inferred axioms ontology version
+            // link from the ontology IRI to the current inferred axioms
+            // ontology version
             repositoryConnection.add(nextOntologyUri, PoddRdfConstants.PODD_BASE_CURRENT_INFERRED_VERSION,
                     nextInferredOntologyUri, managementGraph);
             
             // setup a version number link for this version
             repositoryConnection
                     .add(nextOntologyUri, PoddRdfConstants.OWL_VERSION_IRI, nextVersionUri, managementGraph);
-            // link from the ontology version IRI to the matching inferred axioms ontology version
+            // link from the ontology version IRI to the matching inferred
+            // axioms ontology version
             repositoryConnection.add(nextVersionUri, PoddRdfConstants.PODD_BASE_INFERRED_VERSION,
                     nextInferredOntologyUri, managementGraph);
         }
@@ -2047,7 +2081,8 @@ public class PoddSesameManagerImpl implements PoddSesameManager
             // Update the current version and cleanup previous versions
             if(updateCurrentAndDeletePrevious)
             {
-                // remove the content of any contexts that are the object of versionIRI statements
+                // remove the content of any contexts that are the object of
+                // versionIRI statements
                 final List<Statement> previousVersions =
                         Iterations.asList(repositoryConnection.getStatements(nextOntologyUri,
                                 PoddRdfConstants.OWL_VERSION_IRI, null, true, managementGraph));
@@ -2065,10 +2100,12 @@ public class PoddSesameManagerImpl implements PoddSesameManager
                         {
                             if(nextInferredVersion.getObject() instanceof URI)
                             {
-                                // clear inferred statements for previous inferred version
+                                // clear inferred statements for previous
+                                // inferred version
                                 repositoryConnection.clear((URI)nextInferredVersion.getObject());
                                 
-                                // remove all references from artifact management graph
+                                // remove all references from artifact
+                                // management graph
                                 repositoryConnection.remove((URI)nextInferredVersion.getObject(), null, null,
                                         managementGraph);
                             }
@@ -2087,7 +2124,8 @@ public class PoddSesameManagerImpl implements PoddSesameManager
                     }
                 }
                 
-                // remove whatever was previously there for the current version marker
+                // remove whatever was previously there for the current version
+                // marker
                 repositoryConnection.remove(nextOntologyUri, PoddRdfConstants.OMV_CURRENT_VERSION, null,
                         managementGraph);
                 
@@ -2095,15 +2133,18 @@ public class PoddSesameManagerImpl implements PoddSesameManager
                 repositoryConnection.add(nextOntologyUri, PoddRdfConstants.OMV_CURRENT_VERSION, nextVersionUri,
                         managementGraph);
                 
-                // remove whatever was previously there for the current inferred version marker
+                // remove whatever was previously there for the current inferred
+                // version marker
                 repositoryConnection.remove(nextOntologyUri, PoddRdfConstants.PODD_BASE_CURRENT_INFERRED_VERSION, null,
                         managementGraph);
                 
-                // link from the ontology IRI to the current inferred axioms ontology version
+                // link from the ontology IRI to the current inferred axioms
+                // ontology version
                 repositoryConnection.add(nextOntologyUri, PoddRdfConstants.PODD_BASE_CURRENT_INFERRED_VERSION,
                         nextInferredOntologyUri, managementGraph);
                 
-                // remove previous versionIRI statements if they are no longer needed, before adding
+                // remove previous versionIRI statements if they are no longer
+                // needed, before adding
                 // the new version below
                 repositoryConnection.remove(nextOntologyUri, PoddRdfConstants.OWL_VERSION_IRI, null, managementGraph);
             }

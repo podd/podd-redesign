@@ -168,8 +168,10 @@ public class UserEditResourceImpl extends AbstractUserResourceImpl
         final User user = this.getRequest().getClientInfo().getUser();
         this.log.info("authenticated user: {}", user);
         
-        // Even though this page only displays user information, since the intention is
-        // to modify user information, the Action is considered as a "User Edit".
+        // Even though this page only displays user information, since the
+        // intention is
+        // to modify user information, the Action is considered as a
+        // "User Edit".
         this.checkAuthentication(action);
         
         final Map<String, Object> dataModel = RestletUtils.getBaseDataModel(this.getRequest());
@@ -209,7 +211,8 @@ public class UserEditResourceImpl extends AbstractUserResourceImpl
     {
         // User identifier and email are fixed and cannot be changed
         
-        // Password change is not allowed from this User Edit Service. Print a warning.
+        // Password change is not allowed from this User Edit Service. Print a
+        // warning.
         final String password = model.filter(null, SesameRealmConstants.OAS_USERSECRET, null).objectString();
         if(password != null)
         {
@@ -270,7 +273,8 @@ public class UserEditResourceImpl extends AbstractUserResourceImpl
             currentUser.setPosition(position);
         }
         
-        // TODO: no longer seems such a good idea! Simply updating the Status if sent seems better.
+        // TODO: no longer seems such a good idea! Simply updating the Status if
+        // sent seems better.
         PoddUserStatus status = PoddUserStatus.INACTIVE;
         final URI statusUri = model.filter(null, PoddRdfConstants.PODD_USER_STATUS, null).objectURI();
         if(statusUri != null)

@@ -299,9 +299,11 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
             final String body = this.getText(results);
             
             // verify: received contents are in RDF/JSON
-            // Assert.assertTrue("Result does not have @prefix", body.contains("@prefix"));
+            // Assert.assertTrue("Result does not have @prefix",
+            // body.contains("@prefix"));
             
-            // verify: received contents have artifact's ontology and version IRIs
+            // verify: received contents have artifact's ontology and version
+            // IRIs
             Assert.assertTrue("Result does not contain artifact URI", body.contains(artifactUri));
             
             final Model model = this.assertRdf(new StringReader(body), RDFFormat.RDFJSON, 28);
@@ -393,7 +395,8 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
             Assert.assertTrue("Turtle result did not have namespaces", body.contains("@prefix"));
             Assert.assertTrue("Turtle result should end with a period", body.endsWith(" ."));
             
-            // verify: received contents have artifact's ontology and version IRIs
+            // verify: received contents have artifact's ontology and version
+            // IRIs
             Assert.assertTrue("Result does not contain artifact URI", body.contains(artifactUri));
             
             final Model model = this.assertRdf(new StringReader(body), RDFFormat.TURTLE, 28);

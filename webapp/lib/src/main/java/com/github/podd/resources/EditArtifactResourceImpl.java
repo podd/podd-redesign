@@ -80,7 +80,8 @@ public class EditArtifactResourceImpl extends AbstractPoddResourceImpl
             throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Artifact IRI not submitted");
         }
         
-        // Once we find the artifact URI, check authentication for it immediately
+        // Once we find the artifact URI, check authentication for it
+        // immediately
         this.checkAuthentication(PoddAction.ARTIFACT_EDIT, PoddRdfConstants.VF.createURI(artifactUri));
         
         final String versionUri = this.getQuery().getFirstValue(PoddWebConstants.KEY_ARTIFACT_VERSION_IDENTIFIER, true);
@@ -156,7 +157,8 @@ public class EditArtifactResourceImpl extends AbstractPoddResourceImpl
                             updatePolicy, danglingObjectPolicy, fileRefVerificationPolicy);
             // TODO - send detailed errors for display where possible
             
-            // FIXME Change response format so that it does not resemble an empty OWL Ontology
+            // FIXME Change response format so that it does not resemble an
+            // empty OWL Ontology
             // - write the artifact ID into response
             Rio.write(model, output, outputFormat);
         }
@@ -281,7 +283,8 @@ public class EditArtifactResourceImpl extends AbstractPoddResourceImpl
         dataModel.put("artifactIri", ontologyID.getOntologyIRI().toString());
         dataModel.put("versionIri", ontologyID.getVersionIRI().toString());
         
-        // Defaults to false. Set to true if multiple objects are being edited concurrently
+        // Defaults to false. Set to true if multiple objects are being edited
+        // concurrently
         // TODO: investigate how to use this
         dataModel.put("initialized", false);
         dataModel.put("stopRefreshKey", "Stop Refresh Key");

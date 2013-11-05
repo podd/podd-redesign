@@ -391,8 +391,10 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
                     
                     if(currentVersionsMap.containsKey(nextImport))
                     {
-                        // Map down to the current version to ensure that we can load
-                        // multiple versions simultaneously (if possible with the rest of
+                        // Map down to the current version to ensure that we can
+                        // load
+                        // multiple versions simultaneously (if possible with
+                        // the rest of
                         // the system)
                         nextImportsSet.add(currentVersionsMap.get(nextImport));
                     }
@@ -409,7 +411,8 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
                             if(nextAllVersions.equals(nextImport))
                             {
                                 foundAllVersion = true;
-                                // this should not normally occur, as the current versions
+                                // this should not normally occur, as the
+                                // current versions
                                 // map should also contain this key
                                 nextImport = currentVersionsMap.get(nextAllVersions);
                                 nextImportsSet.add((URI)nextImport);
@@ -439,7 +442,8 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
             }
         }
         this.log.debug("adding import for {} at {}", nextVersionUri, maxIndex);
-        // TODO: FIXME: This will not allow for multiple versions of a single schema
+        // TODO: FIXME: This will not allow for multiple versions of a single
+        // schema
         // ontology at the same time
         importOrder.add(maxIndex, nextVersionUri);
     }
@@ -527,7 +531,8 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
                 else
                 {
                     schemaOntologyUris.add((URI)nextOntology);
-                    // check ontology IRI does not have any associated owl:imports
+                    // check ontology IRI does not have any associated
+                    // owl:imports
                     if(model.filter(nextOntology, OWL.IMPORTS, null).objects().size() > 0)
                     {
                         throw new SchemaManifestException(IRI.create((URI)nextOntology),
@@ -557,7 +562,8 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
             this.mapAllVersions(model, currentVersionsMap, allVersionsMap, nextSchemaOntologyUri);
         }
         
-        // Map the actual schema ontologies to the correct order, based on current versions and all
+        // Map the actual schema ontologies to the correct order, based on
+        // current versions and all
         // versions with the imports taken into account
         for(final URI nextVersionUri : schemaVersionUris)
         {
@@ -632,14 +638,16 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
         
         try
         {
-            // TODO: Should we store these copies in a separate repository again, to reduce bloat in
+            // TODO: Should we store these copies in a separate repository
+            // again, to reduce bloat in
             // the management repository??
             conn = this.repositoryManager.getManagementRepository().getConnection();
             conn.begin();
             
             this.owlManager.dumpOntologyToRepository(ontology, conn);
             
-            // FIXME: Remove the following once it is not needed and OWL databases are being used
+            // FIXME: Remove the following once it is not needed and OWL
+            // databases are being used
             final InferredOWLOntologyID nextInferredOntology = this.owlManager.inferStatements(ontology, conn);
             
             // update the link in the schema ontology management graph

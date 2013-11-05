@@ -43,7 +43,8 @@ public class SPARQLDataRepositoryImpl extends PoddFileRepositoryImpl<SPARQLDataR
     {
         super(nextDataRepository, model);
         
-        // check that the model contains values for protocol, host, port, fingerprint, username, and
+        // check that the model contains values for protocol, host, port,
+        // fingerprint, username, and
         // secret
         final String protocol =
                 model.filter(super.aliasUri, PoddRdfConstants.PODD_DATA_REPOSITORY_PROTOCOL, null).objectString();
@@ -73,7 +74,8 @@ public class SPARQLDataRepositoryImpl extends PoddFileRepositoryImpl<SPARQLDataR
             return false;
         }
         
-        // unnecessary as Generics ensure only an SPARQLDataReference can be passed in
+        // unnecessary as Generics ensure only an SPARQLDataReference can be
+        // passed in
         if(!(reference instanceof SPARQLDataReference))
         {
             return false;

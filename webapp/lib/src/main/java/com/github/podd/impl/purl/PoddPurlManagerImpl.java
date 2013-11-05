@@ -128,12 +128,15 @@ public class PoddPurlManagerImpl implements PoddPurlManager
     {
         final Set<PoddPurlReference> internalPurlResults =
                 Collections.newSetFromMap(new ConcurrentHashMap<PoddPurlReference, Boolean>());
-        // NOTE: We use a Set to avoid duplicate calls to any Purl processors for any
+        // NOTE: We use a Set to avoid duplicate calls to any Purl processors
+        // for any
         // temporary URI
         final Set<URI> temporaryURIs = Collections.newSetFromMap(new ConcurrentHashMap<URI, Boolean>());
         
-        // NOTE: a Factory may handle only a particular temporary URI format, necessitating to
-        // go through multiple factories to extract ALL temporary URIs in the Repository.
+        // NOTE: a Factory may handle only a particular temporary URI format,
+        // necessitating to
+        // go through multiple factories to extract ALL temporary URIs in the
+        // Repository.
         for(final PoddPurlProcessorFactory nextProcessorFactory : this.getPurlProcessorFactoryRegistry().getByStage(
                 this.processorStage))
         {
@@ -143,7 +146,8 @@ public class PoddPurlManagerImpl implements PoddPurlManager
                 
                 final GraphQuery graphQuery = repositoryConnection.prepareGraphQuery(QueryLanguage.SPARQL, sparqlQuery);
                 
-                // Create a new dataset to specify contexts that the query will be allowed to access
+                // Create a new dataset to specify contexts that the query will
+                // be allowed to access
                 final DatasetImpl dataset = new DatasetImpl();
                 for(final URI artifactGraphUri : contexts)
                 {
@@ -151,20 +155,25 @@ public class PoddPurlManagerImpl implements PoddPurlManager
                     dataset.addNamedGraph(artifactGraphUri);
                 }
                 
-                // set the dataset for the query to be our artificially constructed dataset
+                // set the dataset for the query to be our artificially
+                // constructed dataset
                 graphQuery.setDataset(dataset);
                 
                 final GraphQueryResult queryResult = graphQuery.evaluate();
                 
-                // If the query matched anything, then for each of the temporary URIs in the
-                // resulting construct statements, we create a Purl reference and add it to the
+                // If the query matched anything, then for each of the temporary
+                // URIs in the
+                // resulting construct statements, we create a Purl reference
+                // and add it to the
                 // results
                 while(queryResult.hasNext())
                 {
                     final Statement next = queryResult.next();
-                    // This processor factory matches the graph that we wish to use, so we create a
+                    // This processor factory matches the graph that we wish to
+                    // use, so we create a
                     // processor instance now to create the PURL
-                    // NOTE: This object cannot be shared as we do not specify that it needs to be
+                    // NOTE: This object cannot be shared as we do not specify
+                    // that it needs to be
                     // thread safe
                     final PoddPurlProcessor processor = nextProcessorFactory.getProcessor();
                     
@@ -176,8 +185,10 @@ public class PoddPurlManagerImpl implements PoddPurlManager
                         internalPurlResults.add(processor.handleTranslation((URI)next.getSubject(), parentUri));
                     }
                     
-                    // Predicate rewriting is not supported. Predicates in OWL Documents must
-                    // be URIs from recognized vocabularies, so cannot be auto generated PURLs
+                    // Predicate rewriting is not supported. Predicates in OWL
+                    // Documents must
+                    // be URIs from recognized vocabularies, so cannot be auto
+                    // generated PURLs
                     
                     // Object rewriting
                     if(next.getObject() instanceof URI && !temporaryURIs.contains(next.getObject())
@@ -191,7 +202,8 @@ public class PoddPurlManagerImpl implements PoddPurlManager
             catch(final MalformedQueryException | QueryEvaluationException e)
             {
                 this.log.error("Unexpected query exception", e);
-                // continue after logging an error, as another ProcessorFactory may generate a Purl
+                // continue after logging an error, as another ProcessorFactory
+                // may generate a Purl
                 // for this failed temporary URI
             }
         }

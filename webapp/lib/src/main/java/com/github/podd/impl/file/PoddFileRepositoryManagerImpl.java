@@ -156,7 +156,10 @@ public class PoddFileRepositoryManagerImpl implements PoddDataRepositoryManager
                         repositoryConfiguration.getAsModel()
                                 .filter(null, PoddRdfConstants.PODD_DATA_REPOSITORY_ALIAS, null).subjects();
                 
-                this.log.debug("Found {} subject URIs", subjectUris.size()); // should be only 1
+                this.log.debug("Found {} subject URIs", subjectUris.size()); // should
+                                                                             // be
+                                                                             // only
+                                                                             // 1
                                                                              // here
                 for(final Resource subjectUri : subjectUris)
                 {
@@ -173,7 +176,8 @@ public class PoddFileRepositoryManagerImpl implements PoddDataRepositoryManager
                     throw new FileRepositoryIncompleteException("Incomplete File Repository since Model is empty");
                 }
                 
-                // check that the subject URIs used in the repository configuration are not already
+                // check that the subject URIs used in the repository
+                // configuration are not already
                 // used in the file repository management graph
                 final Set<Resource> subjectUris =
                         model.filter(null, PoddRdfConstants.PODD_DATA_REPOSITORY_ALIAS, null).subjects();
@@ -249,14 +253,16 @@ public class PoddFileRepositoryManagerImpl implements PoddDataRepositoryManager
             }
             catch(OWLOntologyCreationException | OWLParserException | IOException e)
             {
-                // throwing up the original Exceptions is also a possibility here.
+                // throwing up the original Exceptions is also a possibility
+                // here.
                 throw new EmptyOntologyException(nextOntology, "Error parsing Model to create an Ontology");
             }
             
             // Repository configuration can be an empty ontology
             // if(nextOntology.isEmpty())
             // {
-            // throw new EmptyOntologyException(nextOntology, "Ontology was empty");
+            // throw new EmptyOntologyException(nextOntology,
+            // "Ontology was empty");
             // }
             
             // verify that the ontology in OWL-DL profile
@@ -412,8 +418,10 @@ public class PoddFileRepositoryManagerImpl implements PoddDataRepositoryManager
             
             final URI context = this.repositoryManager.getFileRepositoryManagementGraph();
             final Model repositories = new LinkedHashModel();
-            // Fetch the entire configuration into memory, as it should never be more than a trivial
-            // size. If this hampers efficiency could switch back to on demand querying
+            // Fetch the entire configuration into memory, as it should never be
+            // more than a trivial
+            // size. If this hampers efficiency could switch back to on demand
+            // querying
             Iterations.addAll(conn.getStatements(null, null, null, true, context), repositories);
             final Set<Resource> matchingRepositories = new HashSet<Resource>();
             for(final Resource nextRepository : repositories.filter(null, RDF.TYPE,
@@ -482,7 +490,8 @@ public class PoddFileRepositoryManagerImpl implements PoddDataRepositoryManager
         {
             this.log.info("File Repository Graph is empty. Loading default configurations...");
             
-            // validate the default alias file against the File Repository configuration schema
+            // validate the default alias file against the File Repository
+            // configuration schema
             this.verifyFileRepositoryAgainstSchema(defaultAliasConfiguration);
             
             final Model allAliases =
@@ -527,7 +536,8 @@ public class PoddFileRepositoryManagerImpl implements PoddDataRepositoryManager
                     "No File Repository mapped to this alias");
         }
         
-        // retrieved early simply to avoid having multiple RepositoryConnections open simultaneously
+        // retrieved early simply to avoid having multiple RepositoryConnections
+        // open simultaneously
         final int aliasCount = this.getRepositoryAliases(repositoryToRemove).size();
         
         RepositoryConnection conn = null;
@@ -540,7 +550,8 @@ public class PoddFileRepositoryManagerImpl implements PoddDataRepositoryManager
             
             if(aliasCount > 1)
             {
-                // several aliases map to this repository. only remove the statement which maps this
+                // several aliases map to this repository. only remove the
+                // statement which maps this
                 // alias
                 conn.remove(null, PoddRdfConstants.PODD_DATA_REPOSITORY_ALIAS, ValueFactoryImpl.getInstance()
                         .createLiteral(aliasInLowerCase), context);
@@ -555,7 +566,8 @@ public class PoddFileRepositoryManagerImpl implements PoddDataRepositoryManager
                                 .filter(null, PoddRdfConstants.PODD_DATA_REPOSITORY_ALIAS,
                                         ValueFactoryImpl.getInstance().createLiteral(aliasInLowerCase)).subjects();
                 
-                this.log.debug("Need to remove {} triples", subjectUris.size()); // DEBUG output
+                this.log.debug("Need to remove {} triples", subjectUris.size()); // DEBUG
+                                                                                 // output
                 for(final Resource subjectUri : subjectUris)
                 {
                     conn.remove(subjectUri, null, null, context);

@@ -103,7 +103,8 @@ public class UserDetailsResourceImpl extends AbstractUserResourceImpl
             dataModel.put("repositoryRoleList", roles);
         }
         
-        // Output the base template, with contentTemplate from the dataModel defining the
+        // Output the base template, with contentTemplate from the dataModel
+        // defining the
         // template to use for the content in the body of the page
         return RestletUtils.getHtmlRepresentation(PoddWebConstants.PROPERTY_TEMPLATE_BASE, dataModel,
                 MediaType.TEXT_HTML, this.getPoddApplication().getTemplateConfiguration());

@@ -24,14 +24,10 @@ import java.util.Map;
 
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.Model;
-import org.openrdf.model.URI;
-import org.openrdf.model.ValueFactory;
 import org.openrdf.model.impl.LinkedHashModel;
 import org.openrdf.model.vocabulary.RDF;
 import org.openrdf.model.vocabulary.RDFS;
 import org.openrdf.rio.RDFFormat;
-import org.openrdf.rio.RDFHandlerException;
-import org.openrdf.rio.RDFWriter;
 import org.openrdf.rio.Rio;
 import org.restlet.data.MediaType;
 import org.restlet.data.Status;
@@ -79,7 +75,8 @@ public class ListArtifactsResourceImpl extends AbstractPoddResourceImpl
             published = Boolean.parseBoolean(publishedString);
         }
         
-        // If the user is authenticated, set unpublished to true before checking the query
+        // If the user is authenticated, set unpublished to true before checking
+        // the query
         // parameters
         // if(this.getClientInfo().isAuthenticated())
         // {
@@ -93,7 +90,8 @@ public class ListArtifactsResourceImpl extends AbstractPoddResourceImpl
         }
         else
         {
-            // Default to showing unpublished artifacts to authenticated users if they did not
+            // Default to showing unpublished artifacts to authenticated users
+            // if they did not
             // specify anything in their query parameters
             unpublished = this.getRequest().getClientInfo().isAuthenticated();
         }
@@ -161,7 +159,8 @@ public class ListArtifactsResourceImpl extends AbstractPoddResourceImpl
                     }
                     catch(final ResourceException e)
                     {
-                        // Ignore this as it should not happen with the throwExceptionOnFailure
+                        // Ignore this as it should not happen with the
+                        // throwExceptionOnFailure
                         // parameter set to false.
                     }
                 }
@@ -220,7 +219,8 @@ public class ListArtifactsResourceImpl extends AbstractPoddResourceImpl
             }
         }
         
-        // Output the base template, with contentTemplate from the dataModel defining the
+        // Output the base template, with contentTemplate from the dataModel
+        // defining the
         // template to use for the content in the body of the page
         return RestletUtils.getHtmlRepresentation(PoddWebConstants.PROPERTY_TEMPLATE_BASE, dataModel,
                 MediaType.TEXT_HTML, this.getPoddApplication().getTemplateConfiguration());
@@ -253,12 +253,12 @@ public class ListArtifactsResourceImpl extends AbstractPoddResourceImpl
             for(final String nextKey : artifactsInternal.keySet())
             {
                 // log.info("nextArtifact: {}", nextKey);
-                List<InferredOWLOntologyID> nextArtifacts = artifactsInternal.get(nextKey);
+                final List<InferredOWLOntologyID> nextArtifacts = artifactsInternal.get(nextKey);
                 OntologyUtils.ontologyIDsToModel(nextArtifacts, model);
                 
                 final List<PoddObjectLabel> results = this.getPoddArtifactManager().getTopObjectLabels(nextArtifacts);
                 
-                for(PoddObjectLabel nextResult : results)
+                for(final PoddObjectLabel nextResult : results)
                 {
                     model.add(nextResult.getOntologyID().getOntologyIRI().toOpenRDFURI(),
                             PoddRdfConstants.PODD_BASE_HAS_TOP_OBJECT, nextResult.getObjectURI());

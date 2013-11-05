@@ -242,7 +242,7 @@ public class RestletPoddClientImpl implements PoddClient
     }
     
     @Override
-    public Model doSPARQL(String queryString, InferredOWLOntologyID artifactId) throws PoddClientException
+    public Model doSPARQL(final String queryString, final InferredOWLOntologyID artifactId) throws PoddClientException
     {
         this.log.info("cookies: {}", this.currentCookies);
         
@@ -265,7 +265,7 @@ public class RestletPoddClientImpl implements PoddClient
         // Pass the desired format to the get method of the ClientResource
         final Representation get = resource.get(RestletUtilMediaType.APPLICATION_RDF_JSON);
         
-        StringWriter writer = new StringWriter(4096);
+        final StringWriter writer = new StringWriter(4096);
         
         try
         {
@@ -414,7 +414,7 @@ public class RestletPoddClientImpl implements PoddClient
     private List<InferredOWLOntologyID> listArtifactsInternal(final boolean published, final boolean unpublished)
         throws PoddClientException
     {
-        return OntologyUtils.modelToOntologyIDs(listArtifacts(published, unpublished));
+        return OntologyUtils.modelToOntologyIDs(this.listArtifacts(published, unpublished));
     }
     
     @Override

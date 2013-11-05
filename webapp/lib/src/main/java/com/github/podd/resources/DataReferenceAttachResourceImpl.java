@@ -197,7 +197,8 @@ public class DataReferenceAttachResourceImpl extends AbstractPoddResourceImpl
         dataModel.put("parentObject", parentDetails);
         dataModel.put("objectUri", objectUri);
         
-        // Output the base template, with contentTemplate from the dataModel defining the
+        // Output the base template, with contentTemplate from the dataModel
+        // defining the
         // template to use for the content in the body of the page
         return RestletUtils.getHtmlRepresentation(PoddWebConstants.PROPERTY_TEMPLATE_BASE, dataModel,
                 MediaType.TEXT_HTML, this.getPoddApplication().getTemplateConfiguration());
@@ -225,7 +226,8 @@ public class DataReferenceAttachResourceImpl extends AbstractPoddResourceImpl
             throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Artifact Version IRI not submitted");
         }
         
-        // check optional parameter: whether file references should be verified. Defaults to NO
+        // check optional parameter: whether file references should be verified.
+        // Defaults to NO
         final String verifyFileRefs = this.getQuery().getFirstValue(PoddWebConstants.KEY_VERIFICATION_POLICY, true);
         DataReferenceVerificationPolicy verificationPolicy = DataReferenceVerificationPolicy.DO_NOT_VERIFY;
         if(verifyFileRefs != null && Boolean.valueOf(verifyFileRefs))

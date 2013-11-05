@@ -131,7 +131,8 @@ public class UploadArtifactResourceImpl extends AbstractPoddResourceImpl
         
         if(MediaType.MULTIPART_FORM_DATA.equals(entity.getMediaType(), true))
         {
-            // - extract file from incoming Representation and load artifact to PODD
+            // - extract file from incoming Representation and load artifact to
+            // PODD
             artifactMap = this.uploadFileAndLoadArtifactIntoPodd(entity);
         }
         else
@@ -141,7 +142,8 @@ public class UploadArtifactResourceImpl extends AbstractPoddResourceImpl
             
             if(formatString == null)
             {
-                // Use the media type that was attached to the entity as a fallback if they did not
+                // Use the media type that was attached to the entity as a
+                // fallback if they did not
                 // specify it as a query parameter
                 formatString = entity.getMediaType().getName();
             }
@@ -178,7 +180,8 @@ public class UploadArtifactResourceImpl extends AbstractPoddResourceImpl
             
         }
         
-        // Map uploading user as Project Administrator for this artifact so that they can edit it
+        // Map uploading user as Project Administrator for this artifact so that
+        // they can edit it
         // and assign permissions to it in the future
         final PoddSesameRealm realm = this.getPoddApplication().getRealm();
         realm.map(this.getRequest().getClientInfo().getUser(), PoddRoles.PROJECT_ADMIN.getRole(), artifactMap
@@ -195,7 +198,8 @@ public class UploadArtifactResourceImpl extends AbstractPoddResourceImpl
     @Get
     public Representation getUploadArtifactPage(final Representation entity) throws ResourceException
     {
-        // even though this only does a page READ, we're checking authorization for CREATE since the
+        // even though this only does a page READ, we're checking authorization
+        // for CREATE since the
         // page is for creating a new artifact via a file upload
         this.checkAuthentication(PoddAction.ARTIFACT_CREATE);
         
@@ -205,7 +209,8 @@ public class UploadArtifactResourceImpl extends AbstractPoddResourceImpl
         dataModel.put("contentTemplate", "artifact_upload.html.ftl");
         dataModel.put("pageTitle", UploadArtifactResourceImpl.UPLOAD_PAGE_TITLE_TEXT);
         
-        // Output the base template, with contentTemplate from the dataModel defining the
+        // Output the base template, with contentTemplate from the dataModel
+        // defining the
         // template to use for the content in the body of the page
         return RestletUtils.getHtmlRepresentation(PoddWebConstants.PROPERTY_TEMPLATE_BASE, dataModel,
                 MediaType.TEXT_HTML, this.getPoddApplication().getTemplateConfiguration());
@@ -232,7 +237,8 @@ public class UploadArtifactResourceImpl extends AbstractPoddResourceImpl
         // This is now an InferredOWLOntologyID
         dataModel.put("artifact", artifactMap);
         
-        // Output the base template, with contentTemplate from the dataModel defining the
+        // Output the base template, with contentTemplate from the dataModel
+        // defining the
         // template to use for the content in the body of the page
         return RestletUtils.getHtmlRepresentation(PoddWebConstants.PROPERTY_TEMPLATE_BASE, dataModel,
                 MediaType.TEXT_HTML, this.getPoddApplication().getTemplateConfiguration());
@@ -285,7 +291,8 @@ public class UploadArtifactResourceImpl extends AbstractPoddResourceImpl
             
             try
             {
-                // FIXME: This should be a method inside of PoddArtifactManagerImpl
+                // FIXME: This should be a method inside of
+                // PoddArtifactManagerImpl
                 final Collection<OWLOntologyID> schemaImports =
                         this.getPoddArtifactManager().getSchemaImports(artifactId);
                 conn = this.getPoddRepositoryManager().getPermanentRepository(schemaImports).getConnection();
@@ -415,7 +422,8 @@ public class UploadArtifactResourceImpl extends AbstractPoddResourceImpl
         final Map<String, String> props = new HashMap<String, String>();
         try
         {
-            // 3: Request is parsed by the handler which generates a list of FileItems
+            // 3: Request is parsed by the handler which generates a list of
+            // FileItems
             items = upload.parseRequest(this.getRequest());
             
             for(final FileItem fi : items)
@@ -428,10 +436,13 @@ public class UploadArtifactResourceImpl extends AbstractPoddResourceImpl
                 }
                 else
                 {
-                    // FIXME: Strip everything up to the last . out of the filename so that
-                    // the filename can be used for content type determination where
+                    // FIXME: Strip everything up to the last . out of the
+                    // filename so that
+                    // the filename can be used for content type determination
+                    // where
                     // possible.
-                    // InputStream uploadedFileInputStream = fi.getInputStream();
+                    // InputStream uploadedFileInputStream =
+                    // fi.getInputStream();
                     try
                     {
                         // Note: These are Java-7 APIs
@@ -449,7 +460,8 @@ public class UploadArtifactResourceImpl extends AbstractPoddResourceImpl
                     }
                     catch(final Exception e)
                     {
-                        // avoid throwing a generic exception just because the apache
+                        // avoid throwing a generic exception just because the
+                        // apache
                         // commons library throws Exception
                         throw new IOException(e);
                     }
@@ -473,15 +485,18 @@ public class UploadArtifactResourceImpl extends AbstractPoddResourceImpl
         
         RDFFormat format = null;
         
-        // If the content type was application/octet-stream then use the file name instead
-        // Browsers attach this content type when they are not sure what the real type is
+        // If the content type was application/octet-stream then use the file
+        // name instead
+        // Browsers attach this content type when they are not sure what the
+        // real type is
         if(MediaType.APPLICATION_OCTET_STREAM.getName().equals(contentType))
         {
             format = Rio.getParserFormatForFileName(filePath.getFileName().toString());
             
             this.log.info("octet-stream contentType filename format={}", format);
         }
-        // Otherwise use the content type directly in preference to using the filename
+        // Otherwise use the content type directly in preference to using the
+        // filename
         else if(contentType != null)
         {
             format = Rio.getParserFormatForMIMEType(contentType);
@@ -489,7 +504,8 @@ public class UploadArtifactResourceImpl extends AbstractPoddResourceImpl
             this.log.info("non-octet-stream contentType format={}", format);
         }
         
-        // If the content type choices failed to resolve the type, then try the filename
+        // If the content type choices failed to resolve the type, then try the
+        // filename
         if(format == null)
         {
             format = Rio.getParserFormatForFileName(filePath.getFileName().toString());
@@ -497,7 +513,8 @@ public class UploadArtifactResourceImpl extends AbstractPoddResourceImpl
             this.log.info("non-content-type filename format={}", format);
         }
         
-        // Or fallback to RDF/XML which at minimum is able to detect when the document is
+        // Or fallback to RDF/XML which at minimum is able to detect when the
+        // document is
         // structurally invalid
         if(format == null)
         {

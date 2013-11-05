@@ -90,7 +90,8 @@ public class UserAddResourceImpl extends AbstractUserResourceImpl
             // - create new PoddUser and add to Realm
             newUser = PoddUser.fromModel(newUserModel, true, false, false);
             
-            // If we didn't get a secret, then do not activate their login at this stage
+            // If we didn't get a secret, then do not activate their login at
+            // this stage
             if(newUser.getSecret() == null)
             {
                 newUser.setUserStatus(PoddUserStatus.INACTIVE);
@@ -193,7 +194,8 @@ public class UserAddResourceImpl extends AbstractUserResourceImpl
         final PoddUserStatus[] statuses = PoddUserStatus.values();
         dataModel.put("statusList", statuses);
         
-        // Output the base template, with contentTemplate from the dataModel defining the
+        // Output the base template, with contentTemplate from the dataModel
+        // defining the
         // template to use for the content in the body of the page
         return RestletUtils.getHtmlRepresentation(PoddWebConstants.PROPERTY_TEMPLATE_BASE, dataModel,
                 MediaType.TEXT_HTML, this.getPoddApplication().getTemplateConfiguration());

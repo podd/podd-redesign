@@ -125,11 +125,13 @@ public class FailOnTimeoutWithStackTraces extends Statement
         }
         catch(final InterruptedException e)
         {
-            return e; // caller will re-throw; no need to call Thread.interrupt()
+            return e; // caller will re-throw; no need to call
+                      // Thread.interrupt()
         }
         catch(final ExecutionException e)
         {
-            // test failed; have caller re-throw the exception thrown by the test
+            // test failed; have caller re-throw the exception thrown by the
+            // test
             return e.getCause();
         }
         catch(final TimeoutException e)

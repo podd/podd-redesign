@@ -47,7 +47,8 @@ public class SparqlResourceImplTest extends AbstractResourceImplTest
         // prepare:
         final ClientResource searchClientResource = new ClientResource(this.getUrl(PoddWebConstants.PATH_SPARQL));
         
-        // there is no need to authenticate or have a test artifact as the artifact ID is checked
+        // there is no need to authenticate or have a test artifact as the
+        // artifact ID is checked
         // for first
         try
         {
@@ -73,7 +74,8 @@ public class SparqlResourceImplTest extends AbstractResourceImplTest
         // prepare:
         final ClientResource searchClientResource = new ClientResource(this.getUrl(PoddWebConstants.PATH_SPARQL));
         
-        // there is no need to authenticate or have a test artifact as the artifact ID is checked
+        // there is no need to authenticate or have a test artifact as the
+        // artifact ID is checked
         // for first
         try
         {
@@ -103,7 +105,8 @@ public class SparqlResourceImplTest extends AbstractResourceImplTest
         
         final ClientResource searchClientResource = new ClientResource(this.getUrl(PoddWebConstants.PATH_SPARQL));
         
-        // there is no need to authenticate or have a test artifact as the search term is checked
+        // there is no need to authenticate or have a test artifact as the
+        // search term is checked
         // for first
         try
         {
@@ -134,7 +137,8 @@ public class SparqlResourceImplTest extends AbstractResourceImplTest
         // prepare:
         final ClientResource searchClientResource = new ClientResource(this.getUrl(PoddWebConstants.PATH_SPARQL));
         
-        // there is no need to authenticate or have a test artifact as the artifact ID is checked
+        // there is no need to authenticate or have a test artifact as the
+        // artifact ID is checked
         // for first
         try
         {
@@ -171,7 +175,8 @@ public class SparqlResourceImplTest extends AbstractResourceImplTest
         // prepare:
         final ClientResource searchClientResource = new ClientResource(this.getUrl(PoddWebConstants.PATH_SPARQL));
         
-        // there is no need to authenticate or have a test artifact as the artifact ID is checked
+        // there is no need to authenticate or have a test artifact as the
+        // artifact ID is checked
         // for first
         try
         {
@@ -208,7 +213,8 @@ public class SparqlResourceImplTest extends AbstractResourceImplTest
         // prepare:
         final ClientResource searchClientResource = new ClientResource(this.getUrl(PoddWebConstants.PATH_SPARQL));
         
-        // there is no need to authenticate or have a test artifact as the artifact ID is checked
+        // there is no need to authenticate or have a test artifact as the
+        // artifact ID is checked
         // for first
         try
         {
@@ -246,7 +252,8 @@ public class SparqlResourceImplTest extends AbstractResourceImplTest
         // prepare:
         final ClientResource searchClientResource = new ClientResource(this.getUrl(PoddWebConstants.PATH_SPARQL));
         
-        // there is no need to authenticate or have a test artifact as the artifact ID is checked
+        // there is no need to authenticate or have a test artifact as the
+        // artifact ID is checked
         // for first
         try
         {
@@ -284,7 +291,8 @@ public class SparqlResourceImplTest extends AbstractResourceImplTest
         // prepare:
         final ClientResource searchClientResource = new ClientResource(this.getUrl(PoddWebConstants.PATH_SPARQL));
         
-        // there is no need to authenticate or have a test artifact as the artifact ID is checked
+        // there is no need to authenticate or have a test artifact as the
+        // artifact ID is checked
         // for first
         try
         {
@@ -300,7 +308,8 @@ public class SparqlResourceImplTest extends AbstractResourceImplTest
                             MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
             
             // verify: response
-            // TODO: Deduplicate statements so they don't appear in both the inferred and concrete
+            // TODO: Deduplicate statements so they don't appear in both the
+            // inferred and concrete
             final Model resultModel = this.assertRdf(results, RDFFormat.RDFXML, 835);
             // verify that only type statements have been returned
             Assert.assertEquals(835, resultModel.filter(null, RDF.TYPE, null).size());

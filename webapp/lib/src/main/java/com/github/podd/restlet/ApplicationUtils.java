@@ -143,7 +143,8 @@ public class ApplicationUtils
             
             if(nextRealm.getVerifier() instanceof DigestVerifier)
             {
-                // NOTE: The verifier in this case must support digest verification by being an
+                // NOTE: The verifier in this case must support digest
+                // verification by being an
                 // instance of DigestVerifier
                 result.setVerifier(nextRealm.getVerifier());
             }
@@ -213,7 +214,8 @@ public class ApplicationUtils
         final String repositoryUrl =
                 props.get(PoddWebConstants.PROPERTY_SESAME_URL, PoddWebConstants.DEFAULT_SESAME_URL);
         
-        // if we weren't able to find a repository URL in the configuration, we setup an
+        // if we weren't able to find a repository URL in the configuration, we
+        // setup an
         // in-memory store
         if(repositoryUrl == null || repositoryUrl.trim().isEmpty())
         {
@@ -290,7 +292,8 @@ public class ApplicationUtils
         
         // File Reference manager
         final DataReferenceProcessorRegistry nextFileRegistry = new DataReferenceProcessorRegistry();
-        // clear any automatically added entries that may come from META-INF/services entries on the
+        // clear any automatically added entries that may come from
+        // META-INF/services entries on the
         // classpath
         nextFileRegistry.clear();
         final DataReferenceProcessorFactory nextFileProcessorFactory = new SSHFileReferenceProcessorFactoryImpl();
@@ -374,19 +377,18 @@ public class ApplicationUtils
             
             // TODO: Use a manifest file to load up the current versions here
             /*
-             * application.getPoddSchemaManager().uploadSchemaOntology(
-             * ApplicationUtils.class.getResourceAsStream(PoddRdfConstants.PATH_PODD_DCTERMS),
-             * RDFFormat.RDFXML); application.getPoddSchemaManager().uploadSchemaOntology(
-             * ApplicationUtils.class.getResourceAsStream(PoddRdfConstants.PATH_PODD_FOAF),
-             * RDFFormat.RDFXML); application.getPoddSchemaManager().uploadSchemaOntology(
-             * ApplicationUtils.class.getResourceAsStream(PoddRdfConstants.PATH_PODD_USER),
-             * RDFFormat.RDFXML); application.getPoddSchemaManager().uploadSchemaOntology(
-             * ApplicationUtils.class.getResourceAsStream(PoddRdfConstants.PATH_PODD_BASE),
-             * RDFFormat.RDFXML); application.getPoddSchemaManager().uploadSchemaOntology(
-             * ApplicationUtils.class.getResourceAsStream(PoddRdfConstants.PATH_PODD_SCIENCE),
-             * RDFFormat.RDFXML); application.getPoddSchemaManager().uploadSchemaOntology(
-             * ApplicationUtils.class.getResourceAsStream(PoddRdfConstants.PATH_PODD_PLANT),
-             * RDFFormat.RDFXML);
+             * application.getPoddSchemaManager().uploadSchemaOntology( ApplicationUtils
+             * .class.getResourceAsStream(PoddRdfConstants.PATH_PODD_DCTERMS), RDFFormat.RDFXML);
+             * application.getPoddSchemaManager().uploadSchemaOntology( ApplicationUtils
+             * .class.getResourceAsStream(PoddRdfConstants.PATH_PODD_FOAF), RDFFormat.RDFXML);
+             * application.getPoddSchemaManager().uploadSchemaOntology( ApplicationUtils
+             * .class.getResourceAsStream(PoddRdfConstants.PATH_PODD_USER), RDFFormat.RDFXML);
+             * application.getPoddSchemaManager().uploadSchemaOntology( ApplicationUtils
+             * .class.getResourceAsStream(PoddRdfConstants.PATH_PODD_BASE), RDFFormat.RDFXML);
+             * application.getPoddSchemaManager().uploadSchemaOntology( ApplicationUtils
+             * .class.getResourceAsStream(PoddRdfConstants.PATH_PODD_SCIENCE), RDFFormat.RDFXML);
+             * application.getPoddSchemaManager().uploadSchemaOntology( ApplicationUtils
+             * .class.getResourceAsStream(PoddRdfConstants.PATH_PODD_PLANT), RDFFormat.RDFXML);
              */
             // Enable the following for debugging
             // dumpSchemaGraph(application, nextRepository);
@@ -396,7 +398,8 @@ public class ApplicationUtils
             ApplicationUtils.log.error("Fatal Error!!! Could not load schema ontologies", e);
         }
         
-        // OasMemoryRealm has extensions so that getClientInfo().getUser() will contain first name,
+        // OasMemoryRealm has extensions so that getClientInfo().getUser() will
+        // contain first name,
         // last name, and email address as necessary
         final PoddSesameRealm nextRealm =
                 new PoddSesameRealm(nextRepository, PoddRdfConstants.DEFAULT_USER_MANAGEMENT_GRAPH);
@@ -404,7 +407,8 @@ public class ApplicationUtils
         // FIXME: Make this configurable
         nextRealm.setName("PODDRealm");
         
-        // Check if there is a current admin, and only add our test admin user if there is no admin
+        // Check if there is a current admin, and only add our test admin user
+        // if there is no admin
         // in the system
         boolean foundCurrentAdmin = false;
         for(final RestletUtilUser nextUser : nextRealm.getUsers())
@@ -435,17 +439,23 @@ public class ApplicationUtils
             
             ApplicationUtils.log.debug("testAdminUserRoles: {}, {}", testAdminUserRoles, testAdminUserRoles.size());
             
-            // FIXME: Should put the application in maintenance mode at this point (when that is
-            // supported), to require password/username change before opening up to other users
+            // FIXME: Should put the application in maintenance mode at this
+            // point (when that is
+            // supported), to require password/username change before opening up
+            // to other users
             
         }
         // final User findUser = nextRealm.findUser("testAdminUser");
         
         // ApplicationUtils.log.debug("findUser: {}", findUser);
-        // ApplicationUtils.log.debug("findUser.getFirstName: {}", findUser.getFirstName());
-        // ApplicationUtils.log.debug("findUser.getLastName: {}", findUser.getLastName());
-        // ApplicationUtils.log.debug("findUser.getName: {}", findUser.getName());
-        // ApplicationUtils.log.debug("findUser.getIdentifier: {}", findUser.getIdentifier());
+        // ApplicationUtils.log.debug("findUser.getFirstName: {}",
+        // findUser.getFirstName());
+        // ApplicationUtils.log.debug("findUser.getLastName: {}",
+        // findUser.getLastName());
+        // ApplicationUtils.log.debug("findUser.getName: {}",
+        // findUser.getName());
+        // ApplicationUtils.log.debug("findUser.getIdentifier: {}",
+        // findUser.getIdentifier());
         
         // TODO: Define groups here also
         
@@ -455,7 +465,8 @@ public class ApplicationUtils
         // hardcodedLocalSecrets.put("testUser", "testPassword".toCharArray());
         // verifier.setLocalSecrets(hardcodedLocalSecrets);
         
-        // final Context authenticatorChildContext = applicationContext.createChildContext();
+        // final Context authenticatorChildContext =
+        // applicationContext.createChildContext();
         final ChallengeAuthenticator newAuthenticator =
                 ApplicationUtils.getNewAuthenticator(nextRealm, applicationContext, props);
         application.setAuthenticator(newAuthenticator);
@@ -470,11 +481,13 @@ public class ApplicationUtils
         // applicationContext.setDefaultVerifier(nextRealm.getVerifier());
         // applicationContext.setDefaultEnroler(nextRealm.getEnroler());
         
-        // final Context templateChildContext = applicationContext.createChildContext();
+        // final Context templateChildContext =
+        // applicationContext.createChildContext();
         final Configuration newTemplateConfiguration = ApplicationUtils.getNewTemplateConfiguration(applicationContext);
         application.setTemplateConfiguration(newTemplateConfiguration);
         
-        // create a custom error handler using our overridden PoddStatusService together with the
+        // create a custom error handler using our overridden PoddStatusService
+        // together with the
         // freemarker configuration
         final PoddStatusService statusService = new PoddStatusService(newTemplateConfiguration);
         application.setStatusService(statusService);

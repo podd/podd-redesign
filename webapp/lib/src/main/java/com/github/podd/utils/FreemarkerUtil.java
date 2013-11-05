@@ -86,7 +86,8 @@ public class FreemarkerUtil
                 
                 return dataType.stringValue();
             }
-            // Default to xsd:string datatype if any value happens to get through without a datatype
+            // Default to xsd:string datatype if any value happens to get
+            // through without a datatype
             // at this point
             return "xsd:string";
         }

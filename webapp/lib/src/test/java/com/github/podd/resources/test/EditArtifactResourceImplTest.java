@@ -193,7 +193,8 @@ public class EditArtifactResourceImplTest extends AbstractResourceImplTest
             Assert.assertTrue("Version IRI not in response", updatedArtifactDetails.contains("versionIRI"));
             Assert.assertTrue("Inferred version not in response", updatedArtifactDetails.contains("inferredVersion"));
             
-            // verify: objects left dangling after edit have been removed from the artifact
+            // verify: objects left dangling after edit have been removed from
+            // the artifact
             final String artifactBody =
                     this.getArtifactAsString(artifactID.getOntologyIRI().toString(), MediaType.APPLICATION_RDF_TURTLE);
             final String[] danglingObjects =
@@ -325,7 +326,8 @@ public class EditArtifactResourceImplTest extends AbstractResourceImplTest
         {
             Assert.assertEquals(Status.CLIENT_ERROR_NOT_FOUND, e.getStatus());
             
-            // TODO: verify the cause and details (as in UploadArtifactResourceImplTest)
+            // TODO: verify the cause and details (as in
+            // UploadArtifactResourceImplTest)
             final String body = this.getText(editArtifactClientResource.getResponseEntity());
             final ByteArrayInputStream inputStream = new ByteArrayInputStream(body.getBytes(StandardCharsets.UTF_8));
             final Model model = Rio.parse(inputStream, "", RDFFormat.RDFXML);
@@ -395,7 +397,8 @@ public class EditArtifactResourceImplTest extends AbstractResourceImplTest
         final ClientResource editArtifactClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_EDIT));
         
-        // there is no need to authenticate, have a test artifact or send RDF to modify as the
+        // there is no need to authenticate, have a test artifact or send RDF to
+        // modify as the
         // artifact is checked for first
         try
         {
@@ -536,7 +539,8 @@ public class EditArtifactResourceImplTest extends AbstractResourceImplTest
         try
         {
             editArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactUri);
-            // not requesting a specific object results in the Project being shown.
+            // not requesting a specific object results in the Project being
+            // shown.
             
             final Representation results =
                     RestletTestUtils.doTestAuthenticatedRequest(editArtifactClientResource, Method.GET, null,

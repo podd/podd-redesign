@@ -59,7 +59,8 @@ public class GetSchemaResourceImpl extends AbstractPoddResourceImpl
             
             final String schemaPath = (String)this.getRequest().getAttributes().get(PoddWebConstants.KEY_SCHEMA_PATH);
             
-            // If they didn't specify anything in query parameters, look at the path for a backup
+            // If they didn't specify anything in query parameters, look at the
+            // path for a backup
             if(schemaString == null && versionString == null)
             {
                 if(schemaPath != null)

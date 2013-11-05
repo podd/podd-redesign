@@ -137,7 +137,7 @@ public class SPARQLDataRepositoryImplTest extends AbstractPoddFileRepositoryTest
      * 
      * (non-Javadoc)
      * 
-     * @see com.github.podd.api.file.test.AbstractPoddFileRepositoryTest#getNewPoddFileRepository()
+     * @see com.github.podd.api.file.test.AbstractPoddFileRepositoryTest# getNewPoddFileRepository()
      */
     @Override
     protected PoddDataRepository<SPARQLDataReference> getNewPoddFileRepository() throws Exception

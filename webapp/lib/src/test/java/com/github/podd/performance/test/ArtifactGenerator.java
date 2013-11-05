@@ -262,7 +262,8 @@ public class ArtifactGenerator
     {
         final URI objectUri =
                 ArtifactGenerator.VF.createURI("urn:temp:uuid:object:" + seed + ":" + UUID.randomUUID().toString());
-        // final URI objectUri = VF.createURI("http://example.com/podd-performance:" + seed + ":" +
+        // final URI objectUri =
+        // VF.createURI("http://example.com/podd-performance:" + seed + ":" +
         // UUID.randomUUID().toString());
         return objectUri;
     }

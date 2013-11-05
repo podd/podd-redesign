@@ -56,7 +56,8 @@ public class GetMetadataResourceImplTest extends AbstractResourceImplTest
             
             // FIXME: Is there a better way to do this
             // verify: response is empty as no such object exists
-            // Assert.assertTrue("Expected NULL for response text", getText(results).isEmpty());
+            // Assert.assertTrue("Expected NULL for response text",
+            // getText(results).isEmpty());
         }
         finally
         {
@@ -182,15 +183,19 @@ public class GetMetadataResourceImplTest extends AbstractResourceImplTest
             
             // final String body = getText(results);
             // verify:
-            // Assert.assertNull("No content since Publication cannot have child objects", body);
+            // Assert.assertNull("No content since Publication cannot have child objects",
+            // body);
             // final Model model =
-            // this.assertRdf(new ByteArrayInputStream(body.getBytes(StandardCharsets.UTF_8)),
+            // this.assertRdf(new
+            // ByteArrayInputStream(body.getBytes(StandardCharsets.UTF_8)),
             // RDFFormat.TURTLE, 7);
             //
             // Assert.assertEquals("Unexpected no. of properties", 1,
-            // model.filter(PoddRdfConstants.VF.createURI(objectType), null, null).size() - 1);
+            // model.filter(PoddRdfConstants.VF.createURI(objectType), null,
+            // null).size() - 1);
             // Assert.assertEquals("Expected no Do-Not-Display properties", 0,
-            // model.filter(null, PoddRdfConstants.PODD_BASE_DO_NOT_DISPLAY, null).size());
+            // model.filter(null, PoddRdfConstants.PODD_BASE_DO_NOT_DISPLAY,
+            // null).size());
         }
         finally
         {
@@ -249,7 +254,8 @@ public class GetMetadataResourceImplTest extends AbstractResourceImplTest
             createObjectClientResource.addQueryParameter(PoddWebConstants.KEY_OBJECT_TYPE_IDENTIFIER, objectType);
             
             // include-do-not-display-properties defaults to false
-            // metadata-policy defaults to exclude sub-properties of poddBase:contains
+            // metadata-policy defaults to exclude sub-properties of
+            // poddBase:contains
             
             final Representation results =
                     RestletTestUtils.doTestAuthenticatedRequest(createObjectClientResource, Method.GET, null,
@@ -289,7 +295,8 @@ public class GetMetadataResourceImplTest extends AbstractResourceImplTest
             createObjectClientResource.addQueryParameter(PoddWebConstants.KEY_OBJECT_TYPE_IDENTIFIER, objectType);
             
             // include-do-not-display-properties defaults to false
-            // metadata-policy defaults to exclude sub-properties of poddBase:contains
+            // metadata-policy defaults to exclude sub-properties of
+            // poddBase:contains
             
             final Representation results =
                     RestletTestUtils.doTestAuthenticatedRequest(createObjectClientResource, Method.GET, null,
@@ -321,7 +328,8 @@ public class GetMetadataResourceImplTest extends AbstractResourceImplTest
             createObjectClientResource.addQueryParameter(PoddWebConstants.KEY_OBJECT_TYPE_IDENTIFIER, objectType);
             
             // include-do-not-display-properties defaults to false
-            // metadata-policy defaults to exclude sub-properties of poddBase:contains
+            // metadata-policy defaults to exclude sub-properties of
+            // poddBase:contains
             
             final Representation results =
                     RestletTestUtils.doTestAuthenticatedRequest(createObjectClientResource, Method.GET, null,

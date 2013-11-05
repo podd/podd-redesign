@@ -147,7 +147,8 @@ public class UserEditResourceImplTest extends AbstractResourceImplTest
                 Assert.assertEquals("Unexpected user identifier", testIdentifier,
                         model.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).objectString());
                 
-                // verify: details have been correctly updated (by retrieving User details again)
+                // verify: details have been correctly updated (by retrieving
+                // User details again)
                 final ClientResource userDetailsClientResource2 =
                         new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_DETAILS));
                 try
@@ -312,7 +313,8 @@ public class UserEditResourceImplTest extends AbstractResourceImplTest
                 Assert.assertEquals("Unexpected user identifier", testIdentifier,
                         model.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).objectString());
                 
-                // verify: details have been correctly updated (by retrieving User details again)
+                // verify: details have been correctly updated (by retrieving
+                // User details again)
                 final ClientResource userDetailsClientResource2 =
                         new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_DETAILS));
                 try

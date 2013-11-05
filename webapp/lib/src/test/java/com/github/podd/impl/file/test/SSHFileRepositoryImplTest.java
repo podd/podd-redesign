@@ -160,7 +160,7 @@ public class SSHFileRepositoryImplTest extends AbstractPoddFileRepositoryTest<SS
      * 
      * (non-Javadoc)
      * 
-     * @see com.github.podd.api.file.test.AbstractPoddFileRepositoryTest#getNewPoddFileRepository()
+     * @see com.github.podd.api.file.test.AbstractPoddFileRepositoryTest# getNewPoddFileRepository()
      */
     @Override
     protected PoddDataRepository<SSHFileReference> getNewPoddFileRepository() throws Exception

@@ -40,7 +40,8 @@ public class AboutResourceImpl extends AbstractPoddResourceImpl
     public Representation getAboutPageHtml(final Representation entity) throws ResourceException
     {
         // Enable the following to test authenticated access
-        // this.getPoddApplication().authenticate(PoddAction.ROLE_EDIT, getRequest(),
+        // this.getPoddApplication().authenticate(PoddAction.ROLE_EDIT,
+        // getRequest(),
         // getResponse());
         this.log.info("getAboutPageHtml");
         final User user = this.getRequest().getClientInfo().getUser();
@@ -53,12 +54,14 @@ public class AboutResourceImpl extends AbstractPoddResourceImpl
         
         dataModel.put("pageTitle", "PODD About Page");
         
-        // FIXME: By default use the referrer to populate the redirectTo field internally for
+        // FIXME: By default use the referrer to populate the redirectTo field
+        // internally for
         // use after a successful login
         dataModel.put("referrerRef", this.getRequest().getReferrerRef());
         this.log.info("referrerRef={}", this.getRequest().getReferrerRef());
         
-        // Output the base template, with contentTemplate from the dataModel defining the
+        // Output the base template, with contentTemplate from the dataModel
+        // defining the
         // template
         // to use for the content in the body of the page
         return RestletUtils.getHtmlRepresentation(PoddWebConstants.PROPERTY_TEMPLATE_BASE, dataModel,

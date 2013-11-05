@@ -108,9 +108,11 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
             }
             else
             {
-                // Make them authenticate first so that only authenticated users see 404 messages
+                // Make them authenticate first so that only authenticated users
+                // see 404 messages
                 this.checkAuthentication(PoddAction.UNPUBLISHED_ARTIFACT_READ, null, true);
-                // Should never hit here, but putting it here to avoid possible NPEs further on
+                // Should never hit here, but putting it here to avoid possible
+                // NPEs further on
                 throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Something went wrong");
             }
         }
@@ -163,9 +165,11 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
     @Get(":rdf|rj|json|ttl")
     public Representation getArtifactRdf(final Representation entity, final Variant variant) throws ResourceException
     {
-        // FIXME: Some Firefox requests get sent with Accept: */*, and Restlet chooses this method
+        // FIXME: Some Firefox requests get sent with Accept: */*, and Restlet
+        // chooses this method
         // instead of HTML as default
-        // To fix this we need to check whether Accept is exactly "*/*" and response with HTML
+        // To fix this we need to check whether Accept is exactly "*/*" and
+        // response with HTML
         // variant instead of an RDF variant
         
         this.log.debug("getArtifactRdf");
@@ -322,7 +326,8 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
         
         dataModel.put("util", new FreemarkerUtil());
         
-        // FIXME: No support currently for interactive editing of data references, so hide the edit
+        // FIXME: No support currently for interactive editing of data
+        // references, so hide the edit
         // button to avoid users clicking on it
         for(final PoddObjectLabel nextType : objectTypes)
         {

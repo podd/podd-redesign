@@ -55,7 +55,8 @@ public class ListArtifactsResourceImplTest extends AbstractResourceImplTest
             listArtifactsClientResource.addQueryParameter(PoddWebConstants.KEY_PUBLISHED, "true");
             listArtifactsClientResource.addQueryParameter(PoddWebConstants.KEY_UNPUBLISHED, "true");
             
-            // Representation results = listArtifactsClientResource.get(MediaType.TEXT_HTML);
+            // Representation results =
+            // listArtifactsClientResource.get(MediaType.TEXT_HTML);
             final Representation results =
                     RestletTestUtils.doTestAuthenticatedRequest(listArtifactsClientResource, Method.GET, null,
                             MediaType.TEXT_HTML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
@@ -94,7 +95,8 @@ public class ListArtifactsResourceImplTest extends AbstractResourceImplTest
             listArtifactsClientResource.addQueryParameter(PoddWebConstants.KEY_PUBLISHED, "true");
             listArtifactsClientResource.addQueryParameter(PoddWebConstants.KEY_UNPUBLISHED, "true");
             
-            // Representation results = listArtifactsClientResource.get(MediaType.TEXT_HTML);
+            // Representation results =
+            // listArtifactsClientResource.get(MediaType.TEXT_HTML);
             final Representation results =
                     RestletTestUtils.doTestAuthenticatedRequest(listArtifactsClientResource, Method.GET, null,
                             MediaType.TEXT_HTML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
@@ -133,7 +135,8 @@ public class ListArtifactsResourceImplTest extends AbstractResourceImplTest
             listArtifactsClientResource.addQueryParameter(PoddWebConstants.KEY_PUBLISHED, "true");
             listArtifactsClientResource.addQueryParameter(PoddWebConstants.KEY_UNPUBLISHED, "true");
             
-            // Representation results = listArtifactsClientResource.get(MediaType.TEXT_HTML);
+            // Representation results =
+            // listArtifactsClientResource.get(MediaType.TEXT_HTML);
             final Representation results =
                     RestletTestUtils.doTestAuthenticatedRequest(listArtifactsClientResource, Method.GET, null,
                             RestletUtilMediaType.APPLICATION_RDF_JSON, Status.SUCCESS_OK, this.testWithAdminPrivileges);
@@ -157,8 +160,8 @@ public class ListArtifactsResourceImplTest extends AbstractResourceImplTest
         // prepare: add two artifacts
         final String artifactUriString1 = this.loadTestArtifact(TestConstants.TEST_ARTIFACT_BASIC_1_INTERNAL_OBJECT);
         final String artifactUriString2 = this.loadTestArtifact(TestConstants.TEST_ARTIFACT_BASIC_PROJECT_2);
-        final URI artifactUri1 = vf.createURI(artifactUriString1);
-        final URI artifactUri2 = vf.createURI(artifactUriString2);
+        final URI artifactUri1 = this.vf.createURI(artifactUriString1);
+        final URI artifactUri2 = this.vf.createURI(artifactUriString2);
         final ClientResource listArtifactsClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_LIST));
         
@@ -167,13 +170,14 @@ public class ListArtifactsResourceImplTest extends AbstractResourceImplTest
             listArtifactsClientResource.addQueryParameter(PoddWebConstants.KEY_PUBLISHED, "true");
             listArtifactsClientResource.addQueryParameter(PoddWebConstants.KEY_UNPUBLISHED, "true");
             
-            // Representation results = listArtifactsClientResource.get(MediaType.TEXT_HTML);
+            // Representation results =
+            // listArtifactsClientResource.get(MediaType.TEXT_HTML);
             final Representation results =
                     RestletTestUtils.doTestAuthenticatedRequest(listArtifactsClientResource, Method.GET, null,
                             RestletUtilMediaType.APPLICATION_RDF_JSON, Status.SUCCESS_OK, this.testWithAdminPrivileges);
             
             // verify:
-            Model model = this.assertRdf(results, RDFFormat.RDFJSON, 17);
+            final Model model = this.assertRdf(results, RDFFormat.RDFJSON, 17);
             
             Assert.assertTrue(model.contains(artifactUri1, PoddRdfConstants.PODD_BASE_HAS_TOP_OBJECT, null));
             Assert.assertTrue(model.contains(artifactUri2, PoddRdfConstants.PODD_BASE_HAS_TOP_OBJECT, null));

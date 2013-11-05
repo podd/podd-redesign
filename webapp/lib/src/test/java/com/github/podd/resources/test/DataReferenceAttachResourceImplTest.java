@@ -149,7 +149,8 @@ public class DataReferenceAttachResourceImplTest extends AbstractResourceImplTes
     @Test
     public void testAttachFileReferenceRdfWithoutVerification() throws Exception
     {
-        // prepare: add an artifact (with PURLs so where to attach FileRef is known in advance)
+        // prepare: add an artifact (with PURLs so where to attach FileRef is
+        // known in advance)
         final InferredOWLOntologyID artifactID =
                 this.loadTestArtifact(TestConstants.TEST_ARTIFACT_20130206, MediaType.APPLICATION_RDF_TURTLE);
         
@@ -162,7 +163,8 @@ public class DataReferenceAttachResourceImplTest extends AbstractResourceImplTes
                     .getOntologyIRI().toString());
             fileRefAttachClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_VERSION_IDENTIFIER, artifactID
                     .getVersionIRI().toString());
-            // Query parameter Verification policy - NOT SUPPLIED - defaults to false
+            // Query parameter Verification policy - NOT SUPPLIED - defaults to
+            // false
             
             final Representation input =
                     this.buildRepresentationFromResource(TestConstants.TEST_ARTIFACT_FRAGMENT_NEW_FILE_REF_OBJECT,
@@ -195,10 +197,12 @@ public class DataReferenceAttachResourceImplTest extends AbstractResourceImplTes
             // final String body = this.getText(results);
             
             // verify: Inferred Ontology ID is received in RDF format
-            // Assert.assertTrue("Response not in RDF format", body.contains("<rdf:RDF"));
+            // Assert.assertTrue("Response not in RDF format",
+            // body.contains("<rdf:RDF"));
             // Assert.assertTrue("Artifact version has not been updated properly",
             // body.contains("artifact:1:version:2"));
-            // Assert.assertTrue("Version IRI not in response", body.contains("versionIRI"));
+            // Assert.assertTrue("Version IRI not in response",
+            // body.contains("versionIRI"));
             // Assert.assertTrue("Inferred version not in response",
             // body.contains("inferredVersion"));
             //
@@ -226,11 +230,13 @@ public class DataReferenceAttachResourceImplTest extends AbstractResourceImplTes
         
         try
         {
-            // prepare: add an artifact (with PURLs so where to attach FileRef is known in advance)
+            // prepare: add an artifact (with PURLs so where to attach FileRef
+            // is known in advance)
             final InferredOWLOntologyID artifactID =
                     this.loadTestArtifact(TestConstants.TEST_ARTIFACT_20130206, MediaType.APPLICATION_RDF_TURTLE);
             
-            // prepare: build test fragment with correct value set for poddBase:hasPath
+            // prepare: build test fragment with correct value set for
+            // poddBase:hasPath
             final String fileReferenceAsString =
                     this.buildFileReferenceString(TestConstants.TEST_ARTIFACT_FRAGMENT_NEW_FILE_REF_VERIFIABLE,
                             RDFFormat.RDFXML, this.sshDir);
@@ -289,7 +295,8 @@ public class DataReferenceAttachResourceImplTest extends AbstractResourceImplTes
     @Test
     public void testAttachFileReferenceTurtleWithoutVerification() throws Exception
     {
-        // prepare: add an artifact (with PURLs so where to attach FileRef is known in advance)
+        // prepare: add an artifact (with PURLs so where to attach FileRef is
+        // known in advance)
         final InferredOWLOntologyID artifactID =
                 this.loadTestArtifact(TestConstants.TEST_ARTIFACT_20130206, MediaType.APPLICATION_RDF_TURTLE);
         
@@ -302,7 +309,8 @@ public class DataReferenceAttachResourceImplTest extends AbstractResourceImplTes
                     .getOntologyIRI().toString());
             fileRefAttachClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_VERSION_IDENTIFIER, artifactID
                     .getVersionIRI().toString());
-            // Query parameter Verification policy - NOT SUPPLIED - defaults to false
+            // Query parameter Verification policy - NOT SUPPLIED - defaults to
+            // false
             
             final Representation input =
                     this.buildRepresentationFromResource(TestConstants.TEST_ARTIFACT_FRAGMENT_NEW_FILE_REF_OBJECT_TTL,
@@ -342,11 +350,13 @@ public class DataReferenceAttachResourceImplTest extends AbstractResourceImplTes
         
         try
         {
-            // prepare: add an artifact (with PURLs so where to attach FileRef is known in advance)
+            // prepare: add an artifact (with PURLs so where to attach FileRef
+            // is known in advance)
             final InferredOWLOntologyID artifactID =
                     this.loadTestArtifact(TestConstants.TEST_ARTIFACT_20130206, MediaType.APPLICATION_RDF_TURTLE);
             
-            // prepare: build test fragment with correct value set for poddBase:hasPath
+            // prepare: build test fragment with correct value set for
+            // poddBase:hasPath
             final String fileReferenceAsString =
                     this.buildFileReferenceString(TestConstants.TEST_ARTIFACT_FRAGMENT_NEW_FILE_REF_VERIFIABLE_TTL,
                             RDFFormat.TURTLE, this.sshDir);
@@ -407,7 +417,8 @@ public class DataReferenceAttachResourceImplTest extends AbstractResourceImplTes
     @Test
     public void testErrorAttachFileReferenceRdfFileVerificationFailure() throws Exception
     {
-        // prepare: add an artifact (with PURLs so where to attach FileRef is known in advance)
+        // prepare: add an artifact (with PURLs so where to attach FileRef is
+        // known in advance)
         final InferredOWLOntologyID artifactID =
                 this.loadTestArtifact(TestConstants.TEST_ARTIFACT_20130206, MediaType.APPLICATION_RDF_TURTLE);
         
@@ -463,7 +474,8 @@ public class DataReferenceAttachResourceImplTest extends AbstractResourceImplTes
             fileRefAttachClientResource.addQueryParameter(PoddWebConstants.KEY_VERIFICATION_POLICY,
                     Boolean.toString(true));
             
-            // there is no need to authenticate, have a test artifact or send RDF content as the
+            // there is no need to authenticate, have a test artifact or send
+            // RDF content as the
             // artifact ID is checked for first
             
             fileRefAttachClientResource.post(null, MediaType.TEXT_PLAIN);
@@ -530,7 +542,8 @@ public class DataReferenceAttachResourceImplTest extends AbstractResourceImplTes
         final ClientResource fileRefAttachClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_ATTACH_DATA_REF));
         
-        // authentication is required as version IRI is checked AFTER authentication
+        // authentication is required as version IRI is checked AFTER
+        // authentication
         try
         {
             fileRefAttachClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactUri);

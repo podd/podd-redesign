@@ -146,7 +146,8 @@ public class PoddOWLManagerImpl implements PoddOWLManager
             final List<InferredOWLOntologyID> directImportsList =
                     this.buildDirectImportsList(inferredOntologyID, conn, context);
             secondLevelImports.addAll(directImportsList);
-            // TODO - support multiple levels by converting into a recursive implementation
+            // TODO - support multiple levels by converting into a recursive
+            // implementation
         }
         
         for(final InferredOWLOntologyID secondImport : secondLevelImports)
@@ -181,7 +182,8 @@ public class PoddOWLManagerImpl implements PoddOWLManager
         {
             throw new NullPointerException("OWLOntology is incomplete");
         }
-        // NOTE: if InferredOntologyIRI is null, only the base ontology is cached
+        // NOTE: if InferredOntologyIRI is null, only the base ontology is
+        // cached
         
         final IRI baseOntologyIRI = ontologyID.getOntologyIRI();
         final IRI baseOntologyVersionIRI = ontologyID.getVersionIRI();
@@ -197,16 +199,19 @@ public class PoddOWLManagerImpl implements PoddOWLManager
             }
         }
         
-        // Only direct imports and first-level indirect imports are identified. This works for the
+        // Only direct imports and first-level indirect imports are identified.
+        // This works for the
         // current PODD schema ontologies which have a maximum import depth of 3
         // (PoddPlant -> PoddScience -> PoddBase)
-        // TODO: Fix this using a SPARQL which identifies the complete imports closure and sorts
+        // TODO: Fix this using a SPARQL which identifies the complete imports
+        // closure and sorts
         // them
         // in the proper order for loading.
         final List<InferredOWLOntologyID> imports = this.buildTwoLevelOrderedImportsList(ontologyID, conn, context);
         this.log.debug("The schema ontology {} has {} imports.", baseOntologyVersionIRI, imports.size());
         
-        // -- load the imported ontologies into the Manager's cache. It is expected that they are
+        // -- load the imported ontologies into the Manager's cache. It is
+        // expected that they are
         // already in the Repository
         for(final InferredOWLOntologyID inferredOntologyID : imports)
         {
@@ -221,7 +226,8 @@ public class PoddOWLManagerImpl implements PoddOWLManager
             }
         }
         
-        // -- load the requested schema ontology (and inferred statements if they exist) into the
+        // -- load the requested schema ontology (and inferred statements if
+        // they exist) into the
         // Manager's cache
         this.parseRDFStatements(conn, baseOntologyVersionIRI.toOpenRDFURI());
         if(inferredOntologyIRI != null)
@@ -261,7 +267,8 @@ public class PoddOWLManagerImpl implements PoddOWLManager
         axiomGenerators.add(new InferredInverseObjectPropertiesAxiomGenerator());
         axiomGenerators.add(new InferredObjectPropertyCharacteristicAxiomGenerator());
         
-        // NOTE: InferredPropertyAssertionGenerator significantly slows down inference computation
+        // NOTE: InferredPropertyAssertionGenerator significantly slows down
+        // inference computation
         axiomGenerators.add(new org.semanticweb.owlapi.util.InferredPropertyAssertionGenerator());
         
         axiomGenerators.add(new InferredSubClassAxiomGenerator());
@@ -342,7 +349,8 @@ public class PoddOWLManagerImpl implements PoddOWLManager
         
         final URI context = contextIRI.toOpenRDFURI();
         
-        // Create an RDFHandler that will insert all triples after they are emitted from OWLAPI
+        // Create an RDFHandler that will insert all triples after they are
+        // emitted from OWLAPI
         // into a specific context in the Sesame Repository
         RDFInserter repositoryHandler = new RDFInserter(nextRepositoryConnection);
         if(contextToCompareWith != null)
@@ -396,9 +404,11 @@ public class PoddOWLManagerImpl implements PoddOWLManager
     @Override
     public OWLOntologyManager getOWLOntologyManager()
     {
-        // TODO: Remove this method so that we can synchronize every access to OWLOntologyManager
+        // TODO: Remove this method so that we can synchronize every access to
+        // OWLOntologyManager
         // locally for threadsafety
-        // TODO: Also do not let OWLOntology objects escape as they contains references to
+        // TODO: Also do not let OWLOntology objects escape as they contains
+        // references to
         // OWLOntologyManager that can also be used in the same way
         return this.owlOntologyManager;
     }
@@ -520,14 +530,16 @@ public class PoddOWLManagerImpl implements PoddOWLManager
     {
         synchronized(this.owlOntologyManager)
         {
-            // TODO: Verify that this .contains method matches our desired semantics
+            // TODO: Verify that this .contains method matches our desired
+            // semantics
             final boolean containsOntology = this.owlOntologyManager.contains(ontologyID);
             
             if(containsOntology)
             {
                 this.owlOntologyManager.removeOntology(ontologyID);
                 
-                // return true if the ontology manager does not contain the ontology at this point
+                // return true if the ontology manager does not contain the
+                // ontology at this point
                 return !this.owlOntologyManager.contains(ontologyID);
             }
             else

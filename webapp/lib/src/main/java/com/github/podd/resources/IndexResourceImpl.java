@@ -40,7 +40,8 @@ public class IndexResourceImpl extends AbstractPoddResourceImpl
     public Representation getIndexPageHtml(final Representation entity) throws ResourceException
     {
         // Enable either of the following to test authenticated access
-        // this.getPoddApplication().authenticate(PoddAction.ROLE_EDIT, getRequest(),
+        // this.getPoddApplication().authenticate(PoddAction.ROLE_EDIT,
+        // getRequest(),
         // getResponse());
         // this.checkAuthentication(PoddAction.ROLE_EDIT);
         
@@ -53,7 +54,8 @@ public class IndexResourceImpl extends AbstractPoddResourceImpl
         dataModel.put("contentTemplate", "index.html.ftl");
         dataModel.put("pageTitle", "PODD Index Page");
         
-        // Output the base template, with contentTemplate from the dataModel defining the
+        // Output the base template, with contentTemplate from the dataModel
+        // defining the
         // template to use for the content in the body of the page
         return RestletUtils.getHtmlRepresentation(PoddWebConstants.PROPERTY_TEMPLATE_BASE, dataModel,
                 MediaType.TEXT_HTML, this.getPoddApplication().getTemplateConfiguration());

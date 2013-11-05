@@ -32,8 +32,8 @@ public class FileReferenceManagerImplTest extends AbstractDataReferenceManagerTe
     /*
      * (non-Javadoc)
      * 
-     * @see
-     * com.github.podd.api.file.test.AbstractDataReferenceManagerTest#getNewFileReferenceManager()
+     * @see com.github.podd.api.file.test.AbstractDataReferenceManagerTest#
+     * getNewFileReferenceManager()
      */
     @Override
     public DataReferenceManager getNewDataReferenceManager()

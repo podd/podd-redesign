@@ -87,7 +87,8 @@ public class SearchOntologyResourceImplTest extends AbstractResourceImplTest
         // prepare:
         final ClientResource searchClientResource = new ClientResource(this.getUrl(PoddWebConstants.PATH_SEARCH));
         
-        // there is no need to authenticate or have a test artifact as the artifact ID is checked
+        // there is no need to authenticate or have a test artifact as the
+        // artifact ID is checked
         // for first
         try
         {
@@ -149,7 +150,8 @@ public class SearchOntologyResourceImplTest extends AbstractResourceImplTest
         
         final ClientResource searchClientResource = new ClientResource(this.getUrl(PoddWebConstants.PATH_SEARCH));
         
-        // there is no need to authenticate or have a test artifact as the search term is checked
+        // there is no need to authenticate or have a test artifact as the
+        // search term is checked
         // for first
         try
         {
@@ -372,7 +374,8 @@ public class SearchOntologyResourceImplTest extends AbstractResourceImplTest
     @Test
     public void testSearchRdfWithoutSearchTypes() throws Exception
     {
-        final String[] searchTypes = {}; // EVERYTHING in the search space is compared
+        final String[] searchTypes = {}; // EVERYTHING in the search space is
+                                         // compared
         final MediaType requestMediaType = MediaType.APPLICATION_RDF_XML;
         
         final Model resultModel = this.internalTestSearchRdf("e", searchTypes, requestMediaType, null);

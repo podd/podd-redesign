@@ -138,7 +138,8 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
         
         // Define extensions for RDF and Javascript
         // These extensions are also used to identify mediatypes in services
-        // For example: @Get("owl") will not be processed without the declaration below
+        // For example: @Get("owl") will not be processed without the
+        // declaration below
         this.getMetadataService().addExtension("rdf", MediaType.APPLICATION_RDF_XML, true);
         this.getMetadataService().addExtension("rj", RestletUtilMediaType.APPLICATION_RDF_JSON, true);
         this.getMetadataService().addExtension("owl", MediaType.APPLICATION_RDF_XML, false);
@@ -181,10 +182,12 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
                 throw new RuntimeException("Could not find authentication method");
             }
             
-            // add challenges to the response and set the status to HTTP 401 Unauthorized
+            // add challenges to the response and set the status to HTTP 401
+            // Unauthorized
             this.getAuthenticator().challenge(response, false);
             
-            // Return false after the challenge and HTTP 401 response have been added to the
+            // Return false after the challenge and HTTP 401 response have been
+            // added to the
             // response
             return false;
         }
@@ -207,7 +210,8 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
             this.log.error("Authenticated user does not have enough privileges to execute the given action: {}", action);
             
             // FIXME: Implement auditing here
-            // this.getDataHandler().addLogDetailsForRequest(message, referenceUri,
+            // this.getDataHandler().addLogDetailsForRequest(message,
+            // referenceUri,
             // authenticationScope, get, currentUser, currentRole);
             
             return false;
@@ -279,8 +283,10 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
         
         final Router router = new Router(this.getContext());
         
-        // Add a route for Login form. Login service is handled by the authenticator
-        // NOTE: This only displays the login form. All HTTP POST requests to the login path should
+        // Add a route for Login form. Login service is handled by the
+        // authenticator
+        // NOTE: This only displays the login form. All HTTP POST requests to
+        // the login path should
         // be handled by the Authenticator
         final String loginFormPath = PoddWebConstants.PATH_LOGIN_FORM;
         this.log.debug("attaching login service to path={}", loginFormPath);
@@ -423,14 +429,18 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
         // PropertyUtils.getProperty(PropertyUtils.PROPERTY_LOGOUT_FORM_PATH,
         // PropertyUtils.DEFAULT_LOGOUT_FORM_PATH);
         // this.log.info("attaching logout service to path={}", logout);
-        // FIXME: Switch between the logout resource implementations here based on the authenticator
+        // FIXME: Switch between the logout resource implementations here based
+        // on the authenticator
         // router.attach(logout, CookieLogoutResourceImpl.class);
         
         this.log.debug("routes={}", router.getRoutes().toString());
         
-        // put the authenticator in front of the resource router so it can handle challenge
-        // responses and forward them on to the right location after locking in the authentication
-        // data. Authentication of individual methods on individual resources is handled using calls
+        // put the authenticator in front of the resource router so it can
+        // handle challenge
+        // responses and forward them on to the right location after locking in
+        // the authentication
+        // data. Authentication of individual methods on individual resources is
+        // handled using calls
         // to PoddWebServiceApplication.authenticate()
         authenticator.setNext(router);
         
@@ -443,7 +453,8 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
     @Override
     public Model getAliasesConfiguration(final PropertyUtil propertyUtil)
     {
-        // If the aliasConfiguration is empty then populate it with the default aliases here
+        // If the aliasConfiguration is empty then populate it with the default
+        // aliases here
         if(this.aliasesConfiguration.isEmpty())
         {
             final String aliasesFile =
@@ -523,8 +534,8 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
     /*
      * (non-Javadoc)
      * 
-     * @see
-     * net.maenad.oas.webservice.impl.OasWebServiceApplicationInterface#getTemplateConfiguration()
+     * @see net.maenad.oas.webservice.impl.OasWebServiceApplicationInterface#
+     * getTemplateConfiguration()
      */
     @Override
     public Configuration getTemplateConfiguration()

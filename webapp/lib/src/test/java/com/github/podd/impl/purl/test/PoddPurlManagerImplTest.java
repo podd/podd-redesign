@@ -76,7 +76,8 @@ public class PoddPurlManagerImplTest extends AbstractPoddPurlManagerTest
             
             Assert.assertFalse("Purl and Temporary URI were same", purl.getPurlURI().equals(purl.getTemporaryURI()));
             
-            // check temporary URI is present in the original RDF statements as a subject or object
+            // check temporary URI is present in the original RDF statements as
+            // a subject or object
             final boolean tempUriExistsAsSubject =
                     this.testRepositoryConnection.getStatements(purl.getTemporaryURI(), null, null, false, context)
                             .hasNext();
@@ -86,7 +87,8 @@ public class PoddPurlManagerImplTest extends AbstractPoddPurlManagerTest
             Assert.assertTrue("Temporary URI not found in original RDF statements", tempUriExistsAsSubject
                     || tempUriExistsAsObject);
             
-            // The following assertion checks whether the generated Purls use the parent URI or not
+            // The following assertion checks whether the generated Purls use
+            // the parent URI or not
             if(useParentUri)
             {
                 Assert.assertTrue("Purl not using parent URI",

@@ -47,7 +47,8 @@ public class SSHFileRepositoryImpl extends PoddFileRepositoryImpl<SSHFileReferen
     {
         super(nextDataRepository, model);
         
-        // check that the model contains values for protocol, host, port, fingerprint, username, and
+        // check that the model contains values for protocol, host, port,
+        // fingerprint, username, and
         // secret
         final String protocol =
                 model.filter(super.aliasUri, PoddRdfConstants.PODD_DATA_REPOSITORY_PROTOCOL, null).objectString();
@@ -82,7 +83,8 @@ public class SSHFileRepositoryImpl extends PoddFileRepositoryImpl<SSHFileReferen
             return false;
         }
         
-        // unnecessary as Generics ensure only an SSHFileReference can be passed in
+        // unnecessary as Generics ensure only an SSHFileReference can be passed
+        // in
         if(!(reference instanceof SSHFileReference))
         {
             return false;

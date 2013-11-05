@@ -74,7 +74,7 @@ public class HrppcPoddClientTest extends RestletPoddClientImplIntegrationTest
     @Test
     public final void testTemplateProject() throws Exception
     {
-        String formattedProject = String.format(HrppcPoddClient.TEMPLATE_PROJECT, 4, 6);
+        final String formattedProject = String.format(HrppcPoddClient.TEMPLATE_PROJECT, 4, 6);
         
         Assert.assertEquals("Project#0004-0006", formattedProject);
     }
@@ -82,7 +82,7 @@ public class HrppcPoddClientTest extends RestletPoddClientImplIntegrationTest
     @Test
     public final void testTemplateSparqlExperiments() throws Exception
     {
-        String formattedQueryString =
+        final String formattedQueryString =
                 String.format(HrppcPoddClient.TEMPLATE_SPARQL_BY_TYPE,
                         RenderUtils.getSPARQLQueryString(PoddRdfConstants.PODD_SCIENCE_INVESTIGATION));
         

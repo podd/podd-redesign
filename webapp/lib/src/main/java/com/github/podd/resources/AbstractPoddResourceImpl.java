@@ -110,12 +110,14 @@ public abstract class AbstractPoddResourceImpl extends ServerResource
             // Strategies for fixing #81
             // If they have an existing cookie then we tell them to discard it
             // CookieSetting cookie =
-            // this.getResponse().getCookieSettings().getFirst(PoddWebConstants.COOKIE_NAME, false);
+            // this.getResponse().getCookieSettings().getFirst(PoddWebConstants.COOKIE_NAME,
+            // false);
             // if(cookie != null)
             // {
             // cookie.setMaxAge(0);
             // }
-            // TODO: Test the following strategy if the strategy above does not work
+            // TODO: Test the following strategy if the strategy above does not
+            // work
             // if(this.getResponse().getCookieSettings().removeAll(PoddWebConstants.COOKIE_NAME,
             // true))
             // {
@@ -123,7 +125,8 @@ public abstract class AbstractPoddResourceImpl extends ServerResource
             // .getCookieSettings()
             // .add(new CookieSetting(0, PoddWebConstants.COOKIE_NAME, "",
             // this.getRequest().getRootRef()
-            // .getPath(), this.getRequest().getResourceRef().getHostDomain(), "Reset cookie", 0,
+            // .getPath(), this.getRequest().getResourceRef().getHostDomain(),
+            // "Reset cookie", 0,
             // true));
             // }
             this.log.warn("Client unauthorized. Throwing a ResourceException");
@@ -131,7 +134,8 @@ public abstract class AbstractPoddResourceImpl extends ServerResource
         }
         else
         {
-            // do not log this, as it is a normal part of an operation, as evidenced by not wanting
+            // do not log this, as it is a normal part of an operation, as
+            // evidenced by not wanting
             // to throw an exception
             return false;
         }

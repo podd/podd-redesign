@@ -93,7 +93,8 @@ public class PoddStatusService extends StatusService
         {
             this.log.error("Error writing RDF content in status service", e);
             // We're already trying to send back an error. So ignore this?
-            // FIXME: The error may mean that the error message is not syntactically valid at this
+            // FIXME: The error may mean that the error message is not
+            // syntactically valid at this
             // point, so may need to overwrite it with a hardcoded string
         }
         return out.toString();
@@ -149,7 +150,7 @@ public class PoddStatusService extends StatusService
     /*
      * (non-Javadoc)
      * 
-     * @see org.restlet.service.StatusService#getRepresentation(org.restlet.data.Status,
+     * @see org.restlet.service.StatusService#getRepresentation(org.restlet.data. Status,
      * org.restlet.Request, org.restlet.Response)
      */
     @Override

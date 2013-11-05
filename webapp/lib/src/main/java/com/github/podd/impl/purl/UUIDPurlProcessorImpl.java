@@ -120,7 +120,8 @@ public class UUIDPurlProcessorImpl implements PoddPurlProcessor
             throw new NullPointerException("NULL URI cannot be handled by this Purl Processor");
         }
         
-        // find which of the supported temporary URI prefixes is used in this inputUri
+        // find which of the supported temporary URI prefixes is used in this
+        // inputUri
         String theTemporaryPrefix = null;
         final String inputStr = inputUri.stringValue();
         for(final String aTemporaryPrefix : this.supportedTemporaryUriPrefixes)
@@ -145,7 +146,8 @@ public class UUIDPurlProcessorImpl implements PoddPurlProcessor
             
             // get the first slash after the prefix
             final int index = parentUri.stringValue().indexOf('/', this.prefix.length());
-            // get the UUID from after the end of the prefix (until the next slash)
+            // get the UUID from after the end of the prefix (until the next
+            // slash)
             if(index != -1)
             {
                 b.append(parentUri.stringValue().substring(this.prefix.length(), index));

@@ -68,7 +68,8 @@ public class SparqlResourceImpl extends AbstractPoddResourceImpl
     @Get(":rdf|rj|json|ttl")
     public Representation getSparqlRdf(final Variant variant) throws ResourceException
     {
-        // TODO: Support an interactive HTML page that users can enter queries on and see results
+        // TODO: Support an interactive HTML page that users can enter queries
+        // on and see results
         
         this.log.debug("getSparqlRdf");
         
@@ -93,7 +94,8 @@ public class SparqlResourceImpl extends AbstractPoddResourceImpl
         artifactUris = this.getQuery().getValuesArray(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER);
         if(artifactUris == null || artifactUris.length == 0)
         {
-            // TODO: Support execution of sparql queries over all accessible artifacts if they
+            // TODO: Support execution of sparql queries over all accessible
+            // artifacts if they
             // did
             // not specify any artifacts
             throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "No artifacts specified in request");
@@ -168,7 +170,8 @@ public class SparqlResourceImpl extends AbstractPoddResourceImpl
             artifactUris = form.getEntries().getValuesArray(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER);
             if(artifactUris == null || artifactUris.length == 0)
             {
-                // TODO: Support execution of sparql queries over all accessible artifacts if they
+                // TODO: Support execution of sparql queries over all accessible
+                // artifacts if they
                 // did
                 // not specify any artifacts
                 throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "No artifacts specified in request");
@@ -259,7 +262,8 @@ public class SparqlResourceImpl extends AbstractPoddResourceImpl
                     contextSet.addAll(Arrays.asList(this.getPoddSesameManager().schemaContexts(ontologyID, conn,
                             this.getPoddRepositoryManager().getSchemaManagementGraph())));
                 }
-                // TODO: Support cross-artifact queries if they all import the same schemas
+                // TODO: Support cross-artifact queries if they all import the
+                // same schemas
                 final URI[] contexts = contextSet.toArray(new URI[0]);
                 // MUST not perform queries on all contexts
                 if(this.getPoddRepositoryManager().safeContexts(contexts))
@@ -295,7 +299,8 @@ public class SparqlResourceImpl extends AbstractPoddResourceImpl
             }
             catch(final OpenRDFException e)
             {
-                // TODO: May want to ignore this for stability of queries in the long term
+                // TODO: May want to ignore this for stability of queries in the
+                // long term
                 throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Repository exception occurred", e);
             }
             finally

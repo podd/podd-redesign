@@ -35,10 +35,12 @@ public class PoddObjectLabelImpl implements PoddObjectLabel
     
     private URI objectID;
     
-    // TODO: Migrate this to be Literal to preserve datatype and language where necessary
+    // TODO: Migrate this to be Literal to preserve datatype and language where
+    // necessary
     private String label;
     
-    // TODO: Migrate this to be Literal to preserve datatype and language where necessary
+    // TODO: Migrate this to be Literal to preserve datatype and language where
+    // necessary
     private String description;
     
     /**
@@ -167,12 +169,12 @@ public class PoddObjectLabelImpl implements PoddObjectLabel
     @Override
     public Literal getDescriptionLiteral()
     {
-        return PoddRdfConstants.VF.createLiteral(description);
+        return PoddRdfConstants.VF.createLiteral(this.description);
     }
     
     @Override
     public Literal getLabelLiteral()
     {
-        return PoddRdfConstants.VF.createLiteral(label);
+        return PoddRdfConstants.VF.createLiteral(this.label);
     }
 }

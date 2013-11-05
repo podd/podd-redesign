@@ -70,7 +70,8 @@ public class PoddFileRepositoryManagerImplTest extends AbstractPoddFileRepositor
     @Override
     protected PoddDataRepository<?> buildFileRepositoryInstance(final String alias, final Model model)
     {
-        // prepare: create a mock PoddDataRepository which can only return the test alias string
+        // prepare: create a mock PoddDataRepository which can only return the
+        // test alias string
         return new PoddDataRepository<DataReference>()
             {
                 

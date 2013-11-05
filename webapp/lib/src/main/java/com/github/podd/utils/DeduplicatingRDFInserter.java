@@ -40,7 +40,8 @@ public class DeduplicatingRDFInserter extends RDFInserter
     
     private URI contextToCompareWith = null;
     
-    // TODO: Remove this and use super.con once it is made protected in the parent class
+    // TODO: Remove this and use super.con once it is made protected in the
+    // parent class
     private RepositoryConnection conn = null;
     
     public DeduplicatingRDFInserter(final URI contextToCompareWith, final RepositoryConnection conn)
@@ -74,7 +75,8 @@ public class DeduplicatingRDFInserter extends RDFInserter
             }
             // else
             // {
-            // System.out.println(" DUPLICATE statement. Skip. " + contextToCompareWith.toString());
+            // System.out.println(" DUPLICATE statement. Skip. " +
+            // contextToCompareWith.toString());
             // }
         }
         catch(final RepositoryException e)

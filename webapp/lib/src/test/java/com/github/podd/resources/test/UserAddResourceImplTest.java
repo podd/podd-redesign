@@ -355,7 +355,8 @@ public class UserAddResourceImplTest extends AbstractResourceImplTest
         }
         catch(final ResourceException e)
         {
-            // verify: the cause (simple string matching, not checking for valid RDF content)
+            // verify: the cause (simple string matching, not checking for valid
+            // RDF content)
             Assert.assertEquals(Status.CLIENT_ERROR_CONFLICT, e.getStatus());
             final String body = this.getText(userAddClientResource.getResponseEntity());
             System.out.println(body);
@@ -435,7 +436,8 @@ public class UserAddResourceImplTest extends AbstractResourceImplTest
         }
         catch(final ResourceException e)
         {
-            // verify: the cause (simple string matching, not checking for valid RDF content)
+            // verify: the cause (simple string matching, not checking for valid
+            // RDF content)
             Assert.assertEquals(Status.CLIENT_ERROR_BAD_REQUEST, e.getStatus());
             final String body = this.getText(userAddClientResource.getResponseEntity());
             Assert.assertTrue("Expected cause is missing", body.contains("User Email cannot be empty"));
