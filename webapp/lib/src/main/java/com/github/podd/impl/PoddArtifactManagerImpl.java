@@ -1425,8 +1425,6 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
                     this.getOWLManager().getReasonerProfile().checkOntology(nextOntology);
             if(!profileReport.isInProfile())
             {
-                this.getOWLManager().removeCache(nextOntology.getOntologyID());
-                
                 if(this.log.isInfoEnabled())
                 {
                     for(final OWLProfileViolation violation : profileReport.getViolations())
@@ -1446,7 +1444,6 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             // profile
             if(!nextReasoner.isConsistent())
             {
-                this.getOWLManager().removeCache(nextOntology.getOntologyID());
                 throw new InconsistentOntologyException(nextReasoner, "Ontology is inconsistent");
             }
             
