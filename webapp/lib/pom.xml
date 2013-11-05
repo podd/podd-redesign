@@ -287,9 +287,10 @@
 <!-- Switch off parallel features for now until we resolve where things are breaking down. 
 					<parallel>methods</parallel>
 					<threadCount>8</threadCount>
- -->
-					<forkCount>2</forkCount>
+ 
+					<forkCount>1</forkCount>
 					<reuseForks>false</reuseForks>
+-->
 					<argLine>-Xmx1024M -XX:MaxPermSize=512M</argLine>
 				</configuration>
 			</plugin>
