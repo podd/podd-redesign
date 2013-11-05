@@ -72,7 +72,7 @@ public abstract class AbstractPoddSchemaManagerTest
      * 
      * @return A new instance of {@link PoddOWLManager}, for each call to this method.
      */
-    protected abstract PoddOWLManager getNewPoddOwlManagerInstance();
+    protected abstract PoddOWLManager getNewPoddOwlManagerInstance(OWLOntologyManager manager);
     
     /**
      * 
@@ -175,11 +175,10 @@ public abstract class AbstractPoddSchemaManagerTest
         this.testSesameManager = this.getNewPoddSesameManagerInstance();
         this.testSchemaManager.setSesameManager(this.testSesameManager);
         
-        this.testOwlManager = this.getNewPoddOwlManagerInstance();
+        this.owlapiManager = this.getNewOwlOntologyManagerInstance();
+        this.testOwlManager = this.getNewPoddOwlManagerInstance(this.owlapiManager);
         this.testOwlManager.setReasonerFactory(this.getNewReasonerFactory());
         
-        this.owlapiManager = this.getNewOwlOntologyManagerInstance();
-        this.testOwlManager.setOWLOntologyManager(this.owlapiManager);
         this.testSchemaManager.setOwlManager(this.testOwlManager);
     }
     

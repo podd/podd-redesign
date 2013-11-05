@@ -157,11 +157,10 @@ public class PoddFileRepositoryManagerImplTest extends AbstractPoddFileRepositor
         repositoryManager.setFileRepositoryManagementGraph(PoddRdfConstants.DEFAULT_FILE_REPOSITORY_MANAGEMENT_GRAPH);
         
         // create an OWL Manager
-        final PoddOWLManager owlManager = new PoddOWLManagerImpl();
-        owlManager.setReasonerFactory(OWLReasonerFactoryRegistry.getInstance().getReasonerFactory("Pellet"));
         final OWLOntologyManager manager = OWLOntologyManagerFactoryRegistry.createOWLOntologyManager();
         Assert.assertNotNull("Null implementation of OWLOntologymanager", manager);
-        owlManager.setOWLOntologyManager(manager);
+        final PoddOWLManager owlManager = new PoddOWLManagerImpl(manager);
+        owlManager.setReasonerFactory(OWLReasonerFactoryRegistry.getInstance().getReasonerFactory("Pellet"));
         
         // create the PoddDataRepositoryManager for testing
         final PoddDataRepositoryManager testFileRepositoryManager = new PoddFileRepositoryManagerImpl();

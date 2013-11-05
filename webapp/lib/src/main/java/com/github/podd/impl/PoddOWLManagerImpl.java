@@ -104,9 +104,14 @@ public class PoddOWLManagerImpl implements PoddOWLManager
 {
     protected Logger log = LoggerFactory.getLogger(this.getClass());
     
-    private OWLOntologyManager owlOntologyManager;
+    private final OWLOntologyManager owlOntologyManager;
     
     private OWLReasonerFactory reasonerFactory;
+    
+    public PoddOWLManagerImpl(OWLOntologyManager nextManager)
+    {
+        this.owlOntologyManager = nextManager;
+    }
     
     private List<InferredOWLOntologyID> buildDirectImportsList(final InferredOWLOntologyID ontologyID,
             final RepositoryConnection conn, final URI context) throws OpenRDFException
@@ -687,13 +692,6 @@ public class PoddOWLManagerImpl implements PoddOWLManager
     public void setCurrentVersion(final OWLOntologyID ontologyID)
     {
         throw new RuntimeException("TODO: Implement setCurrentVersion");
-    }
-    
-    @Override
-    public void setOWLOntologyManager(final OWLOntologyManager manager)
-    {
-        this.owlOntologyManager = manager;
-        
     }
     
     @Override

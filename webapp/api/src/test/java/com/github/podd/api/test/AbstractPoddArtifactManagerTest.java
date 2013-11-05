@@ -217,7 +217,7 @@ public abstract class AbstractPoddArtifactManagerTest
      * 
      * @return A new empty instance of an implementation of PoddOWLManager.
      */
-    protected abstract PoddOWLManager getNewOWLManager();
+    protected abstract PoddOWLManager getNewOWLManager(OWLOntologyManager manager);
     
     /**
      * Concrete tests must override this to provide a new, empty, instance of
@@ -583,11 +583,10 @@ public abstract class AbstractPoddArtifactManagerTest
         final PoddPurlManager testPurlManager = this.getNewPurlManager();
         testPurlManager.setPurlProcessorFactoryRegistry(testPurlRegistry);
         
-        final PoddOWLManager testOWLManager = this.getNewOWLManager();
-        testOWLManager.setReasonerFactory(this.getNewReasonerFactory());
         final OWLOntologyManager manager = OWLOntologyManagerFactoryRegistry.createOWLOntologyManager();
         Assert.assertNotNull("Null implementation of OWLOntologymanager", manager);
-        testOWLManager.setOWLOntologyManager(manager);
+        final PoddOWLManager testOWLManager = this.getNewOWLManager(manager);
+        testOWLManager.setReasonerFactory(this.getNewReasonerFactory());
         
         this.testSchemaManager = this.getNewSchemaManager();
         this.testSchemaManager.setOwlManager(testOWLManager);

@@ -71,11 +71,9 @@ public class PoddSesameManagerImplTest extends AbstractPoddSesameManagerTest
                 };
         
         // - create a PODD OWLManager instance
-        final PoddOWLManagerImpl testPoddOWLManager = new PoddOWLManagerImpl();
-        
         final OWLOntologyManager manager = OWLOntologyManagerFactoryRegistry.createOWLOntologyManager();
         Assert.assertNotNull("Null implementation of OWLOntologymanager", manager);
-        testPoddOWLManager.setOWLOntologyManager(manager);
+        final PoddOWLManagerImpl testPoddOWLManager = new PoddOWLManagerImpl(manager);
         
         final OWLReasonerFactory reasonerFactory =
                 OWLReasonerFactoryRegistry.getInstance().getReasonerFactory("Pellet");

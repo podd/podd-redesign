@@ -19,6 +19,7 @@ package com.github.podd.impl.test;
 import org.junit.Assert;
 import org.junit.Test;
 import org.openrdf.repository.RepositoryException;
+import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactoryRegistry;
 
@@ -82,9 +83,9 @@ public class PoddArtifactManagerImplTest extends AbstractPoddArtifactManagerTest
     }
     
     @Override
-    protected PoddOWLManager getNewOWLManager()
+    protected PoddOWLManager getNewOWLManager(OWLOntologyManager manager)
     {
-        return new PoddOWLManagerImpl();
+        return new PoddOWLManagerImpl(manager);
     }
     
     @Override

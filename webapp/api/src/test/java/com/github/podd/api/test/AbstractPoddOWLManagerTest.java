@@ -95,7 +95,7 @@ public abstract class AbstractPoddOWLManagerTest
     /**
      * @return A new instance of PoddOWLManager, for each call to this method
      */
-    protected abstract PoddOWLManager getNewPoddOWLManagerInstance();
+    protected abstract PoddOWLManager getNewPoddOWLManagerInstance(OWLOntologyManager nextManager);
     
     protected OWLOntology independentlyLoadOntology(final OWLOntologyManager testOWLOntologyManager,
             final String resourcePath) throws Exception
@@ -166,12 +166,11 @@ public abstract class AbstractPoddOWLManagerTest
     @Before
     public void setUp() throws Exception
     {
-        this.testOWLManager = this.getNewPoddOWLManagerInstance();
-        Assert.assertNotNull("Null implementation of test OWLManager", this.testOWLManager);
-        
         manager = OWLOntologyManagerFactoryRegistry.createOWLOntologyManager();
         Assert.assertNotNull("Null implementation of OWLOntologymanager", manager);
-        this.testOWLManager.setOWLOntologyManager(manager);
+        
+        this.testOWLManager = this.getNewPoddOWLManagerInstance(manager);
+        Assert.assertNotNull("Null implementation of test OWLManager", this.testOWLManager);
         
         // set a ReasonerFactory for this PoddOWLManager
         final OWLReasonerFactory reasonerFactory = this.getNewOWLReasonerFactoryInstance();
@@ -1334,42 +1333,6 @@ public abstract class AbstractPoddOWLManagerTest
     {
         // omv.ontoware/currentversion
         Assert.fail("TODO: Implement me");
-    }
-    
-    /**
-     * Test method for
-     * {@link com.github.podd.api.PoddOWLManager#setOWLOntologyManager(org.semanticweb.owlapi.model.OWLOntologyManager)}
-     * .
-     * 
-     * NOTE: There is no way of testing that the manager is actually setup correctly, to enforce
-     * encapsulation after this point.
-     * 
-     */
-    @Test
-    public void testSetOWLOntologyManager() throws Exception
-    {
-        // set null to forget the manager being set in setUp()
-        this.testOWLManager.setOWLOntologyManager(null);
-        
-        final OWLOntologyManager nextManager = OWLOntologyManagerFactoryRegistry.createOWLOntologyManager();
-        Assert.assertNotNull("Null implementation of OWLOntologymanager", nextManager);
-        
-        this.testOWLManager.setOWLOntologyManager(nextManager);
-    }
-    
-    /**
-     * Test method for
-     * {@link com.github.podd.api.PoddOWLManager#setOWLOntologyManager(org.semanticweb.owlapi.model.OWLOntologyManager)}
-     * .
-     * 
-     * NOTE: There is no way of testing that the manager is actually setup correctly, to enforce
-     * encapsulation after this point.
-     * 
-     */
-    @Test
-    public void testSetOWLOntologyManagerWithNull() throws Exception
-    {
-        this.testOWLManager.setOWLOntologyManager(null);
     }
     
     /**

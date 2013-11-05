@@ -238,14 +238,6 @@ public interface PoddOWLManager
     void setCurrentVersion(OWLOntologyID ontologyID);
     
     /**
-     * Map a single OWLOntologyManager into this PoddOWLManager.
-     * 
-     * @param manager
-     *            The manager for all PODD {@link OWLOntology} instances.
-     */
-    void setOWLOntologyManager(OWLOntologyManager manager);
-    
-    /**
      * Sets the {@link OWLReasonerFactory} to use when creating instances of {@link OWLReasoner} to
      * verify ontologies and infer statements based on ontologies.
      * 

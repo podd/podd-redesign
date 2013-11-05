@@ -316,14 +316,13 @@ public class ApplicationUtils
         final PoddPurlManager nextPurlManager = new PoddPurlManagerImpl();
         nextPurlManager.setPurlProcessorFactoryRegistry(nextPurlRegistry);
         
-        final PoddOWLManager nextOWLManager = new PoddOWLManagerImpl();
-        nextOWLManager.setReasonerFactory(OWLReasonerFactoryRegistry.getInstance().getReasonerFactory("Pellet"));
         final OWLOntologyManager nextOWLOntologyManager = OWLOntologyManagerFactoryRegistry.createOWLOntologyManager();
         if(nextOWLOntologyManager == null)
         {
             ApplicationUtils.log.error("OWLOntologyManager was null");
         }
-        nextOWLManager.setOWLOntologyManager(nextOWLOntologyManager);
+        final PoddOWLManager nextOWLManager = new PoddOWLManagerImpl(nextOWLOntologyManager);
+        nextOWLManager.setReasonerFactory(OWLReasonerFactoryRegistry.getInstance().getReasonerFactory("Pellet"));
         
         // File Repository Manager
         final PoddDataRepositoryManager nextDataRepositoryManager = new PoddFileRepositoryManagerImpl();

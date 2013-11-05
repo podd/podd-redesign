@@ -16,6 +16,7 @@
  */
 package com.github.podd.impl.test;
 
+import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactoryRegistry;
 
@@ -38,9 +39,9 @@ public class PoddOWLManagerImplTest extends AbstractPoddOWLManagerTest
     }
     
     @Override
-    protected PoddOWLManager getNewPoddOWLManagerInstance()
+    protected PoddOWLManager getNewPoddOWLManagerInstance(OWLOntologyManager manager)
     {
-        return new PoddOWLManagerImpl();
+        return new PoddOWLManagerImpl(manager);
     }
     
 }
