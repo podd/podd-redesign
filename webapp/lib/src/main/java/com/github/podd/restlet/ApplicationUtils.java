@@ -322,7 +322,8 @@ public class ApplicationUtils
         {
             ApplicationUtils.log.error("OWLOntologyManager was null");
         }
-        OWLReasonerFactory reasonerFactory = OWLReasonerFactoryRegistry.getInstance().getReasonerFactory("Pellet");
+        final OWLReasonerFactory reasonerFactory =
+                OWLReasonerFactoryRegistry.getInstance().getReasonerFactory("Pellet");
         if(reasonerFactory == null)
         {
             ApplicationUtils.log.error("OWLReasonerFactory was null");

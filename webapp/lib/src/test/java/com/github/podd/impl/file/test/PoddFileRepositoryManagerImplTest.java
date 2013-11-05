@@ -160,7 +160,8 @@ public class PoddFileRepositoryManagerImplTest extends AbstractPoddFileRepositor
         // create an OWL Manager
         final OWLOntologyManager manager = OWLOntologyManagerFactoryRegistry.createOWLOntologyManager();
         Assert.assertNotNull("Null implementation of OWLOntologymanager", manager);
-        OWLReasonerFactory reasonerFactory = OWLReasonerFactoryRegistry.getInstance().getReasonerFactory("Pellet");
+        final OWLReasonerFactory reasonerFactory =
+                OWLReasonerFactoryRegistry.getInstance().getReasonerFactory("Pellet");
         Assert.assertNotNull("Null implementation of OWLReasonerFactory", reasonerFactory);
         final PoddOWLManager owlManager = new PoddOWLManagerImpl(manager, reasonerFactory);
         

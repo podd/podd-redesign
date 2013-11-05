@@ -26,7 +26,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.mockito.Mockito;
 import org.openrdf.model.BNode;
 import org.openrdf.model.Model;
 import org.openrdf.model.Statement;
@@ -167,13 +166,13 @@ public abstract class AbstractPoddOWLManagerTest
     @Before
     public void setUp() throws Exception
     {
-        manager = OWLOntologyManagerFactoryRegistry.createOWLOntologyManager();
-        Assert.assertNotNull("Null implementation of OWLOntologymanager", manager);
+        this.manager = OWLOntologyManagerFactoryRegistry.createOWLOntologyManager();
+        Assert.assertNotNull("Null implementation of OWLOntologymanager", this.manager);
         
         final OWLReasonerFactory reasonerFactory = this.getNewOWLReasonerFactoryInstance();
         Assert.assertNotNull("Null implementation of reasoner factory", reasonerFactory);
         
-        this.testOWLManager = this.getNewPoddOWLManagerInstance(manager, reasonerFactory);
+        this.testOWLManager = this.getNewPoddOWLManagerInstance(this.manager, reasonerFactory);
         Assert.assertNotNull("Null implementation of test OWLManager", this.testOWLManager);
         
         // create a memory Repository for tests

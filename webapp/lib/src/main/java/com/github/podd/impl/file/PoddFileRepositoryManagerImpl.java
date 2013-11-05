@@ -48,21 +48,6 @@ import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.RDFParseException;
 import org.openrdf.rio.Rio;
 import org.openrdf.rio.UnsupportedRDFormatException;
-import org.semanticweb.owlapi.formats.OWLOntologyFormatFactoryRegistry;
-import org.semanticweb.owlapi.formats.RioRDFOntologyFormatFactory;
-import org.semanticweb.owlapi.io.OWLParserException;
-import org.semanticweb.owlapi.model.OWLOntology;
-import org.semanticweb.owlapi.model.OWLOntologyCreationException;
-import org.semanticweb.owlapi.model.OWLOntologyManager;
-import org.semanticweb.owlapi.profiles.OWLProfile;
-import org.semanticweb.owlapi.profiles.OWLProfileRegistry;
-import org.semanticweb.owlapi.profiles.OWLProfileReport;
-import org.semanticweb.owlapi.profiles.OWLProfileViolation;
-import org.semanticweb.owlapi.reasoner.OWLReasoner;
-import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
-import org.semanticweb.owlapi.reasoner.OWLReasonerFactoryRegistry;
-import org.semanticweb.owlapi.rio.RioMemoryTripleSource;
-import org.semanticweb.owlapi.rio.RioParserImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -74,13 +59,10 @@ import com.github.podd.api.file.PoddDataRepositoryManager;
 import com.github.podd.api.file.PoddDataRepositoryRegistry;
 import com.github.podd.exception.DataRepositoryException;
 import com.github.podd.exception.DataRepositoryMappingNotFoundException;
-import com.github.podd.exception.EmptyOntologyException;
 import com.github.podd.exception.FileReferenceInvalidException;
 import com.github.podd.exception.FileReferenceVerificationFailureException;
 import com.github.podd.exception.FileRepositoryIncompleteException;
 import com.github.podd.exception.FileRepositoryMappingExistsException;
-import com.github.podd.exception.InconsistentOntologyException;
-import com.github.podd.exception.OntologyNotInProfileException;
 import com.github.podd.exception.PoddException;
 import com.github.podd.exception.PoddRuntimeException;
 import com.github.podd.utils.PoddRdfConstants;
@@ -110,7 +92,7 @@ public class PoddFileRepositoryManagerImpl implements PoddDataRepositoryManager
         try (final InputStream inputA = this.getClass().getResourceAsStream(PoddRdfConstants.PATH_PODD_DATA_REPOSITORY);)
         {
             // load poddDataRepository.owl into a Model
-            dataRepositorySchema = Rio.parse(inputA, "", RDFFormat.RDFXML);
+            this.dataRepositorySchema = Rio.parse(inputA, "", RDFFormat.RDFXML);
         }
         catch(IOException | RDFParseException | UnsupportedRDFormatException e)
         {
@@ -413,8 +395,7 @@ public class PoddFileRepositoryManagerImpl implements PoddDataRepositoryManager
     }
     
     @Override
-    public void initialise(final Model defaultAliasConfiguration) throws OpenRDFException, PoddException,
-        IOException
+    public void initialise(final Model defaultAliasConfiguration) throws OpenRDFException, PoddException, IOException
     {
         if(this.repositoryManager == null)
         {
@@ -427,7 +408,7 @@ public class PoddFileRepositoryManagerImpl implements PoddDataRepositoryManager
             
             // validate the default alias file against the File Repository
             // configuration schema
-            this.getOWLManager().verifyAgainstSchema(defaultAliasConfiguration, dataRepositorySchema);
+            this.getOWLManager().verifyAgainstSchema(defaultAliasConfiguration, this.dataRepositorySchema);
             
             final Model allAliases =
                     defaultAliasConfiguration.filter(null, PoddRdfConstants.PODD_DATA_REPOSITORY_ALIAS, null);

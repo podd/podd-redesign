@@ -17,7 +17,6 @@
 package com.github.podd.impl;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashSet;
@@ -38,7 +37,6 @@ import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.util.RDFInserter;
 import org.openrdf.rio.RDFFormat;
-import org.openrdf.rio.Rio;
 import org.semanticweb.owlapi.formats.OWLOntologyFormatFactoryRegistry;
 import org.semanticweb.owlapi.formats.RioRDFOntologyFormatFactory;
 import org.semanticweb.owlapi.io.OWLOntologyDocumentSource;
@@ -86,7 +84,6 @@ import uk.ac.manchester.cs.owl.owlapi.OWLImportsDeclarationImpl;
 import com.github.podd.api.PoddOWLManager;
 import com.github.podd.exception.DataRepositoryException;
 import com.github.podd.exception.EmptyOntologyException;
-import com.github.podd.exception.FileRepositoryIncompleteException;
 import com.github.podd.exception.InconsistentOntologyException;
 import com.github.podd.exception.OntologyNotInProfileException;
 import com.github.podd.exception.PoddException;
@@ -108,7 +105,7 @@ public class PoddOWLManagerImpl implements PoddOWLManager
     
     private final OWLReasonerFactory reasonerFactory;
     
-    public PoddOWLManagerImpl(OWLOntologyManager nextManager, OWLReasonerFactory nextReasonerFactory)
+    public PoddOWLManagerImpl(final OWLOntologyManager nextManager, final OWLReasonerFactory nextReasonerFactory)
     {
         if(nextManager == null)
         {
@@ -454,11 +451,11 @@ public class PoddOWLManagerImpl implements PoddOWLManager
                 // clear OWLAPI memory
                 if(defaultAliasOntology != null)
                 {
-                    owlOntologyManager.removeOntology(defaultAliasOntology);
+                    this.owlOntologyManager.removeOntology(defaultAliasOntology);
                 }
                 if(dataRepositoryOntology != null)
                 {
-                    owlOntologyManager.removeOntology(dataRepositoryOntology);
+                    this.owlOntologyManager.removeOntology(dataRepositoryOntology);
                 }
             }
         }
@@ -497,7 +494,7 @@ public class PoddOWLManagerImpl implements PoddOWLManager
         {
             try
             {
-                nextOntology = owlOntologyManager.createOntology();
+                nextOntology = this.owlOntologyManager.createOntology();
                 final RioMemoryTripleSource owlSource = new RioMemoryTripleSource(model.iterator());
                 
                 owlParser.parse(owlSource, nextOntology);
@@ -541,11 +538,11 @@ public class PoddOWLManagerImpl implements PoddOWLManager
                 throw new InconsistentOntologyException(reasoner, "Ontology is inconsistent");
             }
         }
-        catch(Throwable e)
+        catch(final Throwable e)
         {
             if(nextOntology != null)
             {
-                owlOntologyManager.removeOntology(nextOntology);
+                this.owlOntologyManager.removeOntology(nextOntology);
             }
             throw e;
         }
