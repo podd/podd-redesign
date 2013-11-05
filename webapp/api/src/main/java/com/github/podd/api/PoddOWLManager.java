@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.util.List;
 
 import org.openrdf.OpenRDFException;
+import org.openrdf.model.Model;
 import org.openrdf.model.URI;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
@@ -37,6 +38,10 @@ import org.semanticweb.owlapi.profiles.OWLProfile;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
 
+import com.github.podd.exception.DataRepositoryException;
+import com.github.podd.exception.EmptyOntologyException;
+import com.github.podd.exception.InconsistentOntologyException;
+import com.github.podd.exception.OntologyNotInProfileException;
 import com.github.podd.exception.PoddException;
 import com.github.podd.utils.InferredOWLOntologyID;
 
@@ -127,11 +132,6 @@ public interface PoddOWLManager
      *             If there was an error while attempting to get the Ontology.
      */
     OWLOntology getOntology(OWLOntologyID ontologyID) throws IllegalArgumentException, OWLException;
-    
-    /**
-     * @return The OWLOntologyManager mapped to this PoddOWLManager
-     */
-    OWLOntologyManager getOWLOntologyManager();
     
     /**
      * @return The OWLReasonerFactory mapped to this PoddOWLManager
@@ -253,5 +253,15 @@ public interface PoddOWLManager
      *            The reasoner factory to use for all ontologies in this PoddOWLManager.
      */
     void setReasonerFactory(OWLReasonerFactory reasonerFactory);
+    
+    /**
+     * Helper method to verify that a given {@link Model} represents an ontology which complies with
+     * the given schema OWL Ontology.
+     * 
+     * @param model
+     * @param schemaModel
+     * @throws OntologyNotInProfileException
+     */
+    void verifyAgainstSchema(Model model, Model schemaModel) throws OntologyNotInProfileException;
     
 }

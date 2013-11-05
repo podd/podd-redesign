@@ -130,8 +130,9 @@ public interface PoddDataRepositoryManager
      * @throws OpenRDFException
      * @throws DataRepositoryException
      * @throws IOException
+     * @throws PoddException
      */
-    void initialise(Model defaultAliasesConfiguraton) throws OpenRDFException, DataRepositoryException, IOException;
+    void initialise(Model defaultAliasesConfiguraton) throws OpenRDFException, IOException, PoddException;
     
     /**
      * Removes the mapping for the given alias, returning the {@link PoddDataRepository} object that

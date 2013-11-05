@@ -85,6 +85,8 @@ public abstract class AbstractPoddOWLManagerTest
     
     protected RepositoryConnection testRepositoryConnection;
     
+    private OWLOntologyManager manager;
+    
     /**
      * @return A new OWLReasonerFactory instance for use with the PoddOWLManager
      */
@@ -167,8 +169,7 @@ public abstract class AbstractPoddOWLManagerTest
         this.testOWLManager = this.getNewPoddOWLManagerInstance();
         Assert.assertNotNull("Null implementation of test OWLManager", this.testOWLManager);
         
-        // set an OWLOntologyManager for this PoddOWLManager
-        final OWLOntologyManager manager = OWLOntologyManagerFactoryRegistry.createOWLOntologyManager();
+        manager = OWLOntologyManagerFactoryRegistry.createOWLOntologyManager();
         Assert.assertNotNull("Null implementation of OWLOntologymanager", manager);
         this.testOWLManager.setOWLOntologyManager(manager);
         
@@ -219,17 +220,17 @@ public abstract class AbstractPoddOWLManagerTest
         this.testOWLManager.removeCache(inferredOntologyID.getInferredOWLOntologyID());
         
         Assert.assertFalse("Ontology should not be in memory",
-                this.testOWLManager.getOWLOntologyManager().contains(inferredOntologyID.getBaseOWLOntologyID()));
+                this.manager.contains(inferredOntologyID.getBaseOWLOntologyID()));
         Assert.assertFalse("Ontology should not be in memory",
-                this.testOWLManager.getOWLOntologyManager().contains(inferredOntologyID.getInferredOntologyIRI()));
+                this.manager.contains(inferredOntologyID.getInferredOntologyIRI()));
         
         this.testOWLManager.cacheSchemaOntology(inferredOntologyID, this.testRepositoryConnection, null);
         
         // verify:
         Assert.assertTrue("Ontology should be in memory",
-                this.testOWLManager.getOWLOntologyManager().contains(inferredOntologyID.getBaseOWLOntologyID()));
+                this.manager.contains(inferredOntologyID.getBaseOWLOntologyID()));
         Assert.assertTrue("Ontology should be in memory",
-                this.testOWLManager.getOWLOntologyManager().contains(inferredOntologyID.getInferredOWLOntologyID()));
+                this.manager.contains(inferredOntologyID.getInferredOWLOntologyID()));
     }
     
     /**
@@ -249,15 +250,13 @@ public abstract class AbstractPoddOWLManagerTest
                         TestConstants.EXPECTED_TRIPLE_COUNT_PODD_BASE_CONCRETE,
                         TestConstants.EXPECTED_TRIPLE_COUNT_PODD_BASE_INFERRED);
         
-        Assert.assertNotNull("Ontology should already be in memory", this.testOWLManager.getOWLOntologyManager()
-                .getOntology(inferredOntologyID));
+        Assert.assertNotNull("Ontology should already be in memory", this.manager.getOntology(inferredOntologyID));
         
         // this call will silently return since the ontology is already in cache
         this.testOWLManager.cacheSchemaOntology(inferredOntologyID, this.testRepositoryConnection, null);
         
         // verify:
-        Assert.assertNotNull("Ontology should still be in memory", this.testOWLManager.getOWLOntologyManager()
-                .getOntology(inferredOntologyID));
+        Assert.assertNotNull("Ontology should still be in memory", this.manager.getOntology(inferredOntologyID));
     }
     
     /**
@@ -275,7 +274,7 @@ public abstract class AbstractPoddOWLManagerTest
                         IRI.create("http://purl.org/podd/ns/version/poddBase/1"),
                         IRI.create("urn:inferred:http://purl.org/podd/ns/version/poddBase/1"));
         Assert.assertFalse("Ontology should not be in memory",
-                this.testOWLManager.getOWLOntologyManager().contains(inferredOntologyID.getBaseOWLOntologyID()));
+                this.manager.contains(inferredOntologyID.getBaseOWLOntologyID()));
         
         try
         {
@@ -376,13 +375,11 @@ public abstract class AbstractPoddOWLManagerTest
         this.testOWLManager.removeCache(pScienceInferredOntologyID.getInferredOWLOntologyID());
         
         Assert.assertFalse("Ontology should not be in memory",
-                this.testOWLManager.getOWLOntologyManager().contains(pbInferredOntologyID.getBaseOWLOntologyID()));
+                this.manager.contains(pbInferredOntologyID.getBaseOWLOntologyID()));
         Assert.assertFalse("Ontology should not be in memory",
-                this.testOWLManager.getOWLOntologyManager().contains(pScienceInferredOntologyID.getBaseOWLOntologyID()));
-        Assert.assertFalse(
-                "Ontology should not be in memory",
-                this.testOWLManager.getOWLOntologyManager().contains(
-                        pScienceInferredOntologyID.getInferredOntologyIRI()));
+                this.manager.contains(pScienceInferredOntologyID.getBaseOWLOntologyID()));
+        Assert.assertFalse("Ontology should not be in memory",
+                this.manager.contains(pScienceInferredOntologyID.getInferredOntologyIRI()));
         
         // prepare: 4) create schema management graph
         final URI schemaGraph = PoddRdfConstants.DEFAULT_SCHEMA_MANAGEMENT_GRAPH;
@@ -407,15 +404,13 @@ public abstract class AbstractPoddOWLManagerTest
         
         // verify:
         Assert.assertTrue("Ontology should be in memory",
-                this.testOWLManager.getOWLOntologyManager().contains(pScienceInferredOntologyID.getBaseOWLOntologyID()));
+                this.manager.contains(pScienceInferredOntologyID.getBaseOWLOntologyID()));
         Assert.assertTrue("Ontology should be in memory",
-                this.testOWLManager.getOWLOntologyManager().contains(pbInferredOntologyID.getInferredOntologyIRI()));
-        Assert.assertTrue(
-                "Ontology should be in memory",
-                this.testOWLManager.getOWLOntologyManager().contains(
-                        pScienceInferredOntologyID.getInferredOWLOntologyID()));
+                this.manager.contains(pbInferredOntologyID.getInferredOntologyIRI()));
         Assert.assertTrue("Ontology should be in memory",
-                this.testOWLManager.getOWLOntologyManager().contains(pbInferredOntologyID.getBaseOWLOntologyID()));
+                this.manager.contains(pScienceInferredOntologyID.getInferredOWLOntologyID()));
+        Assert.assertTrue("Ontology should be in memory",
+                this.manager.contains(pbInferredOntologyID.getBaseOWLOntologyID()));
     }
     
     /**
@@ -434,8 +429,7 @@ public abstract class AbstractPoddOWLManagerTest
         // prepare: load and store a schema ontology
         final InputStream inputStream = this.getClass().getResourceAsStream(PoddRdfConstants.PATH_PODD_BASE);
         Assert.assertNotNull("Could not find resource", inputStream);
-        final OWLOntology loadedOntology =
-                this.testOWLManager.getOWLOntologyManager().loadOntologyFromOntologyDocument(inputStream);
+        final OWLOntology loadedOntology = this.manager.loadOntologyFromOntologyDocument(inputStream);
         this.testOWLManager.dumpOntologyToRepository(loadedOntology, this.testRepositoryConnection);
         
         final InferredOWLOntologyID inferredOntologyID =
@@ -445,14 +439,14 @@ public abstract class AbstractPoddOWLManagerTest
         this.testOWLManager.removeCache(inferredOntologyID.getBaseOWLOntologyID());
         
         Assert.assertFalse("Ontology should not be in memory",
-                this.testOWLManager.getOWLOntologyManager().contains(inferredOntologyID.getBaseOWLOntologyID()));
+                this.manager.contains(inferredOntologyID.getBaseOWLOntologyID()));
         
         // invoke method to test
         this.testOWLManager.cacheSchemaOntology(inferredOntologyID, this.testRepositoryConnection, null);
         
         // verify:
         Assert.assertTrue("Ontology should be in memory",
-                this.testOWLManager.getOWLOntologyManager().contains(inferredOntologyID.getBaseOWLOntologyID()));
+                this.manager.contains(inferredOntologyID.getBaseOWLOntologyID()));
     }
     
     /**
@@ -502,19 +496,17 @@ public abstract class AbstractPoddOWLManagerTest
         this.testOWLManager.removeCache(pPlantInferredOntologyID.getInferredOWLOntologyID());
         
         Assert.assertFalse("Ontology should not be in memory",
-                this.testOWLManager.getOWLOntologyManager().contains(pbInferredOntologyID.getBaseOWLOntologyID()));
+                this.manager.contains(pbInferredOntologyID.getBaseOWLOntologyID()));
         Assert.assertFalse("Ontology should not be in memory",
-                this.testOWLManager.getOWLOntologyManager().contains(pbInferredOntologyID.getInferredOntologyIRI()));
+                this.manager.contains(pbInferredOntologyID.getInferredOntologyIRI()));
         Assert.assertFalse("Ontology should not be in memory",
-                this.testOWLManager.getOWLOntologyManager().contains(pScienceInferredOntologyID.getBaseOWLOntologyID()));
-        Assert.assertFalse(
-                "Ontology should not be in memory",
-                this.testOWLManager.getOWLOntologyManager().contains(
-                        pScienceInferredOntologyID.getInferredOntologyIRI()));
+                this.manager.contains(pScienceInferredOntologyID.getBaseOWLOntologyID()));
         Assert.assertFalse("Ontology should not be in memory",
-                this.testOWLManager.getOWLOntologyManager().contains(pPlantInferredOntologyID.getBaseOWLOntologyID()));
+                this.manager.contains(pScienceInferredOntologyID.getInferredOntologyIRI()));
         Assert.assertFalse("Ontology should not be in memory",
-                this.testOWLManager.getOWLOntologyManager().contains(pPlantInferredOntologyID.getInferredOntologyIRI()));
+                this.manager.contains(pPlantInferredOntologyID.getBaseOWLOntologyID()));
+        Assert.assertFalse("Ontology should not be in memory",
+                this.manager.contains(pPlantInferredOntologyID.getInferredOntologyIRI()));
         
         // prepare: 4) create schema management graph
         final URI schemaGraph = PoddRdfConstants.DEFAULT_SCHEMA_MANAGEMENT_GRAPH;
@@ -548,13 +540,11 @@ public abstract class AbstractPoddOWLManagerTest
         
         // verify:
         Assert.assertTrue("Ontology should be in memory",
-                this.testOWLManager.getOWLOntologyManager().contains(pScienceInferredOntologyID.getBaseOWLOntologyID()));
-        Assert.assertTrue(
-                "Ontology should be in memory",
-                this.testOWLManager.getOWLOntologyManager().contains(
-                        pScienceInferredOntologyID.getInferredOWLOntologyID()));
+                this.manager.contains(pScienceInferredOntologyID.getBaseOWLOntologyID()));
         Assert.assertTrue("Ontology should be in memory",
-                this.testOWLManager.getOWLOntologyManager().contains(pbInferredOntologyID.getBaseOWLOntologyID()));
+                this.manager.contains(pScienceInferredOntologyID.getInferredOWLOntologyID()));
+        Assert.assertTrue("Ontology should be in memory",
+                this.manager.contains(pbInferredOntologyID.getBaseOWLOntologyID()));
     }
     
     /**
@@ -663,7 +653,7 @@ public abstract class AbstractPoddOWLManagerTest
     public void testDumpOntologyToRepositoryWithEmptyOntology() throws Exception
     {
         // prepare: load an Ontology independently
-        final OWLOntology nextOntology = this.testOWLManager.getOWLOntologyManager().createOntology();
+        final OWLOntology nextOntology = this.manager.createOntology();
         
         try
         {
@@ -808,14 +798,13 @@ public abstract class AbstractPoddOWLManagerTest
     public void testGetOWLOntologyManagerWithMockObject() throws Exception
     {
         this.testOWLManager.setOWLOntologyManager(null);
-        Assert.assertNull("OWLOntologyManager should have been null", this.testOWLManager.getOWLOntologyManager());
+        Assert.assertNull("OWLOntologyManager should have been null", this.manager);
         
         final OWLOntologyManager mockOWLOntologyManager = Mockito.mock(OWLOntologyManager.class);
         this.testOWLManager.setOWLOntologyManager(mockOWLOntologyManager);
         
-        Assert.assertNotNull("OWLOntologyManager was not set", this.testOWLManager.getOWLOntologyManager());
-        Assert.assertEquals("Not the expected mock OWLManager", mockOWLOntologyManager,
-                this.testOWLManager.getOWLOntologyManager());
+        Assert.assertNotNull("OWLOntologyManager was not set", this.manager);
+        Assert.assertEquals("Not the expected mock OWLManager", mockOWLOntologyManager, this.manager);
     }
     
     /**
@@ -1294,7 +1283,7 @@ public abstract class AbstractPoddOWLManagerTest
     public void testRemoveCacheWithEmptyOntology() throws Exception
     {
         // prepare: create an empty ontology inside this OWLManager
-        final OWLOntologyID ontologyID = this.testOWLManager.getOWLOntologyManager().createOntology().getOntologyID();
+        final OWLOntologyID ontologyID = this.manager.createOntology().getOntologyID();
         final OWLOntology theOntologyFromMemory = this.testOWLManager.getOntology(ontologyID);
         Assert.assertNotNull("The ontology was not in memory", theOntologyFromMemory);
         Assert.assertTrue("Ontology was not empty", theOntologyFromMemory.isEmpty());
@@ -1375,14 +1364,14 @@ public abstract class AbstractPoddOWLManagerTest
     {
         // set null to forget the manager being set in setUp()
         this.testOWLManager.setOWLOntologyManager(null);
-        Assert.assertNull("OWLOntologyManager could not be set to NULL", this.testOWLManager.getOWLOntologyManager());
+        Assert.assertNull("OWLOntologyManager could not be set to NULL", this.manager);
         
         final OWLOntologyManager manager = OWLOntologyManagerFactoryRegistry.createOWLOntologyManager();
         Assert.assertNotNull("Null implementation of OWLOntologymanager", manager);
         
         this.testOWLManager.setOWLOntologyManager(manager);
         
-        Assert.assertNotNull("OWLOntologyManager was not set", this.testOWLManager.getOWLOntologyManager());
+        Assert.assertNotNull("OWLOntologyManager was not set", this.manager);
     }
     
     /**
@@ -1395,7 +1384,7 @@ public abstract class AbstractPoddOWLManagerTest
     public void testSetOWLOntologyManagerWithNull() throws Exception
     {
         this.testOWLManager.setOWLOntologyManager(null);
-        Assert.assertNull("OWLOntologyManager could not be set to NULL", this.testOWLManager.getOWLOntologyManager());
+        Assert.assertNull("OWLOntologyManager could not be set to NULL", this.manager);
     }
     
     /**

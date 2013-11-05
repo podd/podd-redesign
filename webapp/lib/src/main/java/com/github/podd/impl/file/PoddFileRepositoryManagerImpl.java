@@ -45,7 +45,9 @@ import org.openrdf.query.resultio.helpers.QueryResultCollector;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.rio.RDFFormat;
+import org.openrdf.rio.RDFParseException;
 import org.openrdf.rio.Rio;
+import org.openrdf.rio.UnsupportedRDFormatException;
 import org.semanticweb.owlapi.formats.OWLOntologyFormatFactoryRegistry;
 import org.semanticweb.owlapi.formats.RioRDFOntologyFormatFactory;
 import org.semanticweb.owlapi.io.OWLParserException;
@@ -80,6 +82,7 @@ import com.github.podd.exception.FileRepositoryMappingExistsException;
 import com.github.podd.exception.InconsistentOntologyException;
 import com.github.podd.exception.OntologyNotInProfileException;
 import com.github.podd.exception.PoddException;
+import com.github.podd.exception.PoddRuntimeException;
 import com.github.podd.utils.PoddRdfConstants;
 import com.github.podd.utils.RdfUtility;
 
@@ -97,11 +100,23 @@ public class PoddFileRepositoryManagerImpl implements PoddDataRepositoryManager
     
     private PoddOWLManager owlManager;
     
+    private Model dataRepositorySchema;
+    
     /**
      * 
      */
     public PoddFileRepositoryManagerImpl()
     {
+        try (final InputStream inputA = this.getClass().getResourceAsStream(PoddRdfConstants.PATH_PODD_DATA_REPOSITORY);)
+        {
+            // load poddDataRepository.owl into a Model
+            dataRepositorySchema = Rio.parse(inputA, "", RDFFormat.RDFXML);
+        }
+        catch(IOException | RDFParseException | UnsupportedRDFormatException e)
+        {
+            throw new PoddRuntimeException(
+                    "Could not initialise data repository manager due to an RDF or IO exception", e);
+        }
     }
     
     @Override
@@ -213,86 +228,6 @@ public class PoddFileRepositoryManagerImpl implements PoddDataRepositoryManager
                 this.log.warn("Failed to close RepositoryConnection", e);
             }
         }
-    }
-    
-    /**
-     * Helper method to verify that the statements of a given {@link Model} make up a consistent
-     * OWL-DL Ontology.
-     * 
-     * <br>
-     * 
-     * NOTES: Any ontologies imported must be already loaded into the OWLOntologyManager's memory
-     * before invoking this method. When this method returns, the ontology built from the input
-     * Model is in the OWLOntologyManager's memory.
-     * 
-     * @param model
-     *            A Model which should contain an Ontology
-     * @return The loaded Ontology if verification succeeds
-     * @throws DataRepositoryException
-     *             If verification fails
-     */
-    private OWLOntology checkForConsistentOwlDlOntology(final Model model) throws EmptyOntologyException,
-        OntologyNotInProfileException, InconsistentOntologyException
-    {
-        final RioRDFOntologyFormatFactory ontologyFormatFactory =
-                (RioRDFOntologyFormatFactory)OWLOntologyFormatFactoryRegistry.getInstance().getByMIMEType(
-                        RDFFormat.RDFXML.getDefaultMIMEType());
-        final RioParserImpl owlParser = new RioParserImpl(ontologyFormatFactory);
-        
-        final OWLOntologyManager manager = this.getOWLManager().getOWLOntologyManager();
-        OWLOntology nextOntology = null;
-        
-        synchronized(manager)
-        {
-            try
-            {
-                nextOntology = manager.createOntology();
-                final RioMemoryTripleSource owlSource = new RioMemoryTripleSource(model.iterator());
-                
-                owlParser.parse(owlSource, nextOntology);
-            }
-            catch(OWLOntologyCreationException | OWLParserException | IOException e)
-            {
-                // throwing up the original Exceptions is also a possibility
-                // here.
-                throw new EmptyOntologyException(nextOntology, "Error parsing Model to create an Ontology");
-            }
-            
-            // Repository configuration can be an empty ontology
-            // if(nextOntology.isEmpty())
-            // {
-            // throw new EmptyOntologyException(nextOntology,
-            // "Ontology was empty");
-            // }
-            
-            // verify that the ontology in OWL-DL profile
-            final OWLProfile nextProfile = OWLProfileRegistry.getInstance().getProfile(OWLProfile.OWL2_DL);
-            final OWLProfileReport profileReport = nextProfile.checkOntology(nextOntology);
-            if(!profileReport.isInProfile())
-            {
-                if(this.log.isDebugEnabled())
-                {
-                    for(final OWLProfileViolation violation : profileReport.getViolations())
-                    {
-                        this.log.debug(violation.toString());
-                    }
-                }
-                throw new OntologyNotInProfileException(nextOntology, profileReport, "Ontology not in OWL-DL profile");
-            }
-            
-            // check consistency
-            final OWLReasonerFactory reasonerFactory =
-                    OWLReasonerFactoryRegistry.getInstance().getReasonerFactory("Pellet");
-            final OWLReasoner reasoner = reasonerFactory.createReasoner(nextOntology);
-            
-            if(!reasoner.isConsistent())
-            {
-                this.getOWLManager().getOWLOntologyManager().removeOntology(nextOntology);
-                throw new InconsistentOntologyException(reasoner, "Ontology is inconsistent");
-            }
-        }
-        
-        return nextOntology;
     }
     
     @Override
@@ -478,7 +413,7 @@ public class PoddFileRepositoryManagerImpl implements PoddDataRepositoryManager
     }
     
     @Override
-    public void initialise(final Model defaultAliasConfiguration) throws OpenRDFException, DataRepositoryException,
+    public void initialise(final Model defaultAliasConfiguration) throws OpenRDFException, PoddException,
         IOException
     {
         if(this.repositoryManager == null)
@@ -492,7 +427,7 @@ public class PoddFileRepositoryManagerImpl implements PoddDataRepositoryManager
             
             // validate the default alias file against the File Repository
             // configuration schema
-            this.verifyFileRepositoryAgainstSchema(defaultAliasConfiguration);
+            this.getOWLManager().verifyAgainstSchema(defaultAliasConfiguration, dataRepositorySchema);
             
             final Model allAliases =
                     defaultAliasConfiguration.filter(null, PoddRdfConstants.PODD_DATA_REPOSITORY_ALIAS, null);
@@ -640,54 +575,6 @@ public class PoddFileRepositoryManagerImpl implements PoddDataRepositoryManager
         {
             throw new FileReferenceVerificationFailureException(errors,
                     "File Reference validation resulted in failures");
-        }
-    }
-    
-    /**
-     * Helper method to verify that a given {@link Model} represents a FileRepository configuration
-     * which complies with the PODD File Repository schema OWL Ontology.
-     * 
-     * @param model
-     * @param mimeType
-     * @throws DataRepositoryException
-     */
-    private void verifyFileRepositoryAgainstSchema(final Model model) throws DataRepositoryException
-    {
-        OWLOntology dataRepositoryOntology = null;
-        OWLOntology defaultAliasOntology = null;
-        
-        try (final InputStream inputA = this.getClass().getResourceAsStream(PoddRdfConstants.PATH_PODD_DATA_REPOSITORY);)
-        {
-            // load poddDataRepository.owl into a Model
-            final Model schemaModel = Rio.parse(inputA, "", RDFFormat.RDFXML);
-            
-            // verify & load poddDataRepository.owl into OWLAPI
-            dataRepositoryOntology = this.checkForConsistentOwlDlOntology(schemaModel);
-            
-            defaultAliasOntology = this.checkForConsistentOwlDlOntology(model);
-        }
-        catch(final PoddException | OpenRDFException | IOException e)
-        {
-            final String msg = "Failed verification of the DataRepsitory against poddDataRepository.owl";
-            this.log.error(msg, e);
-            throw new FileRepositoryIncompleteException(msg, e);
-        }
-        finally
-        {
-            final OWLOntologyManager manager = this.getOWLManager().getOWLOntologyManager();
-            
-            synchronized(manager)
-            {
-                // clear OWLAPI memory
-                if(defaultAliasOntology != null)
-                {
-                    manager.removeOntology(defaultAliasOntology);
-                }
-                if(dataRepositoryOntology != null)
-                {
-                    manager.removeOntology(dataRepositoryOntology);
-                }
-            }
         }
     }
     
