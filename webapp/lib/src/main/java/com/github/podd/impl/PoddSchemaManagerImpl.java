@@ -620,20 +620,6 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
             throw new NullPointerException("Schema Ontology input stream was null");
         }
         
-        final OWLOntologyDocumentSource owlSource =
-                new StreamDocumentSource(inputStream, fileFormat.getDefaultMIMEType());
-        final OWLOntology ontology = this.owlManager.loadOntology(owlSource);
-        
-        if(ontology.isEmpty())
-        {
-            throw new EmptyOntologyException(ontology, "Schema Ontology contained no axioms");
-        }
-        
-        if(schemaOntologyID != null)
-        {
-            // FIXME: Change OWLOntologyID to schemaOntologyID in this case
-        }
-        
         RepositoryConnection conn = null;
         
         try
@@ -644,11 +630,32 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
             conn = this.repositoryManager.getManagementRepository().getConnection();
             conn.begin();
             
-            this.owlManager.dumpOntologyToRepository(ontology, conn);
-            
-            // FIXME: Remove the following once it is not needed and OWL
-            // databases are being used
-            final InferredOWLOntologyID nextInferredOntology = this.owlManager.inferStatements(ontology, conn);
+            final OWLOntologyDocumentSource owlSource =
+                    new StreamDocumentSource(inputStream, fileFormat.getDefaultMIMEType());
+            InferredOWLOntologyID nextInferredOntology;
+            OWLOntologyID baseOntologyID;
+            synchronized(this)
+            {
+                final OWLOntology ontology = this.owlManager.loadOntology(owlSource);
+                
+                if(ontology.isEmpty())
+                {
+                    throw new EmptyOntologyException(ontology, "Schema Ontology contained no axioms");
+                }
+                
+                if(schemaOntologyID != null)
+                {
+                    // FIXME: Change OWLOntologyID to schemaOntologyID in this case
+                }
+                
+                baseOntologyID = ontology.getOntologyID();
+                
+                this.owlManager.dumpOntologyToRepository(ontology, conn);
+                
+                // FIXME: Remove the following once it is not needed and OWL
+                // databases are being used
+                nextInferredOntology = this.owlManager.inferStatements(ontology, conn);
+            }
             
             // update the link in the schema ontology management graph
             this.sesameManager.updateCurrentManagedSchemaOntologyVersion(nextInferredOntology, true, conn,
@@ -661,10 +668,10 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
             
             conn.commit();
             
-            return new InferredOWLOntologyID(ontology.getOntologyID().getOntologyIRI(), ontology.getOntologyID()
-                    .getVersionIRI(), nextInferredOntology.getOntologyIRI());
+            return new InferredOWLOntologyID(baseOntologyID.getOntologyIRI(), baseOntologyID.getVersionIRI(),
+                    nextInferredOntology.getOntologyIRI());
         }
-        catch(OpenRDFException | IOException e)
+        catch(Throwable e)
         {
             if(conn != null && conn.isActive())
             {
