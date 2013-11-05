@@ -34,7 +34,12 @@ public enum DanglingObjectPolicy
     /**
      * Notify caller of any dangling objects found.
      */
-    REPORT
+    REPORT,
+    
+    /**
+     * Ignore any dangling objects without modification.
+     */
+    IGNORE
     
     ;
 }

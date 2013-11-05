@@ -914,6 +914,13 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             final URI context, final DanglingObjectPolicy policy) throws RepositoryException,
         DisconnectedObjectException
     {
+        // Short-circuit if they wanted to ignore dangling objects
+        if(policy == DanglingObjectPolicy.IGNORE)
+        {
+            this.log.info("Not checking for dangling objects for artifact: {}", artifactID);
+            return;
+        }
+        
         final Set<URI> danglingObjects =
                 RdfUtility.findDisconnectedNodes(artifactID.toOpenRDFURI(), repositoryConnection, context);
         
