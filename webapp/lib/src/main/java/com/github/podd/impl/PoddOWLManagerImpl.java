@@ -550,13 +550,9 @@ public class PoddOWLManagerImpl implements PoddOWLManager
         return nextOntology;
     }
     
-    protected OWLOntologyManager getOWLOntologyManager()
+    private OWLOntologyManager getOWLOntologyManager()
     {
-        // TODO: Remove this method so that we can synchronize every access to
-        // OWLOntologyManager
-        // locally for threadsafety
-        // TODO: Also do not let OWLOntology objects escape as they contains
-        // references to
+        // TODO: Also do not let OWLOntology objects escape as they contain references to
         // OWLOntologyManager that can also be used in the same way
         return this.owlOntologyManager;
     }
