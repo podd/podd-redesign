@@ -19,6 +19,7 @@ package com.github.podd.impl;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -158,7 +159,7 @@ public class PoddOWLManagerImpl implements PoddOWLManager
             }
         }
         
-        final List<InferredOWLOntologyID> orderedResultsList = new ArrayList<InferredOWLOntologyID>();
+        final Set<InferredOWLOntologyID> orderedResultsList = new LinkedHashSet<InferredOWLOntologyID>();
         // add any indirect imports first
         for(final InferredOWLOntologyID inferredOntologyID : secondLevelImports)
         {
@@ -170,7 +171,7 @@ public class PoddOWLManagerImpl implements PoddOWLManager
             this.log.debug("adding {} to results", inferredOntologyID);
             orderedResultsList.add(inferredOntologyID);
         }
-        return orderedResultsList;
+        return new ArrayList<InferredOWLOntologyID>(orderedResultsList);
     }
     
     @Override
