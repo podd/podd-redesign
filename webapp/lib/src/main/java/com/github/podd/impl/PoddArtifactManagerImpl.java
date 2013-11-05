@@ -1027,6 +1027,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
                     this.getSesameManager().getSchemaVersion(importedSchemaIRI, permanentRepositoryConnection,
                             this.getRepositoryManager().getSchemaManagementGraph());
             
+            // Always replace with the version IRI
             if(!importedSchemaIRI.equals(schemaOntologyID.getVersionIRI()))
             {
                 // modify import to be a specific version of the schema
@@ -1780,6 +1781,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         final Repository tempRepository = this.getRepositoryManager().getNewTemporaryRepository(currentSchemaImports);
         RepositoryConnection tempRepositoryConnection = null;
         RepositoryConnection permanentRepositoryConnection = null;
+        RepositoryConnection managementRepositoryConnection = null;
         InferredOWLOntologyID inferredOWLOntologyID = null;
         
         try
@@ -1787,6 +1789,8 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             // create a temporary in-memory repository
             tempRepositoryConnection = tempRepository.getConnection();
             tempRepositoryConnection.begin();
+            
+            managementRepositoryConnection = this.getRepositoryManager().getManagementRepository().getConnection();
             
             permanentRepositoryConnection =
                     this.getRepositoryManager().getPermanentRepository(currentSchemaImports).getConnection();
@@ -1801,7 +1805,11 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             tempRepositoryConnection.add(repoResult, tempContext);
             
             // update the artifact statements
-            if(UpdatePolicy.REPLACE_EXISTING.equals(updatePolicy))
+            if(UpdatePolicy.REPLACE_ALL == updatePolicy)
+            {
+                throw new PoddRuntimeException("TODO: Implement support for UpdatePolicy.REPLACE_ALL");
+            }
+            else if(UpdatePolicy.REPLACE_EXISTING == updatePolicy)
             {
                 // create an intermediate context and add "edit" statements to
                 // it
@@ -1848,9 +1856,13 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
                 tempRepositoryConnection.add(
                         tempRepositoryConnection.getStatements(null, null, null, false, intContext), tempContext);
             }
-            else
+            else if(UpdatePolicy.MERGE_WITH_EXISTING == updatePolicy)
             {
                 tempRepositoryConnection.add(model, tempContext);
+            }
+            else
+            {
+                throw new PoddRuntimeException("Did not recognise the UpdatePolicy: " + updatePolicy);
             }
             
             // check and update statements with default timestamp values
@@ -1922,6 +1934,11 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         }
         catch(final Exception e)
         {
+            if(managementRepositoryConnection != null && managementRepositoryConnection.isActive())
+            {
+                managementRepositoryConnection.rollback();
+            }
+            
             if(permanentRepositoryConnection != null && permanentRepositoryConnection.isActive())
             {
                 permanentRepositoryConnection.rollback();
@@ -1936,6 +1953,18 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         }
         finally
         {
+            if(managementRepositoryConnection != null && managementRepositoryConnection.isOpen())
+            {
+                try
+                {
+                    managementRepositoryConnection.close();
+                }
+                catch(final RepositoryException e)
+                {
+                    this.log.error("Found exception closing repository connection", e);
+                }
+            }
+            
             if(permanentRepositoryConnection != null && permanentRepositoryConnection.isOpen())
             {
                 try

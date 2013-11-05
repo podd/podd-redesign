@@ -200,18 +200,14 @@ public class PoddOWLManagerImpl implements PoddOWLManager
         }
         
         // Only direct imports and first-level indirect imports are identified.
-        // This works for the
-        // current PODD schema ontologies which have a maximum import depth of 3
+        // This works for the current PODD schema ontologies which have a maximum import depth of 3
         // (PoddPlant -> PoddScience -> PoddBase)
-        // TODO: Fix this using a SPARQL which identifies the complete imports
-        // closure and sorts
-        // them
-        // in the proper order for loading.
+        // TODO: Fix this using a SPARQL which identifies the complete imports closure and sorts
+        // them in the proper order for loading.
         final List<InferredOWLOntologyID> imports = this.buildTwoLevelOrderedImportsList(ontologyID, conn, context);
         this.log.debug("The schema ontology {} has {} imports.", baseOntologyVersionIRI, imports.size());
         
-        // -- load the imported ontologies into the Manager's cache. It is
-        // expected that they are
+        // -- load the imported ontologies into the Manager's cache. It is expected that they are
         // already in the Repository
         for(final InferredOWLOntologyID inferredOntologyID : imports)
         {
@@ -226,8 +222,7 @@ public class PoddOWLManagerImpl implements PoddOWLManager
             }
         }
         
-        // -- load the requested schema ontology (and inferred statements if
-        // they exist) into the
+        // -- load the requested schema ontology (and inferred statements if they exist) into the
         // Manager's cache
         this.parseRDFStatements(conn, baseOntologyVersionIRI.toOpenRDFURI());
         if(inferredOntologyIRI != null)
@@ -467,34 +462,31 @@ public class PoddOWLManagerImpl implements PoddOWLManager
     public OWLOntology loadOntology(final OWLOntologyDocumentSource owlSource) throws OWLException, IOException,
         PoddException
     {
-        OWLOntology nextOntology;
-        if(owlSource instanceof RioMemoryTripleSource)
+        synchronized(this.owlOntologyManager)
         {
-            final RioRDFOntologyFormatFactory ontologyFormatFactory =
-                    (RioRDFOntologyFormatFactory)OWLOntologyFormatFactoryRegistry.getInstance().getByMIMEType(
-                            "application/rdf+xml");
-            final RioParserImpl owlParser = new RioParserImpl(ontologyFormatFactory);
-            
-            synchronized(this.owlOntologyManager)
+            OWLOntology nextOntology;
+            if(owlSource instanceof RioMemoryTripleSource)
             {
+                final RioRDFOntologyFormatFactory ontologyFormatFactory =
+                        (RioRDFOntologyFormatFactory)OWLOntologyFormatFactoryRegistry.getInstance().getByMIMEType(
+                                "application/rdf+xml");
+                final RioParserImpl owlParser = new RioParserImpl(ontologyFormatFactory);
+                
                 nextOntology = this.owlOntologyManager.createOntology();
                 
                 owlParser.parse(owlSource, nextOntology);
             }
-        }
-        else
-        {
-            synchronized(this.owlOntologyManager)
+            else
             {
                 nextOntology = this.owlOntologyManager.loadOntologyFromOntologyDocument(owlSource);
             }
+            
+            if(nextOntology.isEmpty())
+            {
+                throw new EmptyOntologyException(nextOntology, "Loaded ontology is empty");
+            }
+            return nextOntology;
         }
-        
-        if(nextOntology.isEmpty())
-        {
-            throw new EmptyOntologyException(nextOntology, "Loaded ontology is empty");
-        }
-        return nextOntology;
     }
     
     @Override
