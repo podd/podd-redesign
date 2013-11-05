@@ -62,12 +62,6 @@ public class FileReferenceManagerImpl implements DataReferenceManager
     {
     }
     
-    /*
-     * (non-Javadoc)
-     * 
-     * @see com.github.podd.api.file.PoddFileReferenceManager#extractFileReferences
-     * (org.openrdf.repository .RepositoryConnection, org.openrdf.model.URI[])
-     */
     @Override
     public Set<DataReference> extractDataReferences(final RepositoryConnection repositoryConnection,
             final URI... contexts) throws OpenRDFException
@@ -104,11 +98,9 @@ public class FileReferenceManagerImpl implements DataReferenceManager
                 
                 if(!results.isEmpty())
                 {
-                    // This processor factory matches the graph that we wish to
-                    // use, so we create a
+                    // This processor factory matches the graph that we wish to use, so we create a
                     // processor instance now to create the File Reference
-                    // NOTE: This object cannot be shared as we do not specify
-                    // that it needs to be
+                    // NOTE: This object cannot be shared as we do not specify that it needs to be
                     // threadsafe
                     final DataReferenceProcessor<DataReference> processor = nextProcessorFactory.getProcessor();
                     
@@ -126,27 +118,15 @@ public class FileReferenceManagerImpl implements DataReferenceManager
         return internalFileRefResults;
     }
     
-    /*
-     * (non-Javadoc)
-     * 
-     * @see com.github.podd.api.file.PoddFileReferenceManager#getProcessorFactoryRegistry ()
-     */
     @Override
     public DataReferenceProcessorRegistry getDataProcessorRegistry()
     {
         return this.registry;
     }
     
-    /*
-     * (non-Javadoc)
-     * 
-     * @see com.github.podd.api.file.PoddFileReferenceManager#setProcessorFactoryRegistry
-     * (com.github. podd.api.file.PoddFileReferenceProcessorFactoryRegistry)
-     */
     @Override
     public void setDataProcessorRegistry(final DataReferenceProcessorRegistry registry)
     {
         this.registry = registry;
     }
-    
 }

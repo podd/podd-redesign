@@ -574,7 +574,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
      * @see com.github.podd.api.PoddArtifactManager#getFileReferenceManager()
      */
     @Override
-    public DataReferenceManager getFileReferenceManager()
+    public DataReferenceManager getDataReferenceManager()
     {
         return this.dataReferenceManager;
     }
@@ -963,27 +963,31 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
     private void handleFileReferences(final RepositoryConnection repositoryConnection,
             final DataReferenceVerificationPolicy policy, final URI... contexts) throws OpenRDFException, PoddException
     {
-        if(this.getFileReferenceManager() == null)
+        if(DataReferenceVerificationPolicy.VERIFY == policy)
         {
-            return;
-        }
-        
-        if(DataReferenceVerificationPolicy.VERIFY.equals(policy))
-        {
-            final Set<DataReference> fileReferenceResults =
-                    this.getFileReferenceManager().extractDataReferences(repositoryConnection, contexts);
-            
-            this.log.debug("Handling File reference validation");
-            
-            try
+            if(this.getDataReferenceManager() == null)
             {
-                this.dataRepositoryManager.verifyDataReferences(fileReferenceResults);
+                this.log.error("Could not verify data references as the manager was not initialised.");
             }
-            catch(final FileReferenceVerificationFailureException e)
+            else
             {
-                this.log.warn("From " + fileReferenceResults.size() + " file references, "
-                        + e.getValidationFailures().size() + " failed validation.");
-                throw e;
+                this.log.debug("Extracting data references");
+                
+                final Set<DataReference> fileReferenceResults =
+                        this.getDataReferenceManager().extractDataReferences(repositoryConnection, contexts);
+                
+                this.log.debug("Handling File reference validation");
+                
+                try
+                {
+                    this.dataRepositoryManager.verifyDataReferences(fileReferenceResults);
+                }
+                catch(final FileReferenceVerificationFailureException e)
+                {
+                    this.log.warn("From " + fileReferenceResults.size() + " file references, "
+                            + e.getValidationFailures().size() + " failed validation.");
+                    throw e;
+                }
             }
         }
     }
@@ -1325,11 +1329,9 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             // statements into OWLAPI
             this.handleCacheSchemasInMemory(permanentRepositoryConnection, temporaryRepositoryConnection, randomContext);
             
-            // TODO: This web service could be used accidentally to insert
-            // invalid file references
             inferredOWLOntologyID =
                     this.loadInferStoreArtifact(temporaryRepositoryConnection, permanentRepositoryConnection,
-                            randomContext, dataReferenceVerificationPolicy);
+                            randomContext, dataReferenceVerificationPolicy, false);
             
             permanentRepositoryConnection.commit();
             
@@ -1409,8 +1411,9 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
      */
     private InferredOWLOntologyID loadInferStoreArtifact(final RepositoryConnection tempRepositoryConnection,
             final RepositoryConnection permanentRepositoryConnection, final URI tempContext,
-            final DataReferenceVerificationPolicy fileReferencePolicy) throws OpenRDFException, OWLException,
-        IOException, PoddException, OntologyNotInProfileException, InconsistentOntologyException
+            final DataReferenceVerificationPolicy fileReferencePolicy, final boolean asynchronousInferences)
+        throws OpenRDFException, OWLException, IOException, PoddException, OntologyNotInProfileException,
+        InconsistentOntologyException
     {
         // load into OWLAPI
         this.log.debug("Loading podd artifact from temp repository: {}", tempContext);
@@ -1870,11 +1873,9 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             
             final Model resultsModel = new LinkedHashModel();
             
-            // add (temp-object-URI :hasPurl PURL) statements to Model
-            // NOTE: Using nested loops is rather inefficient, but these
-            // collections are not
-            // expected
-            // to have more than a handful of elements
+            // add (temp-object-URI :replacedTempUriWith PURL) statements to Model
+            // NOTE: Using nested loops is rather inefficient, but these collections are not
+            // expected to have more than a handful of elements
             for(final URI objectUri : objectUris)
             {
                 for(final PoddPurlReference purl : purls)
@@ -1887,9 +1888,6 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
                     }
                 }
             }
-            
-            // this.handleFileReferences(tempRepositoryConnection, tempContext,
-            // fileReferenceAction);
             
             // increment the version
             final OWLOntologyID currentManagedArtifactID =
@@ -1915,7 +1913,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             
             inferredOWLOntologyID =
                     this.loadInferStoreArtifact(tempRepositoryConnection, permanentRepositoryConnection, tempContext,
-                            fileReferenceAction);
+                            fileReferenceAction, false);
             
             permanentRepositoryConnection.commit();
             tempRepositoryConnection.rollback();
@@ -1924,14 +1922,14 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         }
         catch(final Exception e)
         {
-            if(tempRepositoryConnection != null && tempRepositoryConnection.isActive())
-            {
-                tempRepositoryConnection.rollback();
-            }
-            
             if(permanentRepositoryConnection != null && permanentRepositoryConnection.isActive())
             {
                 permanentRepositoryConnection.rollback();
+            }
+            
+            if(tempRepositoryConnection != null && tempRepositoryConnection.isActive())
+            {
+                tempRepositoryConnection.rollback();
             }
             
             throw e;
@@ -2043,7 +2041,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             tempRepositoryConnection.commit();
             final InferredOWLOntologyID result =
                     this.loadInferStoreArtifact(tempRepositoryConnection, permanentRepositoryConnection,
-                            newVersionIRI.toOpenRDFURI(), DataReferenceVerificationPolicy.DO_NOT_VERIFY);
+                            newVersionIRI.toOpenRDFURI(), DataReferenceVerificationPolicy.DO_NOT_VERIFY, false);
             permanentRepositoryConnection.commit();
             
             return result;

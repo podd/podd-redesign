@@ -242,7 +242,7 @@ public interface PoddArtifactManager
      * @return The {@link DataReferenceManager} used to create and fetch file references from
      *         artifacts.
      */
-    DataReferenceManager getFileReferenceManager();
+    DataReferenceManager getDataReferenceManager();
     
     Set<DataReference> getFileReferences(InferredOWLOntologyID artifactId);
     

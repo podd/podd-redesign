@@ -1261,7 +1261,7 @@ public abstract class AbstractPoddArtifactManagerTest
     @Test
     public final void testGetFileReferenceManager() throws Exception
     {
-        Assert.assertNotNull("File Reference Manager was null", this.testArtifactManager.getFileReferenceManager());
+        Assert.assertNotNull("File Reference Manager was null", this.testArtifactManager.getDataReferenceManager());
     }
     
     @Test
