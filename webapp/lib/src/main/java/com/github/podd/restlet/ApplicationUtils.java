@@ -51,6 +51,7 @@ import org.restlet.security.Role;
 import org.semanticweb.owlapi.model.OWLException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.OWLOntologyManagerFactoryRegistry;
+import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactoryRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -321,8 +322,12 @@ public class ApplicationUtils
         {
             ApplicationUtils.log.error("OWLOntologyManager was null");
         }
-        final PoddOWLManager nextOWLManager = new PoddOWLManagerImpl(nextOWLOntologyManager);
-        nextOWLManager.setReasonerFactory(OWLReasonerFactoryRegistry.getInstance().getReasonerFactory("Pellet"));
+        OWLReasonerFactory reasonerFactory = OWLReasonerFactoryRegistry.getInstance().getReasonerFactory("Pellet");
+        if(reasonerFactory == null)
+        {
+            ApplicationUtils.log.error("OWLReasonerFactory was null");
+        }
+        final PoddOWLManager nextOWLManager = new PoddOWLManagerImpl(nextOWLOntologyManager, reasonerFactory);
         
         // File Repository Manager
         final PoddDataRepositoryManager nextDataRepositoryManager = new PoddFileRepositoryManagerImpl();

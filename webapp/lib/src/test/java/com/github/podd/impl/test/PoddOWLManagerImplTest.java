@@ -39,9 +39,9 @@ public class PoddOWLManagerImplTest extends AbstractPoddOWLManagerTest
     }
     
     @Override
-    protected PoddOWLManager getNewPoddOWLManagerInstance(OWLOntologyManager manager)
+    protected PoddOWLManager getNewPoddOWLManagerInstance(OWLOntologyManager manager, OWLReasonerFactory reasonerFactory)
     {
-        return new PoddOWLManagerImpl(manager);
+        return new PoddOWLManagerImpl(manager, reasonerFactory);
     }
     
 }

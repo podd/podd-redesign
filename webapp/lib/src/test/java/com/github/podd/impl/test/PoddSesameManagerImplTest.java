@@ -73,12 +73,10 @@ public class PoddSesameManagerImplTest extends AbstractPoddSesameManagerTest
         // - create a PODD OWLManager instance
         final OWLOntologyManager manager = OWLOntologyManagerFactoryRegistry.createOWLOntologyManager();
         Assert.assertNotNull("Null implementation of OWLOntologymanager", manager);
-        final PoddOWLManagerImpl testPoddOWLManager = new PoddOWLManagerImpl(manager);
-        
         final OWLReasonerFactory reasonerFactory =
                 OWLReasonerFactoryRegistry.getInstance().getReasonerFactory("Pellet");
         Assert.assertNotNull("Null implementation of OWLReasonerFactory", reasonerFactory);
-        testPoddOWLManager.setReasonerFactory(reasonerFactory);
+        final PoddOWLManagerImpl testPoddOWLManager = new PoddOWLManagerImpl(manager, reasonerFactory);
         
         // - load each schema ontology (and its inferred ontology) to the
         // RepositoryConnection

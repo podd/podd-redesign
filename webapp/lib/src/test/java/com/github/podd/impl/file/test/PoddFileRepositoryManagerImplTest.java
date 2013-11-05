@@ -36,6 +36,7 @@ import org.openrdf.repository.sail.SailRepository;
 import org.openrdf.sail.memory.MemoryStore;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.OWLOntologyManagerFactoryRegistry;
+import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactoryRegistry;
 
 import com.github.podd.api.PoddOWLManager;
@@ -159,8 +160,9 @@ public class PoddFileRepositoryManagerImplTest extends AbstractPoddFileRepositor
         // create an OWL Manager
         final OWLOntologyManager manager = OWLOntologyManagerFactoryRegistry.createOWLOntologyManager();
         Assert.assertNotNull("Null implementation of OWLOntologymanager", manager);
-        final PoddOWLManager owlManager = new PoddOWLManagerImpl(manager);
-        owlManager.setReasonerFactory(OWLReasonerFactoryRegistry.getInstance().getReasonerFactory("Pellet"));
+        OWLReasonerFactory reasonerFactory = OWLReasonerFactoryRegistry.getInstance().getReasonerFactory("Pellet");
+        Assert.assertNotNull("Null implementation of OWLReasonerFactory", reasonerFactory);
+        final PoddOWLManager owlManager = new PoddOWLManagerImpl(manager, reasonerFactory);
         
         // create the PoddDataRepositoryManager for testing
         final PoddDataRepositoryManager testFileRepositoryManager = new PoddFileRepositoryManagerImpl();

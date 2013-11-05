@@ -134,11 +134,6 @@ public interface PoddOWLManager
     OWLOntology getOntology(OWLOntologyID ontologyID) throws IllegalArgumentException, OWLException;
     
     /**
-     * @return The OWLReasonerFactory mapped to this PoddOWLManager
-     */
-    OWLReasonerFactory getReasonerFactory();
-    
-    /**
      * 
      * @return The {@link OWLProfile} used by the reasoner attached to this PoddOWLManager.
      */
@@ -236,15 +231,6 @@ public interface PoddOWLManager
      *             If the ontologyID does not have a version.
      */
     void setCurrentVersion(OWLOntologyID ontologyID);
-    
-    /**
-     * Sets the {@link OWLReasonerFactory} to use when creating instances of {@link OWLReasoner} to
-     * verify ontologies and infer statements based on ontologies.
-     * 
-     * @param reasonerFactory
-     *            The reasoner factory to use for all ontologies in this PoddOWLManager.
-     */
-    void setReasonerFactory(OWLReasonerFactory reasonerFactory);
     
     /**
      * Helper method to verify that a given {@link Model} represents an ontology which complies with

@@ -106,11 +106,20 @@ public class PoddOWLManagerImpl implements PoddOWLManager
     
     private final OWLOntologyManager owlOntologyManager;
     
-    private OWLReasonerFactory reasonerFactory;
+    private final OWLReasonerFactory reasonerFactory;
     
-    public PoddOWLManagerImpl(OWLOntologyManager nextManager)
+    public PoddOWLManagerImpl(OWLOntologyManager nextManager, OWLReasonerFactory nextReasonerFactory)
     {
+        if(nextManager == null)
+        {
+            throw new IllegalArgumentException("OWLOntologyManager was null");
+        }
+        if(nextReasonerFactory == null)
+        {
+            throw new IllegalArgumentException("OWLReasonerFactory was null");
+        }
         this.owlOntologyManager = nextManager;
+        this.reasonerFactory = nextReasonerFactory;
     }
     
     private List<InferredOWLOntologyID> buildDirectImportsList(final InferredOWLOntologyID ontologyID,
@@ -555,8 +564,7 @@ public class PoddOWLManagerImpl implements PoddOWLManager
         return this.owlOntologyManager;
     }
     
-    @Override
-    public OWLReasonerFactory getReasonerFactory()
+    private OWLReasonerFactory getReasonerFactory()
     {
         return this.reasonerFactory;
     }
@@ -693,11 +701,4 @@ public class PoddOWLManagerImpl implements PoddOWLManager
     {
         throw new RuntimeException("TODO: Implement setCurrentVersion");
     }
-    
-    @Override
-    public void setReasonerFactory(final OWLReasonerFactory reasonerFactory)
-    {
-        this.reasonerFactory = reasonerFactory;
-    }
-    
 }

@@ -56,9 +56,9 @@ public class PoddSchemaManagerImplTest extends AbstractPoddSchemaManagerTest
     }
     
     @Override
-    protected PoddOWLManager getNewPoddOwlManagerInstance(OWLOntologyManager manager)
+    protected PoddOWLManager getNewPoddOwlManagerInstance(OWLOntologyManager manager, OWLReasonerFactory reasonerFactory)
     {
-        return new PoddOWLManagerImpl(manager);
+        return new PoddOWLManagerImpl(manager, reasonerFactory);
     }
     
     @Override

@@ -215,9 +215,12 @@ public abstract class AbstractPoddArtifactManagerTest
      * Concrete tests must override this to provide a new, empty, instance of {@link PoddOWLManager}
      * .
      * 
+     * @param reasonerFactory
+     *            TODO
+     * 
      * @return A new empty instance of an implementation of PoddOWLManager.
      */
-    protected abstract PoddOWLManager getNewOWLManager(OWLOntologyManager manager);
+    protected abstract PoddOWLManager getNewOWLManager(OWLOntologyManager manager, OWLReasonerFactory reasonerFactory);
     
     /**
      * Concrete tests must override this to provide a new, empty, instance of
@@ -585,8 +588,7 @@ public abstract class AbstractPoddArtifactManagerTest
         
         final OWLOntologyManager manager = OWLOntologyManagerFactoryRegistry.createOWLOntologyManager();
         Assert.assertNotNull("Null implementation of OWLOntologymanager", manager);
-        final PoddOWLManager testOWLManager = this.getNewOWLManager(manager);
-        testOWLManager.setReasonerFactory(this.getNewReasonerFactory());
+        final PoddOWLManager testOWLManager = this.getNewOWLManager(manager, this.getNewReasonerFactory());
         
         this.testSchemaManager = this.getNewSchemaManager();
         this.testSchemaManager.setOwlManager(testOWLManager);

@@ -83,9 +83,9 @@ public class PoddArtifactManagerImplTest extends AbstractPoddArtifactManagerTest
     }
     
     @Override
-    protected PoddOWLManager getNewOWLManager(OWLOntologyManager manager)
+    protected PoddOWLManager getNewOWLManager(OWLOntologyManager manager, OWLReasonerFactory reasonerFactory)
     {
-        return new PoddOWLManagerImpl(manager);
+        return new PoddOWLManagerImpl(manager, reasonerFactory);
     }
     
     @Override
