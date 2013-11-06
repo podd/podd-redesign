@@ -189,7 +189,8 @@ public class HrppcPoddClient extends RestletPoddClientImpl
                     }
                     
                     // Process the next line and add it to the upload queue
-                    this.processPlantScanLine(headers, Arrays.asList(nextLine), projectUriMap, uploadQueue);
+                    this.processPlantScanLine(headers, Arrays.asList(nextLine), projectUriMap, experimentUriMap,
+                            uploadQueue);
                 }
             }
         }
@@ -410,10 +411,26 @@ public class HrppcPoddClient extends RestletPoddClientImpl
      * Process a single line from the input file, using the given headers as the definitions for the
      * line.
      * 
+     * @param headers
+     *            The list of headers
+     * @param nextLine
+     *            A list of values which can be matched against the list of headers
+     * @param projectUriMap
+     *            A map from the normalised project names to their URIs and the overall artifact
+     *            identifiers.
+     * @param experimentUriMap
+     *            A map from normalised experiment names to their URIs and the projects that they
+     *            are located in.
+     * @param uploadQueue
+     *            A map from artifact identifiers to Model objects containing all of the necessary
+     *            changes to the artifact.
+     * 
      * @throws PoddClientException
+     *             If there was a problem communicating with PODD or the line was not valid.
      */
     private void processPlantScanLine(final List<String> headers, final List<String> nextLine,
             final ConcurrentMap<String, ConcurrentMap<URI, InferredOWLOntologyID>> projectUriMap,
+            ConcurrentMap<String, ConcurrentMap<URI, URI>> experimentUriMap,
             final ConcurrentMap<InferredOWLOntologyID, Model> uploadQueue) throws PoddClientException
     {
         this.log.info("About to process line: {}", nextLine);
@@ -563,12 +580,14 @@ public class HrppcPoddClient extends RestletPoddClientImpl
             rowNumber = positionMatcher.group(2).trim();
         }
         
-        // Reconstruct Project#0001-0002 structure
+        // Reconstruct Project#0001-0002 structure to get a normalised string
         final String baseProjectName = String.format(HrppcPoddClient.TEMPLATE_PROJECT, projectYear, projectNumber);
         
         if(!projectUriMap.containsKey(baseProjectName))
         {
             this.log.error("Did not find an existing project for a line in the CSV file: {}", baseProjectName);
+            
+            // TODO: Create a new project?
         }
         else
         {
@@ -580,14 +599,64 @@ public class HrppcPoddClient extends RestletPoddClientImpl
             }
             else if(projectDetails.size() > 1)
             {
-                this.log.error("Found multiple PODD Project name mappings : {} {}", baseProjectName, projectDetails);
+                this.log.error(
+                        "Found multiple PODD Project name mappings (not able to select between them automatically) : {} {}",
+                        baseProjectName, projectDetails);
             }
             else
             {
                 this.log.info("Found unique PODD Project name to URI mapping: {} {}", baseProjectName, projectDetails);
                 
-                final Model nextResult = new LinkedHashModel();
+                URI nextProjectUri = projectDetails.keySet().iterator().next();
+                InferredOWLOntologyID nextProjectID = projectDetails.get(nextProjectUri);
                 
+                // Create or find an existing model for the necessary modifications to this
+                // project/artifact
+                Model nextResult = new LinkedHashModel();
+                final Model putIfAbsent = uploadQueue.putIfAbsent(nextProjectID, nextResult);
+                if(putIfAbsent != null)
+                {
+                    nextResult = putIfAbsent;
+                }
+                
+                // Reconstruct Project#0001-0002_Experiment#0001 structure to get a normalised
+                // string
+                final String baseExperimentName =
+                        String.format(HrppcPoddClient.TEMPLATE_EXPERIMENT, projectYear, projectNumber, experimentNumber);
+                
+                if(!experimentUriMap.containsKey(baseExperimentName))
+                {
+                    this.log.error("Did not find an existing experiment for a line in the CSV file: {}",
+                            baseExperimentName);
+                    
+                    // TODO: Create a new experiment?
+                }
+                else
+                {
+                    final Map<URI, URI> experimentDetails = experimentUriMap.get(baseExperimentName);
+                    
+                    if(experimentDetails.isEmpty())
+                    {
+                        this.log.error("Experiment mapping seemed to exist but it was empty: {}", baseExperimentName);
+                    }
+                    else if(experimentDetails.size() > 1)
+                    {
+                        this.log.error(
+                                "Found multiple PODD Experiment name mappings (not able to select between them automatically) : {} {}",
+                                baseExperimentName, experimentDetails);
+                    }
+                    else
+                    {
+                        URI nextExperimentUri = experimentDetails.keySet().iterator().next();
+                        URI checkProjectUri = experimentDetails.get(nextExperimentUri);
+                        if(!nextProjectUri.equals(checkProjectUri))
+                        {
+                            this.log.error(
+                                    "Experiment mapping was against a different project: {} experimentURI={} nextProjectUri={} checkProjectUri={}",
+                                    baseExperimentName, nextExperimentUri, nextProjectUri, checkProjectUri);
+                        }
+                    }
+                }
             }
             
         }
