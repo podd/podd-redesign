@@ -1,0 +1,52 @@
+INITIALISE:
+Seeds -1 -1 -1 -1
+Treatments 110 Fixed
+Layout, Dsgn 11 x 60, Rep 11 x 12
+P1 PHASE: Swap 11 x 12, Corr 11 x 60
+          AType A++, Target 0.000000, MaxInt 10000
+          Intensity 100.000000
+  O11 OBJECTIVE: Weight 0.800000
+                 Linear Covariate NONE
+                 SPATIAL, Row ID(0.00) Col ID(0.00) Gamma 1.000000
+                 B111 RANDOM BLOCK: 4 Rows by 60 Columns, VarianceRatio 1.000000
+  O12 OBJECTIVE: Weight 0.200000
+                 Linear Covariate NONE
+                 SPATIAL, Row ID(0.00) Col ID(0.00) Gamma 1.000000
+                 B121 RANDOM BLOCK: 4 Rows by 12 Columns, VarianceRatio 1.000000
+P2 PHASE: Swap 4 x 12, Corr 11 x 60
+          AType Agg, Target 0.000000, MaxInt 100000
+          Intensity 100.000000
+  O21 OBJECTIVE: Weight 1.000000
+                 Linear Covariate NONE
+                 SPATIAL, Row AR(0.50) Col AR(0.50) Gamma 1.000000
+                 B211 RANDOM BLOCK: 1 Row by 60 Columns, VarianceRatio 1.000000
+                 B212 RANDOM BLOCK: 11 Rows by 1 Column, VarianceRatio 0.500000
+                 B213 RANDOM BLOCK: 1 Row by 1 Column, VarianceRatio 0.100000
+
+DiGGer Search Result
+====================
+
+After     9729  interchanges
+   of    10000:
+
+                A++ AMeasure    Weight
+      Phase 1 :     0.395755
+  Objective 11:     0.394175  0.800000
+  Objective 12:     0.402074  0.200000
+
+
+
+DiGGer Search Result
+====================
+
+After    97543  interchanges
+   of   100000:
+
+                Agg AMeasure    Weight
+      Phase 2 :     0.133577
+  Objective 21:     0.133577  1.000000
+
+
+  Random Model: random=~REP+B111+B121
+
+No runtime error

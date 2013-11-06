@@ -1,0 +1,52 @@
+# Initialise Design ###########
+SEEDS                         # RNG seeds [-1 -1 [-1 -1]]                  
+110 FIXED                     # No. treatments, [F-fixed/R-random [gamma]] 
+11 60  11 12                  # Layout: Design r c, Replicate r c          
+READ SWAP                     # G-GENERATE/R-READ 1st design [S-SWAP file] 
+
+# Search Phase Settings #######
+  11 12   11 60               # Swap r c, Correlation r c                  
+  A++                         # A-type                                     
+  0.000000 10000              # Target A-measure, Max. interchanges to test
+  100.000000                  # Search intensity, (low) 0 - 100 (high)     
+  2                           # Number of objectives                       
+#   Objective Specifications ##
+    0.800000                  # Objective weight                           
+    1                         #  No. of block factors                      
+         4   60  1.000000     #  Block r c gamma                           
+    NONE                      #  None/Row/Column/Both Linear trend code    
+    ID                        #  Correlation between rows: Model [par.]    
+    ID                        #  Correlation between columns: Model [par.] 
+    1.000000                  #  Spatial gamma                             
+#   Objective Specifications ##
+    0.200000                  # Objective weight                           
+    1                         #  No. of block factors                      
+         4   12  1.000000     #  Block r c gamma                           
+    NONE                      #  None/Row/Column/Both Linear trend code    
+    ID                        #  Correlation between rows: Model [par.]    
+    ID                        #  Correlation between columns: Model [par.] 
+    1.000000                  #  Spatial gamma                             
+
+# DiGGer control ##############
+NEW PHASE                     #
+
+# Search Phase Settings #######
+  4 12   11 60                # Swap r c, Correlation r c                  
+  Agg                         # A-type                                     
+  0.000000 100000             # Target A-measure, Max. interchanges to test
+  100.000000                  # Search intensity, (low) 0 - 100 (high)     
+  1                           # Number of objectives                       
+#   Objective Specifications ##
+    1.000000                  # Objective weight                           
+    3                         #  No. of block factors                      
+         1   60  1.000000     #  Block r c gamma                           
+        11    1  0.500000     #  Block r c gamma                           
+         1    1  0.100000     #  Block r c gamma                           
+    NONE                      #  None/Row/Column/Both Linear trend code    
+    AR 0.500000               #  Correlation between rows: Model [par.]    
+    AR 0.500000               #  Correlation between columns: Model [par.] 
+    1.000000                  #  Spatial gamma                             
+
+# DiGGer control ##############
+END                           #
+

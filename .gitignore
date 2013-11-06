@@ -4,6 +4,7 @@ bin/
 .project
 .settings
 *~
+.~lock*
 pom.xml.versionsBackup
 catalog-v001.xml
 stats.csv
