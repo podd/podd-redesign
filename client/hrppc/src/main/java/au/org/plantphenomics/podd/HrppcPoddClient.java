@@ -152,7 +152,16 @@ public class HrppcPoddClient extends RestletPoddClientImpl
         
         // Map starting at experiment name strings and ending with a mapping from the URI of
         // the experiment to the URI of the project that contains the experiment
+        // TODO: This could be converted to not be prefilled in future, but currently it contains
+        // all experiments in all unpublished projects in PODD that are accessible to the current
+        // user
         final ConcurrentMap<String, ConcurrentMap<URI, URI>> experimentUriMap = new ConcurrentHashMap<>();
+        
+        // Cache for tray name mappings, starting at tray barcodes and ending with a mapping from
+        // the URI of the tray to the URI of the experiment that contains the tray
+        // NOTE: This is not prefilled, as it is populated on demand during processing of lines to
+        // only contain the necessary elements
+        final ConcurrentMap<String, ConcurrentMap<URI, URI>> trayUriMap = new ConcurrentHashMap<>();
         
         // Map known project names to their URIs, as the URIs are needed to
         // create statements internally
@@ -197,7 +206,7 @@ public class HrppcPoddClient extends RestletPoddClientImpl
                     
                     // Process the next line and add it to the upload queue
                     this.processTrayScanLine(headers, Arrays.asList(nextLine), projectUriMap, experimentUriMap,
-                            uploadQueue);
+                            trayUriMap, uploadQueue);
                 }
             }
         }
@@ -497,6 +506,9 @@ public class HrppcPoddClient extends RestletPoddClientImpl
      * @param experimentUriMap
      *            A map from normalised experiment names to their URIs and the projects that they
      *            are located in.
+     * @param trayUriMap
+     *            A map from normalised tray names (barcodes) to their URIs and the experiments that
+     *            they are located in.
      * @param uploadQueue
      *            A map from artifact identifiers to Model objects containing all of the necessary
      *            changes to the artifact.
@@ -507,6 +519,7 @@ public class HrppcPoddClient extends RestletPoddClientImpl
     private void processTrayScanLine(final List<String> headers, final List<String> nextLine,
             final ConcurrentMap<String, ConcurrentMap<URI, InferredOWLOntologyID>> projectUriMap,
             final ConcurrentMap<String, ConcurrentMap<URI, URI>> experimentUriMap,
+            ConcurrentMap<String, ConcurrentMap<URI, URI>> trayUriMap,
             final ConcurrentMap<InferredOWLOntologyID, Model> uploadQueue) throws PoddClientException, OpenRDFException
     {
         this.log.info("About to process line: {}", nextLine);
@@ -659,8 +672,8 @@ public class HrppcPoddClient extends RestletPoddClientImpl
             rowNumber = positionMatcher.group(2).trim();
         }
         
-        this.generateTrayScanRDF(projectUriMap, experimentUriMap, uploadQueue, projectYear, projectNumber,
-                experimentNumber, trayId, trayNotes, trayTypeName, plantId);
+        this.generateTrayScanRDF(projectUriMap, experimentUriMap, trayUriMap, uploadQueue, projectYear, projectNumber,
+                experimentNumber, trayId, trayNotes, trayTypeName, plantId, genus, species);
     }
     
     /**
@@ -668,10 +681,14 @@ public class HrppcPoddClient extends RestletPoddClientImpl
      * the relevant model in the upload queue.
      * 
      * @param projectUriMap
-     *            A map of relevant project URIs and their artifact identifiers and standardised
-     *            labels.
+     *            A map of relevant project URIs and their artifact identifiers using their
+     *            standardised labels.
      * @param experimentUriMap
-     *            A map of relevant experiment URIs and their project URIs and standardised labels.
+     *            A map of relevant experiment URIs and their project URIs using their standardised
+     *            labels.
+     * @param trayUriMap
+     *            A map of relevant tray URIs and their experiment URIs using their standardised
+     *            labels.
      * @param uploadQueue
      *            The upload queue containing all of the models to be uploaded.
      * @param projectYear
@@ -680,6 +697,10 @@ public class HrppcPoddClient extends RestletPoddClientImpl
      *            The TrayScan parameter detailing the project number for the next tray.
      * @param experimentNumber
      *            The TrayScan parameter detailing the experiment number for the next tray.
+     * @param species
+     *            The species for the current line.
+     * @param genus
+     *            The genus for the current line.
      * @throws PoddClientException
      *             If there is a PODD Client exception.
      * @throws GraphUtilException
@@ -688,9 +709,11 @@ public class HrppcPoddClient extends RestletPoddClientImpl
     private void generateTrayScanRDF(
             final ConcurrentMap<String, ConcurrentMap<URI, InferredOWLOntologyID>> projectUriMap,
             final ConcurrentMap<String, ConcurrentMap<URI, URI>> experimentUriMap,
+            ConcurrentMap<String, ConcurrentMap<URI, URI>> trayUriMap,
             final ConcurrentMap<InferredOWLOntologyID, Model> uploadQueue, final int projectYear,
             final int projectNumber, final int experimentNumber, final String trayId, final String trayNotes,
-            final String trayTypeName, final String plantId) throws PoddClientException, GraphUtilException
+            final String trayTypeName, final String plantId, String genus, String species) throws PoddClientException,
+        GraphUtilException
     {
         // Reconstruct Project#0001-0002 structure to get a normalised string
         final String baseProjectName = String.format(HrppcPoddClient.TEMPLATE_PROJECT, projectYear, projectNumber);
@@ -785,25 +808,43 @@ public class HrppcPoddClient extends RestletPoddClientImpl
         
         // Check whether trayId already has an assigned URI
         URI nextTrayURI;
-        final Model trayIdSparqlResults =
-                this.doSPARQL(
-                        String.format(HrppcPoddClient.TEMPLATE_SPARQL_BY_TYPE_LABEL_STRSTARTS,
-                                RenderUtils.escape(trayId),
-                                RenderUtils.getSPARQLQueryString(PoddRdfConstants.PODD_SCIENCE_CONTAINER)),
-                        nextProjectID);
-        
-        if(trayIdSparqlResults.isEmpty())
+        if(trayUriMap.containsKey(trayId))
         {
-            this.log.info("Could not find an existing container for tray barcode, assigning a temporary URI: {} {}",
-                    trayId, nextProjectID);
-            
-            nextTrayURI = this.vf.createURI("urn:temp:uuid:tray:" + UUID.randomUUID().toString());
+            nextTrayURI = trayUriMap.get(trayId).keySet().iterator().next();
         }
         else
         {
-            nextTrayURI =
-                    GraphUtil.getUniqueSubjectURI(trayIdSparqlResults, RDF.TYPE,
-                            PoddRdfConstants.PODD_SCIENCE_CONTAINER);
+            final Model trayIdSparqlResults =
+                    this.doSPARQL(
+                            String.format(HrppcPoddClient.TEMPLATE_SPARQL_BY_TYPE_LABEL_STRSTARTS,
+                                    RenderUtils.escape(trayId),
+                                    RenderUtils.getSPARQLQueryString(PoddRdfConstants.PODD_SCIENCE_CONTAINER)),
+                            nextProjectID);
+            
+            if(trayIdSparqlResults.isEmpty())
+            {
+                this.log.info(
+                        "Could not find an existing container for tray barcode, assigning a temporary URI: {} {}",
+                        trayId, nextProjectID);
+                
+                nextTrayURI = this.vf.createURI("urn:temp:uuid:tray:" + UUID.randomUUID().toString());
+            }
+            else
+            {
+                nextTrayURI =
+                        GraphUtil.getUniqueSubjectURI(trayIdSparqlResults, RDF.TYPE,
+                                PoddRdfConstants.PODD_SCIENCE_CONTAINER);
+            }
+            
+            ConcurrentMap<URI, URI> nextTrayUriMap = new ConcurrentHashMap<>();
+            ConcurrentMap<URI, URI> putIfAbsent2 = trayUriMap.putIfAbsent(trayId, nextTrayUriMap);
+            if(putIfAbsent2 != null)
+            {
+                nextTrayUriMap = putIfAbsent2;
+            }
+            nextTrayUriMap.put(nextTrayURI, nextExperimentUri);
+            
+            trayUriMap.putIfAbsent(trayId, nextTrayUriMap);
         }
         
         // Check whether plantId already has an assigned URI
