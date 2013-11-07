@@ -141,8 +141,7 @@ public class RestletPoddClientImpl implements PoddClient
     public InferredOWLOntologyID appendArtifact(final InferredOWLOntologyID ontologyIRI,
             final InputStream partialInputStream, final RDFFormat format) throws PoddClientException
     {
-        // TODO Auto-generated method stub
-        return null;
+        throw new RuntimeException("TODO: Implement appendArtifact");
     }
     
     @Override
