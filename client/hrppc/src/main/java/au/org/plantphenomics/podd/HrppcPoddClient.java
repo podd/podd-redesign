@@ -719,7 +719,7 @@ public class HrppcPoddClient extends RestletPoddClientImpl
         {
             this.log.error(
                     "Found multiple PODD Project name mappings (not able to select between them automatically) : {}\n\n {}",
-                    baseProjectName, projectDetails);
+                    baseProjectName, projectDetails.keySet());
             
             // TODO: Throw exception?
             return;
