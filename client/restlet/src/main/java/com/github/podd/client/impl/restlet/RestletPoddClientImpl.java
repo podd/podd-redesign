@@ -610,7 +610,7 @@ public class RestletPoddClientImpl implements PoddClient
     public List<PoddUser> listUsers() throws PoddClientException
     {
         // Implement this when the service is available
-        throw new RuntimeException("TODO: Implement me!");
+        throw new RuntimeException("TODO: Implement listUsers!");
     }
     
     /*
@@ -769,7 +769,7 @@ public class RestletPoddClientImpl implements PoddClient
     @Override
     public InferredOWLOntologyID publishArtifact(final InferredOWLOntologyID ontologyIRI) throws PoddClientException
     {
-        throw new RuntimeException("TODO: Implement me!");
+        throw new RuntimeException("TODO: Implement publishArtifact!");
     }
     
     @Override
@@ -822,16 +822,14 @@ public class RestletPoddClientImpl implements PoddClient
     @Override
     public InferredOWLOntologyID unpublishArtifact(final InferredOWLOntologyID ontologyIRI) throws PoddClientException
     {
-        // TODO Auto-generated method stub
-        return null;
+        throw new RuntimeException("TODO: Implement unpublishArtifact");
     }
     
     @Override
     public InferredOWLOntologyID updateArtifact(final InferredOWLOntologyID ontologyIRI,
             final InputStream fullInputStream, final RDFFormat format) throws PoddClientException
     {
-        // TODO Auto-generated method stub
-        return null;
+        throw new RuntimeException("TODO: Implement updateArtifact");
     }
     
     @Override
