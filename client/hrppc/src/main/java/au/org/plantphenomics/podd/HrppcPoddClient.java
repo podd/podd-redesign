@@ -847,6 +847,7 @@ public class HrppcPoddClient extends RestletPoddClientImpl
         // Add new poddScience:Container for pot
         nextResult.add(nextPotURI, RDF.TYPE, PoddRdfConstants.PODD_SCIENCE_CONTAINER);
         // Link pot to tray
+        nextResult.add(nextTrayURI, PoddRdfConstants.PODD_SCIENCE_HAS_CONTAINER, nextPotURI);
         // PlantID => Add poddScience:hasBarcode to pot
         nextResult.add(nextPotURI, PoddRdfConstants.PODD_SCIENCE_HAS_BARCODE, this.vf.createLiteral(plantId));
         // PlantName => TODO: Link using poddScience:hasLine
