@@ -263,7 +263,7 @@ public class HrppcPoddClient extends RestletPoddClientImpl
                     {
                         final Model label = nextSparqlResults.filter(nextExperiment, RDFS.LABEL, null);
                         
-                        DebugUtils.printContents(label);
+                        // DebugUtils.printContents(label);
                         
                         if(label.isEmpty())
                         {
@@ -382,7 +382,7 @@ public class HrppcPoddClient extends RestletPoddClientImpl
         {
             final Model nextTopObject = this.getTopObject(nextArtifact, currentUnpublishedArtifacts);
             
-            DebugUtils.printContents(nextTopObject);
+            // DebugUtils.printContents(nextTopObject);
             
             final Model types = nextTopObject.filter(null, RDF.TYPE, PoddRdfConstants.PODD_SCIENCE_PROJECT);
             if(types.isEmpty())
@@ -414,7 +414,7 @@ public class HrppcPoddClient extends RestletPoddClientImpl
                 {
                     final Model label = nextTopObject.filter(project, RDFS.LABEL, null);
                     
-                    DebugUtils.printContents(label);
+                    // DebugUtils.printContents(label);
                     
                     if(label.isEmpty())
                     {
@@ -925,7 +925,7 @@ public class HrppcPoddClient extends RestletPoddClientImpl
         // Add poddScience:hasReplicate for tray to link it to the rep #
         // Add poddScience:hasReplicate for pot to link it to the rep # (??to make queries easier??)
         
-        DebugUtils.printContents(nextResult);
+        // DebugUtils.printContents(nextResult);
     }
     
     /**
