@@ -141,7 +141,54 @@ public class RestletPoddClientImpl implements PoddClient
     public InferredOWLOntologyID appendArtifact(final InferredOWLOntologyID ontologyIRI,
             final InputStream partialInputStream, final RDFFormat format) throws PoddClientException
     {
-        throw new RuntimeException("TODO: Implement appendArtifact");
+        return appendArtifact(ontologyIRI, partialInputStream, format, DanglingObjectPolicy.REPORT,
+                DataReferenceVerificationPolicy.DO_NOT_VERIFY);
+    }
+    
+    @Override
+    public InferredOWLOntologyID appendArtifact(final InferredOWLOntologyID ontologyIRI,
+            final InputStream partialInputStream, final RDFFormat format,
+            final DanglingObjectPolicy danglingObjectPolicy,
+            final DataReferenceVerificationPolicy dataReferenceVerificationPolicy) throws PoddClientException
+    {
+        final InputRepresentation rep =
+                new InputRepresentation(partialInputStream, MediaType.valueOf(format.getDefaultMIMEType()));
+        
+        final ClientResource resource = new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_UPLOAD));
+        resource.getCookies().addAll(this.currentCookies);
+        
+        this.log.info("cookies: {}", this.currentCookies);
+        
+        resource.addQueryParameter("format", format.getDefaultMIMEType());
+        if(danglingObjectPolicy == DanglingObjectPolicy.FORCE_CLEAN)
+        {
+            resource.addQueryParameter(PoddWebConstants.KEY_EDIT_WITH_FORCE, "true");
+        }
+        if(dataReferenceVerificationPolicy == DataReferenceVerificationPolicy.VERIFY)
+        {
+            resource.addQueryParameter(PoddWebConstants.KEY_EDIT_VERIFY_FILE_REFERENCES, "true");
+        }
+        
+        // Request the results in Turtle to reduce the bandwidth
+        final Representation post = resource.post(rep, MediaType.APPLICATION_RDF_TURTLE);
+        
+        try
+        {
+            final Model parsedStatements = this.parseRdf(post);
+            
+            final Collection<InferredOWLOntologyID> result = OntologyUtils.modelToOntologyIDs(parsedStatements);
+            
+            if(!result.isEmpty())
+            {
+                return result.iterator().next();
+            }
+            
+            throw new PoddClientException("Failed to verify that the artifact was uploaded correctly.");
+        }
+        catch(final IOException e)
+        {
+            throw new PoddClientException("Could not parse artifact details due to an IOException", e);
+        }
     }
     
     @Override
