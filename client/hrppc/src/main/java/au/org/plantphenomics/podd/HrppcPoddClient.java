@@ -122,14 +122,14 @@ public class HrppcPoddClient extends RestletPoddClientImpl
     }
     
     /**
-     * Parses the given PlantScan project/experiment/tray/pot list and inserts the items into PODD
+     * Parses the given TrayScan project/experiment/tray/pot list and inserts the items into PODD
      * where they do not exist.
      * 
      * TODO: Should this process create new projects where they do not already exist? Ideally they
      * should be created and roles assigned before this process, but could be fine to do that in
      * here
      */
-    public void uploadPlantScanList(final InputStream in) throws IOException, PoddClientException
+    public void uploadTrayScanList(final InputStream in) throws IOException, PoddClientException
     {
         // Only select the unpublished artifacts, as we cannot edit published artifacts
         final Model currentUnpublishedArtifacts = this.listArtifacts(false, true);
@@ -189,7 +189,7 @@ public class HrppcPoddClient extends RestletPoddClientImpl
                     }
                     
                     // Process the next line and add it to the upload queue
-                    this.processPlantScanLine(headers, Arrays.asList(nextLine), projectUriMap, experimentUriMap,
+                    this.processTrayScanLine(headers, Arrays.asList(nextLine), projectUriMap, experimentUriMap,
                             uploadQueue);
                 }
             }
@@ -428,7 +428,7 @@ public class HrppcPoddClient extends RestletPoddClientImpl
      * @throws PoddClientException
      *             If there was a problem communicating with PODD or the line was not valid.
      */
-    private void processPlantScanLine(final List<String> headers, final List<String> nextLine,
+    private void processTrayScanLine(final List<String> headers, final List<String> nextLine,
             final ConcurrentMap<String, ConcurrentMap<URI, InferredOWLOntologyID>> projectUriMap,
             ConcurrentMap<String, ConcurrentMap<URI, URI>> experimentUriMap,
             final ConcurrentMap<InferredOWLOntologyID, Model> uploadQueue) throws PoddClientException
@@ -564,8 +564,11 @@ public class HrppcPoddClient extends RestletPoddClientImpl
         
         if(!positionMatcher.matches())
         {
-            this.log.error("Position did not match expected format: {}", position);
-            throw new PoddClientException(MessageFormat.format("Position did not match expected format: {0}", position));
+            this.log.error("Position did not match expected format: {} {}", position, nextLine);
+            // TODO: These may not be populated so do not throw an exception if it fails.
+            // throw new
+            // PoddClientException(MessageFormat.format("Position did not match expected format: {0}",
+            // position));
         }
         else if(positionMatcher.groupCount() != HrppcPoddClient.POSITION_SIZE)
         {
@@ -580,85 +583,109 @@ public class HrppcPoddClient extends RestletPoddClientImpl
             rowNumber = positionMatcher.group(2).trim();
         }
         
+        generateTrayScanRDF(projectUriMap, experimentUriMap, uploadQueue, projectYear, projectNumber, experimentNumber);
+    }
+    
+    /**
+     * Generates the RDF triples necessary for the given TrayScan parameters and adds the details to
+     * the relevant model in the upload queue.
+     * 
+     * @param projectUriMap
+     *            A map of relevant project URIs and their artifact identifiers and standardised
+     *            labels.
+     * @param experimentUriMap
+     *            A map of relevant experiment URIs and their project URIs and standardised labels.
+     * @param uploadQueue
+     *            The upload queue containing all of the models to be uploaded.
+     * @param projectYear
+     *            The TrayScan parameter detailing the project year for the next tray.
+     * @param projectNumber
+     *            The TrayScan parameter detailing the project number for the next tray.
+     * @param experimentNumber
+     *            The TrayScan parameter detailing the experiment number for the next tray.
+     */
+    private void generateTrayScanRDF(
+            final ConcurrentMap<String, ConcurrentMap<URI, InferredOWLOntologyID>> projectUriMap,
+            ConcurrentMap<String, ConcurrentMap<URI, URI>> experimentUriMap,
+            final ConcurrentMap<InferredOWLOntologyID, Model> uploadQueue, int projectYear, int projectNumber,
+            int experimentNumber)
+    {
         // Reconstruct Project#0001-0002 structure to get a normalised string
         final String baseProjectName = String.format(HrppcPoddClient.TEMPLATE_PROJECT, projectYear, projectNumber);
+        URI nextProjectUri = null;
+        URI nextExperimentUri = null;
         
         if(!projectUriMap.containsKey(baseProjectName))
         {
             this.log.error("Did not find an existing project for a line in the CSV file: {}", baseProjectName);
             
             // TODO: Create a new project?
+            return;
+        }
+        
+        final Map<URI, InferredOWLOntologyID> projectDetails = projectUriMap.get(baseProjectName);
+        
+        if(projectDetails.isEmpty())
+        {
+            this.log.error("Project mapping seemed to exist but it was empty: {}", baseProjectName);
+        }
+        else if(projectDetails.size() > 1)
+        {
+            this.log.error(
+                    "Found multiple PODD Project name mappings (not able to select between them automatically) : {} {}",
+                    baseProjectName, projectDetails);
         }
         else
         {
-            final Map<URI, InferredOWLOntologyID> projectDetails = projectUriMap.get(baseProjectName);
+            this.log.info("Found unique PODD Project name to URI mapping: {} {}", baseProjectName, projectDetails);
             
-            if(projectDetails.isEmpty())
+            nextProjectUri = projectDetails.keySet().iterator().next();
+            InferredOWLOntologyID nextProjectID = projectDetails.get(nextProjectUri);
+            
+            // Create or find an existing model for the necessary modifications to this
+            // project/artifact
+            Model nextResult = new LinkedHashModel();
+            final Model putIfAbsent = uploadQueue.putIfAbsent(nextProjectID, nextResult);
+            if(putIfAbsent != null)
             {
-                this.log.error("Project mapping seemed to exist but it was empty: {}", baseProjectName);
+                nextResult = putIfAbsent;
             }
-            else if(projectDetails.size() > 1)
+        }
+        // Reconstruct Project#0001-0002_Experiment#0001 structure to get a normalised
+        // string
+        final String baseExperimentName =
+                String.format(HrppcPoddClient.TEMPLATE_EXPERIMENT, projectYear, projectNumber, experimentNumber);
+        
+        if(!experimentUriMap.containsKey(baseExperimentName))
+        {
+            this.log.error("Did not find an existing experiment for a line in the CSV file: {}", baseExperimentName);
+            
+            // TODO: Create a new experiment?
+            return;
+        }
+        
+        final Map<URI, URI> experimentDetails = experimentUriMap.get(baseExperimentName);
+        
+        if(experimentDetails.isEmpty())
+        {
+            this.log.error("Experiment mapping seemed to exist but it was empty: {}", baseExperimentName);
+        }
+        else if(experimentDetails.size() > 1)
+        {
+            this.log.error(
+                    "Found multiple PODD Experiment name mappings (not able to select between them automatically) : {} {}",
+                    baseExperimentName, experimentDetails);
+        }
+        else
+        {
+            nextExperimentUri = experimentDetails.keySet().iterator().next();
+            URI checkProjectUri = experimentDetails.get(nextExperimentUri);
+            if(!checkProjectUri.equals(nextProjectUri))
             {
                 this.log.error(
-                        "Found multiple PODD Project name mappings (not able to select between them automatically) : {} {}",
-                        baseProjectName, projectDetails);
+                        "Experiment mapping was against a different project: {} experimentURI={} nextProjectUri={} checkProjectUri={}",
+                        baseExperimentName, nextExperimentUri, nextProjectUri, checkProjectUri);
             }
-            else
-            {
-                this.log.info("Found unique PODD Project name to URI mapping: {} {}", baseProjectName, projectDetails);
-                
-                URI nextProjectUri = projectDetails.keySet().iterator().next();
-                InferredOWLOntologyID nextProjectID = projectDetails.get(nextProjectUri);
-                
-                // Create or find an existing model for the necessary modifications to this
-                // project/artifact
-                Model nextResult = new LinkedHashModel();
-                final Model putIfAbsent = uploadQueue.putIfAbsent(nextProjectID, nextResult);
-                if(putIfAbsent != null)
-                {
-                    nextResult = putIfAbsent;
-                }
-                
-                // Reconstruct Project#0001-0002_Experiment#0001 structure to get a normalised
-                // string
-                final String baseExperimentName =
-                        String.format(HrppcPoddClient.TEMPLATE_EXPERIMENT, projectYear, projectNumber, experimentNumber);
-                
-                if(!experimentUriMap.containsKey(baseExperimentName))
-                {
-                    this.log.error("Did not find an existing experiment for a line in the CSV file: {}",
-                            baseExperimentName);
-                    
-                    // TODO: Create a new experiment?
-                }
-                else
-                {
-                    final Map<URI, URI> experimentDetails = experimentUriMap.get(baseExperimentName);
-                    
-                    if(experimentDetails.isEmpty())
-                    {
-                        this.log.error("Experiment mapping seemed to exist but it was empty: {}", baseExperimentName);
-                    }
-                    else if(experimentDetails.size() > 1)
-                    {
-                        this.log.error(
-                                "Found multiple PODD Experiment name mappings (not able to select between them automatically) : {} {}",
-                                baseExperimentName, experimentDetails);
-                    }
-                    else
-                    {
-                        URI nextExperimentUri = experimentDetails.keySet().iterator().next();
-                        URI checkProjectUri = experimentDetails.get(nextExperimentUri);
-                        if(!nextProjectUri.equals(checkProjectUri))
-                        {
-                            this.log.error(
-                                    "Experiment mapping was against a different project: {} experimentURI={} nextProjectUri={} checkProjectUri={}",
-                                    baseExperimentName, nextExperimentUri, nextProjectUri, checkProjectUri);
-                        }
-                    }
-                }
-            }
-            
         }
     }
     

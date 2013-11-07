@@ -93,7 +93,7 @@ public class HrppcPoddClientTest extends RestletPoddClientImplIntegrationTest
     
     /**
      * Test method for
-     * {@link au.org.plantphenomics.podd.HrppcPoddClient#uploadPlantScanList(java.io.InputStream)}.
+     * {@link au.org.plantphenomics.podd.HrppcPoddClient#uploadTrayScanList(java.io.InputStream)}.
      * 
      * @throws Exception
      * @throws
@@ -113,6 +113,6 @@ public class HrppcPoddClientTest extends RestletPoddClientImplIntegrationTest
         Assert.assertNotNull(newArtifact.getOntologyIRI());
         Assert.assertNotNull(newArtifact.getVersionIRI());
         
-        poddClient.uploadPlantScanList(this.getClass().getResourceAsStream("/test/hrppc/PlantScan-Template.csv"));
+        poddClient.uploadTrayScanList(this.getClass().getResourceAsStream("/test/hrppc/PlantScan-Template.csv"));
     }
 }
