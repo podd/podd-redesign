@@ -163,6 +163,12 @@ public class HrppcPoddClient extends RestletPoddClientImpl
         // only contain the necessary elements
         final ConcurrentMap<String, ConcurrentMap<URI, URI>> trayUriMap = new ConcurrentHashMap<>();
         
+        // Cache for pot name mappings, starting at pot barcodes and ending with a mapping from
+        // the URI of the pot to the URI of the tray that contains the pot
+        // NOTE: This is not prefilled, as it is populated on demand during processing of lines to
+        // only contain the necessary elements
+        final ConcurrentMap<String, ConcurrentMap<URI, URI>> potUriMap = new ConcurrentHashMap<>();
+        
         // Map known project names to their URIs, as the URIs are needed to
         // create statements internally
         this.populateProjectUriMap(currentUnpublishedArtifacts, projectUriMap);
@@ -206,7 +212,7 @@ public class HrppcPoddClient extends RestletPoddClientImpl
                     
                     // Process the next line and add it to the upload queue
                     this.processTrayScanLine(headers, Arrays.asList(nextLine), projectUriMap, experimentUriMap,
-                            trayUriMap, uploadQueue);
+                            trayUriMap, potUriMap, uploadQueue);
                 }
             }
         }
@@ -509,6 +515,9 @@ public class HrppcPoddClient extends RestletPoddClientImpl
      * @param trayUriMap
      *            A map from normalised tray names (barcodes) to their URIs and the experiments that
      *            they are located in.
+     * @param potUriMap
+     *            A map from normalised pot names (barcodes) to their URIs and the experiments that
+     *            they are located in.
      * @param uploadQueue
      *            A map from artifact identifiers to Model objects containing all of the necessary
      *            changes to the artifact.
@@ -520,6 +529,7 @@ public class HrppcPoddClient extends RestletPoddClientImpl
             final ConcurrentMap<String, ConcurrentMap<URI, InferredOWLOntologyID>> projectUriMap,
             final ConcurrentMap<String, ConcurrentMap<URI, URI>> experimentUriMap,
             ConcurrentMap<String, ConcurrentMap<URI, URI>> trayUriMap,
+            ConcurrentMap<String, ConcurrentMap<URI, URI>> potUriMap,
             final ConcurrentMap<InferredOWLOntologyID, Model> uploadQueue) throws PoddClientException, OpenRDFException
     {
         this.log.info("About to process line: {}", nextLine);
@@ -672,8 +682,8 @@ public class HrppcPoddClient extends RestletPoddClientImpl
             rowNumber = positionMatcher.group(2).trim();
         }
         
-        this.generateTrayScanRDF(projectUriMap, experimentUriMap, trayUriMap, uploadQueue, projectYear, projectNumber,
-                experimentNumber, trayId, trayNotes, trayTypeName, plantId, genus, species);
+        this.generateTrayScanRDF(projectUriMap, experimentUriMap, trayUriMap, potUriMap, uploadQueue, projectYear,
+                projectNumber, experimentNumber, trayId, trayNotes, trayTypeName, plantId, genus, species);
     }
     
     /**
@@ -689,6 +699,8 @@ public class HrppcPoddClient extends RestletPoddClientImpl
      * @param trayUriMap
      *            A map of relevant tray URIs and their experiment URIs using their standardised
      *            labels.
+     * @param potUriMap
+     *            A map of relevant pot URIs and their tray URIs using their standardised labels.
      * @param uploadQueue
      *            The upload queue containing all of the models to be uploaded.
      * @param projectYear
@@ -710,6 +722,7 @@ public class HrppcPoddClient extends RestletPoddClientImpl
             final ConcurrentMap<String, ConcurrentMap<URI, InferredOWLOntologyID>> projectUriMap,
             final ConcurrentMap<String, ConcurrentMap<URI, URI>> experimentUriMap,
             ConcurrentMap<String, ConcurrentMap<URI, URI>> trayUriMap,
+            ConcurrentMap<String, ConcurrentMap<URI, URI>> potUriMap,
             final ConcurrentMap<InferredOWLOntologyID, Model> uploadQueue, final int projectYear,
             final int projectNumber, final int experimentNumber, final String trayId, final String trayNotes,
             final String trayTypeName, final String plantId, String genus, String species) throws PoddClientException,
@@ -843,31 +856,44 @@ public class HrppcPoddClient extends RestletPoddClientImpl
                 nextTrayUriMap = putIfAbsent2;
             }
             nextTrayUriMap.put(nextTrayURI, nextExperimentUri);
-            
-            trayUriMap.putIfAbsent(trayId, nextTrayUriMap);
         }
         
         // Check whether plantId already has an assigned URI
         URI nextPotURI;
-        final Model plantIdSparqlResults =
-                this.doSPARQL(
-                        String.format(HrppcPoddClient.TEMPLATE_SPARQL_BY_TYPE_LABEL_STRSTARTS,
-                                RenderUtils.escape(plantId),
-                                RenderUtils.getSPARQLQueryString(PoddRdfConstants.PODD_SCIENCE_CONTAINER)),
-                        nextProjectID);
-        
-        if(plantIdSparqlResults.isEmpty())
+        if(potUriMap.containsKey(plantId))
         {
-            this.log.info("Could not find an existing container for pot barcode, assigning a temporary URI: {} {}",
-                    plantId, nextProjectID);
-            
-            nextPotURI = this.vf.createURI("urn:temp:uuid:pot:" + UUID.randomUUID().toString());
+            nextPotURI = potUriMap.get(plantId).keySet().iterator().next();
         }
         else
         {
-            nextPotURI =
-                    GraphUtil.getUniqueSubjectURI(plantIdSparqlResults, RDF.TYPE,
-                            PoddRdfConstants.PODD_SCIENCE_CONTAINER);
+            final Model plantIdSparqlResults =
+                    this.doSPARQL(
+                            String.format(HrppcPoddClient.TEMPLATE_SPARQL_BY_TYPE_LABEL_STRSTARTS,
+                                    RenderUtils.escape(plantId),
+                                    RenderUtils.getSPARQLQueryString(PoddRdfConstants.PODD_SCIENCE_CONTAINER)),
+                            nextProjectID);
+            
+            if(plantIdSparqlResults.isEmpty())
+            {
+                this.log.info("Could not find an existing container for pot barcode, assigning a temporary URI: {} {}",
+                        plantId, nextProjectID);
+                
+                nextPotURI = this.vf.createURI("urn:temp:uuid:pot:" + UUID.randomUUID().toString());
+            }
+            else
+            {
+                nextPotURI =
+                        GraphUtil.getUniqueSubjectURI(plantIdSparqlResults, RDF.TYPE,
+                                PoddRdfConstants.PODD_SCIENCE_CONTAINER);
+            }
+            
+            ConcurrentMap<URI, URI> nextPotUriMap = new ConcurrentHashMap<>();
+            ConcurrentMap<URI, URI> putIfAbsent2 = potUriMap.putIfAbsent(plantId, nextPotUriMap);
+            if(putIfAbsent2 != null)
+            {
+                nextPotUriMap = putIfAbsent2;
+            }
+            nextPotUriMap.put(nextPotURI, nextTrayURI);
         }
         
         // TODO
