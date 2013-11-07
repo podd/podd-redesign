@@ -36,6 +36,7 @@ import org.openrdf.model.Literal;
 import org.openrdf.model.Model;
 import org.openrdf.model.URI;
 import org.openrdf.model.Value;
+import org.openrdf.model.ValueFactory;
 import org.openrdf.model.impl.LinkedHashModel;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.RDFHandlerException;
@@ -85,6 +86,11 @@ public class RestletPoddClientImpl implements PoddClient
     private String serverUrl = null;
     
     private Series<CookieSetting> currentCookies = new Series<CookieSetting>(CookieSetting.class);
+    
+    /**
+     * Shortcut to {@link PoddRdfConstants#VF}
+     */
+    protected ValueFactory vf = PoddRdfConstants.VF;
     
     public RestletPoddClientImpl()
     {

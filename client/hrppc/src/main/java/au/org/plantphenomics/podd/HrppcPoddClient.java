@@ -27,17 +27,21 @@ import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.openrdf.OpenRDFException;
 import org.openrdf.model.Literal;
 import org.openrdf.model.Model;
 import org.openrdf.model.Resource;
 import org.openrdf.model.URI;
 import org.openrdf.model.Value;
 import org.openrdf.model.impl.LinkedHashModel;
+import org.openrdf.model.util.GraphUtil;
+import org.openrdf.model.util.GraphUtilException;
 import org.openrdf.model.vocabulary.RDF;
 import org.openrdf.model.vocabulary.RDFS;
 import org.openrdf.queryrender.RenderUtils;
@@ -111,6 +115,9 @@ public class HrppcPoddClient extends RestletPoddClientImpl
     public static final String TEMPLATE_SPARQL_BY_TYPE =
             "CONSTRUCT { ?object a ?type . ?object <http://www.w3.org/2000/01/rdf-schema#label> ?label . } WHERE { ?object a ?type . OPTIONAL { ?object <http://www.w3.org/2000/01/rdf-schema#label> ?label . } } VALUES (?type) { ( %s ) }";
     
+    public static final String TEMPLATE_SPARQL_BY_TYPE_LABEL_STRSTARTS =
+            "CONSTRUCT { ?object a ?type . ?object <http://www.w3.org/2000/01/rdf-schema#label> ?label . } WHERE { ?object a ?type . ?object <http://www.w3.org/2000/01/rdf-schema#label> ?label . FILTER(STRSTARTS(?label, \"%s\")) } VALUES (?type) { ( %s ) }";
+    
     public HrppcPoddClient()
     {
         super();
@@ -129,7 +136,7 @@ public class HrppcPoddClient extends RestletPoddClientImpl
      * should be created and roles assigned before this process, but could be fine to do that in
      * here
      */
-    public void uploadTrayScanList(final InputStream in) throws IOException, PoddClientException
+    public void uploadTrayScanList(final InputStream in) throws IOException, PoddClientException, OpenRDFException
     {
         // Only select the unpublished artifacts, as we cannot edit published artifacts
         final Model currentUnpublishedArtifacts = this.listArtifacts(false, true);
@@ -430,8 +437,8 @@ public class HrppcPoddClient extends RestletPoddClientImpl
      */
     private void processTrayScanLine(final List<String> headers, final List<String> nextLine,
             final ConcurrentMap<String, ConcurrentMap<URI, InferredOWLOntologyID>> projectUriMap,
-            ConcurrentMap<String, ConcurrentMap<URI, URI>> experimentUriMap,
-            final ConcurrentMap<InferredOWLOntologyID, Model> uploadQueue) throws PoddClientException
+            final ConcurrentMap<String, ConcurrentMap<URI, URI>> experimentUriMap,
+            final ConcurrentMap<InferredOWLOntologyID, Model> uploadQueue) throws PoddClientException, OpenRDFException
     {
         this.log.info("About to process line: {}", nextLine);
         
@@ -583,7 +590,8 @@ public class HrppcPoddClient extends RestletPoddClientImpl
             rowNumber = positionMatcher.group(2).trim();
         }
         
-        generateTrayScanRDF(projectUriMap, experimentUriMap, uploadQueue, projectYear, projectNumber, experimentNumber);
+        this.generateTrayScanRDF(projectUriMap, experimentUriMap, uploadQueue, projectYear, projectNumber,
+                experimentNumber, trayId, trayNotes, trayTypeName, plantId);
     }
     
     /**
@@ -603,17 +611,23 @@ public class HrppcPoddClient extends RestletPoddClientImpl
      *            The TrayScan parameter detailing the project number for the next tray.
      * @param experimentNumber
      *            The TrayScan parameter detailing the experiment number for the next tray.
+     * @throws PoddClientException
+     *             If there is a PODD Client exception.
+     * @throws GraphUtilException
+     *             If there was an illformed graph.
      */
     private void generateTrayScanRDF(
             final ConcurrentMap<String, ConcurrentMap<URI, InferredOWLOntologyID>> projectUriMap,
-            ConcurrentMap<String, ConcurrentMap<URI, URI>> experimentUriMap,
-            final ConcurrentMap<InferredOWLOntologyID, Model> uploadQueue, int projectYear, int projectNumber,
-            int experimentNumber)
+            final ConcurrentMap<String, ConcurrentMap<URI, URI>> experimentUriMap,
+            final ConcurrentMap<InferredOWLOntologyID, Model> uploadQueue, final int projectYear,
+            final int projectNumber, final int experimentNumber, final String trayId, final String trayNotes,
+            final String trayTypeName, final String plantId) throws PoddClientException, GraphUtilException
     {
         // Reconstruct Project#0001-0002 structure to get a normalised string
         final String baseProjectName = String.format(HrppcPoddClient.TEMPLATE_PROJECT, projectYear, projectNumber);
         URI nextProjectUri = null;
         URI nextExperimentUri = null;
+        InferredOWLOntologyID nextProjectID = null;
         
         if(!projectUriMap.containsKey(baseProjectName))
         {
@@ -628,28 +642,25 @@ public class HrppcPoddClient extends RestletPoddClientImpl
         if(projectDetails.isEmpty())
         {
             this.log.error("Project mapping seemed to exist but it was empty: {}", baseProjectName);
+            
+            // TODO: Create a new project?
+            return;
         }
         else if(projectDetails.size() > 1)
         {
             this.log.error(
                     "Found multiple PODD Project name mappings (not able to select between them automatically) : {} {}",
                     baseProjectName, projectDetails);
+            
+            // TODO: Throw exception?
+            return;
         }
         else
         {
             this.log.info("Found unique PODD Project name to URI mapping: {} {}", baseProjectName, projectDetails);
             
             nextProjectUri = projectDetails.keySet().iterator().next();
-            InferredOWLOntologyID nextProjectID = projectDetails.get(nextProjectUri);
-            
-            // Create or find an existing model for the necessary modifications to this
-            // project/artifact
-            Model nextResult = new LinkedHashModel();
-            final Model putIfAbsent = uploadQueue.putIfAbsent(nextProjectID, nextResult);
-            if(putIfAbsent != null)
-            {
-                nextResult = putIfAbsent;
-            }
+            nextProjectID = projectDetails.get(nextProjectUri);
         }
         // Reconstruct Project#0001-0002_Experiment#0001 structure to get a normalised
         // string
@@ -669,17 +680,23 @@ public class HrppcPoddClient extends RestletPoddClientImpl
         if(experimentDetails.isEmpty())
         {
             this.log.error("Experiment mapping seemed to exist but it was empty: {}", baseExperimentName);
+            
+            // TODO: Create a new experiment?
+            return;
         }
         else if(experimentDetails.size() > 1)
         {
             this.log.error(
                     "Found multiple PODD Experiment name mappings (not able to select between them automatically) : {} {}",
                     baseExperimentName, experimentDetails);
+            
+            // TODO: Throw exception?
+            return;
         }
         else
         {
             nextExperimentUri = experimentDetails.keySet().iterator().next();
-            URI checkProjectUri = experimentDetails.get(nextExperimentUri);
+            final URI checkProjectUri = experimentDetails.get(nextExperimentUri);
             if(!checkProjectUri.equals(nextProjectUri))
             {
                 this.log.error(
@@ -687,6 +704,91 @@ public class HrppcPoddClient extends RestletPoddClientImpl
                         baseExperimentName, nextExperimentUri, nextProjectUri, checkProjectUri);
             }
         }
+        
+        // Create or find an existing model for the necessary modifications to this
+        // project/artifact
+        Model nextResult = new LinkedHashModel();
+        final Model putIfAbsent = uploadQueue.putIfAbsent(nextProjectID, nextResult);
+        if(putIfAbsent != null)
+        {
+            nextResult = putIfAbsent;
+        }
+        
+        // Check whether trayId already has an assigned URI
+        URI nextTrayURI;
+        final Model trayIdSparqlResults =
+                this.doSPARQL(
+                        String.format(HrppcPoddClient.TEMPLATE_SPARQL_BY_TYPE_LABEL_STRSTARTS,
+                                RenderUtils.escape(trayId),
+                                RenderUtils.getSPARQLQueryString(PoddRdfConstants.PODD_SCIENCE_CONTAINER)),
+                        nextProjectID);
+        
+        if(trayIdSparqlResults.isEmpty())
+        {
+            this.log.info("Could not find an existing container for tray barcode, assigning a temporary URI: {} {}",
+                    trayId, nextProjectID);
+            
+            nextTrayURI = this.vf.createURI("urn:temp:uuid:tray:" + UUID.randomUUID().toString());
+        }
+        else
+        {
+            nextTrayURI =
+                    GraphUtil.getUniqueSubjectURI(trayIdSparqlResults, RDF.TYPE,
+                            PoddRdfConstants.PODD_SCIENCE_CONTAINER);
+        }
+        
+        // Check whether plantId already has an assigned URI
+        URI nextPotURI;
+        final Model plantIdSparqlResults =
+                this.doSPARQL(
+                        String.format(HrppcPoddClient.TEMPLATE_SPARQL_BY_TYPE_LABEL_STRSTARTS,
+                                RenderUtils.escape(plantId),
+                                RenderUtils.getSPARQLQueryString(PoddRdfConstants.PODD_SCIENCE_CONTAINER)),
+                        nextProjectID);
+        
+        if(plantIdSparqlResults.isEmpty())
+        {
+            this.log.info("Could not find an existing container for pot barcode, assigning a temporary URI: {} {}",
+                    plantId, nextProjectID);
+            
+            nextPotURI = this.vf.createURI("urn:temp:uuid:pot:" + UUID.randomUUID().toString());
+        }
+        else
+        {
+            nextPotURI =
+                    GraphUtil.getUniqueSubjectURI(plantIdSparqlResults, RDF.TYPE,
+                            PoddRdfConstants.PODD_SCIENCE_CONTAINER);
+        }
+        
+        // TODO
+        // Add new poddScience:Container for tray
+        nextResult.add(nextTrayURI, RDF.TYPE, PoddRdfConstants.PODD_SCIENCE_CONTAINER);
+        // Link tray to experiment
+        nextResult.add(nextExperimentUri, PoddRdfConstants.PODD_SCIENCE_HAS_CONTAINER, nextTrayURI);
+        // TrayID => Add poddScience:hasBarcode to tray
+        nextResult.add(nextTrayURI, PoddRdfConstants.PODD_SCIENCE_HAS_BARCODE, this.vf.createLiteral(trayId));
+        // TrayNotes => Add rdfs:label to tray
+        nextResult.add(nextTrayURI, RDFS.LABEL, this.vf.createLiteral(trayNotes));
+        // TrayTypeName => Add poddScience:hasContainerType to tray
+        nextResult.add(nextTrayURI, PoddRdfConstants.PODD_SCIENCE_HAS_CONTAINER_TYPE,
+                this.vf.createLiteral(trayTypeName));
+        
+        // Position => TODO: Need to use randomisation data to populate the position
+        
+        // Add new poddScience:Container for pot
+        nextResult.add(nextPotURI, RDF.TYPE, PoddRdfConstants.PODD_SCIENCE_CONTAINER);
+        // Link pot to tray
+        // PlantID => Add poddScience:hasBarcode to pot
+        nextResult.add(nextPotURI, PoddRdfConstants.PODD_SCIENCE_HAS_BARCODE, this.vf.createLiteral(plantId));
+        // PlantName => TODO: Link using poddScience:hasLine
+        // TODO: Also link genus and species using poddScience:hasGenusSpecies
+        // PlantNotes => Add rdfs:comment to pot
+        
+        // TODO Using d110cc.csv
+        // Add poddScience:hasReplicate for tray to link it to the rep #
+        // Add poddScience:hasReplicate for pot to link it to the rep # (??to make queries easier??)
+        
+        DebugUtils.printContents(nextResult);
     }
     
     /**

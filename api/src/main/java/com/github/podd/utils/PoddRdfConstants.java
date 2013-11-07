@@ -367,8 +367,24 @@ public interface PoddRdfConstants
             "Project");
     
     /** http://purl.org/podd/ns/poddScience#Investigation */
-    public static final Value PODD_SCIENCE_INVESTIGATION = PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE,
+    public static final URI PODD_SCIENCE_INVESTIGATION = PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE,
             "Investigation");
+    
+    /** http://purl.org/podd/ns/poddScience#Container */
+    public static final URI PODD_SCIENCE_CONTAINER = PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE,
+            "Container");
+    
+    /** http://purl.org/podd/ns/poddScience#hasBarcode */
+    public static final URI PODD_SCIENCE_HAS_BARCODE = PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE,
+            "hasBarcode");
+    
+    /** http://purl.org/podd/ns/poddScience#hasContainer */
+    public static final URI PODD_SCIENCE_HAS_CONTAINER = PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE,
+            "hasContainer");
+    
+    /** http://purl.org/podd/ns/poddScience#hasContainerType */
+    public static final URI PODD_SCIENCE_HAS_CONTAINER_TYPE = PoddRdfConstants.VF.createURI(
+            PoddRdfConstants.PODD_SCIENCE, "hasContainerType");
     
     /** http://purl.org/podd/ns/poddBase#SPARQLDataRepository */
     public static final URI PODD_SPARQL_DATA_REPOSITORY = PoddRdfConstants.VF.createURI(
