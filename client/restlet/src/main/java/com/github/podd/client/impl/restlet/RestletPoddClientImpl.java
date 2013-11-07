@@ -146,7 +146,7 @@ public class RestletPoddClientImpl implements PoddClient
     }
     
     @Override
-    public InferredOWLOntologyID appendArtifact(final InferredOWLOntologyID ontologyIRI,
+    public InferredOWLOntologyID appendArtifact(final InferredOWLOntologyID artifactID,
             final InputStream partialInputStream, final RDFFormat format,
             final DanglingObjectPolicy danglingObjectPolicy,
             final DataReferenceVerificationPolicy dataReferenceVerificationPolicy) throws PoddClientException
@@ -154,12 +154,15 @@ public class RestletPoddClientImpl implements PoddClient
         final InputRepresentation rep =
                 new InputRepresentation(partialInputStream, MediaType.valueOf(format.getDefaultMIMEType()));
         
-        final ClientResource resource = new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_UPLOAD));
+        final ClientResource resource = new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_EDIT));
         resource.getCookies().addAll(this.currentCookies);
         
         this.log.info("cookies: {}", this.currentCookies);
         
-        resource.addQueryParameter("format", format.getDefaultMIMEType());
+        resource.addQueryParameter(PoddWebConstants.KEY_EDIT_WITH_REPLACE, Boolean.toString(false));
+        resource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactID.getOntologyIRI().toString());
+        resource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_VERSION_IDENTIFIER, artifactID.getVersionIRI()
+                .toString());
         if(danglingObjectPolicy == DanglingObjectPolicy.FORCE_CLEAN)
         {
             resource.addQueryParameter(PoddWebConstants.KEY_EDIT_WITH_FORCE, "true");
@@ -168,6 +171,7 @@ public class RestletPoddClientImpl implements PoddClient
         {
             resource.addQueryParameter(PoddWebConstants.KEY_EDIT_VERIFY_FILE_REFERENCES, "true");
         }
+        resource.addQueryParameter("format", format.getDefaultMIMEType());
         
         // Request the results in Turtle to reduce the bandwidth
         final Representation post = resource.post(rep, MediaType.APPLICATION_RDF_TURTLE);
