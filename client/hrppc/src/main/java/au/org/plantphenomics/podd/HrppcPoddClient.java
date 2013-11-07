@@ -246,14 +246,83 @@ public class HrppcPoddClient extends RestletPoddClientImpl
                     }
                     else
                     {
-                        final String name = nextSparqlResults.filter(nextExperiment, RDFS.LABEL, null).objectString();
+                        final Model label = nextSparqlResults.filter(nextExperiment, RDFS.LABEL, null);
                         
-                        this.log.info("Found experiment attached to project: {} {} {}", name, nextExperiment,
-                                projectUri);
+                        DebugUtils.printContents(label);
                         
-                        final ConcurrentMap<URI, URI> nextMap = new ConcurrentHashMap<>();
-                        nextMap.put((URI)nextExperiment, projectUri);
-                        experimentUriMap.put(name, nextMap);
+                        if(label.isEmpty())
+                        {
+                            this.log.error("Experiment did not have a label: {} {}", artifactId, nextExperiment);
+                        }
+                        else
+                        {
+                            for(final Value nextLabel : label.objects())
+                            {
+                                if(!(nextLabel instanceof Literal))
+                                {
+                                    this.log.error("Project had a non-literal label: {} {} {}", artifactId,
+                                            nextExperiment, nextLabel);
+                                }
+                                else
+                                {
+                                    String nextLabelString = nextLabel.stringValue();
+                                    
+                                    // take off any descriptions and leave the
+                                    // project number behind
+                                    nextLabelString = nextLabelString.split(" ")[0];
+                                    
+                                    final Matcher matcher = HrppcPoddClient.REGEX_EXPERIMENT.matcher(nextLabelString);
+                                    
+                                    if(!matcher.matches())
+                                    {
+                                        this.log.error(
+                                                "Found experiment label that did not start with expected format: {}",
+                                                nextLabel);
+                                    }
+                                    else
+                                    {
+                                        this.log.info(
+                                                "Found experiment label with the expected format: '{}' original=<{}>",
+                                                nextLabelString, nextLabel);
+                                        
+                                        final int nextProjectYear = Integer.parseInt(matcher.group(1));
+                                        final int nextProjectNumber = Integer.parseInt(matcher.group(2));
+                                        final int nextExperimentNumber = Integer.parseInt(matcher.group(3));
+                                        
+                                        nextLabelString =
+                                                String.format(HrppcPoddClient.TEMPLATE_EXPERIMENT, nextProjectYear,
+                                                        nextProjectNumber, nextExperimentNumber);
+                                        
+                                        this.log.info("Reformatted experiment label to: '{}' original=<{}>",
+                                                nextLabelString, nextLabel);
+                                        
+                                        ConcurrentMap<URI, URI> labelMap = new ConcurrentHashMap<>();
+                                        final ConcurrentMap<URI, URI> putIfAbsent =
+                                                experimentUriMap.putIfAbsent(nextLabelString, labelMap);
+                                        if(putIfAbsent != null)
+                                        {
+                                            this.log.error(
+                                                    "Found duplicate experiment name, inconsistent results may follow: {} {} {}",
+                                                    artifactId, nextExperiment, nextLabel);
+                                            // Overwrite our reference with the one that already
+                                            // existed
+                                            labelMap = putIfAbsent;
+                                        }
+                                        final URI existingProject =
+                                                labelMap.putIfAbsent((URI)nextExperiment, projectUri);
+                                        // Check for the case where project name maps to different
+                                        // artifacts
+                                        if(existingProject != null && !existingProject.equals(projectUri))
+                                        {
+                                            this.log.error(
+                                                    "Found duplicate experiment name across different projects, inconsistent results may follow: {} {} {} {}",
+                                                    artifactId, existingProject, projectUri, nextLabel);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        
                     }
                 }
             }
@@ -649,7 +718,7 @@ public class HrppcPoddClient extends RestletPoddClientImpl
         else if(projectDetails.size() > 1)
         {
             this.log.error(
-                    "Found multiple PODD Project name mappings (not able to select between them automatically) : {} {}",
+                    "Found multiple PODD Project name mappings (not able to select between them automatically) : {}\n\n {}",
                     baseProjectName, projectDetails);
             
             // TODO: Throw exception?
