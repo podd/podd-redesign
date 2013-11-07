@@ -21,6 +21,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -32,8 +33,11 @@ import org.junit.Test;
 import org.openrdf.model.Model;
 import org.openrdf.model.URI;
 import org.openrdf.model.ValueFactory;
+import org.openrdf.model.impl.LinkedHashModel;
+import org.openrdf.model.util.GraphUtil;
 import org.openrdf.model.vocabulary.OWL;
 import org.openrdf.model.vocabulary.RDF;
+import org.openrdf.model.vocabulary.RDFS;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.RDFHandlerException;
 import org.openrdf.rio.RDFParseException;
@@ -230,7 +234,35 @@ public abstract class AbstractPoddClientTest
     @Test
     public final void testAppendArtifact() throws Exception
     {
-        Assert.fail("Not yet implemented"); // TODO
+        this.testClient.login(AbstractPoddClientTest.TEST_ADMIN_USER, AbstractPoddClientTest.TEST_ADMIN_PASSWORD);
+        
+        final InputStream input = this.getClass().getResourceAsStream("/test/artifacts/basicProject-3.rdf");
+        Assert.assertNotNull("Test resource missing", input);
+        
+        final InferredOWLOntologyID newArtifact = this.testClient.uploadNewArtifact(input, RDFFormat.RDFXML);
+        Assert.assertNotNull(newArtifact);
+        Assert.assertNotNull(newArtifact.getOntologyIRI());
+        Assert.assertNotNull(newArtifact.getVersionIRI());
+        
+        final ByteArrayOutputStream outputStream = new ByteArrayOutputStream(8096);
+        this.testClient.downloadArtifact(newArtifact, outputStream, RDFFormat.RDFJSON);
+        final Model model =
+                this.parseRdf(new ByteArrayInputStream(outputStream.toByteArray()), RDFFormat.RDFJSON,
+                        AbstractPoddClientTest.BASIC_PROJECT_1_EXPECTED_CONCRETE_TRIPLES);
+        
+        Assert.assertTrue(model.contains(newArtifact.getOntologyIRI().toOpenRDFURI(), RDF.TYPE, OWL.ONTOLOGY));
+        Assert.assertTrue(model.contains(newArtifact.getOntologyIRI().toOpenRDFURI(), OWL.VERSIONIRI, newArtifact
+                .getVersionIRI().toOpenRDFURI()));
+        
+        // Then test append with an updated model
+        
+        URI investigationUri =
+                GraphUtil.getUniqueSubjectURI(model, RDF.TYPE, PoddRdfConstants.PODD_SCIENCE_INVESTIGATION);
+        URI containerUri = vf.createURI("urn:temp:uuid:container:1");
+        
+        Model updates = new LinkedHashModel();
+        updates.add(investigationUri, PoddRdfConstants.PODD_SCIENCE_HAS_CONTAINER, containerUri);
+        updates.add(containerUri, RDFS.LABEL, vf.createLiteral("Test container number 1"));
     }
     
     /**
