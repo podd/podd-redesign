@@ -55,7 +55,6 @@ import au.com.bytecode.opencsv.CSVReader;
 
 import com.github.podd.client.api.PoddClientException;
 import com.github.podd.client.impl.restlet.RestletPoddClientImpl;
-import com.github.podd.utils.DebugUtils;
 import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.OntologyUtils;
 import com.github.podd.utils.PoddRdfConstants;
@@ -348,7 +347,7 @@ public class HrppcPoddClient extends RestletPoddClientImpl
     public ConcurrentMap<InferredOWLOntologyID, InferredOWLOntologyID> uploadToPodd(
             final ConcurrentMap<InferredOWLOntologyID, Model> uploadQueue) throws PoddClientException
     {
-        ConcurrentMap<InferredOWLOntologyID, InferredOWLOntologyID> resultMap = new ConcurrentHashMap<>();
+        final ConcurrentMap<InferredOWLOntologyID, InferredOWLOntologyID> resultMap = new ConcurrentHashMap<>();
         for(final InferredOWLOntologyID nextUpload : uploadQueue.keySet())
         {
             try
@@ -536,8 +535,8 @@ public class HrppcPoddClient extends RestletPoddClientImpl
     private void processTrayScanLine(final List<String> headers, final List<String> nextLine,
             final ConcurrentMap<String, ConcurrentMap<URI, InferredOWLOntologyID>> projectUriMap,
             final ConcurrentMap<String, ConcurrentMap<URI, URI>> experimentUriMap,
-            ConcurrentMap<String, ConcurrentMap<URI, URI>> trayUriMap,
-            ConcurrentMap<String, ConcurrentMap<URI, URI>> potUriMap,
+            final ConcurrentMap<String, ConcurrentMap<URI, URI>> trayUriMap,
+            final ConcurrentMap<String, ConcurrentMap<URI, URI>> potUriMap,
             final ConcurrentMap<InferredOWLOntologyID, Model> uploadQueue) throws PoddClientException, OpenRDFException
     {
         this.log.info("About to process line: {}", nextLine);
@@ -729,93 +728,40 @@ public class HrppcPoddClient extends RestletPoddClientImpl
     private void generateTrayScanRDF(
             final ConcurrentMap<String, ConcurrentMap<URI, InferredOWLOntologyID>> projectUriMap,
             final ConcurrentMap<String, ConcurrentMap<URI, URI>> experimentUriMap,
-            ConcurrentMap<String, ConcurrentMap<URI, URI>> trayUriMap,
-            ConcurrentMap<String, ConcurrentMap<URI, URI>> potUriMap,
+            final ConcurrentMap<String, ConcurrentMap<URI, URI>> trayUriMap,
+            final ConcurrentMap<String, ConcurrentMap<URI, URI>> potUriMap,
             final ConcurrentMap<InferredOWLOntologyID, Model> uploadQueue, final int projectYear,
             final int projectNumber, final int experimentNumber, final String trayId, final String trayNotes,
-            final String trayTypeName, final String plantId, String genus, String species) throws PoddClientException,
-        GraphUtilException
+            final String trayTypeName, final String plantId, final String genus, final String species)
+        throws PoddClientException, GraphUtilException
     {
         // Reconstruct Project#0001-0002 structure to get a normalised string
         final String baseProjectName = String.format(HrppcPoddClient.TEMPLATE_PROJECT, projectYear, projectNumber);
-        URI nextProjectUri = null;
         URI nextExperimentUri = null;
-        InferredOWLOntologyID nextProjectID = null;
         
-        if(!projectUriMap.containsKey(baseProjectName))
-        {
-            this.log.error("Did not find an existing project for a line in the CSV file: {}", baseProjectName);
-            
-            // TODO: Create a new project?
-            return;
-        }
+        final Map<URI, InferredOWLOntologyID> projectDetails = this.getProjectDetails(projectUriMap, baseProjectName);
+        this.checkProjectDetails(baseProjectName, projectDetails);
         
-        final Map<URI, InferredOWLOntologyID> projectDetails = projectUriMap.get(baseProjectName);
+        final URI nextProjectUri = projectDetails.keySet().iterator().next();
+        final InferredOWLOntologyID nextProjectID = projectDetails.get(nextProjectUri);
         
-        if(projectDetails.isEmpty())
-        {
-            this.log.error("Project mapping seemed to exist but it was empty: {}", baseProjectName);
-            
-            // TODO: Create a new project?
-            return;
-        }
-        else if(projectDetails.size() > 1)
-        {
-            this.log.error(
-                    "Found multiple PODD Project name mappings (not able to select between them automatically) : {}\n\n {}",
-                    baseProjectName, projectDetails.keySet());
-            
-            // TODO: Throw exception?
-            return;
-        }
-        else
-        {
-            this.log.info("Found unique PODD Project name to URI mapping: {} {}", baseProjectName, projectDetails);
-            
-            nextProjectUri = projectDetails.keySet().iterator().next();
-            nextProjectID = projectDetails.get(nextProjectUri);
-        }
+        this.log.info("Found unique PODD Project name to URI mapping: {} {}", baseProjectName, projectDetails);
+        
         // Reconstruct Project#0001-0002_Experiment#0001 structure to get a normalised
         // string
         final String baseExperimentName =
                 String.format(HrppcPoddClient.TEMPLATE_EXPERIMENT, projectYear, projectNumber, experimentNumber);
         
-        if(!experimentUriMap.containsKey(baseExperimentName))
-        {
-            this.log.error("Did not find an existing experiment for a line in the CSV file: {}", baseExperimentName);
-            
-            // TODO: Create a new experiment?
-            return;
-        }
+        final Map<URI, URI> experimentDetails = this.getExperimentDetails(experimentUriMap, baseExperimentName);
+        this.checkExperimentDetails(baseExperimentName, experimentDetails);
         
-        final Map<URI, URI> experimentDetails = experimentUriMap.get(baseExperimentName);
-        
-        if(experimentDetails.isEmpty())
-        {
-            this.log.error("Experiment mapping seemed to exist but it was empty: {}", baseExperimentName);
-            
-            // TODO: Create a new experiment?
-            return;
-        }
-        else if(experimentDetails.size() > 1)
+        nextExperimentUri = experimentDetails.keySet().iterator().next();
+        final URI checkProjectUri = experimentDetails.get(nextExperimentUri);
+        if(!checkProjectUri.equals(nextProjectUri))
         {
             this.log.error(
-                    "Found multiple PODD Experiment name mappings (not able to select between them automatically) : {} {}",
-                    baseExperimentName, experimentDetails);
-            
-            // TODO: Throw exception?
-            return;
-        }
-        else
-        {
-            nextExperimentUri = experimentDetails.keySet().iterator().next();
-            final URI checkProjectUri = experimentDetails.get(nextExperimentUri);
-            if(!checkProjectUri.equals(nextProjectUri))
-            {
-                this.log.error(
-                        "Experiment mapping was against a different project: {} experimentURI={} nextProjectUri={} checkProjectUri={}",
-                        baseExperimentName, nextExperimentUri, nextProjectUri, checkProjectUri);
-            }
+                    "Experiment mapping was against a different project: {} experimentURI={} nextProjectUri={} checkProjectUri={}",
+                    baseExperimentName, nextExperimentUri, nextProjectUri, checkProjectUri);
         }
         
         // Create or find an existing model for the necessary modifications to this
@@ -827,82 +773,10 @@ public class HrppcPoddClient extends RestletPoddClientImpl
             nextResult = putIfAbsent;
         }
         
-        // Check whether trayId already has an assigned URI
-        URI nextTrayURI;
-        if(trayUriMap.containsKey(trayId))
-        {
-            nextTrayURI = trayUriMap.get(trayId).keySet().iterator().next();
-        }
-        else
-        {
-            final Model trayIdSparqlResults =
-                    this.doSPARQL(
-                            String.format(HrppcPoddClient.TEMPLATE_SPARQL_BY_TYPE_LABEL_STRSTARTS,
-                                    RenderUtils.escape(trayId),
-                                    RenderUtils.getSPARQLQueryString(PoddRdfConstants.PODD_SCIENCE_CONTAINER)),
-                            nextProjectID);
-            
-            if(trayIdSparqlResults.isEmpty())
-            {
-                this.log.info(
-                        "Could not find an existing container for tray barcode, assigning a temporary URI: {} {}",
-                        trayId, nextProjectID);
-                
-                nextTrayURI = this.vf.createURI("urn:temp:uuid:tray:" + UUID.randomUUID().toString());
-            }
-            else
-            {
-                nextTrayURI =
-                        GraphUtil.getUniqueSubjectURI(trayIdSparqlResults, RDF.TYPE,
-                                PoddRdfConstants.PODD_SCIENCE_CONTAINER);
-            }
-            
-            ConcurrentMap<URI, URI> nextTrayUriMap = new ConcurrentHashMap<>();
-            ConcurrentMap<URI, URI> putIfAbsent2 = trayUriMap.putIfAbsent(trayId, nextTrayUriMap);
-            if(putIfAbsent2 != null)
-            {
-                nextTrayUriMap = putIfAbsent2;
-            }
-            nextTrayUriMap.put(nextTrayURI, nextExperimentUri);
-        }
+        final URI nextTrayURI = this.getTrayUri(trayUriMap, trayId, nextProjectID, nextExperimentUri);
         
         // Check whether plantId already has an assigned URI
-        URI nextPotURI;
-        if(potUriMap.containsKey(plantId))
-        {
-            nextPotURI = potUriMap.get(plantId).keySet().iterator().next();
-        }
-        else
-        {
-            final Model plantIdSparqlResults =
-                    this.doSPARQL(
-                            String.format(HrppcPoddClient.TEMPLATE_SPARQL_BY_TYPE_LABEL_STRSTARTS,
-                                    RenderUtils.escape(plantId),
-                                    RenderUtils.getSPARQLQueryString(PoddRdfConstants.PODD_SCIENCE_CONTAINER)),
-                            nextProjectID);
-            
-            if(plantIdSparqlResults.isEmpty())
-            {
-                this.log.info("Could not find an existing container for pot barcode, assigning a temporary URI: {} {}",
-                        plantId, nextProjectID);
-                
-                nextPotURI = this.vf.createURI("urn:temp:uuid:pot:" + UUID.randomUUID().toString());
-            }
-            else
-            {
-                nextPotURI =
-                        GraphUtil.getUniqueSubjectURI(plantIdSparqlResults, RDF.TYPE,
-                                PoddRdfConstants.PODD_SCIENCE_CONTAINER);
-            }
-            
-            ConcurrentMap<URI, URI> nextPotUriMap = new ConcurrentHashMap<>();
-            ConcurrentMap<URI, URI> putIfAbsent2 = potUriMap.putIfAbsent(plantId, nextPotUriMap);
-            if(putIfAbsent2 != null)
-            {
-                nextPotUriMap = putIfAbsent2;
-            }
-            nextPotUriMap.put(nextPotURI, nextTrayURI);
-        }
+        final URI nextPotURI = this.getPotUri(potUriMap, plantId, nextProjectID, nextTrayURI);
         
         // TODO
         // Add new poddScience:Container for tray
@@ -934,6 +808,219 @@ public class HrppcPoddClient extends RestletPoddClientImpl
         // Add poddScience:hasReplicate for pot to link it to the rep # (??to make queries easier??)
         
         // DebugUtils.printContents(nextResult);
+    }
+    
+    /**
+     * @param baseExperimentName
+     * @param experimentDetails
+     * @throws PoddClientException
+     */
+    private void checkExperimentDetails(final String baseExperimentName, final Map<URI, URI> experimentDetails)
+        throws PoddClientException
+    {
+        if(experimentDetails.isEmpty())
+        {
+            this.log.error("Experiment mapping seemed to exist but it was empty: {}", baseExperimentName);
+            
+            // TODO: Create a new experiment?
+            // return;
+            throw new PoddClientException("Did not find an existing experiment for a line in the CSV file: "
+                    + baseExperimentName);
+            
+        }
+        else if(experimentDetails.size() > 1)
+        {
+            this.log.error(
+                    "Found multiple PODD Experiment name mappings (not able to select between them automatically) : {} {}",
+                    baseExperimentName, experimentDetails);
+            
+            // TODO: Throw exception?
+            // return;
+            throw new PoddClientException("Found multiple experiments for a line in the CSV file: "
+                    + baseExperimentName);
+            
+        }
+    }
+    
+    /**
+     * @param experimentUriMap
+     * @param baseExperimentName
+     * @return
+     * @throws PoddClientException
+     */
+    private Map<URI, URI> getExperimentDetails(final ConcurrentMap<String, ConcurrentMap<URI, URI>> experimentUriMap,
+            final String baseExperimentName) throws PoddClientException
+    {
+        if(!experimentUriMap.containsKey(baseExperimentName))
+        {
+            this.log.error("Did not find an existing experiment for a line in the CSV file: {}", baseExperimentName);
+            
+            // TODO: Create a new experiment?
+            // return;
+            throw new PoddClientException("Did not find an existing experiment for a line in the CSV file: "
+                    + baseExperimentName);
+        }
+        
+        return experimentUriMap.get(baseExperimentName);
+    }
+    
+    /**
+     * @param baseProjectName
+     * @param projectDetails
+     * @throws PoddClientException
+     */
+    private void checkProjectDetails(final String baseProjectName, final Map<URI, InferredOWLOntologyID> projectDetails)
+        throws PoddClientException
+    {
+        if(projectDetails.isEmpty())
+        {
+            this.log.error("Project mapping seemed to exist but it was empty: {}", baseProjectName);
+            
+            // TODO: Create a new project?
+            // return;
+            throw new PoddClientException("Did not find an existing project for a line in the CSV file: "
+                    + baseProjectName);
+        }
+        else if(projectDetails.size() > 1)
+        {
+            this.log.error(
+                    "Found multiple PODD Project name mappings (not able to select between them automatically) : {}\n\n {}",
+                    baseProjectName, projectDetails.keySet());
+            
+            // TODO: Throw exception?
+            // return;
+            throw new PoddClientException("Found multiple projects for a line in the CSV file: " + baseProjectName);
+        }
+    }
+    
+    /**
+     * @param projectUriMap
+     * @param baseProjectName
+     * @return
+     * @throws PoddClientException
+     */
+    private Map<URI, InferredOWLOntologyID> getProjectDetails(
+            final ConcurrentMap<String, ConcurrentMap<URI, InferredOWLOntologyID>> projectUriMap,
+            final String baseProjectName) throws PoddClientException
+    {
+        if(!projectUriMap.containsKey(baseProjectName))
+        {
+            this.log.error("Did not find an existing project for a line in the CSV file: {}", baseProjectName);
+            
+            // TODO: Create a new project?
+            // return;
+            
+            throw new PoddClientException("Did not find an existing project for a line in the CSV file: "
+                    + baseProjectName);
+        }
+        
+        return projectUriMap.get(baseProjectName);
+    }
+    
+    /**
+     * @param trayUriMap
+     * @param trayId
+     * @param nextProjectID
+     * @param nextExperimentUri
+     * @return
+     * @throws PoddClientException
+     * @throws GraphUtilException
+     */
+    private URI getTrayUri(final ConcurrentMap<String, ConcurrentMap<URI, URI>> trayUriMap, final String trayId,
+            final InferredOWLOntologyID nextProjectID, final URI nextExperimentUri) throws PoddClientException,
+        GraphUtilException
+    {
+        // Check whether trayId already has an assigned URI
+        URI nextTrayURI;
+        if(trayUriMap.containsKey(trayId))
+        {
+            nextTrayURI = trayUriMap.get(trayId).keySet().iterator().next();
+        }
+        else
+        {
+            final Model trayIdSparqlResults =
+                    this.doSPARQL(
+                            String.format(HrppcPoddClient.TEMPLATE_SPARQL_BY_TYPE_LABEL_STRSTARTS,
+                                    RenderUtils.escape(trayId),
+                                    RenderUtils.getSPARQLQueryString(PoddRdfConstants.PODD_SCIENCE_CONTAINER)),
+                            nextProjectID);
+            
+            if(trayIdSparqlResults.isEmpty())
+            {
+                this.log.info(
+                        "Could not find an existing container for tray barcode, assigning a temporary URI: {} {}",
+                        trayId, nextProjectID);
+                
+                nextTrayURI = this.vf.createURI("urn:temp:uuid:tray:" + UUID.randomUUID().toString());
+            }
+            else
+            {
+                nextTrayURI =
+                        GraphUtil.getUniqueSubjectURI(trayIdSparqlResults, RDF.TYPE,
+                                PoddRdfConstants.PODD_SCIENCE_CONTAINER);
+            }
+            
+            ConcurrentMap<URI, URI> nextTrayUriMap = new ConcurrentHashMap<>();
+            final ConcurrentMap<URI, URI> putIfAbsent2 = trayUriMap.putIfAbsent(trayId, nextTrayUriMap);
+            if(putIfAbsent2 != null)
+            {
+                nextTrayUriMap = putIfAbsent2;
+            }
+            nextTrayUriMap.put(nextTrayURI, nextExperimentUri);
+        }
+        return nextTrayURI;
+    }
+    
+    /**
+     * @param potUriMap
+     * @param plantId
+     * @param nextProjectID
+     * @param nextTrayURI
+     * @return
+     * @throws PoddClientException
+     * @throws GraphUtilException
+     */
+    private URI getPotUri(final ConcurrentMap<String, ConcurrentMap<URI, URI>> potUriMap, final String plantId,
+            final InferredOWLOntologyID nextProjectID, final URI nextTrayURI) throws PoddClientException,
+        GraphUtilException
+    {
+        URI nextPotURI;
+        if(potUriMap.containsKey(plantId))
+        {
+            nextPotURI = potUriMap.get(plantId).keySet().iterator().next();
+        }
+        else
+        {
+            final Model plantIdSparqlResults =
+                    this.doSPARQL(
+                            String.format(HrppcPoddClient.TEMPLATE_SPARQL_BY_TYPE_LABEL_STRSTARTS,
+                                    RenderUtils.escape(plantId),
+                                    RenderUtils.getSPARQLQueryString(PoddRdfConstants.PODD_SCIENCE_CONTAINER)),
+                            nextProjectID);
+            
+            if(plantIdSparqlResults.isEmpty())
+            {
+                this.log.info("Could not find an existing container for pot barcode, assigning a temporary URI: {} {}",
+                        plantId, nextProjectID);
+                
+                nextPotURI = this.vf.createURI("urn:temp:uuid:pot:" + UUID.randomUUID().toString());
+            }
+            else
+            {
+                nextPotURI =
+                        GraphUtil.getUniqueSubjectURI(plantIdSparqlResults, RDF.TYPE,
+                                PoddRdfConstants.PODD_SCIENCE_CONTAINER);
+            }
+            
+            ConcurrentMap<URI, URI> nextPotUriMap = new ConcurrentHashMap<>();
+            final ConcurrentMap<URI, URI> putIfAbsent2 = potUriMap.putIfAbsent(plantId, nextPotUriMap);
+            if(putIfAbsent2 != null)
+            {
+                nextPotUriMap = putIfAbsent2;
+            }
+            nextPotUriMap.put(nextPotURI, nextTrayURI);
+        }
+        return nextPotURI;
     }
     
     /**
