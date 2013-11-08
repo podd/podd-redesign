@@ -230,7 +230,6 @@ public abstract class AbstractPoddClientTest
      * {@link com.github.podd.client.api.PoddClient#appendArtifact(OWLOntologyID, InputStream, RDFFormat)}
      * .
      */
-    @Ignore
     @Test
     public final void testAppendArtifact() throws Exception
     {
@@ -260,7 +259,9 @@ public abstract class AbstractPoddClientTest
                 GraphUtil.getUniqueSubjectURI(model, RDF.TYPE, PoddRdfConstants.PODD_SCIENCE_INVESTIGATION);
         URI containerUri = vf.createURI("urn:temp:uuid:container:1");
         
-        Model updates = new LinkedHashModel();
+        // Must have all of the existing triples for the investigation present or they will be
+        // removed by the append as a partial update.
+        Model updates = new LinkedHashModel(model.filter(investigationUri, null, null));
         updates.add(investigationUri, PoddRdfConstants.PODD_SCIENCE_HAS_CONTAINER, containerUri);
         updates.add(containerUri, RDFS.LABEL, vf.createLiteral("Test container number 1"));
     }
