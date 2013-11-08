@@ -133,11 +133,9 @@ public class HrppcPoddClientIntegrationTest extends RestletPoddClientImplIntegra
         
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream(2048);
         
-        
-        
         // Dump for debugging
         poddClient.downloadArtifact(uploadedArtifacts.get(newArtifact), outputStream, RDFFormat.RDFJSON);
         
-        this.parseRdf(new ByteArrayInputStream(outputStream.toByteArray()), RDFFormat.RDFJSON, -1);
+        this.parseRdf(new ByteArrayInputStream(outputStream.toByteArray()), RDFFormat.RDFJSON, 1397);
     }
 }
