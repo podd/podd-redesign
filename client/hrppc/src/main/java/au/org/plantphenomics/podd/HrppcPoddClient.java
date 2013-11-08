@@ -136,7 +136,8 @@ public class HrppcPoddClient extends RestletPoddClientImpl
      * should be created and roles assigned before this process, but could be fine to do that in
      * here
      */
-    public void uploadTrayScanList(final InputStream in) throws IOException, PoddClientException, OpenRDFException
+    public ConcurrentMap<InferredOWLOntologyID, Model> processTrayScanList(final InputStream in) throws IOException,
+        PoddClientException, OpenRDFException
     {
         // Only select the unpublished artifacts, as we cannot edit published artifacts
         final Model currentUnpublishedArtifacts = this.listArtifacts(false, true);
@@ -227,7 +228,7 @@ public class HrppcPoddClient extends RestletPoddClientImpl
             this.log.error("Document did not contain any valid rows");
         }
         
-        this.uploadToPodd(uploadQueue);
+        return uploadQueue;
     }
     
     private void populateExperimentUriMap(
@@ -344,8 +345,10 @@ public class HrppcPoddClient extends RestletPoddClientImpl
         }
     }
     
-    private void uploadToPodd(final ConcurrentMap<InferredOWLOntologyID, Model> uploadQueue) throws PoddClientException
+    public ConcurrentMap<InferredOWLOntologyID, InferredOWLOntologyID> uploadToPodd(
+            final ConcurrentMap<InferredOWLOntologyID, Model> uploadQueue) throws PoddClientException
     {
+        ConcurrentMap<InferredOWLOntologyID, InferredOWLOntologyID> resultMap = new ConcurrentHashMap<>();
         for(final InferredOWLOntologyID nextUpload : uploadQueue.keySet())
         {
             try
@@ -361,10 +364,13 @@ public class HrppcPoddClient extends RestletPoddClientImpl
                 {
                     this.log.error("Did not find a valid result from append artifact: {}", nextUpload);
                 }
-                
-                if(nextUpload.equals(newID))
+                else if(nextUpload.equals(newID))
                 {
                     this.log.error("Result from append artifact was not changed, as expected. {} {}", nextUpload, newID);
+                }
+                else
+                {
+                    resultMap.putIfAbsent(nextUpload, newID);
                 }
             }
             catch(final RDFHandlerException e)
@@ -372,13 +378,15 @@ public class HrppcPoddClient extends RestletPoddClientImpl
                 this.log.error("Found exception generating upload body: ", e);
             }
         }
+        return resultMap;
     }
     
     private void populateProjectUriMap(final Model currentUnpublishedArtifacts,
             final ConcurrentMap<String, ConcurrentMap<URI, InferredOWLOntologyID>> projectUriMap)
         throws PoddClientException
     {
-        for(final InferredOWLOntologyID nextArtifact : OntologyUtils.modelToOntologyIDs(currentUnpublishedArtifacts))
+        for(final InferredOWLOntologyID nextArtifact : OntologyUtils.modelToOntologyIDs(currentUnpublishedArtifacts,
+                true, false))
         {
             final Model nextTopObject = this.getTopObject(nextArtifact, currentUnpublishedArtifacts);
             

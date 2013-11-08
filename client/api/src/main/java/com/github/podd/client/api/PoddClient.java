@@ -75,6 +75,10 @@ public interface PoddClient
     InferredOWLOntologyID appendArtifact(InferredOWLOntologyID ontologyId, InputStream partialInputStream,
             RDFFormat format) throws PoddClientException;
     
+    InferredOWLOntologyID appendArtifact(InferredOWLOntologyID ontologyId, InputStream partialInputStream,
+            RDFFormat format, DanglingObjectPolicy danglingObjectPolicy,
+            DataReferenceVerificationPolicy dataReferenceVerificationPolicy) throws PoddClientException;
+    
     /**
      * Submits a request to the PODD File Reference Attachment service to attach a file reference
      * from a registered repository into the artifact as a child of the given object IRI.

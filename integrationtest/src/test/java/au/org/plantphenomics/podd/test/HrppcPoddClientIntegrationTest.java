@@ -16,13 +16,18 @@
  */
 package au.org.plantphenomics.podd.test;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.util.concurrent.ConcurrentMap;
 import java.util.regex.Matcher;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.openrdf.model.Model;
 import org.openrdf.queryrender.RenderUtils;
 import org.openrdf.rio.RDFFormat;
+import org.openrdf.rio.Rio;
 
 import au.org.plantphenomics.podd.HrppcPoddClient;
 
@@ -35,7 +40,7 @@ import com.github.podd.utils.PoddRdfConstants;
  * @author Peter Ansell p_ansell@yahoo.com
  * 
  */
-public class HrppcPoddClientTest extends RestletPoddClientImplIntegrationTest
+public class HrppcPoddClientIntegrationTest extends RestletPoddClientImplIntegrationTest
 {
     @Override
     protected HrppcPoddClient getNewPoddClientInstance()
@@ -93,7 +98,7 @@ public class HrppcPoddClientTest extends RestletPoddClientImplIntegrationTest
     
     /**
      * Test method for
-     * {@link au.org.plantphenomics.podd.HrppcPoddClient#uploadTrayScanList(java.io.InputStream)}.
+     * {@link au.org.plantphenomics.podd.HrppcPoddClient#processTrayScanList(java.io.InputStream)}.
      * 
      * @throws Exception
      * @throws
@@ -112,7 +117,25 @@ public class HrppcPoddClientTest extends RestletPoddClientImplIntegrationTest
         Assert.assertNotNull(newArtifact);
         Assert.assertNotNull(newArtifact.getOntologyIRI());
         Assert.assertNotNull(newArtifact.getVersionIRI());
+        // Must not be leaking the inferred ontology information to users
+        Assert.assertNull(newArtifact.getInferredOntologyIRI());
         
-        poddClient.uploadTrayScanList(this.getClass().getResourceAsStream("/test/hrppc/PlantScan-Template.csv"));
+        ConcurrentMap<InferredOWLOntologyID, Model> uploadQueue =
+                poddClient.processTrayScanList(this.getClass()
+                        .getResourceAsStream("/test/hrppc/PlantScan-Template.csv"));
+        
+        Assert.assertEquals(1, uploadQueue.size());
+        
+        ConcurrentMap<InferredOWLOntologyID, InferredOWLOntologyID> uploadedArtifacts =
+                poddClient.uploadToPodd(uploadQueue);
+        
+        Assert.assertEquals(1, uploadedArtifacts.size());
+        
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream(2048);
+        
+        // Dump for debugging
+        poddClient.downloadArtifact(uploadedArtifacts.get(newArtifact), outputStream, RDFFormat.RDFJSON);
+        
+        this.parseRdf(new ByteArrayInputStream(outputStream.toByteArray()), RDFFormat.RDFJSON, 1397);
     }
 }

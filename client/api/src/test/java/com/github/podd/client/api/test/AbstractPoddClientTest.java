@@ -20,7 +20,9 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringWriter;
 import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -32,8 +34,11 @@ import org.junit.Test;
 import org.openrdf.model.Model;
 import org.openrdf.model.URI;
 import org.openrdf.model.ValueFactory;
+import org.openrdf.model.impl.LinkedHashModel;
+import org.openrdf.model.util.GraphUtil;
 import org.openrdf.model.vocabulary.OWL;
 import org.openrdf.model.vocabulary.RDF;
+import org.openrdf.model.vocabulary.RDFS;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.RDFHandlerException;
 import org.openrdf.rio.RDFParseException;
@@ -72,6 +77,7 @@ public abstract class AbstractPoddClientTest
     private PoddClient testClient;
     
     private static final int BASIC_PROJECT_1_EXPECTED_CONCRETE_TRIPLES = 24;
+    private static final int BASIC_PROJECT_3_EXPECTED_CONCRETE_TRIPLES = 21;
     
     protected static final ValueFactory vf = PoddRdfConstants.VF;
     
@@ -226,11 +232,55 @@ public abstract class AbstractPoddClientTest
      * {@link com.github.podd.client.api.PoddClient#appendArtifact(OWLOntologyID, InputStream, RDFFormat)}
      * .
      */
-    @Ignore
     @Test
     public final void testAppendArtifact() throws Exception
     {
-        Assert.fail("Not yet implemented"); // TODO
+        this.testClient.login(AbstractPoddClientTest.TEST_ADMIN_USER, AbstractPoddClientTest.TEST_ADMIN_PASSWORD);
+        
+        final InputStream input = this.getClass().getResourceAsStream("/test/artifacts/basicProject-3.rdf");
+        Assert.assertNotNull("Test resource missing", input);
+        
+        final InferredOWLOntologyID newArtifact = this.testClient.uploadNewArtifact(input, RDFFormat.RDFXML);
+        Assert.assertNotNull(newArtifact);
+        Assert.assertNotNull(newArtifact.getOntologyIRI());
+        Assert.assertNotNull(newArtifact.getVersionIRI());
+        Assert.assertNull(newArtifact.getInferredOntologyIRI());
+        
+        final ByteArrayOutputStream outputStream = new ByteArrayOutputStream(8096);
+        this.testClient.downloadArtifact(newArtifact, outputStream, RDFFormat.RDFJSON);
+        final Model model =
+                this.parseRdf(new ByteArrayInputStream(outputStream.toByteArray()), RDFFormat.RDFJSON,
+                        AbstractPoddClientTest.BASIC_PROJECT_3_EXPECTED_CONCRETE_TRIPLES);
+        
+        Assert.assertTrue(model.contains(newArtifact.getOntologyIRI().toOpenRDFURI(), RDF.TYPE, OWL.ONTOLOGY));
+        Assert.assertTrue(model.contains(newArtifact.getOntologyIRI().toOpenRDFURI(), OWL.VERSIONIRI, newArtifact
+                .getVersionIRI().toOpenRDFURI()));
+        
+        // Then test append with an updated model
+        
+        URI investigationUri =
+                GraphUtil.getUniqueSubjectURI(model, RDF.TYPE, PoddRdfConstants.PODD_SCIENCE_INVESTIGATION);
+        URI containerUri = vf.createURI("urn:temp:uuid:container:1");
+        
+        // Must have all of the existing triples for the investigation present or they will be
+        // removed by the append as a partial update.
+        Model updates = new LinkedHashModel(model.filter(investigationUri, null, null));
+        updates.add(investigationUri, PoddRdfConstants.PODD_SCIENCE_HAS_CONTAINER, containerUri);
+        updates.add(containerUri, RDF.TYPE, PoddRdfConstants.PODD_SCIENCE_CONTAINER);
+        updates.add(containerUri, RDFS.LABEL, vf.createLiteral("Test container number 1"));
+        ByteArrayOutputStream outputStream2 = new ByteArrayOutputStream(4096);
+        
+        Rio.write(updates, outputStream2, RDFFormat.RDFJSON);
+        InferredOWLOntologyID appendArtifact =
+                this.testClient.appendArtifact(newArtifact, new ByteArrayInputStream(outputStream2.toByteArray()),
+                        RDFFormat.RDFJSON);
+        
+        Assert.assertNotNull(appendArtifact);
+        Assert.assertNotNull(appendArtifact.getOntologyIRI());
+        Assert.assertEquals(appendArtifact.getOntologyIRI(), newArtifact.getOntologyIRI());
+        Assert.assertNotNull(appendArtifact.getVersionIRI());
+        Assert.assertNotEquals(appendArtifact.getVersionIRI(), newArtifact.getVersionIRI());
+        Assert.assertNull(appendArtifact.getInferredOntologyIRI());
     }
     
     /**

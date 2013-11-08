@@ -30,6 +30,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import org.openrdf.model.Literal;
@@ -141,7 +142,59 @@ public class RestletPoddClientImpl implements PoddClient
     public InferredOWLOntologyID appendArtifact(final InferredOWLOntologyID ontologyIRI,
             final InputStream partialInputStream, final RDFFormat format) throws PoddClientException
     {
-        throw new RuntimeException("TODO: Implement appendArtifact");
+        return appendArtifact(ontologyIRI, partialInputStream, format, DanglingObjectPolicy.REPORT,
+                DataReferenceVerificationPolicy.DO_NOT_VERIFY);
+    }
+    
+    @Override
+    public InferredOWLOntologyID appendArtifact(final InferredOWLOntologyID artifactID,
+            final InputStream partialInputStream, final RDFFormat format,
+            final DanglingObjectPolicy danglingObjectPolicy,
+            final DataReferenceVerificationPolicy dataReferenceVerificationPolicy) throws PoddClientException
+    {
+        final InputRepresentation rep =
+                new InputRepresentation(partialInputStream, MediaType.valueOf(format.getDefaultMIMEType()));
+        
+        final ClientResource resource = new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_EDIT));
+        resource.getCookies().addAll(this.currentCookies);
+        
+        this.log.info("cookies: {}", this.currentCookies);
+        
+        resource.addQueryParameter(PoddWebConstants.KEY_EDIT_WITH_REPLACE, Boolean.toString(false));
+        resource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactID.getOntologyIRI().toString());
+        resource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_VERSION_IDENTIFIER, artifactID.getVersionIRI()
+                .toString());
+        if(danglingObjectPolicy == DanglingObjectPolicy.FORCE_CLEAN)
+        {
+            resource.addQueryParameter(PoddWebConstants.KEY_EDIT_WITH_FORCE, "true");
+        }
+        if(dataReferenceVerificationPolicy == DataReferenceVerificationPolicy.VERIFY)
+        {
+            resource.addQueryParameter(PoddWebConstants.KEY_EDIT_VERIFY_FILE_REFERENCES, "true");
+        }
+        resource.addQueryParameter("format", format.getDefaultMIMEType());
+        
+        // Request the results in Turtle to reduce the bandwidth
+        final Representation post = resource.post(rep, MediaType.APPLICATION_RDF_TURTLE);
+        
+        try
+        {
+            final Model parsedStatements = this.parseRdf(post);
+            
+            final Collection<InferredOWLOntologyID> result =
+                    OntologyUtils.modelToOntologyIDs(parsedStatements, true, false);
+            
+            if(!result.isEmpty())
+            {
+                return result.iterator().next();
+            }
+            
+            throw new PoddClientException("Failed to verify that the artifact was uploaded correctly.");
+        }
+        catch(final IOException e)
+        {
+            throw new PoddClientException("Could not parse artifact details due to an IOException", e);
+        }
     }
     
     @Override
@@ -165,7 +218,8 @@ public class RestletPoddClientImpl implements PoddClient
         {
             final Model parsedStatements = this.parseRdf(post);
             
-            final Collection<InferredOWLOntologyID> result = OntologyUtils.modelToOntologyIDs(parsedStatements);
+            final Collection<InferredOWLOntologyID> result =
+                    OntologyUtils.modelToOntologyIDs(parsedStatements, true, false);
             
             if(!result.isEmpty())
             {
@@ -288,6 +342,10 @@ public class RestletPoddClientImpl implements PoddClient
     public void downloadArtifact(final InferredOWLOntologyID artifactId, final OutputStream outputStream,
             final RDFFormat format) throws PoddClientException
     {
+        Objects.requireNonNull(artifactId);
+        Objects.requireNonNull(outputStream);
+        Objects.requireNonNull(format);
+        
         this.log.info("cookies: {}", this.currentCookies);
         
         final ClientResource resource = new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_GET_BASE));
@@ -300,7 +358,8 @@ public class RestletPoddClientImpl implements PoddClient
             // FIXME: Versions are not supported in general by PODD, but they are important for
             // verifying the state of the client to allow for early failure in cases where the
             // client is out of date.
-            resource.addQueryParameter("versionUri", artifactId.getVersionIRI().toString());
+            resource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_VERSION_IDENTIFIER, artifactId.getVersionIRI()
+                    .toString());
         }
         
         // Pass the desired format to the get method of the ClientResource
@@ -419,7 +478,7 @@ public class RestletPoddClientImpl implements PoddClient
     private List<InferredOWLOntologyID> listArtifactsInternal(final boolean published, final boolean unpublished)
         throws PoddClientException
     {
-        return OntologyUtils.modelToOntologyIDs(this.listArtifacts(published, unpublished));
+        return OntologyUtils.modelToOntologyIDs(this.listArtifacts(published, unpublished), false, false);
     }
     
     @Override
@@ -869,7 +928,8 @@ public class RestletPoddClientImpl implements PoddClient
         {
             final Model parsedStatements = this.parseRdf(post);
             
-            final Collection<InferredOWLOntologyID> result = OntologyUtils.modelToOntologyIDs(parsedStatements);
+            final Collection<InferredOWLOntologyID> result =
+                    OntologyUtils.modelToOntologyIDs(parsedStatements, true, false);
             
             if(!result.isEmpty())
             {
