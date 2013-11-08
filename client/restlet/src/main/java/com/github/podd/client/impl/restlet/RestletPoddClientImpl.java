@@ -30,6 +30,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import org.openrdf.model.Literal;
@@ -180,7 +181,8 @@ public class RestletPoddClientImpl implements PoddClient
         {
             final Model parsedStatements = this.parseRdf(post);
             
-            final Collection<InferredOWLOntologyID> result = OntologyUtils.modelToOntologyIDs(parsedStatements);
+            final Collection<InferredOWLOntologyID> result =
+                    OntologyUtils.modelToOntologyIDs(parsedStatements, true, false);
             
             if(!result.isEmpty())
             {
@@ -216,7 +218,8 @@ public class RestletPoddClientImpl implements PoddClient
         {
             final Model parsedStatements = this.parseRdf(post);
             
-            final Collection<InferredOWLOntologyID> result = OntologyUtils.modelToOntologyIDs(parsedStatements);
+            final Collection<InferredOWLOntologyID> result =
+                    OntologyUtils.modelToOntologyIDs(parsedStatements, true, false);
             
             if(!result.isEmpty())
             {
@@ -339,6 +342,10 @@ public class RestletPoddClientImpl implements PoddClient
     public void downloadArtifact(final InferredOWLOntologyID artifactId, final OutputStream outputStream,
             final RDFFormat format) throws PoddClientException
     {
+        Objects.requireNonNull(artifactId);
+        Objects.requireNonNull(outputStream);
+        Objects.requireNonNull(format);
+        
         this.log.info("cookies: {}", this.currentCookies);
         
         final ClientResource resource = new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_GET_BASE));
@@ -351,7 +358,8 @@ public class RestletPoddClientImpl implements PoddClient
             // FIXME: Versions are not supported in general by PODD, but they are important for
             // verifying the state of the client to allow for early failure in cases where the
             // client is out of date.
-            resource.addQueryParameter("versionUri", artifactId.getVersionIRI().toString());
+            resource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_VERSION_IDENTIFIER, artifactId.getVersionIRI()
+                    .toString());
         }
         
         // Pass the desired format to the get method of the ClientResource
@@ -470,7 +478,7 @@ public class RestletPoddClientImpl implements PoddClient
     private List<InferredOWLOntologyID> listArtifactsInternal(final boolean published, final boolean unpublished)
         throws PoddClientException
     {
-        return OntologyUtils.modelToOntologyIDs(this.listArtifacts(published, unpublished));
+        return OntologyUtils.modelToOntologyIDs(this.listArtifacts(published, unpublished), false, false);
     }
     
     @Override
@@ -920,7 +928,8 @@ public class RestletPoddClientImpl implements PoddClient
         {
             final Model parsedStatements = this.parseRdf(post);
             
-            final Collection<InferredOWLOntologyID> result = OntologyUtils.modelToOntologyIDs(parsedStatements);
+            final Collection<InferredOWLOntologyID> result =
+                    OntologyUtils.modelToOntologyIDs(parsedStatements, true, false);
             
             if(!result.isEmpty())
             {

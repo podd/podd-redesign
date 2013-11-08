@@ -20,6 +20,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringWriter;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -76,6 +77,7 @@ public abstract class AbstractPoddClientTest
     private PoddClient testClient;
     
     private static final int BASIC_PROJECT_1_EXPECTED_CONCRETE_TRIPLES = 24;
+    private static final int BASIC_PROJECT_3_EXPECTED_CONCRETE_TRIPLES = 21;
     
     protected static final ValueFactory vf = PoddRdfConstants.VF;
     
@@ -242,12 +244,13 @@ public abstract class AbstractPoddClientTest
         Assert.assertNotNull(newArtifact);
         Assert.assertNotNull(newArtifact.getOntologyIRI());
         Assert.assertNotNull(newArtifact.getVersionIRI());
+        Assert.assertNull(newArtifact.getInferredOntologyIRI());
         
         final ByteArrayOutputStream outputStream = new ByteArrayOutputStream(8096);
         this.testClient.downloadArtifact(newArtifact, outputStream, RDFFormat.RDFJSON);
         final Model model =
                 this.parseRdf(new ByteArrayInputStream(outputStream.toByteArray()), RDFFormat.RDFJSON,
-                        AbstractPoddClientTest.BASIC_PROJECT_1_EXPECTED_CONCRETE_TRIPLES);
+                        AbstractPoddClientTest.BASIC_PROJECT_3_EXPECTED_CONCRETE_TRIPLES);
         
         Assert.assertTrue(model.contains(newArtifact.getOntologyIRI().toOpenRDFURI(), RDF.TYPE, OWL.ONTOLOGY));
         Assert.assertTrue(model.contains(newArtifact.getOntologyIRI().toOpenRDFURI(), OWL.VERSIONIRI, newArtifact
@@ -263,7 +266,21 @@ public abstract class AbstractPoddClientTest
         // removed by the append as a partial update.
         Model updates = new LinkedHashModel(model.filter(investigationUri, null, null));
         updates.add(investigationUri, PoddRdfConstants.PODD_SCIENCE_HAS_CONTAINER, containerUri);
+        updates.add(containerUri, RDF.TYPE, PoddRdfConstants.PODD_SCIENCE_CONTAINER);
         updates.add(containerUri, RDFS.LABEL, vf.createLiteral("Test container number 1"));
+        ByteArrayOutputStream outputStream2 = new ByteArrayOutputStream(4096);
+        
+        Rio.write(updates, outputStream2, RDFFormat.RDFJSON);
+        InferredOWLOntologyID appendArtifact =
+                this.testClient.appendArtifact(newArtifact, new ByteArrayInputStream(outputStream2.toByteArray()),
+                        RDFFormat.RDFJSON);
+        
+        Assert.assertNotNull(appendArtifact);
+        Assert.assertNotNull(appendArtifact.getOntologyIRI());
+        Assert.assertEquals(appendArtifact.getOntologyIRI(), newArtifact.getOntologyIRI());
+        Assert.assertNotNull(appendArtifact.getVersionIRI());
+        Assert.assertNotEquals(appendArtifact.getVersionIRI(), newArtifact.getVersionIRI());
+        Assert.assertNull(appendArtifact.getInferredOntologyIRI());
     }
     
     /**

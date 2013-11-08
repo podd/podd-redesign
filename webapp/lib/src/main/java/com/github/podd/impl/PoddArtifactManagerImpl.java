@@ -160,7 +160,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
                 this.updateArtifact(ontologyId.getOntologyIRI().toOpenRDFURI(), ontologyId.getVersionIRI()
                         .toOpenRDFURI(), fileReferenceObjects, model, UpdatePolicy.MERGE_WITH_EXISTING,
                         DanglingObjectPolicy.REPORT, dataReferenceVerificationPolicy);
-        return OntologyUtils.modelToOntologyIDs(resultModel).get(0);
+        return OntologyUtils.modelToOntologyIDs(resultModel, true, false).get(0);
     }
     
     @Override

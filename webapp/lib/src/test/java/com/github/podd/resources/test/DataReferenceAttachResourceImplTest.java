@@ -174,11 +174,11 @@ public class DataReferenceAttachResourceImplTest extends AbstractResourceImplTes
                     RestletTestUtils.doTestAuthenticatedRequest(fileRefAttachClientResource, Method.POST, input,
                             MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
             
-            final Model ontologyIDModel = this.assertRdf(results, RDFFormat.RDFXML, 5);
+            final Model ontologyIDModel = this.assertRdf(results, RDFFormat.RDFXML, 3);
             
-            Assert.assertEquals(3, ontologyIDModel.subjects().size());
-            Assert.assertEquals(3, ontologyIDModel.predicates().size());
-            Assert.assertEquals(3, ontologyIDModel.objects().size());
+            Assert.assertEquals(2, ontologyIDModel.subjects().size());
+            Assert.assertEquals(2, ontologyIDModel.predicates().size());
+            Assert.assertEquals(2, ontologyIDModel.objects().size());
             Assert.assertEquals(1, ontologyIDModel.contexts().size());
             
             final List<InferredOWLOntologyID> ontologyIDs = OntologyUtils.modelToOntologyIDs(ontologyIDModel);
@@ -268,7 +268,7 @@ public class DataReferenceAttachResourceImplTest extends AbstractResourceImplTes
                 Assert.assertTrue("Artifact version has not been updated properly",
                         body.contains("artifact:1:version:2"));
                 Assert.assertTrue("Version IRI not in response", body.contains("versionIRI"));
-                Assert.assertTrue("Inferred version not in response", body.contains("inferredVersion"));
+                Assert.assertFalse("Inferred version in response", body.contains("inferredVersion"));
                 
                 // verify: new file reference has been added to the artifact
                 final String artifactBody =
@@ -325,7 +325,7 @@ public class DataReferenceAttachResourceImplTest extends AbstractResourceImplTes
             // verify: An updated Inferred Ontology ID is received
             Assert.assertTrue("Artifact version has not been updated properly", body.contains("artifact:1:version:2"));
             Assert.assertTrue("Version IRI not in response", body.contains("versionIRI"));
-            Assert.assertTrue("Inferred version not in response", body.contains("inferredVersion"));
+            Assert.assertFalse("Inferred version in response", body.contains("inferredVersion"));
             
             // verify: new file reference has been added to the artifact
             final String artifactBody =
@@ -387,7 +387,7 @@ public class DataReferenceAttachResourceImplTest extends AbstractResourceImplTes
                 Assert.assertTrue("Artifact version has not been updated properly",
                         body.contains("artifact:1:version:2"));
                 Assert.assertTrue("Version IRI not in response", body.contains("versionIRI"));
-                Assert.assertTrue("Inferred version not in response", body.contains("inferredVersion"));
+                Assert.assertFalse("Inferred version in response", body.contains("inferredVersion"));
                 
                 // verify: new file reference has been added to the artifact
                 final String artifactBody =

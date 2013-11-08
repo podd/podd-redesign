@@ -60,7 +60,7 @@ public class OntologyUtils
      */
     public static List<InferredOWLOntologyID> modelToOntologyIDs(final Model input)
     {
-        return OntologyUtils.modelToOntologyIDs(input, false);
+        return OntologyUtils.modelToOntologyIDs(input, false, true);
     }
     
     /**
@@ -75,7 +75,8 @@ public class OntologyUtils
      * @return A Collection of {@link InferredOWLOntologyID} instances derived from the statements
      *         in the model.
      */
-    public static List<InferredOWLOntologyID> modelToOntologyIDs(final Model input, final boolean allowVersionless)
+    public static List<InferredOWLOntologyID> modelToOntologyIDs(final Model input, final boolean allowVersionless,
+            final boolean includeInferred)
     {
         final List<InferredOWLOntologyID> results = new ArrayList<InferredOWLOntologyID>();
         
@@ -105,44 +106,54 @@ public class OntologyUtils
                                     input.filter((URI)nextVersion.getObject(),
                                             PoddRdfConstants.PODD_BASE_INFERRED_VERSION, null);
                             
-                            if(inferredOntologies.isEmpty())
+                            if(!includeInferred)
                             {
-                                // If there were no poddBase#inferredVersion statements, backup by
-                                // trying to infer the versions using owl:imports
-                                final Model importsOntologies =
-                                        input.filter(null, OWL.IMPORTS, nextVersion.getObject());
-                                
-                                if(importsOntologies.isEmpty())
-                                {
-                                    results.add(new InferredOWLOntologyID((URI)nextTypeStatement.getSubject(),
-                                            (URI)nextVersion.getObject(), null));
-                                }
-                                else
-                                {
-                                    for(final Statement nextImportOntology : importsOntologies)
-                                    {
-                                        if(nextImportOntology.getSubject() instanceof URI)
-                                        {
-                                            results.add(new InferredOWLOntologyID((URI)nextTypeStatement.getSubject(),
-                                                    (URI)nextVersion.getObject(), (URI)nextImportOntology.getSubject()));
-                                        }
-                                        else
-                                        {
-                                            OntologyUtils.log.error("Found a non-URI import statement: {}",
-                                                    nextImportOntology);
-                                        }
-                                        
-                                    }
-                                }
+                                results.add(new InferredOWLOntologyID((URI)nextTypeStatement.getSubject(),
+                                        (URI)nextVersion.getObject(), null));
                             }
                             else
                             {
-                                for(final Statement nextInferredOntology : inferredOntologies)
+                                if(inferredOntologies.isEmpty())
                                 {
-                                    if(nextInferredOntology.getObject() instanceof URI)
+                                    // If there were no poddBase#inferredVersion statements, backup
+                                    // by
+                                    // trying to infer the versions using owl:imports
+                                    final Model importsOntologies =
+                                            input.filter(null, OWL.IMPORTS, nextVersion.getObject());
+                                    
+                                    if(importsOntologies.isEmpty())
                                     {
                                         results.add(new InferredOWLOntologyID((URI)nextTypeStatement.getSubject(),
-                                                (URI)nextVersion.getObject(), (URI)nextInferredOntology.getObject()));
+                                                (URI)nextVersion.getObject(), null));
+                                    }
+                                    else
+                                    {
+                                        for(final Statement nextImportOntology : importsOntologies)
+                                        {
+                                            if(nextImportOntology.getSubject() instanceof URI)
+                                            {
+                                                results.add(new InferredOWLOntologyID((URI)nextTypeStatement
+                                                        .getSubject(), (URI)nextVersion.getObject(),
+                                                        (URI)nextImportOntology.getSubject()));
+                                            }
+                                            else
+                                            {
+                                                OntologyUtils.log.error("Found a non-URI import statement: {}",
+                                                        nextImportOntology);
+                                            }
+                                            
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    for(final Statement nextInferredOntology : inferredOntologies)
+                                    {
+                                        if(nextInferredOntology.getObject() instanceof URI)
+                                        {
+                                            results.add(new InferredOWLOntologyID((URI)nextTypeStatement.getSubject(),
+                                                    (URI)nextVersion.getObject(), (URI)nextInferredOntology.getObject()));
+                                        }
                                     }
                                 }
                             }
