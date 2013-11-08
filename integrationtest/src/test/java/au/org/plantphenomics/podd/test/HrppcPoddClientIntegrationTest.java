@@ -35,7 +35,7 @@ import com.github.podd.utils.PoddRdfConstants;
  * @author Peter Ansell p_ansell@yahoo.com
  * 
  */
-public class HrppcPoddClientTest extends RestletPoddClientImplIntegrationTest
+public class HrppcPoddClientIntegrationTest extends RestletPoddClientImplIntegrationTest
 {
     @Override
     protected HrppcPoddClient getNewPoddClientInstance()
