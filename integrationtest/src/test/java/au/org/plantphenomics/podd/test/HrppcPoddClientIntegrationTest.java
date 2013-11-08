@@ -25,9 +25,9 @@ import java.util.regex.Matcher;
 import org.junit.Assert;
 import org.junit.Test;
 import org.openrdf.model.Model;
+import org.openrdf.model.vocabulary.RDF;
 import org.openrdf.queryrender.RenderUtils;
 import org.openrdf.rio.RDFFormat;
-import org.openrdf.rio.Rio;
 
 import au.org.plantphenomics.podd.HrppcPoddClient;
 
@@ -120,22 +120,35 @@ public class HrppcPoddClientIntegrationTest extends RestletPoddClientImplIntegra
         // Must not be leaking the inferred ontology information to users
         Assert.assertNull(newArtifact.getInferredOntologyIRI());
         
-        ConcurrentMap<InferredOWLOntologyID, Model> uploadQueue =
+        final ConcurrentMap<InferredOWLOntologyID, Model> uploadQueue =
                 poddClient.processTrayScanList(this.getClass()
                         .getResourceAsStream("/test/hrppc/PlantScan-Template.csv"));
         
         Assert.assertEquals(1, uploadQueue.size());
+        Assert.assertTrue(uploadQueue.containsKey(newArtifact));
+        final Model beforeUploadModel = uploadQueue.get(newArtifact);
+        Assert.assertNotNull(uploadQueue.get(newArtifact));
         
-        ConcurrentMap<InferredOWLOntologyID, InferredOWLOntologyID> uploadedArtifacts =
+        // Check how many containers are to be uploaded
+        Assert.assertEquals(336, beforeUploadModel.filter(null, RDF.TYPE, PoddRdfConstants.PODD_SCIENCE_CONTAINER)
+                .size());
+        
+        final ConcurrentMap<InferredOWLOntologyID, InferredOWLOntologyID> uploadedArtifacts =
                 poddClient.uploadToPodd(uploadQueue);
         
         Assert.assertEquals(1, uploadedArtifacts.size());
         
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream(2048);
+        final ByteArrayOutputStream outputStream = new ByteArrayOutputStream(2048);
         
         // Dump for debugging
         poddClient.downloadArtifact(uploadedArtifacts.get(newArtifact), outputStream, RDFFormat.RDFJSON);
         
-        this.parseRdf(new ByteArrayInputStream(outputStream.toByteArray()), RDFFormat.RDFJSON, 1397);
+        final Model model =
+                this.parseRdf(new ByteArrayInputStream(outputStream.toByteArray()), RDFFormat.RDFJSON, 1397);
+        
+        Assert.assertEquals(1, model.filter(null, RDF.TYPE, PoddRdfConstants.PODD_SCIENCE_PROJECT).size());
+        Assert.assertEquals(1, model.filter(null, RDF.TYPE, PoddRdfConstants.PODD_SCIENCE_INVESTIGATION).size());
+        // Verify that the number of containers is consistent
+        Assert.assertEquals(336, model.filter(null, RDF.TYPE, PoddRdfConstants.PODD_SCIENCE_CONTAINER).size());
     }
 }
