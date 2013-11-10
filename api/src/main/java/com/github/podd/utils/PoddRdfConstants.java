@@ -374,9 +374,33 @@ public interface PoddRdfConstants
     public static final URI PODD_SCIENCE_CONTAINER = PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE,
             "Container");
     
+    /** http://purl.org/podd/ns/poddScience#Genotype */
+    public static final URI PODD_SCIENCE_GENOTYPE = PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE,
+            "Genotype");
+    
     /** http://purl.org/podd/ns/poddScience#hasBarcode */
     public static final URI PODD_SCIENCE_HAS_BARCODE = PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE,
             "hasBarcode");
+    
+    /** http://purl.org/podd/ns/poddScience#hasGenotype */
+    public static final URI PODD_SCIENCE_HAS_GENOTYPE = PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE,
+            "hasGenotype");
+    
+    /** http://purl.org/podd/ns/poddScience#refersToGenotype */
+    public static final URI PODD_SCIENCE_REFERS_TO_GENOTYPE = PoddRdfConstants.VF.createURI(
+            PoddRdfConstants.PODD_SCIENCE, "refersToGenotype");
+    
+    /** http://purl.org/podd/ns/poddScience#hasGenus */
+    public static final URI PODD_SCIENCE_HAS_GENUS = PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE,
+            "hasGenus");
+    
+    /** http://purl.org/podd/ns/poddScience#hasSpecies */
+    public static final URI PODD_SCIENCE_HAS_SPECIES = PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE,
+            "hasSpecies");
+    
+    /** http://purl.org/podd/ns/poddScience#hasLine */
+    public static final URI PODD_SCIENCE_HAS_LINE = PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE,
+            "hasLine");
     
     /** http://purl.org/podd/ns/poddScience#hasContainer */
     public static final URI PODD_SCIENCE_HAS_CONTAINER = PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE,

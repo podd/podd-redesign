@@ -117,6 +117,9 @@ public class HrppcPoddClient extends RestletPoddClientImpl
     public static final String TEMPLATE_SPARQL_BY_TYPE_LABEL_STRSTARTS =
             "CONSTRUCT { ?object a ?type . ?object <http://www.w3.org/2000/01/rdf-schema#label> ?label . } WHERE { ?object a ?type . ?object <http://www.w3.org/2000/01/rdf-schema#label> ?label . FILTER(STRSTARTS(?label, \"%s\")) } VALUES (?type) { ( %s ) }";
     
+    public static final String TEMPLATE_SPARQL_BY_TYPE_ALL_PROPERTIES =
+            "CONSTRUCT { ?object a ?type . ?object ?predicate ?value . } WHERE { ?object a ?type . ?object ?predicate ?value . } VALUES (?type) { ( %s ) }";
+    
     public HrppcPoddClient()
     {
         super();
@@ -138,9 +141,6 @@ public class HrppcPoddClient extends RestletPoddClientImpl
     public ConcurrentMap<InferredOWLOntologyID, Model> processTrayScanList(final InputStream in) throws IOException,
         PoddClientException, OpenRDFException
     {
-        // Only select the unpublished artifacts, as we cannot edit published artifacts
-        final Model currentUnpublishedArtifacts = this.listArtifacts(false, true);
-        
         // Keep a queue so that we only need to update each project once for
         // this operation to succeed
         final ConcurrentMap<InferredOWLOntologyID, Model> uploadQueue = new ConcurrentHashMap<>();
@@ -157,6 +157,10 @@ public class HrppcPoddClient extends RestletPoddClientImpl
         // user
         final ConcurrentMap<String, ConcurrentMap<URI, URI>> experimentUriMap = new ConcurrentHashMap<>();
         
+        // Genotype mappings, starting at the URI of the project and mapping to the URI of the
+        // genotype and the RDF Model containing the statements describing this genotype
+        final ConcurrentMap<URI, ConcurrentMap<URI, Model>> genotypeUriMap = new ConcurrentHashMap<>();
+        
         // Cache for tray name mappings, starting at tray barcodes and ending with a mapping from
         // the URI of the tray to the URI of the experiment that contains the tray
         // NOTE: This is not prefilled, as it is populated on demand during processing of lines to
@@ -169,18 +173,29 @@ public class HrppcPoddClient extends RestletPoddClientImpl
         // only contain the necessary elements
         final ConcurrentMap<String, ConcurrentMap<URI, URI>> potUriMap = new ConcurrentHashMap<>();
         
+        // -----------------------------------------------------------------------------------------
+        // Now cache URIs for projects, experiments, and genotypes for all unpublished projects that
+        // the current user can access
+        // -----------------------------------------------------------------------------------------
+        
+        // Only select the unpublished artifacts, as we cannot edit published artifacts
+        final Model currentUnpublishedArtifacts = this.listArtifacts(false, true);
+        
         // Map known project names to their URIs, as the URIs are needed to
         // create statements internally
         this.populateProjectUriMap(currentUnpublishedArtifacts, projectUriMap);
         
         this.populateExperimentUriMap(projectUriMap, experimentUriMap);
         
+        this.populateGenotypeUriMap(projectUriMap, genotypeUriMap);
+        
+        // -----------------------------------------------------------------------------------------
+        // Now process the CSV file line by line using the caches to reduce multiple queries to the
+        // server where possible
+        // -----------------------------------------------------------------------------------------
+        
         List<String> headers = null;
-        // TODO: Implement getObjectsByType(InferredOWLOntology, URI) so that
-        // experiments etc can be found easily
-        // and the identifier can be mapped as necessary to the identifier in
-        // the header
-        // Supressing warning generated erroneously by Eclipse:
+        // Supressing try-with-resources warning generated erroneously by Eclipse:
         // https://bugs.eclipse.org/bugs/show_bug.cgi?id=371614
         try (@SuppressWarnings("resource")
         final InputStreamReader inputStreamReader = new InputStreamReader(in, StandardCharsets.UTF_8);
@@ -212,7 +227,7 @@ public class HrppcPoddClient extends RestletPoddClientImpl
                     
                     // Process the next line and add it to the upload queue
                     this.processTrayScanLine(headers, Arrays.asList(nextLine), projectUriMap, experimentUriMap,
-                            trayUriMap, potUriMap, uploadQueue);
+                            trayUriMap, potUriMap, genotypeUriMap, uploadQueue);
                 }
             }
         }
@@ -228,6 +243,55 @@ public class HrppcPoddClient extends RestletPoddClientImpl
         }
         
         return uploadQueue;
+    }
+    
+    private void populateGenotypeUriMap(
+            final ConcurrentMap<String, ConcurrentMap<URI, InferredOWLOntologyID>> projectUriMap,
+            final ConcurrentMap<URI, ConcurrentMap<URI, Model>> genotypeUriMap) throws PoddClientException
+    {
+        for(final String nextProjectName : projectUriMap.keySet())
+        {
+            final ConcurrentMap<URI, InferredOWLOntologyID> nextProjectNameMapping = projectUriMap.get(nextProjectName);
+            for(final URI projectUri : nextProjectNameMapping.keySet())
+            {
+                final InferredOWLOntologyID artifactId = nextProjectNameMapping.get(projectUri);
+                final Model nextSparqlResults =
+                        this.doSPARQL(
+                                String.format(HrppcPoddClient.TEMPLATE_SPARQL_BY_TYPE_ALL_PROPERTIES,
+                                        RenderUtils.getSPARQLQueryString(PoddRdfConstants.PODD_SCIENCE_GENOTYPE)),
+                                artifactId);
+                if(nextSparqlResults.isEmpty())
+                {
+                    this.log.info("Could not find any existing genotypes for project: {} {}", nextProjectName,
+                            projectUri);
+                }
+                
+                for(final Resource nextGenotype : nextSparqlResults.filter(null, RDF.TYPE,
+                        PoddRdfConstants.PODD_SCIENCE_GENOTYPE).subjects())
+                {
+                    if(!(nextGenotype instanceof URI))
+                    {
+                        this.log.error("Found genotype that was not assigned a URI: {} artifact={}", nextGenotype,
+                                artifactId);
+                    }
+                    else
+                    {
+                        ConcurrentMap<URI, Model> nextGenotypeMap = new ConcurrentHashMap<>();
+                        final ConcurrentMap<URI, Model> putIfAbsent = genotypeUriMap.put(projectUri, nextGenotypeMap);
+                        if(putIfAbsent != null)
+                        {
+                            nextGenotypeMap = putIfAbsent;
+                        }
+                        final Model putIfAbsent2 = nextGenotypeMap.putIfAbsent((URI)nextGenotype, nextSparqlResults);
+                        if(putIfAbsent2 != null)
+                        {
+                            this.log.info("Found existing description for genotype URI within the same project: {} {}",
+                                    projectUri, nextGenotype);
+                        }
+                    }
+                }
+            }
+        }
     }
     
     private void populateExperimentUriMap(
@@ -248,7 +312,8 @@ public class HrppcPoddClient extends RestletPoddClientImpl
                 
                 if(nextSparqlResults.isEmpty())
                 {
-                    this.log.info("Could not find any experiments for project: {} {}", nextProjectName, projectUri);
+                    this.log.info("Could not find any existing experiments for project: {} {}", nextProjectName,
+                            projectUri);
                 }
                 
                 for(final Resource nextExperiment : nextSparqlResults.filter(null, RDF.TYPE,
@@ -537,6 +602,7 @@ public class HrppcPoddClient extends RestletPoddClientImpl
             final ConcurrentMap<String, ConcurrentMap<URI, URI>> experimentUriMap,
             final ConcurrentMap<String, ConcurrentMap<URI, URI>> trayUriMap,
             final ConcurrentMap<String, ConcurrentMap<URI, URI>> potUriMap,
+            final ConcurrentMap<URI, ConcurrentMap<URI, Model>> genotypeUriMap,
             final ConcurrentMap<InferredOWLOntologyID, Model> uploadQueue) throws PoddClientException, OpenRDFException
     {
         this.log.info("About to process line: {}", nextLine);
@@ -689,8 +755,9 @@ public class HrppcPoddClient extends RestletPoddClientImpl
             rowNumber = positionMatcher.group(2).trim();
         }
         
-        this.generateTrayScanRDF(projectUriMap, experimentUriMap, trayUriMap, potUriMap, uploadQueue, projectYear,
-                projectNumber, experimentNumber, trayId, trayNotes, trayTypeName, plantId, genus, species);
+        this.generateTrayScanRDF(projectUriMap, experimentUriMap, trayUriMap, potUriMap, genotypeUriMap, uploadQueue,
+                projectYear, projectNumber, experimentNumber, trayId, trayNotes, trayTypeName, plantId, plantName,
+                plantNotes, genus, species);
     }
     
     /**
@@ -716,6 +783,10 @@ public class HrppcPoddClient extends RestletPoddClientImpl
      *            The TrayScan parameter detailing the project number for the next tray.
      * @param experimentNumber
      *            The TrayScan parameter detailing the experiment number for the next tray.
+     * @param plantName
+     *            The name of this plant
+     * @param plantNotes
+     *            Specific notes about this plant
      * @param species
      *            The species for the current line.
      * @param genus
@@ -730,10 +801,11 @@ public class HrppcPoddClient extends RestletPoddClientImpl
             final ConcurrentMap<String, ConcurrentMap<URI, URI>> experimentUriMap,
             final ConcurrentMap<String, ConcurrentMap<URI, URI>> trayUriMap,
             final ConcurrentMap<String, ConcurrentMap<URI, URI>> potUriMap,
+            final ConcurrentMap<URI, ConcurrentMap<URI, Model>> genotypeUriMap,
             final ConcurrentMap<InferredOWLOntologyID, Model> uploadQueue, final int projectYear,
             final int projectNumber, final int experimentNumber, final String trayId, final String trayNotes,
-            final String trayTypeName, final String plantId, final String genus, final String species)
-        throws PoddClientException, GraphUtilException
+            final String trayTypeName, final String plantId, final String plantName, final String plantNotes,
+            final String genus, final String species) throws PoddClientException, GraphUtilException
     {
         // Reconstruct Project#0001-0002 structure to get a normalised string
         final String baseProjectName = String.format(HrppcPoddClient.TEMPLATE_PROJECT, projectYear, projectNumber);
@@ -778,7 +850,11 @@ public class HrppcPoddClient extends RestletPoddClientImpl
         // Check whether plantId already has an assigned URI
         final URI nextPotURI = this.getPotUri(potUriMap, plantId, nextProjectID, nextTrayURI);
         
-        // TODO
+        // Check whether genus/specieis/plantName already has an assigned URI (and automatically
+        // assign a temporary URI if it does not)
+        final URI nextGenotypeURI =
+                this.getGenotypeUri(genotypeUriMap, genus, species, plantName, nextProjectID, nextProjectUri);
+        
         // Add new poddScience:Container for tray
         nextResult.add(nextTrayURI, RDF.TYPE, PoddRdfConstants.PODD_SCIENCE_CONTAINER);
         // Link tray to experiment
@@ -791,23 +867,122 @@ public class HrppcPoddClient extends RestletPoddClientImpl
         nextResult.add(nextTrayURI, PoddRdfConstants.PODD_SCIENCE_HAS_CONTAINER_TYPE,
                 this.vf.createLiteral(trayTypeName));
         
-        // Position => TODO: Need to use randomisation data to populate the position
-        
         // Add new poddScience:Container for pot
         nextResult.add(nextPotURI, RDF.TYPE, PoddRdfConstants.PODD_SCIENCE_CONTAINER);
         // Link pot to tray
         nextResult.add(nextTrayURI, PoddRdfConstants.PODD_SCIENCE_HAS_CONTAINER, nextPotURI);
         // PlantID => Add poddScience:hasBarcode to pot
         nextResult.add(nextPotURI, PoddRdfConstants.PODD_SCIENCE_HAS_BARCODE, this.vf.createLiteral(plantId));
-        // PlantName => TODO: Link using poddScience:hasLine
-        // TODO: Also link genus and species using poddScience:hasGenusSpecies
+        // Link the genus/species/plantName combination to a genotype
+        nextResult.add(nextPotURI, PoddRdfConstants.PODD_SCIENCE_REFERS_TO_GENOTYPE, nextGenotypeURI);
+        if(nextGenotypeURI.stringValue().startsWith(this.TEMP_UUID_PREFIX))
+        {
+            // Add all of the statements for the genotype to the update to make sure that temporary
+            // descriptions are added
+            nextResult.addAll(genotypeUriMap.get(nextProjectUri).get(nextGenotypeURI));
+        }
         // PlantNotes => Add rdfs:comment to pot
+        nextResult.add(nextPotURI, RDFS.COMMENT, this.vf.createLiteral(plantNotes));
         
+        // Position => TODO: Need to use randomisation data to populate the position
         // TODO Using d110cc.csv
         // Add poddScience:hasReplicate for tray to link it to the rep #
         // Add poddScience:hasReplicate for pot to link it to the rep # (??to make queries easier??)
         
         // DebugUtils.printContents(nextResult);
+    }
+    
+    /**
+     * Gets a genotype URI matching the given genus, species, and plantName (line) from the given
+     * cache, creating a new entry if necessary and giving it a temporary URI.
+     * 
+     * @param genotypeUriMap
+     * @param genus
+     * @param species
+     * @param plantName
+     * @param nextProjectID
+     * @param nextProjectUri
+     * @return
+     */
+    private URI getGenotypeUri(final ConcurrentMap<URI, ConcurrentMap<URI, Model>> genotypeUriMap, final String genus,
+            final String species, final String plantName, final InferredOWLOntologyID nextProjectID,
+            final URI nextProjectUri)
+    {
+        URI nextGenotypeURI = null;
+        if(genotypeUriMap.containsKey(nextProjectUri))
+        {
+            final ConcurrentMap<URI, Model> nextProjectGenotypeMap = genotypeUriMap.get(nextProjectUri);
+            
+            for(final URI existingGenotypeURI : nextProjectGenotypeMap.keySet())
+            {
+                final Model nextModel = nextProjectGenotypeMap.get(existingGenotypeURI);
+                
+                if(nextModel.contains(existingGenotypeURI, PoddRdfConstants.PODD_SCIENCE_HAS_GENUS,
+                        this.vf.createLiteral(genus)))
+                {
+                    if(nextModel.contains(existingGenotypeURI, PoddRdfConstants.PODD_SCIENCE_HAS_SPECIES,
+                            this.vf.createLiteral(species)))
+                    {
+                        if(nextModel.contains(existingGenotypeURI, PoddRdfConstants.PODD_SCIENCE_HAS_LINE,
+                                this.vf.createLiteral(plantName)))
+                        {
+                            nextGenotypeURI = existingGenotypeURI;
+                            break;
+                        }
+                        else
+                        {
+                            this.log.info(
+                                    "Did not find any genotypes with the given genus and species and line in this project: {} {} {} {}",
+                                    nextProjectUri, genus, species, plantName);
+                        }
+                    }
+                    else
+                    {
+                        this.log.info(
+                                "Did not find any genotypes with the given genus and species in this project: {} {} {}",
+                                nextProjectUri, genus, species);
+                    }
+                }
+                else
+                {
+                    this.log.info("Did not find any genotypes with the given genus in this project: {} {}",
+                            nextProjectUri, genus);
+                }
+            }
+        }
+        
+        // If no genotype was found, then create a new description and assign it a temporary URI
+        if(nextGenotypeURI == null)
+        {
+            this.log.info(
+                    "Could not find an existing genotype for description provided, assigning a temporary URI: {} {} {} {}",
+                    nextProjectID, genus, species, plantName);
+            
+            nextGenotypeURI = this.vf.createURI(this.TEMP_UUID_PREFIX + "genotype:" + UUID.randomUUID().toString());
+            
+            final Model newModel = new LinkedHashModel();
+            newModel.add(nextProjectUri, PoddRdfConstants.PODD_SCIENCE_HAS_GENOTYPE, nextGenotypeURI);
+            newModel.add(nextGenotypeURI, RDF.TYPE, PoddRdfConstants.PODD_SCIENCE_GENOTYPE);
+            newModel.add(nextGenotypeURI, PoddRdfConstants.PODD_SCIENCE_HAS_GENUS, this.vf.createLiteral(genus));
+            newModel.add(nextGenotypeURI, PoddRdfConstants.PODD_SCIENCE_HAS_SPECIES, this.vf.createLiteral(species));
+            newModel.add(nextGenotypeURI, PoddRdfConstants.PODD_SCIENCE_HAS_LINE, this.vf.createLiteral(plantName));
+            
+            ConcurrentMap<URI, Model> nextGenotypeUriMap = new ConcurrentHashMap<>();
+            final ConcurrentMap<URI, Model> putIfAbsent =
+                    genotypeUriMap.putIfAbsent(nextProjectUri, nextGenotypeUriMap);
+            if(putIfAbsent != null)
+            {
+                nextGenotypeUriMap = putIfAbsent;
+            }
+            final Model putIfAbsent2 = nextGenotypeUriMap.putIfAbsent(nextGenotypeURI, newModel);
+            if(putIfAbsent2 != null)
+            {
+                this.log.error("ERROR: Generated two temporary Genotype URIs that were identical! : {} {}",
+                        nextProjectUri, nextGenotypeURI);
+            }
+        }
+        return nextGenotypeURI;
+        
     }
     
     /**
@@ -951,7 +1126,7 @@ public class HrppcPoddClient extends RestletPoddClientImpl
                         "Could not find an existing container for tray barcode, assigning a temporary URI: {} {}",
                         trayId, nextProjectID);
                 
-                nextTrayURI = this.vf.createURI("urn:temp:uuid:tray:" + UUID.randomUUID().toString());
+                nextTrayURI = this.vf.createURI(this.TEMP_UUID_PREFIX + "tray:" + UUID.randomUUID().toString());
             }
             else
             {
@@ -1003,7 +1178,7 @@ public class HrppcPoddClient extends RestletPoddClientImpl
                 this.log.info("Could not find an existing container for pot barcode, assigning a temporary URI: {} {}",
                         plantId, nextProjectID);
                 
-                nextPotURI = this.vf.createURI("urn:temp:uuid:pot:" + UUID.randomUUID().toString());
+                nextPotURI = this.vf.createURI(this.TEMP_UUID_PREFIX + "pot:" + UUID.randomUUID().toString());
             }
             else
             {
