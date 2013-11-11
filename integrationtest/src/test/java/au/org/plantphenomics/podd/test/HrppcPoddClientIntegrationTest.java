@@ -23,6 +23,7 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.regex.Matcher;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.openrdf.model.Model;
 import org.openrdf.model.vocabulary.RDF;
@@ -155,4 +156,67 @@ public class HrppcPoddClientIntegrationTest extends RestletPoddClientImplIntegra
         // Verify that the number of genotype links are consistent
         Assert.assertEquals(320, model.filter(null, PoddRdfConstants.PODD_SCIENCE_HAS_GENOTYPE, null).size());
     }
+    
+    /**
+     * Test method for
+     * {@link au.org.plantphenomics.podd.HrppcPoddClient#processRandomisationList(InputStream)}.
+     * 
+     * @throws Exception
+     */
+    @Ignore
+    @Test
+    public final void testUploadRandomisationList() throws Exception
+    {
+        final HrppcPoddClient poddClient = this.getNewPoddClientInstance();
+        poddClient.setPoddServerUrl(this.getTestPoddServerUrl());
+        poddClient.login(AbstractPoddClientTest.TEST_ADMIN_USER, AbstractPoddClientTest.TEST_ADMIN_PASSWORD);
+        
+        final InputStream input = this.getClass().getResourceAsStream("/test/artifacts/basicProject-3.rdf");
+        Assert.assertNotNull("Test resource missing", input);
+        
+        final InferredOWLOntologyID newArtifact = poddClient.uploadNewArtifact(input, RDFFormat.RDFXML);
+        Assert.assertNotNull(newArtifact);
+        Assert.assertNotNull(newArtifact.getOntologyIRI());
+        Assert.assertNotNull(newArtifact.getVersionIRI());
+        // Must not be leaking the inferred ontology information to users
+        Assert.assertNull(newArtifact.getInferredOntologyIRI());
+        
+        final ConcurrentMap<InferredOWLOntologyID, Model> uploadQueue =
+                poddClient.processTrayScanList(this.getClass()
+                        .getResourceAsStream("/test/hrppc/PlantScan-Template.csv"));
+        
+        Assert.assertEquals(1, uploadQueue.size());
+        Assert.assertTrue(uploadQueue.containsKey(newArtifact));
+        final Model beforeUploadModel = uploadQueue.get(newArtifact);
+        Assert.assertNotNull(uploadQueue.get(newArtifact));
+        
+        // Check how many containers are to be uploaded
+        Assert.assertEquals(336, beforeUploadModel.filter(null, RDF.TYPE, PoddRdfConstants.PODD_SCIENCE_CONTAINER)
+                .size());
+        
+        final ConcurrentMap<InferredOWLOntologyID, InferredOWLOntologyID> uploadedArtifacts =
+                poddClient.uploadToPodd(uploadQueue);
+        
+        Assert.assertEquals(1, uploadedArtifacts.size());
+        
+        final ByteArrayOutputStream outputStream = new ByteArrayOutputStream(2048);
+        
+        InferredOWLOntologyID updatedArtifactID = uploadedArtifacts.get(newArtifact);
+        
+        // Dump for debugging
+        poddClient.downloadArtifact(updatedArtifactID, outputStream, RDFFormat.RDFJSON);
+        
+        final Model model =
+                this.parseRdf(new ByteArrayInputStream(outputStream.toByteArray()), RDFFormat.RDFJSON, 4277);
+        
+        Assert.assertEquals(1, model.filter(null, RDF.TYPE, PoddRdfConstants.PODD_SCIENCE_PROJECT).size());
+        Assert.assertEquals(1, model.filter(null, RDF.TYPE, PoddRdfConstants.PODD_SCIENCE_INVESTIGATION).size());
+        // Verify that the number of containers is consistent
+        Assert.assertEquals(336, model.filter(null, RDF.TYPE, PoddRdfConstants.PODD_SCIENCE_CONTAINER).size());
+        // Verify that the number of genotypes is consistent
+        Assert.assertEquals(320, model.filter(null, RDF.TYPE, PoddRdfConstants.PODD_SCIENCE_GENOTYPE).size());
+        // Verify that the number of genotype links are consistent
+        Assert.assertEquals(320, model.filter(null, PoddRdfConstants.PODD_SCIENCE_HAS_GENOTYPE, null).size());
+    }
+    
 }
