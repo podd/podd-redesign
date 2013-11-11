@@ -296,7 +296,8 @@
 				<groupId>org.mortbay.jetty</groupId>
 				<artifactId>jetty-maven-plugin</artifactId>
 				<configuration>
-					<scanIntervalSeconds>10</scanIntervalSeconds>
+					<reload>manual</reload>
+					<scanIntervalSeconds>0</scanIntervalSeconds>
 					<stopKey>foo</stopKey>
 					<stopPort>9999</stopPort>
 					<webAppConfig>
@@ -321,7 +322,6 @@
 							<goal>run</goal>
 						</goals>
 						<configuration>
-							<reload>manual</reload>
 							<scanIntervalSeconds>0</scanIntervalSeconds>
 							<daemon>true</daemon>
 						</configuration>
