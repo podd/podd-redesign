@@ -122,15 +122,14 @@ public class RdfUtilityTest
     @Test
     public void testInputStreamToModel() throws Exception
     {
-        final InputStream resourceStream = this.getClass().getResourceAsStream(PoddRdfConstants.PATH_PODD_SCIENCE);
-        Assert.assertNotNull("Missing test resource", PoddRdfConstants.PATH_PODD_SCIENCE);
+        final InputStream resourceStream = this.getClass().getResourceAsStream(PoddRdfConstants.PATH_PODD_DCTERMS);
+        Assert.assertNotNull("Missing test resource", PoddRdfConstants.PATH_PODD_DCTERMS);
         
         final Model model = RdfUtility.inputStreamToModel(resourceStream, RDFFormat.RDFXML);
         
         Assert.assertNotNull("Model was NULL", model);
         Assert.assertFalse("Model was empty", model.isEmpty());
-        // FIXME: Make these number checks easy to maintain
-        Assert.assertEquals("Not the expected number of statements in the Model", 1329, model.size());
+        Assert.assertEquals("Not the expected number of statements in the Model", 47, model.size());
     }
     
     @Test
