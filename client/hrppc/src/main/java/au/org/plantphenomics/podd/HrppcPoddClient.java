@@ -262,7 +262,7 @@ public class HrppcPoddClient extends RestletPoddClientImpl
                                 artifactId);
                 if(nextSparqlResults.isEmpty())
                 {
-                    this.log.info("Could not find any existing genotypes for project: {} {}", nextProjectName,
+                    this.log.debug("Could not find any existing genotypes for project: {} {}", nextProjectName,
                             projectUri);
                 }
                 
@@ -361,7 +361,7 @@ public class HrppcPoddClient extends RestletPoddClientImpl
                                     }
                                     else
                                     {
-                                        this.log.info(
+                                        this.log.debug(
                                                 "Found experiment label with the expected format: '{}' original=<{}>",
                                                 nextLabelString, nextLabel);
                                         
@@ -373,7 +373,7 @@ public class HrppcPoddClient extends RestletPoddClientImpl
                                                 String.format(HrppcPoddClient.TEMPLATE_EXPERIMENT, nextProjectYear,
                                                         nextProjectNumber, nextExperimentNumber);
                                         
-                                        this.log.info("Reformatted experiment label to: '{}' original=<{}>",
+                                        this.log.debug("Reformatted experiment label to: '{}' original=<{}>",
                                                 nextLabelString, nextLabel);
                                         
                                         ConcurrentMap<URI, URI> labelMap = new ConcurrentHashMap<>();
@@ -518,7 +518,7 @@ public class HrppcPoddClient extends RestletPoddClientImpl
                                 }
                                 else
                                 {
-                                    this.log.info("Found project label with the expected format: '{}' original=<{}>",
+                                    this.log.debug("Found project label with the expected format: '{}' original=<{}>",
                                             nextLabelString, nextLabel);
                                     
                                     final int nextProjectYear = Integer.parseInt(matcher.group(1));
@@ -528,7 +528,7 @@ public class HrppcPoddClient extends RestletPoddClientImpl
                                             String.format(HrppcPoddClient.TEMPLATE_PROJECT, nextProjectYear,
                                                     nextProjectNumber);
                                     
-                                    this.log.info("Reformatted project label to: '{}' original=<{}>", nextLabelString,
+                                    this.log.debug("Reformatted project label to: '{}' original=<{}>", nextLabelString,
                                             nextLabel);
                                     
                                     ConcurrentMap<URI, InferredOWLOntologyID> labelMap = new ConcurrentHashMap<>();
@@ -817,7 +817,7 @@ public class HrppcPoddClient extends RestletPoddClientImpl
         final URI nextProjectUri = projectDetails.keySet().iterator().next();
         final InferredOWLOntologyID nextProjectID = projectDetails.get(nextProjectUri);
         
-        this.log.info("Found unique PODD Project name to URI mapping: {} {}", baseProjectName, projectDetails);
+        this.log.debug("Found unique PODD Project name to URI mapping: {} {}", baseProjectName, projectDetails);
         
         // Reconstruct Project#0001-0002_Experiment#0001 structure to get a normalised
         // string
@@ -931,21 +931,21 @@ public class HrppcPoddClient extends RestletPoddClientImpl
                         }
                         else
                         {
-                            this.log.info(
+                            this.log.debug(
                                     "Did not find any genotypes with the given genus and species and line in this project: {} {} {} {}",
                                     nextProjectUri, genus, species, plantName);
                         }
                     }
                     else
                     {
-                        this.log.info(
+                        this.log.debug(
                                 "Did not find any genotypes with the given genus and species in this project: {} {} {}",
                                 nextProjectUri, genus, species);
                     }
                 }
                 else
                 {
-                    this.log.info("Did not find any genotypes with the given genus in this project: {} {}",
+                    this.log.debug("Did not find any genotypes with the given genus in this project: {} {}",
                             nextProjectUri, genus);
                 }
             }
@@ -954,7 +954,7 @@ public class HrppcPoddClient extends RestletPoddClientImpl
         // If no genotype was found, then create a new description and assign it a temporary URI
         if(nextGenotypeURI == null)
         {
-            this.log.info(
+            this.log.debug(
                     "Could not find an existing genotype for description provided, assigning a temporary URI: {} {} {} {}",
                     nextProjectID, genus, species, plantName);
             
@@ -1124,7 +1124,7 @@ public class HrppcPoddClient extends RestletPoddClientImpl
             
             if(trayIdSparqlResults.isEmpty())
             {
-                this.log.info(
+                this.log.debug(
                         "Could not find an existing container for tray barcode, assigning a temporary URI: {} {}",
                         trayId, nextProjectID);
                 
@@ -1177,7 +1177,8 @@ public class HrppcPoddClient extends RestletPoddClientImpl
             
             if(plantIdSparqlResults.isEmpty())
             {
-                this.log.info("Could not find an existing container for pot barcode, assigning a temporary URI: {} {}",
+                this.log.debug(
+                        "Could not find an existing container for pot barcode, assigning a temporary URI: {} {}",
                         plantId, nextProjectID);
                 
                 nextPotURI = this.vf.createURI(this.TEMP_UUID_PREFIX + "pot:" + UUID.randomUUID().toString());
