@@ -101,7 +101,6 @@ public class HrppcPoddClientIntegrationTest extends RestletPoddClientImplIntegra
      * {@link au.org.plantphenomics.podd.HrppcPoddClient#processTrayScanList(java.io.InputStream)}.
      * 
      * @throws Exception
-     * @throws
      */
     @Test
     public final void testUploadPlantScanList() throws Exception
