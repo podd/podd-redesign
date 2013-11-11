@@ -68,4 +68,16 @@ public final class RandomisationConstants
      */
     public static final String RAND_VAR = "var";
     
+    /**
+     * Randomisation header for the name used by the randomisation algorithm to identify a line
+     * number in the lookup table used to identify a line.
+     */
+    public static final String RAND_LINE_NUMBER = "Randomisation line number";
+    
+    /**
+     * Randomisation header for the name used by the client to identify a line in the lookup table
+     * used to identify a line.
+     */
+    public static final String RAND_CLIENT_LINE_NAME = "Client line name";
+    
 }
