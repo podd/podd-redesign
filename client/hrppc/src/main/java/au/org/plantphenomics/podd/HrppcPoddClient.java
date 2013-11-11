@@ -881,8 +881,8 @@ public class HrppcPoddClient extends RestletPoddClientImpl
             // descriptions are added
             nextResult.addAll(genotypeUriMap.get(nextProjectUri).get(nextGenotypeURI));
         }
-        // PlantNotes => Add rdfs:comment to pot
-        nextResult.add(nextPotURI, RDFS.COMMENT, this.vf.createLiteral(plantNotes));
+        // PlantNotes => Add rdfs:label to pot
+        nextResult.add(nextPotURI, RDFS.LABEL, this.vf.createLiteral(plantNotes));
         
         // Position => TODO: Need to use randomisation data to populate the position
         // TODO Using d110cc.csv

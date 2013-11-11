@@ -144,7 +144,7 @@ public class HrppcPoddClientIntegrationTest extends RestletPoddClientImplIntegra
         poddClient.downloadArtifact(uploadedArtifacts.get(newArtifact), outputStream, RDFFormat.RDFJSON);
         
         final Model model =
-                this.parseRdf(new ByteArrayInputStream(outputStream.toByteArray()), RDFFormat.RDFJSON, 3957);
+                this.parseRdf(new ByteArrayInputStream(outputStream.toByteArray()), RDFFormat.RDFJSON, 4277);
         
         Assert.assertEquals(1, model.filter(null, RDF.TYPE, PoddRdfConstants.PODD_SCIENCE_PROJECT).size());
         Assert.assertEquals(1, model.filter(null, RDF.TYPE, PoddRdfConstants.PODD_SCIENCE_INVESTIGATION).size());
