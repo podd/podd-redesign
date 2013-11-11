@@ -1435,6 +1435,79 @@ public class HrppcPoddClient extends RestletPoddClientImpl
                 plantNotes, genus, species);
     }
     
+    public ConcurrentMap<String, String> processRandomisationLineNameMappingList(final InputStream in)
+        throws IOException, PoddClientException
+    {
+        // -----------------------------------------------------------------------------------------
+        // Now process the CSV file line by line using the caches to reduce multiple queries to the
+        // server where possible
+        // -----------------------------------------------------------------------------------------
+        
+        List<String> headers = null;
+        ConcurrentMap<String, String> result = new ConcurrentHashMap<>();
+        // Supressing try-with-resources warning generated erroneously by Eclipse:
+        // https://bugs.eclipse.org/bugs/show_bug.cgi?id=371614
+        try (@SuppressWarnings("resource")
+        final InputStreamReader inputStreamReader = new InputStreamReader(in, StandardCharsets.UTF_8);
+                final CSVReader reader = new CSVReader(inputStreamReader);)
+        {
+            String[] nextLine;
+            while((nextLine = reader.readNext()) != null)
+            {
+                if(headers == null)
+                {
+                    // header line is mandatory in PODD CSV
+                    headers = Arrays.asList(nextLine);
+                    try
+                    {
+                        if(headers.size() != 2)
+                        {
+                            throw new IllegalArgumentException("Did not find required number of headers");
+                        }
+                        
+                        if(!headers.get(0).equals(RandomisationConstants.RAND_LINE_NUMBER))
+                        {
+                            throw new IllegalArgumentException("Missing " + RandomisationConstants.RAND_LINE_NUMBER
+                                    + " header");
+                        }
+                        
+                        if(!headers.get(1).equals(RandomisationConstants.RAND_CLIENT_LINE_NAME))
+                        {
+                            throw new IllegalArgumentException("Missing "
+                                    + RandomisationConstants.RAND_CLIENT_LINE_NAME + " header");
+                        }
+                    }
+                    catch(final IllegalArgumentException e)
+                    {
+                        this.log.error("Could not verify headers for line name mappings file: {}", e.getMessage());
+                        throw new PoddClientException("Could not verify headers for line name mappings file", e);
+                    }
+                }
+                else
+                {
+                    if(nextLine.length != headers.size())
+                    {
+                        this.log.error("Line and header sizes were different: {} {}", headers, nextLine);
+                    }
+                    
+                    result.putIfAbsent(headers.get(0), headers.get(1));
+                }
+            }
+        }
+        
+        if(headers == null)
+        {
+            this.log.error("Document did not contain a valid header line");
+        }
+        
+        if(result.isEmpty())
+        {
+            this.log.error("Document did not contain any valid rows");
+        }
+        
+        return result;
+    }
+    
     /**
      * Parses the given TrayScan project/experiment/tray/pot list and inserts the items into PODD
      * where they do not exist.
