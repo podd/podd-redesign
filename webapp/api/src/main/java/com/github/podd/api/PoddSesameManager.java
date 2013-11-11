@@ -459,6 +459,7 @@ public interface PoddSesameManager
      * Carries out a case-insensitive search for objects whose labels match a given term. The search
      * is carried out in the specified contexts. An optional array of URIs can be used to limit the
      * RDF types of objects to match. <br>
+     * NOTE: All of the types, if given, must match for the search to succeed.
      * 
      * @param searchTerm
      *            A String term which is searched for in the RDF:Labels
@@ -466,7 +467,7 @@ public interface PoddSesameManager
      * @param offset
      * @param repositoryConnection
      * @param searchTypes
-     *            The types (i.e. RDF:Type) of results to match with the search term
+     *            The types (i.e. RDF:Type) of results to match with the search term.
      * @return A {@link Model} containing the URI and Label of each matching object.
      */
     Model searchOntologyLabels(String searchTerm, URI[] searchTypes, int limit, int offset,
