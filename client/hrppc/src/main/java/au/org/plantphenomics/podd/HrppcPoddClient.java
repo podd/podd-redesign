@@ -963,6 +963,8 @@ public class HrppcPoddClient extends RestletPoddClientImpl
             final Model newModel = new LinkedHashModel();
             newModel.add(nextProjectUri, PoddRdfConstants.PODD_SCIENCE_HAS_GENOTYPE, nextGenotypeURI);
             newModel.add(nextGenotypeURI, RDF.TYPE, PoddRdfConstants.PODD_SCIENCE_GENOTYPE);
+            newModel.add(nextGenotypeURI, RDFS.LABEL,
+                    this.vf.createLiteral(genus + " " + species + " (" + plantName + ")"));
             newModel.add(nextGenotypeURI, PoddRdfConstants.PODD_SCIENCE_HAS_GENUS, this.vf.createLiteral(genus));
             newModel.add(nextGenotypeURI, PoddRdfConstants.PODD_SCIENCE_HAS_SPECIES, this.vf.createLiteral(species));
             newModel.add(nextGenotypeURI, PoddRdfConstants.PODD_SCIENCE_HAS_LINE, this.vf.createLiteral(plantName));
