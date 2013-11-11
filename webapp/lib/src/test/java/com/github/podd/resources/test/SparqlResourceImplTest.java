@@ -269,9 +269,9 @@ public class SparqlResourceImplTest extends AbstractResourceImplTest
                             MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
             
             // verify: response
-            final Model resultModel = this.assertRdf(results, RDFFormat.RDFXML, 658);
+            final Model resultModel = this.assertRdf(results, RDFFormat.RDFXML, 684);
             // verify that only type statements have been returned
-            Assert.assertEquals(658, resultModel.filter(null, RDF.TYPE, null).size());
+            Assert.assertEquals(684, resultModel.filter(null, RDF.TYPE, null).size());
             Assert.assertEquals(543, resultModel.filter(null, RDF.TYPE, null).subjects().size());
             Assert.assertEquals(35, resultModel.filter(null, RDF.TYPE, null).objects().size());
         }
