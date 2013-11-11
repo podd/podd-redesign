@@ -1263,7 +1263,7 @@ public class HrppcPoddClient extends RestletPoddClientImpl
                     headers = Arrays.asList(nextLine);
                     try
                     {
-                        this.verifyProjectListHeaders(headers);
+                        this.verifyRandomisationListHeaders(headers);
                     }
                     catch(final IllegalArgumentException e)
                     {
@@ -1568,7 +1568,7 @@ public class HrppcPoddClient extends RestletPoddClientImpl
                     headers = Arrays.asList(nextLine);
                     try
                     {
-                        this.verifyProjectListHeaders(headers);
+                        this.verifyTrayScanListHeaders(headers);
                     }
                     catch(final IllegalArgumentException e)
                     {
@@ -1646,7 +1646,58 @@ public class HrppcPoddClient extends RestletPoddClientImpl
      * @throws IllegalArgumentException
      *             If the headers are not verified correctly.
      */
-    private void verifyProjectListHeaders(final List<String> headers) throws IllegalArgumentException
+    private void verifyRandomisationListHeaders(final List<String> headers) throws IllegalArgumentException
+    {
+        if(headers == null || headers.size() < HrppcPoddClient.MIN_HEADERS_SIZE)
+        {
+            this.log.error("Did not find valid headers: {}", headers);
+            throw new IllegalArgumentException("Did not find valid headers");
+        }
+        
+        if(!headers.contains(HrppcPoddClient.TRAY_ID))
+        {
+            throw new IllegalArgumentException("Did not find tray id header");
+        }
+        
+        if(!headers.contains(HrppcPoddClient.TRAY_NOTES))
+        {
+            throw new IllegalArgumentException("Did not find tray notes header");
+        }
+        
+        if(!headers.contains(HrppcPoddClient.TRAY_TYPE_NAME))
+        {
+            throw new IllegalArgumentException("Did not find tray type name header");
+        }
+        
+        if(!headers.contains(HrppcPoddClient.POSITION))
+        {
+            throw new IllegalArgumentException("Did not find position header");
+        }
+        
+        if(!headers.contains(HrppcPoddClient.PLANT_ID))
+        {
+            throw new IllegalArgumentException("Did not find plant id header");
+        }
+        
+        if(!headers.contains(HrppcPoddClient.PLANT_NAME))
+        {
+            throw new IllegalArgumentException("Did not find plant name header");
+        }
+        
+        if(!headers.contains(HrppcPoddClient.PLANT_NOTES))
+        {
+            throw new IllegalArgumentException("Did not find plant notes header");
+        }
+    }
+    
+    /**
+     * Verifies the list of projects, throwing an IllegalArgumentException if there are unrecognised
+     * headers or if any mandatory headers are missing.
+     * 
+     * @throws IllegalArgumentException
+     *             If the headers are not verified correctly.
+     */
+    private void verifyTrayScanListHeaders(final List<String> headers) throws IllegalArgumentException
     {
         if(headers == null || headers.size() < HrppcPoddClient.MIN_HEADERS_SIZE)
         {
