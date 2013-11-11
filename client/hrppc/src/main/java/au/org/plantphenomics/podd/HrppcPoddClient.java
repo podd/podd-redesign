@@ -31,7 +31,6 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.Literal;
@@ -67,58 +66,6 @@ import com.github.podd.utils.PoddRdfConstants;
 public class HrppcPoddClient extends RestletPoddClientImpl
 {
     private final Logger log = LoggerFactory.getLogger(this.getClass());
-    
-    public static final int MIN_HEADERS_SIZE = 7;
-    
-    public static final String TRAY_ID = "TrayID";
-    public static final String TRAY_NOTES = "TrayNotes";
-    public static final String TRAY_TYPE_NAME = "TrayTypeName";
-    public static final String POSITION = "Position";
-    public static final String PLANT_ID = "PlantID";
-    public static final String PLANT_NAME = "PlantName";
-    public static final String PLANT_NOTES = "PlantNotes";
-    
-    public static final Pattern REGEX_PROJECT = Pattern.compile("^Project#(\\d{4})-(\\d{4}).*");
-    
-    public static final Pattern REGEX_EXPERIMENT = Pattern.compile("^Project#(\\d{4})-(\\d{4})_Experiment#(\\d{4}).*");
-    
-    public static final String TEMPLATE_PROJECT = "Project#%04d-%04d";
-    
-    public static final String TEMPLATE_EXPERIMENT = "Project#%04d-%04d_Experiment#%04d";
-    
-    // PROJECT#YYYY-NNNN_EXPERIMENT#NNNN_GENUS.SPECIES_TRAY#NNNNN
-    public static final Pattern REGEX_TRAY = Pattern
-            .compile("Project#(\\d{4})-(\\d{4})_Experiment#(\\d{4})_(\\w+)\\.(\\w+)_Tray#(\\d{4,5})");
-    
-    /**
-     * Number of groups matching in the tray id regex.
-     */
-    public static final int TRAY_ID_SIZE = 6;
-    
-    // PROJECT#YYYY-NNNN_EXPERIMENT#NNNN_GENUS.SPECIES_TRAY#NNNNN_POT#NNNNN
-    public static final Pattern REGEX_PLANT = Pattern
-            .compile("Project#(\\d{4})-(\\d{4})_Experiment#(\\d{4})_(\\w+)\\.(\\w+)_Tray#(\\d{4,5})_Pot#(\\d{4,5})");
-    
-    /**
-     * Number of groups matching in the plant id regex.
-     */
-    public static final int PLANT_ID_SIZE = 7;
-    
-    public static final Pattern REGEX_POSITION = Pattern.compile("([a-zA-Z]+)([0-9]+)");
-    
-    /**
-     * Number of groups matching in the position regex.
-     */
-    public static final int POSITION_SIZE = 2;
-    
-    public static final String TEMPLATE_SPARQL_BY_TYPE =
-            "CONSTRUCT { ?object a ?type . ?object <http://www.w3.org/2000/01/rdf-schema#label> ?label . } WHERE { ?object a ?type . OPTIONAL { ?object <http://www.w3.org/2000/01/rdf-schema#label> ?label . } } VALUES (?type) { ( %s ) }";
-    
-    public static final String TEMPLATE_SPARQL_BY_TYPE_LABEL_STRSTARTS =
-            "CONSTRUCT { ?object a ?type . ?object <http://www.w3.org/2000/01/rdf-schema#label> ?label . } WHERE { ?object a ?type . ?object <http://www.w3.org/2000/01/rdf-schema#label> ?label . FILTER(STRSTARTS(?label, \"%s\")) } VALUES (?type) { ( %s ) }";
-    
-    public static final String TEMPLATE_SPARQL_BY_TYPE_ALL_PROPERTIES =
-            "CONSTRUCT { ?object a ?type . ?object ?predicate ?value . } WHERE { ?object a ?type . ?object ?predicate ?value . } VALUES (?type) { ( %s ) }";
     
     public HrppcPoddClient()
     {
@@ -239,7 +186,8 @@ public class HrppcPoddClient extends RestletPoddClientImpl
             final String genus, final String species) throws PoddClientException, GraphUtilException
     {
         // Reconstruct Project#0001-0002 structure to get a normalised string
-        final String baseProjectName = String.format(HrppcPoddClient.TEMPLATE_PROJECT, projectYear, projectNumber);
+        final String baseProjectName =
+                String.format(ClientSpreadsheetConstants.TEMPLATE_PROJECT, projectYear, projectNumber);
         URI nextExperimentUri = null;
         
         final Map<URI, InferredOWLOntologyID> projectDetails = this.getProjectDetails(projectUriMap, baseProjectName);
@@ -253,7 +201,8 @@ public class HrppcPoddClient extends RestletPoddClientImpl
         // Reconstruct Project#0001-0002_Experiment#0001 structure to get a normalised
         // string
         final String baseExperimentName =
-                String.format(HrppcPoddClient.TEMPLATE_EXPERIMENT, projectYear, projectNumber, experimentNumber);
+                String.format(ClientSpreadsheetConstants.TEMPLATE_EXPERIMENT, projectYear, projectNumber,
+                        experimentNumber);
         
         final Map<URI, URI> experimentDetails = this.getExperimentDetails(experimentUriMap, baseExperimentName);
         this.checkExperimentDetails(baseExperimentName, experimentDetails);
@@ -371,7 +320,8 @@ public class HrppcPoddClient extends RestletPoddClientImpl
             final String genus, final String species) throws PoddClientException, GraphUtilException
     {
         // Reconstruct Project#0001-0002 structure to get a normalised string
-        final String baseProjectName = String.format(HrppcPoddClient.TEMPLATE_PROJECT, projectYear, projectNumber);
+        final String baseProjectName =
+                String.format(ClientSpreadsheetConstants.TEMPLATE_PROJECT, projectYear, projectNumber);
         URI nextExperimentUri = null;
         
         final Map<URI, InferredOWLOntologyID> projectDetails = this.getProjectDetails(projectUriMap, baseProjectName);
@@ -385,7 +335,8 @@ public class HrppcPoddClient extends RestletPoddClientImpl
         // Reconstruct Project#0001-0002_Experiment#0001 structure to get a normalised
         // string
         final String baseExperimentName =
-                String.format(HrppcPoddClient.TEMPLATE_EXPERIMENT, projectYear, projectNumber, experimentNumber);
+                String.format(ClientSpreadsheetConstants.TEMPLATE_EXPERIMENT, projectYear, projectNumber,
+                        experimentNumber);
         
         final Map<URI, URI> experimentDetails = this.getExperimentDetails(experimentUriMap, baseExperimentName);
         this.checkExperimentDetails(baseExperimentName, experimentDetails);
@@ -593,11 +544,9 @@ public class HrppcPoddClient extends RestletPoddClientImpl
         else
         {
             final Model plantIdSparqlResults =
-                    this.doSPARQL(
-                            String.format(HrppcPoddClient.TEMPLATE_SPARQL_BY_TYPE_LABEL_STRSTARTS,
-                                    RenderUtils.escape(plantId),
-                                    RenderUtils.getSPARQLQueryString(PoddRdfConstants.PODD_SCIENCE_CONTAINER)),
-                            nextProjectID);
+                    this.doSPARQL(String.format(ClientSpreadsheetConstants.TEMPLATE_SPARQL_BY_TYPE_LABEL_STRSTARTS,
+                            RenderUtils.escape(plantId),
+                            RenderUtils.getSPARQLQueryString(PoddRdfConstants.PODD_SCIENCE_CONTAINER)), nextProjectID);
             
             if(plantIdSparqlResults.isEmpty())
             {
@@ -679,11 +628,9 @@ public class HrppcPoddClient extends RestletPoddClientImpl
         else
         {
             final Model trayIdSparqlResults =
-                    this.doSPARQL(
-                            String.format(HrppcPoddClient.TEMPLATE_SPARQL_BY_TYPE_LABEL_STRSTARTS,
-                                    RenderUtils.escape(trayId),
-                                    RenderUtils.getSPARQLQueryString(PoddRdfConstants.PODD_SCIENCE_CONTAINER)),
-                            nextProjectID);
+                    this.doSPARQL(String.format(ClientSpreadsheetConstants.TEMPLATE_SPARQL_BY_TYPE_LABEL_STRSTARTS,
+                            RenderUtils.escape(trayId),
+                            RenderUtils.getSPARQLQueryString(PoddRdfConstants.PODD_SCIENCE_CONTAINER)), nextProjectID);
             
             if(trayIdSparqlResults.isEmpty())
             {
@@ -723,7 +670,7 @@ public class HrppcPoddClient extends RestletPoddClientImpl
                 final InferredOWLOntologyID artifactId = nextProjectNameMapping.get(projectUri);
                 final Model nextSparqlResults =
                         this.doSPARQL(
-                                String.format(HrppcPoddClient.TEMPLATE_SPARQL_BY_TYPE,
+                                String.format(ClientSpreadsheetConstants.TEMPLATE_SPARQL_BY_TYPE,
                                         RenderUtils.getSPARQLQueryString(PoddRdfConstants.PODD_SCIENCE_INVESTIGATION)),
                                 artifactId);
                 
@@ -768,7 +715,8 @@ public class HrppcPoddClient extends RestletPoddClientImpl
                                     // project number behind
                                     nextLabelString = nextLabelString.split(" ")[0];
                                     
-                                    final Matcher matcher = HrppcPoddClient.REGEX_EXPERIMENT.matcher(nextLabelString);
+                                    final Matcher matcher =
+                                            ClientSpreadsheetConstants.REGEX_EXPERIMENT.matcher(nextLabelString);
                                     
                                     if(!matcher.matches())
                                     {
@@ -787,8 +735,8 @@ public class HrppcPoddClient extends RestletPoddClientImpl
                                         final int nextExperimentNumber = Integer.parseInt(matcher.group(3));
                                         
                                         nextLabelString =
-                                                String.format(HrppcPoddClient.TEMPLATE_EXPERIMENT, nextProjectYear,
-                                                        nextProjectNumber, nextExperimentNumber);
+                                                String.format(ClientSpreadsheetConstants.TEMPLATE_EXPERIMENT,
+                                                        nextProjectYear, nextProjectNumber, nextExperimentNumber);
                                         
                                         this.log.debug("Reformatted experiment label to: '{}' original=<{}>",
                                                 nextLabelString, nextLabel);
@@ -837,10 +785,8 @@ public class HrppcPoddClient extends RestletPoddClientImpl
             {
                 final InferredOWLOntologyID artifactId = nextProjectNameMapping.get(projectUri);
                 final Model nextSparqlResults =
-                        this.doSPARQL(
-                                String.format(HrppcPoddClient.TEMPLATE_SPARQL_BY_TYPE_ALL_PROPERTIES,
-                                        RenderUtils.getSPARQLQueryString(PoddRdfConstants.PODD_SCIENCE_GENOTYPE)),
-                                artifactId);
+                        this.doSPARQL(String.format(ClientSpreadsheetConstants.TEMPLATE_SPARQL_BY_TYPE_ALL_PROPERTIES,
+                                RenderUtils.getSPARQLQueryString(PoddRdfConstants.PODD_SCIENCE_GENOTYPE)), artifactId);
                 if(nextSparqlResults.isEmpty())
                 {
                     this.log.debug("Could not find any existing genotypes for project: {} {}", nextProjectName,
@@ -939,7 +885,8 @@ public class HrppcPoddClient extends RestletPoddClientImpl
                                 // project number behind
                                 nextLabelString = nextLabelString.split(" ")[0];
                                 
-                                final Matcher matcher = HrppcPoddClient.REGEX_PROJECT.matcher(nextLabelString);
+                                final Matcher matcher =
+                                        ClientSpreadsheetConstants.REGEX_PROJECT.matcher(nextLabelString);
                                 
                                 if(!matcher.matches())
                                 {
@@ -955,7 +902,7 @@ public class HrppcPoddClient extends RestletPoddClientImpl
                                     final int nextProjectNumber = Integer.parseInt(matcher.group(2));
                                     
                                     nextLabelString =
-                                            String.format(HrppcPoddClient.TEMPLATE_PROJECT, nextProjectYear,
+                                            String.format(ClientSpreadsheetConstants.TEMPLATE_PROJECT, nextProjectYear,
                                                     nextProjectNumber);
                                     
                                     this.log.debug("Reformatted project label to: '{}' original=<{}>", nextLabelString,
@@ -1042,31 +989,31 @@ public class HrppcPoddClient extends RestletPoddClientImpl
             final String nextHeader = headers.get(i);
             final String nextField = nextLine.get(i);
             
-            if(nextHeader.trim().equals(HrppcPoddClient.TRAY_ID))
+            if(nextHeader.trim().equals(ClientSpreadsheetConstants.CLIENT_TRAY_ID))
             {
                 trayId = nextField;
             }
-            else if(nextHeader.trim().equals(HrppcPoddClient.TRAY_NOTES))
+            else if(nextHeader.trim().equals(ClientSpreadsheetConstants.CLIENT_TRAY_NOTES))
             {
                 trayNotes = nextField;
             }
-            else if(nextHeader.trim().equals(HrppcPoddClient.TRAY_TYPE_NAME))
+            else if(nextHeader.trim().equals(ClientSpreadsheetConstants.CLIENT_TRAY_TYPE_NAME))
             {
                 trayTypeName = nextField;
             }
-            else if(nextHeader.trim().equals(HrppcPoddClient.POSITION))
+            else if(nextHeader.trim().equals(ClientSpreadsheetConstants.CLIENT_POSITION))
             {
                 position = nextField;
             }
-            else if(nextHeader.trim().equals(HrppcPoddClient.PLANT_ID))
+            else if(nextHeader.trim().equals(ClientSpreadsheetConstants.CLIENT_PLANT_ID))
             {
                 plantId = nextField;
             }
-            else if(nextHeader.trim().equals(HrppcPoddClient.PLANT_NAME))
+            else if(nextHeader.trim().equals(ClientSpreadsheetConstants.CLIENT_PLANT_NAME))
             {
                 plantName = nextField;
             }
-            else if(nextHeader.trim().equals(HrppcPoddClient.PLANT_NOTES))
+            else if(nextHeader.trim().equals(ClientSpreadsheetConstants.CLIENT_PLANT_NOTES))
             {
                 plantNotes = nextField;
             }
@@ -1084,7 +1031,7 @@ public class HrppcPoddClient extends RestletPoddClientImpl
         int trayNumber = 0;
         int potNumber = 0;
         
-        final Matcher trayMatcher = HrppcPoddClient.REGEX_TRAY.matcher(trayId);
+        final Matcher trayMatcher = ClientSpreadsheetConstants.REGEX_TRAY.matcher(trayId);
         
         if(!trayMatcher.matches())
         {
@@ -1092,10 +1039,10 @@ public class HrppcPoddClient extends RestletPoddClientImpl
         }
         else
         {
-            if(trayMatcher.groupCount() != HrppcPoddClient.TRAY_ID_SIZE)
+            if(trayMatcher.groupCount() != ClientSpreadsheetConstants.CLIENT_TRAY_ID_SIZE)
             {
                 this.log.error("Did not find the expected number of regex matches for Tray ID: {} {}",
-                        trayMatcher.groupCount(), HrppcPoddClient.TRAY_ID_SIZE);
+                        trayMatcher.groupCount(), ClientSpreadsheetConstants.CLIENT_TRAY_ID_SIZE);
             }
             else
             {
@@ -1108,7 +1055,7 @@ public class HrppcPoddClient extends RestletPoddClientImpl
             }
         }
         
-        final Matcher plantMatcher = HrppcPoddClient.REGEX_PLANT.matcher(plantId);
+        final Matcher plantMatcher = ClientSpreadsheetConstants.REGEX_PLANT.matcher(plantId);
         
         if(!plantMatcher.matches())
         {
@@ -1116,10 +1063,10 @@ public class HrppcPoddClient extends RestletPoddClientImpl
         }
         else
         {
-            if(plantMatcher.groupCount() != HrppcPoddClient.PLANT_ID_SIZE)
+            if(plantMatcher.groupCount() != ClientSpreadsheetConstants.CLIENT_PLANT_ID_SIZE)
             {
                 this.log.error("Did not find the expected number of regex matches for Plant ID: {} {}",
-                        plantMatcher.groupCount(), HrppcPoddClient.PLANT_ID_SIZE);
+                        plantMatcher.groupCount(), ClientSpreadsheetConstants.CLIENT_PLANT_ID_SIZE);
             }
             else
             {
@@ -1154,7 +1101,7 @@ public class HrppcPoddClient extends RestletPoddClientImpl
         String columnLetter = null;
         String rowNumber = null;
         
-        final Matcher positionMatcher = HrppcPoddClient.REGEX_POSITION.matcher(position);
+        final Matcher positionMatcher = ClientSpreadsheetConstants.REGEX_POSITION.matcher(position);
         
         if(!positionMatcher.matches())
         {
@@ -1164,10 +1111,10 @@ public class HrppcPoddClient extends RestletPoddClientImpl
             // PoddClientException(MessageFormat.format("Position did not match expected format: {0}",
             // position));
         }
-        else if(positionMatcher.groupCount() != HrppcPoddClient.POSITION_SIZE)
+        else if(positionMatcher.groupCount() != ClientSpreadsheetConstants.POSITION_SIZE)
         {
             this.log.error("Did not find the expected number of regex matches for Position: {} {}",
-                    positionMatcher.groupCount(), HrppcPoddClient.POSITION_SIZE);
+                    positionMatcher.groupCount(), ClientSpreadsheetConstants.POSITION_SIZE);
             throw new PoddClientException(MessageFormat.format(
                     "Did not find the expected number of regex matches for Position: {0}", position));
         }
@@ -1348,31 +1295,31 @@ public class HrppcPoddClient extends RestletPoddClientImpl
             final String nextHeader = headers.get(i);
             final String nextField = nextLine.get(i);
             
-            if(nextHeader.trim().equals(HrppcPoddClient.TRAY_ID))
+            if(nextHeader.trim().equals(ClientSpreadsheetConstants.CLIENT_TRAY_ID))
             {
                 trayId = nextField;
             }
-            else if(nextHeader.trim().equals(HrppcPoddClient.TRAY_NOTES))
+            else if(nextHeader.trim().equals(ClientSpreadsheetConstants.CLIENT_TRAY_NOTES))
             {
                 trayNotes = nextField;
             }
-            else if(nextHeader.trim().equals(HrppcPoddClient.TRAY_TYPE_NAME))
+            else if(nextHeader.trim().equals(ClientSpreadsheetConstants.CLIENT_TRAY_TYPE_NAME))
             {
                 trayTypeName = nextField;
             }
-            else if(nextHeader.trim().equals(HrppcPoddClient.POSITION))
+            else if(nextHeader.trim().equals(ClientSpreadsheetConstants.CLIENT_POSITION))
             {
                 position = nextField;
             }
-            else if(nextHeader.trim().equals(HrppcPoddClient.PLANT_ID))
+            else if(nextHeader.trim().equals(ClientSpreadsheetConstants.CLIENT_PLANT_ID))
             {
                 plantId = nextField;
             }
-            else if(nextHeader.trim().equals(HrppcPoddClient.PLANT_NAME))
+            else if(nextHeader.trim().equals(ClientSpreadsheetConstants.CLIENT_PLANT_NAME))
             {
                 plantName = nextField;
             }
-            else if(nextHeader.trim().equals(HrppcPoddClient.PLANT_NOTES))
+            else if(nextHeader.trim().equals(ClientSpreadsheetConstants.CLIENT_PLANT_NOTES))
             {
                 plantNotes = nextField;
             }
@@ -1390,7 +1337,7 @@ public class HrppcPoddClient extends RestletPoddClientImpl
         int trayNumber = 0;
         int potNumber = 0;
         
-        final Matcher trayMatcher = HrppcPoddClient.REGEX_TRAY.matcher(trayId);
+        final Matcher trayMatcher = ClientSpreadsheetConstants.REGEX_TRAY.matcher(trayId);
         
         if(!trayMatcher.matches())
         {
@@ -1398,10 +1345,10 @@ public class HrppcPoddClient extends RestletPoddClientImpl
         }
         else
         {
-            if(trayMatcher.groupCount() != HrppcPoddClient.TRAY_ID_SIZE)
+            if(trayMatcher.groupCount() != ClientSpreadsheetConstants.CLIENT_TRAY_ID_SIZE)
             {
                 this.log.error("Did not find the expected number of regex matches for Tray ID: {} {}",
-                        trayMatcher.groupCount(), HrppcPoddClient.TRAY_ID_SIZE);
+                        trayMatcher.groupCount(), ClientSpreadsheetConstants.CLIENT_TRAY_ID_SIZE);
             }
             else
             {
@@ -1414,7 +1361,7 @@ public class HrppcPoddClient extends RestletPoddClientImpl
             }
         }
         
-        final Matcher plantMatcher = HrppcPoddClient.REGEX_PLANT.matcher(plantId);
+        final Matcher plantMatcher = ClientSpreadsheetConstants.REGEX_PLANT.matcher(plantId);
         
         if(!plantMatcher.matches())
         {
@@ -1422,10 +1369,10 @@ public class HrppcPoddClient extends RestletPoddClientImpl
         }
         else
         {
-            if(plantMatcher.groupCount() != HrppcPoddClient.PLANT_ID_SIZE)
+            if(plantMatcher.groupCount() != ClientSpreadsheetConstants.CLIENT_PLANT_ID_SIZE)
             {
                 this.log.error("Did not find the expected number of regex matches for Plant ID: {} {}",
-                        plantMatcher.groupCount(), HrppcPoddClient.PLANT_ID_SIZE);
+                        plantMatcher.groupCount(), ClientSpreadsheetConstants.CLIENT_PLANT_ID_SIZE);
             }
             else
             {
@@ -1460,7 +1407,7 @@ public class HrppcPoddClient extends RestletPoddClientImpl
         String columnLetter = null;
         String rowNumber = null;
         
-        final Matcher positionMatcher = HrppcPoddClient.REGEX_POSITION.matcher(position);
+        final Matcher positionMatcher = ClientSpreadsheetConstants.REGEX_POSITION.matcher(position);
         
         if(!positionMatcher.matches())
         {
@@ -1470,10 +1417,10 @@ public class HrppcPoddClient extends RestletPoddClientImpl
             // PoddClientException(MessageFormat.format("Position did not match expected format: {0}",
             // position));
         }
-        else if(positionMatcher.groupCount() != HrppcPoddClient.POSITION_SIZE)
+        else if(positionMatcher.groupCount() != ClientSpreadsheetConstants.POSITION_SIZE)
         {
             this.log.error("Did not find the expected number of regex matches for Position: {} {}",
-                    positionMatcher.groupCount(), HrppcPoddClient.POSITION_SIZE);
+                    positionMatcher.groupCount(), ClientSpreadsheetConstants.POSITION_SIZE);
             throw new PoddClientException(MessageFormat.format(
                     "Did not find the expected number of regex matches for Position: {0}", position));
         }
@@ -1640,53 +1587,59 @@ public class HrppcPoddClient extends RestletPoddClientImpl
     }
     
     /**
-     * Verifies the list of projects, throwing an IllegalArgumentException if there are unrecognised
-     * headers or if any mandatory headers are missing.
+     * Verifies the list of randomisation tray/pot combinations, throwing an
+     * IllegalArgumentException if there are unrecognised headers or if any mandatory headers are
+     * missing.
      * 
      * @throws IllegalArgumentException
      *             If the headers are not verified correctly.
      */
     private void verifyRandomisationListHeaders(final List<String> headers) throws IllegalArgumentException
     {
-        if(headers == null || headers.size() < HrppcPoddClient.MIN_HEADERS_SIZE)
+        if(headers == null || headers.size() < RandomisationConstants.MIN_RANDOMISATION_HEADERS_SIZE)
         {
             this.log.error("Did not find valid headers: {}", headers);
             throw new IllegalArgumentException("Did not find valid headers");
         }
         
-        if(!headers.contains(HrppcPoddClient.TRAY_ID))
+        if(!headers.contains(RandomisationConstants.RAND_SHELF))
         {
-            throw new IllegalArgumentException("Did not find tray id header");
+            throw new IllegalArgumentException("Did not find shelf number header");
         }
         
-        if(!headers.contains(HrppcPoddClient.TRAY_NOTES))
+        if(!headers.contains(RandomisationConstants.RAND_SHELF_SIDE))
         {
-            throw new IllegalArgumentException("Did not find tray notes header");
+            throw new IllegalArgumentException("Did not find shelf side header");
         }
         
-        if(!headers.contains(HrppcPoddClient.TRAY_TYPE_NAME))
+        if(!headers.contains(RandomisationConstants.RAND_REPLICATE))
         {
-            throw new IllegalArgumentException("Did not find tray type name header");
+            throw new IllegalArgumentException("Did not find replicate header");
         }
         
-        if(!headers.contains(HrppcPoddClient.POSITION))
+        if(!headers.contains(RandomisationConstants.RAND_TRAY))
         {
-            throw new IllegalArgumentException("Did not find position header");
+            throw new IllegalArgumentException("Did not find tray header");
         }
         
-        if(!headers.contains(HrppcPoddClient.PLANT_ID))
+        if(!headers.contains(RandomisationConstants.RAND_ROW))
         {
-            throw new IllegalArgumentException("Did not find plant id header");
+            throw new IllegalArgumentException("Did not find row header");
         }
         
-        if(!headers.contains(HrppcPoddClient.PLANT_NAME))
+        if(!headers.contains(RandomisationConstants.RAND_COLUMN))
         {
-            throw new IllegalArgumentException("Did not find plant name header");
+            throw new IllegalArgumentException("Did not find column header");
         }
         
-        if(!headers.contains(HrppcPoddClient.PLANT_NOTES))
+        if(!headers.contains(RandomisationConstants.RAND_LAYOUT))
         {
-            throw new IllegalArgumentException("Did not find plant notes header");
+            throw new IllegalArgumentException("Did not find layout header");
+        }
+        
+        if(!headers.contains(RandomisationConstants.RAND_VAR))
+        {
+            throw new IllegalArgumentException("Did not find var header");
         }
     }
     
@@ -1699,43 +1652,43 @@ public class HrppcPoddClient extends RestletPoddClientImpl
      */
     private void verifyTrayScanListHeaders(final List<String> headers) throws IllegalArgumentException
     {
-        if(headers == null || headers.size() < HrppcPoddClient.MIN_HEADERS_SIZE)
+        if(headers == null || headers.size() < ClientSpreadsheetConstants.MIN_PLANTSCAN_HEADERS_SIZE)
         {
             this.log.error("Did not find valid headers: {}", headers);
             throw new IllegalArgumentException("Did not find valid headers");
         }
         
-        if(!headers.contains(HrppcPoddClient.TRAY_ID))
+        if(!headers.contains(ClientSpreadsheetConstants.CLIENT_TRAY_ID))
         {
             throw new IllegalArgumentException("Did not find tray id header");
         }
         
-        if(!headers.contains(HrppcPoddClient.TRAY_NOTES))
+        if(!headers.contains(ClientSpreadsheetConstants.CLIENT_TRAY_NOTES))
         {
             throw new IllegalArgumentException("Did not find tray notes header");
         }
         
-        if(!headers.contains(HrppcPoddClient.TRAY_TYPE_NAME))
+        if(!headers.contains(ClientSpreadsheetConstants.CLIENT_TRAY_TYPE_NAME))
         {
             throw new IllegalArgumentException("Did not find tray type name header");
         }
         
-        if(!headers.contains(HrppcPoddClient.POSITION))
+        if(!headers.contains(ClientSpreadsheetConstants.CLIENT_POSITION))
         {
             throw new IllegalArgumentException("Did not find position header");
         }
         
-        if(!headers.contains(HrppcPoddClient.PLANT_ID))
+        if(!headers.contains(ClientSpreadsheetConstants.CLIENT_PLANT_ID))
         {
             throw new IllegalArgumentException("Did not find plant id header");
         }
         
-        if(!headers.contains(HrppcPoddClient.PLANT_NAME))
+        if(!headers.contains(ClientSpreadsheetConstants.CLIENT_PLANT_NAME))
         {
             throw new IllegalArgumentException("Did not find plant name header");
         }
         
-        if(!headers.contains(HrppcPoddClient.PLANT_NOTES))
+        if(!headers.contains(ClientSpreadsheetConstants.CLIENT_PLANT_NOTES))
         {
             throw new IllegalArgumentException("Did not find plant notes header");
         }

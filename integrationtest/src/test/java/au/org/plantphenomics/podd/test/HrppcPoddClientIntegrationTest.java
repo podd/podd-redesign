@@ -29,6 +29,7 @@ import org.openrdf.model.vocabulary.RDF;
 import org.openrdf.queryrender.RenderUtils;
 import org.openrdf.rio.RDFFormat;
 
+import au.org.plantphenomics.podd.ClientSpreadsheetConstants;
 import au.org.plantphenomics.podd.HrppcPoddClient;
 
 import com.github.podd.client.api.test.AbstractPoddClientTest;
@@ -51,7 +52,7 @@ public class HrppcPoddClientIntegrationTest extends RestletPoddClientImplIntegra
     @Test
     public final void testRegexProject() throws Exception
     {
-        final Matcher matcher = HrppcPoddClient.REGEX_PROJECT.matcher("Project#2014-0001");
+        final Matcher matcher = ClientSpreadsheetConstants.REGEX_PROJECT.matcher("Project#2014-0001");
         Assert.assertTrue(matcher.matches());
         
     }
@@ -59,10 +60,10 @@ public class HrppcPoddClientIntegrationTest extends RestletPoddClientImplIntegra
     @Test
     public final void testRegexPosition() throws Exception
     {
-        final Matcher matcher1 = HrppcPoddClient.REGEX_POSITION.matcher("B2");
+        final Matcher matcher1 = ClientSpreadsheetConstants.REGEX_POSITION.matcher("B2");
         Assert.assertTrue(matcher1.matches());
         
-        final Matcher matcher2 = HrppcPoddClient.REGEX_POSITION.matcher("AB23454");
+        final Matcher matcher2 = ClientSpreadsheetConstants.REGEX_POSITION.matcher("AB23454");
         Assert.assertTrue(matcher2.matches());
     }
     
@@ -70,7 +71,7 @@ public class HrppcPoddClientIntegrationTest extends RestletPoddClientImplIntegra
     public final void testRegexTray() throws Exception
     {
         final Matcher matcher =
-                HrppcPoddClient.REGEX_TRAY
+                ClientSpreadsheetConstants.REGEX_TRAY
                         .matcher("Project#2014-0001_Experiment#0001_IArabidopsis.thaliana_Tray#00009");
         Assert.assertTrue(matcher.matches());
         
@@ -79,7 +80,7 @@ public class HrppcPoddClientIntegrationTest extends RestletPoddClientImplIntegra
     @Test
     public final void testTemplateProject() throws Exception
     {
-        final String formattedProject = String.format(HrppcPoddClient.TEMPLATE_PROJECT, 4, 6);
+        final String formattedProject = String.format(ClientSpreadsheetConstants.TEMPLATE_PROJECT, 4, 6);
         
         Assert.assertEquals("Project#0004-0006", formattedProject);
     }
@@ -88,7 +89,7 @@ public class HrppcPoddClientIntegrationTest extends RestletPoddClientImplIntegra
     public final void testTemplateSparqlExperiments() throws Exception
     {
         final String formattedQueryString =
-                String.format(HrppcPoddClient.TEMPLATE_SPARQL_BY_TYPE,
+                String.format(ClientSpreadsheetConstants.TEMPLATE_SPARQL_BY_TYPE,
                         RenderUtils.getSPARQLQueryString(PoddRdfConstants.PODD_SCIENCE_INVESTIGATION));
         
         Assert.assertEquals(
