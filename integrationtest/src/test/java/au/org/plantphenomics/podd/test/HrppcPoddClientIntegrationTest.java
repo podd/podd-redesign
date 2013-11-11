@@ -144,11 +144,15 @@ public class HrppcPoddClientIntegrationTest extends RestletPoddClientImplIntegra
         poddClient.downloadArtifact(uploadedArtifacts.get(newArtifact), outputStream, RDFFormat.RDFJSON);
         
         final Model model =
-                this.parseRdf(new ByteArrayInputStream(outputStream.toByteArray()), RDFFormat.RDFJSON, 1397);
+                this.parseRdf(new ByteArrayInputStream(outputStream.toByteArray()), RDFFormat.RDFJSON, 3957);
         
         Assert.assertEquals(1, model.filter(null, RDF.TYPE, PoddRdfConstants.PODD_SCIENCE_PROJECT).size());
         Assert.assertEquals(1, model.filter(null, RDF.TYPE, PoddRdfConstants.PODD_SCIENCE_INVESTIGATION).size());
         // Verify that the number of containers is consistent
         Assert.assertEquals(336, model.filter(null, RDF.TYPE, PoddRdfConstants.PODD_SCIENCE_CONTAINER).size());
+        // Verify that the number of genotypes is consistent
+        Assert.assertEquals(320, model.filter(null, RDF.TYPE, PoddRdfConstants.PODD_SCIENCE_GENOTYPE).size());
+        // Verify that the number of genotype links are consistent
+        Assert.assertEquals(320, model.filter(null, PoddRdfConstants.PODD_SCIENCE_HAS_GENOTYPE, null).size());
     }
 }
