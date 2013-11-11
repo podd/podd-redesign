@@ -244,7 +244,9 @@ public class SearchOntologyResourceImplTest extends AbstractResourceImplTest
     @Test
     public void testSearchJson() throws Exception
     {
-        final String[] searchTypes = { "http://purl.org/podd/ns/poddScience#Platform", OWL.THING.stringValue() };
+        final String[] searchTypes = { "http://purl.org/podd/ns/poddScience#Platform" };// ,
+                                                                                        // OWL.THING.stringValue()
+                                                                                        // };
         final MediaType requestMediaType = MediaType.APPLICATION_JSON;
         
         final Model resultModel = this.internalTestSearchRdf("Scan", searchTypes, requestMediaType, null);
@@ -285,6 +287,31 @@ public class SearchOntologyResourceImplTest extends AbstractResourceImplTest
      */
     @Test
     public void testSearchRdfForPlatforms() throws Exception
+    {
+        final String[] searchTypes = { "http://purl.org/podd/ns/poddScience#Platform" };// ,
+                                                                                        // OWL.THING.stringValue()
+                                                                                        // };
+        final MediaType requestMediaType = MediaType.APPLICATION_RDF_XML;
+        
+        final Model resultModel = this.internalTestSearchRdf("me", searchTypes, requestMediaType, null);
+        
+        // verify:
+        Assert.assertEquals("Not the expected number of results", 9, resultModel.size());
+        Assert.assertEquals("Expected Platform SPAD Meter not found", 1,
+                resultModel.filter(null, null, PoddRdfConstants.VF.createLiteral("SPAD Meter")).size());
+        Assert.assertEquals("Expected Platform Pyrometer not found", 1,
+                resultModel.filter(null, null, PoddRdfConstants.VF.createLiteral("Pyrometer")).size());
+        Assert.assertEquals("Expected Platform SC1 Porometer not found", 1,
+                resultModel.filter(null, null, PoddRdfConstants.VF.createLiteral("SC1 Porometer")).size());
+    }
+    
+    /**
+     * Test successful search for a Platform in RDF/XML including owl:Thing in the list to verify
+     * that it doesn't expand the search space, as the search types must all match. Ie, it is not
+     * the case that if "any" types match the search will succeed.
+     */
+    @Test
+    public void testSearchRdfForPlatformsWithOWLThing() throws Exception
     {
         final String[] searchTypes = { "http://purl.org/podd/ns/poddScience#Platform", OWL.THING.stringValue() };
         final MediaType requestMediaType = MediaType.APPLICATION_RDF_XML;
@@ -401,7 +428,9 @@ public class SearchOntologyResourceImplTest extends AbstractResourceImplTest
     @Test
     public void testSearchTurtle() throws Exception
     {
-        final String[] searchTypes = { "http://purl.org/podd/ns/poddScience#Platform", OWL.THING.stringValue() };
+        final String[] searchTypes = { "http://purl.org/podd/ns/poddScience#Platform" };// ,
+                                                                                        // OWL.THING.stringValue()
+                                                                                        // };
         final MediaType requestMediaType = MediaType.APPLICATION_RDF_TURTLE;
         
         final Model resultModel = this.internalTestSearchRdf("Scan", searchTypes, requestMediaType, null);
