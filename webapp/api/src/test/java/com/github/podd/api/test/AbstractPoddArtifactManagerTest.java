@@ -303,9 +303,9 @@ public abstract class AbstractPoddArtifactManagerTest
                                 MetadataPolicy.ONLY_CONTAINS, 63, 11, 0 },
                         
                         { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Publication"), false,
-                                MetadataPolicy.INCLUDE_ALL, 94, 12, 0 },
+                                MetadataPolicy.INCLUDE_ALL, 93, 12, 0 },
                         { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Publication"), true,
-                                MetadataPolicy.INCLUDE_ALL, 120, 16, 3 },
+                                MetadataPolicy.INCLUDE_ALL, 119, 16, 3 },
                         { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Publication"), false,
                                 MetadataPolicy.ONLY_CONTAINS, 21, 4, 0 },
                         

@@ -229,9 +229,9 @@ public class GetMetadataResourceImplTest extends AbstractResourceImplTest
                             MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
             
             // verify: received contents are in RDF
-            final Model model = this.assertRdf(results, RDFFormat.RDFXML, 156);
+            final Model model = this.assertRdf(results, RDFFormat.RDFXML, 165);
             
-            Assert.assertEquals("Unexpected no. of properties", 19,
+            Assert.assertEquals("Unexpected no. of properties", 20,
                     model.filter(PoddRdfConstants.VF.createURI(objectType), null, null).size() - 1);
             Assert.assertEquals("Expected no Do-Not-Display properties", 3,
                     model.filter(null, PoddRdfConstants.PODD_BASE_DO_NOT_DISPLAY, null).size());

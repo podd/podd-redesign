@@ -153,10 +153,10 @@ public class SparqlResourceImplTest extends AbstractResourceImplTest
                             MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
             
             // verify: response
-            final Model resultModel = this.assertRdf(results, RDFFormat.RDFXML, 835);
+            final Model resultModel = this.assertRdf(results, RDFFormat.RDFXML, 837);
             // verify that only type statements have been returned
-            Assert.assertEquals(835, resultModel.filter(null, RDF.TYPE, null).size());
-            Assert.assertEquals(542, resultModel.filter(null, RDF.TYPE, null).subjects().size());
+            Assert.assertEquals(837, resultModel.filter(null, RDF.TYPE, null).size());
+            Assert.assertEquals(544, resultModel.filter(null, RDF.TYPE, null).subjects().size());
             Assert.assertEquals(43, resultModel.filter(null, RDF.TYPE, null).objects().size());
         }
         finally
@@ -191,10 +191,10 @@ public class SparqlResourceImplTest extends AbstractResourceImplTest
                             MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
             
             // verify: response
-            final Model resultModel = this.assertRdf(results, RDFFormat.RDFXML, 835);
+            final Model resultModel = this.assertRdf(results, RDFFormat.RDFXML, 837);
             // verify that only type statements have been returned
-            Assert.assertEquals(835, resultModel.filter(null, RDF.TYPE, null).size());
-            Assert.assertEquals(542, resultModel.filter(null, RDF.TYPE, null).subjects().size());
+            Assert.assertEquals(837, resultModel.filter(null, RDF.TYPE, null).size());
+            Assert.assertEquals(544, resultModel.filter(null, RDF.TYPE, null).subjects().size());
             Assert.assertEquals(43, resultModel.filter(null, RDF.TYPE, null).objects().size());
         }
         finally
@@ -269,10 +269,10 @@ public class SparqlResourceImplTest extends AbstractResourceImplTest
                             MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
             
             // verify: response
-            final Model resultModel = this.assertRdf(results, RDFFormat.RDFXML, 682);
+            final Model resultModel = this.assertRdf(results, RDFFormat.RDFXML, 658);
             // verify that only type statements have been returned
-            Assert.assertEquals(682, resultModel.filter(null, RDF.TYPE, null).size());
-            Assert.assertEquals(541, resultModel.filter(null, RDF.TYPE, null).subjects().size());
+            Assert.assertEquals(658, resultModel.filter(null, RDF.TYPE, null).size());
+            Assert.assertEquals(543, resultModel.filter(null, RDF.TYPE, null).subjects().size());
             Assert.assertEquals(35, resultModel.filter(null, RDF.TYPE, null).objects().size());
         }
         finally
@@ -310,10 +310,10 @@ public class SparqlResourceImplTest extends AbstractResourceImplTest
             // verify: response
             // TODO: Deduplicate statements so they don't appear in both the
             // inferred and concrete
-            final Model resultModel = this.assertRdf(results, RDFFormat.RDFXML, 835);
+            final Model resultModel = this.assertRdf(results, RDFFormat.RDFXML, 837);
             // verify that only type statements have been returned
-            Assert.assertEquals(835, resultModel.filter(null, RDF.TYPE, null).size());
-            Assert.assertEquals(542, resultModel.filter(null, RDF.TYPE, null).subjects().size());
+            Assert.assertEquals(837, resultModel.filter(null, RDF.TYPE, null).size());
+            Assert.assertEquals(544, resultModel.filter(null, RDF.TYPE, null).subjects().size());
             Assert.assertEquals(43, resultModel.filter(null, RDF.TYPE, null).objects().size());
         }
         finally

@@ -1201,9 +1201,9 @@ public abstract class AbstractPoddSesameManagerTest
                         
                         // cannot "contain" any Child Objects
                         { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Publication"), false,
-                                MetadataPolicy.INCLUDE_ALL, 94, 11, 0 },
+                                MetadataPolicy.INCLUDE_ALL, 93, 11, 0 },
                         { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Publication"), true,
-                                MetadataPolicy.INCLUDE_ALL, 120, 15, 3 },
+                                MetadataPolicy.INCLUDE_ALL, 119, 15, 3 },
                         { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Publication"), false,
                                 MetadataPolicy.ONLY_CONTAINS, 13, 2, 0 },
                         
