@@ -1597,7 +1597,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             conn = this.getRepositoryManager().getPermanentRepository(currentSchemaImports).getConnection();
             // FIXME: Cannot use contexts like this for a federated method
             final URI[] contexts =
-                    this.getSesameManager().versionAndSchemaContexts(ontologyID, conn,
+                    this.getSesameManager().versionAndInferredAndSchemaContexts(ontologyID, conn,
                             this.getRepositoryManager().getSchemaManagementGraph());
             return this.getSesameManager().searchOntologyLabels(searchTerm, searchTypes, 1000, 0, conn, contexts);
         }
