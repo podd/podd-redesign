@@ -321,6 +321,7 @@
 							<goal>run</goal>
 						</goals>
 						<configuration>
+							<reload>manual</reload>
 							<scanIntervalSeconds>0</scanIntervalSeconds>
 							<daemon>true</daemon>
 						</configuration>
