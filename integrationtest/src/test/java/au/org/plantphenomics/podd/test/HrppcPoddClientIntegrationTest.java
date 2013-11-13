@@ -201,7 +201,7 @@ public class HrppcPoddClientIntegrationTest extends RestletPoddClientImplIntegra
         
         final ByteArrayOutputStream outputStream = new ByteArrayOutputStream(2048);
         
-        InferredOWLOntologyID updatedArtifactID = uploadedArtifacts.get(newArtifact);
+        final InferredOWLOntologyID updatedArtifactID = uploadedArtifacts.get(newArtifact);
         
         // Dump for debugging
         poddClient.downloadArtifact(updatedArtifactID, outputStream, RDFFormat.RDFJSON);
@@ -219,4 +219,22 @@ public class HrppcPoddClientIntegrationTest extends RestletPoddClientImplIntegra
         Assert.assertEquals(320, model.filter(null, PoddRdfConstants.PODD_SCIENCE_HAS_GENOTYPE, null).size());
     }
     
+    /**
+     * Test method for
+     * {@link au.org.plantphenomics.podd.HrppcPoddClient#processRandomisationLineNameMappingList(InputStream)}
+     * .
+     * 
+     * @throws Exception
+     */
+    @Test
+    public final void testProcessRandomisationLineNameMappingList() throws Exception
+    {
+        final HrppcPoddClient poddClient = this.getNewPoddClientInstance();
+        
+        final ConcurrentMap<String, String> processRandomisationLineNameMappingList =
+                poddClient.processRandomisationLineNameMappingList(this.getClass().getResourceAsStream(
+                        "/test/hrppc/randomisation-pot_allocation-linenames.csv"));
+        
+        Assert.assertEquals(110, processRandomisationLineNameMappingList.size());
+    }
 }

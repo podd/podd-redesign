@@ -1457,7 +1457,7 @@ public class HrppcPoddClient extends RestletPoddClientImpl
         // -----------------------------------------------------------------------------------------
         
         List<String> headers = null;
-        ConcurrentMap<String, String> result = new ConcurrentHashMap<>();
+        final ConcurrentMap<String, String> result = new ConcurrentHashMap<>();
         // Supressing try-with-resources warning generated erroneously by Eclipse:
         // https://bugs.eclipse.org/bugs/show_bug.cgi?id=371614
         try (@SuppressWarnings("resource")
@@ -1503,7 +1503,13 @@ public class HrppcPoddClient extends RestletPoddClientImpl
                         this.log.error("Line and header sizes were different: {} {}", headers, nextLine);
                     }
                     
-                    result.putIfAbsent(headers.get(0), headers.get(1));
+                    final String putIfAbsent = result.putIfAbsent(nextLine[0], nextLine[1]);
+                    if(putIfAbsent != null)
+                    {
+                        this.log.error(
+                                "Found multiple mappings for line name and number: linenumber={} duplicate={} original={}",
+                                nextLine[0], nextLine[1], putIfAbsent);
+                    }
                 }
             }
         }
