@@ -1138,7 +1138,7 @@ public class HrppcPoddClient extends RestletPoddClientImpl
      * should be created and roles assigned before this process, but could be fine to do that in
      * here
      */
-    public ConcurrentMap<InferredOWLOntologyID, Model> processRandomisationList(final InputStream in)
+    public ConcurrentMap<InferredOWLOntologyID, Model> processRandomisationList(final InputStream in, final ConcurrentMap<String, String> lineNumberMappings)
         throws IOException, PoddClientException, OpenRDFException
     {
         // Keep a queue so that we only need to update each project once for
