@@ -1435,6 +1435,19 @@ public class HrppcPoddClient extends RestletPoddClientImpl
                 plantNotes, genus, species);
     }
     
+    /**
+     * Parses the mapping of line numbers to the line names used to identify lines in the
+     * randomisation process.
+     * 
+     * @param in
+     *            An {@link InputStream} containing the CSV file with the mapping of line numbers to
+     *            line names
+     * @return A map from line numbers to line names.
+     * @throws IOException
+     *             If there is an {@link IOException}.
+     * @throws PoddClientException
+     *             If there is a problem communicating with the PODD server.
+     */
     public ConcurrentMap<String, String> processRandomisationLineNameMappingList(final InputStream in)
         throws IOException, PoddClientException
     {
