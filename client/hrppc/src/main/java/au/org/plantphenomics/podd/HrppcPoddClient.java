@@ -1550,7 +1550,7 @@ public class HrppcPoddClient extends RestletPoddClientImpl
             parsedString = IOUtils.toString(reader);
         }
         
-        String[] lines = parsedString.split("\r\n");
+        String[] lines = parsedString.split("\r?\n");
         
         List<List<String>> splitLines = new ArrayList<>();
         
