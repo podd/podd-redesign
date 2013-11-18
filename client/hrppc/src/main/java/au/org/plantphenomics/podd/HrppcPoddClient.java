@@ -24,6 +24,7 @@ import java.io.StringWriter;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -1138,8 +1139,9 @@ public class HrppcPoddClient extends RestletPoddClientImpl
      * should be created and roles assigned before this process, but could be fine to do that in
      * here
      */
-    public ConcurrentMap<InferredOWLOntologyID, Model> processRandomisationList(final InputStream in, final ConcurrentMap<String, String> lineNumberMappings)
-        throws IOException, PoddClientException, OpenRDFException
+    public ConcurrentMap<InferredOWLOntologyID, Model> processRandomisationList(final InputStream in,
+            final ConcurrentMap<String, String> lineNumberMappings) throws IOException, PoddClientException,
+        OpenRDFException
     {
         // Keep a queue so that we only need to update each project once for
         // this operation to succeed
@@ -1525,6 +1527,121 @@ public class HrppcPoddClient extends RestletPoddClientImpl
         }
         
         return result;
+    }
+    
+    /**
+     * Parses an LST file generated for the randomisation process.
+     * 
+     * @param in
+     * @return
+     * @throws IOException
+     * @throws PoddClientException
+     */
+    public List<Map<String, String>> parseLstFile(final InputStream in) throws IOException, PoddClientException
+    {
+        List<Map<String, String>> result = new ArrayList<>();
+        
+        List<String> headers = null;
+        // Supressing try-with-resources warning generated erroneously by Eclipse:
+        // https://bugs.eclipse.org/bugs/show_bug.cgi?id=371614
+        try (@SuppressWarnings("resource")
+        final InputStreamReader inputStreamReader = new InputStreamReader(in, StandardCharsets.UTF_8);
+                final CSVReader reader = new CSVReader(inputStreamReader);)
+        {
+            String[] nextLine;
+            while((nextLine = reader.readNext()) != null)
+            {
+                if(headers == null)
+                {
+                    // header line is mandatory in PODD CSV
+                    headers = Arrays.asList(nextLine);
+                    try
+                    {
+                        this.verifyLstHeaders(headers);
+                    }
+                    catch(final IllegalArgumentException e)
+                    {
+                        this.log.error("Could not verify headers for project list: {}", e.getMessage());
+                        throw new PoddClientException("Could not verify headers for project list", e);
+                    }
+                }
+                else
+                {
+                    if(nextLine.length != headers.size())
+                    {
+                        this.log.error("Line and header sizes were different: {} {}", headers, nextLine);
+                    }
+                    
+                }
+            }
+        }
+        
+        if(headers == null)
+        {
+            this.log.error("Document did not contain a valid header line");
+        }
+        
+        if(result.isEmpty())
+        {
+            this.log.error("Document did not contain any valid rows");
+        }
+        
+        return result;
+    }
+    
+    private void verifyLstHeaders(List<String> headers)
+    {
+        if(headers == null || headers.size() < LstConstants.MIN_LST_HEADERS_SIZE)
+        {
+            this.log.error("Did not find valid headers: {}", headers);
+            throw new IllegalArgumentException("Did not find valid headers");
+        }
+        
+        if(!headers.contains(LstConstants.UNIT))
+        {
+            throw new IllegalArgumentException("Did not find UNIT header");
+        }
+        
+        if(!headers.contains(LstConstants.ID))
+        {
+            throw new IllegalArgumentException("Did not find ID header");
+        }
+        
+        if(!headers.contains(LstConstants.ENTRY))
+        {
+            throw new IllegalArgumentException("Did not find ENTRY header");
+        }
+        
+        if(!headers.contains(LstConstants.ROW))
+        {
+            throw new IllegalArgumentException("Did not find ROW header");
+        }
+        
+        if(!headers.contains(LstConstants.RANGE))
+        {
+            throw new IllegalArgumentException("Did not find RANGE header");
+        }
+        
+        if(!headers.contains(LstConstants.REP))
+        {
+            throw new IllegalArgumentException("Did not find REP header");
+        }
+        
+        if(!headers.contains(LstConstants.TRT))
+        {
+            throw new IllegalArgumentException("Did not find TRT header");
+        }
+        
+        if(!headers.contains(LstConstants.B111))
+        {
+            throw new IllegalArgumentException("Did not find B111 header");
+        }
+        
+        if(!headers.contains(LstConstants.B121))
+        {
+            throw new IllegalArgumentException("Did not find B121 header");
+        }
+        
     }
     
     /**
