@@ -19,6 +19,7 @@ package au.org.plantphenomics.podd.test;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.io.StringWriter;
 import java.util.concurrent.ConcurrentMap;
 import java.util.regex.Matcher;
 
@@ -236,5 +237,15 @@ public class HrppcPoddClientIntegrationTest extends RestletPoddClientImplIntegra
                         "/test/hrppc/randomisation-pot_allocation-linenames.csv"));
         
         Assert.assertEquals(110, processRandomisationLineNameMappingList.size());
+    }
+    
+    @Test
+    public final void testProcessLstFile() throws Exception
+    {
+        final HrppcPoddClient poddClient = this.getNewPoddClientInstance();
+        
+        StringWriter results = new StringWriter();
+        poddClient.parseLstFile(this.getClass().getResourceAsStream("/test/hrppc/d110cc.lst"), results);
+        System.out.print(results.toString());
     }
 }

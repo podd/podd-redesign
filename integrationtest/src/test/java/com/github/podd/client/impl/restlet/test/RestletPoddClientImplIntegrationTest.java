@@ -135,6 +135,10 @@ public class RestletPoddClientImplIntegrationTest extends AbstractPoddClientTest
                 representation.release();
             }
         }
+        catch(Throwable e)
+        {
+            this.log.error("FAILURE: Could not reset PODD server after test complete", e);
+        }
         finally
         {
             if(clientResource.getNext() != null && clientResource.getNext() instanceof Client)
@@ -144,13 +148,9 @@ public class RestletPoddClientImplIntegrationTest extends AbstractPoddClientTest
                 {
                     c.stop();
                 }
-                catch(final IOException e)
+                catch(final Throwable e)
                 {
-                    throw e;
-                }
-                catch(final Exception e)
-                {
-                    throw new IOException(e);
+                    this.log.error("FAILURE: Could not reset PODD server after test complete", e);
                 }
             }
             

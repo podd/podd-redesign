@@ -17,10 +17,13 @@
 package au.org.plantphenomics.podd;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.StringWriter;
+import java.io.Writer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
@@ -33,6 +36,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.regex.Matcher;
 
+import org.apache.commons.io.IOUtils;
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.Literal;
 import org.openrdf.model.Model;
@@ -1530,49 +1534,73 @@ public class HrppcPoddClient extends RestletPoddClientImpl
     }
     
     /**
-     * Parses an LST file generated for the randomisation process.
+     * Parses an LST file generated for the randomisation process and returns a CSV file that can be
+     * imported into Excel.
      * 
      * @param in
-     * @return
      * @throws IOException
      * @throws PoddClientException
      */
-    public List<Map<String, String>> parseLstFile(final InputStream in) throws IOException, PoddClientException
+    public void parseLstFile(final InputStream in, final Writer output) throws IOException, PoddClientException
     {
-        List<Map<String, String>> result = new ArrayList<>();
-        
         List<String> headers = null;
-        // Supressing try-with-resources warning generated erroneously by Eclipse:
-        // https://bugs.eclipse.org/bugs/show_bug.cgi?id=371614
-        try (@SuppressWarnings("resource")
-        final InputStreamReader inputStreamReader = new InputStreamReader(in, StandardCharsets.UTF_8);
-                final CSVReader reader = new CSVReader(inputStreamReader);)
+        String parsedString;
+        try (final InputStreamReader reader = new InputStreamReader(in, StandardCharsets.UTF_8);)
         {
-            String[] nextLine;
-            while((nextLine = reader.readNext()) != null)
+            parsedString = IOUtils.toString(reader);
+        }
+        
+        String[] lines = parsedString.split("\r\n");
+        
+        List<List<String>> splitLines = new ArrayList<>();
+        
+        for(String nextLineFull : lines)
+        {
+            splitLines.add(Arrays.asList(nextLineFull.trim().split("\\s+")));
+        }
+        
+        for(List<String> nextLine : splitLines)
+        {
+            if(headers == null)
             {
-                if(headers == null)
+                // header line is mandatory in LST file
+                headers = nextLine;
+                try
                 {
-                    // header line is mandatory in PODD CSV
-                    headers = Arrays.asList(nextLine);
-                    try
-                    {
-                        this.verifyLstHeaders(headers);
-                    }
-                    catch(final IllegalArgumentException e)
-                    {
-                        this.log.error("Could not verify headers for project list: {}", e.getMessage());
-                        throw new PoddClientException("Could not verify headers for project list", e);
-                    }
+                    this.verifyLstHeaders(headers);
                 }
-                else
+                catch(final IllegalArgumentException e)
                 {
-                    if(nextLine.length != headers.size())
-                    {
-                        this.log.error("Line and header sizes were different: {} {}", headers, nextLine);
-                    }
-                    
+                    this.log.error("Could not verify headers for LST file: {}", e.getMessage());
+                    throw new PoddClientException("Could not verify headers for LST file", e);
                 }
+                
+                for(int i = 0; i < headers.size(); i++)
+                {
+                    if(i > 0)
+                    {
+                        output.write(", ");
+                    }
+                    output.write(headers.get(i));
+                }
+                output.write("\r\n");
+            }
+            else
+            {
+                if(nextLine.size() != headers.size())
+                {
+                    this.log.error("Line and header sizes were different: {} {}", headers, nextLine);
+                }
+                
+                for(int i = 0; i < headers.size(); i++)
+                {
+                    if(i > 0)
+                    {
+                        output.write(", ");
+                    }
+                    output.write(nextLine.get(i));
+                }
+                output.write("\r\n");
             }
         }
         
@@ -1580,13 +1608,6 @@ public class HrppcPoddClient extends RestletPoddClientImpl
         {
             this.log.error("Document did not contain a valid header line");
         }
-        
-        if(result.isEmpty())
-        {
-            this.log.error("Document did not contain any valid rows");
-        }
-        
-        return result;
     }
     
     private void verifyLstHeaders(List<String> headers)
