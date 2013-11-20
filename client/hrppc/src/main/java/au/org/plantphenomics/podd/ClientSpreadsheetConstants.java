@@ -57,7 +57,7 @@ public final class ClientSpreadsheetConstants
      * Client spreadsheet header for the type of the tray.
      */
     public static final String CLIENT_TRAY_TYPE_NAME = "TrayTypeName";
-    public static final int MIN_PLANTSCAN_HEADERS_SIZE = 7;
+    public static final int MIN_TRAYSCAN_HEADERS_SIZE = 7;
     /**
      * Number of groups matching in the position regex.
      */
