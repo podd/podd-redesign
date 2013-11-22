@@ -188,27 +188,32 @@ public class HrppcPoddClient extends RestletPoddClientImpl
             final ConcurrentMap<InferredOWLOntologyID, Model> uploadQueue, final PoddCSVTrayPotLine nextLine)
         throws PoddClientException, GraphUtilException
     {
+        
         // Reconstruct Project#0001-0002 structure to get a normalised string
-        final String baseProjectName =
-                String.format(ClientSpreadsheetConstants.TEMPLATE_PROJECT, nextLine.year, nextLine.projectNumber);
+        
+        // final String baseProjectName =
+        // String.format(ClientSpreadsheetConstants.TEMPLATE_PROJECT, nextLine.year,
+        // nextLine.projectNumber);
         URI nextExperimentUri = null;
         
-        final Map<URI, InferredOWLOntologyID> projectDetails = this.getProjectDetails(projectUriMap, baseProjectName);
-        this.checkProjectDetails(baseProjectName, projectDetails);
+        final Map<URI, InferredOWLOntologyID> projectDetails =
+                this.getProjectDetails(projectUriMap, nextLine.projectID);
+        this.checkProjectDetails(nextLine.projectID, projectDetails);
         
         final URI nextProjectUri = projectDetails.keySet().iterator().next();
         final InferredOWLOntologyID nextProjectID = projectDetails.get(nextProjectUri);
         
-        this.log.debug("Found unique PODD Project name to URI mapping: {} {}", baseProjectName, projectDetails);
+        this.log.debug("Found unique PODD Project name to URI mapping: {} {}", nextLine.projectID, projectDetails);
         
         // Reconstruct Project#0001-0002_Experiment#0001 structure to get a normalised
         // string
-        final String baseExperimentName =
-                String.format(ClientSpreadsheetConstants.TEMPLATE_EXPERIMENT, nextLine.year, nextLine.projectNumber,
-                        nextLine.experimentNumber);
+        // final String baseExperimentName =
+        // String.format(ClientSpreadsheetConstants.TEMPLATE_EXPERIMENT, nextLine.year,
+        // nextLine.projectNumber,
+        // nextLine.experimentNumber);
         
-        final Map<URI, URI> experimentDetails = this.getExperimentDetails(experimentUriMap, baseExperimentName);
-        this.checkExperimentDetails(baseExperimentName, experimentDetails);
+        final Map<URI, URI> experimentDetails = this.getExperimentDetails(experimentUriMap, nextLine.experimentID);
+        this.checkExperimentDetails(nextLine.experimentID, experimentDetails);
         
         nextExperimentUri = experimentDetails.keySet().iterator().next();
         final URI checkProjectUri = experimentDetails.get(nextExperimentUri);
@@ -216,7 +221,7 @@ public class HrppcPoddClient extends RestletPoddClientImpl
         {
             this.log.error(
                     "Experiment mapping was against a different project: {} experimentURI={} nextProjectUri={} checkProjectUri={}",
-                    baseExperimentName, nextExperimentUri, nextProjectUri, checkProjectUri);
+                    nextLine.experimentID, nextExperimentUri, nextProjectUri, checkProjectUri);
         }
         
         // Create or find an existing model for the necessary modifications to this
@@ -240,8 +245,10 @@ public class HrppcPoddClient extends RestletPoddClientImpl
                         nextProjectID, nextProjectUri);
         
         // Add new poddScience:Container for tray
+        // TODO: Create specialised container subtype for tray
         nextResult.add(nextTrayURI, RDF.TYPE, PoddRdfConstants.PODD_SCIENCE_CONTAINER);
         // Link tray to experiment
+        // TODO: Create specialised container relation for tray
         nextResult.add(nextExperimentUri, PoddRdfConstants.PODD_SCIENCE_HAS_CONTAINER, nextTrayURI);
         // TrayID => Add poddScience:hasBarcode to tray
         nextResult.add(nextTrayURI, PoddRdfConstants.PODD_SCIENCE_HAS_BARCODE, this.vf.createLiteral(nextLine.trayID));
@@ -252,8 +259,10 @@ public class HrppcPoddClient extends RestletPoddClientImpl
                 this.vf.createLiteral(nextLine.trayTypeName));
         
         // Add new poddScience:Container for pot
+        // TODO: Create specialised container subtype for pot
         nextResult.add(nextPotURI, RDF.TYPE, PoddRdfConstants.PODD_SCIENCE_CONTAINER);
         // Link pot to tray
+        // TODO: Create specialised container relation for pot
         nextResult.add(nextTrayURI, PoddRdfConstants.PODD_SCIENCE_HAS_CONTAINER, nextPotURI);
         // PlantID => Add poddScience:hasBarcode to pot
         nextResult.add(nextPotURI, PoddRdfConstants.PODD_SCIENCE_HAS_BARCODE, this.vf.createLiteral(nextLine.plantID));
@@ -860,13 +869,81 @@ public class HrppcPoddClient extends RestletPoddClientImpl
             final String nextHeader = headers.get(i);
             final String nextField = nextLine.get(i);
             
-            if(nextHeader.trim().equals(ClientSpreadsheetConstants.CLIENT_TRAY_ID))
+            if(nextHeader.trim().equals(ClientSpreadsheetConstants.CLIENT_YEAR))
+            {
+                result.year = nextField;
+            }
+            else if(nextHeader.trim().equals(ClientSpreadsheetConstants.CLIENT_PROJECT_NUMBER))
+            {
+                result.projectNumber = nextField;
+            }
+            else if(nextHeader.trim().equals(ClientSpreadsheetConstants.CLIENT_PROJECT_ID))
+            {
+                result.projectID = nextField;
+            }
+            else if(nextHeader.trim().equals(ClientSpreadsheetConstants.CLIENT_EXPERIMENT_NUMBER))
+            {
+                result.experimentNumber = nextField;
+            }
+            else if(nextHeader.trim().equals(ClientSpreadsheetConstants.CLIENT_EXPERIMENT_ID))
+            {
+                result.experimentID = nextField;
+            }
+            else if(nextHeader.trim().equals(ClientSpreadsheetConstants.CLIENT_GENUS))
+            {
+                result.genus = nextField;
+            }
+            else if(nextHeader.trim().equals(ClientSpreadsheetConstants.CLIENT_SPECIES))
+            {
+                result.species = nextField;
+            }
+            else if(nextHeader.trim().equals(ClientSpreadsheetConstants.CLIENT_POT_NUMBER))
+            {
+                result.potNumber = nextField;
+            }
+            else if(nextHeader.trim().equals(ClientSpreadsheetConstants.CLIENT_TRAY_NUMBER))
+            {
+                result.trayNumber = nextField;
+            }
+            else if(nextHeader.trim().equals(ClientSpreadsheetConstants.CLIENT_POT_NUMBER_TRAY))
+            {
+                result.potNumberTray = nextField;
+            }
+            else if(nextHeader.trim().equals(ClientSpreadsheetConstants.CLIENT_COLUMN_NUMBER_TRAY))
+            {
+                result.columnNumberTray = nextField;
+            }
+            else if(nextHeader.trim().equals(ClientSpreadsheetConstants.CLIENT_COLUMN_LETTER))
+            {
+                result.columnLetter = nextField;
+            }
+            else if(nextHeader.trim().equals(ClientSpreadsheetConstants.CLIENT_ROW_NUMBER_TRAY))
+            {
+                result.rowNumberTray = nextField;
+            }
+            else if(nextHeader.trim().equals(ClientSpreadsheetConstants.CLIENT_ROW_NUMBER_REP))
+            {
+                result.rowNumberRep = nextField;
+            }
+            else if(nextHeader.trim().equals(ClientSpreadsheetConstants.CLIENT_COLUMN_NUMBER_REP))
+            {
+                result.columnNumberRep = nextField;
+            }
+            else if(nextHeader.trim().equals(ClientSpreadsheetConstants.CLIENT_COLUMN_NUMBER))
+            {
+                result.columnNumber = nextField;
+            }
+            else if(nextHeader.trim().equals(ClientSpreadsheetConstants.CLIENT_TRAY_ID))
             {
                 result.trayID = nextField;
             }
             else if(nextHeader.trim().equals(ClientSpreadsheetConstants.CLIENT_TRAY_NOTES))
             {
                 result.trayNotes = nextField;
+            }
+            else if(nextHeader.trim().equals(ClientSpreadsheetConstants.CLIENT_TRAY_ROW_NUMBER))
+            {
+                result.trayRowNumber = nextField;
             }
             else if(nextHeader.trim().equals(ClientSpreadsheetConstants.CLIENT_TRAY_TYPE_NAME))
             {
@@ -880,6 +957,10 @@ public class HrppcPoddClient extends RestletPoddClientImpl
             {
                 result.plantID = nextField;
             }
+            else if(nextHeader.trim().equals(ClientSpreadsheetConstants.CLIENT_PLANT_LINE_NUMBER))
+            {
+                result.plantLineNumber = nextField;
+            }
             else if(nextHeader.trim().equals(ClientSpreadsheetConstants.CLIENT_PLANT_NAME))
             {
                 result.plantName = nextField;
@@ -887,6 +968,18 @@ public class HrppcPoddClient extends RestletPoddClientImpl
             else if(nextHeader.trim().equals(ClientSpreadsheetConstants.CLIENT_PLANT_NOTES))
             {
                 result.plantNotes = nextField;
+            }
+            else if(nextHeader.trim().equals(ClientSpreadsheetConstants.CLIENT_CONTROL))
+            {
+                result.control = nextField;
+            }
+            else if(nextHeader.trim().equals(ClientSpreadsheetConstants.CLIENT_REPLICATE_NUMBER))
+            {
+                result.replicateNumber = nextField;
+            }
+            else if(nextHeader.trim().equals(ClientSpreadsheetConstants.CLIENT_POT_REPLICATE_NUMBER))
+            {
+                result.potReplicateNumber = nextField;
             }
             else
             {

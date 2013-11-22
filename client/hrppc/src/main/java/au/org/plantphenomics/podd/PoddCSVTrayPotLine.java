@@ -26,7 +26,9 @@ public class PoddCSVTrayPotLine
 {
     public String year;
     public String projectNumber;
+    public String projectID;
     public String experimentNumber;
+    public String experimentID;
     public String genus;
     public String species;
     public String potNumber;

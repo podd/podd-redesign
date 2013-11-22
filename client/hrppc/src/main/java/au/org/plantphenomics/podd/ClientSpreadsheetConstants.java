@@ -28,7 +28,9 @@ public final class ClientSpreadsheetConstants
 {
     public static final String CLIENT_YEAR = "Year";
     public static final String CLIENT_PROJECT_NUMBER = "ProjectNumber";
+    public static final String CLIENT_PROJECT_ID = "ProjectID";
     public static final String CLIENT_EXPERIMENT_NUMBER = "ExperimentNumber";
+    public static final String CLIENT_EXPERIMENT_ID = "ExperimentID";
     public static final String CLIENT_GENUS = "Genus";
     public static final String CLIENT_SPECIES = "Species";
     public static final String CLIENT_POT_NUMBER = "PotNumber";
