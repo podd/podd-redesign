@@ -69,8 +69,6 @@ public final class ClientSpreadsheetConstants
      * Number of groups matching in the plant id regex.
      */
     public static final int CLIENT_PLANT_ID_SIZE = 7;
-    public static final String CLIENT_PLANT_NAME = "PlantName";
-    public static final String CLIENT_PLANT_NOTES = "PlantNotes";
     /**
      * Number of groups matching in the tray id regex.
      */

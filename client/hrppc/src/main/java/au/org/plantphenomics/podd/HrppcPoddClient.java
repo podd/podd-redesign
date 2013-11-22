@@ -185,14 +185,12 @@ public class HrppcPoddClient extends RestletPoddClientImpl
             final ConcurrentMap<String, ConcurrentMap<URI, URI>> trayUriMap,
             final ConcurrentMap<String, ConcurrentMap<URI, URI>> potUriMap,
             final ConcurrentMap<URI, ConcurrentMap<URI, Model>> genotypeUriMap,
-            final ConcurrentMap<InferredOWLOntologyID, Model> uploadQueue, final int projectYear,
-            final int projectNumber, final int experimentNumber, final String trayId, final String trayNotes,
-            final String trayTypeName, final String plantId, final String plantName, final String plantNotes,
-            final String genus, final String species) throws PoddClientException, GraphUtilException
+            final ConcurrentMap<InferredOWLOntologyID, Model> uploadQueue, final PoddCSVTrayPotLine nextLine)
+        throws PoddClientException, GraphUtilException
     {
         // Reconstruct Project#0001-0002 structure to get a normalised string
         final String baseProjectName =
-                String.format(ClientSpreadsheetConstants.TEMPLATE_PROJECT, projectYear, projectNumber);
+                String.format(ClientSpreadsheetConstants.TEMPLATE_PROJECT, nextLine.year, nextLine.projectNumber);
         URI nextExperimentUri = null;
         
         final Map<URI, InferredOWLOntologyID> projectDetails = this.getProjectDetails(projectUriMap, baseProjectName);
@@ -206,8 +204,8 @@ public class HrppcPoddClient extends RestletPoddClientImpl
         // Reconstruct Project#0001-0002_Experiment#0001 structure to get a normalised
         // string
         final String baseExperimentName =
-                String.format(ClientSpreadsheetConstants.TEMPLATE_EXPERIMENT, projectYear, projectNumber,
-                        experimentNumber);
+                String.format(ClientSpreadsheetConstants.TEMPLATE_EXPERIMENT, nextLine.year, nextLine.projectNumber,
+                        nextLine.experimentNumber);
         
         final Map<URI, URI> experimentDetails = this.getExperimentDetails(experimentUriMap, baseExperimentName);
         this.checkExperimentDetails(baseExperimentName, experimentDetails);
@@ -230,34 +228,35 @@ public class HrppcPoddClient extends RestletPoddClientImpl
             nextResult = putIfAbsent;
         }
         
-        final URI nextTrayURI = this.getTrayUri(trayUriMap, trayId, nextProjectID, nextExperimentUri);
+        final URI nextTrayURI = this.getTrayUri(trayUriMap, nextLine.trayID, nextProjectID, nextExperimentUri);
         
         // Check whether plantId already has an assigned URI
-        final URI nextPotURI = this.getPotUri(potUriMap, plantId, nextProjectID, nextTrayURI);
+        final URI nextPotURI = this.getPotUri(potUriMap, nextLine.plantID, nextProjectID, nextTrayURI);
         
         // Check whether genus/specieis/plantName already has an assigned URI (and automatically
         // assign a temporary URI if it does not)
         final URI nextGenotypeURI =
-                this.getGenotypeUri(genotypeUriMap, genus, species, plantName, nextProjectID, nextProjectUri);
+                this.getGenotypeUri(genotypeUriMap, nextLine.genus, nextLine.species, nextLine.plantLineName,
+                        nextProjectID, nextProjectUri);
         
         // Add new poddScience:Container for tray
         nextResult.add(nextTrayURI, RDF.TYPE, PoddRdfConstants.PODD_SCIENCE_CONTAINER);
         // Link tray to experiment
         nextResult.add(nextExperimentUri, PoddRdfConstants.PODD_SCIENCE_HAS_CONTAINER, nextTrayURI);
         // TrayID => Add poddScience:hasBarcode to tray
-        nextResult.add(nextTrayURI, PoddRdfConstants.PODD_SCIENCE_HAS_BARCODE, this.vf.createLiteral(trayId));
+        nextResult.add(nextTrayURI, PoddRdfConstants.PODD_SCIENCE_HAS_BARCODE, this.vf.createLiteral(nextLine.trayID));
         // TrayNotes => Add rdfs:label to tray
-        nextResult.add(nextTrayURI, RDFS.LABEL, this.vf.createLiteral(trayNotes));
+        nextResult.add(nextTrayURI, RDFS.LABEL, this.vf.createLiteral(nextLine.trayNotes));
         // TrayTypeName => Add poddScience:hasContainerType to tray
         nextResult.add(nextTrayURI, PoddRdfConstants.PODD_SCIENCE_HAS_CONTAINER_TYPE,
-                this.vf.createLiteral(trayTypeName));
+                this.vf.createLiteral(nextLine.trayTypeName));
         
         // Add new poddScience:Container for pot
         nextResult.add(nextPotURI, RDF.TYPE, PoddRdfConstants.PODD_SCIENCE_CONTAINER);
         // Link pot to tray
         nextResult.add(nextTrayURI, PoddRdfConstants.PODD_SCIENCE_HAS_CONTAINER, nextPotURI);
         // PlantID => Add poddScience:hasBarcode to pot
-        nextResult.add(nextPotURI, PoddRdfConstants.PODD_SCIENCE_HAS_BARCODE, this.vf.createLiteral(plantId));
+        nextResult.add(nextPotURI, PoddRdfConstants.PODD_SCIENCE_HAS_BARCODE, this.vf.createLiteral(nextLine.plantID));
         // Link the genus/species/plantName combination to a genotype
         nextResult.add(nextPotURI, PoddRdfConstants.PODD_SCIENCE_REFERS_TO_GENOTYPE, nextGenotypeURI);
         if(nextGenotypeURI.stringValue().startsWith(this.TEMP_UUID_PREFIX))
@@ -268,13 +267,13 @@ public class HrppcPoddClient extends RestletPoddClientImpl
         }
         String potLabel;
         // PlantNotes => Add rdfs:label to pot
-        if(plantNotes.isEmpty())
+        if(nextLine.plantNote == null || nextLine.plantNote.isEmpty())
         {
-            potLabel = ClientSpreadsheetConstants.LABEL_POT + " " + plantName;
+            potLabel = ClientSpreadsheetConstants.LABEL_POT + " " + nextLine.plantLineName;
         }
         else
         {
-            potLabel = ClientSpreadsheetConstants.LABEL_POT + " " + plantName + " : " + plantNotes;
+            potLabel = ClientSpreadsheetConstants.LABEL_POT + " " + nextLine.plantLineName + " : " + nextLine.plantNote;
         }
         nextResult.add(nextPotURI, RDFS.LABEL, this.vf.createLiteral(potLabel));
         // Position => TODO: Need to use randomisation data to populate the position
@@ -854,14 +853,14 @@ public class HrppcPoddClient extends RestletPoddClientImpl
             final ConcurrentMap<InferredOWLOntologyID, Model> uploadQueue) throws PoddClientException, OpenRDFException
     {
         this.log.info("About to process line: {}", nextLine);
-        
-        String trayId = null;
-        String trayNotes = null;
-        String trayTypeName = null;
-        String position = null;
-        String plantId = null;
-        String plantName = null;
-        String plantNotes = null;
+        PoddCSVTrayPotLine result = new PoddCSVTrayPotLine();
+        // String trayId = null;
+        // String trayNotes = null;
+        // String trayTypeName = null;
+        // String position = null;
+        // String plantId = null;
+        // String plantName = null;
+        // String plantNotes = null;
         
         for(int i = 0; i < headers.size(); i++)
         {
@@ -870,142 +869,41 @@ public class HrppcPoddClient extends RestletPoddClientImpl
             
             if(nextHeader.trim().equals(ClientSpreadsheetConstants.CLIENT_TRAY_ID))
             {
-                trayId = nextField;
+                result.trayID = nextField;
             }
             else if(nextHeader.trim().equals(ClientSpreadsheetConstants.CLIENT_TRAY_NOTES))
             {
-                trayNotes = nextField;
+                result.trayNotes = nextField;
             }
             else if(nextHeader.trim().equals(ClientSpreadsheetConstants.CLIENT_TRAY_TYPE_NAME))
             {
-                trayTypeName = nextField;
+                result.trayTypeName = nextField;
             }
             else if(nextHeader.trim().equals(ClientSpreadsheetConstants.CLIENT_POSITION))
             {
-                position = nextField;
+                result.position = nextField;
             }
             else if(nextHeader.trim().equals(ClientSpreadsheetConstants.CLIENT_PLANT_ID))
             {
-                plantId = nextField;
+                result.plantID = nextField;
             }
-            else if(nextHeader.trim().equals(ClientSpreadsheetConstants.CLIENT_PLANT_NAME))
+            else if(nextHeader.trim().equals(ClientSpreadsheetConstants.CLIENT_PLANT_LINE_NAME))
             {
-                plantName = nextField;
+                result.plantLineName = nextField;
             }
-            else if(nextHeader.trim().equals(ClientSpreadsheetConstants.CLIENT_PLANT_NOTES))
+            else if(nextHeader.trim().equals(ClientSpreadsheetConstants.CLIENT_PLANT_NOTE))
             {
-                plantNotes = nextField;
+                result.plantNote = nextField;
             }
             else
             {
                 this.log.error("Found unrecognised header: {} {}", nextHeader, nextField);
+                throw new PoddClientException("TODO: Handle unrecognised header: " + nextHeader);
             }
-        }
-        
-        int projectYear = 0;
-        int projectNumber = 0;
-        int experimentNumber = 0;
-        String genus = null;
-        String species = null;
-        int trayNumber = 0;
-        int potNumber = 0;
-        
-        final Matcher trayMatcher = ClientSpreadsheetConstants.REGEX_TRAY.matcher(trayId);
-        
-        if(!trayMatcher.matches())
-        {
-            this.log.error("Tray ID did not match expected format: {}", trayId);
-        }
-        else
-        {
-            if(trayMatcher.groupCount() != ClientSpreadsheetConstants.CLIENT_TRAY_ID_SIZE)
-            {
-                this.log.error("Did not find the expected number of regex matches for Tray ID: {} {}",
-                        trayMatcher.groupCount(), ClientSpreadsheetConstants.CLIENT_TRAY_ID_SIZE);
-            }
-            else
-            {
-                projectYear = Integer.parseInt(trayMatcher.group(1).trim());
-                projectNumber = Integer.parseInt(trayMatcher.group(2).trim());
-                experimentNumber = Integer.parseInt(trayMatcher.group(3).trim());
-                genus = trayMatcher.group(4).trim();
-                species = trayMatcher.group(5).trim();
-                trayNumber = Integer.parseInt(trayMatcher.group(6).trim());
-            }
-        }
-        
-        final Matcher plantMatcher = ClientSpreadsheetConstants.REGEX_PLANT.matcher(plantId);
-        
-        if(!plantMatcher.matches())
-        {
-            this.log.error("Plant ID did not match expected format: {}", plantId);
-        }
-        else
-        {
-            if(plantMatcher.groupCount() != ClientSpreadsheetConstants.CLIENT_PLANT_ID_SIZE)
-            {
-                this.log.error("Did not find the expected number of regex matches for Plant ID: {} {}",
-                        plantMatcher.groupCount(), ClientSpreadsheetConstants.CLIENT_PLANT_ID_SIZE);
-            }
-            else
-            {
-                // if(projectYear == null)
-                // {
-                // projectYear = plantMatcher.group(1).trim();
-                // }
-                // if(projectNumber == null)
-                // {
-                // projectNumber = plantMatcher.group(2);
-                // }
-                // if(experimentNumber == null)
-                // {
-                // experimentNumber = plantMatcher.group(3);
-                // }
-                if(genus == null)
-                {
-                    genus = plantMatcher.group(4).trim();
-                }
-                if(species == null)
-                {
-                    species = plantMatcher.group(5).trim();
-                }
-                // if(trayNumber == null)
-                // {
-                // trayNumber = plantMatcher.group(6);
-                // }
-                potNumber = Integer.parseInt(plantMatcher.group(7).trim());
-            }
-        }
-        
-        String columnLetter = null;
-        String rowNumber = null;
-        
-        final Matcher positionMatcher = ClientSpreadsheetConstants.REGEX_POSITION.matcher(position);
-        
-        if(!positionMatcher.matches())
-        {
-            this.log.error("Position did not match expected format: {} {}", position, nextLine);
-            // TODO: These may not be populated so do not throw an exception if it fails.
-            // throw new
-            // PoddClientException(MessageFormat.format("Position did not match expected format: {0}",
-            // position));
-        }
-        else if(positionMatcher.groupCount() != ClientSpreadsheetConstants.POSITION_SIZE)
-        {
-            this.log.error("Did not find the expected number of regex matches for Position: {} {}",
-                    positionMatcher.groupCount(), ClientSpreadsheetConstants.POSITION_SIZE);
-            throw new PoddClientException(MessageFormat.format(
-                    "Did not find the expected number of regex matches for Position: {0}", position));
-        }
-        else
-        {
-            columnLetter = positionMatcher.group(1).trim();
-            rowNumber = positionMatcher.group(2).trim();
         }
         
         this.generateTrayScanRDF(projectUriMap, experimentUriMap, trayUriMap, potUriMap, genotypeUriMap, uploadQueue,
-                projectYear, projectNumber, experimentNumber, trayId, trayNotes, trayTypeName, plantId, plantName,
-                plantNotes, genus, species);
+                result);
     }
     
     /**
@@ -1423,12 +1321,12 @@ public class HrppcPoddClient extends RestletPoddClientImpl
             throw new IllegalArgumentException("Did not find plant id header");
         }
         
-        if(!headers.contains(ClientSpreadsheetConstants.CLIENT_PLANT_NAME))
+        if(!headers.contains(ClientSpreadsheetConstants.CLIENT_PLANT_LINE_NAME))
         {
             throw new IllegalArgumentException("Did not find plant name header");
         }
         
-        if(!headers.contains(ClientSpreadsheetConstants.CLIENT_PLANT_NOTES))
+        if(!headers.contains(ClientSpreadsheetConstants.CLIENT_PLANT_NOTE))
         {
             throw new IllegalArgumentException("Did not find plant notes header");
         }
