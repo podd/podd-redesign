@@ -26,8 +26,45 @@ import java.util.regex.Pattern;
  */
 public final class ClientSpreadsheetConstants
 {
-    
+    public static final String CLIENT_YEAR = "Year";
+    public static final String CLIENT_PROJECT_NUMBER = "ProjectNumber";
+    public static final String CLIENT_EXPERIMENT_NUMBER = "ExperimentNumber";
+    public static final String CLIENT_GENUS = "Genus";
+    public static final String CLIENT_SPECIES = "Species";
+    public static final String CLIENT_POT_NUMBER = "PotNumber";
+    public static final String CLIENT_TRAY_NUMBER = "TrayNumber";
+    public static final String CLIENT_POT_NUMBER_TRAY = "PotNumberTray";
+    public static final String CLIENT_COLUMN_NUMBER_TRAY = "ColumnNumberTray";
+    public static final String CLIENT_COLUMN_LETTER = "ColumnLetter";
+    public static final String CLIENT_ROW_NUMBER_TRAY = "RowNumberTray";
+    public static final String CLIENT_ROW_NUMBER_REP = "RowNumberRep";
+    public static final String CLIENT_COLUMN_NUMBER_REP = "ColumnNumberRep";
+    public static final String CLIENT_COLUMN_NUMBER = "ColumnNumber";
+    /**
+     * Client spreadsheet header for the barcode for the tray.
+     */
+    public static final String CLIENT_TRAY_ID = "TrayID";
+    /**
+     * Client spreadsheet header for the notes for the tray.
+     */
+    public static final String CLIENT_TRAY_NOTES = "TrayNotes";
+    public static final String CLIENT_TRAY_ROW_NUMBER = "TrayRowNumber";
+    /**
+     * Client spreadsheet header for the type of the tray.
+     */
+    public static final String CLIENT_TRAY_TYPE_NAME = "TrayTypeName";
+    /**
+     * Client spreadsheet header for the position.
+     */
+    public static final String CLIENT_POSITION = "Position";
     public static final String CLIENT_PLANT_ID = "PlantID";
+    public static final String CLIENT_PLANT_LINE_NUMBER = "PlantLineNumber";
+    public static final String CLIENT_PLANT_LINE_NAME = "PlantLineName";
+    public static final String CLIENT_PLANT_NOTE = "PlantNote";
+    public static final String CLIENT_CONTROL = "Control";
+    public static final String CLIENT_REPLICATE_NUMBER = "ReplicateNumber";
+    public static final String CLIENT_POT_REPLICATE_NUMBER = "PotReplicateNumber";
+    
     /**
      * Number of groups matching in the plant id regex.
      */
@@ -35,28 +72,9 @@ public final class ClientSpreadsheetConstants
     public static final String CLIENT_PLANT_NAME = "PlantName";
     public static final String CLIENT_PLANT_NOTES = "PlantNotes";
     /**
-     * Client spreadsheet header for the position.
-     * <p>
-     * NOTE: This is not currently used, as the randomisation spreadsheet defines the position for a
-     * tray and pot.
-     */
-    public static final String CLIENT_POSITION = "Position";
-    /**
-     * Client spreadsheet header for the barcode for the tray.
-     */
-    public static final String CLIENT_TRAY_ID = "TrayID";
-    /**
      * Number of groups matching in the tray id regex.
      */
     public static final int CLIENT_TRAY_ID_SIZE = 6;
-    /**
-     * Client spreadsheet header for the notes for the tray.
-     */
-    public static final String CLIENT_TRAY_NOTES = "TrayNotes";
-    /**
-     * Client spreadsheet header for the type of the tray.
-     */
-    public static final String CLIENT_TRAY_TYPE_NAME = "TrayTypeName";
     public static final int MIN_TRAYSCAN_HEADERS_SIZE = 7;
     /**
      * Number of groups matching in the position regex.
@@ -79,5 +97,6 @@ public final class ClientSpreadsheetConstants
             "CONSTRUCT { ?object a ?type . ?object ?predicate ?value . } WHERE { ?object a ?type . ?object ?predicate ?value . } VALUES (?type) { ( %s ) }";
     public static final String TEMPLATE_SPARQL_BY_TYPE_LABEL_STRSTARTS =
             "CONSTRUCT { ?object a ?type . ?object <http://www.w3.org/2000/01/rdf-schema#label> ?label . } WHERE { ?object a ?type . ?object <http://www.w3.org/2000/01/rdf-schema#label> ?label . FILTER(STRSTARTS(?label, \"%s\")) } VALUES (?type) { ( %s ) }";
+    public static final String LABEL_POT = "Pot #";
     
 }

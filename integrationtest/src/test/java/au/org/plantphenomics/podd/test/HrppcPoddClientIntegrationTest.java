@@ -222,7 +222,7 @@ public class HrppcPoddClientIntegrationTest extends RestletPoddClientImplIntegra
     
     /**
      * Test method for
-     * {@link au.org.plantphenomics.podd.HrppcPoddClient#processRandomisationLineNameMappingList(InputStream)}
+     * {@link au.org.plantphenomics.podd.HrppcPoddClient#processLineNameMappingList(InputStream)}
      * .
      * 
      * @throws Exception
@@ -233,7 +233,7 @@ public class HrppcPoddClientIntegrationTest extends RestletPoddClientImplIntegra
         final HrppcPoddClient poddClient = this.getNewPoddClientInstance();
         
         final ConcurrentMap<String, String> processRandomisationLineNameMappingList =
-                poddClient.processRandomisationLineNameMappingList(this.getClass().getResourceAsStream(
+                poddClient.processLineNameMappingList(this.getClass().getResourceAsStream(
                         "/test/hrppc/randomisation-pot_allocation-linenames.csv"));
         
         Assert.assertEquals(110, processRandomisationLineNameMappingList.size());

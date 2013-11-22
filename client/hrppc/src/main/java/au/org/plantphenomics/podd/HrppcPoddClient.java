@@ -266,9 +266,17 @@ public class HrppcPoddClient extends RestletPoddClientImpl
             // descriptions are added
             nextResult.addAll(genotypeUriMap.get(nextProjectUri).get(nextGenotypeURI));
         }
+        String potLabel;
         // PlantNotes => Add rdfs:label to pot
-        nextResult.add(nextPotURI, RDFS.LABEL, this.vf.createLiteral(plantNotes));
-        
+        if(plantNotes.isEmpty())
+        {
+            potLabel = ClientSpreadsheetConstants.LABEL_POT + " " + plantName;
+        }
+        else
+        {
+            potLabel = ClientSpreadsheetConstants.LABEL_POT + " " + plantName + " : " + plantNotes;
+        }
+        nextResult.add(nextPotURI, RDFS.LABEL, this.vf.createLiteral(potLabel));
         // Position => TODO: Need to use randomisation data to populate the position
         // TODO Using d110cc.csv
         // Add poddScience:hasReplicate for tray to link it to the rep #
@@ -1013,8 +1021,8 @@ public class HrppcPoddClient extends RestletPoddClientImpl
      * @throws PoddClientException
      *             If there is a problem communicating with the PODD server.
      */
-    public ConcurrentMap<String, String> processRandomisationLineNameMappingList(final InputStream in)
-        throws IOException, PoddClientException
+    public ConcurrentMap<String, String> processLineNameMappingList(final InputStream in) throws IOException,
+        PoddClientException
     {
         // -----------------------------------------------------------------------------------------
         // Now process the CSV file line by line using the caches to reduce multiple queries to the
