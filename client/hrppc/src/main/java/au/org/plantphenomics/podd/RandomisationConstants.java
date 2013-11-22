@@ -24,51 +24,6 @@ package au.org.plantphenomics.podd;
 public final class RandomisationConstants
 {
     /**
-     * The minimum number of headers in the randomisation file.
-     */
-    public static final int MIN_RANDOMISATION_HEADERS_SIZE = 7;
-    
-    /**
-     * Randomisation header for column number.
-     */
-    public static final String RAND_COLUMN = "column";
-    
-    /**
-     * Randomisation header for the number used by the R script to identify a line.
-     */
-    public static final String RAND_LAYOUT = "layout";
-    
-    /**
-     * Randomisation header for replicate number.
-     */
-    public static final String RAND_REPLICATE = "Rep";
-    
-    /**
-     * Randomisation header for row number.
-     */
-    public static final String RAND_ROW = "row";
-    
-    /**
-     * Randomisation header for shelf number.
-     */
-    public static final String RAND_SHELF = "Shelf";
-    
-    /**
-     * Randomisation header for shelf side.
-     */
-    public static final String RAND_SHELF_SIDE = "shelf side";
-    
-    /**
-     * Randomisation header for tray number.
-     */
-    public static final String RAND_TRAY = "tray";
-    
-    /**
-     * Randomisation header for the name used by the scientist to identify a line.
-     */
-    public static final String RAND_VAR = "var";
-    
-    /**
      * Randomisation header for the name used by the randomisation algorithm to identify a line
      * number in the lookup table used to identify a line.
      */

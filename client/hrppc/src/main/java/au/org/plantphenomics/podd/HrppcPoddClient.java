@@ -1376,63 +1376,6 @@ public class HrppcPoddClient extends RestletPoddClientImpl
     }
     
     /**
-     * Verifies the list of randomisation tray/pot combinations, throwing an
-     * IllegalArgumentException if there are unrecognised headers or if any mandatory headers are
-     * missing.
-     * 
-     * @throws IllegalArgumentException
-     *             If the headers are not verified correctly.
-     */
-    public void verifyRandomisationListHeaders(final List<String> headers) throws IllegalArgumentException
-    {
-        if(headers == null || headers.size() < RandomisationConstants.MIN_RANDOMISATION_HEADERS_SIZE)
-        {
-            this.log.error("Did not find valid headers: {}", headers);
-            throw new IllegalArgumentException("Did not find valid headers");
-        }
-        
-        if(!headers.contains(RandomisationConstants.RAND_SHELF))
-        {
-            throw new IllegalArgumentException("Did not find shelf number header");
-        }
-        
-        if(!headers.contains(RandomisationConstants.RAND_SHELF_SIDE))
-        {
-            throw new IllegalArgumentException("Did not find shelf side header");
-        }
-        
-        if(!headers.contains(RandomisationConstants.RAND_REPLICATE))
-        {
-            throw new IllegalArgumentException("Did not find replicate header");
-        }
-        
-        if(!headers.contains(RandomisationConstants.RAND_TRAY))
-        {
-            throw new IllegalArgumentException("Did not find tray header");
-        }
-        
-        if(!headers.contains(RandomisationConstants.RAND_ROW))
-        {
-            throw new IllegalArgumentException("Did not find row header");
-        }
-        
-        if(!headers.contains(RandomisationConstants.RAND_COLUMN))
-        {
-            throw new IllegalArgumentException("Did not find column header");
-        }
-        
-        if(!headers.contains(RandomisationConstants.RAND_LAYOUT))
-        {
-            throw new IllegalArgumentException("Did not find layout header");
-        }
-        
-        if(!headers.contains(RandomisationConstants.RAND_VAR))
-        {
-            throw new IllegalArgumentException("Did not find var header");
-        }
-    }
-    
-    /**
      * Verifies the list of projects, throwing an IllegalArgumentException if there are unrecognised
      * headers or if any mandatory headers are missing.
      * 
