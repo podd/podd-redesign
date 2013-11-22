@@ -382,6 +382,14 @@ public interface PoddRdfConstants
     public static final URI PODD_SCIENCE_HAS_BARCODE = PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE,
             "hasBarcode");
     
+    /** http://purl.org/podd/ns/poddScience#hasPosition */
+    public static final URI PODD_SCIENCE_HAS_POSITION = PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE,
+            "hasPosition");
+    
+    /** http://purl.org/podd/ns/poddScience#hasReplicate */
+    public static final URI PODD_SCIENCE_HAS_REPLICATE = PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE,
+            "hasReplicate");
+    
     /** http://purl.org/podd/ns/poddScience#hasGenotype */
     public static final URI PODD_SCIENCE_HAS_GENOTYPE = PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE,
             "hasGenotype");

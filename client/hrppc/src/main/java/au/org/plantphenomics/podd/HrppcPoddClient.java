@@ -285,12 +285,10 @@ public class HrppcPoddClient extends RestletPoddClientImpl
             potLabel = ClientSpreadsheetConstants.LABEL_POT + " " + nextLine.plantName + " : " + nextLine.plantNotes;
         }
         nextResult.add(nextPotURI, RDFS.LABEL, this.vf.createLiteral(potLabel));
-        // Position => TODO: Need to use randomisation data to populate the position
-        // TODO Using d110cc.csv
-        // Add poddScience:hasReplicate for tray to link it to the rep #
-        // Add poddScience:hasReplicate for pot to link it to the rep # (??to make queries easier??)
         
-        // DebugUtils.printContents(nextResult);
+        nextResult.add(nextPotURI, PoddRdfConstants.PODD_SCIENCE_HAS_POSITION, this.vf.createLiteral(nextLine.position));
+        nextResult.add(nextPotURI, PoddRdfConstants.PODD_SCIENCE_HAS_REPLICATE, this.vf.createLiteral(nextLine.replicateNumber));
+        
     }
     
     /**
