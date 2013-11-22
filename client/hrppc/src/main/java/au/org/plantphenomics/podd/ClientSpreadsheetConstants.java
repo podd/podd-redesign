@@ -59,8 +59,8 @@ public final class ClientSpreadsheetConstants
     public static final String CLIENT_POSITION = "Position";
     public static final String CLIENT_PLANT_ID = "PlantID";
     public static final String CLIENT_PLANT_LINE_NUMBER = "PlantLineNumber";
-    public static final String CLIENT_PLANT_LINE_NAME = "PlantLineName";
-    public static final String CLIENT_PLANT_NOTE = "PlantNote";
+    public static final String CLIENT_PLANT_NAME = "PlantName";
+    public static final String CLIENT_PLANT_NOTES = "PlantNotes";
     public static final String CLIENT_CONTROL = "Control";
     public static final String CLIENT_REPLICATE_NUMBER = "ReplicateNumber";
     public static final String CLIENT_POT_REPLICATE_NUMBER = "PotReplicateNumber";

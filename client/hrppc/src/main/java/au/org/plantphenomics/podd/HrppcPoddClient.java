@@ -236,7 +236,7 @@ public class HrppcPoddClient extends RestletPoddClientImpl
         // Check whether genus/specieis/plantName already has an assigned URI (and automatically
         // assign a temporary URI if it does not)
         final URI nextGenotypeURI =
-                this.getGenotypeUri(genotypeUriMap, nextLine.genus, nextLine.species, nextLine.plantLineName,
+                this.getGenotypeUri(genotypeUriMap, nextLine.genus, nextLine.species, nextLine.plantName,
                         nextProjectID, nextProjectUri);
         
         // Add new poddScience:Container for tray
@@ -267,13 +267,13 @@ public class HrppcPoddClient extends RestletPoddClientImpl
         }
         String potLabel;
         // PlantNotes => Add rdfs:label to pot
-        if(nextLine.plantNote == null || nextLine.plantNote.isEmpty())
+        if(nextLine.plantNotes == null || nextLine.plantNotes.isEmpty())
         {
-            potLabel = ClientSpreadsheetConstants.LABEL_POT + " " + nextLine.plantLineName;
+            potLabel = ClientSpreadsheetConstants.LABEL_POT + " " + nextLine.plantName;
         }
         else
         {
-            potLabel = ClientSpreadsheetConstants.LABEL_POT + " " + nextLine.plantLineName + " : " + nextLine.plantNote;
+            potLabel = ClientSpreadsheetConstants.LABEL_POT + " " + nextLine.plantName + " : " + nextLine.plantNotes;
         }
         nextResult.add(nextPotURI, RDFS.LABEL, this.vf.createLiteral(potLabel));
         // Position => TODO: Need to use randomisation data to populate the position
@@ -854,13 +854,6 @@ public class HrppcPoddClient extends RestletPoddClientImpl
     {
         this.log.info("About to process line: {}", nextLine);
         PoddCSVTrayPotLine result = new PoddCSVTrayPotLine();
-        // String trayId = null;
-        // String trayNotes = null;
-        // String trayTypeName = null;
-        // String position = null;
-        // String plantId = null;
-        // String plantName = null;
-        // String plantNotes = null;
         
         for(int i = 0; i < headers.size(); i++)
         {
@@ -887,13 +880,13 @@ public class HrppcPoddClient extends RestletPoddClientImpl
             {
                 result.plantID = nextField;
             }
-            else if(nextHeader.trim().equals(ClientSpreadsheetConstants.CLIENT_PLANT_LINE_NAME))
+            else if(nextHeader.trim().equals(ClientSpreadsheetConstants.CLIENT_PLANT_NAME))
             {
-                result.plantLineName = nextField;
+                result.plantName = nextField;
             }
-            else if(nextHeader.trim().equals(ClientSpreadsheetConstants.CLIENT_PLANT_NOTE))
+            else if(nextHeader.trim().equals(ClientSpreadsheetConstants.CLIENT_PLANT_NOTES))
             {
-                result.plantNote = nextField;
+                result.plantNotes = nextField;
             }
             else
             {
@@ -1321,12 +1314,12 @@ public class HrppcPoddClient extends RestletPoddClientImpl
             throw new IllegalArgumentException("Did not find plant id header");
         }
         
-        if(!headers.contains(ClientSpreadsheetConstants.CLIENT_PLANT_LINE_NAME))
+        if(!headers.contains(ClientSpreadsheetConstants.CLIENT_PLANT_NAME))
         {
             throw new IllegalArgumentException("Did not find plant name header");
         }
         
-        if(!headers.contains(ClientSpreadsheetConstants.CLIENT_PLANT_NOTE))
+        if(!headers.contains(ClientSpreadsheetConstants.CLIENT_PLANT_NOTES))
         {
             throw new IllegalArgumentException("Did not find plant notes header");
         }

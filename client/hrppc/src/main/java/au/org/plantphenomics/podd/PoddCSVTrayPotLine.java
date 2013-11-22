@@ -45,8 +45,8 @@ public class PoddCSVTrayPotLine
     public String position;
     public String plantID;
     public String plantLineNumber;
-    public String plantLineName;
-    public String plantNote;
+    public String plantName;
+    public String plantNotes;
     public String control;
     public String replicateNumber;
     public String potReplicateNumber;
