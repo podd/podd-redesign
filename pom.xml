@@ -86,7 +86,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<restlet.version>2.1.1</restlet.version>
-		<restletutils.version>0.3-SNAPSHOT</restletutils.version>
+		<restletutils.version>0.3</restletutils.version>
 		<sesame.version>2.7.8</sesame.version>
 		<sesame-rio-extensions.version>0.4</sesame-rio-extensions.version>
 		<slf4j.version>1.7.5</slf4j.version>
