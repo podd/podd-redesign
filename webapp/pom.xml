@@ -31,6 +31,5 @@
 	<modules>
 		<module>api</module>
 		<module>lib</module>
-		<module>csiro</module>
 	</modules>
 </project>
