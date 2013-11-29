@@ -374,6 +374,12 @@ public interface PoddRdfConstants
     public static final URI PODD_SCIENCE_CONTAINER = PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE,
             "Container");
     
+    /** http://purl.org/podd/ns/poddScience#Tray */
+    public static final URI PODD_SCIENCE_TRAY = PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Tray");
+    
+    /** http://purl.org/podd/ns/poddScience#Pot */
+    public static final URI PODD_SCIENCE_POT = PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Pot");
+    
     /** http://purl.org/podd/ns/poddScience#Genotype */
     public static final URI PODD_SCIENCE_GENOTYPE = PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE,
             "Genotype");
@@ -410,13 +416,73 @@ public interface PoddRdfConstants
     public static final URI PODD_SCIENCE_HAS_LINE = PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE,
             "hasLine");
     
+    /** http://purl.org/podd/ns/poddScience#hasLineNumber */
+    public static final URI PODD_SCIENCE_HAS_LINE_NUMBER = PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE,
+            "hasLineNumber");
+    
     /** http://purl.org/podd/ns/poddScience#hasContainer */
     public static final URI PODD_SCIENCE_HAS_CONTAINER = PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE,
             "hasContainer");
     
+    /** http://purl.org/podd/ns/poddScience#hasTray */
+    public static final URI PODD_SCIENCE_HAS_TRAY = PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE,
+            "hasTray");
+    
+    /** http://purl.org/podd/ns/poddScience#hasPot */
+    public static final URI PODD_SCIENCE_HAS_POT = PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE,
+            "hasPot");
+    
     /** http://purl.org/podd/ns/poddScience#hasContainerType */
     public static final URI PODD_SCIENCE_HAS_CONTAINER_TYPE = PoddRdfConstants.VF.createURI(
             PoddRdfConstants.PODD_SCIENCE, "hasContainerType");
+    
+    /** http://purl.org/podd/ns/poddScience#hasTrayNumber */
+    public static final URI PODD_SCIENCE_HAS_TRAY_NUMBER = PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE,
+            "hasTrayNumber");
+    
+    /** http://purl.org/podd/ns/poddScience#hasTrayRowNumber */
+    public static final URI PODD_SCIENCE_HAS_TRAY_ROW_NUMBER = PoddRdfConstants.VF.createURI(
+            PoddRdfConstants.PODD_SCIENCE, "hasTrayRowNumber");
+    
+    /** http://purl.org/podd/ns/poddScience#hasPotNumber */
+    public static final URI PODD_SCIENCE_HAS_POT_NUMBER = PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE,
+            "hasPotNumber");
+    
+    /** http://purl.org/podd/ns/poddScience#hasPotColumnNumberOverall */
+    public static final URI PODD_SCIENCE_HAS_POT_COLUMN_NUMBER_OVERALL = PoddRdfConstants.VF.createURI(
+            PoddRdfConstants.PODD_SCIENCE, "hasPotColumnNumberOverall");
+    
+    /** http://purl.org/podd/ns/poddScience#hasPotColumnNumberReplicate */
+    public static final URI PODD_SCIENCE_HAS_POT_COLUMN_NUMBER_REPLICATE = PoddRdfConstants.VF.createURI(
+            PoddRdfConstants.PODD_SCIENCE, "hasPotColumnNumberReplicate");
+    
+    /** http://purl.org/podd/ns/poddScience#hasPotColumnNumberTray */
+    public static final URI PODD_SCIENCE_HAS_POT_COLUMN_NUMBER_TRAY = PoddRdfConstants.VF.createURI(
+            PoddRdfConstants.PODD_SCIENCE, "hasPotColumnNumberTray");
+    
+    /** http://purl.org/podd/ns/poddScience#hasPotColumnLetterTray */
+    public static final URI PODD_SCIENCE_HAS_POT_COLUMN_LETTER_TRAY = PoddRdfConstants.VF.createURI(
+            PoddRdfConstants.PODD_SCIENCE, "hasPotColumnLetterTray");
+    
+    /** http://purl.org/podd/ns/poddScience#hasPotPositionTray */
+    public static final URI PODD_SCIENCE_HAS_POT_POSITION_TRAY = PoddRdfConstants.VF.createURI(
+            PoddRdfConstants.PODD_SCIENCE, "hasPotPositionTray");
+    
+    /** http://purl.org/podd/ns/poddScience#hasPotNumberTray */
+    public static final URI PODD_SCIENCE_HAS_POT_NUMBER_TRAY = PoddRdfConstants.VF.createURI(
+            PoddRdfConstants.PODD_SCIENCE, "hasPotNumberTray");
+    
+    /** http://purl.org/podd/ns/poddScience#hasPotNumberReplicate */
+    public static final URI PODD_SCIENCE_HAS_POT_NUMBER_REPLICATE = PoddRdfConstants.VF.createURI(
+            PoddRdfConstants.PODD_SCIENCE, "hasPotNumberReplicate");
+    
+    /** http://purl.org/podd/ns/poddScience#hasPotRowNumberReplicate */
+    public static final URI PODD_SCIENCE_HAS_POT_ROW_NUMBER_REPLICATE = PoddRdfConstants.VF.createURI(
+            PoddRdfConstants.PODD_SCIENCE, "hasPotRowNumberReplicate");
+    
+    /** http://purl.org/podd/ns/poddScience#hasPotRowNumberTray */
+    public static final URI PODD_SCIENCE_HAS_POT_ROW_NUMBER_TRAY = PoddRdfConstants.VF.createURI(
+            PoddRdfConstants.PODD_SCIENCE, "hasPotRowNumberTray");
     
     /** http://purl.org/podd/ns/poddBase#SPARQLDataRepository */
     public static final URI PODD_SPARQL_DATA_REPOSITORY = PoddRdfConstants.VF.createURI(
