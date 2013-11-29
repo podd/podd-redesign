@@ -60,6 +60,7 @@ import org.semanticweb.owlapi.rio.RioMemoryTripleSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.clarkparsia.owlapi.explanation.GlassBoxExplanation;
 import com.github.podd.api.DanglingObjectPolicy;
 import com.github.podd.api.DataReferenceVerificationPolicy;
 import com.github.podd.api.MetadataPolicy;
@@ -1452,6 +1453,8 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             // profile
             if(!nextReasoner.isConsistent())
             {
+                GlassBoxExplanation test = new GlassBoxExplanation(nextOntology, this.getOWLManager().getReasonerFactory());
+                
                 throw new InconsistentOntologyException(nextReasoner, "Ontology is inconsistent");
             }
             

@@ -35,6 +35,7 @@ import org.semanticweb.owlapi.model.OWLOntologyID;
 import org.semanticweb.owlapi.model.OWLRuntimeException;
 import org.semanticweb.owlapi.profiles.OWLProfile;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
+import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
 
 import com.github.podd.exception.OntologyNotInProfileException;
 import com.github.podd.exception.PoddException;
@@ -236,5 +237,7 @@ public interface PoddOWLManager
      * @throws OntologyNotInProfileException
      */
     void verifyAgainstSchema(Model model, Model schemaModel) throws OntologyNotInProfileException;
+    
+    OWLReasonerFactory getReasonerFactory();
     
 }

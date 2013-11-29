@@ -162,6 +162,12 @@
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
+			<groupId>com.github.ansell.pellet</groupId>
+			<artifactId>pellet-explanation</artifactId>
+			<!-- TODO: FIXME: This is necessary to use GlassboxExplanation right now. -->
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
 			<groupId>org.kohsuke.metainf-services</groupId>
 			<artifactId>metainf-services</artifactId>
 		</dependency>
