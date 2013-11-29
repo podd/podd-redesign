@@ -43,7 +43,7 @@ import org.semanticweb.owlapi.model.IRI;
 
 import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.OntologyUtils;
-import com.github.podd.utils.PoddRdfConstants;
+import com.github.podd.utils.PODD;
 
 /**
  * Test for OntologyUtils class that translates between RDF and InferredOWLOntologyID instances.
@@ -232,7 +232,7 @@ public class OntologyUtilsTest
         Assert.assertEquals(5, input.size());
         Assert.assertTrue(input.contains(null, RDF.TYPE, OWL.ONTOLOGY));
         Assert.assertTrue(input.contains(null, OWL.VERSIONIRI, null));
-        Assert.assertTrue(input.contains(null, PoddRdfConstants.PODD_BASE_INFERRED_VERSION, null));
+        Assert.assertTrue(input.contains(null, PODD.PODD_BASE_INFERRED_VERSION, null));
         Assert.assertEquals(3, input.filter(null, RDF.TYPE, OWL.ONTOLOGY).size());
     }
     
@@ -352,7 +352,7 @@ public class OntologyUtilsTest
         Assert.assertEquals(5, ontologyIDsToModel.size());
         Assert.assertTrue(ontologyIDsToModel.contains(null, RDF.TYPE, OWL.ONTOLOGY));
         Assert.assertTrue(ontologyIDsToModel.contains(null, OWL.VERSIONIRI, null));
-        Assert.assertTrue(ontologyIDsToModel.contains(null, PoddRdfConstants.PODD_BASE_INFERRED_VERSION, null));
+        Assert.assertTrue(ontologyIDsToModel.contains(null, PODD.PODD_BASE_INFERRED_VERSION, null));
         Assert.assertEquals(3, ontologyIDsToModel.filter(null, RDF.TYPE, OWL.ONTOLOGY).size());
     }
     

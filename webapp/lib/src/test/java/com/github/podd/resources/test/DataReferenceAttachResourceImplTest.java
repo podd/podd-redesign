@@ -51,7 +51,7 @@ import com.github.podd.impl.file.test.SSHService;
 import com.github.podd.utils.DebugUtils;
 import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.OntologyUtils;
-import com.github.podd.utils.PoddRdfConstants;
+import com.github.podd.utils.PODD;
 import com.github.podd.utils.PoddWebConstants;
 
 /**
@@ -88,11 +88,10 @@ public class DataReferenceAttachResourceImplTest extends AbstractResourceImplTes
                         TestConstants.TEST_REMOTE_FILE_PATH + "/" + TestConstants.TEST_REMOTE_FILE_NAME), completePath,
                 StandardCopyOption.REPLACE_EXISTING);
         
-        final Resource aliasUri =
-                model.filter(null, PoddRdfConstants.PODD_BASE_HAS_ALIAS, null).subjects().iterator().next();
-        model.add(aliasUri, PoddRdfConstants.PODD_BASE_HAS_FILE_PATH,
+        final Resource aliasUri = model.filter(null, PODD.PODD_BASE_HAS_ALIAS, null).subjects().iterator().next();
+        model.add(aliasUri, PODD.PODD_BASE_HAS_FILE_PATH,
                 ValueFactoryImpl.getInstance().createLiteral(testDirectory.toAbsolutePath().toString()));
-        model.add(aliasUri, PoddRdfConstants.PODD_BASE_HAS_FILENAME,
+        model.add(aliasUri, PODD.PODD_BASE_HAS_FILENAME,
                 ValueFactoryImpl.getInstance().createLiteral(TestConstants.TEST_REMOTE_FILE_NAME));
         
         // get a String representation of the statements in the Model

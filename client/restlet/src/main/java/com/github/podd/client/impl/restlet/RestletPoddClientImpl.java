@@ -70,7 +70,7 @@ import com.github.podd.client.api.PoddClientException;
 import com.github.podd.utils.DebugUtils;
 import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.OntologyUtils;
-import com.github.podd.utils.PoddRdfConstants;
+import com.github.podd.utils.PODD;
 import com.github.podd.utils.PoddRoles;
 import com.github.podd.utils.PoddUser;
 import com.github.podd.utils.PoddWebConstants;
@@ -91,9 +91,9 @@ public class RestletPoddClientImpl implements PoddClient
     private Series<CookieSetting> currentCookies = new Series<CookieSetting>(CookieSetting.class);
     
     /**
-     * Shortcut to {@link PoddRdfConstants#VF}
+     * Shortcut to {@link PODD#VF}
      */
-    protected ValueFactory vf = PoddRdfConstants.VF;
+    protected ValueFactory vf = PODD.VF;
     
     public RestletPoddClientImpl()
     {
@@ -129,7 +129,7 @@ public class RestletPoddClientImpl implements PoddClient
             final Model parsedStatements = this.parseRdf(post);
             
             if(!parsedStatements.contains(null, SesameRealmConstants.OAS_USERIDENTIFIER,
-                    PoddRdfConstants.VF.createLiteral(userIdentifier)))
+                    PODD.VF.createLiteral(userIdentifier)))
             {
                 this.log.warn("Role edit response did not seem to contain the user identifier");
             }
@@ -144,7 +144,7 @@ public class RestletPoddClientImpl implements PoddClient
     public InferredOWLOntologyID appendArtifact(final InferredOWLOntologyID ontologyIRI,
             final InputStream partialInputStream, final RDFFormat format) throws PoddClientException
     {
-        return appendArtifact(ontologyIRI, partialInputStream, format, DanglingObjectPolicy.REPORT,
+        return this.appendArtifact(ontologyIRI, partialInputStream, format, DanglingObjectPolicy.REPORT,
                 DataReferenceVerificationPolicy.DO_NOT_VERIFY);
     }
     
@@ -567,7 +567,7 @@ public class RestletPoddClientImpl implements PoddClient
             
             DebugUtils.printContents(model);
             
-            final Set<Value> aliases = model.filter(null, PoddRdfConstants.PODD_BASE_HAS_ALIAS, null).objects();
+            final Set<Value> aliases = model.filter(null, PODD.PODD_BASE_HAS_ALIAS, null).objects();
             
             final List<String> aliasResults = new ArrayList<String>(aliases.size());
             for(final Value nextAlias : aliases)
@@ -858,7 +858,7 @@ public class RestletPoddClientImpl implements PoddClient
             final Model parsedStatements = this.parseRdf(post);
             
             if(!parsedStatements.contains(null, SesameRealmConstants.OAS_USERIDENTIFIER,
-                    PoddRdfConstants.VF.createLiteral(userIdentifier)))
+                    PODD.VF.createLiteral(userIdentifier)))
             {
                 this.log.warn("Role edit response did not seem to contain the user identifier");
             }

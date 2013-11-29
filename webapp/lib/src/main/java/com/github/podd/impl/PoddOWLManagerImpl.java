@@ -89,7 +89,7 @@ import com.github.podd.exception.OntologyNotInProfileException;
 import com.github.podd.exception.PoddException;
 import com.github.podd.utils.DeduplicatingRDFInserter;
 import com.github.podd.utils.InferredOWLOntologyID;
-import com.github.podd.utils.PoddRdfConstants;
+import com.github.podd.utils.PODD;
 
 /**
  * Implementation of PoddOWLManager interface.
@@ -127,8 +127,8 @@ public class PoddOWLManagerImpl implements PoddOWLManager
         final String subject = ontologyID.getOntologyIRI().toQuotedString();
         final String sparqlQuery =
                 "SELECT ?x ?xv ?xiv WHERE { " + subject + " <" + OWL.IMPORTS.stringValue() + "> ?xv ." + "?x <"
-                        + PoddRdfConstants.OWL_VERSION_IRI + "> ?xv ." + "?x <"
-                        + PoddRdfConstants.PODD_BASE_CURRENT_INFERRED_VERSION + "> ?xiv ." + " }";
+                        + PODD.OWL_VERSION_IRI + "> ?xv ." + "?x <" + PODD.PODD_BASE_CURRENT_INFERRED_VERSION
+                        + "> ?xiv ." + " }";
         this.log.debug("Generated SPARQL {}", sparqlQuery);
         final TupleQuery query = conn.prepareTupleQuery(QueryLanguage.SPARQL, sparqlQuery);
         
@@ -406,7 +406,7 @@ public class PoddOWLManagerImpl implements PoddOWLManager
             throw new NullPointerException("OWLOntology is incomplete");
         }
         
-        final IRI inferredOntologyIRI = IRI.create(PoddRdfConstants.INFERRED_PREFIX + ontologyID.getVersionIRI());
+        final IRI inferredOntologyIRI = IRI.create(PODD.INFERRED_PREFIX + ontologyID.getVersionIRI());
         
         return new InferredOWLOntologyID(ontologyID.getOntologyIRI(), ontologyID.getVersionIRI(), inferredOntologyIRI);
     }

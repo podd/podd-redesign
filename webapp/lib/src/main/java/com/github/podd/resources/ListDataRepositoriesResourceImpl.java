@@ -42,7 +42,7 @@ import com.github.podd.api.file.PoddDataRepositoryManager;
 import com.github.podd.exception.PoddException;
 import com.github.podd.restlet.PoddAction;
 import com.github.podd.restlet.RestletUtils;
-import com.github.podd.utils.PoddRdfConstants;
+import com.github.podd.utils.PODD;
 import com.github.podd.utils.PoddWebConstants;
 
 /**
@@ -120,9 +120,8 @@ public class ListDataRepositoriesResourceImpl extends AbstractPoddResourceImpl
         {
             for(final String nextAlias : poddDataRepositoryManager.getAllAliases())
             {
-                final BNode resourceNode = PoddRdfConstants.VF.createBNode();
-                results.add(resourceNode, PoddRdfConstants.PODD_BASE_HAS_ALIAS,
-                        PoddRdfConstants.VF.createLiteral(nextAlias));
+                final BNode resourceNode = PODD.VF.createBNode();
+                results.add(resourceNode, PODD.PODD_BASE_HAS_ALIAS, PODD.VF.createLiteral(nextAlias));
                 
                 final PoddDataRepository<?> dataRepository = poddDataRepositoryManager.getRepository(nextAlias);
                 

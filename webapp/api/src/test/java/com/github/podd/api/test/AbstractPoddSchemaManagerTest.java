@@ -46,7 +46,7 @@ import com.github.podd.exception.PoddException;
 import com.github.podd.exception.SchemaManifestException;
 import com.github.podd.exception.UnmanagedSchemaIRIException;
 import com.github.podd.utils.InferredOWLOntologyID;
-import com.github.podd.utils.PoddRdfConstants;
+import com.github.podd.utils.PODD;
 
 /**
  * Abstract test to verify that the PoddSchemaManager API contract is followed by implementations.
@@ -133,8 +133,7 @@ public abstract class AbstractPoddSchemaManagerTest
      */
     private void loadSchemaOntologies() throws Exception
     {
-        this.loadSchemaOntologies(new PropertyUtil("podd").get(PoddRdfConstants.KEY_SCHEMAS,
-                PoddRdfConstants.PATH_DEFAULT_SCHEMAS));
+        this.loadSchemaOntologies(new PropertyUtil("podd").get(PODD.KEY_SCHEMAS, PODD.PATH_DEFAULT_SCHEMAS));
     }
     
     private void loadSchemaOntologies(final String schemaManifest) throws OpenRDFException, IOException, OWLException,
@@ -1243,8 +1242,7 @@ public abstract class AbstractPoddSchemaManagerTest
     public final void testUploadSchemaOntologyWithOntologyIRIAndVersionIRI() throws Exception
     {
         final String[] resourcePaths =
-                { PoddRdfConstants.PATH_PODD_DCTERMS, PoddRdfConstants.PATH_PODD_FOAF, PoddRdfConstants.PATH_PODD_USER,
-                        PoddRdfConstants.PATH_PODD_BASE, };
+                { PODD.PATH_PODD_DCTERMS, PODD.PATH_PODD_FOAF, PODD.PATH_PODD_USER, PODD.PATH_PODD_BASE, };
         
         for(final String path : resourcePaths)
         {

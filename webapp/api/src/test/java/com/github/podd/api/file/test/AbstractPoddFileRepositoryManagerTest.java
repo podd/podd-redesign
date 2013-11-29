@@ -45,7 +45,7 @@ import com.github.podd.exception.DataRepositoryMappingNotFoundException;
 import com.github.podd.exception.FileReferenceInvalidException;
 import com.github.podd.exception.FileReferenceVerificationFailureException;
 import com.github.podd.exception.FileRepositoryIncompleteException;
-import com.github.podd.utils.PoddRdfConstants;
+import com.github.podd.utils.PODD;
 
 /**
  * Abstract test to verify that the PoddDataRepositoryManager API contract is followed by
@@ -441,7 +441,7 @@ public abstract class AbstractPoddFileRepositoryManagerTest
         Assert.assertEquals("File Repository Graph was not cleaned properly", 0, this.testFileRepositoryManager
                 .getAllAliases().size());
         
-        try (final InputStream input = this.getClass().getResourceAsStream(PoddRdfConstants.PATH_DEFAULT_ALIASES_FILE))
+        try (final InputStream input = this.getClass().getResourceAsStream(PODD.PATH_DEFAULT_ALIASES_FILE))
         {
             this.testFileRepositoryManager.initialise(Rio.parse(input, "", RDFFormat.TURTLE));
         }

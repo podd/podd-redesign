@@ -103,8 +103,7 @@ public class OntologyUtils
                         if(nextVersion.getObject() instanceof URI)
                         {
                             final Model inferredOntologies =
-                                    input.filter((URI)nextVersion.getObject(),
-                                            PoddRdfConstants.PODD_BASE_INFERRED_VERSION, null);
+                                    input.filter((URI)nextVersion.getObject(), PODD.PODD_BASE_INFERRED_VERSION, null);
                             
                             if(!includeInferred)
                             {
@@ -252,7 +251,7 @@ public class OntologyUtils
                         result.add(vf.createStatement(inferredOntology.getInferredOntologyIRI().toOpenRDFURI(),
                                 RDF.TYPE, OWL.ONTOLOGY));
                         result.add(vf.createStatement(inferredOntology.getVersionIRI().toOpenRDFURI(),
-                                PoddRdfConstants.PODD_BASE_INFERRED_VERSION, inferredOntology.getInferredOntologyIRI()
+                                PODD.PODD_BASE_INFERRED_VERSION, inferredOntology.getInferredOntologyIRI()
                                         .toOpenRDFURI()));
                     }
                 }

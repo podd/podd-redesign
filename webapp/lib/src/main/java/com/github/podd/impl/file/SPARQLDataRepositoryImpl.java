@@ -28,7 +28,7 @@ import com.github.podd.api.file.PoddDataRepository;
 import com.github.podd.api.file.SPARQLDataReference;
 import com.github.podd.exception.FileReferenceNotSupportedException;
 import com.github.podd.exception.FileRepositoryIncompleteException;
-import com.github.podd.utils.PoddRdfConstants;
+import com.github.podd.utils.PODD;
 
 /**
  * @author Peter Ansell p_ansell@yahoo.com
@@ -46,14 +46,10 @@ public class SPARQLDataRepositoryImpl extends PoddFileRepositoryImpl<SPARQLDataR
         // check that the model contains values for protocol, host, port,
         // fingerprint, username, and
         // secret
-        final String protocol =
-                model.filter(super.aliasUri, PoddRdfConstants.PODD_DATA_REPOSITORY_PROTOCOL, null).objectString();
-        final String host =
-                model.filter(super.aliasUri, PoddRdfConstants.PODD_DATA_REPOSITORY_HOST, null).objectString();
-        final String port =
-                model.filter(super.aliasUri, PoddRdfConstants.PODD_DATA_REPOSITORY_PORT, null).objectString();
-        final String path =
-                model.filter(super.aliasUri, PoddRdfConstants.PODD_DATA_REPOSITORY_PATH, null).objectString();
+        final String protocol = model.filter(super.aliasUri, PODD.PODD_DATA_REPOSITORY_PROTOCOL, null).objectString();
+        final String host = model.filter(super.aliasUri, PODD.PODD_DATA_REPOSITORY_HOST, null).objectString();
+        final String port = model.filter(super.aliasUri, PODD.PODD_DATA_REPOSITORY_PORT, null).objectString();
+        final String path = model.filter(super.aliasUri, PODD.PODD_DATA_REPOSITORY_PATH, null).objectString();
         
         if(protocol == null || host == null || port == null || path == null)
         {
@@ -98,10 +94,8 @@ public class SPARQLDataRepositoryImpl extends PoddFileRepositoryImpl<SPARQLDataR
             throw new FileReferenceNotSupportedException(dataReference, "cannot handle file reference for validation");
         }
         
-        final String host =
-                this.model.filter(super.aliasUri, PoddRdfConstants.PODD_DATA_REPOSITORY_HOST, null).objectString();
-        final String port =
-                this.model.filter(super.aliasUri, PoddRdfConstants.PODD_DATA_REPOSITORY_PORT, null).objectString();
+        final String host = this.model.filter(super.aliasUri, PODD.PODD_DATA_REPOSITORY_HOST, null).objectString();
+        final String port = this.model.filter(super.aliasUri, PODD.PODD_DATA_REPOSITORY_PORT, null).objectString();
         
         int portNo = -1;
         try

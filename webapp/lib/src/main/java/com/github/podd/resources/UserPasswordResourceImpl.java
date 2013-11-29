@@ -50,7 +50,7 @@ import com.github.podd.restlet.PoddAction;
 import com.github.podd.restlet.PoddSesameRealm;
 import com.github.podd.restlet.PoddWebServiceApplication;
 import com.github.podd.restlet.RestletUtils;
-import com.github.podd.utils.PoddRdfConstants;
+import com.github.podd.utils.PODD;
 import com.github.podd.utils.PoddUser;
 import com.github.podd.utils.PoddWebConstants;
 
@@ -77,7 +77,7 @@ public class UserPasswordResourceImpl extends AbstractUserResourceImpl
         // changing own password, verify old password.
         if(changeOwnPassword)
         {
-            final String oldPassword = model.filter(null, PoddRdfConstants.PODD_USER_OLDSECRET, null).objectString();
+            final String oldPassword = model.filter(null, PODD.PODD_USER_OLDSECRET, null).objectString();
             
             final Verifier verifier = nextRealm.getVerifier();
             if(verifier == null)
@@ -186,8 +186,7 @@ public class UserPasswordResourceImpl extends AbstractUserResourceImpl
         try
         {
             final Model model = new LinkedHashModel();
-            model.add(userUri, SesameRealmConstants.OAS_USERIDENTIFIER,
-                    PoddRdfConstants.VF.createLiteral(poddUser.getIdentifier()));
+            model.add(userUri, SesameRealmConstants.OAS_USERIDENTIFIER, PODD.VF.createLiteral(poddUser.getIdentifier()));
             Rio.write(model, output, outputFormat);
         }
         catch(final OpenRDFException e)

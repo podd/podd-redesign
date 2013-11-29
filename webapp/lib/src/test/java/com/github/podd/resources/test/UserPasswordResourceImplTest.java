@@ -36,7 +36,7 @@ import org.restlet.resource.ResourceException;
 
 import com.github.ansell.restletutils.SesameRealmConstants;
 import com.github.ansell.restletutils.test.RestletTestUtils;
-import com.github.podd.utils.PoddRdfConstants;
+import com.github.podd.utils.PODD;
 import com.github.podd.utils.PoddWebConstants;
 
 /**
@@ -51,14 +51,12 @@ public class UserPasswordResourceImplTest extends AbstractResourceImplTest
     {
         final String testIdentifier = "anotherUser";
         final String newPassword = "modifiedPassword";
-        final URI tempUserUri = PoddRdfConstants.VF.createURI("urn:temp:user");
+        final URI tempUserUri = PODD.VF.createURI("urn:temp:user");
         
         // prepare: create Model with modified password and user identifier
         final Model userInfoModel = new LinkedHashModel();
-        userInfoModel.add(tempUserUri, SesameRealmConstants.OAS_USERIDENTIFIER,
-                PoddRdfConstants.VF.createLiteral(testIdentifier));
-        userInfoModel.add(tempUserUri, SesameRealmConstants.OAS_USERSECRET,
-                PoddRdfConstants.VF.createLiteral(newPassword));
+        userInfoModel.add(tempUserUri, SesameRealmConstants.OAS_USERIDENTIFIER, PODD.VF.createLiteral(testIdentifier));
+        userInfoModel.add(tempUserUri, SesameRealmConstants.OAS_USERSECRET, PODD.VF.createLiteral(newPassword));
         
         // submit new password to Change Password Service
         final MediaType mediaType = MediaType.APPLICATION_RDF_XML;
@@ -115,16 +113,13 @@ public class UserPasswordResourceImplTest extends AbstractResourceImplTest
         final String testIdentifier = "testAdminUser";
         final String oldPassword = "testAdminPassword";
         final String newPassword = "modifiedPassword";
-        final URI tempUserUri = PoddRdfConstants.VF.createURI("urn:temp:user");
+        final URI tempUserUri = PODD.VF.createURI("urn:temp:user");
         
         // prepare: create Model with modified password and user identifier
         final Model userInfoModel = new LinkedHashModel();
-        userInfoModel.add(tempUserUri, SesameRealmConstants.OAS_USERIDENTIFIER,
-                PoddRdfConstants.VF.createLiteral(testIdentifier));
-        userInfoModel.add(tempUserUri, PoddRdfConstants.PODD_USER_OLDSECRET,
-                PoddRdfConstants.VF.createLiteral(oldPassword));
-        userInfoModel.add(tempUserUri, SesameRealmConstants.OAS_USERSECRET,
-                PoddRdfConstants.VF.createLiteral(newPassword));
+        userInfoModel.add(tempUserUri, SesameRealmConstants.OAS_USERIDENTIFIER, PODD.VF.createLiteral(testIdentifier));
+        userInfoModel.add(tempUserUri, PODD.PODD_USER_OLDSECRET, PODD.VF.createLiteral(oldPassword));
+        userInfoModel.add(tempUserUri, SesameRealmConstants.OAS_USERSECRET, PODD.VF.createLiteral(newPassword));
         
         // submit new password to Change Password Service
         final MediaType mediaType = MediaType.APPLICATION_RDF_XML;

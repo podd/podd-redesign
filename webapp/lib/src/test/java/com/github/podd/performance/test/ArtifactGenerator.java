@@ -30,7 +30,7 @@ import org.openrdf.model.vocabulary.RDFS;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.Rio;
 
-import com.github.podd.utils.PoddRdfConstants;
+import com.github.podd.utils.PODD;
 
 /**
  * Utility class to generate PODD artifacts for test purposes. To generate a PODD artifact set the
@@ -113,18 +113,18 @@ public class ArtifactGenerator
     protected void addAnalysis(final Model model, final URI parentUri, final String seed, final URI... platformRefs)
     {
         final URI thisObject =
-                this.addBasics(model, seed, ArtifactGenerator.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Analysis"),
-                        "Analysis " + seed, "Description about Analysis " + seed);
+                this.addBasics(model, seed, ArtifactGenerator.VF.createURI(PODD.PODD_SCIENCE, "Analysis"), "Analysis "
+                        + seed, "Description about Analysis " + seed);
         
         // refers To
         for(final URI referredPlatform : platformRefs)
         {
-            model.add(thisObject, ArtifactGenerator.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "refersToPlatform"),
+            model.add(thisObject, ArtifactGenerator.VF.createURI(PODD.PODD_SCIENCE, "refersToPlatform"),
                     referredPlatform);
         }
         
         // connect to parent
-        model.add(parentUri, ArtifactGenerator.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "hasAnalysis"), thisObject);
+        model.add(parentUri, ArtifactGenerator.VF.createURI(PODD.PODD_SCIENCE, "hasAnalysis"), thisObject);
     }
     
     /**
@@ -150,17 +150,17 @@ public class ArtifactGenerator
     protected URI addGenotype(final Model model, final URI parentUri, final String seed)
     {
         final URI thisObject =
-                this.addBasics(model, seed, ArtifactGenerator.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Genotype"),
-                        "Genotype " + seed, "Description about Genotype " + seed);
+                this.addBasics(model, seed, ArtifactGenerator.VF.createURI(PODD.PODD_SCIENCE, "Genotype"), "Genotype "
+                        + seed, "Description about Genotype " + seed);
         
         // mandatory attribute
-        model.add(thisObject, ArtifactGenerator.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "hasGenusSpecies"),
+        model.add(thisObject, ArtifactGenerator.VF.createURI(PODD.PODD_SCIENCE, "hasGenusSpecies"),
                 ArtifactGenerator.VF.createLiteral("Genus or species " + seed, ArtifactGenerator.XSD_STRING));
-        model.add(thisObject, ArtifactGenerator.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "hasWildType"),
-                ArtifactGenerator.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "WildType_Yes"));
+        model.add(thisObject, ArtifactGenerator.VF.createURI(PODD.PODD_SCIENCE, "hasWildType"),
+                ArtifactGenerator.VF.createURI(PODD.PODD_SCIENCE, "WildType_Yes"));
         
         // connect to parent
-        model.add(parentUri, ArtifactGenerator.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "hasGenotype"), thisObject);
+        model.add(parentUri, ArtifactGenerator.VF.createURI(PODD.PODD_SCIENCE, "hasGenotype"), thisObject);
         
         return thisObject;
     }
@@ -171,17 +171,15 @@ public class ArtifactGenerator
     protected URI addInvestigation(final Model model, final URI parentUri, final String seed)
     {
         final URI thisObject =
-                this.addBasics(model, seed,
-                        ArtifactGenerator.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Investigation"),
+                this.addBasics(model, seed, ArtifactGenerator.VF.createURI(PODD.PODD_SCIENCE, "Investigation"),
                         "Investigation " + seed, "Description about Investigation " + seed);
         
         // mandatory attribute
-        model.add(thisObject, ArtifactGenerator.VF.createURI(PoddRdfConstants.PODD_BASE, "hasStartDateTime"),
+        model.add(thisObject, ArtifactGenerator.VF.createURI(PODD.PODD_BASE, "hasStartDateTime"),
                 ArtifactGenerator.VF.createLiteral("2013-01-01T09:00:00", ArtifactGenerator.XSD_DATETIME));
         
         // connect to parent
-        model.add(parentUri, ArtifactGenerator.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "hasInvestigation"),
-                thisObject);
+        model.add(parentUri, ArtifactGenerator.VF.createURI(PODD.PODD_SCIENCE, "hasInvestigation"), thisObject);
         
         return thisObject;
     }
@@ -192,15 +190,15 @@ public class ArtifactGenerator
     protected URI addPlatform(final Model model, final URI parentUri, final String seed)
     {
         final URI thisObject =
-                this.addBasics(model, seed, ArtifactGenerator.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Platform"),
-                        "Platform " + seed, "Description about Platform " + seed);
+                this.addBasics(model, seed, ArtifactGenerator.VF.createURI(PODD.PODD_SCIENCE, "Platform"), "Platform "
+                        + seed, "Description about Platform " + seed);
         
         // mandatory attribute
-        model.add(thisObject, ArtifactGenerator.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "hasPlatformType"),
-                ArtifactGenerator.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "PlatformType_HardwareSoftware"));
+        model.add(thisObject, ArtifactGenerator.VF.createURI(PODD.PODD_SCIENCE, "hasPlatformType"),
+                ArtifactGenerator.VF.createURI(PODD.PODD_SCIENCE, "PlatformType_HardwareSoftware"));
         
         // connect to parent
-        model.add(parentUri, ArtifactGenerator.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "hasPlatform"), thisObject);
+        model.add(parentUri, ArtifactGenerator.VF.createURI(PODD.PODD_SCIENCE, "hasPlatform"), thisObject);
         
         return thisObject;
     }
@@ -221,20 +219,20 @@ public class ArtifactGenerator
         
         // top object
         final URI topObject =
-                this.addBasics(model, seed, ArtifactGenerator.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Project"),
-                        "Project " + seed, "Description about Project " + seed);
-        model.add(topObject, ArtifactGenerator.VF.createURI(PoddRdfConstants.PODD_BASE, "hasLeadInstitution"),
+                this.addBasics(model, seed, ArtifactGenerator.VF.createURI(PODD.PODD_SCIENCE, "Project"), "Project "
+                        + seed, "Description about Project " + seed);
+        model.add(topObject, ArtifactGenerator.VF.createURI(PODD.PODD_BASE, "hasLeadInstitution"),
                 ArtifactGenerator.VF.createLiteral("CSIRO HRPPC " + seed, ArtifactGenerator.XSD_STRING));
-        model.add(topObject, ArtifactGenerator.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "hasANZSRC"),
-                ArtifactGenerator.VF.createURI(PoddRdfConstants.PODD_PLANT, "ANZSRC06-Biological-Sciences"));
-        model.add(topObject, ArtifactGenerator.VF.createURI(PoddRdfConstants.PODD_BASE, "hasPrincipalInvestigator"),
+        model.add(topObject, ArtifactGenerator.VF.createURI(PODD.PODD_SCIENCE, "hasANZSRC"),
+                ArtifactGenerator.VF.createURI(PODD.PODD_PLANT, "ANZSRC06-Biological-Sciences"));
+        model.add(topObject, ArtifactGenerator.VF.createURI(PODD.PODD_BASE, "hasPrincipalInvestigator"),
                 ArtifactGenerator.VF.createURI("mailto:xavier.sirault@csiro.au"));
-        model.add(topObject, ArtifactGenerator.VF.createURI(PoddRdfConstants.PODD_BASE, "hasPublicationStatus"),
-                ArtifactGenerator.VF.createURI(PoddRdfConstants.PODD_BASE, "NotPublished"));
-        model.add(topObject, ArtifactGenerator.VF.createURI(PoddRdfConstants.PODD_BASE, "hasStartDate"),
+        model.add(topObject, ArtifactGenerator.VF.createURI(PODD.PODD_BASE, "hasPublicationStatus"),
+                ArtifactGenerator.VF.createURI(PODD.PODD_BASE, "NotPublished"));
+        model.add(topObject, ArtifactGenerator.VF.createURI(PODD.PODD_BASE, "hasStartDate"),
                 ArtifactGenerator.VF.createLiteral("2013-01-01", ArtifactGenerator.XSD_DATE));
         
-        model.add(artifactUri, PoddRdfConstants.PODD_BASE_HAS_TOP_OBJECT, topObject);
+        model.add(artifactUri, PODD.PODD_BASE_HAS_TOP_OBJECT, topObject);
         
         return topObject;
     }
@@ -248,12 +246,12 @@ public class ArtifactGenerator
         
         model.setNamespace("xsd", "http://www.w3.org/2001/XMLSchema#");
         model.setNamespace("dcterms", "http://purl.org/dc/terms/");
-        model.setNamespace("dcTerms", PoddRdfConstants.PODD_DCTERMS);
-        model.setNamespace("foaf", PoddRdfConstants.PODD_FOAF);
-        model.setNamespace("poddUser", PoddRdfConstants.PODD_USER);
-        model.setNamespace("poddBase", PoddRdfConstants.PODD_BASE);
-        model.setNamespace("poddScience", PoddRdfConstants.PODD_SCIENCE);
-        model.setNamespace("poddPlant", PoddRdfConstants.PODD_PLANT);
+        model.setNamespace("dcTerms", PODD.PODD_DCTERMS);
+        model.setNamespace("foaf", PODD.PODD_FOAF);
+        model.setNamespace("poddUser", PODD.PODD_USER);
+        model.setNamespace("poddBase", PODD.PODD_BASE);
+        model.setNamespace("poddScience", PODD.PODD_SCIENCE);
+        model.setNamespace("poddPlant", PODD.PODD_PLANT);
         
         return model;
     }

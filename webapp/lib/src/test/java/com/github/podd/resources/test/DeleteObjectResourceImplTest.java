@@ -30,7 +30,7 @@ import org.restlet.resource.ClientResource;
 import com.github.ansell.restletutils.test.RestletTestUtils;
 import com.github.podd.api.test.TestConstants;
 import com.github.podd.utils.InferredOWLOntologyID;
-import com.github.podd.utils.PoddRdfConstants;
+import com.github.podd.utils.PODD;
 import com.github.podd.utils.PoddWebConstants;
 
 /**
@@ -93,7 +93,7 @@ public class DeleteObjectResourceImplTest extends AbstractResourceImplTest
             
             // verify: retrieve artifact and check deleted object's not present
             final Model retrievedArtifact = this.getArtifact(artifactID.getOntologyIRI().toString(), 80);
-            final URI objectToDeleteUri = PoddRdfConstants.VF.createURI(objectToDelete);
+            final URI objectToDeleteUri = PODD.VF.createURI(objectToDelete);
             Assert.assertTrue("Object not deleted", retrievedArtifact.filter(objectToDeleteUri, null, null).isEmpty());
             Assert.assertTrue("Object not deleted", retrievedArtifact.filter(null, null, objectToDeleteUri).isEmpty());
         }

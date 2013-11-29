@@ -20,7 +20,7 @@ import org.openrdf.model.Model;
 import org.openrdf.model.Resource;
 import org.semanticweb.owlapi.model.IRI;
 
-import com.github.podd.utils.PoddRdfConstants;
+import com.github.podd.utils.PODD;
 
 /**
  * An exception indicating that the artifact denoted by the given IRI is already managed by PODD.
@@ -80,7 +80,7 @@ public class DuplicateArtifactIRIException extends UnmanagedSchemaException
         
         if(this.getDuplicateOntologyIRI() != null)
         {
-            model.add(errorResource, PoddRdfConstants.ERR_SOURCE, this.getDuplicateOntologyIRI().toOpenRDFURI());
+            model.add(errorResource, PODD.ERR_SOURCE, this.getDuplicateOntologyIRI().toOpenRDFURI());
         }
         
         return model;

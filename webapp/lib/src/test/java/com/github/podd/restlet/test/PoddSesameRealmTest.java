@@ -40,7 +40,7 @@ import org.restlet.security.Role;
 import com.github.ansell.restletutils.SesameRealmConstants;
 import com.github.podd.restlet.PoddSesameRealm;
 import com.github.podd.utils.DebugUtils;
-import com.github.podd.utils.PoddRdfConstants;
+import com.github.podd.utils.PODD;
 import com.github.podd.utils.PoddRoles;
 import com.github.podd.utils.PoddUser;
 import com.github.podd.utils.PoddUserStatus;
@@ -51,7 +51,7 @@ import com.github.podd.utils.PoddUserStatus;
  */
 public class PoddSesameRealmTest
 {
-    private static final URI userMgtContext = PoddRdfConstants.VF.createURI("urn:context:usermanagement:graph");
+    private static final URI userMgtContext = PODD.VF.createURI("urn:context:usermanagement:graph");
     
     private Repository testRepository;
     private PoddSesameRealm testRealm;
@@ -66,7 +66,7 @@ public class PoddSesameRealmTest
     protected PoddUser addTestUser(final String userId)
     {
         
-        final URI testUserHomePage = PoddRdfConstants.VF.createURI("http://example.org/" + userId);
+        final URI testUserHomePage = PODD.VF.createURI("http://example.org/" + userId);
         final PoddUser testUser =
                 new PoddUser(userId, "secret".toCharArray(), "First", "Last", userId, PoddUserStatus.ACTIVE,
                         testUserHomePage, "Some Organization", "SOME_ORCID_ID");
@@ -154,7 +154,7 @@ public class PoddSesameRealmTest
         final String testIdentifier = "xTest@example.com";
         final PoddUser testUser =
                 new PoddUser(testIdentifier, "secret".toCharArray(), "First", "Last", testIdentifier,
-                        PoddUserStatus.INACTIVE, PoddRdfConstants.VF.createURI("http://example.org/" + testIdentifier),
+                        PoddUserStatus.INACTIVE, PODD.VF.createURI("http://example.org/" + testIdentifier),
                         "Some Organization", "SOME_ORCID_ID");
         this.testRealm.addUser(testUser);
         
@@ -173,8 +173,7 @@ public class PoddSesameRealmTest
         final String testIdentifier = "xTest@example.com";
         final PoddUser testUser =
                 new PoddUser(testIdentifier, null, "First", "Last", testIdentifier, PoddUserStatus.INACTIVE,
-                        PoddRdfConstants.VF.createURI("http://example.org/" + testIdentifier), "Some Organization",
-                        "SOME_ORCID_ID");
+                        PODD.VF.createURI("http://example.org/" + testIdentifier), "Some Organization", "SOME_ORCID_ID");
         this.testRealm.addUser(testUser);
         
         final PoddUser retrievedUser = this.testRealm.findUser(testIdentifier);
@@ -192,8 +191,7 @@ public class PoddSesameRealmTest
         final String testIdentifier = "xTest@example.com";
         final PoddUser testUser =
                 new PoddUser(testIdentifier, null, "First", "Last", testIdentifier, PoddUserStatus.ACTIVE,
-                        PoddRdfConstants.VF.createURI("http://example.org/" + testIdentifier), "Some Organization",
-                        "SOME_ORCID_ID");
+                        PODD.VF.createURI("http://example.org/" + testIdentifier), "Some Organization", "SOME_ORCID_ID");
         this.testRealm.addUser(testUser);
         
         final PoddUser retrievedUser = this.testRealm.findUser(testIdentifier);
@@ -213,10 +211,10 @@ public class PoddSesameRealmTest
         final PoddUser user2 = this.addTestUser("bob@hope.com");
         
         // -prepare: test objects
-        final URI object1URI = PoddRdfConstants.VF.createURI("urn:podd:artifact:1");
-        final URI object2URI = PoddRdfConstants.VF.createURI("urn:podd:artifact:2");
-        final URI object3URI = PoddRdfConstants.VF.createURI("urn:podd:artifact:3");
-        final URI object4URI = PoddRdfConstants.VF.createURI("urn:podd:artifact:4");
+        final URI object1URI = PODD.VF.createURI("urn:podd:artifact:1");
+        final URI object2URI = PODD.VF.createURI("urn:podd:artifact:2");
+        final URI object3URI = PODD.VF.createURI("urn:podd:artifact:3");
+        final URI object4URI = PODD.VF.createURI("urn:podd:artifact:4");
         
         // -prepare: map Users - Roles and Objects together
         this.testRealm.map(user1, PoddRoles.ADMIN.getRole());
@@ -258,7 +256,7 @@ public class PoddSesameRealmTest
         final PoddUser user1 = this.addTestUser("john@example.com");
         
         // -prepare: test objects
-        final URI object1URI = PoddRdfConstants.VF.createURI("urn:podd:artifact:1");
+        final URI object1URI = PODD.VF.createURI("urn:podd:artifact:1");
         
         // -prepare: map Users - Roles and Objects together
         this.testRealm.map(user1, PoddRoles.ADMIN.getRole());
@@ -279,8 +277,8 @@ public class PoddSesameRealmTest
         final PoddUser user2 = this.addTestUser("bob@hope.com");
         
         // -prepare: test objects
-        final URI object1URI = PoddRdfConstants.VF.createURI("urn:podd:artifact:1");
-        final URI object2URI = PoddRdfConstants.VF.createURI("urn:podd:artifact:2");
+        final URI object1URI = PODD.VF.createURI("urn:podd:artifact:1");
+        final URI object2URI = PODD.VF.createURI("urn:podd:artifact:2");
         
         // -prepare: map Users - Roles and Objects together
         this.testRealm.map(user1, PoddRoles.PROJECT_MEMBER.getRole(), object1URI);
@@ -304,8 +302,8 @@ public class PoddSesameRealmTest
         final PoddUser user2 = this.addTestUser("bob@hope.com");
         
         // -prepare: test objects
-        final URI object1URI = PoddRdfConstants.VF.createURI("urn:podd:artifact:1");
-        final URI object2URI = PoddRdfConstants.VF.createURI("urn:podd:artifact:2");
+        final URI object1URI = PODD.VF.createURI("urn:podd:artifact:1");
+        final URI object2URI = PODD.VF.createURI("urn:podd:artifact:2");
         
         // -prepare: map Users - Roles and Objects together
         this.testRealm.map(user1, PoddRoles.PROJECT_MEMBER.getRole(), object1URI);
@@ -360,8 +358,8 @@ public class PoddSesameRealmTest
         final PoddUser user2 = this.addTestUser("bob@hope.com");
         
         // -prepare: test objects
-        final URI object1URI = PoddRdfConstants.VF.createURI("urn:podd:artifact:1");
-        final URI object2URI = PoddRdfConstants.VF.createURI("urn:podd:artifact:2");
+        final URI object1URI = PODD.VF.createURI("urn:podd:artifact:1");
+        final URI object2URI = PODD.VF.createURI("urn:podd:artifact:2");
         
         // -prepare: map Users - Roles and Objects together
         this.testRealm.map(user1, PoddRoles.PROJECT_MEMBER.getRole(), object1URI);
@@ -392,8 +390,8 @@ public class PoddSesameRealmTest
         final PoddUser user2 = this.addTestUser("bob@hope.com");
         
         // -prepare: test objects
-        final URI object1URI = PoddRdfConstants.VF.createURI("urn:podd:artifact:1");
-        final URI object2URI = PoddRdfConstants.VF.createURI("urn:podd:artifact:2");
+        final URI object1URI = PODD.VF.createURI("urn:podd:artifact:1");
+        final URI object2URI = PODD.VF.createURI("urn:podd:artifact:2");
         
         // -prepare: map Users - Roles and Objects together
         this.testRealm.map(user1, PoddRoles.PROJECT_MEMBER.getRole(), object1URI);
@@ -418,8 +416,8 @@ public class PoddSesameRealmTest
         final PoddUser user1 = this.addTestUser("john@example.com");
         
         // -prepare: test objects
-        final URI object1URI = PoddRdfConstants.VF.createURI("urn:podd:artifact:1");
-        final URI object2URI = PoddRdfConstants.VF.createURI("urn:podd:artifact:2");
+        final URI object1URI = PODD.VF.createURI("urn:podd:artifact:1");
+        final URI object2URI = PODD.VF.createURI("urn:podd:artifact:2");
         
         // -map Users - Roles and Objects together
         this.testRealm.map(user1, PoddRoles.ADMIN.getRole());
@@ -448,7 +446,7 @@ public class PoddSesameRealmTest
         Assert.assertEquals(2, list3.size());
         
         // verify: 2 RoleMappedObject statements exist in the repository
-        final Model list4 = this.getStatementList(null, PoddRdfConstants.PODD_ROLEMAPPEDOBJECT, null);
+        final Model list4 = this.getStatementList(null, PODD.PODD_ROLEMAPPEDOBJECT, null);
         Assert.assertFalse(list4.isEmpty());
         Assert.assertEquals(2, list4.size());
     }
@@ -493,12 +491,11 @@ public class PoddSesameRealmTest
         // -prepare: users
         final PoddUser testUser1 =
                 new PoddUser("ks1985", "secret".toCharArray(), "Kamal", "Silva", "kamal@silva.com",
-                        PoddUserStatus.ACTIVE, PoddRdfConstants.VF.createURI("http://example.org/kamal"),
+                        PoddUserStatus.ACTIVE, PODD.VF.createURI("http://example.org/kamal"),
                         "University of Queensland", "SOME_ORCID_ID");
         final PoddUser testUser2 =
                 new PoddUser("ns1983", "secret".toCharArray(), "Nimal", "Silva", "Nimal@silva.com",
-                        PoddUserStatus.ACTIVE, PoddRdfConstants.VF.createURI("http://example.org/nimal"), "CSIRO",
-                        "SOME_ORCID_ID");
+                        PoddUserStatus.ACTIVE, PODD.VF.createURI("http://example.org/nimal"), "CSIRO", "SOME_ORCID_ID");
         this.testRealm.addUser(testUser1);
         this.testRealm.addUser(testUser2);
         
@@ -514,12 +511,11 @@ public class PoddSesameRealmTest
         // -prepare: users
         final PoddUser testUser1 =
                 new PoddUser("ks1985", "secret".toCharArray(), "Kamal", "Silva", "kamal@silva.com",
-                        PoddUserStatus.ACTIVE, PoddRdfConstants.VF.createURI("http://example.org/kamal"),
+                        PoddUserStatus.ACTIVE, PODD.VF.createURI("http://example.org/kamal"),
                         "University of Queensland", "SOME_ORCID_ID");
         final PoddUser testUser2 =
                 new PoddUser("ns1983", "secret".toCharArray(), "Nimal", "Silva", "Nimal@silva.com",
-                        PoddUserStatus.ACTIVE, PoddRdfConstants.VF.createURI("http://example.org/nimal"), "CSIRO",
-                        "SOME_ORCID_ID");
+                        PoddUserStatus.ACTIVE, PODD.VF.createURI("http://example.org/nimal"), "CSIRO", "SOME_ORCID_ID");
         this.testRealm.addUser(testUser1);
         this.testRealm.addUser(testUser2);
         
@@ -563,7 +559,7 @@ public class PoddSesameRealmTest
     {
         // -prepare: user and test object
         final PoddUser user1 = this.addTestUser("john@example.com");
-        final URI object1URI = PoddRdfConstants.VF.createURI("urn:podd:artifact:1");
+        final URI object1URI = PODD.VF.createURI("urn:podd:artifact:1");
         
         // -map Users with Roles and Objects together
         this.testRealm.map(user1, PoddRoles.ADMIN.getRole());
@@ -604,14 +600,14 @@ public class PoddSesameRealmTest
         final String testUserId = "john@example.com";
         
         // create test user
-        final URI testUser1HomePage = PoddRdfConstants.VF.createURI("http://example.org/john");
+        final URI testUser1HomePage = PODD.VF.createURI("http://example.org/john");
         final PoddUser testUser1 =
                 new PoddUser(testUserId, "secret".toCharArray(), "First", "Last", testUserId, PoddUserStatus.ACTIVE,
                         testUser1HomePage, "UQ", "john_ORCID_111");
         this.testRealm.addUser(testUser1);
         
         // second test user
-        final URI testUser2HomePage = PoddRdfConstants.VF.createURI("http://example.org/john.cloned");
+        final URI testUser2HomePage = PODD.VF.createURI("http://example.org/john.cloned");
         final String testUser2FirstName = "Jason";
         final String testUser2LastName = "Bourne";
         final PoddUser testUser2 =

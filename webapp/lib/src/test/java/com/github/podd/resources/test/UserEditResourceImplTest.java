@@ -41,7 +41,7 @@ import org.restlet.resource.ResourceException;
 
 import com.github.ansell.restletutils.SesameRealmConstants;
 import com.github.ansell.restletutils.test.RestletTestUtils;
-import com.github.podd.utils.PoddRdfConstants;
+import com.github.podd.utils.PODD;
 import com.github.podd.utils.PoddRoles;
 import com.github.podd.utils.PoddUserStatus;
 import com.github.podd.utils.PoddWebConstants;
@@ -123,10 +123,9 @@ public class UserEditResourceImplTest extends AbstractResourceImplTest
             
             userInfoModel.remove(userUri, SesameRealmConstants.OAS_USERFIRSTNAME, null);
             userInfoModel.remove(userUri, SesameRealmConstants.OAS_USERLASTNAME, null);
-            userInfoModel.add(userUri, SesameRealmConstants.OAS_USERFIRSTNAME,
-                    PoddRdfConstants.VF.createLiteral(modifiedFirstName));
-            userInfoModel.add(userUri, SesameRealmConstants.OAS_USERLASTNAME,
-                    PoddRdfConstants.VF.createLiteral(modifiedLastName));
+            userInfoModel
+                    .add(userUri, SesameRealmConstants.OAS_USERFIRSTNAME, PODD.VF.createLiteral(modifiedFirstName));
+            userInfoModel.add(userUri, SesameRealmConstants.OAS_USERLASTNAME, PODD.VF.createLiteral(modifiedLastName));
             // submit modified details to Edit User Service
             final ClientResource userEditClientResource =
                     new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_EDIT));
@@ -200,7 +199,7 @@ public class UserEditResourceImplTest extends AbstractResourceImplTest
         final String testIdentifier = "testuser@podd.com";
         final String testHomePage = "http:///www.john.doe.com";
         final List<Map.Entry<URI, URI>> roles = new LinkedList<Map.Entry<URI, URI>>();
-        roles.add(new AbstractMap.SimpleEntry<URI, URI>(PoddRoles.PROJECT_ADMIN.getURI(), PoddRdfConstants.VF
+        roles.add(new AbstractMap.SimpleEntry<URI, URI>(PoddRoles.PROJECT_ADMIN.getURI(), PODD.VF
                 .createURI("urn:podd:some-project")));
         final String testFirstName = "John";
         final String testLastName = "Doe";
@@ -256,7 +255,7 @@ public class UserEditResourceImplTest extends AbstractResourceImplTest
         // prepare: add a Test User account
         final String testIdentifier = "testuser@podd.com";
         final List<Map.Entry<URI, URI>> roles = new LinkedList<Map.Entry<URI, URI>>();
-        roles.add(new AbstractMap.SimpleEntry<URI, URI>(PoddRoles.PROJECT_ADMIN.getURI(), PoddRdfConstants.VF
+        roles.add(new AbstractMap.SimpleEntry<URI, URI>(PoddRoles.PROJECT_ADMIN.getURI(), PODD.VF
                 .createURI("urn:podd:some-project")));
         this.loadTestUser(testIdentifier, "testuserpassword", "John", "Doe", testIdentifier,
                 "http:///www.john.doe.com", "CSIRO", "john-orcid", "Mr", "000333434", "Some Address", "Researcher",
@@ -286,12 +285,11 @@ public class UserEditResourceImplTest extends AbstractResourceImplTest
             
             userInfoModel.remove(userUri, SesameRealmConstants.OAS_USERFIRSTNAME, null);
             userInfoModel.remove(userUri, SesameRealmConstants.OAS_USERLASTNAME, null);
-            userInfoModel.remove(userUri, PoddRdfConstants.PODD_USER_STATUS, null);
-            userInfoModel.add(userUri, SesameRealmConstants.OAS_USERFIRSTNAME,
-                    PoddRdfConstants.VF.createLiteral(modifiedFirstName));
-            userInfoModel.add(userUri, SesameRealmConstants.OAS_USERLASTNAME,
-                    PoddRdfConstants.VF.createLiteral(modifiedLastName));
-            userInfoModel.add(userUri, PoddRdfConstants.PODD_USER_STATUS, PoddUserStatus.INACTIVE.getURI());
+            userInfoModel.remove(userUri, PODD.PODD_USER_STATUS, null);
+            userInfoModel
+                    .add(userUri, SesameRealmConstants.OAS_USERFIRSTNAME, PODD.VF.createLiteral(modifiedFirstName));
+            userInfoModel.add(userUri, SesameRealmConstants.OAS_USERLASTNAME, PODD.VF.createLiteral(modifiedLastName));
+            userInfoModel.add(userUri, PODD.PODD_USER_STATUS, PoddUserStatus.INACTIVE.getURI());
             
             // submit modified details to Edit User Service
             final ClientResource userEditClientResource =
@@ -339,7 +337,7 @@ public class UserEditResourceImplTest extends AbstractResourceImplTest
                     Assert.assertEquals("Role count should not have changed", 1,
                             resultsModel.filter(null, SesameRealmConstants.OAS_ROLEMAPPEDROLE, null).objects().size());
                     Assert.assertEquals("Status was not modified", PoddUserStatus.INACTIVE.getURI(), resultsModel
-                            .filter(null, PoddRdfConstants.PODD_USER_STATUS, null).objectURI());
+                            .filter(null, PODD.PODD_USER_STATUS, null).objectURI());
                 }
                 finally
                 {
@@ -365,15 +363,13 @@ public class UserEditResourceImplTest extends AbstractResourceImplTest
     {
         final String testIdentifier = "testAdminUser";
         final String testPassword = "modifiedPassword";
-        final URI tempUserUri = PoddRdfConstants.VF.createURI("urn:temp:user");
+        final URI tempUserUri = PODD.VF.createURI("urn:temp:user");
         
         // prepare: create Model with modified password and user identifier
         final Model userInfoModel = new LinkedHashModel();
-        userInfoModel.add(tempUserUri, SesameRealmConstants.OAS_USERIDENTIFIER,
-                PoddRdfConstants.VF.createLiteral(testIdentifier));
-        userInfoModel.add(tempUserUri, SesameRealmConstants.OAS_USERSECRET,
-                PoddRdfConstants.VF.createLiteral(testPassword));
-        userInfoModel.add(tempUserUri, PoddRdfConstants.PODD_USER_STATUS, PoddUserStatus.ACTIVE.getURI());
+        userInfoModel.add(tempUserUri, SesameRealmConstants.OAS_USERIDENTIFIER, PODD.VF.createLiteral(testIdentifier));
+        userInfoModel.add(tempUserUri, SesameRealmConstants.OAS_USERSECRET, PODD.VF.createLiteral(testPassword));
+        userInfoModel.add(tempUserUri, PODD.PODD_USER_STATUS, PoddUserStatus.ACTIVE.getURI());
         
         // submit new password to Edit User Service
         final MediaType mediaType = MediaType.APPLICATION_RDF_XML;
@@ -493,7 +489,7 @@ public class UserEditResourceImplTest extends AbstractResourceImplTest
         // prepare: add a Test User account
         final String testIdentifier = "testuser@podd.com";
         final List<Map.Entry<URI, URI>> roles = new LinkedList<Map.Entry<URI, URI>>();
-        roles.add(new AbstractMap.SimpleEntry<URI, URI>(PoddRoles.PROJECT_ADMIN.getURI(), PoddRdfConstants.VF
+        roles.add(new AbstractMap.SimpleEntry<URI, URI>(PoddRoles.PROJECT_ADMIN.getURI(), PODD.VF
                 .createURI("urn:podd:some-project")));
         this.loadTestUser(testIdentifier, "testuserpassword", "John", "Doe", testIdentifier,
                 "http:///www.john.doe.com", "CSIRO", "john-orcid", "Mr", "000333434", "Some Address", "Researcher",
@@ -523,10 +519,9 @@ public class UserEditResourceImplTest extends AbstractResourceImplTest
             
             userInfoModel.remove(userUri, SesameRealmConstants.OAS_USERFIRSTNAME, null);
             userInfoModel.remove(userUri, SesameRealmConstants.OAS_USERLASTNAME, null);
-            userInfoModel.add(userUri, SesameRealmConstants.OAS_USERFIRSTNAME,
-                    PoddRdfConstants.VF.createLiteral(modifiedFirstName));
-            userInfoModel.add(userUri, SesameRealmConstants.OAS_USERLASTNAME,
-                    PoddRdfConstants.VF.createLiteral(modifiedLastName));
+            userInfoModel
+                    .add(userUri, SesameRealmConstants.OAS_USERFIRSTNAME, PODD.VF.createLiteral(modifiedFirstName));
+            userInfoModel.add(userUri, SesameRealmConstants.OAS_USERLASTNAME, PODD.VF.createLiteral(modifiedLastName));
             
             final StringWriter out = new StringWriter();
             Rio.write(userInfoModel, out, format);

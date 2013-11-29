@@ -76,7 +76,7 @@ import org.slf4j.LoggerFactory;
 
 import com.github.ansell.restletutils.RestletUtilRole;
 import com.github.ansell.restletutils.SesameRealmConstants;
-import com.github.podd.utils.PoddRdfConstants;
+import com.github.podd.utils.PODD;
 import com.github.podd.utils.PoddRoles;
 import com.github.podd.utils.PoddUser;
 import com.github.podd.utils.PoddUserStatus;
@@ -506,43 +506,43 @@ public class PoddSesameRealm extends Realm
             
             if(nextUser.getOrganization() != null)
             {
-                conn.add(nextUserUUID, PoddRdfConstants.PODD_USER_ORGANIZATION,
-                        this.vf.createLiteral(nextUser.getOrganization()), this.getContexts());
+                conn.add(nextUserUUID, PODD.PODD_USER_ORGANIZATION, this.vf.createLiteral(nextUser.getOrganization()),
+                        this.getContexts());
             }
             
             if(nextUser.getOrcid() != null)
             {
-                conn.add(nextUserUUID, PoddRdfConstants.PODD_USER_ORCID, this.vf.createLiteral(nextUser.getOrcid()),
+                conn.add(nextUserUUID, PODD.PODD_USER_ORCID, this.vf.createLiteral(nextUser.getOrcid()),
                         this.getContexts());
             }
             
             if(nextUser.getHomePage() != null)
             {
-                conn.add(nextUserUUID, PoddRdfConstants.PODD_USER_HOMEPAGE, nextUser.getHomePage(), this.getContexts());
+                conn.add(nextUserUUID, PODD.PODD_USER_HOMEPAGE, nextUser.getHomePage(), this.getContexts());
             }
             
             if(nextUser.getTitle() != null)
             {
-                conn.add(nextUserUUID, PoddRdfConstants.PODD_USER_TITLE, this.vf.createLiteral(nextUser.getTitle()),
+                conn.add(nextUserUUID, PODD.PODD_USER_TITLE, this.vf.createLiteral(nextUser.getTitle()),
                         this.getContexts());
             }
             
             if(nextUser.getPhone() != null)
             {
-                conn.add(nextUserUUID, PoddRdfConstants.PODD_USER_PHONE, this.vf.createLiteral(nextUser.getPhone()),
+                conn.add(nextUserUUID, PODD.PODD_USER_PHONE, this.vf.createLiteral(nextUser.getPhone()),
                         this.getContexts());
             }
             
             if(nextUser.getAddress() != null)
             {
-                conn.add(nextUserUUID, PoddRdfConstants.PODD_USER_ADDRESS,
-                        this.vf.createLiteral(nextUser.getAddress()), this.getContexts());
+                conn.add(nextUserUUID, PODD.PODD_USER_ADDRESS, this.vf.createLiteral(nextUser.getAddress()),
+                        this.getContexts());
             }
             
             if(nextUser.getPosition() != null)
             {
-                conn.add(nextUserUUID, PoddRdfConstants.PODD_USER_POSITION,
-                        this.vf.createLiteral(nextUser.getPosition()), this.getContexts());
+                conn.add(nextUserUUID, PODD.PODD_USER_POSITION, this.vf.createLiteral(nextUser.getPosition()),
+                        this.getContexts());
             }
             
             PoddUserStatus status = PoddUserStatus.INACTIVE;
@@ -550,7 +550,7 @@ public class PoddSesameRealm extends Realm
             {
                 status = nextUser.getUserStatus();
             }
-            conn.add(nextUserUUID, PoddRdfConstants.PODD_USER_STATUS, status.getURI(), this.getContexts());
+            conn.add(nextUserUUID, PODD.PODD_USER_STATUS, status.getURI(), this.getContexts());
             
             conn.commit();
             
@@ -721,7 +721,7 @@ public class PoddSesameRealm extends Realm
         query.append(" . ");
         
         query.append(roleMappingVar);
-        query.append(RenderUtils.getSPARQLQueryString(PoddRdfConstants.PODD_ROLEMAPPEDOBJECT));
+        query.append(RenderUtils.getSPARQLQueryString(PODD.PODD_ROLEMAPPEDOBJECT));
         query.append(" ?object . ");
         
         if(userIdentifier != null)
@@ -771,7 +771,7 @@ public class PoddSesameRealm extends Realm
         
         query.append(" OPTIONAL{ ");
         query.append(roleMappingVar);
-        query.append(" <" + PoddRdfConstants.PODD_ROLEMAPPEDOBJECT + "> ");
+        query.append(" <" + PODD.PODD_ROLEMAPPEDOBJECT + "> ");
         query.append(" ?");
         query.append(PoddSesameRealm.PARAM_OBJECT_URI);
         query.append(" . } ");
@@ -834,7 +834,7 @@ public class PoddSesameRealm extends Realm
         
         query.append(" ?");
         query.append(PoddSesameRealm.PARAM_USER_URI);
-        query.append(" <" + PoddRdfConstants.PODD_USER_STATUS + "> ");
+        query.append(" <" + PODD.PODD_USER_STATUS + "> ");
         query.append(" ?");
         query.append(PoddSesameRealm.PARAM_USER_STATUS);
         query.append(" . ");
@@ -848,21 +848,21 @@ public class PoddSesameRealm extends Realm
         
         query.append(" OPTIONAL{ ?");
         query.append(PoddSesameRealm.PARAM_USER_URI);
-        query.append(" <" + PoddRdfConstants.PODD_USER_ORCID + "> ");
+        query.append(" <" + PODD.PODD_USER_ORCID + "> ");
         query.append(" ?");
         query.append(PoddSesameRealm.PARAM_USER_ORCID);
         query.append(" . } ");
         
         query.append(" OPTIONAL{ ?");
         query.append(PoddSesameRealm.PARAM_USER_URI);
-        query.append(" <" + PoddRdfConstants.PODD_USER_HOMEPAGE + "> ");
+        query.append(" <" + PODD.PODD_USER_HOMEPAGE + "> ");
         query.append(" ?");
         query.append(PoddSesameRealm.PARAM_USER_HOMEPAGE);
         query.append(" . } ");
         
         query.append(" OPTIONAL{ ?");
         query.append(PoddSesameRealm.PARAM_USER_URI);
-        query.append(" <" + PoddRdfConstants.PODD_USER_ORGANIZATION + "> ");
+        query.append(" <" + PODD.PODD_USER_ORGANIZATION + "> ");
         query.append(" ?");
         query.append(PoddSesameRealm.PARAM_USER_ORGANIZATION);
         query.append(" . } ");
@@ -890,28 +890,28 @@ public class PoddSesameRealm extends Realm
         
         query.append(" OPTIONAL{ ?");
         query.append(PoddSesameRealm.PARAM_USER_URI);
-        query.append(" <" + PoddRdfConstants.PODD_USER_TITLE + "> ");
+        query.append(" <" + PODD.PODD_USER_TITLE + "> ");
         query.append(" ?");
         query.append(PoddSesameRealm.PARAM_USER_TITLE);
         query.append(" . } ");
         
         query.append(" OPTIONAL{ ?");
         query.append(PoddSesameRealm.PARAM_USER_URI);
-        query.append(" <" + PoddRdfConstants.PODD_USER_PHONE + "> ");
+        query.append(" <" + PODD.PODD_USER_PHONE + "> ");
         query.append(" ?");
         query.append(PoddSesameRealm.PARAM_USER_PHONE);
         query.append(" . } ");
         
         query.append(" OPTIONAL{ ?");
         query.append(PoddSesameRealm.PARAM_USER_URI);
-        query.append(" <" + PoddRdfConstants.PODD_USER_ADDRESS + "> ");
+        query.append(" <" + PODD.PODD_USER_ADDRESS + "> ");
         query.append(" ?");
         query.append(PoddSesameRealm.PARAM_USER_ADDRESS);
         query.append(" . } ");
         
         query.append(" OPTIONAL{ ?");
         query.append(PoddSesameRealm.PARAM_USER_URI);
-        query.append(" <" + PoddRdfConstants.PODD_USER_POSITION + "> ");
+        query.append(" <" + PODD.PODD_USER_POSITION + "> ");
         query.append(" ?");
         query.append(PoddSesameRealm.PARAM_USER_POSITION);
         query.append(" . } ");
@@ -989,20 +989,20 @@ public class PoddSesameRealm extends Realm
         
         query.append(" ?");
         query.append(PoddSesameRealm.PARAM_USER_URI);
-        query.append(" <" + PoddRdfConstants.PODD_USER_STATUS + "> ");
+        query.append(" <" + PODD.PODD_USER_STATUS + "> ");
         query.append(" <" + status.getURI() + "> ");
         query.append(" . ");
         
         query.append(" OPTIONAL{ ?");
         query.append(PoddSesameRealm.PARAM_USER_URI);
-        query.append(" <" + PoddRdfConstants.PODD_USER_HOMEPAGE + "> ");
+        query.append(" <" + PODD.PODD_USER_HOMEPAGE + "> ");
         query.append(" ?");
         query.append(PoddSesameRealm.PARAM_USER_HOMEPAGE);
         query.append(" . } ");
         
         query.append(" OPTIONAL{ ?");
         query.append(PoddSesameRealm.PARAM_USER_URI);
-        query.append(" <" + PoddRdfConstants.PODD_USER_ORGANIZATION + "> ");
+        query.append(" <" + PODD.PODD_USER_ORGANIZATION + "> ");
         query.append(" ?");
         query.append(PoddSesameRealm.PARAM_USER_ORGANIZATION);
         query.append(" . } ");
@@ -1030,35 +1030,35 @@ public class PoddSesameRealm extends Realm
         
         query.append(" OPTIONAL{ ?");
         query.append(PoddSesameRealm.PARAM_USER_URI);
-        query.append(" <" + PoddRdfConstants.PODD_USER_TITLE + "> ");
+        query.append(" <" + PODD.PODD_USER_TITLE + "> ");
         query.append(" ?");
         query.append(PoddSesameRealm.PARAM_USER_TITLE);
         query.append(" . } ");
         
         query.append(" OPTIONAL{ ?");
         query.append(PoddSesameRealm.PARAM_USER_URI);
-        query.append(" <" + PoddRdfConstants.PODD_USER_PHONE + "> ");
+        query.append(" <" + PODD.PODD_USER_PHONE + "> ");
         query.append(" ?");
         query.append(PoddSesameRealm.PARAM_USER_PHONE);
         query.append(" . } ");
         
         query.append(" OPTIONAL{ ?");
         query.append(PoddSesameRealm.PARAM_USER_URI);
-        query.append(" <" + PoddRdfConstants.PODD_USER_ADDRESS + "> ");
+        query.append(" <" + PODD.PODD_USER_ADDRESS + "> ");
         query.append(" ?");
         query.append(PoddSesameRealm.PARAM_USER_ADDRESS);
         query.append(" . } ");
         
         query.append(" OPTIONAL{ ?");
         query.append(PoddSesameRealm.PARAM_USER_URI);
-        query.append(" <" + PoddRdfConstants.PODD_USER_POSITION + "> ");
+        query.append(" <" + PODD.PODD_USER_POSITION + "> ");
         query.append(" ?");
         query.append(PoddSesameRealm.PARAM_USER_POSITION);
         query.append(" . } ");
         
         query.append(" OPTIONAL{ ?");
         query.append(PoddSesameRealm.PARAM_USER_URI);
-        query.append(" <" + PoddRdfConstants.PODD_USER_ORCID + "> ");
+        query.append(" <" + PODD.PODD_USER_ORCID + "> ");
         query.append(" ?");
         query.append(PoddSesameRealm.PARAM_USER_ORCID);
         query.append(" . } ");
@@ -1119,7 +1119,7 @@ public class PoddSesameRealm extends Realm
         
         query.append(" OPTIONAL{ ?");
         query.append(PoddSesameRealm.PARAM_USER_URI);
-        query.append(" <" + PoddRdfConstants.PODD_USER_ORGANIZATION + "> ");
+        query.append(" <" + PODD.PODD_USER_ORGANIZATION + "> ");
         query.append(" ?");
         query.append(PoddSesameRealm.PARAM_USER_ORGANIZATION);
         query.append(" . } ");
@@ -1151,7 +1151,7 @@ public class PoddSesameRealm extends Realm
         // filter by Status if provided
         query.append(" ?");
         query.append(PoddSesameRealm.PARAM_USER_URI);
-        query.append(" <" + PoddRdfConstants.PODD_USER_STATUS + "> ");
+        query.append(" <" + PODD.PODD_USER_STATUS + "> ");
         if(status == null)
         {
             query.append(" ?");
@@ -2464,8 +2464,8 @@ public class PoddSesameRealm extends Realm
             
             if(optionalObjectUri != null)
             {
-                conn.add(this.vf.createStatement(nextRoleMappingUUID, PoddRdfConstants.PODD_ROLEMAPPEDOBJECT,
-                        optionalObjectUri), this.getContexts());
+                conn.add(this.vf.createStatement(nextRoleMappingUUID, PODD.PODD_ROLEMAPPEDOBJECT, optionalObjectUri),
+                        this.getContexts());
             }
             
             conn.commit();
@@ -2525,7 +2525,7 @@ public class PoddSesameRealm extends Realm
                 // could this lead to an inefficient sparql query?
                 searchTerm = "";
             }
-            tupleQuery.setBinding(PoddSesameRealm.PARAM_SEARCH_TERM, PoddRdfConstants.VF.createLiteral(searchTerm));
+            tupleQuery.setBinding(PoddSesameRealm.PARAM_SEARCH_TERM, PODD.VF.createLiteral(searchTerm));
             
             final QueryResultCollector resultCollector = RdfUtility.executeTupleQuery(tupleQuery, this.getContexts());
             
@@ -2806,7 +2806,7 @@ public class PoddSesameRealm extends Realm
                 query.append("   ?roleMappingUri a <" + SesameRealmConstants.OAS_ROLEMAPPING + "> . ");
                 query.append("   ?roleMappingUri <" + SesameRealmConstants.OAS_ROLEMAPPEDUSER + "> ?identifier . ");
                 query.append("   ?roleMappingUri <" + SesameRealmConstants.OAS_ROLEMAPPEDROLE + "> ?role . ");
-                query.append("   ?roleMappingUri <" + PoddRdfConstants.PODD_ROLEMAPPEDOBJECT + "> ?object . ");
+                query.append("   ?roleMappingUri <" + PODD.PODD_ROLEMAPPEDOBJECT + "> ?object . ");
                 query.append("   FILTER(str(?identifier) = \"" + NTriplesUtil.escapeString(user.getIdentifier())
                         + "\") ");
                 query.append(" } ");

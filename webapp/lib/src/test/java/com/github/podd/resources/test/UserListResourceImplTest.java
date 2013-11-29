@@ -20,7 +20,7 @@ import org.restlet.resource.ResourceException;
 
 import com.github.ansell.restletutils.SesameRealmConstants;
 import com.github.ansell.restletutils.test.RestletTestUtils;
-import com.github.podd.utils.PoddRdfConstants;
+import com.github.podd.utils.PODD;
 import com.github.podd.utils.PoddWebConstants;
 
 /**
@@ -96,14 +96,14 @@ public class UserListResourceImplTest extends AbstractResourceImplTest
                     1,
                     resultsModel
                             .filter(null, SesameRealmConstants.OAS_USERIDENTIFIER,
-                                    PoddRdfConstants.VF.createLiteral("testAdminUser")).subjects().size());
+                                    PODD.VF.createLiteral("testAdminUser")).subjects().size());
             
             Assert.assertEquals(
                     "Missing anotherUser",
                     1,
                     resultsModel
-                            .filter(null, SesameRealmConstants.OAS_USERIDENTIFIER,
-                                    PoddRdfConstants.VF.createLiteral("anotherUser")).subjects().size());
+                            .filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, PODD.VF.createLiteral("anotherUser"))
+                            .subjects().size());
         }
         finally
         {

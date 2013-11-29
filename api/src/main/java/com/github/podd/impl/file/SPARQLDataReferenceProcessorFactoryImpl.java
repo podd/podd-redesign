@@ -28,7 +28,7 @@ import com.github.podd.api.PoddProcessorStage;
 import com.github.podd.api.file.DataReferenceProcessor;
 import com.github.podd.api.file.DataReferenceProcessorFactory;
 import com.github.podd.api.file.SPARQLDataReferenceProcessorFactory;
-import com.github.podd.utils.PoddRdfConstants;
+import com.github.podd.utils.PODD;
 
 /**
  * An SPARQL Data Reference Processor Factory that creates {@link SPARQLDataReferenceProcessorImpl}
@@ -88,8 +88,8 @@ public class SPARQLDataReferenceProcessorFactoryImpl implements SPARQLDataRefere
         // match all triples about a subject whose TYPE is poddBase:SSHFileReference
         builder.append(" ?")
                 .append(this.getSPARQLVariable())
-                .append(" <" + RDF.TYPE.stringValue() + "> <"
-                        + PoddRdfConstants.PODD_BASE_DATA_REFERENCE_TYPE_SPARQL.stringValue() + "> . ");
+                .append(" <" + RDF.TYPE.stringValue() + "> <" + PODD.PODD_BASE_DATA_REFERENCE_TYPE_SPARQL.stringValue()
+                        + "> . ");
         
         builder.append(" ?").append(this.getSPARQLVariable()).append(" ?predicate ?object . ");
         

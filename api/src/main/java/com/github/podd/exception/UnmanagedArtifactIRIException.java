@@ -20,7 +20,7 @@ import org.openrdf.model.Model;
 import org.openrdf.model.Resource;
 import org.semanticweb.owlapi.model.IRI;
 
-import com.github.podd.utils.PoddRdfConstants;
+import com.github.podd.utils.PODD;
 
 /**
  * An exception indicating that the artifact denoted by the given IRI was not managed by PODD.
@@ -81,7 +81,7 @@ public class UnmanagedArtifactIRIException extends UnmanagedSchemaException
         
         if(this.getUnmanagedOntologyIRI() != null)
         {
-            model.add(errorResource, PoddRdfConstants.ERR_SOURCE, this.getUnmanagedOntologyIRI().toOpenRDFURI());
+            model.add(errorResource, PODD.ERR_SOURCE, this.getUnmanagedOntologyIRI().toOpenRDFURI());
         }
         
         return model;

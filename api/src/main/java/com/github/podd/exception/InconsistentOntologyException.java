@@ -22,7 +22,7 @@ import org.openrdf.model.Resource;
 import org.openrdf.model.vocabulary.RDFS;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
 
-import com.github.podd.utils.PoddRdfConstants;
+import com.github.podd.utils.PODD;
 
 /**
  * An exception indicating that the given ontology was inconsistent.
@@ -86,14 +86,14 @@ public class InconsistentOntologyException extends PoddException
         final OWLReasoner reasoner = this.getReasoner();
         if(reasoner != null)
         {
-            final BNode reasonerUri = PoddRdfConstants.VF.createBNode();
-            model.add(errorResource, PoddRdfConstants.ERR_IDENTIFIER, reasonerUri);
-            model.add(reasonerUri, RDFS.LABEL, PoddRdfConstants.VF.createLiteral(reasoner.getReasonerName()));
-            model.add(reasonerUri, PoddRdfConstants.OMV_CURRENT_VERSION,
-                    PoddRdfConstants.VF.createLiteral(reasoner.getReasonerVersion().toString()));
+            final BNode reasonerUri = PODD.VF.createBNode();
+            model.add(errorResource, PODD.ERR_IDENTIFIER, reasonerUri);
+            model.add(reasonerUri, RDFS.LABEL, PODD.VF.createLiteral(reasoner.getReasonerName()));
+            model.add(reasonerUri, PODD.OMV_CURRENT_VERSION,
+                    PODD.VF.createLiteral(reasoner.getReasonerVersion().toString()));
             
-            model.add(errorResource, PoddRdfConstants.ERR_SOURCE, reasoner.getRootOntology().getOntologyID()
-                    .getOntologyIRI().toOpenRDFURI());
+            model.add(errorResource, PODD.ERR_SOURCE, reasoner.getRootOntology().getOntologyID().getOntologyIRI()
+                    .toOpenRDFURI());
             
             // TODO: can we get the causes for inconsistency?
             // use ExplanationGenerator - sample code in podd-ontologies

@@ -78,7 +78,7 @@ import com.github.podd.resources.UserListResourceImpl;
 import com.github.podd.resources.UserPasswordResourceImpl;
 import com.github.podd.resources.UserRolesResourceImpl;
 import com.github.podd.resources.UserSearchResourceImpl;
-import com.github.podd.utils.PoddRdfConstants;
+import com.github.podd.utils.PODD;
 import com.github.podd.utils.PoddRoles;
 import com.github.podd.utils.PoddUser;
 import com.github.podd.utils.PoddUserStatus;
@@ -457,8 +457,7 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
         // aliases here
         if(this.aliasesConfiguration.isEmpty())
         {
-            final String aliasesFile =
-                    propertyUtil.get(PoddRdfConstants.KEY_ALIASES, PoddRdfConstants.PATH_DEFAULT_ALIASES_FILE);
+            final String aliasesFile = propertyUtil.get(PODD.KEY_ALIASES, PODD.PATH_DEFAULT_ALIASES_FILE);
             try (final InputStream input = ApplicationUtils.class.getResourceAsStream(aliasesFile);)
             {
                 if(input != null)

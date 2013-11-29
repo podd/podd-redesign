@@ -43,8 +43,8 @@ import com.github.podd.restlet.PoddAction;
 import com.github.podd.restlet.RestletUtils;
 import com.github.podd.utils.FreemarkerUtil;
 import com.github.podd.utils.InferredOWLOntologyID;
+import com.github.podd.utils.PODD;
 import com.github.podd.utils.PoddObjectLabel;
-import com.github.podd.utils.PoddRdfConstants;
 import com.github.podd.utils.PoddWebConstants;
 
 /**
@@ -192,8 +192,7 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
             this.log.debug("requesting get artifact ({}): {}", variant.getMediaType().getName(), artifactString);
             
             // FIXME: The artifact may be published here
-            this.checkAuthentication(PoddAction.UNPUBLISHED_ARTIFACT_READ,
-                    PoddRdfConstants.VF.createURI(artifactString));
+            this.checkAuthentication(PoddAction.UNPUBLISHED_ARTIFACT_READ, PODD.VF.createURI(artifactString));
             // completed checking authorization
             
             final User user = this.getRequest().getClientInfo().getUser();
@@ -273,7 +272,7 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
         // Get label for the object type
         final PoddObjectLabel label = objectTypes.get(0);
         dataModel.put("objectType", label);
-        if(PoddRdfConstants.PODD_SCIENCE_PROJECT.equals(label.getObjectURI()))
+        if(PODD.PODD_SCIENCE_PROJECT.equals(label.getObjectURI()))
         {
             dataModel.put("isProject", true);
         }
@@ -331,9 +330,9 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
         // button to avoid users clicking on it
         for(final PoddObjectLabel nextType : objectTypes)
         {
-            if(nextType.getObjectURI().equals(PoddRdfConstants.PODD_BASE_DATA_REFERENCE_TYPE)
-                    || nextType.getObjectURI().equals(PoddRdfConstants.PODD_BASE_DATA_REFERENCE_TYPE_SPARQL)
-                    || nextType.getObjectURI().equals(PoddRdfConstants.PODD_BASE_FILE_REFERENCE_TYPE_SSH))
+            if(nextType.getObjectURI().equals(PODD.PODD_BASE_DATA_REFERENCE_TYPE)
+                    || nextType.getObjectURI().equals(PODD.PODD_BASE_DATA_REFERENCE_TYPE_SPARQL)
+                    || nextType.getObjectURI().equals(PODD.PODD_BASE_FILE_REFERENCE_TYPE_SSH))
             {
                 dataModel.put("canEditObject", false);
                 dataModel.put("canAddChildren", false);

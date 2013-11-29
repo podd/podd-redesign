@@ -38,9 +38,9 @@ import com.github.podd.exception.UnmanagedSchemaIRIException;
 import com.github.podd.restlet.PoddAction;
 import com.github.podd.restlet.RestletUtils;
 import com.github.podd.utils.InferredOWLOntologyID;
+import com.github.podd.utils.PODD;
 import com.github.podd.utils.PoddObjectLabel;
 import com.github.podd.utils.PoddObjectLabelImpl;
-import com.github.podd.utils.PoddRdfConstants;
 import com.github.podd.utils.PoddWebConstants;
 
 /**
@@ -87,7 +87,7 @@ public class AddObjectResourceImpl extends AbstractPoddResourceImpl
         }
         else
         {
-            this.checkAuthentication(PoddAction.ARTIFACT_EDIT, PoddRdfConstants.VF.createURI(artifactUri));
+            this.checkAuthentication(PoddAction.ARTIFACT_EDIT, PODD.VF.createURI(artifactUri));
         }
         
         final PoddObjectLabel objectTypeLabel = this.getObjectTypeLabel(artifactUri, objectType);
@@ -154,7 +154,7 @@ public class AddObjectResourceImpl extends AbstractPoddResourceImpl
                 // FIXME: Why is there a hack here???
                 ontologyID =
                         this.getPoddSchemaManager().getCurrentSchemaOntologyVersion(
-                                IRI.create(PoddRdfConstants.PODD_SCIENCE.replace("#", "")));
+                                IRI.create(PODD.PODD_SCIENCE.replace("#", "")));
             }
             else
             {
@@ -168,8 +168,7 @@ public class AddObjectResourceImpl extends AbstractPoddResourceImpl
             try
             {
                 objectLabel =
-                        this.getPoddSesameManager().getObjectLabel(ontologyID,
-                                PoddRdfConstants.VF.createURI(objectType), conn,
+                        this.getPoddSesameManager().getObjectLabel(ontologyID, PODD.VF.createURI(objectType), conn,
                                 this.getPoddRepositoryManager().getSchemaManagementGraph());
             }
             finally
@@ -186,7 +185,7 @@ public class AddObjectResourceImpl extends AbstractPoddResourceImpl
         {
             e.printStackTrace();
             // failed to find Label
-            final URI objectTypeUri = PoddRdfConstants.VF.createURI(objectType);
+            final URI objectTypeUri = PODD.VF.createURI(objectType);
             objectLabel = new PoddObjectLabelImpl(null, objectTypeUri, objectType);
         }
         return objectLabel;

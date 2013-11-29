@@ -26,7 +26,7 @@ import org.semanticweb.owlapi.model.OWLOntologyID;
 import com.github.podd.api.file.DataReference;
 import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.OntologyUtils;
-import com.github.podd.utils.PoddRdfConstants;
+import com.github.podd.utils.PODD;
 
 public abstract class AbstractDataReferenceImpl implements DataReference
 {
@@ -39,7 +39,7 @@ public abstract class AbstractDataReferenceImpl implements DataReference
     /**
      * Defaults to http://purl.org/podd/ns/poddBase#hasDataReference
      */
-    private IRI parentPredicateIRI = IRI.create(PoddRdfConstants.PODD_BASE_HAS_DATA_REFERENCE);
+    private IRI parentPredicateIRI = IRI.create(PODD.PODD_BASE_HAS_DATA_REFERENCE);
     
     public AbstractDataReferenceImpl()
     {
@@ -152,16 +152,16 @@ public abstract class AbstractDataReferenceImpl implements DataReference
         // Override users who set the parent predicate IRI to null using the default
         if(this.getParentPredicateIRI() == null)
         {
-            this.setParentPredicateIRI(IRI.create(PoddRdfConstants.PODD_BASE_HAS_DATA_REFERENCE));
+            this.setParentPredicateIRI(IRI.create(PODD.PODD_BASE_HAS_DATA_REFERENCE));
         }
         
         final Model result = new LinkedHashModel();
         
         result.add(this.getParentIri().toOpenRDFURI(), this.getParentPredicateIRI().toOpenRDFURI(), this.getObjectIri()
                 .toOpenRDFURI());
-        result.add(this.getObjectIri().toOpenRDFURI(), RDF.TYPE, PoddRdfConstants.PODD_BASE_DATA_REFERENCE_TYPE);
-        result.add(this.getObjectIri().toOpenRDFURI(), PoddRdfConstants.PODD_BASE_HAS_ALIAS,
-                PoddRdfConstants.VF.createLiteral(this.getRepositoryAlias()));
+        result.add(this.getObjectIri().toOpenRDFURI(), RDF.TYPE, PODD.PODD_BASE_DATA_REFERENCE_TYPE);
+        result.add(this.getObjectIri().toOpenRDFURI(), PODD.PODD_BASE_HAS_ALIAS,
+                PODD.VF.createLiteral(this.getRepositoryAlias()));
         
         if(this.getArtifactID() != null)
         {
@@ -170,8 +170,7 @@ public abstract class AbstractDataReferenceImpl implements DataReference
         
         if(this.getLabel() != null)
         {
-            result.add(this.getObjectIri().toOpenRDFURI(), RDFS.LABEL,
-                    PoddRdfConstants.VF.createLiteral(this.getLabel()));
+            result.add(this.getObjectIri().toOpenRDFURI(), RDFS.LABEL, PODD.VF.createLiteral(this.getLabel()));
         }
         
         return result;

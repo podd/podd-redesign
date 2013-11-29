@@ -34,7 +34,7 @@ import org.slf4j.LoggerFactory;
 import com.github.podd.api.file.SPARQLDataReference;
 import com.github.podd.api.file.SPARQLDataReferenceProcessor;
 import com.github.podd.utils.DebugUtils;
-import com.github.podd.utils.PoddRdfConstants;
+import com.github.podd.utils.PODD;
 
 /**
  * Processor for File References of type <i>http://purl.org/podd/ns/poddBase#SPARQLDataReference</i>
@@ -103,14 +103,13 @@ public class SPARQLDataReferenceProcessorImpl implements SPARQLDataReferenceProc
                     fileReference.setLabel(label.iterator().next().stringValue());
                 }
                 
-                final Set<Value> graph =
-                        model.filter(fileRef, PoddRdfConstants.PODD_BASE_HAS_SPARQL_GRAPH, null).objects();
+                final Set<Value> graph = model.filter(fileRef, PODD.PODD_BASE_HAS_SPARQL_GRAPH, null).objects();
                 if(!graph.isEmpty())
                 {
                     fileReference.setGraph(graph.iterator().next().stringValue());
                 }
                 
-                final Set<Value> alias = model.filter(fileRef, PoddRdfConstants.PODD_BASE_HAS_ALIAS, null).objects();
+                final Set<Value> alias = model.filter(fileRef, PODD.PODD_BASE_HAS_ALIAS, null).objects();
                 if(!alias.isEmpty())
                 {
                     fileReference.setRepositoryAlias(alias.iterator().next().stringValue());
@@ -143,7 +142,7 @@ public class SPARQLDataReferenceProcessorImpl implements SPARQLDataReferenceProc
     @Override
     public Set<URI> getTypes()
     {
-        return Collections.singleton(PoddRdfConstants.PODD_BASE_DATA_REFERENCE_TYPE_SPARQL);
+        return Collections.singleton(PODD.PODD_BASE_DATA_REFERENCE_TYPE_SPARQL);
     }
     
 }

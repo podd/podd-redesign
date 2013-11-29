@@ -45,7 +45,7 @@ import com.github.podd.restlet.PoddAction;
 import com.github.podd.restlet.PoddSesameRealm;
 import com.github.podd.restlet.PoddWebServiceApplication;
 import com.github.podd.restlet.RestletUtils;
-import com.github.podd.utils.PoddRdfConstants;
+import com.github.podd.utils.PODD;
 import com.github.podd.utils.PoddRoles;
 import com.github.podd.utils.PoddUser;
 import com.github.podd.utils.PoddUserStatus;
@@ -122,8 +122,7 @@ public class UserAddResourceImpl extends AbstractUserResourceImpl
                         newUserModel.filter(mappingUri, SesameRealmConstants.OAS_ROLEMAPPEDROLE, null).objectURI();
                 final RestletUtilRole role = PoddRoles.getRoleByUri(roleUri);
                 
-                final URI mappedObject =
-                        newUserModel.filter(mappingUri, PoddRdfConstants.PODD_ROLEMAPPEDOBJECT, null).objectURI();
+                final URI mappedObject = newUserModel.filter(mappingUri, PODD.PODD_ROLEMAPPEDOBJECT, null).objectURI();
                 
                 this.log.debug("Mapping <{}> to Role <{}> with Optional Object <{}>", newUser.getIdentifier(),
                         role.getName(), mappedObject);
@@ -159,7 +158,7 @@ public class UserAddResourceImpl extends AbstractUserResourceImpl
         {
             final Model model = new LinkedHashModel();
             model.add(newUserUri, SesameRealmConstants.OAS_USERIDENTIFIER,
-                    PoddRdfConstants.VF.createLiteral(newUser.getIdentifier()));
+                    PODD.VF.createLiteral(newUser.getIdentifier()));
             
             Rio.write(model, output, outputFormat);
         }

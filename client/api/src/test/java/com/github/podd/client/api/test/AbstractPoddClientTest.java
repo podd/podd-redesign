@@ -20,9 +20,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.StringWriter;
 import java.util.Collection;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -53,7 +51,7 @@ import com.github.podd.api.file.DataReference;
 import com.github.podd.client.api.PoddClient;
 import com.github.podd.utils.DebugUtils;
 import com.github.podd.utils.InferredOWLOntologyID;
-import com.github.podd.utils.PoddRdfConstants;
+import com.github.podd.utils.PODD;
 import com.github.podd.utils.PoddRoles;
 import com.github.podd.utils.PoddUser;
 import com.github.podd.utils.PoddUserStatus;
@@ -79,7 +77,7 @@ public abstract class AbstractPoddClientTest
     private static final int BASIC_PROJECT_1_EXPECTED_CONCRETE_TRIPLES = 24;
     private static final int BASIC_PROJECT_3_EXPECTED_CONCRETE_TRIPLES = 21;
     
-    protected static final ValueFactory vf = PoddRdfConstants.VF;
+    protected static final ValueFactory vf = PODD.VF;
     
     /**
      * Instruct the implementors of this test to attempt to deploy a file reference that has the
@@ -258,20 +256,19 @@ public abstract class AbstractPoddClientTest
         
         // Then test append with an updated model
         
-        URI investigationUri =
-                GraphUtil.getUniqueSubjectURI(model, RDF.TYPE, PoddRdfConstants.PODD_SCIENCE_INVESTIGATION);
-        URI containerUri = vf.createURI("urn:temp:uuid:container:1");
+        final URI investigationUri = GraphUtil.getUniqueSubjectURI(model, RDF.TYPE, PODD.PODD_SCIENCE_INVESTIGATION);
+        final URI containerUri = AbstractPoddClientTest.vf.createURI("urn:temp:uuid:container:1");
         
         // Must have all of the existing triples for the investigation present or they will be
         // removed by the append as a partial update.
-        Model updates = new LinkedHashModel(model.filter(investigationUri, null, null));
-        updates.add(investigationUri, PoddRdfConstants.PODD_SCIENCE_HAS_CONTAINER, containerUri);
-        updates.add(containerUri, RDF.TYPE, PoddRdfConstants.PODD_SCIENCE_CONTAINER);
-        updates.add(containerUri, RDFS.LABEL, vf.createLiteral("Test container number 1"));
-        ByteArrayOutputStream outputStream2 = new ByteArrayOutputStream(4096);
+        final Model updates = new LinkedHashModel(model.filter(investigationUri, null, null));
+        updates.add(investigationUri, PODD.PODD_SCIENCE_HAS_CONTAINER, containerUri);
+        updates.add(containerUri, RDF.TYPE, PODD.PODD_SCIENCE_CONTAINER);
+        updates.add(containerUri, RDFS.LABEL, AbstractPoddClientTest.vf.createLiteral("Test container number 1"));
+        final ByteArrayOutputStream outputStream2 = new ByteArrayOutputStream(4096);
         
         Rio.write(updates, outputStream2, RDFFormat.RDFJSON);
-        InferredOWLOntologyID appendArtifact =
+        final InferredOWLOntologyID appendArtifact =
                 this.testClient.appendArtifact(newArtifact, new ByteArrayInputStream(outputStream2.toByteArray()),
                         RDFFormat.RDFJSON);
         
@@ -313,15 +310,14 @@ public abstract class AbstractPoddClientTest
                             AbstractPoddClientTest.BASIC_PROJECT_1_EXPECTED_CONCRETE_TRIPLES);
             
             final Model topObject =
-                    parseRdf.filter(newArtifact.getOntologyIRI().toOpenRDFURI(),
-                            PoddRdfConstants.PODD_BASE_HAS_TOP_OBJECT, null);
+                    parseRdf.filter(newArtifact.getOntologyIRI().toOpenRDFURI(), PODD.PODD_BASE_HAS_TOP_OBJECT, null);
             
             Assert.assertEquals("Did not find unique top object in artifact", 1, topObject.size());
             
             final DataReference testRef = this.deployFileReference("test-file-label");
             testRef.setArtifactID(newArtifact);
             testRef.setParentIri(IRI.create(topObject.objectURI()));
-            testRef.setParentPredicateIRI(IRI.create(PoddRdfConstants.PODD_BASE_HAS_DATA_REFERENCE));
+            testRef.setParentPredicateIRI(IRI.create(PODD.PODD_BASE_HAS_DATA_REFERENCE));
             // TODO: If this breaks then need to attach it to a different part of an extended
             // project
             testRef.setObjectIri(IRI.create("urn:temp:uuid:dataReference:1"));
@@ -342,8 +338,8 @@ public abstract class AbstractPoddClientTest
                     this.parseRdf(new ByteArrayInputStream(afterOutputStream.toByteArray()), RDFFormat.RDFJSON, 32);
             
             final Model afterTopObject =
-                    afterParseRdf.filter(newArtifact.getOntologyIRI().toOpenRDFURI(),
-                            PoddRdfConstants.PODD_BASE_HAS_TOP_OBJECT, null);
+                    afterParseRdf.filter(newArtifact.getOntologyIRI().toOpenRDFURI(), PODD.PODD_BASE_HAS_TOP_OBJECT,
+                            null);
             
             Assert.assertEquals("Did not find unique top object in artifact", 1, afterTopObject.size());
             
@@ -352,7 +348,7 @@ public abstract class AbstractPoddClientTest
             Assert.assertEquals(afterTopObject.objectURI(), topObject.objectURI());
             
             final Model afterDataReferenceURI =
-                    afterParseRdf.filter(topObject.objectURI(), PoddRdfConstants.PODD_BASE_HAS_DATA_REFERENCE, null);
+                    afterParseRdf.filter(topObject.objectURI(), PODD.PODD_BASE_HAS_DATA_REFERENCE, null);
             
             Assert.assertNotEquals(topObject.objectURI(), afterDataReferenceURI.objectURI());
             
@@ -378,8 +374,8 @@ public abstract class AbstractPoddClientTest
         final PoddUser testUser =
                 new PoddUser("theNextUser", "theNextPassword".toCharArray(), "The Next", "User",
                         "test@thenext.example.com", PoddUserStatus.ACTIVE,
-                        PoddRdfConstants.VF.createURI("http://example.com/thenext/"), "UQ", null, "Dr", "0912348765",
-                        "Brisbane", "Adjunct Professor");
+                        PODD.VF.createURI("http://example.com/thenext/"), "UQ", null, "Dr", "0912348765", "Brisbane",
+                        "Adjunct Professor");
         
         final PoddUser userDetails = this.testClient.createUser(testUser);
         

@@ -169,12 +169,12 @@ public class PoddObjectLabelImpl implements PoddObjectLabel
     @Override
     public Literal getDescriptionLiteral()
     {
-        return PoddRdfConstants.VF.createLiteral(this.description);
+        return PODD.VF.createLiteral(this.description);
     }
     
     @Override
     public Literal getLabelLiteral()
     {
-        return PoddRdfConstants.VF.createLiteral(this.label);
+        return PODD.VF.createLiteral(this.label);
     }
 }

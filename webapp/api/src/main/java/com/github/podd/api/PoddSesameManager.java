@@ -33,8 +33,8 @@ import org.semanticweb.owlapi.model.IRI;
 import com.github.podd.exception.UnmanagedArtifactIRIException;
 import com.github.podd.exception.UnmanagedSchemaIRIException;
 import com.github.podd.utils.InferredOWLOntologyID;
+import com.github.podd.utils.PODD;
 import com.github.podd.utils.PoddObjectLabel;
-import com.github.podd.utils.PoddRdfConstants;
 
 /**
  * Manages interactions with Sesame Repositories for PODD.
@@ -129,17 +129,15 @@ public interface PoddSesameManager
      * 
      * Possible output URIs represent the following cardinalities:
      * <ul>
-     * <li>{@link PoddRdfConstants.PODD_BASE_CARDINALITY_EXACTLY_ONE} (Mandatory)</li>
-     * <li>{@link PoddRdfConstants.PODD_BASE_CARDINALITY_ONE_OR_MANY} (Mandatory, can have multiple
-     * values)</li>
-     * <li>{@link PoddRdfConstants.PODD_BASE_CARDINALITY_ZERO_OR_MANY} (Optional, can have multiple
-     * values)</li>
-     * <li>{@link PoddRdfConstants.PODD_BASE_CARDINALITY_ZERO_OR_ONE} (Optional, the default)</li>
+     * <li>{@link PODD.PODD_BASE_CARDINALITY_EXACTLY_ONE} (Mandatory)</li>
+     * <li>{@link PODD.PODD_BASE_CARDINALITY_ONE_OR_MANY} (Mandatory, can have multiple values)</li>
+     * <li>{@link PODD.PODD_BASE_CARDINALITY_ZERO_OR_MANY} (Optional, can have multiple values)</li>
+     * <li>{@link PODD.PODD_BASE_CARDINALITY_ZERO_OR_ONE} (Optional, the default)</li>
      * </ul>
      * 
      * <p>
      * For example, passing in <i>PoddTopObject</i> and property <i>hasLeadInstitution</i>, will
-     * return {@link PoddRdfConstants.PODD_BASE_CARDINALITY_EXACTLY_ONE}.
+     * return {@link PODD.PODD_BASE_CARDINALITY_EXACTLY_ONE}.
      * </p>
      * <br>
      * <p>

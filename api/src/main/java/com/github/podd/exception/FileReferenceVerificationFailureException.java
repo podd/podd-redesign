@@ -27,7 +27,7 @@ import org.openrdf.model.vocabulary.RDF;
 import org.openrdf.model.vocabulary.RDFS;
 
 import com.github.podd.api.file.DataReference;
-import com.github.podd.utils.PoddRdfConstants;
+import com.github.podd.utils.PODD;
 
 /**
  * An exception that is thrown to indicate that validating a set of {@link DataReference}s resulted
@@ -79,17 +79,17 @@ public class FileReferenceVerificationFailureException extends PoddException
             final Throwable throwable = validationFailures.get(dataReference);
             // TODO
             model.add(dataReference.getObjectIri().toOpenRDFURI(), RDFS.LABEL,
-                    PoddRdfConstants.VF.createLiteral(throwable.getMessage()));
+                    PODD.VF.createLiteral(throwable.getMessage()));
             dataReference.getLabel();
             
-            final BNode v = PoddRdfConstants.VF.createBNode();
-            model.add(errorResource, PoddRdfConstants.ERR_CONTAINS, v);
-            model.add(v, RDF.TYPE, PoddRdfConstants.ERR_TYPE_ERROR);
+            final BNode v = PODD.VF.createBNode();
+            model.add(errorResource, PODD.ERR_CONTAINS, v);
+            model.add(v, RDF.TYPE, PODD.ERR_TYPE_ERROR);
             
             final URI dataRefUri = dataReference.getObjectIri().toOpenRDFURI();
-            model.add(v, PoddRdfConstants.ERR_SOURCE, dataRefUri);
-            model.add(dataRefUri, RDFS.LABEL, PoddRdfConstants.VF.createLiteral(dataReference.getLabel()));
-            model.add(dataRefUri, RDFS.COMMENT, PoddRdfConstants.VF.createLiteral(throwable.getMessage()));
+            model.add(v, PODD.ERR_SOURCE, dataRefUri);
+            model.add(dataRefUri, RDFS.LABEL, PODD.VF.createLiteral(dataReference.getLabel()));
+            model.add(dataRefUri, RDFS.COMMENT, PODD.VF.createLiteral(throwable.getMessage()));
         }
         
         return model;

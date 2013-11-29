@@ -52,8 +52,8 @@ import com.github.podd.exception.UnmanagedArtifactVersionException;
 import com.github.podd.restlet.PoddAction;
 import com.github.podd.restlet.RestletUtils;
 import com.github.podd.utils.InferredOWLOntologyID;
+import com.github.podd.utils.PODD;
 import com.github.podd.utils.PoddObjectLabel;
-import com.github.podd.utils.PoddRdfConstants;
 import com.github.podd.utils.PoddWebConstants;
 
 /**
@@ -82,7 +82,7 @@ public class EditArtifactResourceImpl extends AbstractPoddResourceImpl
         
         // Once we find the artifact URI, check authentication for it
         // immediately
-        this.checkAuthentication(PoddAction.ARTIFACT_EDIT, PoddRdfConstants.VF.createURI(artifactUri));
+        this.checkAuthentication(PoddAction.ARTIFACT_EDIT, PODD.VF.createURI(artifactUri));
         
         final String versionUri = this.getQuery().getFirstValue(PoddWebConstants.KEY_ARTIFACT_VERSION_IDENTIFIER, true);
         
@@ -123,7 +123,7 @@ public class EditArtifactResourceImpl extends AbstractPoddResourceImpl
         final Collection<URI> objectUris = new ArrayList<URI>(objectURIStrings.length);
         for(final String nextObjectURIString : objectURIStrings)
         {
-            objectUris.add(PoddRdfConstants.VF.createURI(nextObjectURIString));
+            objectUris.add(PODD.VF.createURI(nextObjectURIString));
         }
         
         this.log.debug("requesting edit artifact ({}): {}, {} with isReplace {}", variant.getMediaType().getName(),
@@ -152,9 +152,9 @@ public class EditArtifactResourceImpl extends AbstractPoddResourceImpl
         try
         {
             final Model model =
-                    this.getPoddArtifactManager().updateArtifact(PoddRdfConstants.VF.createURI(artifactUri),
-                            PoddRdfConstants.VF.createURI(versionUri), objectUris, inputStream, inputFormat,
-                            updatePolicy, danglingObjectPolicy, fileRefVerificationPolicy);
+                    this.getPoddArtifactManager().updateArtifact(PODD.VF.createURI(artifactUri),
+                            PODD.VF.createURI(versionUri), objectUris, inputStream, inputFormat, updatePolicy,
+                            danglingObjectPolicy, fileRefVerificationPolicy);
             // TODO - send detailed errors for display where possible
             
             // FIXME Change response format so that it does not resemble an
@@ -202,7 +202,7 @@ public class EditArtifactResourceImpl extends AbstractPoddResourceImpl
         
         this.log.debug("requesting to edit artifact (HTML): {}, {}", artifactUri, objectToEdit);
         
-        this.checkAuthentication(PoddAction.ARTIFACT_EDIT, PoddRdfConstants.VF.createURI(artifactUri));
+        this.checkAuthentication(PoddAction.ARTIFACT_EDIT, PODD.VF.createURI(artifactUri));
         
         final User user = this.getRequest().getClientInfo().getUser();
         this.log.debug("authenticated user: {}", user);
@@ -240,7 +240,7 @@ public class EditArtifactResourceImpl extends AbstractPoddResourceImpl
             }
             else
             {
-                objectUri = PoddRdfConstants.VF.createURI(objectToEdit);
+                objectUri = PODD.VF.createURI(objectToEdit);
             }
             if(objectUri != null)
             {

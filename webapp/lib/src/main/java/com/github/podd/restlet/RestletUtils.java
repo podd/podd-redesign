@@ -63,9 +63,9 @@ import com.github.ansell.restletutils.RestletUtilRole;
 import com.github.podd.api.PoddArtifactManager;
 import com.github.podd.exception.UnmanagedArtifactIRIException;
 import com.github.podd.utils.InferredOWLOntologyID;
+import com.github.podd.utils.PODD;
 import com.github.podd.utils.PoddObjectLabel;
 import com.github.podd.utils.PoddObjectLabelImpl;
-import com.github.podd.utils.PoddRdfConstants;
 import com.github.podd.utils.PoddRoles;
 import com.github.podd.utils.PoddUser;
 
@@ -221,7 +221,7 @@ public final class RestletUtils
         
         if(objectToView != null && !objectToView.trim().isEmpty())
         {
-            theObject = artifactManager.getObjectLabel(ontologyID, PoddRdfConstants.VF.createURI(objectToView));
+            theObject = artifactManager.getObjectLabel(ontologyID, PODD.VF.createURI(objectToView));
         }
         else
         {

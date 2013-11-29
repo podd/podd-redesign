@@ -28,7 +28,7 @@ import com.github.podd.api.file.PoddDataRepository;
 import com.github.podd.api.file.PoddDataRepositoryFactory;
 import com.github.podd.exception.DataRepositoryException;
 import com.github.podd.exception.FileRepositoryIncompleteException;
-import com.github.podd.utils.PoddRdfConstants;
+import com.github.podd.utils.PODD;
 
 /**
  * A factory to build {@link PoddDataRepository} instances from a {@link Model}.
@@ -42,14 +42,14 @@ public class SSHFileRepositoryImplFactory implements PoddDataRepositoryFactory
     @Override
     public boolean canCreate(final Set<URI> types)
     {
-        return types.contains(PoddRdfConstants.PODD_SSH_FILE_REPOSITORY);
+        return types.contains(PODD.PODD_SSH_FILE_REPOSITORY);
     }
     
     @Override
     public PoddDataRepository<?> createDataRepository(final Resource nextDataRepository, final Model statements)
         throws DataRepositoryException
     {
-        if(statements.contains(null, RDF.TYPE, PoddRdfConstants.PODD_SSH_FILE_REPOSITORY))
+        if(statements.contains(null, RDF.TYPE, PODD.PODD_SSH_FILE_REPOSITORY))
         {
             return new SSHFileRepositoryImpl(nextDataRepository, statements);
         }
@@ -60,6 +60,6 @@ public class SSHFileRepositoryImplFactory implements PoddDataRepositoryFactory
     @Override
     public String getKey()
     {
-        return "datarepositoryfactory:" + PoddRdfConstants.PODD_SSH_FILE_REPOSITORY.stringValue();
+        return "datarepositoryfactory:" + PODD.PODD_SSH_FILE_REPOSITORY.stringValue();
     }
 }

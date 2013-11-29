@@ -28,7 +28,7 @@ import com.github.podd.api.PoddProcessorStage;
 import com.github.podd.api.file.DataReferenceProcessor;
 import com.github.podd.api.file.DataReferenceProcessorFactory;
 import com.github.podd.api.file.SSHFileReferenceProcessorFactory;
-import com.github.podd.utils.PoddRdfConstants;
+import com.github.podd.utils.PODD;
 
 /**
  * An SSH File Reference Processor Factory that creates <code>SSHFileReferenceProcessorImpl</code>
@@ -88,8 +88,8 @@ public class SSHFileReferenceProcessorFactoryImpl implements SSHFileReferencePro
         // match all triples about a subject whose TYPE is poddBase:SSHFileReference
         builder.append(" ?")
                 .append(this.getSPARQLVariable())
-                .append(" <" + RDF.TYPE.stringValue() + "> <"
-                        + PoddRdfConstants.PODD_BASE_FILE_REFERENCE_TYPE_SSH.stringValue() + "> . ");
+                .append(" <" + RDF.TYPE.stringValue() + "> <" + PODD.PODD_BASE_FILE_REFERENCE_TYPE_SSH.stringValue()
+                        + "> . ");
         
         builder.append(" ?").append(this.getSPARQLVariable()).append(" ?predicate ?object . ");
         

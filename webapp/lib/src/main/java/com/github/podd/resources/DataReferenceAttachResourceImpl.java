@@ -54,8 +54,8 @@ import com.github.podd.restlet.PoddAction;
 import com.github.podd.restlet.RestletUtils;
 import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.OntologyUtils;
+import com.github.podd.utils.PODD;
 import com.github.podd.utils.PoddObjectLabel;
-import com.github.podd.utils.PoddRdfConstants;
 import com.github.podd.utils.PoddWebConstants;
 
 /**
@@ -98,8 +98,8 @@ public class DataReferenceAttachResourceImpl extends AbstractPoddResourceImpl
         
         final Model model = Rio.parse(inputStream, "", inputFormat);
         
-        final URI artifactUri = PoddRdfConstants.VF.createURI(artifactUriString);
-        final URI versionUri = PoddRdfConstants.VF.createURI(versionUriString);
+        final URI artifactUri = PODD.VF.createURI(artifactUriString);
+        final URI versionUri = PODD.VF.createURI(versionUriString);
         
         final PoddArtifactManager artifactManager = this.getPoddArtifactManager();
         
@@ -159,7 +159,7 @@ public class DataReferenceAttachResourceImpl extends AbstractPoddResourceImpl
             throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Object IRI not submitted");
         }
         
-        this.checkAuthentication(PoddAction.ARTIFACT_EDIT, PoddRdfConstants.VF.createURI(artifactUri));
+        this.checkAuthentication(PoddAction.ARTIFACT_EDIT, PODD.VF.createURI(artifactUri));
         
         InferredOWLOntologyID artifact;
         
@@ -216,7 +216,7 @@ public class DataReferenceAttachResourceImpl extends AbstractPoddResourceImpl
             throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Artifact IRI not submitted");
         }
         
-        this.checkAuthentication(PoddAction.ARTIFACT_EDIT, PoddRdfConstants.VF.createURI(artifactUri));
+        this.checkAuthentication(PoddAction.ARTIFACT_EDIT, PODD.VF.createURI(artifactUri));
         
         // check mandatory parameter: artifact version IRI
         final String versionUri = this.getQuery().getFirstValue(PoddWebConstants.KEY_ARTIFACT_VERSION_IDENTIFIER, true);

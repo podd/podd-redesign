@@ -36,7 +36,7 @@ import com.github.podd.restlet.PoddAction;
 import com.github.podd.restlet.PoddSesameRealm;
 import com.github.podd.restlet.RestletUtils;
 import com.github.podd.utils.InferredOWLOntologyID;
-import com.github.podd.utils.PoddRdfConstants;
+import com.github.podd.utils.PODD;
 import com.github.podd.utils.PoddWebConstants;
 
 /**
@@ -64,7 +64,7 @@ public class DeleteArtifactResourceImpl extends AbstractPoddResourceImpl
                         "Did not find an artifacturi parameter in the request");
             }
             
-            final URI artifactUri = PoddRdfConstants.VF.createURI(artifactUriString);
+            final URI artifactUri = PODD.VF.createURI(artifactUriString);
             
             this.checkAuthentication(PoddAction.UNPUBLISHED_ARTIFACT_DELETE, artifactUri);
             
@@ -119,7 +119,7 @@ public class DeleteArtifactResourceImpl extends AbstractPoddResourceImpl
             throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Artifact IRI not submitted");
         }
         
-        this.checkAuthentication(PoddAction.UNPUBLISHED_ARTIFACT_DELETE, PoddRdfConstants.VF.createURI(artifactUri));
+        this.checkAuthentication(PoddAction.UNPUBLISHED_ARTIFACT_DELETE, PODD.VF.createURI(artifactUri));
         
         this.log.info("deleteArtifactHtml");
         final User user = this.getRequest().getClientInfo().getUser();

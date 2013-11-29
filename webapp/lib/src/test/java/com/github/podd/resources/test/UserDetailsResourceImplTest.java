@@ -40,7 +40,7 @@ import org.restlet.resource.ResourceException;
 import com.github.ansell.restletutils.RestletUtilRole;
 import com.github.ansell.restletutils.SesameRealmConstants;
 import com.github.ansell.restletutils.test.RestletTestUtils;
-import com.github.podd.utils.PoddRdfConstants;
+import com.github.podd.utils.PODD;
 import com.github.podd.utils.PoddRoles;
 import com.github.podd.utils.PoddUserStatus;
 import com.github.podd.utils.PoddWebConstants;
@@ -143,7 +143,7 @@ public class UserDetailsResourceImplTest extends AbstractResourceImplTest
         final String testIdentifier = "testuser@podd.com";
         final List<Map.Entry<URI, URI>> roles = new LinkedList<Map.Entry<URI, URI>>();
         roles.add(new AbstractMap.SimpleEntry<URI, URI>(PoddRoles.ADMIN.getURI(), null));
-        roles.add(new AbstractMap.SimpleEntry<URI, URI>(PoddRoles.PROJECT_ADMIN.getURI(), PoddRdfConstants.VF
+        roles.add(new AbstractMap.SimpleEntry<URI, URI>(PoddRoles.PROJECT_ADMIN.getURI(), PODD.VF
                 .createURI("urn:podd:some-project")));
         this.loadTestUser(testIdentifier, "testuserpassword", "John", "Doe", testIdentifier,
                 "http:///www.john.doe.com", "CSIRO", "john-orcid", "Mr", "000333434", "Some Address", "Researcher",
@@ -248,7 +248,7 @@ public class UserDetailsResourceImplTest extends AbstractResourceImplTest
     {
         // prepare: add a Test User account
         final String testIdentifier = "testuser@podd.com";
-        final URI testObjectUri = PoddRdfConstants.VF.createURI("urn:podd:some-project");
+        final URI testObjectUri = PODD.VF.createURI("urn:podd:some-project");
         final List<Map.Entry<URI, URI>> roles = new LinkedList<Map.Entry<URI, URI>>();
         roles.add(new AbstractMap.SimpleEntry<URI, URI>(PoddRoles.ADMIN.getURI(), null));
         roles.add(new AbstractMap.SimpleEntry<URI, URI>(PoddRoles.PROJECT_ADMIN.getURI(), testObjectUri));
@@ -277,9 +277,9 @@ public class UserDetailsResourceImplTest extends AbstractResourceImplTest
                     resultsModel.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).subjects().iterator()
                             .next().stringValue());
             Assert.assertEquals("Not the expected object URI", testObjectUri,
-                    resultsModel.filter(null, PoddRdfConstants.PODD_ROLEMAPPEDOBJECT, null).objectURI());
+                    resultsModel.filter(null, PODD.PODD_ROLEMAPPEDOBJECT, null).objectURI());
             Assert.assertEquals("Not the expected User Status", PoddUserStatus.ACTIVE.getURI(),
-                    resultsModel.filter(null, PoddRdfConstants.PODD_USER_STATUS, null).objectURI());
+                    resultsModel.filter(null, PODD.PODD_USER_STATUS, null).objectURI());
         }
         finally
         {

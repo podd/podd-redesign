@@ -44,7 +44,7 @@ import org.slf4j.LoggerFactory;
 
 import com.github.ansell.restletutils.RestletUtilMediaType;
 import com.github.podd.exception.PoddException;
-import com.github.podd.utils.PoddRdfConstants;
+import com.github.podd.utils.PODD;
 
 import freemarker.template.Configuration;
 
@@ -104,17 +104,16 @@ public class PoddStatusService extends StatusService
     {
         final Model model = new LinkedHashModel();
         
-        final BNode topNode = PoddRdfConstants.VF.createBNode("error");
-        model.add(topNode, RDF.TYPE, PoddRdfConstants.ERR_TYPE_TOP_ERROR);
-        model.add(topNode, PoddRdfConstants.HTTP_STATUS_CODE_VALUE, PoddRdfConstants.VF.createLiteral(status.getCode()));
-        model.add(topNode, PoddRdfConstants.HTTP_REASON_PHRASE,
-                PoddRdfConstants.VF.createLiteral(status.getReasonPhrase()));
+        final BNode topNode = PODD.VF.createBNode("error");
+        model.add(topNode, RDF.TYPE, PODD.ERR_TYPE_TOP_ERROR);
+        model.add(topNode, PODD.HTTP_STATUS_CODE_VALUE, PODD.VF.createLiteral(status.getCode()));
+        model.add(topNode, PODD.HTTP_REASON_PHRASE, PODD.VF.createLiteral(status.getReasonPhrase()));
         
         final String errorDescription = status.getDescription();
-        model.add(topNode, RDFS.COMMENT, PoddRdfConstants.VF.createLiteral(errorDescription));
+        model.add(topNode, RDFS.COMMENT, PODD.VF.createLiteral(errorDescription));
         
-        final BNode errorNode = PoddRdfConstants.VF.createBNode("cause");
-        model.add(topNode, PoddRdfConstants.ERR_CONTAINS, errorNode);
+        final BNode errorNode = PODD.VF.createBNode("cause");
+        model.add(topNode, PODD.ERR_CONTAINS, errorNode);
         
         final Throwable throwable = status.getThrowable();
         if(throwable != null && throwable instanceof PoddException)
@@ -123,25 +122,24 @@ public class PoddStatusService extends StatusService
         }
         else
         {
-            model.add(errorNode, RDF.TYPE, PoddRdfConstants.ERR_TYPE_ERROR);
+            model.add(errorNode, RDF.TYPE, PODD.ERR_TYPE_ERROR);
             
             if(throwable != null)
             {
-                model.add(errorNode, PoddRdfConstants.ERR_EXCEPTION_CLASS,
-                        PoddRdfConstants.VF.createLiteral(throwable.getClass().getName()));
+                model.add(errorNode, PODD.ERR_EXCEPTION_CLASS, PODD.VF.createLiteral(throwable.getClass().getName()));
                 
                 if(throwable.getMessage() != null)
                 {
-                    model.add(errorNode, RDFS.LABEL, PoddRdfConstants.VF.createLiteral(throwable.getMessage()));
+                    model.add(errorNode, RDFS.LABEL, PODD.VF.createLiteral(throwable.getMessage()));
                 }
                 
                 final StringWriter sw = new StringWriter();
                 throwable.printStackTrace(new PrintWriter(sw));
-                model.add(errorNode, RDFS.COMMENT, PoddRdfConstants.VF.createLiteral(sw.toString()));
+                model.add(errorNode, RDFS.COMMENT, PODD.VF.createLiteral(sw.toString()));
             }
             else
             {
-                model.add(errorNode, RDFS.COMMENT, PoddRdfConstants.VF.createLiteral("Error details unavailable"));
+                model.add(errorNode, RDFS.COMMENT, PODD.VF.createLiteral("Error details unavailable"));
             }
         }
         return model;

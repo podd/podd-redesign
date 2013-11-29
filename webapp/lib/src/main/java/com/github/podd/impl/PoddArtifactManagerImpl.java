@@ -92,8 +92,8 @@ import com.github.podd.exception.UnmanagedArtifactVersionException;
 import com.github.podd.exception.UnmanagedSchemaIRIException;
 import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.OntologyUtils;
+import com.github.podd.utils.PODD;
 import com.github.podd.utils.PoddObjectLabel;
-import com.github.podd.utils.PoddRdfConstants;
 import com.github.podd.utils.RdfUtility;
 
 /**
@@ -135,10 +135,10 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             final DataReferenceVerificationPolicy dataReferenceVerificationPolicy) throws OpenRDFException,
         IOException, OWLException, PoddException
     {
-        model.removeAll(model.filter(null, PoddRdfConstants.PODD_BASE_INFERRED_VERSION, null));
+        model.removeAll(model.filter(null, PODD.PODD_BASE_INFERRED_VERSION, null));
         
         final Set<Resource> fileReferences =
-                model.filter(null, RDF.TYPE, PoddRdfConstants.PODD_BASE_DATA_REFERENCE_TYPE).subjects();
+                model.filter(null, RDF.TYPE, PODD.PODD_BASE_DATA_REFERENCE_TYPE).subjects();
         final Collection<URI> fileReferenceObjects = new ArrayList<URI>(fileReferences.size());
         for(final Resource nextFileReference : fileReferences)
         {
@@ -272,7 +272,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         
         this.log.debug("deleteObject ({}) from artifact {} with cascade={}", objectUri, artifactUri, cascade);
         
-        final URI objectToDelete = PoddRdfConstants.VF.createURI(objectUri);
+        final URI objectToDelete = PODD.VF.createURI(objectUri);
         
         final Collection<URI> objectsToUpdate = new ArrayList<URI>();
         objectsToUpdate.add(objectToDelete);
@@ -1257,8 +1257,8 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             // information is a privileged operation that must be done through
             // the designated API
             // method
-            temporaryRepositoryConnection.remove((Resource)null, PoddRdfConstants.PODD_BASE_HAS_PUBLICATION_STATUS,
-                    (Resource)null, randomContext);
+            temporaryRepositoryConnection.remove((Resource)null, PODD.PODD_BASE_HAS_PUBLICATION_STATUS, (Resource)null,
+                    randomContext);
             
             this.handlePurls(temporaryRepositoryConnection, randomContext);
             
@@ -1308,17 +1308,14 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             
             // set version IRI in temporary repository
             this.log.info("Setting version IRI to <{}>", newVersionIRI);
-            temporaryRepositoryConnection.remove(ontologyIRI.toOpenRDFURI(), PoddRdfConstants.OWL_VERSION_IRI, null,
-                    randomContext);
-            temporaryRepositoryConnection.add(ontologyIRI.toOpenRDFURI(), PoddRdfConstants.OWL_VERSION_IRI,
+            temporaryRepositoryConnection.remove(ontologyIRI.toOpenRDFURI(), PODD.OWL_VERSION_IRI, null, randomContext);
+            temporaryRepositoryConnection.add(ontologyIRI.toOpenRDFURI(), PODD.OWL_VERSION_IRI,
                     newVersionIRI.toOpenRDFURI(), randomContext);
             
             // check and update statements with default timestamp values
-            final Value now = PoddRdfConstants.VF.createLiteral(new Date());
-            this.handleTimestamps(temporaryRepositoryConnection, PoddRdfConstants.PODD_BASE_CREATED_AT, now,
-                    randomContext);
-            this.handleTimestamps(temporaryRepositoryConnection, PoddRdfConstants.PODD_BASE_LAST_MODIFIED, now,
-                    randomContext);
+            final Value now = PODD.VF.createLiteral(new Date());
+            this.handleTimestamps(temporaryRepositoryConnection, PODD.PODD_BASE_CREATED_AT, now, randomContext);
+            this.handleTimestamps(temporaryRepositoryConnection, PODD.PODD_BASE_LAST_MODIFIED, now, randomContext);
             
             this.handleDanglingObjects(ontologyIRI, temporaryRepositoryConnection, randomContext, danglingObjectPolicy);
             
@@ -1813,7 +1810,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             {
                 // create an intermediate context and add "edit" statements to
                 // it
-                final URI intContext = PoddRdfConstants.VF.createURI("urn:intermediate:", UUID.randomUUID().toString());
+                final URI intContext = PODD.VF.createURI("urn:intermediate:", UUID.randomUUID().toString());
                 
                 tempRepositoryConnection.add(model, intContext);
                 
@@ -1866,9 +1863,9 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             }
             
             // check and update statements with default timestamp values
-            final Value now = PoddRdfConstants.VF.createLiteral(new Date());
-            this.handleTimestamps(tempRepositoryConnection, PoddRdfConstants.PODD_BASE_CREATED_AT, now, tempContext);
-            this.handleTimestamps(tempRepositoryConnection, PoddRdfConstants.PODD_BASE_LAST_MODIFIED, now, tempContext);
+            final Value now = PODD.VF.createLiteral(new Date());
+            this.handleTimestamps(tempRepositoryConnection, PODD.PODD_BASE_CREATED_AT, now, tempContext);
+            this.handleTimestamps(tempRepositoryConnection, PODD.PODD_BASE_LAST_MODIFIED, now, tempContext);
             
             this.handleDanglingObjects(artifactID.getOntologyIRI(), tempRepositoryConnection, tempContext,
                     danglingObjectAction);
@@ -1878,8 +1875,8 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             // information is a privileged operation that must be done through
             // the designated API
             // method
-            tempRepositoryConnection.remove((Resource)null, PoddRdfConstants.PODD_BASE_HAS_PUBLICATION_STATUS,
-                    (Resource)null, tempContext);
+            tempRepositoryConnection.remove((Resource)null, PODD.PODD_BASE_HAS_PUBLICATION_STATUS, (Resource)null,
+                    tempContext);
             
             final Set<PoddPurlReference> purls = this.handlePurls(tempRepositoryConnection, tempContext);
             
@@ -1895,7 +1892,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
                     final URI tempUri = purl.getTemporaryURI();
                     if(objectUri.equals(tempUri))
                     {
-                        resultsModel.add(objectUri, PoddRdfConstants.PODD_REPLACED_TEMP_URI_WITH, purl.getPurlURI());
+                        resultsModel.add(objectUri, PODD.PODD_REPLACED_TEMP_URI_WITH, purl.getPurlURI());
                         break; // out of inner loop
                     }
                 }
@@ -1910,9 +1907,9 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             
             // set version IRI in temporary repository
             this.log.info("Setting version IRI to <{}>", newVersionIRI);
-            tempRepositoryConnection.remove(artifactID.getOntologyIRI().toOpenRDFURI(),
-                    PoddRdfConstants.OWL_VERSION_IRI, null, tempContext);
-            tempRepositoryConnection.add(artifactID.getOntologyIRI().toOpenRDFURI(), PoddRdfConstants.OWL_VERSION_IRI,
+            tempRepositoryConnection.remove(artifactID.getOntologyIRI().toOpenRDFURI(), PODD.OWL_VERSION_IRI, null,
+                    tempContext);
+            tempRepositoryConnection.add(artifactID.getOntologyIRI().toOpenRDFURI(), PODD.OWL_VERSION_IRI,
                     newVersionIRI.toOpenRDFURI(), tempContext);
             
             // check and ensure schema ontology imports are for version IRIs

@@ -104,8 +104,8 @@ import com.github.podd.exception.UnmanagedSchemaIRIException;
 import com.github.podd.utils.DebugUtils;
 import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.OntologyUtils;
+import com.github.podd.utils.PODD;
 import com.github.podd.utils.PoddObjectLabel;
-import com.github.podd.utils.PoddRdfConstants;
 
 /**
  * @author Peter Ansell p_ansell@yahoo.com
@@ -290,48 +290,46 @@ public abstract class AbstractPoddArtifactManagerTest
         // expected model size, expected property count, do-not-display statement count
         final Object[][] testData =
                 {
-                        { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_BASE, "NoSuchObjectType"), false,
-                                MetadataPolicy.INCLUDE_ALL, 0, 0, 0 },
+                        { PODD.VF.createURI(PODD.PODD_BASE, "NoSuchObjectType"), false, MetadataPolicy.INCLUDE_ALL, 0,
+                                0, 0 },
                         
-                        { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Project"), false,
-                                MetadataPolicy.INCLUDE_ALL, 156, 19, 0 },
-                        { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Project"), false,
-                                MetadataPolicy.EXCLUDE_CONTAINS, 88, 10, 0 },
-                        { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Project"), true,
-                                MetadataPolicy.INCLUDE_ALL, 293, 35, 13 },
-                        { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Project"), false,
-                                MetadataPolicy.ONLY_CONTAINS, 63, 11, 0 },
+                        { PODD.VF.createURI(PODD.PODD_SCIENCE, "Project"), false, MetadataPolicy.INCLUDE_ALL, 156, 19,
+                                0 },
+                        { PODD.VF.createURI(PODD.PODD_SCIENCE, "Project"), false, MetadataPolicy.EXCLUDE_CONTAINS, 88,
+                                10, 0 },
+                        { PODD.VF.createURI(PODD.PODD_SCIENCE, "Project"), true, MetadataPolicy.INCLUDE_ALL, 293, 35,
+                                13 },
+                        { PODD.VF.createURI(PODD.PODD_SCIENCE, "Project"), false, MetadataPolicy.ONLY_CONTAINS, 63, 11,
+                                0 },
                         
-                        { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Publication"), false,
-                                MetadataPolicy.INCLUDE_ALL, 93, 12, 0 },
-                        { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Publication"), true,
-                                MetadataPolicy.INCLUDE_ALL, 119, 16, 3 },
-                        { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Publication"), false,
-                                MetadataPolicy.ONLY_CONTAINS, 21, 4, 0 },
+                        { PODD.VF.createURI(PODD.PODD_SCIENCE, "Publication"), false, MetadataPolicy.INCLUDE_ALL, 93,
+                                12, 0 },
+                        { PODD.VF.createURI(PODD.PODD_SCIENCE, "Publication"), true, MetadataPolicy.INCLUDE_ALL, 119,
+                                16, 3 },
+                        { PODD.VF.createURI(PODD.PODD_SCIENCE, "Publication"), false, MetadataPolicy.ONLY_CONTAINS, 21,
+                                4, 0 },
                         
-                        { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Environment"), false,
-                                MetadataPolicy.INCLUDE_ALL, 73, 10, 0 },
-                        { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Environment"), true,
-                                MetadataPolicy.INCLUDE_ALL, 99, 14, 3 },
-                        { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Environment"), false,
-                                MetadataPolicy.ONLY_CONTAINS, 33, 6, 0 },
+                        { PODD.VF.createURI(PODD.PODD_SCIENCE, "Environment"), false, MetadataPolicy.INCLUDE_ALL, 73,
+                                10, 0 },
+                        { PODD.VF.createURI(PODD.PODD_SCIENCE, "Environment"), true, MetadataPolicy.INCLUDE_ALL, 99,
+                                14, 3 },
+                        { PODD.VF.createURI(PODD.PODD_SCIENCE, "Environment"), false, MetadataPolicy.ONLY_CONTAINS, 33,
+                                6, 0 },
                         
                         // to expose issue #96 - add child Process has no fields
-                        { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Process"), false,
-                                MetadataPolicy.INCLUDE_ALL, 38, 6, 0 },
-                        { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Process"), true,
-                                MetadataPolicy.INCLUDE_ALL, 64, 10, 3 },
-                        { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Process"), false,
-                                MetadataPolicy.ONLY_CONTAINS, 27, 5, 0 },
-                        { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Process"), false,
-                                MetadataPolicy.EXCLUDE_CONTAINS, 18, 3, 0 },
+                        { PODD.VF.createURI(PODD.PODD_SCIENCE, "Process"), false, MetadataPolicy.INCLUDE_ALL, 38, 6, 0 },
+                        { PODD.VF.createURI(PODD.PODD_SCIENCE, "Process"), true, MetadataPolicy.INCLUDE_ALL, 64, 10, 3 },
+                        { PODD.VF.createURI(PODD.PODD_SCIENCE, "Process"), false, MetadataPolicy.ONLY_CONTAINS, 27, 5,
+                                0 },
+                        { PODD.VF.createURI(PODD.PODD_SCIENCE, "Process"), false, MetadataPolicy.EXCLUDE_CONTAINS, 18,
+                                3, 0 },
                         
-                        { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_PLANT, "FieldConditions"), false,
-                                MetadataPolicy.INCLUDE_ALL, 89, 12, 0 },
-                        { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_PLANT, "FieldConditions"), true,
-                                MetadataPolicy.INCLUDE_ALL, 115, 16, 3 },
-                        { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_PLANT, "FieldConditions"), false,
-                                MetadataPolicy.ONLY_CONTAINS, 33, 6, 0 }, };
+                        { PODD.VF.createURI(PODD.PODD_PLANT, "FieldConditions"), false, MetadataPolicy.INCLUDE_ALL, 89,
+                                12, 0 },
+                        { PODD.VF.createURI(PODD.PODD_PLANT, "FieldConditions"), true, MetadataPolicy.INCLUDE_ALL, 115,
+                                16, 3 },
+                        { PODD.VF.createURI(PODD.PODD_PLANT, "FieldConditions"), false, MetadataPolicy.ONLY_CONTAINS,
+                                33, 6, 0 }, };
         
         for(final Object[] element : testData)
         {
@@ -365,8 +363,7 @@ public abstract class AbstractPoddArtifactManagerTest
             Assert.assertEquals("Not the expected no. of properties", expectedPropertyCount,
                     model.filter(objectType, null, null).size());
             Assert.assertEquals("Not the expected no. of non-displayable properties",
-                    expectedNonDisplayablePropertyCount,
-                    model.filter(null, PoddRdfConstants.PODD_BASE_DO_NOT_DISPLAY, null).size());
+                    expectedNonDisplayablePropertyCount, model.filter(null, PODD.PODD_BASE_DO_NOT_DISPLAY, null).size());
         }
     }
     
@@ -441,7 +438,7 @@ public abstract class AbstractPoddArtifactManagerTest
         // verify statement counts
         final URI versionURI = loadedBaseOntology.getOntologyID().getVersionIRI().toOpenRDFURI();
         
-        long assertedSize = repositoryConnection.size(versionURI);
+        final long assertedSize = repositoryConnection.size(versionURI);
         // Assert.assertEquals("Wrong statement count", assertedStatementCount, assertedSize);
         if(assertedStatementCount != assertedSize)
         {
@@ -450,7 +447,7 @@ public abstract class AbstractPoddArtifactManagerTest
         }
         
         final URI inferredOntologyURI = inferredOntologyID.getInferredOntologyIRI().toOpenRDFURI();
-        long inferredSize = repositoryConnection.size(inferredOntologyURI);
+        final long inferredSize = repositoryConnection.size(inferredOntologyURI);
         // Assert.assertEquals("Wrong inferred statement count", inferredStatementCount,
         // inferredSize);
         if(inferredStatementCount != inferredSize)
@@ -501,27 +498,27 @@ public abstract class AbstractPoddArtifactManagerTest
     {
         // prepare: load schema ontologies
         final InferredOWLOntologyID inferredDctermsOntologyID =
-                this.loadInferStoreOntology(PoddRdfConstants.PATH_PODD_DCTERMS, RDFFormat.RDFXML,
+                this.loadInferStoreOntology(PODD.PATH_PODD_DCTERMS, RDFFormat.RDFXML,
                         TestConstants.EXPECTED_TRIPLE_COUNT_DC_TERMS_CONCRETE,
                         TestConstants.EXPECTED_TRIPLE_COUNT_DC_TERMS_INFERRED, this.testRepositoryConnection);
         final InferredOWLOntologyID inferredFoafOntologyID =
-                this.loadInferStoreOntology(PoddRdfConstants.PATH_PODD_FOAF, RDFFormat.RDFXML,
+                this.loadInferStoreOntology(PODD.PATH_PODD_FOAF, RDFFormat.RDFXML,
                         TestConstants.EXPECTED_TRIPLE_COUNT_FOAF_CONCRETE,
                         TestConstants.EXPECTED_TRIPLE_COUNT_FOAF_INFERRED, this.testRepositoryConnection);
         final InferredOWLOntologyID inferredPUserOntologyID =
-                this.loadInferStoreOntology(PoddRdfConstants.PATH_PODD_USER, RDFFormat.RDFXML,
+                this.loadInferStoreOntology(PODD.PATH_PODD_USER, RDFFormat.RDFXML,
                         TestConstants.EXPECTED_TRIPLE_COUNT_PODD_USER_CONCRETE,
                         TestConstants.EXPECTED_TRIPLE_COUNT_PODD_USER_INFERRED, this.testRepositoryConnection);
         final InferredOWLOntologyID inferredPBaseOntologyID =
-                this.loadInferStoreOntology(PoddRdfConstants.PATH_PODD_BASE, RDFFormat.RDFXML,
+                this.loadInferStoreOntology(PODD.PATH_PODD_BASE, RDFFormat.RDFXML,
                         TestConstants.EXPECTED_TRIPLE_COUNT_PODD_BASE_CONCRETE,
                         TestConstants.EXPECTED_TRIPLE_COUNT_PODD_BASE_INFERRED, this.testRepositoryConnection);
         final InferredOWLOntologyID inferredPScienceOntologyID =
-                this.loadInferStoreOntology(PoddRdfConstants.PATH_PODD_SCIENCE, RDFFormat.RDFXML,
+                this.loadInferStoreOntology(PODD.PATH_PODD_SCIENCE, RDFFormat.RDFXML,
                         TestConstants.EXPECTED_TRIPLE_COUNT_PODD_SCIENCE_CONCRETE,
                         TestConstants.EXPECTED_TRIPLE_COUNT_PODD_SCIENCE_INFERRED, this.testRepositoryConnection);
         final InferredOWLOntologyID inferredPPlantOntologyID =
-                this.loadInferStoreOntology(PoddRdfConstants.PATH_PODD_PLANT, RDFFormat.RDFXML,
+                this.loadInferStoreOntology(PODD.PATH_PODD_PLANT, RDFFormat.RDFXML,
                         TestConstants.EXPECTED_TRIPLE_COUNT_PODD_PLANT_CONCRETE,
                         TestConstants.EXPECTED_TRIPLE_COUNT_PODD_PLANT_INFERRED, this.testRepositoryConnection);
         
@@ -692,7 +689,7 @@ public abstract class AbstractPoddArtifactManagerTest
             // verify: file reference object
             final List<Statement> fileRefList =
                     Iterations.asList(nextRepositoryConnection.getStatements(null, ValueFactoryImpl.getInstance()
-                            .createURI(PoddRdfConstants.PODD_BASE, "hasDataReference"), null, false, updatedArtifact
+                            .createURI(PODD.PODD_BASE, "hasDataReference"), null, false, updatedArtifact
                             .getVersionIRI().toOpenRDFURI()));
             Assert.assertEquals("Graph should have 1 file reference", 1, fileRefList.size());
             
@@ -916,9 +913,9 @@ public abstract class AbstractPoddArtifactManagerTest
             Assert.assertEquals("Reduction in artifact size incorrect", expectedArtifactSize, artifactModel.size());
             
             Assert.assertTrue("Object was not deleted",
-                    artifactModel.filter(PoddRdfConstants.VF.createURI(objectToDelete), null, null).isEmpty());
+                    artifactModel.filter(PODD.VF.createURI(objectToDelete), null, null).isEmpty());
             Assert.assertTrue("Object was not deleted",
-                    artifactModel.filter(null, null, PoddRdfConstants.VF.createURI(objectToDelete)).isEmpty());
+                    artifactModel.filter(null, null, PODD.VF.createURI(objectToDelete)).isEmpty());
         }
     }
     
@@ -958,8 +955,8 @@ public abstract class AbstractPoddArtifactManagerTest
             final Model artifactModel = this.testArtifactManager.exportArtifact(artifactID, false);
             Assert.assertEquals("Reduction in artifact size incorrect",
                     TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES, artifactModel.size());
-            Assert.assertFalse("Object was deleted",
-                    artifactModel.filter(PoddRdfConstants.VF.createURI(objectToDelete), null, null).isEmpty());
+            Assert.assertFalse("Object was deleted", artifactModel
+                    .filter(PODD.VF.createURI(objectToDelete), null, null).isEmpty());
         }
     }
     
@@ -997,8 +994,8 @@ public abstract class AbstractPoddArtifactManagerTest
             final Model artifactModel = this.testArtifactManager.exportArtifact(artifactID, false);
             Assert.assertEquals("Reduction in artifact size incorrect",
                     TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES, artifactModel.size());
-            Assert.assertFalse("Object was deleted",
-                    artifactModel.filter(PoddRdfConstants.VF.createURI(objectToDelete), null, null).isEmpty());
+            Assert.assertFalse("Object was deleted", artifactModel
+                    .filter(PODD.VF.createURI(objectToDelete), null, null).isEmpty());
         }
     }
     
@@ -1031,9 +1028,9 @@ public abstract class AbstractPoddArtifactManagerTest
         final Model artifactModel = this.testArtifactManager.exportArtifact(modifiedArtifactId, false);
         Assert.assertEquals("Reduction in artifact size incorrect", 72, artifactModel.size());
         Assert.assertTrue("Object still exists as an object of some statement",
-                artifactModel.filter(null, null, PoddRdfConstants.VF.createURI(objectToDelete)).isEmpty());
+                artifactModel.filter(null, null, PODD.VF.createURI(objectToDelete)).isEmpty());
         Assert.assertTrue("Object exists as a subject of some statement",
-                artifactModel.filter(PoddRdfConstants.VF.createURI(objectToDelete), null, null).isEmpty());
+                artifactModel.filter(PODD.VF.createURI(objectToDelete), null, null).isEmpty());
     }
     
     /**
@@ -1071,8 +1068,8 @@ public abstract class AbstractPoddArtifactManagerTest
             final Model artifactModel = this.testArtifactManager.exportArtifact(artifactID, false);
             Assert.assertEquals("Reduction in artifact size incorrect",
                     TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES, artifactModel.size());
-            Assert.assertFalse("Object was deleted",
-                    artifactModel.filter(PoddRdfConstants.VF.createURI(objectToDelete), null, null).isEmpty());
+            Assert.assertFalse("Object was deleted", artifactModel
+                    .filter(PODD.VF.createURI(objectToDelete), null, null).isEmpty());
         }
     }
     
@@ -1117,7 +1114,7 @@ public abstract class AbstractPoddArtifactManagerTest
         
         final ByteArrayOutputStream output = new ByteArrayOutputStream();
         
-        final URI objectType = PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Process");
+        final URI objectType = PODD.VF.createURI(PODD.PODD_SCIENCE, "Process");
         
         this.testArtifactManager.exportObjectMetadata(objectType, output, RDFFormat.TURTLE, false,
                 MetadataPolicy.EXCLUDE_CONTAINS, null);
@@ -1228,7 +1225,7 @@ public abstract class AbstractPoddArtifactManagerTest
         final Model testModel = new LinkedHashModel();
         for(final String s : objectUris)
         {
-            testModel.add(PoddRdfConstants.VF.createURI(s), RDFS.LABEL, PoddRdfConstants.VF.createLiteral("?blank"));
+            testModel.add(PODD.VF.createURI(s), RDFS.LABEL, PODD.VF.createLiteral("?blank"));
         }
         
         final Model resultModel = this.testArtifactManager.fillMissingData(artifactIDv1, testModel);
@@ -1237,7 +1234,7 @@ public abstract class AbstractPoddArtifactManagerTest
         for(int i = 0; i < objectUris.length; i++)
         {
             final String objectString =
-                    resultModel.filter(PoddRdfConstants.VF.createURI(objectUris[i]), RDFS.LABEL, null).objectString();
+                    resultModel.filter(PODD.VF.createURI(objectUris[i]), RDFS.LABEL, null).objectString();
             Assert.assertEquals("Not the expected label", expectedLabels[i], objectString);
         }
     }
@@ -1263,7 +1260,7 @@ public abstract class AbstractPoddArtifactManagerTest
         
         for(final Object[] element : testData)
         {
-            final URI objectUri = PoddRdfConstants.VF.createURI(element[0].toString());
+            final URI objectUri = PODD.VF.createURI(element[0].toString());
             final int expectedChildObjectCount = (int)element[1];
             
             final Set<URI> childObjects = this.testArtifactManager.getChildObjects(ontologyID, objectUri);
@@ -1650,23 +1647,23 @@ public abstract class AbstractPoddArtifactManagerTest
     {
         // prepare: load schema ontologies
         final InferredOWLOntologyID inferredDctermsOntologyID =
-                this.loadInferStoreOntology(PoddRdfConstants.PATH_PODD_DCTERMS, RDFFormat.RDFXML,
+                this.loadInferStoreOntology(PODD.PATH_PODD_DCTERMS, RDFFormat.RDFXML,
                         TestConstants.EXPECTED_TRIPLE_COUNT_DC_TERMS_CONCRETE,
                         TestConstants.EXPECTED_TRIPLE_COUNT_DC_TERMS_INFERRED, this.testRepositoryConnection);
         final InferredOWLOntologyID inferredFoafOntologyID =
-                this.loadInferStoreOntology(PoddRdfConstants.PATH_PODD_FOAF, RDFFormat.RDFXML,
+                this.loadInferStoreOntology(PODD.PATH_PODD_FOAF, RDFFormat.RDFXML,
                         TestConstants.EXPECTED_TRIPLE_COUNT_FOAF_CONCRETE,
                         TestConstants.EXPECTED_TRIPLE_COUNT_FOAF_INFERRED, this.testRepositoryConnection);
         final InferredOWLOntologyID inferredPUserOntologyID =
-                this.loadInferStoreOntology(PoddRdfConstants.PATH_PODD_USER, RDFFormat.RDFXML,
+                this.loadInferStoreOntology(PODD.PATH_PODD_USER, RDFFormat.RDFXML,
                         TestConstants.EXPECTED_TRIPLE_COUNT_PODD_USER_CONCRETE,
                         TestConstants.EXPECTED_TRIPLE_COUNT_PODD_USER_INFERRED, this.testRepositoryConnection);
         final InferredOWLOntologyID inferredPBaseOntologyID =
-                this.loadInferStoreOntology(PoddRdfConstants.PATH_PODD_BASE, RDFFormat.RDFXML,
+                this.loadInferStoreOntology(PODD.PATH_PODD_BASE, RDFFormat.RDFXML,
                         TestConstants.EXPECTED_TRIPLE_COUNT_PODD_BASE_CONCRETE,
                         TestConstants.EXPECTED_TRIPLE_COUNT_PODD_BASE_INFERRED, this.testRepositoryConnection);
         final InferredOWLOntologyID inferredPScienceOntologyID =
-                this.loadInferStoreOntology(PoddRdfConstants.PATH_PODD_SCIENCE, RDFFormat.RDFXML,
+                this.loadInferStoreOntology(PODD.PATH_PODD_SCIENCE, RDFFormat.RDFXML,
                         TestConstants.EXPECTED_TRIPLE_COUNT_PODD_SCIENCE_CONCRETE,
                         TestConstants.EXPECTED_TRIPLE_COUNT_PODD_SCIENCE_INFERRED, this.testRepositoryConnection);
         
@@ -1939,13 +1936,13 @@ public abstract class AbstractPoddArtifactManagerTest
             // verify: a single PUBLICATION_STATUS in asserted ontology
             final List<Statement> publicationStatusStatementList =
                     Iterations.asList(nextRepositoryConnection.getStatements(null,
-                            PoddRdfConstants.PODD_BASE_HAS_PUBLICATION_STATUS, null, false,
+                            PODD.PODD_BASE_HAS_PUBLICATION_STATUS, null, false,
                             this.testRepositoryManager.getArtifactManagementGraph()));
             Assert.assertEquals("Graph should have one HAS_PUBLICATION_STATUS statement.", 1,
                     publicationStatusStatementList.size());
             
             // verify: artifact is PUBLISHED
-            Assert.assertEquals("Wrong publication status", PoddRdfConstants.PODD_BASE_PUBLISHED.toString(),
+            Assert.assertEquals("Wrong publication status", PODD.PODD_BASE_PUBLISHED.toString(),
                     publicationStatusStatementList.get(0).getObject().toString());
         }
         finally
@@ -1983,8 +1980,7 @@ public abstract class AbstractPoddArtifactManagerTest
         
         final String searchTerm = "lat";
         final URI[] searchTypes =
-                { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Platform"),
-                        PoddRdfConstants.VF.createURI(OWL.NAMESPACE, "NamedIndividual") };
+                { PODD.VF.createURI(PODD.PODD_SCIENCE, "Platform"), PODD.VF.createURI(OWL.NAMESPACE, "NamedIndividual") };
         
         final Model result = this.testArtifactManager.searchForOntologyLabels(artifactIDv1, searchTerm, searchTypes);
         
@@ -1992,7 +1988,7 @@ public abstract class AbstractPoddArtifactManagerTest
         Assert.assertNotNull("NULL result", result);
         Assert.assertEquals("Not the expected number of search results", 1, result.size());
         Assert.assertEquals("Expected custom Platform 1 not found", 1,
-                result.filter(null, null, PoddRdfConstants.VF.createLiteral("Platform 1")).size());
+                result.filter(null, null, PODD.VF.createLiteral("Platform 1")).size());
     }
     
     /**
@@ -2030,9 +2026,9 @@ public abstract class AbstractPoddArtifactManagerTest
     public final void testUpdateArtifactAddNewPoddObjectsWithMerge() throws Exception
     {
         final List<URI> objectUriList =
-                Arrays.asList(PoddRdfConstants.VF.createURI("urn:temp:uuid:object-rice-scan-34343-a"),
-                        PoddRdfConstants.VF.createURI("urn:temp:uuid:publication35"),
-                        PoddRdfConstants.VF.createURI("urn:temp:uuid:publication46"));
+                Arrays.asList(PODD.VF.createURI("urn:temp:uuid:object-rice-scan-34343-a"),
+                        PODD.VF.createURI("urn:temp:uuid:publication35"),
+                        PODD.VF.createURI("urn:temp:uuid:publication46"));
         
         final InferredOWLOntologyID updatedArtifact =
                 this.internalTestUpdateArtifact(TestConstants.TEST_ARTIFACT_20130206, RDFFormat.TURTLE, 7,
@@ -2055,7 +2051,7 @@ public abstract class AbstractPoddArtifactManagerTest
             // verify: 2 publications exist
             final List<Statement> testList =
                     Iterations.asList(nextRepositoryConnection.getStatements(null, ValueFactoryImpl.getInstance()
-                            .createURI(PoddRdfConstants.PODD_SCIENCE, "hasPublication"), null, false, updatedArtifact
+                            .createURI(PODD.PODD_SCIENCE, "hasPublication"), null, false, updatedArtifact
                             .getVersionIRI().toOpenRDFURI()));
             Assert.assertEquals("Graph should have 2 publications", 3, testList.size());
             
@@ -2092,9 +2088,9 @@ public abstract class AbstractPoddArtifactManagerTest
     {
         final List<URI> objectUriList = Arrays.asList(
         // a temporary URI for a Platform being newly added
-                PoddRdfConstants.VF.createURI("urn:temp:uuid:object-rice-scanner-platform"),
+                PODD.VF.createURI("urn:temp:uuid:object-rice-scanner-platform"),
                 // a Platform that is pre-defined in PODD Plant Ontology
-                PoddRdfConstants.VF.createURI("http://purl.org/podd/ns/poddPlant#PlantScan-6e"));
+                PODD.VF.createURI("http://purl.org/podd/ns/poddPlant#PlantScan-6e"));
         
         final InferredOWLOntologyID updatedArtifact =
                 this.internalTestUpdateArtifact(TestConstants.TEST_ARTIFACT_20130206, RDFFormat.TURTLE, 7,
@@ -2117,8 +2113,8 @@ public abstract class AbstractPoddArtifactManagerTest
             // verify: platform object
             final List<Statement> platformList =
                     Iterations.asList(nextRepositoryConnection.getStatements(null, ValueFactoryImpl.getInstance()
-                            .createURI(PoddRdfConstants.PODD_SCIENCE, "hasPlatform"), null, false, updatedArtifact
-                            .getVersionIRI().toOpenRDFURI()));
+                            .createURI(PODD.PODD_SCIENCE, "hasPlatform"), null, false, updatedArtifact.getVersionIRI()
+                            .toOpenRDFURI()));
             
             // 2 added in the test plus a platform that was defined in the initially uploaded
             // artifact
@@ -2183,7 +2179,7 @@ public abstract class AbstractPoddArtifactManagerTest
             // verify: file reference object
             final List<Statement> fileRefList =
                     Iterations.asList(nextRepositoryConnection.getStatements(null, ValueFactoryImpl.getInstance()
-                            .createURI(PoddRdfConstants.PODD_BASE, "hasDataReference"), null, false, updatedArtifact
+                            .createURI(PODD.PODD_BASE, "hasDataReference"), null, false, updatedArtifact
                             .getVersionIRI().toOpenRDFURI()));
             Assert.assertEquals("Graph should have 1 file reference", 1, fileRefList.size());
             
@@ -2234,7 +2230,7 @@ public abstract class AbstractPoddArtifactManagerTest
             // verify: 2 publications exist
             final List<Statement> testList =
                     Iterations.asList(nextRepositoryConnection.getStatements(null, ValueFactoryImpl.getInstance()
-                            .createURI(PoddRdfConstants.PODD_SCIENCE, "hasPublication"), null, false, updatedArtifact
+                            .createURI(PODD.PODD_SCIENCE, "hasPublication"), null, false, updatedArtifact
                             .getVersionIRI().toOpenRDFURI()));
             Assert.assertEquals("Graph should have 2 publications", 2, testList.size());
             
@@ -2316,15 +2312,15 @@ public abstract class AbstractPoddArtifactManagerTest
             // verify: still only 1 publication
             final List<Statement> testList =
                     Iterations.asList(nextRepositoryConnection.getStatements(null, ValueFactoryImpl.getInstance()
-                            .createURI(PoddRdfConstants.PODD_SCIENCE, "hasPublication"), null, false, updatedArtifact
+                            .createURI(PODD.PODD_SCIENCE, "hasPublication"), null, false, updatedArtifact
                             .getVersionIRI().toOpenRDFURI()));
             Assert.assertEquals("Incorrect no. of hasPublication statements", 1, testList.size());
             
             // verify: publication info has been updated
             final List<Statement> testList2 =
                     Iterations.asList(nextRepositoryConnection.getStatements(null, ValueFactoryImpl.getInstance()
-                            .createURI(PoddRdfConstants.PODD_SCIENCE, "hasYear"), null, false, updatedArtifact
-                            .getVersionIRI().toOpenRDFURI()));
+                            .createURI(PODD.PODD_SCIENCE, "hasYear"), null, false, updatedArtifact.getVersionIRI()
+                            .toOpenRDFURI()));
             Assert.assertEquals("Incorrect no. of hasYear statements", 1, testList2.size());
             Assert.assertEquals("Publication Year has not bee updated", "2011", testList2.get(0).getObject()
                     .stringValue());
@@ -2778,8 +2774,8 @@ public abstract class AbstractPoddArtifactManagerTest
         
         // verify: OWL_VERSION
         final List<Statement> stmtList =
-                Iterations.asList(repositoryConnection.getStatements(ontologyIRI.toOpenRDFURI(),
-                        PoddRdfConstants.OWL_VERSION_IRI, null, false, testGraph));
+                Iterations.asList(repositoryConnection.getStatements(ontologyIRI.toOpenRDFURI(), PODD.OWL_VERSION_IRI,
+                        null, false, testGraph));
         Assert.assertEquals("Graph should have one OWL_VERSION statement", 1, stmtList.size());
         Assert.assertEquals("Wrong OWL_VERSION in Object", versionIRI.toString(), stmtList.get(0).getObject()
                 .toString());
@@ -2787,7 +2783,7 @@ public abstract class AbstractPoddArtifactManagerTest
         // verify: OMV_CURRENT_VERSION
         final List<Statement> currentVersionStatementList =
                 Iterations.asList(repositoryConnection.getStatements(ontologyIRI.toOpenRDFURI(),
-                        PoddRdfConstants.OMV_CURRENT_VERSION, null, false, testGraph));
+                        PODD.OMV_CURRENT_VERSION, null, false, testGraph));
         Assert.assertEquals("Graph should have one OMV_CURRENT_VERSION statement", 1,
                 currentVersionStatementList.size());
         Assert.assertEquals("Wrong OMV_CURRENT_VERSION in Object", versionIRI.toString(), currentVersionStatementList
@@ -2796,7 +2792,7 @@ public abstract class AbstractPoddArtifactManagerTest
         // verify: INFERRED_VERSION
         final List<Statement> inferredVersionStatementList =
                 Iterations.asList(repositoryConnection.getStatements(versionIRI.toOpenRDFURI(),
-                        PoddRdfConstants.PODD_BASE_INFERRED_VERSION, null, false, testGraph));
+                        PODD.PODD_BASE_INFERRED_VERSION, null, false, testGraph));
         Assert.assertEquals("Graph should have one INFERRED_VERSION statement", 1, inferredVersionStatementList.size());
         Assert.assertEquals("Wrong INFERRED_VERSION in Object", inferredVersionIRI.toString(),
                 inferredVersionStatementList.get(0).getObject().toString());
@@ -2804,7 +2800,7 @@ public abstract class AbstractPoddArtifactManagerTest
         // verify: CURRENT_INFERRED_VERSION
         final List<Statement> currentInferredVersionStatementList =
                 Iterations.asList(repositoryConnection.getStatements(ontologyIRI.toOpenRDFURI(),
-                        PoddRdfConstants.PODD_BASE_CURRENT_INFERRED_VERSION, null, false, testGraph));
+                        PODD.PODD_BASE_CURRENT_INFERRED_VERSION, null, false, testGraph));
         Assert.assertEquals("Graph should have one CURRENT_INFERRED_VERSION statement", 1,
                 currentInferredVersionStatementList.size());
         Assert.assertEquals("Wrong CURRENT_INFERRED_VERSION in Object", inferredVersionIRI.toString(),
@@ -2894,8 +2890,8 @@ public abstract class AbstractPoddArtifactManagerTest
         
         // verify: owl:versionIRI incremented in graph
         final List<Statement> versionIRIs =
-                Iterations.asList(nextRepositoryConnection.getStatements(null, PoddRdfConstants.OWL_VERSION_IRI, null,
-                        false, updatedArtifact.getVersionIRI().toOpenRDFURI()));
+                Iterations.asList(nextRepositoryConnection.getStatements(null, PODD.OWL_VERSION_IRI, null, false,
+                        updatedArtifact.getVersionIRI().toOpenRDFURI()));
         Assert.assertEquals("Should have only 1 version IRI", 1, versionIRIs.size());
         Assert.assertEquals("Version IRI not expected value", expectedVersionIri, versionIRIs.get(0).getObject()
                 .stringValue());

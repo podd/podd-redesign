@@ -32,7 +32,7 @@ import com.github.podd.api.file.DataReferenceProcessor;
 import com.github.podd.api.file.SPARQLDataReference;
 import com.github.podd.api.file.SPARQLDataReferenceProcessor;
 import com.github.podd.api.test.TestConstants;
-import com.github.podd.utils.PoddRdfConstants;
+import com.github.podd.utils.PODD;
 
 /**
  * @author kutila
@@ -44,7 +44,7 @@ public abstract class AbstractSPARQLDataReferenceProcessorTest extends
     @Override
     protected Set<URI> getExpectedDataReferenceTypes()
     {
-        return Collections.singleton(PoddRdfConstants.PODD_BASE_DATA_REFERENCE_TYPE_SPARQL);
+        return Collections.singleton(PODD.PODD_BASE_DATA_REFERENCE_TYPE_SPARQL);
     }
     
     @Override

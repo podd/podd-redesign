@@ -42,7 +42,7 @@ import com.github.podd.exception.UnmanagedArtifactIRIException;
 import com.github.podd.restlet.PoddAction;
 import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.OntologyUtils;
-import com.github.podd.utils.PoddRdfConstants;
+import com.github.podd.utils.PODD;
 import com.github.podd.utils.PoddWebConstants;
 
 /**
@@ -93,7 +93,7 @@ public class DeleteObjectResourceImpl extends AbstractPoddResourceImpl
             }
             final boolean cascade = Boolean.valueOf(cascadeString);
             
-            this.checkAuthentication(PoddAction.ARTIFACT_EDIT, PoddRdfConstants.VF.createURI(artifactUri));
+            this.checkAuthentication(PoddAction.ARTIFACT_EDIT, PODD.VF.createURI(artifactUri));
             
             this.log.debug("requesting delete object: {}, {}, {} with cascade {}", artifactUri, versionUri, objectUri,
                     cascade);

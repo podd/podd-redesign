@@ -25,7 +25,7 @@ import org.openrdf.model.impl.LinkedHashModel;
 import org.openrdf.model.vocabulary.RDF;
 import org.openrdf.model.vocabulary.RDFS;
 
-import com.github.podd.utils.PoddRdfConstants;
+import com.github.podd.utils.PODD;
 
 /**
  * This class extends <code>java.lang.Exception</code> to provide a PODD specific checked exception
@@ -67,18 +67,17 @@ public abstract class PoddException extends Exception
     {
         final Model model = new LinkedHashModel();
         
-        model.add(errorResource, RDF.TYPE, PoddRdfConstants.ERR_TYPE_ERROR);
-        model.add(errorResource, PoddRdfConstants.ERR_EXCEPTION_CLASS,
-                PoddRdfConstants.VF.createLiteral(this.getClass().getName()));
+        model.add(errorResource, RDF.TYPE, PODD.ERR_TYPE_ERROR);
+        model.add(errorResource, PODD.ERR_EXCEPTION_CLASS, PODD.VF.createLiteral(this.getClass().getName()));
         
         if(this.getMessage() != null)
         {
-            model.add(errorResource, RDFS.LABEL, PoddRdfConstants.VF.createLiteral(this.getMessage()));
+            model.add(errorResource, RDFS.LABEL, PODD.VF.createLiteral(this.getMessage()));
         }
         
         final StringWriter sw = new StringWriter();
         this.printStackTrace(new PrintWriter(sw));
-        model.add(errorResource, RDFS.COMMENT, PoddRdfConstants.VF.createLiteral(sw.toString()));
+        model.add(errorResource, RDFS.COMMENT, PODD.VF.createLiteral(sw.toString()));
         
         return model;
     }

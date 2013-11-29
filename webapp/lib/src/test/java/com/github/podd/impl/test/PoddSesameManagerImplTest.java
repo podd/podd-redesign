@@ -33,7 +33,7 @@ import com.github.podd.api.test.TestOntologyUtils;
 import com.github.podd.impl.PoddOWLManagerImpl;
 import com.github.podd.impl.PoddSesameManagerImpl;
 import com.github.podd.utils.InferredOWLOntologyID;
-import com.github.podd.utils.PoddRdfConstants;
+import com.github.podd.utils.PODD;
 
 /**
  * @author kutila
@@ -64,9 +64,8 @@ public class PoddSesameManagerImplTest extends AbstractPoddSesameManagerTest
         
         // - schema ontologies to be loaded
         final String[] schemaResourcePaths =
-                { PoddRdfConstants.PATH_PODD_DCTERMS, PoddRdfConstants.PATH_PODD_FOAF, PoddRdfConstants.PATH_PODD_USER,
-                        PoddRdfConstants.PATH_PODD_BASE, PoddRdfConstants.PATH_PODD_SCIENCE,
-                        PoddRdfConstants.PATH_PODD_PLANT,
+                { PODD.PATH_PODD_DCTERMS, PODD.PATH_PODD_FOAF, PODD.PATH_PODD_USER, PODD.PATH_PODD_BASE,
+                        PODD.PATH_PODD_SCIENCE, PODD.PATH_PODD_PLANT,
                 // PoddRdfConstants.PATH_PODD_ANIMAL,
                 };
         

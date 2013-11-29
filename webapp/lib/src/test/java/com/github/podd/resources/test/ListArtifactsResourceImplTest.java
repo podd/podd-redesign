@@ -30,7 +30,7 @@ import org.restlet.resource.ClientResource;
 import com.github.ansell.restletutils.RestletUtilMediaType;
 import com.github.ansell.restletutils.test.RestletTestUtils;
 import com.github.podd.api.test.TestConstants;
-import com.github.podd.utils.PoddRdfConstants;
+import com.github.podd.utils.PODD;
 import com.github.podd.utils.PoddWebConstants;
 
 /**
@@ -179,8 +179,8 @@ public class ListArtifactsResourceImplTest extends AbstractResourceImplTest
             // verify:
             final Model model = this.assertRdf(results, RDFFormat.RDFJSON, 17);
             
-            Assert.assertTrue(model.contains(artifactUri1, PoddRdfConstants.PODD_BASE_HAS_TOP_OBJECT, null));
-            Assert.assertTrue(model.contains(artifactUri2, PoddRdfConstants.PODD_BASE_HAS_TOP_OBJECT, null));
+            Assert.assertTrue(model.contains(artifactUri1, PODD.PODD_BASE_HAS_TOP_OBJECT, null));
+            Assert.assertTrue(model.contains(artifactUri2, PODD.PODD_BASE_HAS_TOP_OBJECT, null));
         }
         finally
         {

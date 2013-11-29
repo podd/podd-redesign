@@ -45,7 +45,7 @@ import org.restlet.resource.ResourceException;
 import com.github.ansell.restletutils.SesameRealmConstants;
 import com.github.ansell.restletutils.test.RestletTestUtils;
 import com.github.podd.utils.DebugUtils;
-import com.github.podd.utils.PoddRdfConstants;
+import com.github.podd.utils.PODD;
 import com.github.podd.utils.PoddRoles;
 import com.github.podd.utils.PoddUserStatus;
 import com.github.podd.utils.PoddWebConstants;
@@ -74,41 +74,31 @@ public class UserAddResourceImplTest extends AbstractResourceImplTest
         final String testLastName = "Last";
         
         final Model userInfoModel = new LinkedHashModel();
-        final URI tempUserUri = PoddRdfConstants.VF.createURI("urn:temp:user");
-        userInfoModel.add(tempUserUri, SesameRealmConstants.OAS_USERIDENTIFIER,
-                PoddRdfConstants.VF.createLiteral(testEmail));
-        userInfoModel.add(tempUserUri, SesameRealmConstants.OAS_USERSECRET,
-                PoddRdfConstants.VF.createLiteral(testPassword));
-        userInfoModel.add(tempUserUri, SesameRealmConstants.OAS_USERFIRSTNAME,
-                PoddRdfConstants.VF.createLiteral(testFirstName));
-        userInfoModel.add(tempUserUri, SesameRealmConstants.OAS_USERLASTNAME,
-                PoddRdfConstants.VF.createLiteral(testLastName));
-        userInfoModel.add(tempUserUri, PoddRdfConstants.PODD_USER_HOMEPAGE,
-                PoddRdfConstants.VF.createURI("http://nohomepage"));
-        userInfoModel.add(tempUserUri, PoddRdfConstants.PODD_USER_ORGANIZATION,
-                PoddRdfConstants.VF.createLiteral("n/a"));
-        userInfoModel.add(tempUserUri, PoddRdfConstants.PODD_USER_ORCID, PoddRdfConstants.VF.createLiteral("n/a"));
-        userInfoModel.add(tempUserUri, PoddRdfConstants.PODD_USER_STATUS, PoddUserStatus.INACTIVE.getURI());
+        final URI tempUserUri = PODD.VF.createURI("urn:temp:user");
+        userInfoModel.add(tempUserUri, SesameRealmConstants.OAS_USERIDENTIFIER, PODD.VF.createLiteral(testEmail));
+        userInfoModel.add(tempUserUri, SesameRealmConstants.OAS_USERSECRET, PODD.VF.createLiteral(testPassword));
+        userInfoModel.add(tempUserUri, SesameRealmConstants.OAS_USERFIRSTNAME, PODD.VF.createLiteral(testFirstName));
+        userInfoModel.add(tempUserUri, SesameRealmConstants.OAS_USERLASTNAME, PODD.VF.createLiteral(testLastName));
+        userInfoModel.add(tempUserUri, PODD.PODD_USER_HOMEPAGE, PODD.VF.createURI("http://nohomepage"));
+        userInfoModel.add(tempUserUri, PODD.PODD_USER_ORGANIZATION, PODD.VF.createLiteral("n/a"));
+        userInfoModel.add(tempUserUri, PODD.PODD_USER_ORCID, PODD.VF.createLiteral("n/a"));
+        userInfoModel.add(tempUserUri, PODD.PODD_USER_STATUS, PoddUserStatus.INACTIVE.getURI());
         
-        userInfoModel
-                .add(tempUserUri, SesameRealmConstants.OAS_USEREMAIL, PoddRdfConstants.VF.createLiteral(testEmail));
+        userInfoModel.add(tempUserUri, SesameRealmConstants.OAS_USEREMAIL, PODD.VF.createLiteral(testEmail));
         
         // prepare: add 'Repository Admin User' Role
-        final URI authenticatedRoleMapping =
-                PoddRdfConstants.VF.createURI("urn:podd:rolemapping:", UUID.randomUUID().toString());
+        final URI authenticatedRoleMapping = PODD.VF.createURI("urn:podd:rolemapping:", UUID.randomUUID().toString());
         userInfoModel.add(authenticatedRoleMapping, RDF.TYPE, SesameRealmConstants.OAS_ROLEMAPPING);
         userInfoModel.add(authenticatedRoleMapping, SesameRealmConstants.OAS_ROLEMAPPEDUSER, tempUserUri);
         userInfoModel.add(authenticatedRoleMapping, SesameRealmConstants.OAS_ROLEMAPPEDROLE, PoddRoles.ADMIN.getURI());
         
         // prepare: add 'Project Observer' Role of an imaginary project
-        final URI observerRoleMapping =
-                PoddRdfConstants.VF.createURI("urn:podd:rolemapping:", UUID.randomUUID().toString());
+        final URI observerRoleMapping = PODD.VF.createURI("urn:podd:rolemapping:", UUID.randomUUID().toString());
         userInfoModel.add(observerRoleMapping, RDF.TYPE, SesameRealmConstants.OAS_ROLEMAPPING);
         userInfoModel.add(observerRoleMapping, SesameRealmConstants.OAS_ROLEMAPPEDUSER, tempUserUri);
         userInfoModel.add(observerRoleMapping, SesameRealmConstants.OAS_ROLEMAPPEDROLE,
                 PoddRoles.PROJECT_OBSERVER.getURI());
-        userInfoModel.add(observerRoleMapping, PoddRdfConstants.PODD_ROLEMAPPEDOBJECT,
-                PoddRdfConstants.VF.createURI("urn:podd:some:project"));
+        userInfoModel.add(observerRoleMapping, PODD.PODD_ROLEMAPPEDOBJECT, PODD.VF.createURI("urn:podd:some:project"));
         
         final ClientResource userAddClientResource = new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_ADD));
         
@@ -169,7 +159,7 @@ public class UserAddResourceImplTest extends AbstractResourceImplTest
         final String testIdentifier = "testuser@podd.com";
         final List<Map.Entry<URI, URI>> roles = new LinkedList<Map.Entry<URI, URI>>();
         roles.add(new AbstractMap.SimpleEntry<URI, URI>(PoddRoles.ADMIN.getURI(), null));
-        roles.add(new AbstractMap.SimpleEntry<URI, URI>(PoddRoles.PROJECT_ADMIN.getURI(), PoddRdfConstants.VF
+        roles.add(new AbstractMap.SimpleEntry<URI, URI>(PoddRoles.PROJECT_ADMIN.getURI(), PODD.VF
                 .createURI("urn:podd:some-project")));
         final String testUserUri =
                 this.loadTestUser(testIdentifier, "testuserpassword", "John", "Doe", testIdentifier,
@@ -200,7 +190,7 @@ public class UserAddResourceImplTest extends AbstractResourceImplTest
                     resultsModel.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).subjects().iterator()
                             .next().stringValue());
             Assert.assertEquals("Unexpected user Status", PoddUserStatus.ACTIVE.getURI(),
-                    resultsModel.filter(null, PoddRdfConstants.PODD_USER_STATUS, null).objectURI());
+                    resultsModel.filter(null, PODD.PODD_USER_STATUS, null).objectURI());
         }
         finally
         {
@@ -245,7 +235,7 @@ public class UserAddResourceImplTest extends AbstractResourceImplTest
                     resultsModel.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).subjects().iterator()
                             .next().stringValue());
             Assert.assertEquals("User Status was not set to INACTIVE by default", PoddUserStatus.INACTIVE.getURI(),
-                    resultsModel.filter(null, PoddRdfConstants.PODD_USER_STATUS, null).objectURI());
+                    resultsModel.filter(null, PODD.PODD_USER_STATUS, null).objectURI());
             
             // verify: Project Creator Role has been assigned by default
             final Set<Resource> roleMappings =
@@ -268,7 +258,7 @@ public class UserAddResourceImplTest extends AbstractResourceImplTest
         final String testIdentifier = "newPoddUser";
         final List<Map.Entry<URI, URI>> roles = new LinkedList<Map.Entry<URI, URI>>();
         roles.add(new AbstractMap.SimpleEntry<URI, URI>(PoddRoles.ADMIN.getURI(), null));
-        roles.add(new AbstractMap.SimpleEntry<URI, URI>(PoddRoles.PROJECT_ADMIN.getURI(), PoddRdfConstants.VF
+        roles.add(new AbstractMap.SimpleEntry<URI, URI>(PoddRoles.PROJECT_ADMIN.getURI(), PODD.VF
                 .createURI("urn:podd:some-project")));
         final String testUserUri =
                 this.loadTestUser(testIdentifier, "testuserpassword", "John", "Doe", testIdentifier, null, null, null,
@@ -297,7 +287,7 @@ public class UserAddResourceImplTest extends AbstractResourceImplTest
                     resultsModel.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).subjects().iterator()
                             .next().stringValue());
             Assert.assertEquals("User Status was not set to INACTIVE by default", PoddUserStatus.INACTIVE.getURI(),
-                    resultsModel.filter(null, PoddRdfConstants.PODD_USER_STATUS, null).objectURI());
+                    resultsModel.filter(null, PODD.PODD_USER_STATUS, null).objectURI());
         }
         finally
         {
@@ -313,7 +303,7 @@ public class UserAddResourceImplTest extends AbstractResourceImplTest
         // prepare: add a Test User account
         final List<Map.Entry<URI, URI>> roles = new LinkedList<Map.Entry<URI, URI>>();
         roles.add(new AbstractMap.SimpleEntry<URI, URI>(PoddRoles.ADMIN.getURI(), null));
-        roles.add(new AbstractMap.SimpleEntry<URI, URI>(PoddRoles.PROJECT_ADMIN.getURI(), PoddRdfConstants.VF
+        roles.add(new AbstractMap.SimpleEntry<URI, URI>(PoddRoles.PROJECT_ADMIN.getURI(), PODD.VF
                 .createURI("urn:podd:some-project")));
         this.loadTestUser(testIdentifier, "testuserpassword", "John", "Doe", testIdentifier, null, null, null, null,
                 null, null, null, roles, PoddUserStatus.ACTIVE);
@@ -323,22 +313,15 @@ public class UserAddResourceImplTest extends AbstractResourceImplTest
         final RDFFormat format = Rio.getWriterFormatForMIMEType(mediaType.getName(), RDFFormat.RDFXML);
         
         final Model userInfoModel = new LinkedHashModel();
-        final URI tempUserUri = PoddRdfConstants.VF.createURI("urn:temp:user");
-        userInfoModel.add(tempUserUri, SesameRealmConstants.OAS_USERIDENTIFIER,
-                PoddRdfConstants.VF.createLiteral(testIdentifier));
-        userInfoModel.add(tempUserUri, SesameRealmConstants.OAS_USERSECRET,
-                PoddRdfConstants.VF.createLiteral("testpassword"));
-        userInfoModel.add(tempUserUri, SesameRealmConstants.OAS_USERFIRSTNAME,
-                PoddRdfConstants.VF.createLiteral("First"));
-        userInfoModel
-                .add(tempUserUri, SesameRealmConstants.OAS_USERLASTNAME, PoddRdfConstants.VF.createLiteral("Last"));
-        userInfoModel.add(tempUserUri, PoddRdfConstants.PODD_USER_HOMEPAGE,
-                PoddRdfConstants.VF.createURI("http://nohomepage"));
-        userInfoModel.add(tempUserUri, PoddRdfConstants.PODD_USER_ORGANIZATION,
-                PoddRdfConstants.VF.createLiteral("n/a"));
-        userInfoModel.add(tempUserUri, PoddRdfConstants.PODD_USER_ORCID, PoddRdfConstants.VF.createLiteral("n/a"));
-        userInfoModel.add(tempUserUri, SesameRealmConstants.OAS_USEREMAIL,
-                PoddRdfConstants.VF.createLiteral(testIdentifier));
+        final URI tempUserUri = PODD.VF.createURI("urn:temp:user");
+        userInfoModel.add(tempUserUri, SesameRealmConstants.OAS_USERIDENTIFIER, PODD.VF.createLiteral(testIdentifier));
+        userInfoModel.add(tempUserUri, SesameRealmConstants.OAS_USERSECRET, PODD.VF.createLiteral("testpassword"));
+        userInfoModel.add(tempUserUri, SesameRealmConstants.OAS_USERFIRSTNAME, PODD.VF.createLiteral("First"));
+        userInfoModel.add(tempUserUri, SesameRealmConstants.OAS_USERLASTNAME, PODD.VF.createLiteral("Last"));
+        userInfoModel.add(tempUserUri, PODD.PODD_USER_HOMEPAGE, PODD.VF.createURI("http://nohomepage"));
+        userInfoModel.add(tempUserUri, PODD.PODD_USER_ORGANIZATION, PODD.VF.createLiteral("n/a"));
+        userInfoModel.add(tempUserUri, PODD.PODD_USER_ORCID, PODD.VF.createLiteral("n/a"));
+        userInfoModel.add(tempUserUri, SesameRealmConstants.OAS_USEREMAIL, PODD.VF.createLiteral(testIdentifier));
         
         final ByteArrayOutputStream out = new ByteArrayOutputStream();
         Rio.write(userInfoModel, out, format);
@@ -405,19 +388,14 @@ public class UserAddResourceImplTest extends AbstractResourceImplTest
         final String testLastName = "Last";
         
         final Model userInfoModel = new LinkedHashModel();
-        final URI tempUserUri = PoddRdfConstants.VF.createURI("urn:temp:user");
-        userInfoModel.add(tempUserUri, SesameRealmConstants.OAS_USERIDENTIFIER,
-                PoddRdfConstants.VF.createLiteral(testIdentifier));
-        userInfoModel.add(tempUserUri, SesameRealmConstants.OAS_USERSECRET,
-                PoddRdfConstants.VF.createLiteral(testPassword));
-        userInfoModel.add(tempUserUri, SesameRealmConstants.OAS_USERFIRSTNAME,
-                PoddRdfConstants.VF.createLiteral(testFirstName));
-        userInfoModel.add(tempUserUri, SesameRealmConstants.OAS_USERLASTNAME,
-                PoddRdfConstants.VF.createLiteral(testLastName));
+        final URI tempUserUri = PODD.VF.createURI("urn:temp:user");
+        userInfoModel.add(tempUserUri, SesameRealmConstants.OAS_USERIDENTIFIER, PODD.VF.createLiteral(testIdentifier));
+        userInfoModel.add(tempUserUri, SesameRealmConstants.OAS_USERSECRET, PODD.VF.createLiteral(testPassword));
+        userInfoModel.add(tempUserUri, SesameRealmConstants.OAS_USERFIRSTNAME, PODD.VF.createLiteral(testFirstName));
+        userInfoModel.add(tempUserUri, SesameRealmConstants.OAS_USERLASTNAME, PODD.VF.createLiteral(testLastName));
         
         // prepare: add 'Authenticated User' Role
-        final URI authenticatedRoleMapping =
-                PoddRdfConstants.VF.createURI("urn:podd:rolemapping:", UUID.randomUUID().toString());
+        final URI authenticatedRoleMapping = PODD.VF.createURI("urn:podd:rolemapping:", UUID.randomUUID().toString());
         userInfoModel.add(authenticatedRoleMapping, RDF.TYPE, SesameRealmConstants.OAS_ROLEMAPPING);
         userInfoModel.add(authenticatedRoleMapping, SesameRealmConstants.OAS_ROLEMAPPEDUSER, tempUserUri);
         userInfoModel.add(authenticatedRoleMapping, SesameRealmConstants.OAS_ROLEMAPPEDROLE, PoddRoles.ADMIN.getURI());

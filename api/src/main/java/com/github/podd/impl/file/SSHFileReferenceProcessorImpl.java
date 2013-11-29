@@ -34,7 +34,7 @@ import org.slf4j.LoggerFactory;
 import com.github.podd.api.file.SSHFileReference;
 import com.github.podd.api.file.SSHFileReferenceProcessor;
 import com.github.podd.utils.DebugUtils;
-import com.github.podd.utils.PoddRdfConstants;
+import com.github.podd.utils.PODD;
 
 /**
  * Processor for File References of type <i>http://purl.org/podd/ns/poddBase#SSHFileReference</i>.
@@ -103,20 +103,19 @@ public class SSHFileReferenceProcessorImpl implements SSHFileReferenceProcessor
                     fileReference.setLabel(label.iterator().next().stringValue());
                 }
                 
-                final Set<Value> filename =
-                        model.filter(fileRef, PoddRdfConstants.PODD_BASE_HAS_FILENAME, null).objects();
+                final Set<Value> filename = model.filter(fileRef, PODD.PODD_BASE_HAS_FILENAME, null).objects();
                 if(!filename.isEmpty())
                 {
                     fileReference.setFilename(filename.iterator().next().stringValue());
                 }
                 
-                final Set<Value> path = model.filter(fileRef, PoddRdfConstants.PODD_BASE_HAS_FILE_PATH, null).objects();
+                final Set<Value> path = model.filter(fileRef, PODD.PODD_BASE_HAS_FILE_PATH, null).objects();
                 if(!path.isEmpty())
                 {
                     fileReference.setPath(path.iterator().next().stringValue());
                 }
                 
-                final Set<Value> alias = model.filter(fileRef, PoddRdfConstants.PODD_BASE_HAS_ALIAS, null).objects();
+                final Set<Value> alias = model.filter(fileRef, PODD.PODD_BASE_HAS_ALIAS, null).objects();
                 if(!alias.isEmpty())
                 {
                     fileReference.setRepositoryAlias(alias.iterator().next().stringValue());
@@ -149,7 +148,7 @@ public class SSHFileReferenceProcessorImpl implements SSHFileReferenceProcessor
     @Override
     public Set<URI> getTypes()
     {
-        return Collections.singleton(PoddRdfConstants.PODD_BASE_FILE_REFERENCE_TYPE_SSH);
+        return Collections.singleton(PODD.PODD_BASE_FILE_REFERENCE_TYPE_SSH);
     }
     
 }

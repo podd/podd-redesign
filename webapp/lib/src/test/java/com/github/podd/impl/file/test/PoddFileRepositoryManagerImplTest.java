@@ -49,7 +49,7 @@ import com.github.podd.exception.FileReferenceNotSupportedException;
 import com.github.podd.impl.PoddOWLManagerImpl;
 import com.github.podd.impl.PoddRepositoryManagerImpl;
 import com.github.podd.impl.file.PoddFileRepositoryManagerImpl;
-import com.github.podd.utils.PoddRdfConstants;
+import com.github.podd.utils.PODD;
 
 /**
  * This concrete test class uses SSH File References and a test SSH file repository to run through
@@ -115,24 +115,23 @@ public class PoddFileRepositoryManagerImplTest extends AbstractPoddFileRepositor
         final Model model = new LinkedHashModel();
         for(final String alias : aliases)
         {
-            model.add(aliasUri, PoddRdfConstants.PODD_DATA_REPOSITORY_ALIAS, ValueFactoryImpl.getInstance()
-                    .createLiteral(alias));
+            model.add(aliasUri, PODD.PODD_DATA_REPOSITORY_ALIAS, ValueFactoryImpl.getInstance().createLiteral(alias));
         }
-        model.add(aliasUri, RDF.TYPE, PoddRdfConstants.PODD_DATA_REPOSITORY);
+        model.add(aliasUri, RDF.TYPE, PODD.PODD_DATA_REPOSITORY);
         
         // SSH implementation specific configurations
-        model.add(aliasUri, RDF.TYPE, PoddRdfConstants.PODD_SSH_FILE_REPOSITORY);
-        model.add(aliasUri, PoddRdfConstants.PODD_DATA_REPOSITORY_PROTOCOL, ValueFactoryImpl.getInstance()
-                .createLiteral(PoddDataRepository.PROTOCOL_SSH));
-        model.add(aliasUri, PoddRdfConstants.PODD_DATA_REPOSITORY_HOST,
+        model.add(aliasUri, RDF.TYPE, PODD.PODD_SSH_FILE_REPOSITORY);
+        model.add(aliasUri, PODD.PODD_DATA_REPOSITORY_PROTOCOL,
+                ValueFactoryImpl.getInstance().createLiteral(PoddDataRepository.PROTOCOL_SSH));
+        model.add(aliasUri, PODD.PODD_DATA_REPOSITORY_HOST,
                 ValueFactoryImpl.getInstance().createLiteral(SSHService.TEST_SSH_HOST));
-        model.add(aliasUri, PoddRdfConstants.PODD_DATA_REPOSITORY_PORT,
+        model.add(aliasUri, PODD.PODD_DATA_REPOSITORY_PORT,
                 ValueFactoryImpl.getInstance().createLiteral(this.sshd.TEST_SSH_SERVICE_PORT));
-        model.add(aliasUri, PoddRdfConstants.PODD_FILE_REPOSITORY_FINGERPRINT, ValueFactoryImpl.getInstance()
-                .createLiteral(SSHService.TEST_SSH_FINGERPRINT));
-        model.add(aliasUri, PoddRdfConstants.PODD_FILE_REPOSITORY_USERNAME, ValueFactoryImpl.getInstance()
-                .createLiteral(SSHService.TEST_SSH_USERNAME));
-        model.add(aliasUri, PoddRdfConstants.PODD_FILE_REPOSITORY_SECRET,
+        model.add(aliasUri, PODD.PODD_FILE_REPOSITORY_FINGERPRINT,
+                ValueFactoryImpl.getInstance().createLiteral(SSHService.TEST_SSH_FINGERPRINT));
+        model.add(aliasUri, PODD.PODD_FILE_REPOSITORY_USERNAME,
+                ValueFactoryImpl.getInstance().createLiteral(SSHService.TEST_SSH_USERNAME));
+        model.add(aliasUri, PODD.PODD_FILE_REPOSITORY_SECRET,
                 ValueFactoryImpl.getInstance().createLiteral(SSHService.TEST_SSH_SECRET));
         
         return model;
@@ -155,7 +154,7 @@ public class PoddFileRepositoryManagerImplTest extends AbstractPoddFileRepositor
         
         final PoddRepositoryManager repositoryManager = new PoddRepositoryManagerImpl();
         repositoryManager.setManagementRepository(testRepository);
-        repositoryManager.setFileRepositoryManagementGraph(PoddRdfConstants.DEFAULT_FILE_REPOSITORY_MANAGEMENT_GRAPH);
+        repositoryManager.setFileRepositoryManagementGraph(PODD.DEFAULT_FILE_REPOSITORY_MANAGEMENT_GRAPH);
         
         // create an OWL Manager
         final OWLOntologyManager manager = OWLOntologyManagerFactoryRegistry.createOWLOntologyManager();

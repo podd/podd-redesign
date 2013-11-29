@@ -21,7 +21,7 @@ import org.openrdf.model.Resource;
 import org.openrdf.model.vocabulary.OWL;
 import org.semanticweb.owlapi.model.IRI;
 
-import com.github.podd.utils.PoddRdfConstants;
+import com.github.podd.utils.PODD;
 
 /**
  * An exception indicating that the particular version IRI of the artifact denoted by the given IRI
@@ -115,10 +115,10 @@ public class UnmanagedArtifactVersionException extends UnmanagedSchemaException
         
         if(this.getOntologyID() != null)
         {
-            model.add(errorResource, PoddRdfConstants.ERR_SOURCE, this.getUnmanagedVersionIRI().toOpenRDFURI());
+            model.add(errorResource, PODD.ERR_SOURCE, this.getUnmanagedVersionIRI().toOpenRDFURI());
             
             model.add(errorResource, OWL.ONTOLOGY, this.getOntologyID().toOpenRDFURI());
-            model.add(errorResource, PoddRdfConstants.OWL_VERSION_IRI, this.getArtifactVersion().toOpenRDFURI());
+            model.add(errorResource, PODD.OWL_VERSION_IRI, this.getArtifactVersion().toOpenRDFURI());
         }
         
         return model;

@@ -20,7 +20,7 @@ import org.openrdf.model.Model;
 import org.openrdf.model.vocabulary.RDF;
 
 import com.github.podd.api.file.SPARQLDataReference;
-import com.github.podd.utils.PoddRdfConstants;
+import com.github.podd.utils.PODD;
 
 /**
  * A simple implementation of a SPARQL Data Reference object for use within PODD.
@@ -56,12 +56,12 @@ public class SPARQLDataReferenceImpl extends AbstractDataReferenceImpl implement
     {
         final Model result = super.toRDF();
         
-        result.add(this.getObjectIri().toOpenRDFURI(), RDF.TYPE, PoddRdfConstants.PODD_BASE_DATA_REFERENCE_TYPE_SPARQL);
+        result.add(this.getObjectIri().toOpenRDFURI(), RDF.TYPE, PODD.PODD_BASE_DATA_REFERENCE_TYPE_SPARQL);
         
         if(this.getGraph() != null)
         {
-            result.add(this.getObjectIri().toOpenRDFURI(), PoddRdfConstants.PODD_BASE_HAS_SPARQL_GRAPH,
-                    PoddRdfConstants.VF.createLiteral(this.getGraph()));
+            result.add(this.getObjectIri().toOpenRDFURI(), PODD.PODD_BASE_HAS_SPARQL_GRAPH,
+                    PODD.VF.createLiteral(this.getGraph()));
         }
         
         return result;

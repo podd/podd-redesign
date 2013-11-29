@@ -79,7 +79,7 @@ import com.github.podd.impl.file.PoddFileRepositoryManagerImpl;
 import com.github.podd.impl.file.SSHFileReferenceProcessorFactoryImpl;
 import com.github.podd.impl.purl.PoddPurlManagerImpl;
 import com.github.podd.impl.purl.UUIDPurlProcessorFactoryImpl;
-import com.github.podd.utils.PoddRdfConstants;
+import com.github.podd.utils.PODD;
 import com.github.podd.utils.PoddRoles;
 import com.github.podd.utils.PoddUser;
 import com.github.podd.utils.PoddUserStatus;
@@ -368,8 +368,7 @@ public class ApplicationUtils
          */
         try
         {
-            final String schemaManifest =
-                    props.get(PoddRdfConstants.KEY_SCHEMAS, PoddRdfConstants.PATH_DEFAULT_SCHEMAS);
+            final String schemaManifest = props.get(PODD.KEY_SCHEMAS, PODD.PATH_DEFAULT_SCHEMAS);
             Model model = null;
             
             try (final InputStream schemaManifestStream = application.getClass().getResourceAsStream(schemaManifest);)
@@ -406,8 +405,7 @@ public class ApplicationUtils
         // OasMemoryRealm has extensions so that getClientInfo().getUser() will
         // contain first name,
         // last name, and email address as necessary
-        final PoddSesameRealm nextRealm =
-                new PoddSesameRealm(nextRepository, PoddRdfConstants.DEFAULT_USER_MANAGEMENT_GRAPH);
+        final PoddSesameRealm nextRealm = new PoddSesameRealm(nextRepository, PODD.DEFAULT_USER_MANAGEMENT_GRAPH);
         
         // FIXME: Make this configurable
         nextRealm.setName("PODDRealm");
@@ -427,7 +425,7 @@ public class ApplicationUtils
         
         if(!foundCurrentAdmin)
         {
-            final URI testAdminUserHomePage = PoddRdfConstants.VF.createURI("http://www.example.com/testAdmin");
+            final URI testAdminUserHomePage = PODD.VF.createURI("http://www.example.com/testAdmin");
             final String username =
                     props.get(PoddWebConstants.PROPERTY_INITIAL_ADMIN_USERNAME,
                             PoddWebConstants.DEFAULT_INITIAL_ADMIN_USERNAME);

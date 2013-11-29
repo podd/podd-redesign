@@ -32,7 +32,7 @@ import org.openrdf.model.vocabulary.RDF;
 
 import com.github.ansell.restletutils.RestletUtilRole;
 import com.github.ansell.restletutils.SesameRealmConstants;
-import com.github.podd.utils.PoddRdfConstants;
+import com.github.podd.utils.PODD;
 import com.github.podd.utils.PoddRoles;
 
 /**
@@ -50,7 +50,7 @@ public class RestletUtilsTest
     @Before
     public void setUp() throws Exception
     {
-        this.vf = PoddRdfConstants.VF;
+        this.vf = PODD.VF;
     }
     
     /**
@@ -107,7 +107,7 @@ public class RestletUtilsTest
         final URI objectUri = this.vf.createURI("urn:test:object:uri");
         model.add(resource, RDF.TYPE, SesameRealmConstants.OAS_ROLEMAPPING);
         model.add(resource, SesameRealmConstants.OAS_ROLEMAPPEDROLE, PoddRoles.PROJECT_ADMIN.getURI());
-        model.add(resource, PoddRdfConstants.PODD_ROLEMAPPEDOBJECT, objectUri);
+        model.add(resource, PODD.PODD_ROLEMAPPEDOBJECT, objectUri);
         
         final Map<RestletUtilRole, Collection<URI>> roleMappings = PoddRoles.extractRoleMappingsUser(model);
         Assert.assertFalse(roleMappings.isEmpty());
@@ -151,7 +151,7 @@ public class RestletUtilsTest
         final URI objectUri = this.vf.createURI("urn:test:object:uri");
         model.add(resource, RDF.TYPE, SesameRealmConstants.OAS_ROLEMAPPING);
         model.add(resource, SesameRealmConstants.OAS_ROLEMAPPEDROLE, PoddRoles.ADMIN.getURI());
-        model.add(resource, PoddRdfConstants.PODD_ROLEMAPPEDOBJECT, objectUri);
+        model.add(resource, PODD.PODD_ROLEMAPPEDOBJECT, objectUri);
         
         final Map<RestletUtilRole, Collection<URI>> roleMappings = PoddRoles.extractRoleMappingsUser(model);
         Assert.assertFalse(roleMappings.isEmpty());

@@ -61,9 +61,9 @@ import com.github.podd.api.PoddSesameManager;
 import com.github.podd.exception.UnmanagedArtifactIRIException;
 import com.github.podd.exception.UnmanagedSchemaIRIException;
 import com.github.podd.utils.InferredOWLOntologyID;
+import com.github.podd.utils.PODD;
 import com.github.podd.utils.PoddObjectLabel;
 import com.github.podd.utils.PoddObjectLabelImpl;
-import com.github.podd.utils.PoddRdfConstants;
 import com.github.podd.utils.RdfUtility;
 
 /**
@@ -129,7 +129,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
             {
                 final List<Statement> asList =
                         Iterations.asList(repositoryConnection.getStatements(nextOntologyID.getOntologyIRI()
-                                .toOpenRDFURI(), PoddRdfConstants.OMV_CURRENT_VERSION, null, false, managementGraph));
+                                .toOpenRDFURI(), PODD.OMV_CURRENT_VERSION, null, false, managementGraph));
                 
                 if(asList.size() != 1)
                 {
@@ -152,9 +152,8 @@ public class PoddSesameManagerImpl implements PoddSesameManager
                 else
                 {
                     // Push the next current version into the management graph
-                    repositoryConnection.add(nextOntologyID.getOntologyIRI().toOpenRDFURI(),
-                            PoddRdfConstants.OMV_CURRENT_VERSION, newCurrentVersion.getVersionIRI().toOpenRDFURI(),
-                            managementGraph);
+                    repositoryConnection.add(nextOntologyID.getOntologyIRI().toOpenRDFURI(), PODD.OMV_CURRENT_VERSION,
+                            newCurrentVersion.getVersionIRI().toOpenRDFURI(), managementGraph);
                 }
             }
         }
@@ -219,8 +218,8 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         sb.append("SELECT ?ontologyIri ?cv ?civ WHERE { ");
         
         sb.append(" ?ontologyIri <" + RDF.TYPE.stringValue() + "> <" + OWL.ONTOLOGY.stringValue() + "> . ");
-        sb.append(" ?ontologyIri <" + PoddRdfConstants.OMV_CURRENT_VERSION.stringValue() + "> ?cv . ");
-        sb.append(" ?ontologyIri <" + PoddRdfConstants.PODD_BASE_CURRENT_INFERRED_VERSION.stringValue() + "> ?civ . ");
+        sb.append(" ?ontologyIri <" + PODD.OMV_CURRENT_VERSION.stringValue() + "> ?cv . ");
+        sb.append(" ?ontologyIri <" + PODD.PODD_BASE_CURRENT_INFERRED_VERSION.stringValue() + "> ?civ . ");
         
         sb.append(" }");
         
@@ -260,8 +259,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         
         sb.append(" ?ontologyIri <" + RDF.TYPE.stringValue() + "> <" + OWL.ONTOLOGY.stringValue() + "> . ");
         sb.append(" ?ontologyIri <" + OWL.VERSIONIRI.stringValue() + "> ?versionIri . ");
-        sb.append(" ?versionIri <" + PoddRdfConstants.PODD_BASE_INFERRED_VERSION.stringValue()
-                + "> ?inferredVersionIri . ");
+        sb.append(" ?versionIri <" + PODD.PODD_BASE_INFERRED_VERSION.stringValue() + "> ?inferredVersionIri . ");
         
         sb.append(" }");
         
@@ -432,12 +430,12 @@ public class PoddSesameManagerImpl implements PoddSesameManager
             if(nextProperty instanceof URI)
             {
                 final URI nextPropertyURI = (URI)nextProperty;
-                URI nextCardinality = PoddRdfConstants.PODD_BASE_CARDINALITY_ZERO_OR_MANY;
+                URI nextCardinality = PODD.PODD_BASE_CARDINALITY_ZERO_OR_MANY;
                 
                 final Value qualifiedCardinalityValue = next.getValue("qualifiedCardinality");
                 if(qualifiedCardinalityValue != null)
                 {
-                    nextCardinality = PoddRdfConstants.PODD_BASE_CARDINALITY_EXACTLY_ONE;
+                    nextCardinality = PODD.PODD_BASE_CARDINALITY_EXACTLY_ONE;
                 }
                 
                 int minCardinality = -1;
@@ -457,11 +455,11 @@ public class PoddSesameManagerImpl implements PoddSesameManager
                 
                 if(maxCardinality == 1 && minCardinality < 1)
                 {
-                    nextCardinality = PoddRdfConstants.PODD_BASE_CARDINALITY_ZERO_OR_ONE;
+                    nextCardinality = PODD.PODD_BASE_CARDINALITY_ZERO_OR_ONE;
                 }
                 else if(minCardinality == 1 && maxCardinality != 1)
                 {
-                    nextCardinality = PoddRdfConstants.PODD_BASE_CARDINALITY_ONE_OR_MANY;
+                    nextCardinality = PODD.PODD_BASE_CARDINALITY_ONE_OR_MANY;
                 }
                 
                 final URI putIfAbsent = resultMap.putIfAbsent(nextPropertyURI, nextCardinality);
@@ -492,8 +490,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         sb.append(" WHERE { ");
         sb.append(" ?poddObject ?propertyUri ?childUri . ");
         sb.append(" FILTER(isIRI(?childUri)) . ");
-        sb.append(" ?propertyUri <" + RDFS.SUBPROPERTYOF.stringValue() + "> <" + PoddRdfConstants.PODD_BASE_CONTAINS
-                + "> . ");
+        sb.append(" ?propertyUri <" + RDFS.SUBPROPERTYOF.stringValue() + "> <" + PODD.PODD_BASE_CONTAINS + "> . ");
         sb.append(" } ");
         
         this.log.debug("Created SPARQL {} with poddObject bound to {}", sb, objectUri);
@@ -622,8 +619,8 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         final StringBuilder sb1 = new StringBuilder(1024);
         sb1.append("SELECT ?cv ?civ WHERE { ");
         sb1.append(" ?ontologyIri <" + RDF.TYPE.stringValue() + "> <" + OWL.ONTOLOGY.stringValue() + "> . ");
-        sb1.append(" ?ontologyIri <" + PoddRdfConstants.OMV_CURRENT_VERSION.stringValue() + "> ?cv . ");
-        sb1.append(" ?ontologyIri <" + PoddRdfConstants.PODD_BASE_CURRENT_INFERRED_VERSION.stringValue() + "> ?civ . ");
+        sb1.append(" ?ontologyIri <" + PODD.OMV_CURRENT_VERSION.stringValue() + "> ?cv . ");
+        sb1.append(" ?ontologyIri <" + PODD.PODD_BASE_CURRENT_INFERRED_VERSION.stringValue() + "> ?civ . ");
         
         sb1.append(" }");
         
@@ -653,8 +650,8 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         sb2.append(" ?x <" + RDF.TYPE.stringValue() + "> <" + OWL.ONTOLOGY.stringValue() + "> . ");
         sb2.append(" ?x <" + OWL.VERSIONIRI.stringValue() + "> ?versionIri . ");
         sb2.append(" ?x <" + OWL.VERSIONIRI.stringValue() + "> ?cv . ");
-        sb2.append(" ?x <" + PoddRdfConstants.OMV_CURRENT_VERSION.stringValue() + "> ?cv . ");
-        sb2.append(" ?x <" + PoddRdfConstants.PODD_BASE_CURRENT_INFERRED_VERSION.stringValue() + "> ?civ . ");
+        sb2.append(" ?x <" + PODD.OMV_CURRENT_VERSION.stringValue() + "> ?cv . ");
+        sb2.append(" ?x <" + PODD.PODD_BASE_CURRENT_INFERRED_VERSION.stringValue() + "> ?civ . ");
         sb2.append(" }");
         
         this.log.debug("Generated SPARQL {} with versionIri bound to {}", sb2, ontologyIRI);
@@ -834,8 +831,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         // value may not have a Label
         sb.append(" OPTIONAL {?value <" + RDFS.LABEL.stringValue() + "> ?valueLabel } . ");
         
-        sb.append(" FILTER NOT EXISTS { ?propertyUri <" + PoddRdfConstants.PODD_BASE_DO_NOT_DISPLAY.stringValue()
-                + "> true } ");
+        sb.append(" FILTER NOT EXISTS { ?propertyUri <" + PODD.PODD_BASE_DO_NOT_DISPLAY.stringValue() + "> true } ");
         
         sb.append(" FILTER (?value != <" + OWL.THING.stringValue() + ">) ");
         sb.append(" FILTER (?value != <" + OWL.INDIVIDUAL.stringValue() + ">) ");
@@ -962,12 +958,12 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         owlRestrictionQuery.append(" OPTIONAL { ?rangeClass <" + RDFS.LABEL.stringValue() + "> ?rangeClassLabel } . ");
         
         // exclude doNotDisplay properties
-        owlRestrictionQuery.append(" FILTER NOT EXISTS { ?propertyUri <"
-                + PoddRdfConstants.PODD_BASE_DO_NOT_DISPLAY.stringValue() + "> true . } ");
+        owlRestrictionQuery.append(" FILTER NOT EXISTS { ?propertyUri <" + PODD.PODD_BASE_DO_NOT_DISPLAY.stringValue()
+                + "> true . } ");
         
         // include only contains sub-properties
         owlRestrictionQuery.append("FILTER EXISTS { ?propertyUri <" + RDFS.SUBPROPERTYOF.stringValue() + "> <"
-                + PoddRdfConstants.PODD_BASE_CONTAINS.stringValue() + "> } ");
+                + PODD.PODD_BASE_CONTAINS.stringValue() + "> } ");
         
         owlRestrictionQuery.append("}");
         final String owlRestrictionQueryString = owlRestrictionQuery.toString();
@@ -1112,19 +1108,19 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         if(!includeDoNotDisplayProperties)
         {
             owlRestrictionQuery.append(" FILTER NOT EXISTS { ?propertyUri <"
-                    + PoddRdfConstants.PODD_BASE_DO_NOT_DISPLAY.stringValue() + "> true . } ");
+                    + PODD.PODD_BASE_DO_NOT_DISPLAY.stringValue() + "> true . } ");
         }
         
         switch(containsPropertyPolicy)
         {
             case EXCLUDE_CONTAINS:
                 owlRestrictionQuery.append("FILTER NOT EXISTS { ?propertyUri <" + RDFS.SUBPROPERTYOF.stringValue()
-                        + "> <" + PoddRdfConstants.PODD_BASE_CONTAINS.stringValue() + "> } ");
+                        + "> <" + PODD.PODD_BASE_CONTAINS.stringValue() + "> } ");
                 break;
             
             case ONLY_CONTAINS:
                 owlRestrictionQuery.append("FILTER EXISTS { ?propertyUri <" + RDFS.SUBPROPERTYOF.stringValue() + "> <"
-                        + PoddRdfConstants.PODD_BASE_CONTAINS.stringValue() + "> } ");
+                        + PODD.PODD_BASE_CONTAINS.stringValue() + "> } ");
                 break;
             
             default:
@@ -1165,20 +1161,20 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         
         if(!includeDoNotDisplayProperties)
         {
-            rdfsQuery.append(" FILTER NOT EXISTS { ?propertyUri <"
-                    + PoddRdfConstants.PODD_BASE_DO_NOT_DISPLAY.stringValue() + "> true . } ");
+            rdfsQuery.append(" FILTER NOT EXISTS { ?propertyUri <" + PODD.PODD_BASE_DO_NOT_DISPLAY.stringValue()
+                    + "> true . } ");
         }
         
         switch(containsPropertyPolicy)
         {
             case EXCLUDE_CONTAINS:
                 rdfsQuery.append("FILTER NOT EXISTS { ?propertyUri <" + RDFS.SUBPROPERTYOF.stringValue() + "> <"
-                        + PoddRdfConstants.PODD_BASE_CONTAINS.stringValue() + "> } ");
+                        + PODD.PODD_BASE_CONTAINS.stringValue() + "> } ");
                 break;
             
             case ONLY_CONTAINS:
                 rdfsQuery.append("FILTER EXISTS { ?propertyUri <" + RDFS.SUBPROPERTYOF.stringValue() + "> <"
-                        + PoddRdfConstants.PODD_BASE_CONTAINS.stringValue() + "> } ");
+                        + PODD.PODD_BASE_CONTAINS.stringValue() + "> } ");
                 break;
             
             default:
@@ -1258,28 +1254,25 @@ public class PoddSesameManagerImpl implements PoddSesameManager
             sb2.append("CONSTRUCT { ");
             sb2.append(" ?propertyUri <" + RDF.TYPE.stringValue() + "> ?propertyType . ");
             sb2.append(" ?propertyUri <" + RDFS.LABEL.stringValue() + "> ?propertyLabel . ");
-            sb2.append(" ?propertyUri <" + PoddRdfConstants.PODD_BASE_DISPLAY_TYPE.stringValue()
-                    + "> ?propertyDisplayType . ");
-            sb2.append(" ?propertyUri <" + PoddRdfConstants.PODD_BASE_WEIGHT.stringValue() + "> ?propertyWeight . ");
+            sb2.append(" ?propertyUri <" + PODD.PODD_BASE_DISPLAY_TYPE.stringValue() + "> ?propertyDisplayType . ");
+            sb2.append(" ?propertyUri <" + PODD.PODD_BASE_WEIGHT.stringValue() + "> ?propertyWeight . ");
             
-            sb2.append(" ?propertyUri <" + PoddRdfConstants.PODD_BASE_DO_NOT_DISPLAY.stringValue()
-                    + "> ?propertyDoNotDisplay . ");
+            sb2.append(" ?propertyUri <" + PODD.PODD_BASE_DO_NOT_DISPLAY.stringValue() + "> ?propertyDoNotDisplay . ");
             
             sb2.append("} WHERE {");
             
             sb2.append(" ?propertyUri <" + RDF.TYPE.stringValue() + "> ?propertyType . ");
             
-            sb2.append(" OPTIONAL {?propertyUri <" + PoddRdfConstants.PODD_BASE_DISPLAY_TYPE.stringValue()
+            sb2.append(" OPTIONAL {?propertyUri <" + PODD.PODD_BASE_DISPLAY_TYPE.stringValue()
                     + "> ?propertyDisplayType . }  ");
             
             sb2.append(" OPTIONAL {?propertyUri <" + RDFS.LABEL.stringValue() + "> ?propertyLabel . } ");
             
-            sb2.append(" OPTIONAL {?propertyUri <" + PoddRdfConstants.PODD_BASE_WEIGHT.stringValue()
-                    + "> ?propertyWeight . } ");
+            sb2.append(" OPTIONAL {?propertyUri <" + PODD.PODD_BASE_WEIGHT.stringValue() + "> ?propertyWeight . } ");
             
             if(includeDoNotDisplayProperties)
             {
-                sb2.append(" OPTIONAL { ?propertyUri <" + PoddRdfConstants.PODD_BASE_DO_NOT_DISPLAY.stringValue()
+                sb2.append(" OPTIONAL { ?propertyUri <" + PODD.PODD_BASE_DO_NOT_DISPLAY.stringValue()
                         + "> ?propertyDoNotDisplay . } ");
             }
             
@@ -1316,12 +1309,11 @@ public class PoddSesameManagerImpl implements PoddSesameManager
             
             if(cardinalityValue != null)
             {
-                results.add(nextProperty, PoddRdfConstants.PODD_BASE_HAS_CARDINALITY, cardinalityValue);
+                results.add(nextProperty, PODD.PODD_BASE_HAS_CARDINALITY, cardinalityValue);
             }
             else if(nextProperty.equals(RDFS.LABEL))
             {
-                results.add(nextProperty, PoddRdfConstants.PODD_BASE_HAS_CARDINALITY,
-                        PoddRdfConstants.PODD_BASE_CARDINALITY_EXACTLY_ONE);
+                results.add(nextProperty, PODD.PODD_BASE_HAS_CARDINALITY, PODD.PODD_BASE_CARDINALITY_EXACTLY_ONE);
             }
         }
         
@@ -1340,8 +1332,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
             
             // --- for 'drop-down' type properties, add all possible options
             // into Model
-            if(results.contains(property, PoddRdfConstants.PODD_BASE_DISPLAY_TYPE,
-                    PoddRdfConstants.PODD_BASE_DISPLAY_TYPE_DROPDOWN))
+            if(results.contains(property, PODD.PODD_BASE_DISPLAY_TYPE, PODD.PODD_BASE_DISPLAY_TYPE_DROPDOWN))
             {
                 for(final Resource nextRestriction : results.filter(null, OWL.ONPROPERTY, property).subjects())
                 {
@@ -1353,8 +1344,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
                         // TODO: Add OWL.ONCLASS to Sesame vocabulary
                         nextRangeTypes =
                                 results.filter(nextRestriction,
-                                        PoddRdfConstants.VF.createURI("http://www.w3.org/2002/07/owl#onClass"), null)
-                                        .objects();
+                                        PODD.VF.createURI("http://www.w3.org/2002/07/owl#onClass"), null).objects();
                     }
                     for(final Value nextRangeType : nextRangeTypes)
                     {
@@ -1402,8 +1392,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         sb.append(" WHERE { ");
         sb.append(" ?objectUri <" + RDF.TYPE + "> ?poddTypeUri . ");
         
-        sb.append(" FILTER NOT EXISTS { ?poddTypeUri <" + PoddRdfConstants.PODD_BASE_DO_NOT_DISPLAY.stringValue()
-                + "> true } ");
+        sb.append(" FILTER NOT EXISTS { ?poddTypeUri <" + PODD.PODD_BASE_DO_NOT_DISPLAY.stringValue() + "> true } ");
         sb.append(" FILTER isIRI(?poddTypeUri) ");
         
         // filter out TYPE statements for OWL:Thing, OWL:Individual,
@@ -1454,7 +1443,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         if(onlyCurrentVersions)
         {
             sb.append(" ?ontology ");
-            sb.append(RenderUtils.getSPARQLQueryString(PoddRdfConstants.OMV_CURRENT_VERSION));
+            sb.append(RenderUtils.getSPARQLQueryString(PODD.OMV_CURRENT_VERSION));
             sb.append(" ?version . ");
         }
         else
@@ -1464,7 +1453,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
             sb.append(" ?version . ");
         }
         sb.append("OPTIONAL{ ?version ");
-        sb.append(RenderUtils.getSPARQLQueryString(PoddRdfConstants.PODD_BASE_INFERRED_VERSION));
+        sb.append(RenderUtils.getSPARQLQueryString(PODD.PODD_BASE_INFERRED_VERSION));
         sb.append(" ?inferredVersion . ");
         sb.append(" }");
         sb.append("}");
@@ -1515,7 +1504,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         // query
         final String sparqlQuery =
                 "SELECT ?nextOntology WHERE { ?nextOntology <" + RDF.TYPE + "> <" + OWL.ONTOLOGY.stringValue()
-                        + ">  . " + " ?nextOntology <" + PoddRdfConstants.PODD_BASE_HAS_TOP_OBJECT + "> ?y " + " }";
+                        + ">  . " + " ?nextOntology <" + PODD.PODD_BASE_HAS_TOP_OBJECT + "> ?y " + " }";
         this.log.debug("Generated SPARQL {}", sparqlQuery);
         final TupleQuery query = repositoryConnection.prepareTupleQuery(QueryLanguage.SPARQL, sparqlQuery);
         
@@ -1561,7 +1550,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         sb2.append("SELECT ?ontologyIri ?inferredIri WHERE { ");
         sb2.append(" ?ontologyIri <" + RDF.TYPE.stringValue() + "> <" + OWL.ONTOLOGY.stringValue() + "> . ");
         sb2.append(" ?ontologyIri <" + OWL.VERSIONIRI.stringValue() + "> ?versionIri . ");
-        sb2.append(" ?versionIri <" + PoddRdfConstants.PODD_BASE_INFERRED_VERSION.stringValue() + "> ?inferredIri . ");
+        sb2.append(" ?versionIri <" + PODD.PODD_BASE_INFERRED_VERSION.stringValue() + "> ?inferredIri . ");
         sb2.append(" }");
         
         this.log.debug("Generated SPARQL {} with versionIri bound to <{}>", sb2, versionIRI);
@@ -1611,7 +1600,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         sb.append("} WHERE {");
         sb.append(" ?parent ?parentChildProperty ?poddObject . ");
         sb.append(" ?parentChildProperty <" + RDFS.SUBPROPERTYOF.stringValue() + "> <"
-                + PoddRdfConstants.PODD_BASE_CONTAINS.stringValue() + "> . ");
+                + PODD.PODD_BASE_CONTAINS.stringValue() + "> . ");
         sb.append("}");
         
         final GraphQuery graphQuery = repositoryConnection.prepareGraphQuery(QueryLanguage.SPARQL, sb.toString());
@@ -1644,7 +1633,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         sb.append("} WHERE {");
         sb.append(" ?referrer ?refersToProperty ?poddObject . ");
         sb.append(" ?refersToProperty <" + RDFS.SUBPROPERTYOF.stringValue() + "> <"
-                + PoddRdfConstants.PODD_BASE_REFERS_TO.stringValue() + "> . ");
+                + PODD.PODD_BASE_REFERS_TO.stringValue() + "> . ");
         sb.append("}");
         
         final GraphQuery graphQuery = repositoryConnection.prepareGraphQuery(QueryLanguage.SPARQL, sb.toString());
@@ -1716,7 +1705,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         
         sb.append(" WHERE { ");
         
-        sb.append(" ?artifactUri <" + PoddRdfConstants.PODD_BASE_HAS_TOP_OBJECT.stringValue() + "> ?topObjectUri . \n");
+        sb.append(" ?artifactUri <" + PODD.PODD_BASE_HAS_TOP_OBJECT.stringValue() + "> ?topObjectUri . \n");
         
         sb.append(" }");
         
@@ -1759,7 +1748,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         sb.append(" OPTIONAL { ?propertyUri <" + RDFS.LABEL.stringValue() + "> ?propertyLabel } . ");
         
         // for ORDER BY
-        sb.append("OPTIONAL { ?propertyUri <" + PoddRdfConstants.PODD_BASE_WEIGHT.stringValue() + "> ?weight } . ");
+        sb.append("OPTIONAL { ?propertyUri <" + PODD.PODD_BASE_WEIGHT.stringValue() + "> ?weight } . ");
         
         sb.append("FILTER (?value != <" + OWL.THING.stringValue() + ">) ");
         sb.append("FILTER (?value != <" + OWL.INDIVIDUAL.stringValue() + ">) ");
@@ -1775,11 +1764,10 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         if(excludeContainsProperties)
         {
             sb.append("FILTER NOT EXISTS { ?propertyUri <" + RDFS.SUBPROPERTYOF.stringValue() + "> <"
-                    + PoddRdfConstants.PODD_BASE_CONTAINS.stringValue() + "> } ");
+                    + PODD.PODD_BASE_CONTAINS.stringValue() + "> } ");
         }
         
-        sb.append(" FILTER NOT EXISTS { ?propertyUri <" + PoddRdfConstants.PODD_BASE_DO_NOT_DISPLAY.stringValue()
-                + "> true } ");
+        sb.append(" FILTER NOT EXISTS { ?propertyUri <" + PODD.PODD_BASE_DO_NOT_DISPLAY.stringValue() + "> true } ");
         
         sb.append(" } ");
         sb.append("  ORDER BY ASC(xsd:integer(?weight)) ASC(?propertyLabel) ");
@@ -1841,9 +1829,9 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         sparqlQuery.append(RenderUtils.getSPARQLQueryString(ontologyID.getVersionIRI().toOpenRDFURI()));
         sparqlQuery.append(" . ");
         sparqlQuery.append(" ?artifact ").append(
-                RenderUtils.getSPARQLQueryString(PoddRdfConstants.PODD_BASE_HAS_PUBLICATION_STATUS));
+                RenderUtils.getSPARQLQueryString(PODD.PODD_BASE_HAS_PUBLICATION_STATUS));
         sparqlQuery.append(" ");
-        sparqlQuery.append(RenderUtils.getSPARQLQueryString(PoddRdfConstants.PODD_BASE_PUBLISHED));
+        sparqlQuery.append(RenderUtils.getSPARQLQueryString(PODD.PODD_BASE_PUBLISHED));
         sparqlQuery.append(" . ");
         sparqlQuery.append(" } ");
         
@@ -1896,7 +1884,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         sb.append(offset);
         
         final GraphQuery graphQuery = repositoryConnection.prepareGraphQuery(QueryLanguage.SPARQL, sb.toString());
-        graphQuery.setBinding("searchTerm", PoddRdfConstants.VF.createLiteral(searchTerm));
+        graphQuery.setBinding("searchTerm", PODD.VF.createLiteral(searchTerm));
         
         this.log.debug("Created SPARQL {} with searchTerm bound to '{}' ", sb, searchTerm);
         
@@ -1914,17 +1902,16 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         if(wantToPublish)
         {
             if(!repositoryConnection.hasStatement(ontologyID.getOntologyIRI().toOpenRDFURI(),
-                    PoddRdfConstants.PODD_BASE_HAS_PUBLICATION_STATUS, PoddRdfConstants.PODD_BASE_PUBLISHED, false,
-                    artifactManagementGraph))
+                    PODD.PODD_BASE_HAS_PUBLICATION_STATUS, PODD.PODD_BASE_PUBLISHED, false, artifactManagementGraph))
             {
                 changeRequired = true;
             }
         }
         else
         {
-            if(!repositoryConnection.hasStatement(ontologyID.getOntologyIRI().toOpenRDFURI(),
-                    PoddRdfConstants.PODD_BASE_HAS_PUBLICATION_STATUS, PoddRdfConstants.PODD_BASE_NOT_PUBLISHED, false,
-                    artifactManagementGraph))
+            if(!repositoryConnection
+                    .hasStatement(ontologyID.getOntologyIRI().toOpenRDFURI(), PODD.PODD_BASE_HAS_PUBLICATION_STATUS,
+                            PODD.PODD_BASE_NOT_PUBLISHED, false, artifactManagementGraph))
             {
                 changeRequired = true;
             }
@@ -1938,12 +1925,11 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         {
             // remove previous value for publication status
             repositoryConnection.remove(ontologyID.getOntologyIRI().toOpenRDFURI(),
-                    PoddRdfConstants.PODD_BASE_HAS_PUBLICATION_STATUS, null, artifactManagementGraph);
+                    PODD.PODD_BASE_HAS_PUBLICATION_STATUS, null, artifactManagementGraph);
             
             // then insert the publication status as #Published
-            repositoryConnection.add(ontologyID.getOntologyIRI().toOpenRDFURI(),
-                    PoddRdfConstants.PODD_BASE_HAS_PUBLICATION_STATUS, PoddRdfConstants.PODD_BASE_PUBLISHED,
-                    artifactManagementGraph);
+            repositoryConnection.add(ontologyID.getOntologyIRI().toOpenRDFURI(), PODD.PODD_BASE_HAS_PUBLICATION_STATUS,
+                    PODD.PODD_BASE_PUBLISHED, artifactManagementGraph);
             
             this.log.info("{} was set as Published", ontologyID.getOntologyIRI().toOpenRDFURI());
         }
@@ -1951,14 +1937,13 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         {
             // remove previous value for publication status
             repositoryConnection.remove(ontologyID.getOntologyIRI().toOpenRDFURI(),
-                    PoddRdfConstants.PODD_BASE_HAS_PUBLICATION_STATUS, null, artifactManagementGraph);
+                    PODD.PODD_BASE_HAS_PUBLICATION_STATUS, null, artifactManagementGraph);
             
             this.updateManagedPoddArtifactVersion(ontologyID, true, repositoryConnection, artifactManagementGraph);
             
             // then insert the publication status as #NotPublished
-            repositoryConnection.add(ontologyID.getOntologyIRI().toOpenRDFURI(),
-                    PoddRdfConstants.PODD_BASE_HAS_PUBLICATION_STATUS, PoddRdfConstants.PODD_BASE_NOT_PUBLISHED,
-                    artifactManagementGraph);
+            repositoryConnection.add(ontologyID.getOntologyIRI().toOpenRDFURI(), PODD.PODD_BASE_HAS_PUBLICATION_STATUS,
+                    PODD.PODD_BASE_NOT_PUBLISHED, artifactManagementGraph);
             
             this.log.info("{} was set as Unpublished", ontologyID.getOntologyIRI().toOpenRDFURI());
         }
@@ -1984,11 +1969,11 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         // type the ontology
         repositoryConnection.add(nextOntologyUri, RDF.TYPE, OWL.ONTOLOGY, context);
         // setup a version number link for this version
-        repositoryConnection.add(nextOntologyUri, PoddRdfConstants.OWL_VERSION_IRI, nextVersionUri, context);
+        repositoryConnection.add(nextOntologyUri, PODD.OWL_VERSION_IRI, nextVersionUri, context);
         
         final List<Statement> currentVersions =
-                Iterations.asList(repositoryConnection.getStatements(nextOntologyUri,
-                        PoddRdfConstants.OMV_CURRENT_VERSION, null, false, context));
+                Iterations.asList(repositoryConnection.getStatements(nextOntologyUri, PODD.OMV_CURRENT_VERSION, null,
+                        false, context));
         
         // If there are no current versions, or we must update the current
         // version, then do it
@@ -1997,10 +1982,10 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         {
             // remove whatever was previously there for the current version
             // marker
-            repositoryConnection.remove(nextOntologyUri, PoddRdfConstants.OMV_CURRENT_VERSION, null, context);
+            repositoryConnection.remove(nextOntologyUri, PODD.OMV_CURRENT_VERSION, null, context);
             
             // then insert the new current version marker
-            repositoryConnection.add(nextOntologyUri, PoddRdfConstants.OMV_CURRENT_VERSION, nextVersionUri, context);
+            repositoryConnection.add(nextOntologyUri, PODD.OMV_CURRENT_VERSION, nextVersionUri, context);
         }
         
         // then do a similar process with the inferred axioms ontology
@@ -2008,18 +1993,16 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         
         // remove whatever was previously there for the current inferred version
         // marker
-        repositoryConnection
-                .remove(nextOntologyUri, PoddRdfConstants.PODD_BASE_CURRENT_INFERRED_VERSION, null, context);
+        repositoryConnection.remove(nextOntologyUri, PODD.PODD_BASE_CURRENT_INFERRED_VERSION, null, context);
         
         // link from the ontology IRI to the current inferred axioms ontology
         // version
-        repositoryConnection.add(nextOntologyUri, PoddRdfConstants.PODD_BASE_CURRENT_INFERRED_VERSION,
-                nextInferredOntologyUri, context);
+        repositoryConnection.add(nextOntologyUri, PODD.PODD_BASE_CURRENT_INFERRED_VERSION, nextInferredOntologyUri,
+                context);
         
         // link from the ontology version IRI to the matching inferred axioms
         // ontology version
-        repositoryConnection.add(nextVersionUri, PoddRdfConstants.PODD_BASE_INFERRED_VERSION, nextInferredOntologyUri,
-                context);
+        repositoryConnection.add(nextVersionUri, PODD.PODD_BASE_INFERRED_VERSION, nextInferredOntologyUri, context);
         
     }
     
@@ -2052,20 +2035,18 @@ public class PoddSesameManagerImpl implements PoddSesameManager
             repositoryConnection.add(nextInferredOntologyUri, RDF.TYPE, OWL.ONTOLOGY, managementGraph);
             
             // then insert the new current version marker
-            repositoryConnection.add(nextOntologyUri, PoddRdfConstants.OMV_CURRENT_VERSION, nextVersionUri,
-                    managementGraph);
+            repositoryConnection.add(nextOntologyUri, PODD.OMV_CURRENT_VERSION, nextVersionUri, managementGraph);
             // link from the ontology IRI to the current inferred axioms
             // ontology version
-            repositoryConnection.add(nextOntologyUri, PoddRdfConstants.PODD_BASE_CURRENT_INFERRED_VERSION,
-                    nextInferredOntologyUri, managementGraph);
+            repositoryConnection.add(nextOntologyUri, PODD.PODD_BASE_CURRENT_INFERRED_VERSION, nextInferredOntologyUri,
+                    managementGraph);
             
             // setup a version number link for this version
-            repositoryConnection
-                    .add(nextOntologyUri, PoddRdfConstants.OWL_VERSION_IRI, nextVersionUri, managementGraph);
+            repositoryConnection.add(nextOntologyUri, PODD.OWL_VERSION_IRI, nextVersionUri, managementGraph);
             // link from the ontology version IRI to the matching inferred
             // axioms ontology version
-            repositoryConnection.add(nextVersionUri, PoddRdfConstants.PODD_BASE_INFERRED_VERSION,
-                    nextInferredOntologyUri, managementGraph);
+            repositoryConnection.add(nextVersionUri, PODD.PODD_BASE_INFERRED_VERSION, nextInferredOntologyUri,
+                    managementGraph);
         }
         else
         {
@@ -2084,8 +2065,8 @@ public class PoddSesameManagerImpl implements PoddSesameManager
                 // remove the content of any contexts that are the object of
                 // versionIRI statements
                 final List<Statement> previousVersions =
-                        Iterations.asList(repositoryConnection.getStatements(nextOntologyUri,
-                                PoddRdfConstants.OWL_VERSION_IRI, null, true, managementGraph));
+                        Iterations.asList(repositoryConnection.getStatements(nextOntologyUri, PODD.OWL_VERSION_IRI,
+                                null, true, managementGraph));
                 
                 for(final Statement nextPreviousVersion : previousVersions)
                 {
@@ -2093,8 +2074,8 @@ public class PoddSesameManagerImpl implements PoddSesameManager
                     {
                         final List<Statement> previousInferredVersions =
                                 Iterations.asList(repositoryConnection.getStatements(
-                                        (URI)nextPreviousVersion.getObject(),
-                                        PoddRdfConstants.PODD_BASE_INFERRED_VERSION, null, false, managementGraph));
+                                        (URI)nextPreviousVersion.getObject(), PODD.PODD_BASE_INFERRED_VERSION, null,
+                                        false, managementGraph));
                         
                         for(final Statement nextInferredVersion : previousInferredVersions)
                         {
@@ -2126,36 +2107,33 @@ public class PoddSesameManagerImpl implements PoddSesameManager
                 
                 // remove whatever was previously there for the current version
                 // marker
-                repositoryConnection.remove(nextOntologyUri, PoddRdfConstants.OMV_CURRENT_VERSION, null,
-                        managementGraph);
+                repositoryConnection.remove(nextOntologyUri, PODD.OMV_CURRENT_VERSION, null, managementGraph);
                 
                 // then insert the new current version marker
-                repositoryConnection.add(nextOntologyUri, PoddRdfConstants.OMV_CURRENT_VERSION, nextVersionUri,
-                        managementGraph);
+                repositoryConnection.add(nextOntologyUri, PODD.OMV_CURRENT_VERSION, nextVersionUri, managementGraph);
                 
                 // remove whatever was previously there for the current inferred
                 // version marker
-                repositoryConnection.remove(nextOntologyUri, PoddRdfConstants.PODD_BASE_CURRENT_INFERRED_VERSION, null,
+                repositoryConnection.remove(nextOntologyUri, PODD.PODD_BASE_CURRENT_INFERRED_VERSION, null,
                         managementGraph);
                 
                 // link from the ontology IRI to the current inferred axioms
                 // ontology version
-                repositoryConnection.add(nextOntologyUri, PoddRdfConstants.PODD_BASE_CURRENT_INFERRED_VERSION,
+                repositoryConnection.add(nextOntologyUri, PODD.PODD_BASE_CURRENT_INFERRED_VERSION,
                         nextInferredOntologyUri, managementGraph);
                 
                 // remove previous versionIRI statements if they are no longer
                 // needed, before adding
                 // the new version below
-                repositoryConnection.remove(nextOntologyUri, PoddRdfConstants.OWL_VERSION_IRI, null, managementGraph);
+                repositoryConnection.remove(nextOntologyUri, PODD.OWL_VERSION_IRI, null, managementGraph);
             }
             
             // always setup a version number link for this version
-            repositoryConnection
-                    .add(nextOntologyUri, PoddRdfConstants.OWL_VERSION_IRI, nextVersionUri, managementGraph);
+            repositoryConnection.add(nextOntologyUri, PODD.OWL_VERSION_IRI, nextVersionUri, managementGraph);
             
             // always setup an inferred axioms ontology version for this version
-            repositoryConnection.add(nextVersionUri, PoddRdfConstants.PODD_BASE_INFERRED_VERSION,
-                    nextInferredOntologyUri, managementGraph);
+            repositoryConnection.add(nextVersionUri, PODD.PODD_BASE_INFERRED_VERSION, nextInferredOntologyUri,
+                    managementGraph);
         }
     }
     

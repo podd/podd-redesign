@@ -37,7 +37,7 @@ import com.github.podd.exception.PoddException;
 import com.github.podd.exception.UnmanagedArtifactIRIException;
 import com.github.podd.restlet.PoddAction;
 import com.github.podd.utils.InferredOWLOntologyID;
-import com.github.podd.utils.PoddRdfConstants;
+import com.github.podd.utils.PODD;
 import com.github.podd.utils.PoddWebConstants;
 
 /**
@@ -95,7 +95,7 @@ public class GetMetadataResourceImpl extends AbstractPoddResourceImpl
         }
         else
         {
-            this.checkAuthentication(PoddAction.ARTIFACT_EDIT, PoddRdfConstants.VF.createURI(artifactUri));
+            this.checkAuthentication(PoddAction.ARTIFACT_EDIT, PODD.VF.createURI(artifactUri));
         }
         
         final User user = this.getRequest().getClientInfo().getUser();
@@ -111,8 +111,8 @@ public class GetMetadataResourceImpl extends AbstractPoddResourceImpl
                 artifactID = this.getPoddArtifactManager().getArtifact(IRI.create(artifactUri));
             }
             
-            this.getPoddArtifactManager().exportObjectMetadata(PoddRdfConstants.VF.createURI(objectType), output,
-                    format, includeDoNotDisplayProperties, containsPropertyPolicy, artifactID);
+            this.getPoddArtifactManager().exportObjectMetadata(PODD.VF.createURI(objectType), output, format,
+                    includeDoNotDisplayProperties, containsPropertyPolicy, artifactID);
         }
         catch(final UnmanagedArtifactIRIException e)
         {

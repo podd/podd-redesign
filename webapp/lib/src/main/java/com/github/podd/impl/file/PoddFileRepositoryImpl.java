@@ -31,7 +31,7 @@ import org.openrdf.model.vocabulary.RDF;
 import com.github.podd.api.file.DataReference;
 import com.github.podd.api.file.PoddDataRepository;
 import com.github.podd.exception.FileRepositoryIncompleteException;
-import com.github.podd.utils.PoddRdfConstants;
+import com.github.podd.utils.PODD;
 
 /**
  * An abstract implementation of {@link PoddDataRepository} which maintains the <i>alias</i> and
@@ -67,8 +67,7 @@ abstract class PoddFileRepositoryImpl<T extends DataReference> implements PoddDa
         this.model = new LinkedHashModel(model.filter(nextDataRepository, null, null));
         
         // check that the model contains an "alias" and at least one "type"
-        final Model aliasModel =
-                this.model.filter(nextDataRepository, PoddRdfConstants.PODD_DATA_REPOSITORY_ALIAS, null);
+        final Model aliasModel = this.model.filter(nextDataRepository, PODD.PODD_DATA_REPOSITORY_ALIAS, null);
         
         if(aliasModel.isEmpty())
         {

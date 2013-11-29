@@ -38,7 +38,7 @@ import com.github.ansell.restletutils.test.RestletTestUtils;
 import com.github.podd.api.test.TestConstants;
 import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.OntologyUtils;
-import com.github.podd.utils.PoddRdfConstants;
+import com.github.podd.utils.PODD;
 import com.github.podd.utils.PoddWebConstants;
 
 /**
@@ -268,8 +268,8 @@ public class EditArtifactResourceImplTest extends AbstractResourceImplTest
             for(final String objectUri : newObjects)
             {
                 final String purl =
-                        model.filter(PoddRdfConstants.VF.createURI(objectUri),
-                                PoddRdfConstants.PODD_REPLACED_TEMP_URI_WITH, null).objectString();
+                        model.filter(PODD.VF.createURI(objectUri), PODD.PODD_REPLACED_TEMP_URI_WITH, null)
+                                .objectString();
                 Assert.assertNotNull("Object URI's PURL not in response", purl);
                 Assert.assertTrue("PURL does not start as expected", purl.startsWith("http://example.org/purl/"));
             }
@@ -332,7 +332,7 @@ public class EditArtifactResourceImplTest extends AbstractResourceImplTest
             final ByteArrayInputStream inputStream = new ByteArrayInputStream(body.getBytes(StandardCharsets.UTF_8));
             final Model model = Rio.parse(inputStream, "", RDFFormat.RDFXML);
             
-            final String sourceOfError = model.filter(null, PoddRdfConstants.ERR_SOURCE, null).objectString();
+            final String sourceOfError = model.filter(null, PODD.ERR_SOURCE, null).objectString();
             Assert.assertEquals("Err#source is not the incorrect artifact ID", incorrectArtifactID, sourceOfError);
         }
         finally
@@ -382,7 +382,7 @@ public class EditArtifactResourceImplTest extends AbstractResourceImplTest
             final ByteArrayInputStream inputStream = new ByteArrayInputStream(body.getBytes(StandardCharsets.UTF_8));
             final Model model = Rio.parse(inputStream, "", RDFFormat.RDFXML);
             
-            final String sourceOfError = model.filter(null, PoddRdfConstants.ERR_SOURCE, null).objectString();
+            final String sourceOfError = model.filter(null, PODD.ERR_SOURCE, null).objectString();
             Assert.assertEquals("Err#source is not the incorrect Version IRI", incorrectVersionIri, sourceOfError);
         }
         finally

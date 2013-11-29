@@ -21,7 +21,7 @@ import org.openrdf.model.URI;
 import com.github.ansell.restletutils.test.RestletTestUtils;
 import com.github.podd.restlet.PoddSesameRealm;
 import com.github.podd.restlet.PoddWebServiceApplication;
-import com.github.podd.utils.PoddRdfConstants;
+import com.github.podd.utils.PODD;
 import com.github.podd.utils.PoddRoles;
 import com.github.podd.utils.PoddUser;
 import com.github.podd.utils.PoddUserStatus;
@@ -40,13 +40,13 @@ public class TestUtils
     {
         final PoddSesameRealm nextRealm = application.getRealm();
         
-        final URI testUserHomePage = PoddRdfConstants.VF.createURI("http://www.example.com/testUser");
+        final URI testUserHomePage = PODD.VF.createURI("http://www.example.com/testUser");
         final PoddUser testUser =
                 new PoddUser(RestletTestUtils.TEST_USERNAME, RestletTestUtils.TEST_PASSWORD, "Test", "User",
                         "test.user@example.com", PoddUserStatus.ACTIVE, testUserHomePage, "CSIRO", "Orcid-Test-User");
         final URI testUserUri = nextRealm.addUser(testUser);
         nextRealm.map(testUser, PoddRoles.PROJECT_CREATOR.getRole());
-        nextRealm.map(testUser, PoddRoles.PROJECT_ADMIN.getRole(), PoddRdfConstants.TEST_ARTIFACT);
+        nextRealm.map(testUser, PoddRoles.PROJECT_ADMIN.getRole(), PODD.TEST_ARTIFACT);
         
         // ApplicationUtils.log.debug("Added Test User to PODD: {} <{}>", testUser.getIdentifier(),
         // testUserUri);

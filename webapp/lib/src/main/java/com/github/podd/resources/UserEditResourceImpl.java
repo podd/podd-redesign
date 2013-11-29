@@ -43,7 +43,7 @@ import com.github.podd.restlet.PoddAction;
 import com.github.podd.restlet.PoddSesameRealm;
 import com.github.podd.restlet.PoddWebServiceApplication;
 import com.github.podd.restlet.RestletUtils;
-import com.github.podd.utils.PoddRdfConstants;
+import com.github.podd.utils.PODD;
 import com.github.podd.utils.PoddUser;
 import com.github.podd.utils.PoddUserStatus;
 import com.github.podd.utils.PoddWebConstants;
@@ -132,8 +132,7 @@ public class UserEditResourceImpl extends AbstractUserResourceImpl
         try
         {
             final Model model = new LinkedHashModel();
-            model.add(userUri, SesameRealmConstants.OAS_USERIDENTIFIER,
-                    PoddRdfConstants.VF.createLiteral(poddUser.getIdentifier()));
+            model.add(userUri, SesameRealmConstants.OAS_USERIDENTIFIER, PODD.VF.createLiteral(poddUser.getIdentifier()));
             Rio.write(model, output, outputFormat);
         }
         catch(final OpenRDFException e)
@@ -231,43 +230,43 @@ public class UserEditResourceImpl extends AbstractUserResourceImpl
             currentUser.setLastName(lastName);
         }
         
-        final URI homePage = model.filter(null, PoddRdfConstants.PODD_USER_HOMEPAGE, null).objectURI();
+        final URI homePage = model.filter(null, PODD.PODD_USER_HOMEPAGE, null).objectURI();
         if(homePage != null)
         {
             currentUser.setHomePage(homePage);
         }
         
-        final String organization = model.filter(null, PoddRdfConstants.PODD_USER_ORGANIZATION, null).objectString();
+        final String organization = model.filter(null, PODD.PODD_USER_ORGANIZATION, null).objectString();
         if(organization != null)
         {
             currentUser.setOrganization(organization);
         }
         
-        final String orcidID = model.filter(null, PoddRdfConstants.PODD_USER_ORCID, null).objectString();
+        final String orcidID = model.filter(null, PODD.PODD_USER_ORCID, null).objectString();
         if(orcidID != null)
         {
             currentUser.setOrcid(orcidID);
         }
         
-        final String title = model.filter(null, PoddRdfConstants.PODD_USER_TITLE, null).objectString();
+        final String title = model.filter(null, PODD.PODD_USER_TITLE, null).objectString();
         if(title != null)
         {
             currentUser.setTitle(title);
         }
         
-        final String phone = model.filter(null, PoddRdfConstants.PODD_USER_PHONE, null).objectString();
+        final String phone = model.filter(null, PODD.PODD_USER_PHONE, null).objectString();
         if(phone != null)
         {
             currentUser.setPhone(phone);
         }
         
-        final String address = model.filter(null, PoddRdfConstants.PODD_USER_ADDRESS, null).objectString();
+        final String address = model.filter(null, PODD.PODD_USER_ADDRESS, null).objectString();
         if(address != null)
         {
             currentUser.setAddress(address);
         }
         
-        final String position = model.filter(null, PoddRdfConstants.PODD_USER_POSITION, null).objectString();
+        final String position = model.filter(null, PODD.PODD_USER_POSITION, null).objectString();
         if(position != null)
         {
             currentUser.setPosition(position);
@@ -276,7 +275,7 @@ public class UserEditResourceImpl extends AbstractUserResourceImpl
         // TODO: no longer seems such a good idea! Simply updating the Status if
         // sent seems better.
         PoddUserStatus status = PoddUserStatus.INACTIVE;
-        final URI statusUri = model.filter(null, PoddRdfConstants.PODD_USER_STATUS, null).objectURI();
+        final URI statusUri = model.filter(null, PODD.PODD_USER_STATUS, null).objectURI();
         if(statusUri != null)
         {
             status = PoddUserStatus.getUserStatusByUri(statusUri);

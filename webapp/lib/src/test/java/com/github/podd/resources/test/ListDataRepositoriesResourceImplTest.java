@@ -31,7 +31,7 @@ import org.restlet.resource.ResourceException;
 
 import com.github.ansell.restletutils.RestletUtilMediaType;
 import com.github.ansell.restletutils.test.RestletTestUtils;
-import com.github.podd.utils.PoddRdfConstants;
+import com.github.podd.utils.PODD;
 import com.github.podd.utils.PoddWebConstants;
 
 /**
@@ -145,7 +145,7 @@ public class ListDataRepositoriesResourceImplTest extends AbstractResourceImplTe
             final Model model = this.assertRdf(results, RDFFormat.RDFJSON, 4);
             
             Assert.assertEquals(2, model.filter(null, RDF.TYPE, null).size());
-            Assert.assertEquals(1, model.filter(null, PoddRdfConstants.PODD_BASE_HAS_ALIAS, null).size());
+            Assert.assertEquals(1, model.filter(null, PODD.PODD_BASE_HAS_ALIAS, null).size());
             Assert.assertEquals(1, model.filter(null, RDFS.LABEL, null).size());
             // DebugUtils.printContents(model);
         }
@@ -172,7 +172,7 @@ public class ListDataRepositoriesResourceImplTest extends AbstractResourceImplTe
             final Model model = this.assertRdf(results, RDFFormat.RDFJSON, 4);
             
             Assert.assertEquals(2, model.filter(null, RDF.TYPE, null).size());
-            Assert.assertEquals(1, model.filter(null, PoddRdfConstants.PODD_BASE_HAS_ALIAS, null).size());
+            Assert.assertEquals(1, model.filter(null, PODD.PODD_BASE_HAS_ALIAS, null).size());
             Assert.assertEquals(1, model.filter(null, RDFS.LABEL, null).size());
             
             // DebugUtils.printContents(model);
@@ -226,7 +226,7 @@ public class ListDataRepositoriesResourceImplTest extends AbstractResourceImplTe
             final Model model = this.assertRdf(results, RDFFormat.RDFXML, 4);
             
             Assert.assertEquals(2, model.filter(null, RDF.TYPE, null).size());
-            Assert.assertEquals(1, model.filter(null, PoddRdfConstants.PODD_BASE_HAS_ALIAS, null).size());
+            Assert.assertEquals(1, model.filter(null, PODD.PODD_BASE_HAS_ALIAS, null).size());
             Assert.assertEquals(1, model.filter(null, RDFS.LABEL, null).size());
             
             // DebugUtils.printContents(model);
@@ -254,7 +254,7 @@ public class ListDataRepositoriesResourceImplTest extends AbstractResourceImplTe
             final Model model = this.assertRdf(results, RDFFormat.RDFXML, 4);
             
             Assert.assertEquals(2, model.filter(null, RDF.TYPE, null).size());
-            Assert.assertEquals(1, model.filter(null, PoddRdfConstants.PODD_BASE_HAS_ALIAS, null).size());
+            Assert.assertEquals(1, model.filter(null, PODD.PODD_BASE_HAS_ALIAS, null).size());
             Assert.assertEquals(1, model.filter(null, RDFS.LABEL, null).size());
             
             // DebugUtils.printContents(model);

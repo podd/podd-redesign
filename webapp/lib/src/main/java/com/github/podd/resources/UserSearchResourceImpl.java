@@ -26,7 +26,7 @@ import com.github.ansell.restletutils.SesameRealmConstants;
 import com.github.podd.restlet.PoddAction;
 import com.github.podd.restlet.PoddSesameRealm;
 import com.github.podd.restlet.PoddWebServiceApplication;
-import com.github.podd.utils.PoddRdfConstants;
+import com.github.podd.utils.PODD;
 import com.github.podd.utils.PoddUser;
 import com.github.podd.utils.PoddWebConstants;
 
@@ -65,9 +65,9 @@ public class UserSearchResourceImpl extends AbstractUserResourceImpl
         for(final PoddUser resultUser : resultList)
         {
             final String label = resultUser.getUserLabel();
-            resultModel.add(resultUser.getUri(), RDFS.LABEL, PoddRdfConstants.VF.createLiteral(label));
+            resultModel.add(resultUser.getUri(), RDFS.LABEL, PODD.VF.createLiteral(label));
             resultModel.add(resultUser.getUri(), SesameRealmConstants.OAS_USERIDENTIFIER,
-                    PoddRdfConstants.VF.createLiteral(resultUser.getIdentifier()));
+                    PODD.VF.createLiteral(resultUser.getIdentifier()));
         }
         
         // - prepare response

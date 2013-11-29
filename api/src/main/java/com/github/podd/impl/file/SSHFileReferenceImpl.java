@@ -20,7 +20,7 @@ import org.openrdf.model.Model;
 import org.openrdf.model.vocabulary.RDF;
 
 import com.github.podd.api.file.SSHFileReference;
-import com.github.podd.utils.PoddRdfConstants;
+import com.github.podd.utils.PODD;
 
 /**
  * A simple implementation of an SSH File Reference object for use within PODD.
@@ -70,18 +70,18 @@ public class SSHFileReferenceImpl extends AbstractDataReferenceImpl implements S
     {
         final Model result = super.toRDF();
         
-        result.add(this.getObjectIri().toOpenRDFURI(), RDF.TYPE, PoddRdfConstants.PODD_BASE_FILE_REFERENCE_TYPE_SSH);
+        result.add(this.getObjectIri().toOpenRDFURI(), RDF.TYPE, PODD.PODD_BASE_FILE_REFERENCE_TYPE_SSH);
         
         if(this.getFilename() != null)
         {
-            result.add(this.getObjectIri().toOpenRDFURI(), PoddRdfConstants.PODD_BASE_HAS_FILENAME,
-                    PoddRdfConstants.VF.createLiteral(this.getFilename()));
+            result.add(this.getObjectIri().toOpenRDFURI(), PODD.PODD_BASE_HAS_FILENAME,
+                    PODD.VF.createLiteral(this.getFilename()));
         }
         
         if(this.getPath() != null)
         {
-            result.add(this.getObjectIri().toOpenRDFURI(), PoddRdfConstants.PODD_BASE_HAS_FILE_PATH,
-                    PoddRdfConstants.VF.createLiteral(this.getPath()));
+            result.add(this.getObjectIri().toOpenRDFURI(), PODD.PODD_BASE_HAS_FILE_PATH,
+                    PODD.VF.createLiteral(this.getPath()));
         }
         
         return result;

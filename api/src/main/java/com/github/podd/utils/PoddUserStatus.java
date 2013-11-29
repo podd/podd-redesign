@@ -68,7 +68,7 @@ public enum PoddUserStatus
     private PoddUserStatus(final String label, final String uri)
     {
         this.label = label;
-        this.uri = PoddRdfConstants.VF.createURI(uri);
+        this.uri = PODD.VF.createURI(uri);
     }
     
     public String getLabel()

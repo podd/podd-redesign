@@ -59,8 +59,8 @@ import com.github.podd.exception.UnmanagedSchemaIRIException;
 import com.github.podd.utils.DebugUtils;
 import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.OntologyUtils;
+import com.github.podd.utils.PODD;
 import com.github.podd.utils.PoddObjectLabel;
-import com.github.podd.utils.PoddRdfConstants;
 
 /**
  * @author kutila
@@ -202,11 +202,11 @@ public abstract class AbstractPoddSesameManagerTest
         this.testRepositoryConnection.add(testOntologyURI, RDF.TYPE, OWL.ONTOLOGY, this.artifactGraph);
         this.testRepositoryConnection.add(testInferredURI, RDF.TYPE, OWL.ONTOLOGY, this.artifactGraph);
         this.testRepositoryConnection.add(testOntologyURI, OWL.VERSIONIRI, testVersionURI, this.artifactGraph);
-        this.testRepositoryConnection.add(testOntologyURI, PoddRdfConstants.OMV_CURRENT_VERSION, testVersionURI,
+        this.testRepositoryConnection
+                .add(testOntologyURI, PODD.OMV_CURRENT_VERSION, testVersionURI, this.artifactGraph);
+        this.testRepositoryConnection.add(testOntologyURI, PODD.PODD_BASE_CURRENT_INFERRED_VERSION, testInferredURI,
                 this.artifactGraph);
-        this.testRepositoryConnection.add(testOntologyURI, PoddRdfConstants.PODD_BASE_CURRENT_INFERRED_VERSION,
-                testInferredURI, this.artifactGraph);
-        this.testRepositoryConnection.add(testVersionURI, PoddRdfConstants.PODD_BASE_INFERRED_VERSION, testInferredURI,
+        this.testRepositoryConnection.add(testVersionURI, PODD.PODD_BASE_INFERRED_VERSION, testInferredURI,
                 this.artifactGraph);
         
         return this.artifactGraph;
@@ -245,14 +245,12 @@ public abstract class AbstractPoddSesameManagerTest
         // Podd-Base
         this.testRepositoryConnection.add(pbBaseOntologyURI, RDF.TYPE, OWL.ONTOLOGY, this.schemaGraph);
         this.testRepositoryConnection.add(pbInferredURI, RDF.TYPE, OWL.ONTOLOGY, this.schemaGraph);
-        this.testRepositoryConnection.add(pbBaseOntologyURI, PoddRdfConstants.OWL_VERSION_IRI, pbVersionURI,
+        this.testRepositoryConnection.add(pbBaseOntologyURI, PODD.OWL_VERSION_IRI, pbVersionURI, this.schemaGraph);
+        this.testRepositoryConnection.add(pbVersionURI, PODD.PODD_BASE_INFERRED_VERSION, pbInferredURI,
                 this.schemaGraph);
-        this.testRepositoryConnection.add(pbVersionURI, PoddRdfConstants.PODD_BASE_INFERRED_VERSION, pbInferredURI,
+        this.testRepositoryConnection.add(pbBaseOntologyURI, PODD.OMV_CURRENT_VERSION, pbVersionURI, this.schemaGraph);
+        this.testRepositoryConnection.add(pbBaseOntologyURI, PODD.PODD_BASE_CURRENT_INFERRED_VERSION, pbInferredURI,
                 this.schemaGraph);
-        this.testRepositoryConnection.add(pbBaseOntologyURI, PoddRdfConstants.OMV_CURRENT_VERSION, pbVersionURI,
-                this.schemaGraph);
-        this.testRepositoryConnection.add(pbBaseOntologyURI, PoddRdfConstants.PODD_BASE_CURRENT_INFERRED_VERSION,
-                pbInferredURI, this.schemaGraph);
         /*
          * The Management graph for Podd-Base created above is as follows.
          * 
@@ -276,15 +274,15 @@ public abstract class AbstractPoddSesameManagerTest
         // Podd-Science
         this.testRepositoryConnection.add(pScienceOntologyURI, RDF.TYPE, OWL.ONTOLOGY, this.schemaGraph);
         this.testRepositoryConnection.add(pScienceInferredURI, RDF.TYPE, OWL.ONTOLOGY, this.schemaGraph);
-        this.testRepositoryConnection.add(pScienceOntologyURI, PoddRdfConstants.OWL_VERSION_IRI, pScienceVersionURI,
+        this.testRepositoryConnection.add(pScienceOntologyURI, PODD.OWL_VERSION_IRI, pScienceVersionURI,
                 this.schemaGraph);
-        this.testRepositoryConnection.add(pScienceOntologyURI, PoddRdfConstants.OMV_CURRENT_VERSION,
-                pScienceVersionURI, this.schemaGraph);
+        this.testRepositoryConnection.add(pScienceOntologyURI, PODD.OMV_CURRENT_VERSION, pScienceVersionURI,
+                this.schemaGraph);
         this.testRepositoryConnection.add(pScienceOntologyURI, OWL.IMPORTS, pbVersionURI, this.schemaGraph);
-        this.testRepositoryConnection.add(pScienceOntologyURI, PoddRdfConstants.PODD_BASE_CURRENT_INFERRED_VERSION,
+        this.testRepositoryConnection.add(pScienceOntologyURI, PODD.PODD_BASE_CURRENT_INFERRED_VERSION,
                 pScienceInferredURI, this.schemaGraph);
-        this.testRepositoryConnection.add(pScienceVersionURI, PoddRdfConstants.PODD_BASE_INFERRED_VERSION,
-                pScienceInferredURI, this.schemaGraph);
+        this.testRepositoryConnection.add(pScienceVersionURI, PODD.PODD_BASE_INFERRED_VERSION, pScienceInferredURI,
+                this.schemaGraph);
         
         // Podd-Plant
         this.testRepositoryConnection.add(pPlantOntologyURI, RDF.TYPE, OWL.ONTOLOGY, this.schemaGraph);
@@ -292,22 +290,21 @@ public abstract class AbstractPoddSesameManagerTest
         this.testRepositoryConnection.add(pPlantVersionURIv2, RDF.TYPE, OWL.ONTOLOGY, this.schemaGraph);
         this.testRepositoryConnection.add(pPlantInferredURIv2, RDF.TYPE, OWL.ONTOLOGY, this.schemaGraph);
         
-        this.testRepositoryConnection.add(pPlantOntologyURI, PoddRdfConstants.OWL_VERSION_IRI, pPlantVersionURI,
-                this.schemaGraph);
-        this.testRepositoryConnection.add(pPlantOntologyURI, PoddRdfConstants.OWL_VERSION_IRI, pPlantVersionURIv2,
-                this.schemaGraph);
+        this.testRepositoryConnection.add(pPlantOntologyURI, PODD.OWL_VERSION_IRI, pPlantVersionURI, this.schemaGraph);
+        this.testRepositoryConnection
+                .add(pPlantOntologyURI, PODD.OWL_VERSION_IRI, pPlantVersionURIv2, this.schemaGraph);
         
-        this.testRepositoryConnection.add(pPlantOntologyURI, PoddRdfConstants.OMV_CURRENT_VERSION, pPlantVersionURIv2,
+        this.testRepositoryConnection.add(pPlantOntologyURI, PODD.OMV_CURRENT_VERSION, pPlantVersionURIv2,
                 this.schemaGraph);
         this.testRepositoryConnection.add(pPlantOntologyURI, OWL.IMPORTS, pScienceVersionURI, this.schemaGraph);
         this.testRepositoryConnection.add(pPlantOntologyURI, OWL.IMPORTS, pbVersionURI, this.schemaGraph);
-        this.testRepositoryConnection.add(pPlantOntologyURI, PoddRdfConstants.PODD_BASE_CURRENT_INFERRED_VERSION,
+        this.testRepositoryConnection.add(pPlantOntologyURI, PODD.PODD_BASE_CURRENT_INFERRED_VERSION,
                 pPlantInferredURIv2, this.schemaGraph);
-        this.testRepositoryConnection.add(pPlantVersionURI, PoddRdfConstants.PODD_BASE_INFERRED_VERSION,
-                pPlantInferredURI, this.schemaGraph);
+        this.testRepositoryConnection.add(pPlantVersionURI, PODD.PODD_BASE_INFERRED_VERSION, pPlantInferredURI,
+                this.schemaGraph);
         
-        this.testRepositoryConnection.add(pPlantVersionURIv2, PoddRdfConstants.PODD_BASE_INFERRED_VERSION,
-                pPlantInferredURIv2, this.schemaGraph);
+        this.testRepositoryConnection.add(pPlantVersionURIv2, PODD.PODD_BASE_INFERRED_VERSION, pPlantInferredURIv2,
+                this.schemaGraph);
         
         return this.schemaGraph;
     }
@@ -410,7 +407,7 @@ public abstract class AbstractPoddSesameManagerTest
         final Model testModel = new LinkedHashModel();
         for(final String s : objectUris)
         {
-            testModel.add(PoddRdfConstants.VF.createURI(s), RDFS.LABEL, PoddRdfConstants.VF.createLiteral("?blank"));
+            testModel.add(PODD.VF.createURI(s), RDFS.LABEL, PODD.VF.createLiteral("?blank"));
         }
         
         final Model resultModel =
@@ -420,7 +417,7 @@ public abstract class AbstractPoddSesameManagerTest
         for(int i = 0; i < objectUris.length; i++)
         {
             final String objectString =
-                    resultModel.filter(PoddRdfConstants.VF.createURI(objectUris[i]), RDFS.LABEL, null).objectString();
+                    resultModel.filter(PODD.VF.createURI(objectUris[i]), RDFS.LABEL, null).objectString();
             Assert.assertEquals("Not the expected label", expectedLabels[i], objectString);
         }
     }
@@ -465,7 +462,7 @@ public abstract class AbstractPoddSesameManagerTest
     @Test
     public void testGetAllValidMembers() throws Exception
     {
-        final ValueFactory vf = PoddRdfConstants.VF;
+        final ValueFactory vf = PODD.VF;
         // prepare: load schema ontologies and test artifact
         this.loadSchemaOntologies();
         final InferredOWLOntologyID ontologyID =
@@ -474,50 +471,44 @@ public abstract class AbstractPoddSesameManagerTest
         
         // Collections to test
         final URI[] collectionsToTest =
-                { vf.createURI(PoddRdfConstants.PODD_SCIENCE, "hasPlatformType"),
-                        vf.createURI(PoddRdfConstants.PODD_SCIENCE, "hasSex"),
-                        vf.createURI(PoddRdfConstants.PODD_SCIENCE, "hasSoftware"),
-                        vf.createURI(PoddRdfConstants.PODD_BASE, "hasPublicationStatus"),
-                        vf.createURI(PoddRdfConstants.PODD_SCIENCE, "hasControl"),
-                        vf.createURI(PoddRdfConstants.PODD_SCIENCE, "hasWildType"),
-                        vf.createURI(PoddRdfConstants.PODD_SCIENCE, "hasANZSRC"),
-                        vf.createURI(PoddRdfConstants.PODD_SCIENCE, "Platform"), };
+                { vf.createURI(PODD.PODD_SCIENCE, "hasPlatformType"), vf.createURI(PODD.PODD_SCIENCE, "hasSex"),
+                        vf.createURI(PODD.PODD_SCIENCE, "hasSoftware"),
+                        vf.createURI(PODD.PODD_BASE, "hasPublicationStatus"),
+                        vf.createURI(PODD.PODD_SCIENCE, "hasControl"), vf.createURI(PODD.PODD_SCIENCE, "hasWildType"),
+                        vf.createURI(PODD.PODD_SCIENCE, "hasANZSRC"), vf.createURI(PODD.PODD_SCIENCE, "Platform"), };
         
         final URI[][] expectedMembers =
                 {
-                        { vf.createURI(PoddRdfConstants.PODD_SCIENCE, "PlatformType_Software"),
-                                vf.createURI(PoddRdfConstants.PODD_SCIENCE, "PlatformType_Hardware"),
-                                vf.createURI(PoddRdfConstants.PODD_SCIENCE, "PlatformType_HardwareSoftware") },
+                        { vf.createURI(PODD.PODD_SCIENCE, "PlatformType_Software"),
+                                vf.createURI(PODD.PODD_SCIENCE, "PlatformType_Hardware"),
+                                vf.createURI(PODD.PODD_SCIENCE, "PlatformType_HardwareSoftware") },
                         
-                        { vf.createURI(PoddRdfConstants.PODD_SCIENCE, "Sex_NotApplicable"),
-                                vf.createURI(PoddRdfConstants.PODD_SCIENCE, "Sex_Unknown"),
-                                vf.createURI(PoddRdfConstants.PODD_SCIENCE, "Sex_Hermaphrodite"),
-                                vf.createURI(PoddRdfConstants.PODD_SCIENCE, "Sex_Female"),
-                                vf.createURI(PoddRdfConstants.PODD_SCIENCE, "Sex_Male") },
+                        { vf.createURI(PODD.PODD_SCIENCE, "Sex_NotApplicable"),
+                                vf.createURI(PODD.PODD_SCIENCE, "Sex_Unknown"),
+                                vf.createURI(PODD.PODD_SCIENCE, "Sex_Hermaphrodite"),
+                                vf.createURI(PODD.PODD_SCIENCE, "Sex_Female"),
+                                vf.createURI(PODD.PODD_SCIENCE, "Sex_Male") },
                         
                         {}, // <poddScience:Software> is not a Collection
                         
-                        { vf.createURI(PoddRdfConstants.PODD_BASE, "Published"),
-                                vf.createURI(PoddRdfConstants.PODD_BASE, "NotPublished"), },
+                        { vf.createURI(PODD.PODD_BASE, "Published"), vf.createURI(PODD.PODD_BASE, "NotPublished"), },
                         
-                        { vf.createURI(PoddRdfConstants.PODD_SCIENCE, "HasControl_Yes"),
-                                vf.createURI(PoddRdfConstants.PODD_SCIENCE, "HasControl_No"),
-                                vf.createURI(PoddRdfConstants.PODD_SCIENCE, "HasControl_NotApplicable"),
-                                vf.createURI(PoddRdfConstants.PODD_SCIENCE, "HasControl_Unknown") },
+                        { vf.createURI(PODD.PODD_SCIENCE, "HasControl_Yes"),
+                                vf.createURI(PODD.PODD_SCIENCE, "HasControl_No"),
+                                vf.createURI(PODD.PODD_SCIENCE, "HasControl_NotApplicable"),
+                                vf.createURI(PODD.PODD_SCIENCE, "HasControl_Unknown") },
                         
-                        { vf.createURI(PoddRdfConstants.PODD_SCIENCE, "WildType_Yes"),
-                                vf.createURI(PoddRdfConstants.PODD_SCIENCE, "WildType_No"),
-                                vf.createURI(PoddRdfConstants.PODD_SCIENCE, "WildType_NotApplicable"),
-                                vf.createURI(PoddRdfConstants.PODD_SCIENCE, "WildType_Unknown") },
+                        { vf.createURI(PODD.PODD_SCIENCE, "WildType_Yes"),
+                                vf.createURI(PODD.PODD_SCIENCE, "WildType_No"),
+                                vf.createURI(PODD.PODD_SCIENCE, "WildType_NotApplicable"),
+                                vf.createURI(PODD.PODD_SCIENCE, "WildType_Unknown") },
                         
-                        {
-                                vf.createURI(PoddRdfConstants.PODD_SCIENCE, "ANZSRC-NotApplicable"),
-                                vf.createURI(PoddRdfConstants.PODD_SCIENCE, "ANZSRC06-Biological-Sciences"),
-                                vf.createURI(PoddRdfConstants.PODD_SCIENCE,
-                                        "ANZSRC07-Agriculture-and-Veterinary-Sciences"),
-                                vf.createURI(PoddRdfConstants.PODD_SCIENCE, "ANZSRC11-Medical-and-Health-Sciences"),
-                                vf.createURI(PoddRdfConstants.PODD_SCIENCE, "ANZSRC05-Environmental-Sciences"),
-                                vf.createURI(PoddRdfConstants.PODD_SCIENCE, "ANZSRC10-Technology")
+                        { vf.createURI(PODD.PODD_SCIENCE, "ANZSRC-NotApplicable"),
+                                vf.createURI(PODD.PODD_SCIENCE, "ANZSRC06-Biological-Sciences"),
+                                vf.createURI(PODD.PODD_SCIENCE, "ANZSRC07-Agriculture-and-Veterinary-Sciences"),
+                                vf.createURI(PODD.PODD_SCIENCE, "ANZSRC11-Medical-and-Health-Sciences"),
+                                vf.createURI(PODD.PODD_SCIENCE, "ANZSRC05-Environmental-Sciences"),
+                                vf.createURI(PODD.PODD_SCIENCE, "ANZSRC10-Technology")
                         
                         },
                         
@@ -565,22 +556,17 @@ public abstract class AbstractPoddSesameManagerTest
         
         final URI[][] testData =
                 {
-                        {
-                                projectObject,
-                                ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_BASE,
-                                        "hasLeadInstitution"), PoddRdfConstants.PODD_BASE_CARDINALITY_EXACTLY_ONE },
-                        { publication45,
-                                ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "hasAbstract"),
-                                PoddRdfConstants.PODD_BASE_CARDINALITY_ZERO_OR_ONE },
                         { projectObject,
-                                ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "hasANZSRC"),
-                                PoddRdfConstants.PODD_BASE_CARDINALITY_ONE_OR_MANY },
-                        { publication45,
-                                ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "hasYear"),
-                                PoddRdfConstants.PODD_BASE_CARDINALITY_ZERO_OR_ONE },
-                        { publication45,
-                                ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "hasAuthors"),
-                                PoddRdfConstants.PODD_BASE_CARDINALITY_ZERO_OR_ONE }, };
+                                ValueFactoryImpl.getInstance().createURI(PODD.PODD_BASE, "hasLeadInstitution"),
+                                PODD.PODD_BASE_CARDINALITY_EXACTLY_ONE },
+                        { publication45, ValueFactoryImpl.getInstance().createURI(PODD.PODD_SCIENCE, "hasAbstract"),
+                                PODD.PODD_BASE_CARDINALITY_ZERO_OR_ONE },
+                        { projectObject, ValueFactoryImpl.getInstance().createURI(PODD.PODD_SCIENCE, "hasANZSRC"),
+                                PODD.PODD_BASE_CARDINALITY_ONE_OR_MANY },
+                        { publication45, ValueFactoryImpl.getInstance().createURI(PODD.PODD_SCIENCE, "hasYear"),
+                                PODD.PODD_BASE_CARDINALITY_ZERO_OR_ONE },
+                        { publication45, ValueFactoryImpl.getInstance().createURI(PODD.PODD_SCIENCE, "hasAuthors"),
+                                PODD.PODD_BASE_CARDINALITY_ZERO_OR_ONE }, };
         
         for(final URI[] element : testData)
         {
@@ -613,28 +599,21 @@ public abstract class AbstractPoddSesameManagerTest
         }
         
         // prepare: test data
-        final URI projectType = ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "Project");
-        final URI publicationType =
-                ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "Publication");
+        final URI projectType = ValueFactoryImpl.getInstance().createURI(PODD.PODD_SCIENCE, "Project");
+        final URI publicationType = ValueFactoryImpl.getInstance().createURI(PODD.PODD_SCIENCE, "Publication");
         
         final URI[][] testData =
                 {
-                        {
-                                projectType,
-                                ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_BASE,
-                                        "hasLeadInstitution"), PoddRdfConstants.PODD_BASE_CARDINALITY_EXACTLY_ONE },
-                        { publicationType,
-                                ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "hasAbstract"),
-                                PoddRdfConstants.PODD_BASE_CARDINALITY_ZERO_OR_ONE },
-                        { projectType,
-                                ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "hasANZSRC"),
-                                PoddRdfConstants.PODD_BASE_CARDINALITY_ONE_OR_MANY },
-                        { publicationType,
-                                ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "hasYear"),
-                                PoddRdfConstants.PODD_BASE_CARDINALITY_ZERO_OR_ONE },
-                        { publicationType,
-                                ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "hasAuthors"),
-                                PoddRdfConstants.PODD_BASE_CARDINALITY_ZERO_OR_ONE }, };
+                        { projectType, ValueFactoryImpl.getInstance().createURI(PODD.PODD_BASE, "hasLeadInstitution"),
+                                PODD.PODD_BASE_CARDINALITY_EXACTLY_ONE },
+                        { publicationType, ValueFactoryImpl.getInstance().createURI(PODD.PODD_SCIENCE, "hasAbstract"),
+                                PODD.PODD_BASE_CARDINALITY_ZERO_OR_ONE },
+                        { projectType, ValueFactoryImpl.getInstance().createURI(PODD.PODD_SCIENCE, "hasANZSRC"),
+                                PODD.PODD_BASE_CARDINALITY_ONE_OR_MANY },
+                        { publicationType, ValueFactoryImpl.getInstance().createURI(PODD.PODD_SCIENCE, "hasYear"),
+                                PODD.PODD_BASE_CARDINALITY_ZERO_OR_ONE },
+                        { publicationType, ValueFactoryImpl.getInstance().createURI(PODD.PODD_SCIENCE, "hasAuthors"),
+                                PODD.PODD_BASE_CARDINALITY_ZERO_OR_ONE }, };
         
         for(final URI[] element : testData)
         {
@@ -1133,8 +1112,8 @@ public abstract class AbstractPoddSesameManagerTest
         // Format: Object Type, expected model size, expected relationship count, expected child
         // object type count
         final Object[][] testData =
-                { { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Investigation"), 85, 10, 15 },
-                        { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Material"), 61, 7, 10 }, };
+                { { PODD.VF.createURI(PODD.PODD_SCIENCE, "Investigation"), 85, 10, 15 },
+                        { PODD.VF.createURI(PODD.PODD_SCIENCE, "Material"), 61, 7, 10 }, };
         
         for(final Object[] element : testData)
         {
@@ -1187,42 +1166,42 @@ public abstract class AbstractPoddSesameManagerTest
         // expected model size, expected property count, do-not-display statement count
         final Object[][] testData =
                 {
-                        { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_BASE, "NoSuchObjectType"), false,
-                                MetadataPolicy.INCLUDE_ALL, 0, -1, 0 },
+                        { PODD.VF.createURI(PODD.PODD_BASE, "NoSuchObjectType"), false, MetadataPolicy.INCLUDE_ALL, 0,
+                                -1, 0 },
                         
-                        { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Project"), false,
-                                MetadataPolicy.INCLUDE_ALL, 156, 18, 0 },
-                        { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Project"), false,
-                                MetadataPolicy.EXCLUDE_CONTAINS, 88, 9, 0 },
-                        { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Project"), true,
-                                MetadataPolicy.INCLUDE_ALL, 293, 34, 13 },
-                        { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Project"), false,
-                                MetadataPolicy.ONLY_CONTAINS, 69, 9, 0 },
+                        { PODD.VF.createURI(PODD.PODD_SCIENCE, "Project"), false, MetadataPolicy.INCLUDE_ALL, 156, 18,
+                                0 },
+                        { PODD.VF.createURI(PODD.PODD_SCIENCE, "Project"), false, MetadataPolicy.EXCLUDE_CONTAINS, 88,
+                                9, 0 },
+                        { PODD.VF.createURI(PODD.PODD_SCIENCE, "Project"), true, MetadataPolicy.INCLUDE_ALL, 293, 34,
+                                13 },
+                        { PODD.VF.createURI(PODD.PODD_SCIENCE, "Project"), false, MetadataPolicy.ONLY_CONTAINS, 69, 9,
+                                0 },
                         
                         // cannot "contain" any Child Objects
-                        { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Publication"), false,
-                                MetadataPolicy.INCLUDE_ALL, 93, 11, 0 },
-                        { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Publication"), true,
-                                MetadataPolicy.INCLUDE_ALL, 119, 15, 3 },
-                        { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Publication"), false,
-                                MetadataPolicy.ONLY_CONTAINS, 13, 2, 0 },
+                        { PODD.VF.createURI(PODD.PODD_SCIENCE, "Publication"), false, MetadataPolicy.INCLUDE_ALL, 93,
+                                11, 0 },
+                        { PODD.VF.createURI(PODD.PODD_SCIENCE, "Publication"), true, MetadataPolicy.INCLUDE_ALL, 119,
+                                15, 3 },
+                        { PODD.VF.createURI(PODD.PODD_SCIENCE, "Publication"), false, MetadataPolicy.ONLY_CONTAINS, 13,
+                                2, 0 },
                         
-                        { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Environment"), false,
-                                MetadataPolicy.INCLUDE_ALL, 73, 9, 0 },
-                        { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Environment"), true,
-                                MetadataPolicy.INCLUDE_ALL, 99, 13, 3 },
-                        { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Environment"), false,
-                                MetadataPolicy.ONLY_CONTAINS, 29, 4, 0 },
+                        { PODD.VF.createURI(PODD.PODD_SCIENCE, "Environment"), false, MetadataPolicy.INCLUDE_ALL, 73,
+                                9, 0 },
+                        { PODD.VF.createURI(PODD.PODD_SCIENCE, "Environment"), true, MetadataPolicy.INCLUDE_ALL, 99,
+                                13, 3 },
+                        { PODD.VF.createURI(PODD.PODD_SCIENCE, "Environment"), false, MetadataPolicy.ONLY_CONTAINS, 29,
+                                4, 0 },
                         
-                        { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_PLANT, "FieldConditions"), false,
-                                MetadataPolicy.INCLUDE_ALL, 89, 11, 0 },
-                        { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_PLANT, "FieldConditions"), true,
-                                MetadataPolicy.INCLUDE_ALL, 115, 15, 3 },
-                        { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_PLANT, "FieldConditions"), false,
-                                MetadataPolicy.ONLY_CONTAINS, 29, 4, 0 },
+                        { PODD.VF.createURI(PODD.PODD_PLANT, "FieldConditions"), false, MetadataPolicy.INCLUDE_ALL, 89,
+                                11, 0 },
+                        { PODD.VF.createURI(PODD.PODD_PLANT, "FieldConditions"), true, MetadataPolicy.INCLUDE_ALL, 115,
+                                15, 3 },
+                        { PODD.VF.createURI(PODD.PODD_PLANT, "FieldConditions"), false, MetadataPolicy.ONLY_CONTAINS,
+                                29, 4, 0 },
                         
-                        { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Material"), false,
-                                MetadataPolicy.INCLUDE_ALL, 217, 24, 0 },
+                        { PODD.VF.createURI(PODD.PODD_SCIENCE, "Material"), false, MetadataPolicy.INCLUDE_ALL, 217, 24,
+                                0 },
                 
                 };
         
@@ -1250,8 +1229,7 @@ public abstract class AbstractPoddSesameManagerTest
             Assert.assertEquals("Not the expected no. of properties", expectedPropertyCount,
                     model.filter(objectType, null, null).size() - 1);
             Assert.assertEquals("Not the expected no. of non-displayable properties",
-                    expectedNonDisplayablePropertyCount,
-                    model.filter(null, PoddRdfConstants.PODD_BASE_DO_NOT_DISPLAY, null).size());
+                    expectedNonDisplayablePropertyCount, model.filter(null, PODD.PODD_BASE_DO_NOT_DISPLAY, null).size());
         }
     }
     
@@ -1949,8 +1927,7 @@ public abstract class AbstractPoddSesameManagerTest
         
         final String searchTerm = "ME";
         final URI[] searchTypes =
-                { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Platform"),
-                        PoddRdfConstants.VF.createURI(OWL.NAMESPACE, "NamedIndividual") };
+                { PODD.VF.createURI(PODD.PODD_SCIENCE, "Platform"), PODD.VF.createURI(OWL.NAMESPACE, "NamedIndividual") };
         final URI[] contexts =
                 this.testPoddSesameManager.versionAndSchemaContexts(ontologyID, this.testRepositoryConnection,
                         this.schemaGraph);
@@ -1966,9 +1943,9 @@ public abstract class AbstractPoddSesameManagerTest
         Assert.assertEquals("Not the expected number of search results", 9, result.size());
         
         Assert.assertEquals("Expected Platform SPAD Meter not found", 1,
-                result.filter(null, null, PoddRdfConstants.VF.createLiteral("SPAD Meter")).size());
+                result.filter(null, null, PODD.VF.createLiteral("SPAD Meter")).size());
         Assert.assertEquals("Expected Platform Pyrometer not found", 1,
-                result.filter(null, null, PoddRdfConstants.VF.createLiteral("Pyrometer")).size());
+                result.filter(null, null, PODD.VF.createLiteral("Pyrometer")).size());
     }
     
     /**
@@ -1986,8 +1963,8 @@ public abstract class AbstractPoddSesameManagerTest
         
         final String searchTerm = "";
         final URI[] searchTypes =
-                { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "WildTypeAssertion"),
-                        PoddRdfConstants.VF.createURI(OWL.NAMESPACE, "NamedIndividual") };
+                { PODD.VF.createURI(PODD.PODD_SCIENCE, "WildTypeAssertion"),
+                        PODD.VF.createURI(OWL.NAMESPACE, "NamedIndividual") };
         final URI[] contexts =
                 this.testPoddSesameManager.versionAndSchemaContexts(ontologyID, this.testRepositoryConnection,
                         this.schemaGraph);
@@ -2000,9 +1977,9 @@ public abstract class AbstractPoddSesameManagerTest
         Assert.assertEquals("Not the expected number of search results", 4, result.size());
         
         Assert.assertEquals("Expected Literal 'Not Applicable' not found", 1,
-                result.filter(null, null, PoddRdfConstants.VF.createLiteral("Not Applicable")).size());
-        Assert.assertEquals("Expected Literal 'No' not found", 1,
-                result.filter(null, null, PoddRdfConstants.VF.createLiteral("No")).size());
+                result.filter(null, null, PODD.VF.createLiteral("Not Applicable")).size());
+        Assert.assertEquals("Expected Literal 'No' not found", 1, result
+                .filter(null, null, PODD.VF.createLiteral("No")).size());
     }
     
     /**
@@ -2088,12 +2065,12 @@ public abstract class AbstractPoddSesameManagerTest
         
         // prepare: add dummy statements in relevant contexts to represent test artifact
         final URI subject = ValueFactoryImpl.getInstance().createURI("http://purl.org/abc-def/artifact:1");
-        this.testRepositoryConnection.add(subject, PoddRdfConstants.PODD_BASE_HAS_PUBLICATION_STATUS,
-                PoddRdfConstants.PODD_BASE_NOT_PUBLISHED, pVersionIRIv1.toOpenRDFURI());
+        this.testRepositoryConnection.add(subject, PODD.PODD_BASE_HAS_PUBLICATION_STATUS, PODD.PODD_BASE_NOT_PUBLISHED,
+                pVersionIRIv1.toOpenRDFURI());
         
         final URI inferredSubject = ValueFactoryImpl.getInstance().createURI("http://purl.org/abc-def/artifact:1");
-        this.testRepositoryConnection.add(inferredSubject, PoddRdfConstants.PODD_BASE_HAS_PUBLICATION_STATUS,
-                PoddRdfConstants.PODD_BASE_NOT_PUBLISHED, pInferredVersionIRIv1.toOpenRDFURI());
+        this.testRepositoryConnection.add(inferredSubject, PODD.PODD_BASE_HAS_PUBLICATION_STATUS,
+                PODD.PODD_BASE_NOT_PUBLISHED, pInferredVersionIRIv1.toOpenRDFURI());
         
         // verify: contexts populated for test artifact
         Assert.assertEquals("Asserted graph should have 1 statement", 1,
@@ -2116,12 +2093,12 @@ public abstract class AbstractPoddSesameManagerTest
         
         // prepare: add dummy statements in relevant contexts for version 2 of test artifact
         final URI subject2 = ValueFactoryImpl.getInstance().createURI("http://purl.org/abc-def/artifact:1");
-        this.testRepositoryConnection.add(subject2, PoddRdfConstants.PODD_BASE_HAS_PUBLICATION_STATUS,
-                PoddRdfConstants.PODD_BASE_NOT_PUBLISHED, pVersionIRIv2.toOpenRDFURI());
+        this.testRepositoryConnection.add(subject2, PODD.PODD_BASE_HAS_PUBLICATION_STATUS,
+                PODD.PODD_BASE_NOT_PUBLISHED, pVersionIRIv2.toOpenRDFURI());
         
         final URI inferredSubject2 = ValueFactoryImpl.getInstance().createURI("http://purl.org/abc-def/artifact:1");
-        this.testRepositoryConnection.add(inferredSubject2, PoddRdfConstants.PODD_BASE_HAS_PUBLICATION_STATUS,
-                PoddRdfConstants.PODD_BASE_NOT_PUBLISHED, pInferredVersionIRIv2.toOpenRDFURI());
+        this.testRepositoryConnection.add(inferredSubject2, PODD.PODD_BASE_HAS_PUBLICATION_STATUS,
+                PODD.PODD_BASE_NOT_PUBLISHED, pInferredVersionIRIv2.toOpenRDFURI());
         
         // verify: contexts populated for test artifact
         Assert.assertEquals("Asserted graph should have 1 statement", 1,
@@ -2322,14 +2299,14 @@ public abstract class AbstractPoddSesameManagerTest
         
         final Model stmtList =
                 new LinkedHashModel(Iterations.asList(this.testRepositoryConnection.getStatements(null,
-                        PoddRdfConstants.OMV_CURRENT_VERSION, null, false, testGraph)));
+                        PODD.OMV_CURRENT_VERSION, null, false, testGraph)));
         Assert.assertEquals("Graph should have one OMV_CURRENT_VERSION statement", 1, stmtList.size());
         Assert.assertEquals("Wrong ontology IRI", ontologyIRI.toOpenRDFURI(), stmtList.subjects().iterator().next());
         Assert.assertEquals("Wrong version IRI", expectedVersionIRI.toOpenRDFURI(), stmtList.objectURI());
         
         final Model inferredVersionStatementList =
                 new LinkedHashModel(Iterations.asList(this.testRepositoryConnection.getStatements(null,
-                        PoddRdfConstants.PODD_BASE_CURRENT_INFERRED_VERSION, null, false, testGraph)));
+                        PODD.PODD_BASE_CURRENT_INFERRED_VERSION, null, false, testGraph)));
         Assert.assertEquals("Graph should have one CURRENT_INFERRED_VERSION statement", 1,
                 inferredVersionStatementList.size());
         Assert.assertEquals("Wrong ontology IRI", ontologyIRI.toOpenRDFURI(), inferredVersionStatementList.subjects()

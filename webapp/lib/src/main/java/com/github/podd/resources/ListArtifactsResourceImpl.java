@@ -41,8 +41,8 @@ import com.github.podd.restlet.PoddAction;
 import com.github.podd.restlet.RestletUtils;
 import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.OntologyUtils;
+import com.github.podd.utils.PODD;
 import com.github.podd.utils.PoddObjectLabel;
-import com.github.podd.utils.PoddRdfConstants;
 import com.github.podd.utils.PoddWebConstants;
 
 /**
@@ -261,7 +261,7 @@ public class ListArtifactsResourceImpl extends AbstractPoddResourceImpl
                 for(final PoddObjectLabel nextResult : results)
                 {
                     model.add(nextResult.getOntologyID().getOntologyIRI().toOpenRDFURI(),
-                            PoddRdfConstants.PODD_BASE_HAS_TOP_OBJECT, nextResult.getObjectURI());
+                            PODD.PODD_BASE_HAS_TOP_OBJECT, nextResult.getObjectURI());
                     model.add(nextResult.getObjectURI(), RDFS.LABEL, nextResult.getLabelLiteral());
                     
                     final List<PoddObjectLabel> typesList =

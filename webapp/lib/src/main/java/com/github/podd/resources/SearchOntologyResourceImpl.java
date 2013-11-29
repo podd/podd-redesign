@@ -42,7 +42,7 @@ import org.semanticweb.owlapi.model.IRI;
 import com.github.podd.exception.UnmanagedArtifactIRIException;
 import com.github.podd.restlet.PoddAction;
 import com.github.podd.utils.InferredOWLOntologyID;
-import com.github.podd.utils.PoddRdfConstants;
+import com.github.podd.utils.PODD;
 import com.github.podd.utils.PoddWebConstants;
 
 /**
@@ -89,7 +89,7 @@ public class SearchOntologyResourceImpl extends AbstractPoddResourceImpl
         {
             for(final String searchType : searchTypes)
             {
-                set.add(PoddRdfConstants.VF.createURI(searchType));
+                set.add(PODD.VF.createURI(searchType));
             }
         }
         

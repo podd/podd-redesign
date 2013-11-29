@@ -47,7 +47,7 @@ import com.github.podd.exception.InconsistentOntologyException;
 import com.github.podd.exception.OntologyNotInProfileException;
 import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.OntologyUtils;
-import com.github.podd.utils.PoddRdfConstants;
+import com.github.podd.utils.PODD;
 import com.github.podd.utils.PoddWebConstants;
 
 /**
@@ -85,28 +85,28 @@ public class UploadArtifactResourceImplTest extends AbstractResourceImplTest
             
             final Model model = this.assertRdf(uploadArtifactClientResource.getResponseEntity(), responseFormat, 13);
             
-            final Set<Resource> errors = model.filter(null, RDF.TYPE, PoddRdfConstants.ERR_TYPE_TOP_ERROR).subjects();
+            final Set<Resource> errors = model.filter(null, RDF.TYPE, PODD.ERR_TYPE_TOP_ERROR).subjects();
             Assert.assertEquals("Not the expected number of Errors", 1, errors.size());
             final Resource topError = errors.iterator().next();
             
             // Resource level error details
             Assert.assertEquals("Not the expected HTTP Status Code", "500",
-                    model.filter(topError, PoddRdfConstants.HTTP_STATUS_CODE_VALUE, null).objectString());
+                    model.filter(topError, PODD.HTTP_STATUS_CODE_VALUE, null).objectString());
             Assert.assertEquals("Not the expected Reason Phrase", "Internal Server Error",
-                    model.filter(topError, PoddRdfConstants.HTTP_REASON_PHRASE, null).objectString());
+                    model.filter(topError, PODD.HTTP_REASON_PHRASE, null).objectString());
             Assert.assertEquals("Not the expected RDFS:comment", "Error loading artifact to PODD",
                     model.filter(topError, RDFS.COMMENT, null).objectString());
             
-            Assert.assertEquals("Expected 1 child error node", 1,
-                    model.filter(topError, PoddRdfConstants.ERR_CONTAINS, null).size());
-            final Resource errorNode = model.filter(topError, PoddRdfConstants.ERR_CONTAINS, null).objectResource();
+            Assert.assertEquals("Expected 1 child error node", 1, model.filter(topError, PODD.ERR_CONTAINS, null)
+                    .size());
+            final Resource errorNode = model.filter(topError, PODD.ERR_CONTAINS, null).objectResource();
             
             // Error cause details
             Assert.assertEquals("Not the expected Exception class", InconsistentOntologyException.class.getName(),
-                    model.filter(errorNode, PoddRdfConstants.ERR_EXCEPTION_CLASS, null).objectString());
+                    model.filter(errorNode, PODD.ERR_EXCEPTION_CLASS, null).objectString());
             
             Assert.assertEquals("Not the expected error source", "urn:temp:inconsistentArtifact:1",
-                    model.filter(errorNode, PoddRdfConstants.ERR_SOURCE, null).objectString());
+                    model.filter(errorNode, PODD.ERR_SOURCE, null).objectString());
         }
         finally
         {
@@ -143,30 +143,27 @@ public class UploadArtifactResourceImplTest extends AbstractResourceImplTest
             
             final Model model = this.assertRdf(uploadArtifactClientResource.getResponseEntity(), responseFormat, 18);
             
-            final Set<Resource> errors = model.filter(null, RDF.TYPE, PoddRdfConstants.ERR_TYPE_TOP_ERROR).subjects();
+            final Set<Resource> errors = model.filter(null, RDF.TYPE, PODD.ERR_TYPE_TOP_ERROR).subjects();
             Assert.assertEquals("Not the expected number of Errors", 1, errors.size());
             final Resource topError = errors.iterator().next();
             
             // Resource level error details
             Assert.assertEquals("Not the expected HTTP Status Code", "500",
-                    model.filter(topError, PoddRdfConstants.HTTP_STATUS_CODE_VALUE, null).objectString());
+                    model.filter(topError, PODD.HTTP_STATUS_CODE_VALUE, null).objectString());
             Assert.assertEquals("Not the expected Reason Phrase", "Internal Server Error",
-                    model.filter(topError, PoddRdfConstants.HTTP_REASON_PHRASE, null).objectString());
+                    model.filter(topError, PODD.HTTP_REASON_PHRASE, null).objectString());
             Assert.assertEquals("Not the expected RDFS:comment", "Error loading artifact to PODD",
                     model.filter(topError, RDFS.COMMENT, null).objectString());
             
             // Error cause details
             Assert.assertEquals("Not the expected Exception class", OntologyNotInProfileException.class.getName(),
-                    model.filter(null, PoddRdfConstants.ERR_EXCEPTION_CLASS, null).objectString());
+                    model.filter(null, PODD.ERR_EXCEPTION_CLASS, null).objectString());
             
             Assert.assertEquals(
                     "Expected error sources not found",
                     2,
-                    model.filter(
-                            null,
-                            PoddRdfConstants.ERR_SOURCE,
-                            PoddRdfConstants.VF
-                                    .createLiteral("ClassAssertion(owl:Individual <mailto:helen.daily@csiro.au>)"))
+                    model.filter(null, PODD.ERR_SOURCE,
+                            PODD.VF.createLiteral("ClassAssertion(owl:Individual <mailto:helen.daily@csiro.au>)"))
                             .size());
         }
         finally

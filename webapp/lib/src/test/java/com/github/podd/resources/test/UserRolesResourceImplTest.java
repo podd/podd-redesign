@@ -47,7 +47,7 @@ import com.github.ansell.restletutils.SesameRealmConstants;
 import com.github.ansell.restletutils.test.RestletTestUtils;
 import com.github.podd.api.test.TestConstants;
 import com.github.podd.utils.InferredOWLOntologyID;
-import com.github.podd.utils.PoddRdfConstants;
+import com.github.podd.utils.PODD;
 import com.github.podd.utils.PoddRoles;
 import com.github.podd.utils.PoddUserStatus;
 import com.github.podd.utils.PoddWebConstants;
@@ -71,15 +71,15 @@ public class UserRolesResourceImplTest extends AbstractResourceImplTest
         final String testIdentifier = "testuser@podd.com";
         final List<Map.Entry<URI, URI>> roles = new LinkedList<Map.Entry<URI, URI>>();
         roles.add(new AbstractMap.SimpleEntry<URI, URI>(PoddRoles.ADMIN.getURI(), null));
-        roles.add(new AbstractMap.SimpleEntry<URI, URI>(PoddRoles.PROJECT_ADMIN.getURI(), PoddRdfConstants.VF
+        roles.add(new AbstractMap.SimpleEntry<URI, URI>(PoddRoles.PROJECT_ADMIN.getURI(), PODD.VF
                 .createURI("urn:podd:cotton-leaf-morphology")));
-        roles.add(new AbstractMap.SimpleEntry<URI, URI>(PoddRoles.PROJECT_MEMBER.getURI(), PoddRdfConstants.VF
+        roles.add(new AbstractMap.SimpleEntry<URI, URI>(PoddRoles.PROJECT_MEMBER.getURI(), PODD.VF
                 .createURI("urn:podd:tea-leaf-study")));
-        roles.add(new AbstractMap.SimpleEntry<URI, URI>(PoddRoles.PROJECT_MEMBER.getURI(), PoddRdfConstants.VF
+        roles.add(new AbstractMap.SimpleEntry<URI, URI>(PoddRoles.PROJECT_MEMBER.getURI(), PODD.VF
                 .createURI("urn:podd:coffee-leaf-study")));
-        roles.add(new AbstractMap.SimpleEntry<URI, URI>(PoddRoles.PROJECT_OBSERVER.getURI(), PoddRdfConstants.VF
+        roles.add(new AbstractMap.SimpleEntry<URI, URI>(PoddRoles.PROJECT_OBSERVER.getURI(), PODD.VF
                 .createURI("urn:podd:banana-leaf-study")));
-        roles.add(new AbstractMap.SimpleEntry<URI, URI>(PoddRoles.PROJECT_OBSERVER.getURI(), PoddRdfConstants.VF
+        roles.add(new AbstractMap.SimpleEntry<URI, URI>(PoddRoles.PROJECT_OBSERVER.getURI(), PODD.VF
                 .createURI("urn:podd:coconut-leaf-study")));
         this.loadTestUser(testIdentifier, "testuserpassword", "John", "Doe", testIdentifier,
                 "http:///www.john.doe.com", "CSIRO", "john-orcid", "Mr", "000333434", "Some Address", "Researcher",
@@ -90,22 +90,20 @@ public class UserRolesResourceImplTest extends AbstractResourceImplTest
         
         // prepare: additional Project Observer Role for Project
         // "cotton-leaf-23567"
-        final URI testProject1Uri = PoddRdfConstants.VF.createURI("urn:podd:project-cotton-leaf-23567");
-        final URI roleMapping1Uri =
-                PoddRdfConstants.VF.createURI("urn:podd:rolemapping1:", UUID.randomUUID().toString());
+        final URI testProject1Uri = PODD.VF.createURI("urn:podd:project-cotton-leaf-23567");
+        final URI roleMapping1Uri = PODD.VF.createURI("urn:podd:rolemapping1:", UUID.randomUUID().toString());
         newModel.add(roleMapping1Uri, RDF.TYPE, SesameRealmConstants.OAS_ROLEMAPPING);
         newModel.add(roleMapping1Uri, SesameRealmConstants.OAS_ROLEMAPPEDROLE, PoddRoles.PROJECT_OBSERVER.getURI());
-        newModel.add(roleMapping1Uri, PoddRdfConstants.PODD_ROLEMAPPEDOBJECT, testProject1Uri);
+        newModel.add(roleMapping1Uri, PODD.PODD_ROLEMAPPEDOBJECT, testProject1Uri);
         // NOTE: no need to specify ROLE_MAPPED_USER as User is identified from
         // the request
         
         // prepare: additional Project Observer Role for Project "tea-leaf-99"
-        final URI testProject2Uri = PoddRdfConstants.VF.createURI("urn:podd:project-tea-leaf-99");
-        final URI roleMapping2Uri =
-                PoddRdfConstants.VF.createURI("urn:podd:rolemapping2:", UUID.randomUUID().toString());
+        final URI testProject2Uri = PODD.VF.createURI("urn:podd:project-tea-leaf-99");
+        final URI roleMapping2Uri = PODD.VF.createURI("urn:podd:rolemapping2:", UUID.randomUUID().toString());
         newModel.add(roleMapping2Uri, RDF.TYPE, SesameRealmConstants.OAS_ROLEMAPPING);
         newModel.add(roleMapping2Uri, SesameRealmConstants.OAS_ROLEMAPPEDROLE, PoddRoles.PROJECT_OBSERVER.getURI());
-        newModel.add(roleMapping2Uri, PoddRdfConstants.PODD_ROLEMAPPEDOBJECT, testProject2Uri);
+        newModel.add(roleMapping2Uri, PODD.PODD_ROLEMAPPEDOBJECT, testProject2Uri);
         
         // submit modified details to User Roles Service
         final ClientResource userRolesClientResource =
@@ -137,10 +135,9 @@ public class UserRolesResourceImplTest extends AbstractResourceImplTest
                 Assert.assertEquals("Unexpected user identifier", testIdentifier,
                         resultsModel.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).objectString());
                 Assert.assertEquals("Status was not ACTIVE", PoddUserStatus.ACTIVE.getURI(),
-                        resultsModel.filter(null, PoddRdfConstants.PODD_USER_STATUS, null).objectURI());
+                        resultsModel.filter(null, PODD.PODD_USER_STATUS, null).objectURI());
                 
-                final Collection<Value> objects =
-                        resultsModel.filter(null, PoddRdfConstants.PODD_ROLEMAPPEDOBJECT, null).objects();
+                final Collection<Value> objects = resultsModel.filter(null, PODD.PODD_ROLEMAPPEDOBJECT, null).objects();
                 Assert.assertEquals("Incorrect no. of Project Roles", 7, objects.size());
                 
                 final Collection<Resource> subjects =
@@ -169,16 +166,16 @@ public class UserRolesResourceImplTest extends AbstractResourceImplTest
         final RDFFormat format = Rio.getWriterFormatForMIMEType(mediaType.getName(), RDFFormat.RDFXML);
         
         // prepare: add a Test User account
-        final URI testProject1Uri = PoddRdfConstants.VF.createURI("urn:podd:coconut-leaf-study");
-        final URI testProject2Uri = PoddRdfConstants.VF.createURI("urn:podd:banana-leaf-study");
+        final URI testProject1Uri = PODD.VF.createURI("urn:podd:coconut-leaf-study");
+        final URI testProject2Uri = PODD.VF.createURI("urn:podd:banana-leaf-study");
         final String testIdentifier = "testuser@podd.com";
         final List<Map.Entry<URI, URI>> roles = new LinkedList<Map.Entry<URI, URI>>();
         roles.add(new AbstractMap.SimpleEntry<URI, URI>(PoddRoles.ADMIN.getURI(), null));
-        roles.add(new AbstractMap.SimpleEntry<URI, URI>(PoddRoles.PROJECT_ADMIN.getURI(), PoddRdfConstants.VF
+        roles.add(new AbstractMap.SimpleEntry<URI, URI>(PoddRoles.PROJECT_ADMIN.getURI(), PODD.VF
                 .createURI("urn:podd:cotton-leaf-morphology")));
-        roles.add(new AbstractMap.SimpleEntry<URI, URI>(PoddRoles.PROJECT_MEMBER.getURI(), PoddRdfConstants.VF
+        roles.add(new AbstractMap.SimpleEntry<URI, URI>(PoddRoles.PROJECT_MEMBER.getURI(), PODD.VF
                 .createURI("urn:podd:tea-leaf-study")));
-        roles.add(new AbstractMap.SimpleEntry<URI, URI>(PoddRoles.PROJECT_MEMBER.getURI(), PoddRdfConstants.VF
+        roles.add(new AbstractMap.SimpleEntry<URI, URI>(PoddRoles.PROJECT_MEMBER.getURI(), PODD.VF
                 .createURI("urn:podd:coffee-leaf-study")));
         roles.add(new AbstractMap.SimpleEntry<URI, URI>(PoddRoles.PROJECT_OBSERVER.getURI(), testProject2Uri));
         roles.add(new AbstractMap.SimpleEntry<URI, URI>(PoddRoles.PROJECT_OBSERVER.getURI(), testProject1Uri));
@@ -188,12 +185,11 @@ public class UserRolesResourceImplTest extends AbstractResourceImplTest
         
         // prepare: Project Observer Role for Project
         // "urn:podd:coconut-leaf-study" is to be deleted
-        final URI roleMapping1Uri =
-                PoddRdfConstants.VF.createURI("urn:podd:rolemapping1:", UUID.randomUUID().toString());
+        final URI roleMapping1Uri = PODD.VF.createURI("urn:podd:rolemapping1:", UUID.randomUUID().toString());
         final Model newModel = new LinkedHashModel();
         newModel.add(roleMapping1Uri, RDF.TYPE, SesameRealmConstants.OAS_ROLEMAPPING);
         newModel.add(roleMapping1Uri, SesameRealmConstants.OAS_ROLEMAPPEDROLE, PoddRoles.PROJECT_OBSERVER.getURI());
-        newModel.add(roleMapping1Uri, PoddRdfConstants.PODD_ROLEMAPPEDOBJECT, testProject1Uri);
+        newModel.add(roleMapping1Uri, PODD.PODD_ROLEMAPPEDOBJECT, testProject1Uri);
         // NOTE: no need to specify ROLE_MAPPED_USER as User is identified from
         // the request
         
@@ -228,7 +224,7 @@ public class UserRolesResourceImplTest extends AbstractResourceImplTest
                 Assert.assertEquals("Unexpected user identifier", testIdentifier,
                         resultsModel.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).objectString());
                 Assert.assertEquals("Status was not ACTIVE", PoddUserStatus.ACTIVE.getURI(),
-                        resultsModel.filter(null, PoddRdfConstants.PODD_USER_STATUS, null).objectURI());
+                        resultsModel.filter(null, PODD.PODD_USER_STATUS, null).objectURI());
                 
                 final Set<Resource> observerMappings =
                         resultsModel.filter(null, SesameRealmConstants.OAS_ROLEMAPPEDROLE,
@@ -237,7 +233,7 @@ public class UserRolesResourceImplTest extends AbstractResourceImplTest
                 
                 final Resource mapping = (Resource)observerMappings.toArray()[0];
                 Assert.assertEquals("Project_Observer Role is not for expected Project", testProject2Uri, resultsModel
-                        .filter(mapping, PoddRdfConstants.PODD_ROLEMAPPEDOBJECT, null).objectURI());
+                        .filter(mapping, PODD.PODD_ROLEMAPPEDOBJECT, null).objectURI());
             }
             finally
             {
@@ -275,17 +271,15 @@ public class UserRolesResourceImplTest extends AbstractResourceImplTest
         final Model newModel = new LinkedHashModel();
         
         // prepare: additional Project Observer Role for TEST_ARTIFACT Project
-        final URI roleMapping1Uri =
-                PoddRdfConstants.VF.createURI("urn:podd:rolemapping1:", UUID.randomUUID().toString());
+        final URI roleMapping1Uri = PODD.VF.createURI("urn:podd:rolemapping1:", UUID.randomUUID().toString());
         newModel.add(roleMapping1Uri, RDF.TYPE, SesameRealmConstants.OAS_ROLEMAPPING);
         newModel.add(roleMapping1Uri, SesameRealmConstants.OAS_ROLEMAPPEDROLE, PoddRoles.PROJECT_OBSERVER.getURI());
-        newModel.add(roleMapping1Uri, PoddRdfConstants.PODD_ROLEMAPPEDOBJECT, PoddRdfConstants.TEST_ARTIFACT);
+        newModel.add(roleMapping1Uri, PODD.PODD_ROLEMAPPEDOBJECT, PODD.TEST_ARTIFACT);
         // NOTE: no need to specify ROLE_MAPPED_USER as User is identified from
         // the request
         
         // prepare: additional Repository Admin Role (which should fail)
-        final URI roleMapping2Uri =
-                PoddRdfConstants.VF.createURI("urn:podd:rolemapping2:", UUID.randomUUID().toString());
+        final URI roleMapping2Uri = PODD.VF.createURI("urn:podd:rolemapping2:", UUID.randomUUID().toString());
         newModel.add(roleMapping2Uri, RDF.TYPE, SesameRealmConstants.OAS_ROLEMAPPING);
         newModel.add(roleMapping2Uri, SesameRealmConstants.OAS_ROLEMAPPEDROLE, PoddRoles.ADMIN.getURI());
         
@@ -325,7 +319,7 @@ public class UserRolesResourceImplTest extends AbstractResourceImplTest
                 Assert.assertEquals("Unexpected user identifier", testIdentifier,
                         resultsModel.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).objectString());
                 Assert.assertEquals("Status was not ACTIVE", PoddUserStatus.ACTIVE.getURI(),
-                        resultsModel.filter(null, PoddRdfConstants.PODD_USER_STATUS, null).objectURI());
+                        resultsModel.filter(null, PODD.PODD_USER_STATUS, null).objectURI());
                 
                 // verify: 1 Roles mapped
                 final Collection<Resource> roleMappings =
@@ -362,30 +356,27 @@ public class UserRolesResourceImplTest extends AbstractResourceImplTest
         final RDFFormat format = Rio.getWriterFormatForMIMEType(mediaType.getName(), RDFFormat.RDFXML);
         
         // prepare: add a Test User account
-        final URI testProject1Uri = PoddRdfConstants.VF.createURI("urn:podd:coconut-leaf-study");
+        final URI testProject1Uri = PODD.VF.createURI("urn:podd:coconut-leaf-study");
         final String testIdentifier = "testuser@podd.com";
         final List<Map.Entry<URI, URI>> roles = new LinkedList<Map.Entry<URI, URI>>();
-        roles.add(new AbstractMap.SimpleEntry<URI, URI>(PoddRoles.PROJECT_OBSERVER.getURI(),
-                PoddRdfConstants.TEST_ARTIFACT));
+        roles.add(new AbstractMap.SimpleEntry<URI, URI>(PoddRoles.PROJECT_OBSERVER.getURI(), PODD.TEST_ARTIFACT));
         roles.add(new AbstractMap.SimpleEntry<URI, URI>(PoddRoles.PROJECT_OBSERVER.getURI(), testProject1Uri));
         this.loadTestUser(testIdentifier, "testuserpassword", "John", "Doe", testIdentifier,
                 "http:///www.john.doe.com", "CSIRO", "john-orcid", "Mr", "000333434", "Some Address", "Researcher",
                 roles, PoddUserStatus.ACTIVE);
         
         // prepare: Project Observer Role for TEST_ARTIFACT is to be deleted
-        final URI roleMapping1Uri =
-                PoddRdfConstants.VF.createURI("urn:podd:rolemapping1:", UUID.randomUUID().toString());
+        final URI roleMapping1Uri = PODD.VF.createURI("urn:podd:rolemapping1:", UUID.randomUUID().toString());
         final Model newModel = new LinkedHashModel();
         newModel.add(roleMapping1Uri, RDF.TYPE, SesameRealmConstants.OAS_ROLEMAPPING);
         newModel.add(roleMapping1Uri, SesameRealmConstants.OAS_ROLEMAPPEDROLE, PoddRoles.PROJECT_OBSERVER.getURI());
-        newModel.add(roleMapping1Uri, PoddRdfConstants.PODD_ROLEMAPPEDOBJECT, PoddRdfConstants.TEST_ARTIFACT);
+        newModel.add(roleMapping1Uri, PODD.PODD_ROLEMAPPEDOBJECT, PODD.TEST_ARTIFACT);
         
         // prepare: Project Observer Role for testProject1 is to be deleted
-        final URI roleMapping2Uri =
-                PoddRdfConstants.VF.createURI("urn:podd:rolemapping2:", UUID.randomUUID().toString());
+        final URI roleMapping2Uri = PODD.VF.createURI("urn:podd:rolemapping2:", UUID.randomUUID().toString());
         newModel.add(roleMapping2Uri, RDF.TYPE, SesameRealmConstants.OAS_ROLEMAPPING);
         newModel.add(roleMapping2Uri, SesameRealmConstants.OAS_ROLEMAPPEDROLE, PoddRoles.PROJECT_OBSERVER.getURI());
-        newModel.add(roleMapping2Uri, PoddRdfConstants.PODD_ROLEMAPPEDOBJECT, testProject1Uri);
+        newModel.add(roleMapping2Uri, PODD.PODD_ROLEMAPPEDOBJECT, testProject1Uri);
         
         final ByteArrayOutputStream out = new ByteArrayOutputStream();
         Rio.write(newModel, out, format);
@@ -425,7 +416,7 @@ public class UserRolesResourceImplTest extends AbstractResourceImplTest
             Assert.assertEquals("Unexpected user identifier", testIdentifier,
                     resultsModel.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).objectString());
             Assert.assertEquals("Status was not ACTIVE", PoddUserStatus.ACTIVE.getURI(),
-                    resultsModel.filter(null, PoddRdfConstants.PODD_USER_STATUS, null).objectURI());
+                    resultsModel.filter(null, PODD.PODD_USER_STATUS, null).objectURI());
             
             final Set<Resource> observerMappings =
                     resultsModel.filter(null, SesameRealmConstants.OAS_ROLEMAPPEDROLE,

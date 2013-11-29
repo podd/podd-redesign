@@ -30,7 +30,7 @@ import org.restlet.resource.ClientResource;
 
 import com.github.ansell.restletutils.test.RestletTestUtils;
 import com.github.podd.api.test.TestConstants;
-import com.github.podd.utils.PoddRdfConstants;
+import com.github.podd.utils.PODD;
 import com.github.podd.utils.PoddWebConstants;
 
 /**
@@ -42,7 +42,7 @@ public class GetMetadataResourceImplTest extends AbstractResourceImplTest
     @Test
     public void testErrorGetWithInvalidObjectType() throws Exception
     {
-        final String objectType = PoddRdfConstants.PODD_SCIENCE + "NoSuchPoddConcept";
+        final String objectType = PODD.PODD_SCIENCE + "NoSuchPoddConcept";
         final ClientResource createObjectClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_GET_METADATA));
         
@@ -72,7 +72,7 @@ public class GetMetadataResourceImplTest extends AbstractResourceImplTest
         final String artifactUri =
                 this.loadTestArtifact(TestConstants.TEST_ARTIFACT_20130206, MediaType.APPLICATION_RDF_TURTLE)
                         .getOntologyIRI().toString();
-        final String objectType = PoddRdfConstants.PODD_SCIENCE + "Investigation";
+        final String objectType = PODD.PODD_SCIENCE + "Investigation";
         
         final ClientResource createObjectClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_GET_METADATA));
@@ -93,23 +93,18 @@ public class GetMetadataResourceImplTest extends AbstractResourceImplTest
             // verify:
             final Model model = this.assertRdf(results, RDFFormat.TURTLE, 85);
             
-            Assert.assertEquals(
-                    "GrowthConditions not found",
-                    1,
-                    model.filter(null, OWL.ALLVALUESFROM,
-                            PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_PLANT, "GrowthConditions")).subjects()
+            Assert.assertEquals("GrowthConditions not found", 1,
+                    model.filter(null, OWL.ALLVALUESFROM, PODD.VF.createURI(PODD.PODD_PLANT, "GrowthConditions"))
+                            .subjects().size());
+            
+            Assert.assertEquals("No label for FieldConditions", 1,
+                    model.filter(PODD.VF.createURI(PODD.PODD_PLANT, "FieldConditions"), RDFS.LABEL, null).objects()
                             .size());
             
-            Assert.assertEquals(
-                    "No label for FieldConditions",
-                    1,
-                    model.filter(PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_PLANT, "FieldConditions"),
-                            RDFS.LABEL, null).objects().size());
-            
             Assert.assertEquals("Unexpected no. of properties", 16,
-                    model.filter(PoddRdfConstants.VF.createURI(objectType), null, null).size());
+                    model.filter(PODD.VF.createURI(objectType), null, null).size());
             Assert.assertEquals("Expected no Do-Not-Display properties", 0,
-                    model.filter(null, PoddRdfConstants.PODD_BASE_DO_NOT_DISPLAY, null).size());
+                    model.filter(null, PODD.PODD_BASE_DO_NOT_DISPLAY, null).size());
         }
         finally
         {
@@ -121,8 +116,7 @@ public class GetMetadataResourceImplTest extends AbstractResourceImplTest
     public void testGetChildrenWithProjectRdf() throws Exception
     {
         final Object[][] testData =
-                { { PoddRdfConstants.PODD_SCIENCE + "Project", 63, 11, 0 },
-                        { PoddRdfConstants.PODD_SCIENCE + "Investigation", 85, 16, 0 }, };
+                { { PODD.PODD_SCIENCE + "Project", 63, 11, 0 }, { PODD.PODD_SCIENCE + "Investigation", 85, 16, 0 }, };
         
         for(final Object[] element : testData)
         {
@@ -151,9 +145,9 @@ public class GetMetadataResourceImplTest extends AbstractResourceImplTest
                 final Model model = this.assertRdf(results, RDFFormat.TURTLE, expectedModelSize);
                 
                 Assert.assertEquals("Unexpected no. of properties", expectedNoOfProperties,
-                        model.filter(PoddRdfConstants.VF.createURI(objectType), null, null).size());
+                        model.filter(PODD.VF.createURI(objectType), null, null).size());
                 Assert.assertEquals("Expected no Do-Not-Display properties", expectedNoOfDnDProperties,
-                        model.filter(null, PoddRdfConstants.PODD_BASE_DO_NOT_DISPLAY, null).size());
+                        model.filter(null, PODD.PODD_BASE_DO_NOT_DISPLAY, null).size());
             }
             finally
             {
@@ -165,7 +159,7 @@ public class GetMetadataResourceImplTest extends AbstractResourceImplTest
     @Test
     public void testGetChildrenWithPublicationRdf() throws Exception
     {
-        final String objectType = PoddRdfConstants.PODD_SCIENCE + "Publication";
+        final String objectType = PODD.PODD_SCIENCE + "Publication";
         
         final ClientResource createObjectClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_GET_METADATA));
@@ -210,7 +204,7 @@ public class GetMetadataResourceImplTest extends AbstractResourceImplTest
         final String artifactUri =
                 this.loadTestArtifact(TestConstants.TEST_ARTIFACT_20130206, MediaType.APPLICATION_RDF_TURTLE)
                         .getOntologyIRI().toString();
-        final String objectType = PoddRdfConstants.PODD_SCIENCE + "Genotype";
+        final String objectType = PODD.PODD_SCIENCE + "Genotype";
         
         final ClientResource createObjectClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_GET_METADATA));
@@ -232,9 +226,9 @@ public class GetMetadataResourceImplTest extends AbstractResourceImplTest
             final Model model = this.assertRdf(results, RDFFormat.RDFXML, 165);
             
             Assert.assertEquals("Unexpected no. of properties", 20,
-                    model.filter(PoddRdfConstants.VF.createURI(objectType), null, null).size() - 1);
+                    model.filter(PODD.VF.createURI(objectType), null, null).size() - 1);
             Assert.assertEquals("Expected no Do-Not-Display properties", 3,
-                    model.filter(null, PoddRdfConstants.PODD_BASE_DO_NOT_DISPLAY, null).size());
+                    model.filter(null, PODD.PODD_BASE_DO_NOT_DISPLAY, null).size());
         }
         finally
         {
@@ -245,7 +239,7 @@ public class GetMetadataResourceImplTest extends AbstractResourceImplTest
     @Test
     public void testGetWithInvestigationRdf() throws Exception
     {
-        final String objectType = PoddRdfConstants.PODD_SCIENCE + "Investigation";
+        final String objectType = PODD.PODD_SCIENCE + "Investigation";
         
         final ClientResource createObjectClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_GET_METADATA));
@@ -265,14 +259,11 @@ public class GetMetadataResourceImplTest extends AbstractResourceImplTest
             final Model model = this.assertRdf(results, RDFFormat.TURTLE, 54);
             
             Assert.assertEquals("Unexpected no. of properties", 6,
-                    model.filter(PoddRdfConstants.VF.createURI(objectType), null, null).size() - 1);
+                    model.filter(PODD.VF.createURI(objectType), null, null).size() - 1);
             Assert.assertEquals("Expected no Do-Not-Display properties", 0,
-                    model.filter(null, PoddRdfConstants.PODD_BASE_DO_NOT_DISPLAY, null).size());
-            Assert.assertEquals(
-                    "Missing metadata about poddScience::refersToProcess",
-                    5,
-                    model.filter(PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "refersToProcess"), null,
-                            null).size());
+                    model.filter(null, PODD.PODD_BASE_DO_NOT_DISPLAY, null).size());
+            Assert.assertEquals("Missing metadata about poddScience::refersToProcess", 5,
+                    model.filter(PODD.VF.createURI(PODD.PODD_SCIENCE, "refersToProcess"), null, null).size());
         }
         finally
         {
@@ -286,7 +277,7 @@ public class GetMetadataResourceImplTest extends AbstractResourceImplTest
     @Test
     public void testGetWithProjectPlanRdf() throws Exception
     {
-        final String objectType = PoddRdfConstants.PODD_SCIENCE + "Process";
+        final String objectType = PODD.PODD_SCIENCE + "Process";
         
         final ClientResource createObjectClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_GET_METADATA));
@@ -306,9 +297,9 @@ public class GetMetadataResourceImplTest extends AbstractResourceImplTest
             final Model model = this.assertRdf(results, RDFFormat.TURTLE, 18);
             
             Assert.assertEquals("Unexpected no. of properties", 2,
-                    model.filter(PoddRdfConstants.VF.createURI(objectType), null, null).size() - 1);
+                    model.filter(PODD.VF.createURI(objectType), null, null).size() - 1);
             Assert.assertEquals("Expected no Do-Not-Display properties", 0,
-                    model.filter(null, PoddRdfConstants.PODD_BASE_DO_NOT_DISPLAY, null).size());
+                    model.filter(null, PODD.PODD_BASE_DO_NOT_DISPLAY, null).size());
         }
         finally
         {
@@ -319,7 +310,7 @@ public class GetMetadataResourceImplTest extends AbstractResourceImplTest
     @Test
     public void testGetWithProjectRdf() throws Exception
     {
-        final String objectType = PoddRdfConstants.PODD_SCIENCE + "Project";
+        final String objectType = PODD.PODD_SCIENCE + "Project";
         
         final ClientResource createObjectClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_GET_METADATA));
@@ -339,9 +330,9 @@ public class GetMetadataResourceImplTest extends AbstractResourceImplTest
             final Model model = this.assertRdf(results, RDFFormat.TURTLE, 88);
             
             Assert.assertEquals("Unexpected no. of properties", 9,
-                    model.filter(PoddRdfConstants.VF.createURI(objectType), null, null).size() - 1);
+                    model.filter(PODD.VF.createURI(objectType), null, null).size() - 1);
             Assert.assertEquals("Expected no Do-Not-Display properties", 0,
-                    model.filter(null, PoddRdfConstants.PODD_BASE_DO_NOT_DISPLAY, null).size());
+                    model.filter(null, PODD.PODD_BASE_DO_NOT_DISPLAY, null).size());
         }
         finally
         {

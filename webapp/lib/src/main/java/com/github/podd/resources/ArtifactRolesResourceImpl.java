@@ -35,8 +35,8 @@ import com.github.podd.restlet.PoddAction;
 import com.github.podd.restlet.PoddWebServiceApplication;
 import com.github.podd.restlet.RestletUtils;
 import com.github.podd.utils.InferredOWLOntologyID;
+import com.github.podd.utils.PODD;
 import com.github.podd.utils.PoddObjectLabel;
-import com.github.podd.utils.PoddRdfConstants;
 import com.github.podd.utils.PoddRoles;
 import com.github.podd.utils.PoddUser;
 import com.github.podd.utils.PoddWebConstants;
@@ -67,7 +67,7 @@ public class ArtifactRolesResourceImpl extends AbstractPoddResourceImpl
         
         this.log.info("requesting to edit Artifact Participants (HTML): {}", artifactUri);
         
-        this.checkAuthentication(PoddAction.PROJECT_ROLE_EDIT, PoddRdfConstants.VF.createURI(artifactUri));
+        this.checkAuthentication(PoddAction.PROJECT_ROLE_EDIT, PODD.VF.createURI(artifactUri));
         
         final User user = this.getRequest().getClientInfo().getUser();
         this.log.info("authenticated user: {}", user);
@@ -151,7 +151,7 @@ public class ArtifactRolesResourceImpl extends AbstractPoddResourceImpl
         
         this.log.info("requesting to edit Artifact Participants (HTML): {}", artifactUri);
         
-        this.checkAuthentication(PoddAction.PROJECT_ROLE_EDIT, PoddRdfConstants.VF.createURI(artifactUri));
+        this.checkAuthentication(PoddAction.PROJECT_ROLE_EDIT, PODD.VF.createURI(artifactUri));
         
         final User user = this.getRequest().getClientInfo().getUser();
         this.log.info("authenticated user: {}", user);

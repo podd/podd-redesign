@@ -35,7 +35,7 @@ import org.openrdf.repository.sail.SailRepository;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.sail.memory.MemoryStore;
 
-import com.github.podd.utils.PoddRdfConstants;
+import com.github.podd.utils.PODD;
 import com.github.podd.utils.RdfUtility;
 
 /**
@@ -90,7 +90,7 @@ public class RdfUtilityTest
                 
                 URI root = null;
                 final RepositoryResult<Statement> statements =
-                        connection.getStatements(null, PoddRdfConstants.PODD_BASE_HAS_TOP_OBJECT, null, false, context);
+                        connection.getStatements(null, PODD.PODD_BASE_HAS_TOP_OBJECT, null, false, context);
                 if(statements.hasNext())
                 {
                     root = (URI)statements.next().getSubject();
@@ -122,8 +122,8 @@ public class RdfUtilityTest
     @Test
     public void testInputStreamToModel() throws Exception
     {
-        final InputStream resourceStream = this.getClass().getResourceAsStream(PoddRdfConstants.PATH_PODD_DCTERMS);
-        Assert.assertNotNull("Missing test resource", PoddRdfConstants.PATH_PODD_DCTERMS);
+        final InputStream resourceStream = this.getClass().getResourceAsStream(PODD.PATH_PODD_DCTERMS);
+        Assert.assertNotNull("Missing test resource", PODD.PATH_PODD_DCTERMS);
         
         final Model model = RdfUtility.inputStreamToModel(resourceStream, RDFFormat.RDFXML);
         

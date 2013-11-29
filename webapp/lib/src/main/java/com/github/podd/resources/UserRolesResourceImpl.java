@@ -50,8 +50,8 @@ import com.github.podd.restlet.PoddAction;
 import com.github.podd.restlet.PoddSesameRealm;
 import com.github.podd.restlet.PoddWebServiceApplication;
 import com.github.podd.restlet.RestletUtils;
+import com.github.podd.utils.PODD;
 import com.github.podd.utils.PoddObjectLabel;
-import com.github.podd.utils.PoddRdfConstants;
 import com.github.podd.utils.PoddRoles;
 import com.github.podd.utils.PoddUser;
 import com.github.podd.utils.PoddWebConstants;
@@ -171,9 +171,8 @@ public class UserRolesResourceImpl extends AbstractUserResourceImpl
                 Rio.getWriterFormatForMIMEType(variant.getMediaType().getName(), RDFFormat.RDFXML);
         try
         {
-            Rio.write(Arrays.asList(PoddRdfConstants.VF.createStatement(poddUser.getUri(),
-                    SesameRealmConstants.OAS_USERIDENTIFIER,
-                    PoddRdfConstants.VF.createLiteral(poddUser.getIdentifier()))), output, outputFormat);
+            Rio.write(Arrays.asList(PODD.VF.createStatement(poddUser.getUri(), SesameRealmConstants.OAS_USERIDENTIFIER,
+                    PODD.VF.createLiteral(poddUser.getIdentifier()))), output, outputFormat);
         }
         catch(final OpenRDFException e)
         {

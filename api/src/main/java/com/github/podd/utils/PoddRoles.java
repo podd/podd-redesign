@@ -105,12 +105,12 @@ public enum PoddRoles implements RestletUtilRole
         {
             for(final String nextUserIdentifier : mappings.get(nextRole))
             {
-                final BNode mappingUri = PoddRdfConstants.VF.createBNode();
+                final BNode mappingUri = PODD.VF.createBNode();
                 
                 model.add(mappingUri, RDF.TYPE, SesameRealmConstants.OAS_ROLEMAPPING, contexts);
                 model.add(mappingUri, SesameRealmConstants.OAS_ROLEMAPPEDROLE, nextRole.getURI(), contexts);
                 model.add(mappingUri, SesameRealmConstants.OAS_ROLEMAPPEDUSER,
-                        PoddRdfConstants.VF.createLiteral(nextUserIdentifier), contexts);
+                        PODD.VF.createLiteral(nextUserIdentifier), contexts);
             }
         }
     }
@@ -126,14 +126,14 @@ public enum PoddRoles implements RestletUtilRole
         {
             for(final URI nextObjectUri : mappings.get(nextRole))
             {
-                final BNode mappingUri = PoddRdfConstants.VF.createBNode();
+                final BNode mappingUri = PODD.VF.createBNode();
                 
                 model.add(mappingUri, RDF.TYPE, SesameRealmConstants.OAS_ROLEMAPPING, contexts);
                 model.add(mappingUri, SesameRealmConstants.OAS_ROLEMAPPEDROLE, nextRole.getURI(), contexts);
                 
                 if(nextObjectUri != null)
                 {
-                    model.add(mappingUri, PoddRdfConstants.PODD_ROLEMAPPEDOBJECT, nextObjectUri, contexts);
+                    model.add(mappingUri, PODD.PODD_ROLEMAPPEDOBJECT, nextObjectUri, contexts);
                 }
             }
         }
@@ -202,8 +202,7 @@ public enum PoddRoles implements RestletUtilRole
                     model.filter(mappingUri, SesameRealmConstants.OAS_ROLEMAPPEDROLE, null, contexts).objectURI();
             final RestletUtilRole role = PoddRoles.getRoleByUri(roleUri);
             
-            final URI mappedObject =
-                    model.filter(mappingUri, PoddRdfConstants.PODD_ROLEMAPPEDOBJECT, null, contexts).objectURI();
+            final URI mappedObject = model.filter(mappingUri, PODD.PODD_ROLEMAPPEDOBJECT, null, contexts).objectURI();
             
             PoddRoles.log.debug("Extracted Role <{}> with Optional Object <{}>", role.getName(), mappedObject);
             Collection<URI> nextObjectUris = new HashSet<>();

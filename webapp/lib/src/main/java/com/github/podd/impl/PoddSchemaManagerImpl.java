@@ -70,7 +70,7 @@ import com.github.podd.exception.UnmanagedSchemaIRIException;
 import com.github.podd.exception.UnmanagedSchemaOntologyIDException;
 import com.github.podd.restlet.ApplicationUtils;
 import com.github.podd.utils.InferredOWLOntologyID;
-import com.github.podd.utils.PoddRdfConstants;
+import com.github.podd.utils.PODD;
 
 /**
  * @author Peter Ansell p_ansell@yahoo.com
@@ -460,7 +460,7 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
         try
         {
             final URI nextCurrentVersionURI =
-                    model.filter(nextSchemaOntologyUri, PoddRdfConstants.OMV_CURRENT_VERSION, null).objectURI();
+                    model.filter(nextSchemaOntologyUri, PODD.OMV_CURRENT_VERSION, null).objectURI();
             
             if(nextCurrentVersionURI == null)
             {
@@ -590,8 +590,7 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
         for(final URI nextOrderedImport : importOrder)
         {
             final String classpathLocation =
-                    model.filter(nextOrderedImport, PoddRdfConstants.PODD_SCHEMA_CLASSPATH, null).objectLiteral()
-                            .stringValue();
+                    model.filter(nextOrderedImport, PODD.PODD_SCHEMA_CLASSPATH, null).objectLiteral().stringValue();
             final RDFFormat format = Rio.getParserFormatForFileName(classpathLocation, RDFFormat.RDFXML);
             try (final InputStream input = ApplicationUtils.class.getResourceAsStream(classpathLocation);)
             {
@@ -671,7 +670,7 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
             return new InferredOWLOntologyID(baseOntologyID.getOntologyIRI(), baseOntologyID.getVersionIRI(),
                     nextInferredOntology.getOntologyIRI());
         }
-        catch(Throwable e)
+        catch(final Throwable e)
         {
             if(conn != null && conn.isActive())
             {
@@ -714,7 +713,7 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
             final Set<Value> importsInManifest = manifestModel.filter(nextVersionUri, OWL.IMPORTS, null).objects();
             
             final String classpathLocation =
-                    manifestModel.filter(nextVersionUri, PoddRdfConstants.PODD_SCHEMA_CLASSPATH, null).objectLiteral()
+                    manifestModel.filter(nextVersionUri, PODD.PODD_SCHEMA_CLASSPATH, null).objectLiteral()
                             .stringValue();
             final RDFFormat format = Rio.getParserFormatForFileName(classpathLocation, RDFFormat.RDFXML);
             try (final InputStream input = ApplicationUtils.class.getResourceAsStream(classpathLocation);)

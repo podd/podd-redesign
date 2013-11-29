@@ -79,7 +79,7 @@ import com.github.podd.restlet.PoddWebServiceApplication;
 import com.github.podd.restlet.RestletUtils;
 import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.OntologyUtils;
-import com.github.podd.utils.PoddRdfConstants;
+import com.github.podd.utils.PODD;
 import com.github.podd.utils.PoddRoles;
 import com.github.podd.utils.PoddWebConstants;
 
@@ -271,14 +271,13 @@ public class UploadArtifactResourceImpl extends AbstractPoddResourceImpl
             
             for(final Resource nextOntology : ontologies)
             {
-                writer.handleStatement(PoddRdfConstants.VF.createStatement(nextOntology, RDF.TYPE, OWL.ONTOLOGY));
+                writer.handleStatement(PODD.VF.createStatement(nextOntology, RDF.TYPE, OWL.ONTOLOGY));
                 
                 for(final Value nextVersion : model.filter(nextOntology, OWL.VERSIONIRI, null).objects())
                 {
                     if(nextVersion instanceof URI)
                     {
-                        writer.handleStatement(PoddRdfConstants.VF.createStatement(nextOntology, OWL.VERSIONIRI,
-                                nextVersion));
+                        writer.handleStatement(PODD.VF.createStatement(nextOntology, OWL.VERSIONIRI, nextVersion));
                     }
                     else
                     {
@@ -299,15 +298,15 @@ public class UploadArtifactResourceImpl extends AbstractPoddResourceImpl
                 final URI topObjectIRI =
                         this.getPoddArtifactManager().getSesameManager().getTopObjectIRI(artifactId, conn);
                 
-                writer.handleStatement(PoddRdfConstants.VF.createStatement(artifactId.getOntologyIRI().toOpenRDFURI(),
-                        PoddRdfConstants.PODD_BASE_HAS_TOP_OBJECT, topObjectIRI));
+                writer.handleStatement(PODD.VF.createStatement(artifactId.getOntologyIRI().toOpenRDFURI(),
+                        PODD.PODD_BASE_HAS_TOP_OBJECT, topObjectIRI));
                 final Set<Statement> topObjectTypes =
                         Iterations.asSet(conn.getStatements(topObjectIRI, RDF.TYPE, null, true, artifactId
                                 .getVersionIRI().toOpenRDFURI()));
                 
                 for(final Statement nextTopObjectType : topObjectTypes)
                 {
-                    writer.handleStatement(PoddRdfConstants.VF.createStatement(nextTopObjectType.getSubject(),
+                    writer.handleStatement(PODD.VF.createStatement(nextTopObjectType.getSubject(),
                             nextTopObjectType.getPredicate(), nextTopObjectType.getObject()));
                 }
             }

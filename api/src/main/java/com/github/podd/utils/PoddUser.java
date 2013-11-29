@@ -113,19 +113,19 @@ public class PoddUser extends RestletUtilUser
         }
         
         PoddUserStatus status = PoddUserStatus.INACTIVE;
-        final URI statusUri = model.filter(null, PoddRdfConstants.PODD_USER_STATUS, null).objectURI();
+        final URI statusUri = model.filter(null, PODD.PODD_USER_STATUS, null).objectURI();
         if(statusUri != null)
         {
             status = PoddUserStatus.getUserStatusByUri(statusUri);
         }
         
-        final URI homePage = model.filter(null, PoddRdfConstants.PODD_USER_HOMEPAGE, null).objectURI();
-        final String organization = model.filter(null, PoddRdfConstants.PODD_USER_ORGANIZATION, null).objectString();
-        final String orcidID = model.filter(null, PoddRdfConstants.PODD_USER_ORCID, null).objectString();
-        final String title = model.filter(null, PoddRdfConstants.PODD_USER_TITLE, null).objectString();
-        final String phone = model.filter(null, PoddRdfConstants.PODD_USER_PHONE, null).objectString();
-        final String address = model.filter(null, PoddRdfConstants.PODD_USER_ADDRESS, null).objectString();
-        final String position = model.filter(null, PoddRdfConstants.PODD_USER_POSITION, null).objectString();
+        final URI homePage = model.filter(null, PODD.PODD_USER_HOMEPAGE, null).objectURI();
+        final String organization = model.filter(null, PODD.PODD_USER_ORGANIZATION, null).objectString();
+        final String orcidID = model.filter(null, PODD.PODD_USER_ORCID, null).objectString();
+        final String title = model.filter(null, PODD.PODD_USER_TITLE, null).objectString();
+        final String phone = model.filter(null, PODD.PODD_USER_PHONE, null).objectString();
+        final String address = model.filter(null, PODD.PODD_USER_ADDRESS, null).objectString();
+        final String position = model.filter(null, PODD.PODD_USER_POSITION, null).objectString();
         
         final PoddUser user =
                 new PoddUser(identifier, secret, firstName, lastName, email, status, homePage, organization, orcidID,
@@ -361,71 +361,64 @@ public class PoddUser extends RestletUtilUser
         
         if(userUri == null)
         {
-            userUri =
-                    PoddRdfConstants.VF.createURI(PoddPurlProcessorPrefixes.UUID.getTemporaryPrefix()
-                            + this.getIdentifier());
+            userUri = PODD.VF.createURI(PoddPurlProcessorPrefixes.UUID.getTemporaryPrefix() + this.getIdentifier());
         }
         
-        model.add(userUri, SesameRealmConstants.OAS_USERIDENTIFIER,
-                PoddRdfConstants.VF.createLiteral(this.getIdentifier()));
+        model.add(userUri, SesameRealmConstants.OAS_USERIDENTIFIER, PODD.VF.createLiteral(this.getIdentifier()));
         
         // Password should not be sent back in RDF to users!
         if(includeSecret && this.getSecret() != null)
         {
-            model.add(userUri, SesameRealmConstants.OAS_USERSECRET,
-                    PoddRdfConstants.VF.createLiteral(new String(this.getSecret())));
+            model.add(userUri, SesameRealmConstants.OAS_USERSECRET, PODD.VF.createLiteral(new String(this.getSecret())));
         }
         
-        model.add(userUri, SesameRealmConstants.OAS_USERFIRSTNAME,
-                PoddRdfConstants.VF.createLiteral(this.getFirstName()));
-        model.add(userUri, SesameRealmConstants.OAS_USERLASTNAME, PoddRdfConstants.VF.createLiteral(this.getLastName()));
-        model.add(userUri, SesameRealmConstants.OAS_USEREMAIL, PoddRdfConstants.VF.createLiteral(this.getEmail()));
+        model.add(userUri, SesameRealmConstants.OAS_USERFIRSTNAME, PODD.VF.createLiteral(this.getFirstName()));
+        model.add(userUri, SesameRealmConstants.OAS_USERLASTNAME, PODD.VF.createLiteral(this.getLastName()));
+        model.add(userUri, SesameRealmConstants.OAS_USEREMAIL, PODD.VF.createLiteral(this.getEmail()));
         
         if(this.getHomePage() != null)
         {
-            model.add(userUri, PoddRdfConstants.PODD_USER_HOMEPAGE, this.getHomePage());
+            model.add(userUri, PODD.PODD_USER_HOMEPAGE, this.getHomePage());
         }
         
         if(this.getOrganization() != null)
         {
-            model.add(userUri, PoddRdfConstants.PODD_USER_ORGANIZATION,
-                    PoddRdfConstants.VF.createLiteral(this.getOrganization()));
+            model.add(userUri, PODD.PODD_USER_ORGANIZATION, PODD.VF.createLiteral(this.getOrganization()));
         }
         
         if(this.getOrcid() != null)
         {
-            model.add(userUri, PoddRdfConstants.PODD_USER_ORCID, PoddRdfConstants.VF.createLiteral(this.getOrcid()));
+            model.add(userUri, PODD.PODD_USER_ORCID, PODD.VF.createLiteral(this.getOrcid()));
         }
         
         if(this.getTitle() != null)
         {
-            model.add(userUri, PoddRdfConstants.PODD_USER_TITLE, PoddRdfConstants.VF.createLiteral(this.getTitle()));
+            model.add(userUri, PODD.PODD_USER_TITLE, PODD.VF.createLiteral(this.getTitle()));
         }
         
         if(this.getPhone() != null)
         {
-            model.add(userUri, PoddRdfConstants.PODD_USER_PHONE, PoddRdfConstants.VF.createLiteral(this.getPhone()));
+            model.add(userUri, PODD.PODD_USER_PHONE, PODD.VF.createLiteral(this.getPhone()));
         }
         
         if(this.getAddress() != null)
         {
-            model.add(userUri, PoddRdfConstants.PODD_USER_ADDRESS, PoddRdfConstants.VF.createLiteral(this.getAddress()));
+            model.add(userUri, PODD.PODD_USER_ADDRESS, PODD.VF.createLiteral(this.getAddress()));
         }
         
         if(this.getPosition() != null)
         {
-            model.add(userUri, PoddRdfConstants.PODD_USER_POSITION,
-                    PoddRdfConstants.VF.createLiteral(this.getPosition()));
+            model.add(userUri, PODD.PODD_USER_POSITION, PODD.VF.createLiteral(this.getPosition()));
         }
         
         if(this.getUserStatus() != null)
         {
-            model.add(userUri, PoddRdfConstants.PODD_USER_STATUS, this.getUserStatus().getURI());
+            model.add(userUri, PODD.PODD_USER_STATUS, this.getUserStatus().getURI());
         }
         else
         {
             // INACTIVE by default
-            model.add(userUri, PoddRdfConstants.PODD_USER_STATUS, PoddUserStatus.INACTIVE.getURI());
+            model.add(userUri, PODD.PODD_USER_STATUS, PoddUserStatus.INACTIVE.getURI());
         }
         
     }

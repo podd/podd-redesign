@@ -25,7 +25,7 @@ import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.profiles.OWLProfileReport;
 import org.semanticweb.owlapi.profiles.OWLProfileViolation;
 
-import com.github.podd.utils.PoddRdfConstants;
+import com.github.podd.utils.PODD;
 
 /**
  * An exception indicating that the OWL Ontology was not found to be in the given OWL Profile.
@@ -101,7 +101,7 @@ public class OntologyNotInProfileException extends PoddException
         
         if(this.getOntology() != null)
         {
-            model.add(errorResource, PoddRdfConstants.ERR_SOURCE, this.getOntology().getOntologyID().getOntologyIRI()
+            model.add(errorResource, PODD.ERR_SOURCE, this.getOntology().getOntologyID().getOntologyIRI()
                     .toOpenRDFURI());
         }
         
@@ -109,12 +109,11 @@ public class OntologyNotInProfileException extends PoddException
         {
             for(final OWLProfileViolation violation : this.getProfileReport().getViolations())
             {
-                final BNode v = PoddRdfConstants.VF.createBNode();
-                model.add(errorResource, PoddRdfConstants.ERR_CONTAINS, v);
-                model.add(v, RDF.TYPE, PoddRdfConstants.ERR_TYPE_ERROR);
-                model.add(v, PoddRdfConstants.ERR_SOURCE,
-                        PoddRdfConstants.VF.createLiteral(violation.getAxiom().toString()));
-                model.add(v, RDFS.COMMENT, PoddRdfConstants.VF.createLiteral(violation.toString()));
+                final BNode v = PODD.VF.createBNode();
+                model.add(errorResource, PODD.ERR_CONTAINS, v);
+                model.add(v, RDF.TYPE, PODD.ERR_TYPE_ERROR);
+                model.add(v, PODD.ERR_SOURCE, PODD.VF.createLiteral(violation.getAxiom().toString()));
+                model.add(v, RDFS.COMMENT, PODD.VF.createLiteral(violation.toString()));
             }
         }
         

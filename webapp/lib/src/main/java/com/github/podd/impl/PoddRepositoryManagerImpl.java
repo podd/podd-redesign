@@ -31,7 +31,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.github.podd.api.PoddRepositoryManager;
-import com.github.podd.utils.PoddRdfConstants;
+import com.github.podd.utils.PODD;
 
 /**
  * @author Peter Ansell p_ansell@yahoo.com
@@ -43,11 +43,11 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
     
     private Repository repository;
     
-    private URI artifactGraph = PoddRdfConstants.DEFAULT_ARTIFACT_MANAGEMENT_GRAPH;
+    private URI artifactGraph = PODD.DEFAULT_ARTIFACT_MANAGEMENT_GRAPH;
     
-    private URI schemaGraph = PoddRdfConstants.DEFAULT_SCHEMA_MANAGEMENT_GRAPH;
+    private URI schemaGraph = PODD.DEFAULT_SCHEMA_MANAGEMENT_GRAPH;
     
-    private URI dataRepositoryGraph = PoddRdfConstants.DEFAULT_FILE_REPOSITORY_MANAGEMENT_GRAPH;
+    private URI dataRepositoryGraph = PODD.DEFAULT_FILE_REPOSITORY_MANAGEMENT_GRAPH;
     
     /**
      * Default constructor, which sets up an in-memory MemoryStore repository.

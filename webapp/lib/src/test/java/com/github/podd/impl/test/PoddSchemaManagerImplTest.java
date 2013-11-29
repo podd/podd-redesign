@@ -41,7 +41,7 @@ import com.github.podd.impl.PoddOWLManagerImpl;
 import com.github.podd.impl.PoddRepositoryManagerImpl;
 import com.github.podd.impl.PoddSchemaManagerImpl;
 import com.github.podd.impl.PoddSesameManagerImpl;
-import com.github.podd.utils.PoddRdfConstants;
+import com.github.podd.utils.PODD;
 
 /**
  * @author Peter Ansell p_ansell@yahoo.com
@@ -107,7 +107,7 @@ public class PoddSchemaManagerImplTest extends AbstractPoddSchemaManagerTest
         final List<URI> testImportOrder = new ArrayList<>();
         for(final String s : testImportOrderArray)
         {
-            testImportOrder.add(PoddRdfConstants.VF.createURI(s));
+            testImportOrder.add(PODD.VF.createURI(s));
         }
         
         ((PoddSchemaManagerImpl)this.testSchemaManager).uploadSchemaOntologiesInOrder(model, testImportOrder);
@@ -140,7 +140,7 @@ public class PoddSchemaManagerImplTest extends AbstractPoddSchemaManagerTest
         final List<URI> testImportOrder = new ArrayList<>();
         for(final String s : testImportOrderArray)
         {
-            testImportOrder.add(PoddRdfConstants.VF.createURI(s));
+            testImportOrder.add(PODD.VF.createURI(s));
         }
         
         try

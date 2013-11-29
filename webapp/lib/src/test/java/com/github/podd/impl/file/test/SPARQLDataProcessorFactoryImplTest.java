@@ -42,7 +42,7 @@ import com.github.podd.api.file.SPARQLDataReferenceProcessor;
 import com.github.podd.api.test.AbstractPoddRdfProcessorFactoryTest;
 import com.github.podd.api.test.TestConstants;
 import com.github.podd.impl.file.SPARQLDataReferenceProcessorFactoryImpl;
-import com.github.podd.utils.PoddRdfConstants;
+import com.github.podd.utils.PODD;
 import com.github.podd.utils.PoddRdfUtils;
 
 /**
@@ -105,7 +105,7 @@ public class SPARQLDataProcessorFactoryImplTest extends
             final Model model = QueryResults.asModel(query.evaluate());
             
             Assert.assertFalse("Empty Model, no file references found.", model.isEmpty());
-            final Model type = model.filter(null, RDF.TYPE, PoddRdfConstants.PODD_BASE_DATA_REFERENCE_TYPE);
+            final Model type = model.filter(null, RDF.TYPE, PODD.PODD_BASE_DATA_REFERENCE_TYPE);
             Assert.assertEquals("Expected 2 file references", 2, type.size());
         }
         finally
@@ -163,7 +163,7 @@ public class SPARQLDataProcessorFactoryImplTest extends
             // verify SPARQL generated a graph as expected
             final Model model = QueryResults.asModel(query.evaluate());
             Assert.assertFalse("Empty Model, no file references found.", model.isEmpty());
-            final Model type = model.filter(null, RDF.TYPE, PoddRdfConstants.PODD_BASE_DATA_REFERENCE_TYPE);
+            final Model type = model.filter(null, RDF.TYPE, PODD.PODD_BASE_DATA_REFERENCE_TYPE);
             Assert.assertEquals("Expected only 1 file reference", 1, type.size());
             Assert.assertEquals("Not the expected file reference", fileReference, type.subjects().iterator().next()
                     .stringValue());

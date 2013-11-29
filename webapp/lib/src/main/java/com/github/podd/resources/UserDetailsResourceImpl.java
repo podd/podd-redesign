@@ -46,7 +46,7 @@ import com.github.podd.restlet.PoddAction;
 import com.github.podd.restlet.PoddSesameRealm;
 import com.github.podd.restlet.PoddWebServiceApplication;
 import com.github.podd.restlet.RestletUtils;
-import com.github.podd.utils.PoddRdfConstants;
+import com.github.podd.utils.PODD;
 import com.github.podd.utils.PoddRoles;
 import com.github.podd.utils.PoddUser;
 import com.github.podd.utils.PoddWebConstants;
@@ -177,8 +177,7 @@ public class UserDetailsResourceImpl extends AbstractUserResourceImpl
             final Entry<Role, URI> entry = entry2;
             final RestletUtilRole roleByName = PoddRoles.getRoleByName(entry.getKey().getName());
             
-            final URI roleMapping =
-                    PoddRdfConstants.VF.createURI("urn:podd:rolemapping:", UUID.randomUUID().toString());
+            final URI roleMapping = PODD.VF.createURI("urn:podd:rolemapping:", UUID.randomUUID().toString());
             userInfoModel.add(roleMapping, RDF.TYPE, SesameRealmConstants.OAS_ROLEMAPPING);
             userInfoModel.add(roleMapping, SesameRealmConstants.OAS_ROLEMAPPEDUSER, user.getUri());
             
@@ -186,7 +185,7 @@ public class UserDetailsResourceImpl extends AbstractUserResourceImpl
             
             if(entry.getValue() != null)
             {
-                userInfoModel.add(roleMapping, PoddRdfConstants.PODD_ROLEMAPPEDOBJECT, entry.getValue());
+                userInfoModel.add(roleMapping, PODD.PODD_ROLEMAPPEDOBJECT, entry.getValue());
             }
         }
         

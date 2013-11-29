@@ -32,7 +32,7 @@ import com.github.podd.api.file.PoddDataRepository;
 import com.github.podd.api.file.SSHFileReference;
 import com.github.podd.exception.FileReferenceNotSupportedException;
 import com.github.podd.exception.FileRepositoryIncompleteException;
-import com.github.podd.utils.PoddRdfConstants;
+import com.github.podd.utils.PODD;
 
 /**
  * @author kutila
@@ -50,18 +50,13 @@ public class SSHFileRepositoryImpl extends PoddFileRepositoryImpl<SSHFileReferen
         // check that the model contains values for protocol, host, port,
         // fingerprint, username, and
         // secret
-        final String protocol =
-                model.filter(super.aliasUri, PoddRdfConstants.PODD_DATA_REPOSITORY_PROTOCOL, null).objectString();
-        final String host =
-                model.filter(super.aliasUri, PoddRdfConstants.PODD_DATA_REPOSITORY_HOST, null).objectString();
-        final String port =
-                model.filter(super.aliasUri, PoddRdfConstants.PODD_DATA_REPOSITORY_PORT, null).objectString();
+        final String protocol = model.filter(super.aliasUri, PODD.PODD_DATA_REPOSITORY_PROTOCOL, null).objectString();
+        final String host = model.filter(super.aliasUri, PODD.PODD_DATA_REPOSITORY_HOST, null).objectString();
+        final String port = model.filter(super.aliasUri, PODD.PODD_DATA_REPOSITORY_PORT, null).objectString();
         final String fingerprint =
-                model.filter(super.aliasUri, PoddRdfConstants.PODD_FILE_REPOSITORY_FINGERPRINT, null).objectString();
-        final String username =
-                model.filter(super.aliasUri, PoddRdfConstants.PODD_FILE_REPOSITORY_USERNAME, null).objectString();
-        final String secret =
-                model.filter(super.aliasUri, PoddRdfConstants.PODD_FILE_REPOSITORY_SECRET, null).objectString();
+                model.filter(super.aliasUri, PODD.PODD_FILE_REPOSITORY_FINGERPRINT, null).objectString();
+        final String username = model.filter(super.aliasUri, PODD.PODD_FILE_REPOSITORY_USERNAME, null).objectString();
+        final String secret = model.filter(super.aliasUri, PODD.PODD_FILE_REPOSITORY_SECRET, null).objectString();
         
         if(protocol == null || host == null || port == null || fingerprint == null || username == null
                 || secret == null)
@@ -107,17 +102,13 @@ public class SSHFileRepositoryImpl extends PoddFileRepositoryImpl<SSHFileReferen
             throw new FileReferenceNotSupportedException(dataReference, "cannot handle file reference for validation");
         }
         
-        final String host =
-                this.model.filter(super.aliasUri, PoddRdfConstants.PODD_DATA_REPOSITORY_HOST, null).objectString();
-        final String port =
-                this.model.filter(super.aliasUri, PoddRdfConstants.PODD_DATA_REPOSITORY_PORT, null).objectString();
+        final String host = this.model.filter(super.aliasUri, PODD.PODD_DATA_REPOSITORY_HOST, null).objectString();
+        final String port = this.model.filter(super.aliasUri, PODD.PODD_DATA_REPOSITORY_PORT, null).objectString();
         final String fingerprint =
-                this.model.filter(super.aliasUri, PoddRdfConstants.PODD_FILE_REPOSITORY_FINGERPRINT, null)
-                        .objectString();
+                this.model.filter(super.aliasUri, PODD.PODD_FILE_REPOSITORY_FINGERPRINT, null).objectString();
         final String username =
-                this.model.filter(super.aliasUri, PoddRdfConstants.PODD_FILE_REPOSITORY_USERNAME, null).objectString();
-        final String secret =
-                this.model.filter(super.aliasUri, PoddRdfConstants.PODD_FILE_REPOSITORY_SECRET, null).objectString();
+                this.model.filter(super.aliasUri, PODD.PODD_FILE_REPOSITORY_USERNAME, null).objectString();
+        final String secret = this.model.filter(super.aliasUri, PODD.PODD_FILE_REPOSITORY_SECRET, null).objectString();
         
         int portNo = -1;
         try
