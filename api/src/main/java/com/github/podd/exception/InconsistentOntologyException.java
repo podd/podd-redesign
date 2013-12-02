@@ -16,12 +16,20 @@
  */
 package com.github.podd.exception;
 
+import java.io.IOException;
+import java.io.StringWriter;
+import java.util.Set;
+
 import org.openrdf.model.BNode;
 import org.openrdf.model.Model;
 import org.openrdf.model.Resource;
+import org.openrdf.model.vocabulary.RDF;
 import org.openrdf.model.vocabulary.RDFS;
-import org.semanticweb.owlapi.reasoner.OWLReasoner;
+import org.semanticweb.owlapi.model.OWLAxiom;
+import org.semanticweb.owlapi.model.OWLException;
+import org.semanticweb.owlapi.model.OWLOntologyID;
 
+import com.clarkparsia.owlapi.explanation.io.ExplanationRenderer;
 import com.github.podd.utils.PODD;
 
 /**
@@ -33,36 +41,38 @@ import com.github.podd.utils.PODD;
 public class InconsistentOntologyException extends PoddException
 {
     private static final long serialVersionUID = 7628963882692198674L;
-    
-    private final OWLReasoner reasoner;
+    private final Set<Set<OWLAxiom>> explanations;
+    private final OWLOntologyID ontologyID;
+    private final ExplanationRenderer renderer;
     
     /**
      * 
-     * @param reasoner
-     *            The OWL Reasoner instance containing the details about why the ontology was
-     *            inconsistent.
      * @param msg
      *            The message for this exception.
      */
-    public InconsistentOntologyException(final OWLReasoner reasoner, final String msg)
+    public InconsistentOntologyException(final Set<Set<OWLAxiom>> inconsistencyExplanations,
+            final OWLOntologyID ontologyID, final ExplanationRenderer explanationRenderer, final String msg)
     {
         super(msg);
-        this.reasoner = reasoner;
+        this.explanations = inconsistencyExplanations;
+        this.ontologyID = ontologyID;
+        this.renderer = explanationRenderer;
     }
     
     /**
-     * @param reasoner
-     *            The OWL Reasoner instance containing the details about why the ontology was
-     *            inconsistent.
      * @param msg
      *            The message for this exception.
      * @param throwable
      *            The cause for this exception.
      */
-    public InconsistentOntologyException(final OWLReasoner reasoner, final String msg, final Throwable throwable)
+    public InconsistentOntologyException(final Set<Set<OWLAxiom>> inconsistencyExplanations,
+            final OWLOntologyID ontologyID, final ExplanationRenderer explanationRenderer, final String msg,
+            final Throwable throwable)
     {
         super(msg, throwable);
-        this.reasoner = reasoner;
+        this.explanations = inconsistencyExplanations;
+        this.ontologyID = ontologyID;
+        this.renderer = explanationRenderer;
     }
     
     /**
@@ -72,10 +82,13 @@ public class InconsistentOntologyException extends PoddException
      * @param throwable
      *            The cause for this exception.
      */
-    public InconsistentOntologyException(final OWLReasoner reasoner, final Throwable throwable)
+    public InconsistentOntologyException(final Set<Set<OWLAxiom>> inconsistencyExplanations,
+            final OWLOntologyID ontologyID, final ExplanationRenderer explanationRenderer, final Throwable throwable)
     {
         super(throwable);
-        this.reasoner = reasoner;
+        this.explanations = inconsistencyExplanations;
+        this.ontologyID = ontologyID;
+        this.renderer = explanationRenderer;
     }
     
     @Override
@@ -83,32 +96,45 @@ public class InconsistentOntologyException extends PoddException
     {
         final Model model = super.getDetailsAsModel(errorResource);
         
-        final OWLReasoner reasoner = this.getReasoner();
-        if(reasoner != null)
+        if(explanations != null)
         {
             final BNode reasonerUri = PODD.VF.createBNode();
             model.add(errorResource, PODD.ERR_IDENTIFIER, reasonerUri);
-            model.add(reasonerUri, RDFS.LABEL, PODD.VF.createLiteral(reasoner.getReasonerName()));
-            model.add(reasonerUri, PODD.OMV_CURRENT_VERSION,
-                    PODD.VF.createLiteral(reasoner.getReasonerVersion().toString()));
+            model.add(reasonerUri, RDFS.LABEL,
+                    PODD.VF.createLiteral("Explanations for inconsistencies (" + explanations.size() + ")"));
             
-            model.add(errorResource, PODD.ERR_SOURCE, reasoner.getRootOntology().getOntologyID().getOntologyIRI()
-                    .toOpenRDFURI());
+            model.add(errorResource, PODD.ERR_SOURCE, ontologyID.getOntologyIRI().toOpenRDFURI());
             
-            // TODO: can we get the causes for inconsistency?
-            // use ExplanationGenerator - sample code in podd-ontologies
+            String explanation;
+            
+            try
+            {
+                StringWriter results = new StringWriter();      
+                
+                renderer.startRendering(results);
+                
+                renderer.render((OWLAxiom)null, explanations);
+                
+                renderer.endRendering();
+                
+                explanation = results.toString();
+            }
+            catch(IOException | OWLException e)
+            {
+                explanation = "Failed to render inconsistency explanation";
+            }
+            final BNode v = PODD.VF.createBNode();
+            model.add(errorResource, PODD.ERR_CONTAINS, v);
+            model.add(v, RDF.TYPE, PODD.ERR_TYPE_ERROR);
+            model.add(v, RDFS.LABEL, PODD.VF.createLiteral(getMessage()));
+            model.add(v, RDFS.COMMENT, PODD.VF.createLiteral(explanation));
         }
         
         return model;
     }
     
-    /**
-     * @return The OWL Reasoner instance containing the details about why the ontology was
-     *         inconsistent.
-     */
-    public OWLReasoner getReasoner()
+    public OWLOntologyID getOntologyID()
     {
-        return this.reasoner;
+        return this.ontologyID;
     }
-    
 }

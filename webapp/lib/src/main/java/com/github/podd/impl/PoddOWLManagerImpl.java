@@ -81,6 +81,9 @@ import org.slf4j.LoggerFactory;
 
 import uk.ac.manchester.cs.owl.owlapi.OWLImportsDeclarationImpl;
 
+import com.clarkparsia.owlapi.explanation.PelletExplanation;
+import com.clarkparsia.owlapi.explanation.io.rdfxml.RDFXMLExplanationRenderer;
+import com.clarkparsia.pellet.owlapiv3.PelletReasoner;
 import com.github.podd.api.PoddOWLManager;
 import com.github.podd.exception.DataRepositoryException;
 import com.github.podd.exception.EmptyOntologyException;
@@ -535,7 +538,13 @@ public class PoddOWLManagerImpl implements PoddOWLManager
             
             if(!reasoner.isConsistent())
             {
-                throw new InconsistentOntologyException(reasoner, "Ontology is inconsistent");
+                PelletExplanation exp = new PelletExplanation((PelletReasoner)reasoner);
+                // Get 100 inconsistency explanations, any more than that and they need to make
+                // modifications and try again
+                RDFXMLExplanationRenderer renderer = new RDFXMLExplanationRenderer();
+                Set<Set<OWLAxiom>> inconsistencyExplanations = exp.getInconsistencyExplanations(100);
+                throw new InconsistentOntologyException(inconsistencyExplanations, nextOntology.getOntologyID(),
+                        renderer, "Ontology is inconsistent");
             }
         }
         catch(final Throwable e)

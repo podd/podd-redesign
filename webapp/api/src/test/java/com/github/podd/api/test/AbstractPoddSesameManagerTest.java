@@ -1112,7 +1112,7 @@ public abstract class AbstractPoddSesameManagerTest
         // Format: Object Type, expected model size, expected relationship count, expected child
         // object type count
         final Object[][] testData =
-                { { PODD.VF.createURI(PODD.PODD_SCIENCE, "Investigation"), 85, 10, 15 },
+                { { PODD.VF.createURI(PODD.PODD_SCIENCE, "Investigation"), 95, 10, 15 },
                         { PODD.VF.createURI(PODD.PODD_SCIENCE, "Material"), 61, 7, 10 }, };
         
         for(final Object[] element : testData)

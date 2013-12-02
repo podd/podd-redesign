@@ -91,7 +91,7 @@ public class GetMetadataResourceImplTest extends AbstractResourceImplTest
                             MediaType.APPLICATION_RDF_TURTLE, Status.SUCCESS_OK, this.testWithAdminPrivileges);
             
             // verify:
-            final Model model = this.assertRdf(results, RDFFormat.TURTLE, 85);
+            final Model model = this.assertRdf(results, RDFFormat.TURTLE, 95);
             
             Assert.assertEquals("GrowthConditions not found", 1,
                     model.filter(null, OWL.ALLVALUESFROM, PODD.VF.createURI(PODD.PODD_PLANT, "GrowthConditions"))
@@ -115,8 +115,13 @@ public class GetMetadataResourceImplTest extends AbstractResourceImplTest
     @Test
     public void testGetChildrenWithProjectRdf() throws Exception
     {
-        final Object[][] testData =
-                { { PODD.PODD_SCIENCE + "Project", 63, 11, 0 }, { PODD.PODD_SCIENCE + "Investigation", 85, 16, 0 }, };
+        final Object[][] testData = {
+        
+        { PODD.PODD_SCIENCE + "Project", 63, 11, 0 },
+        
+        { PODD.PODD_SCIENCE + "Investigation", 95, 16, 0 },
+        
+        };
         
         for(final Object[] element : testData)
         {
@@ -223,7 +228,7 @@ public class GetMetadataResourceImplTest extends AbstractResourceImplTest
                             MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
             
             // verify: received contents are in RDF
-            final Model model = this.assertRdf(results, RDFFormat.RDFXML, 165);
+            final Model model = this.assertRdf(results, RDFFormat.RDFXML, 174);
             
             Assert.assertEquals("Unexpected no. of properties", 20,
                     model.filter(PODD.VF.createURI(objectType), null, null).size() - 1);

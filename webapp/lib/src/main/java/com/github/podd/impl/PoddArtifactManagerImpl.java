@@ -21,11 +21,14 @@ import info.aduna.iteration.Iterations;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -50,17 +53,27 @@ import org.openrdf.repository.RepositoryResult;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.Rio;
 import org.semanticweb.owlapi.model.IRI;
+import org.semanticweb.owlapi.model.OWLAxiom;
+import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLException;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyID;
+import org.semanticweb.owlapi.model.OWLRuntimeException;
+import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
 import org.semanticweb.owlapi.profiles.OWLProfileReport;
 import org.semanticweb.owlapi.profiles.OWLProfileViolation;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
 import org.semanticweb.owlapi.rio.RioMemoryTripleSource;
+import org.semanticweb.owlapi.util.NullProgressMonitor;
+import org.semanticweb.owlapi.util.ProgressMonitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.clarkparsia.owlapi.explanation.GlassBoxExplanation;
+import com.clarkparsia.owlapi.explanation.PelletExplanation;
+import com.clarkparsia.owlapi.explanation.io.manchester.ManchesterSyntaxExplanationRenderer;
+import com.clarkparsia.owlapi.explanation.io.rdfxml.RDFXMLExplanationRenderer;
+import com.clarkparsia.pellet.owlapiv3.PelletReasoner;
 import com.clarkparsia.pellet.owlapiv3.PelletReasonerFactory;
 import com.github.podd.api.DanglingObjectPolicy;
 import com.github.podd.api.DataReferenceVerificationPolicy;
@@ -1454,11 +1467,40 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             // profile
             if(!nextReasoner.isConsistent())
             {
-                GlassBoxExplanation test =
-                        new GlassBoxExplanation(nextOntology, (PelletReasonerFactory)this.getOWLManager()
-                                .getReasonerFactory());
+                RDFXMLExplanationRenderer renderer = new RDFXMLExplanationRenderer();
+                ExplanationUtils exp =
+                        new ExplanationUtils((PelletReasoner)nextReasoner, (PelletReasonerFactory)getOWLManager()
+                                .getReasonerFactory(), renderer, new NullProgressMonitor(), 100);
                 
-                throw new InconsistentOntologyException(nextReasoner, "Ontology is inconsistent");
+                OWLClass owlNothing = nextOntology.getOWLOntologyManager().getOWLDataFactory().getOWLNothing();
+                
+                for(OWLClass cls : nextReasoner.getEquivalentClasses(owlNothing))
+                {
+                    if(cls.isOWLNothing())
+                    {
+                        continue;
+                    }
+                    
+                    OWLSubClassOfAxiom axiom =
+                            nextOntology.getOWLOntologyManager().getOWLDataFactory()
+                                    .getOWLSubClassOfAxiom(cls, owlNothing);
+                    explainUnsatisfiableClass(cls);
+                }
+                
+                PelletExplanation exp = new PelletExplanation((PelletReasoner)nextReasoner);
+                // Get 100 inconsistency explanations, any more than that and they need to make
+                // modifications and try again
+                try
+                {
+                    Set<Set<OWLAxiom>> inconsistencyExplanations = exp.getInconsistencyExplanations(100);
+                    throw new InconsistentOntologyException(inconsistencyExplanations, nextOntology.getOntologyID(),
+                            renderer, "Ontology is inconsistent (explanation available)");
+                }
+                catch(OWLRuntimeException e)
+                {
+                    throw new InconsistentOntologyException(new HashSet<Set<OWLAxiom>>(), nextOntology.getOntologyID(),
+                            renderer, "Ontology is inconsistent (no explanation available)");
+                }
             }
             
             // Copy the statements to permanentRepositoryConnection
