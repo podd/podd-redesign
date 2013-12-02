@@ -119,6 +119,11 @@ import com.github.podd.utils.RdfUtility;
  */
 public class PoddArtifactManagerImpl implements PoddArtifactManager
 {
+    static
+    {
+        GlassBoxExplanation.setup();
+    }
+    
     private final Logger log = LoggerFactory.getLogger(this.getClass());
     
     private DataReferenceManager dataReferenceManager;
@@ -1468,31 +1473,16 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             if(!nextReasoner.isConsistent())
             {
                 RDFXMLExplanationRenderer renderer = new RDFXMLExplanationRenderer();
+                // Get 100 inconsistency explanations, any more than that and they need to make
+                // modifications and try again
                 ExplanationUtils exp =
                         new ExplanationUtils((PelletReasoner)nextReasoner, (PelletReasonerFactory)getOWLManager()
                                 .getReasonerFactory(), renderer, new NullProgressMonitor(), 100);
                 
-                OWLClass owlNothing = nextOntology.getOWLOntologyManager().getOWLDataFactory().getOWLNothing();
-                
-                for(OWLClass cls : nextReasoner.getEquivalentClasses(owlNothing))
-                {
-                    if(cls.isOWLNothing())
-                    {
-                        continue;
-                    }
-                    
-                    OWLSubClassOfAxiom axiom =
-                            nextOntology.getOWLOntologyManager().getOWLDataFactory()
-                                    .getOWLSubClassOfAxiom(cls, owlNothing);
-                    explainUnsatisfiableClass(cls);
-                }
-                
-                PelletExplanation exp = new PelletExplanation((PelletReasoner)nextReasoner);
-                // Get 100 inconsistency explanations, any more than that and they need to make
-                // modifications and try again
                 try
                 {
-                    Set<Set<OWLAxiom>> inconsistencyExplanations = exp.getInconsistencyExplanations(100);
+                    Set<Set<OWLAxiom>> inconsistencyExplanations = exp.explainClassHierarchy();
+                    
                     throw new InconsistentOntologyException(inconsistencyExplanations, nextOntology.getOntologyID(),
                             renderer, "Ontology is inconsistent (explanation available)");
                 }

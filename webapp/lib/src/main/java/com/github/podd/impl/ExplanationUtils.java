@@ -93,7 +93,10 @@ public class ExplanationUtils
                 this.setExplanations.add(axioms);
                 try
                 {
-                    this.rend.render(this.axiom, Collections.singleton(axioms));
+                    if(this.rend != null)
+                    {
+                        this.rend.render(this.axiom, Collections.singleton(axioms));
+                    }
                 }
                 catch(final IOException e)
                 {
@@ -110,7 +113,10 @@ public class ExplanationUtils
         {
             try
             {
-                this.rend.render(this.axiom, Collections.<Set<OWLAxiom>> emptySet());
+                if(this.rend != null)
+                {
+                    this.rend.render(this.axiom, Collections.<Set<OWLAxiom>> emptySet());
+                }
             }
             catch(final OWLException e)
             {
@@ -134,7 +140,7 @@ public class ExplanationUtils
         GlassBoxExplanation.setup();
     }
     
-    private boolean allowInconsistency = false;
+    private boolean allowInconsistency = true;
     private SatisfiabilityConverter converter;
     private int errorExpCount = 0;
     private ExplanationRenderer explanationRenderer;
@@ -175,7 +181,7 @@ public class ExplanationUtils
         this.converter = new SatisfiabilityConverter(reasoner.getManager().getOWLDataFactory());
     }
     
-    private void explainAxiom(final OWLAxiom axiom) throws OWLException
+    private Set<Set<OWLAxiom>> explainAxiom(final OWLAxiom axiom) throws OWLException
     {
         final MultipleExplanationGenerator expGen = new HSTExplanationGenerator(this.getSingleExplanationGenerator());
         final RendererExplanationProgressMonitor rendererMonitor =
@@ -206,9 +212,11 @@ public class ExplanationUtils
         {
             this.multipleExpCount++;
         }
+        
+        return explanations;
     }
     
-    public void explainClassHierarchy() throws OWLException
+    public Set<Set<OWLAxiom>> explainClassHierarchy() throws OWLException
     {
         final Set<OWLClass> visited = new HashSet<OWLClass>();
         
@@ -222,21 +230,27 @@ public class ExplanationUtils
         this.monitor.setProgress(this.reasoner.getRootOntology().getClassesInSignature().size());
         this.monitor.setStarted();
         
+        final Set<Set<OWLAxiom>> result = new HashSet<Set<OWLAxiom>>();
+        
         final Node<OWLClass> bottoms = this.reasoner.getEquivalentClasses(OWL.Nothing);
-        this.explainClassHierarchy(OWL.Nothing, bottoms, visited);
+        result.addAll(this.explainClassHierarchy(OWL.Nothing, bottoms, visited));
         
         final Node<OWLClass> tops = this.reasoner.getEquivalentClasses(OWL.Thing);
-        this.explainClassHierarchy(OWL.Thing, tops, visited);
+        result.addAll(this.explainClassHierarchy(OWL.Thing, tops, visited));
         
         this.monitor.setFinished();
+        
+        return result;
     }
     
-    private void explainClassHierarchy(final OWLClass cls, final Node<OWLClass> eqClasses, final Set<OWLClass> visited)
-        throws OWLException
+    private Set<Set<OWLAxiom>> explainClassHierarchy(final OWLClass cls, final Node<OWLClass> eqClasses,
+            final Set<OWLClass> visited) throws OWLException
     {
+        final Set<Set<OWLAxiom>> result = new HashSet<Set<OWLAxiom>>();
+        
         if(visited.contains(cls))
         {
-            return;
+            return result;
         }
         
         visited.add(cls);
@@ -244,110 +258,115 @@ public class ExplanationUtils
         
         for(final OWLClass eqClass : eqClasses)
         {
-            this.monitor.incrementProgress();
+            // TODO: Support this
+            // this.monitor.incrementProgress();
             
-            this.explainEquivalentClass(cls, eqClass);
+            result.addAll(this.explainEquivalentClass(cls, eqClass));
         }
         
         for(final OWLNamedIndividual ind : this.reasoner.getInstances(cls, true).getFlattened())
         {
-            this.explainInstance(ind, cls);
+            result.addAll(this.explainInstance(ind, cls));
         }
         
         final NodeSet<OWLClass> subClasses = this.reasoner.getSubClasses(cls, true);
         final Map<OWLClass, Node<OWLClass>> subClassEqs = new HashMap<OWLClass, Node<OWLClass>>();
         for(final Node<OWLClass> equivalenceSet : subClasses)
         {
-            if(equivalenceSet.isBottomNode())
+            if(!equivalenceSet.isBottomNode())
             {
-                continue;
+                final OWLClass subClass = equivalenceSet.getRepresentativeElement();
+                subClassEqs.put(subClass, equivalenceSet);
+                result.addAll(this.explainSubClass(subClass, cls));
             }
-            
-            final OWLClass subClass = equivalenceSet.getRepresentativeElement();
-            subClassEqs.put(subClass, equivalenceSet);
-            this.explainSubClass(subClass, cls);
         }
         
         for(final Map.Entry<OWLClass, Node<OWLClass>> entry : subClassEqs.entrySet())
         {
-            this.explainClassHierarchy(entry.getKey(), entry.getValue(), visited);
+            result.addAll(this.explainClassHierarchy(entry.getKey(), entry.getValue(), visited));
         }
+        
+        return result;
     }
     
-    public void explainEquivalentClass(final OWLClass c1, final OWLClass c2) throws OWLException
+    public Set<Set<OWLAxiom>> explainEquivalentClass(final OWLClass c1, final OWLClass c2) throws OWLException
     {
+        final Set<Set<OWLAxiom>> result = new HashSet<Set<OWLAxiom>>();
+        
         if(c1.equals(c2))
         {
-            return;
+            return result;
         }
         
         final OWLAxiom axiom = OWL.equivalentClasses(c1, c2);
         
-        this.explainAxiom(axiom);
+        return this.explainAxiom(axiom);
     }
     
-    public void explainInstance(final OWLIndividual ind, final OWLClass c) throws OWLException
+    public Set<Set<OWLAxiom>> explainInstance(final OWLIndividual ind, final OWLClass c) throws OWLException
     {
+        final Set<Set<OWLAxiom>> result = new HashSet<Set<OWLAxiom>>();
+        
         if(c.isOWLThing())
         {
-            return;
+            return result;
         }
         
         final OWLAxiom axiom = OWL.classAssertion(ind, c);
         
-        this.explainAxiom(axiom);
+        return this.explainAxiom(axiom);
     }
     
-    public void explainPropertyValue(final OWLIndividual s, @SuppressWarnings("rawtypes") final OWLProperty p,
-            final OWLObject o) throws OWLException
+    public Set<Set<OWLAxiom>> explainPropertyValue(final OWLIndividual s,
+            @SuppressWarnings("rawtypes") final OWLProperty p, final OWLObject o) throws OWLException
     {
         if(p.isOWLObjectProperty())
         {
-            this.explainAxiom(OWL.propertyAssertion(s, (OWLObjectProperty)p, (OWLIndividual)o));
+            return this.explainAxiom(OWL.propertyAssertion(s, (OWLObjectProperty)p, (OWLIndividual)o));
         }
         else
         {
-            this.explainAxiom(OWL.propertyAssertion(s, (OWLDataProperty)p, (OWLLiteral)o));
+            return this.explainAxiom(OWL.propertyAssertion(s, (OWLDataProperty)p, (OWLLiteral)o));
         }
     }
     
-    public void explainSubClass(final OWLClass sub, final OWLClass sup) throws OWLException
+    public Set<Set<OWLAxiom>> explainSubClass(final OWLClass sub, final OWLClass sup) throws OWLException
     {
+        final Set<Set<OWLAxiom>> result = new HashSet<Set<OWLAxiom>>();
+        
         if(sub.equals(sup))
         {
-            return;
+            return result;
         }
-        
-        if(sub.isOWLNothing())
+        else if(sub.isOWLNothing())
         {
-            return;
+            return result;
         }
-        
-        if(sup.isOWLThing())
+        else if(sup.isOWLThing())
         {
-            return;
+            return result;
         }
         
         final OWLSubClassOfAxiom axiom = OWL.subClassOf(sub, sup);
-        this.explainAxiom(axiom);
+        return this.explainAxiom(axiom);
     }
     
-    public void explainUnsatisfiableClass(final OWLClass cls) throws OWLException
+    public Set<Set<OWLAxiom>> explainUnsatisfiableClass(final OWLClass cls) throws OWLException
     {
-        this.explainSubClass(cls, OWL.Nothing);
+        return this.explainSubClass(cls, OWL.Nothing);
     }
     
-    public void explainUnsatisfiableClasses() throws OWLException
+    public Set<Set<OWLAxiom>> explainUnsatisfiableClasses() throws OWLException
     {
+        final Set<Set<OWLAxiom>> result = new HashSet<Set<OWLAxiom>>();
         for(final OWLClass cls : this.reasoner.getEquivalentClasses(OWL.Nothing))
         {
-            if(cls.isOWLNothing())
+            if(!cls.isOWLNothing())
             {
-                continue;
+                result.addAll(this.explainUnsatisfiableClass(cls));
             }
-            
-            this.explainUnsatisfiableClass(cls);
         }
+        return result;
     }
     
     private TransactionAwareSingleExpGen getSingleExplanationGenerator()
@@ -360,5 +379,15 @@ public class ExplanationUtils
         {
             return new BlackBoxExplanation(this.reasoner.getRootOntology(), this.reasonerFactory, this.reasoner);
         }
+    }
+    
+    public boolean getAllowInconsistency()
+    {
+        return this.allowInconsistency;
+    }
+    
+    public void setAllowInconsistency(final boolean allowInconsistency)
+    {
+        this.allowInconsistency = allowInconsistency;
     }
 }
