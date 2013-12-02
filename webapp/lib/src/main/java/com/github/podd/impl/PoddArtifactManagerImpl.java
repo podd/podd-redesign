@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import org.mindswap.pellet.exceptions.PelletRuntimeException;
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.Literal;
 import org.openrdf.model.Model;
@@ -1486,10 +1487,15 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
                     throw new InconsistentOntologyException(inconsistencyExplanations, nextOntology.getOntologyID(),
                             renderer, "Ontology is inconsistent (explanation available)");
                 }
-                catch(OWLRuntimeException e)
+                catch(org.mindswap.pellet.exceptions.InconsistentOntologyException e)
                 {
                     throw new InconsistentOntologyException(new HashSet<Set<OWLAxiom>>(), nextOntology.getOntologyID(),
-                            renderer, "Ontology is inconsistent (no explanation available)");
+                            renderer, "Ontology is inconsistent (textual explanation available): " + e.getMessage());
+                }
+                catch(PelletRuntimeException | OWLRuntimeException e)
+                {
+                    throw new InconsistentOntologyException(new HashSet<Set<OWLAxiom>>(), nextOntology.getOntologyID(),
+                            renderer, "Ontology is inconsistent (no explanation available): " + e.getMessage());
                 }
             }
             
