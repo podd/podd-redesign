@@ -101,7 +101,7 @@ public class GetMetadataResourceImplTest extends AbstractResourceImplTest
                     model.filter(PODD.VF.createURI(PODD.PODD_PLANT, "FieldConditions"), RDFS.LABEL, null).objects()
                             .size());
             
-            Assert.assertEquals("Unexpected no. of properties", 16,
+            Assert.assertEquals("Unexpected no. of properties", 18,
                     model.filter(PODD.VF.createURI(objectType), null, null).size());
             Assert.assertEquals("Expected no Do-Not-Display properties", 0,
                     model.filter(null, PODD.PODD_BASE_DO_NOT_DISPLAY, null).size());
@@ -119,7 +119,7 @@ public class GetMetadataResourceImplTest extends AbstractResourceImplTest
         
         { PODD.PODD_SCIENCE + "Project", 63, 11, 0 },
         
-        { PODD.PODD_SCIENCE + "Investigation", 95, 16, 0 },
+        { PODD.PODD_SCIENCE + "Investigation", 95, 18, 0 },
         
         };
         
@@ -230,7 +230,7 @@ public class GetMetadataResourceImplTest extends AbstractResourceImplTest
             // verify: received contents are in RDF
             final Model model = this.assertRdf(results, RDFFormat.RDFXML, 174);
             
-            Assert.assertEquals("Unexpected no. of properties", 20,
+            Assert.assertEquals("Unexpected no. of properties", 21,
                     model.filter(PODD.VF.createURI(objectType), null, null).size() - 1);
             Assert.assertEquals("Expected no Do-Not-Display properties", 3,
                     model.filter(null, PODD.PODD_BASE_DO_NOT_DISPLAY, null).size());

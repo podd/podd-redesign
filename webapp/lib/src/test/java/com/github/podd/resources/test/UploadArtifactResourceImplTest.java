@@ -83,7 +83,7 @@ public class UploadArtifactResourceImplTest extends AbstractResourceImplTest
             // verify: error details
             Assert.assertEquals("Not the expected HTTP status code", Status.SERVER_ERROR_INTERNAL, e.getStatus());
             
-            final Model model = this.assertRdf(uploadArtifactClientResource.getResponseEntity(), responseFormat, 13);
+            final Model model = this.assertRdf(uploadArtifactClientResource.getResponseEntity(), responseFormat, 16);
             
             final Set<Resource> errors = model.filter(null, RDF.TYPE, PODD.ERR_TYPE_TOP_ERROR).subjects();
             Assert.assertEquals("Not the expected number of Errors", 1, errors.size());
@@ -102,11 +102,19 @@ public class UploadArtifactResourceImplTest extends AbstractResourceImplTest
             final Resource errorNode = model.filter(topError, PODD.ERR_CONTAINS, null).objectResource();
             
             // Error cause details
-            Assert.assertEquals("Not the expected Exception class", InconsistentOntologyException.class.getName(),
+            Assert.assertEquals("Not the expected Exception class",
+                    "com.github.podd.exception.InconsistentOntologyException",
                     model.filter(errorNode, PODD.ERR_EXCEPTION_CLASS, null).objectString());
             
             Assert.assertEquals("Not the expected error source", "urn:temp:inconsistentArtifact:1",
                     model.filter(errorNode, PODD.ERR_SOURCE, null).objectString());
+            
+            Assert.assertTrue(
+                    "Not the expected inconsistency explanation",
+                    model.filter(errorNode, RDFS.COMMENT, null)
+                            .objectString()
+                            .contains(
+                                    "Individual urn:temp:object:1960 has more than 1 values for property http://purl.org/podd/ns/poddBase#hasLeadInstitution"));
         }
         finally
         {
