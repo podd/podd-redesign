@@ -143,10 +143,10 @@ public class AbstractResourceImplTest
     public TemporaryFolder tempDirectory = new TemporaryFolder();
     
     /**
-     * Timeout tests after 600 seconds.
+     * Timeout tests after 60 seconds.
      */
     @Rule
-    public TimeoutWithStackTraces timeout = new TimeoutWithStackTraces(600000);
+    public TimeoutWithStackTraces timeout = new TimeoutWithStackTraces(60000);
     
     /**
      * The set of ports that have been used in tests so far in this virtual machine.

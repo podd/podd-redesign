@@ -37,10 +37,10 @@ public interface TestConstants
     public static final int EXPECTED_TRIPLE_COUNT_PODD_BASE_INFERRED = 70;
     
     public static final int EXPECTED_TRIPLE_COUNT_PODD_SCIENCE_CONCRETE = 1468;
-    public static final int EXPECTED_TRIPLE_COUNT_PODD_SCIENCE_INFERRED = 214;
+    public static final int EXPECTED_TRIPLE_COUNT_PODD_SCIENCE_INFERRED = 229;
     
     public static final int EXPECTED_TRIPLE_COUNT_PODD_PLANT_CONCRETE = 214;
-    public static final int EXPECTED_TRIPLE_COUNT_PODD_PLANT_INFERRED = 364;
+    public static final int EXPECTED_TRIPLE_COUNT_PODD_PLANT_INFERRED = 383;
     
     /** Test resource: artifact with no internal objects */
     public static final String TEST_ARTIFACT_BASIC_PROJECT_1 = "/test/artifacts/basicProject-1.rdf";
