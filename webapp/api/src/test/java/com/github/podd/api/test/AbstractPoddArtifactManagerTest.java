@@ -1605,7 +1605,8 @@ public abstract class AbstractPoddArtifactManagerTest
         {
             Assert.assertEquals("Not the expected Root Ontology", "urn:temp:inconsistentArtifact:1", e.getOntologyID()
                     .getOntologyIRI().toString());
-            Assert.assertEquals("Not the expected error message", "Ontology is inconsistent", e.getMessage());
+            Assert.assertTrue("Not the expected error message", e.getMessage().startsWith("Ontology is inconsistent"));
+            
             e.getDetailsAsModel(PODD.VF.createBNode());
             
         }
