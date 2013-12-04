@@ -96,26 +96,26 @@ public class InconsistentOntologyException extends PoddException
     {
         final Model model = super.getDetailsAsModel(errorResource);
         
-        if(explanations != null)
+        if(this.explanations != null)
         {
             final BNode reasonerUri = PODD.VF.createBNode();
             model.add(errorResource, PODD.ERR_IDENTIFIER, reasonerUri);
             model.add(reasonerUri, RDFS.LABEL,
-                    PODD.VF.createLiteral("Explanations for inconsistencies (" + explanations.size() + ")"));
+                    PODD.VF.createLiteral("Explanations for inconsistencies (" + this.explanations.size() + ")"));
             
-            model.add(errorResource, PODD.ERR_SOURCE, ontologyID.getOntologyIRI().toOpenRDFURI());
+            model.add(errorResource, PODD.ERR_SOURCE, this.ontologyID.getOntologyIRI().toOpenRDFURI());
             
             String explanation;
             
             try
             {
-                StringWriter results = new StringWriter();      
+                final StringWriter results = new StringWriter();
                 
-                renderer.startRendering(results);
+                this.renderer.startRendering(results);
                 
-                renderer.render((OWLAxiom)null, explanations);
+                this.renderer.render((OWLAxiom)null, this.explanations);
                 
-                renderer.endRendering();
+                this.renderer.endRendering();
                 
                 explanation = results.toString();
             }
@@ -126,7 +126,7 @@ public class InconsistentOntologyException extends PoddException
             final BNode v = PODD.VF.createBNode();
             model.add(errorResource, PODD.ERR_CONTAINS, v);
             model.add(v, RDF.TYPE, PODD.ERR_TYPE_ERROR);
-            model.add(v, RDFS.LABEL, PODD.VF.createLiteral(getMessage()));
+            model.add(v, RDFS.LABEL, PODD.VF.createLiteral(this.getMessage()));
             model.add(v, RDFS.COMMENT, PODD.VF.createLiteral(explanation));
         }
         

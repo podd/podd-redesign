@@ -538,11 +538,11 @@ public class PoddOWLManagerImpl implements PoddOWLManager
             
             if(!reasoner.isConsistent())
             {
-                PelletExplanation exp = new PelletExplanation((PelletReasoner)reasoner);
+                final PelletExplanation exp = new PelletExplanation((PelletReasoner)reasoner);
                 // Get 100 inconsistency explanations, any more than that and they need to make
                 // modifications and try again
-                RDFXMLExplanationRenderer renderer = new RDFXMLExplanationRenderer();
-                Set<Set<OWLAxiom>> inconsistencyExplanations = exp.getInconsistencyExplanations(100);
+                final RDFXMLExplanationRenderer renderer = new RDFXMLExplanationRenderer();
+                final Set<Set<OWLAxiom>> inconsistencyExplanations = exp.getInconsistencyExplanations(100);
                 throw new InconsistentOntologyException(inconsistencyExplanations, nextOntology.getOntologyID(),
                         renderer, "Ontology is inconsistent");
             }

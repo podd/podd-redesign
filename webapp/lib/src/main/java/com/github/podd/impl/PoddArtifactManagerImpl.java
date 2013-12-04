@@ -21,8 +21,6 @@ import info.aduna.iteration.Iterations;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -55,24 +53,19 @@ import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.Rio;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLAxiom;
-import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLException;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyID;
 import org.semanticweb.owlapi.model.OWLRuntimeException;
-import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
 import org.semanticweb.owlapi.profiles.OWLProfileReport;
 import org.semanticweb.owlapi.profiles.OWLProfileViolation;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
 import org.semanticweb.owlapi.rio.RioMemoryTripleSource;
 import org.semanticweb.owlapi.util.NullProgressMonitor;
-import org.semanticweb.owlapi.util.ProgressMonitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.clarkparsia.owlapi.explanation.GlassBoxExplanation;
-import com.clarkparsia.owlapi.explanation.PelletExplanation;
-import com.clarkparsia.owlapi.explanation.io.manchester.ManchesterSyntaxExplanationRenderer;
 import com.clarkparsia.owlapi.explanation.io.rdfxml.RDFXMLExplanationRenderer;
 import com.clarkparsia.pellet.owlapiv3.PelletReasoner;
 import com.clarkparsia.pellet.owlapiv3.PelletReasonerFactory;
@@ -1473,21 +1466,21 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             // profile
             if(!nextReasoner.isConsistent())
             {
-                RDFXMLExplanationRenderer renderer = new RDFXMLExplanationRenderer();
+                final RDFXMLExplanationRenderer renderer = new RDFXMLExplanationRenderer();
                 // Get 100 inconsistency explanations, any more than that and they need to make
                 // modifications and try again
-                ExplanationUtils exp =
-                        new ExplanationUtils((PelletReasoner)nextReasoner, (PelletReasonerFactory)getOWLManager()
+                final ExplanationUtils exp =
+                        new ExplanationUtils((PelletReasoner)nextReasoner, (PelletReasonerFactory)this.getOWLManager()
                                 .getReasonerFactory(), renderer, new NullProgressMonitor(), 100);
                 
                 try
                 {
-                    Set<Set<OWLAxiom>> inconsistencyExplanations = exp.explainClassHierarchy();
+                    final Set<Set<OWLAxiom>> inconsistencyExplanations = exp.explainClassHierarchy();
                     
                     throw new InconsistentOntologyException(inconsistencyExplanations, nextOntology.getOntologyID(),
                             renderer, "Ontology is inconsistent (explanation available)");
                 }
-                catch(org.mindswap.pellet.exceptions.InconsistentOntologyException e)
+                catch(final org.mindswap.pellet.exceptions.InconsistentOntologyException e)
                 {
                     throw new InconsistentOntologyException(new HashSet<Set<OWLAxiom>>(), nextOntology.getOntologyID(),
                             renderer, "Ontology is inconsistent (textual explanation available): " + e.getMessage());
