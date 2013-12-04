@@ -142,12 +142,14 @@ public abstract class AbstractPoddClientTest
     }
     
     /**
-     * Resets the test PODD server if possible. If not possible it is not recommended to rely on
-     * these tests for extensive verification.
+     * Resets the test PODD and TrayScanDB servers if possible. If this is not possible, it is not
+     * recommended to rely on these tests for extensive verification without first manually
+     * resetting each database to a fresh state.
      * 
-     * @throws IOException
+     * @throws Exception
+     *             If there are any issues resetting the server
      */
-    protected abstract void resetTestPoddServer() throws IOException;
+    protected abstract void resetTestServers() throws Exception;
     
     /**
      * @throws java.lang.Exception
@@ -174,7 +176,7 @@ public abstract class AbstractPoddClientTest
     @After
     public void tearDown() throws Exception
     {
-        this.resetTestPoddServer();
+        this.resetTestServers();
         this.testClient = null;
     }
     

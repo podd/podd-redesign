@@ -117,7 +117,7 @@ public class RestletPoddClientImplIntegrationTest extends AbstractPoddClientTest
     }
     
     @Override
-    protected void resetTestPoddServer() throws IOException
+    protected void resetTestServers() throws IOException
     {
         // Reset server after each test so that assertions are not dependent on the order of the
         // tests, which is unpredictable
