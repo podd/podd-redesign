@@ -533,7 +533,7 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
                     schemaOntologyUris.add((URI)nextOntology);
                     // check ontology IRI does not have any associated
                     // owl:imports
-                    if(model.filter(nextOntology, OWL.IMPORTS, null).objects().size() > 0)
+                    if(model.filter(nextOntology, OWL.IMPORTS, null).size() > 0)
                     {
                         throw new SchemaManifestException(IRI.create((URI)nextOntology),
                                 "Imports should be associated with version IRI");
