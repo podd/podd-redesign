@@ -391,11 +391,8 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
                     
                     if(currentVersionsMap.containsKey(nextImport))
                     {
-                        // Map down to the current version to ensure that we can
-                        // load
-                        // multiple versions simultaneously (if possible with
-                        // the rest of
-                        // the system)
+                        // Map down to the current version to ensure that we can load multiple
+                        // versions simultaneously (if possible with the rest of the system)
                         nextImportsSet.add(currentVersionsMap.get(nextImport));
                     }
                     else if(currentVersionsMap.containsValue(nextImport))
@@ -411,9 +408,8 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
                             if(nextAllVersions.equals(nextImport))
                             {
                                 foundAllVersion = true;
-                                // this should not normally occur, as the
-                                // current versions
-                                // map should also contain this key
+                                // this should not normally occur, as the current versions map
+                                // should also contain this key
                                 nextImport = currentVersionsMap.get(nextAllVersions);
                                 nextImportsSet.add((URI)nextImport);
                             }
@@ -442,9 +438,8 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
             }
         }
         this.log.debug("adding import for {} at {}", nextVersionUri, maxIndex);
-        // TODO: FIXME: This will not allow for multiple versions of a single
-        // schema
-        // ontology at the same time
+        // TODO: FIXME: This will not allow for multiple versions of a single schema ontology at the
+        // same time if they have any shared import versions
         importOrder.add(maxIndex, nextVersionUri);
     }
     
