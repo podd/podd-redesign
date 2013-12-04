@@ -84,7 +84,7 @@ public class RestletPoddClientImpl implements PoddClient
 {
     protected final String TEMP_UUID_PREFIX = "urn:temp:uuid:";
     
-    private final Logger log = LoggerFactory.getLogger(this.getClass());
+    protected final Logger log = LoggerFactory.getLogger(this.getClass());
     
     private String serverUrl = null;
     
