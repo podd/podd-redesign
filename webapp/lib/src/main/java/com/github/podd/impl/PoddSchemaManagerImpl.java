@@ -563,8 +563,7 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
         }
         
         // Map the actual schema ontologies to the correct order, based on
-        // current versions and all
-        // versions with the imports taken into account
+        // current versions and all versions with the imports taken into account
         for(final URI nextVersionUri : schemaVersionUris)
         {
             this.mapAndSortImports(model, currentVersionsMap, allVersionsMap, importsMap, importOrder, nextVersionUri);
@@ -594,6 +593,13 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
             final RDFFormat format = Rio.getParserFormatForFileName(classpathLocation, RDFFormat.RDFXML);
             try (final InputStream input = ApplicationUtils.class.getResourceAsStream(classpathLocation);)
             {
+                if(input == null)
+                {
+                    throw new SchemaManifestException(IRI.create(nextOrderedImport),
+                            "Could not find schema at designated classpath location: "
+                                    + nextOrderedImport.stringValue());
+                    
+                }
                 this.uploadSchemaOntology(input, format);
             }
         }
@@ -721,7 +727,7 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
                 if(input == null)
                 {
                     throw new SchemaManifestException(IRI.create(nextVersionUri),
-                            "Could not find schema at designated classpath location");
+                            "Could not find schema at designated classpath location: " + nextVersionUri.stringValue());
                 }
                 final Model model = Rio.parse(input, "", format);
                 final Set<Value> importsInOwlFile = model.filter(null, OWL.IMPORTS, null).objects();
