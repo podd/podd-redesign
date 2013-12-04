@@ -1250,8 +1250,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         final Collection<OWLOntologyID> schemaImports = this.getSchemaImports(ontologyIDs.get(0));
         
         // connection to the temporary repository that the artifact RDF triples
-        // will be stored while
-        // they are initially parsed by OWLAPI.
+        // will be stored while they are initially parsed by OWLAPI.
         final Repository tempRepository = this.repositoryManager.getNewTemporaryRepository(schemaImports);
         RepositoryConnection temporaryRepositoryConnection = null;
         
@@ -1262,14 +1261,11 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             temporaryRepositoryConnection = tempRepository.getConnection();
             
             // Load the artifact RDF triples into a random context in the temp
-            // repository, which may
-            // be shared between different uploads
+            // repository, which may be shared between different uploads
             temporaryRepositoryConnection.add(model, randomContext);
             
-            // Remove any assertions that the user has made about publication
-            // status, as this
-            // information is a privileged operation that must be done through
-            // the designated API
+            // Remove any assertions that the user has made about publication status, as this
+            // information is a privileged operation that must be done through the designated API
             // method
             temporaryRepositoryConnection.remove((Resource)null, PODD.PODD_BASE_HAS_PUBLICATION_STATUS, (Resource)null,
                     randomContext);
