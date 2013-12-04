@@ -349,6 +349,15 @@ public interface PODD
     /** http://purl.org/podd/ns/poddScience#Pot */
     public static final URI PODD_SCIENCE_POT = PODD.VF.createURI(PODD.PODD_SCIENCE, "Pot");
     
+    /** http://purl.org/podd/ns/poddScience#Material */
+    public static final URI PODD_SCIENCE_MATERIAL = PODD.VF.createURI(PODD.PODD_SCIENCE, "Material");
+    
+    /** http://purl.org/podd/ns/poddScience#hasMaterial */
+    public static final URI PODD_SCIENCE_HAS_MATERIAL = PODD.VF.createURI(PODD.PODD_SCIENCE, "hasMaterial");
+    
+    /** http://purl.org/podd/ns/poddScience#refersToMaterial */
+    public static final URI PODD_SCIENCE_REFERS_TO_MATERIAL = PODD.VF.createURI(PODD.PODD_SCIENCE, "refersToMaterial");
+    
     /** http://purl.org/podd/ns/poddScience#Genotype */
     public static final URI PODD_SCIENCE_GENOTYPE = PODD.VF.createURI(PODD.PODD_SCIENCE, "Genotype");
     
@@ -369,6 +378,19 @@ public interface PODD
     
     /** http://purl.org/podd/ns/poddScience#hasGenus */
     public static final URI PODD_SCIENCE_HAS_GENUS = PODD.VF.createURI(PODD.PODD_SCIENCE, "hasGenus");
+    
+    /** http://purl.org/podd/ns/poddScience#hasControl */
+    public static final URI PODD_SCIENCE_HAS_CONTROL = PODD.VF.createURI(PODD.PODD_SCIENCE, "hasControl");
+    
+    /** http://purl.org/podd/ns/poddScience#HasControl_Yes */
+    public static final URI PODD_SCIENCE_HAS_CONTROL_YES = PODD.VF.createURI(PODD.PODD_SCIENCE, "HasControl_Yes");
+    
+    /** http://purl.org/podd/ns/poddScience#HasControl_No */
+    public static final URI PODD_SCIENCE_HAS_CONTROL_NO = PODD.VF.createURI(PODD.PODD_SCIENCE, "HasControl_No");
+    
+    /** http://purl.org/podd/ns/poddScience#HasControl_Unknown */
+    public static final URI PODD_SCIENCE_HAS_CONTROL_UNKNOWN = PODD.VF.createURI(PODD.PODD_SCIENCE,
+            "HasControl_Unknown");
     
     /** http://purl.org/podd/ns/poddScience#hasSpecies */
     public static final URI PODD_SCIENCE_HAS_SPECIES = PODD.VF.createURI(PODD.PODD_SCIENCE, "hasSpecies");
@@ -391,6 +413,9 @@ public interface PODD
     /** http://purl.org/podd/ns/poddScience#hasContainerType */
     public static final URI PODD_SCIENCE_HAS_CONTAINER_TYPE = PODD.VF.createURI(PODD.PODD_SCIENCE, "hasContainerType");
     
+    /** http://purl.org/podd/ns/poddScience#hasTrayType */
+    public static final URI PODD_SCIENCE_HAS_TRAY_TYPE = PODD.VF.createURI(PODD.PODD_SCIENCE, "hasTrayType");
+    
     /** http://purl.org/podd/ns/poddScience#hasTrayNumber */
     public static final URI PODD_SCIENCE_HAS_TRAY_NUMBER = PODD.VF.createURI(PODD.PODD_SCIENCE, "hasTrayNumber");
     
@@ -399,6 +424,9 @@ public interface PODD
     
     /** http://purl.org/podd/ns/poddScience#hasPotNumber */
     public static final URI PODD_SCIENCE_HAS_POT_NUMBER = PODD.VF.createURI(PODD.PODD_SCIENCE, "hasPotNumber");
+    
+    /** http://purl.org/podd/ns/poddScience#hasPotType */
+    public static final URI PODD_SCIENCE_HAS_POT_TYPE = PODD.VF.createURI(PODD.PODD_SCIENCE, "hasPotType");
     
     /** http://purl.org/podd/ns/poddScience#hasPotColumnNumberOverall */
     public static final URI PODD_SCIENCE_HAS_POT_COLUMN_NUMBER_OVERALL = PODD.VF.createURI(PODD.PODD_SCIENCE,
