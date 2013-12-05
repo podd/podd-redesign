@@ -434,7 +434,8 @@ public class ApplicationUtils
                     {
                         // If the ontology IRI of the artifacts schema import was in the updated
                         // list, then signal it for updating
-                        if(nextUpdatedSchemaImport.getOntologyIRI().equals(nextSchemaImport.getOntologyIRI()))
+                        if(nextUpdatedSchemaImport.getOntologyIRI().equals(nextSchemaImport.getOntologyIRI())
+                                && !nextUpdatedSchemaImport.getVersionIRI().equals(nextSchemaImport.getVersionIRI()))
                         {
                             Set<InferredOWLOntologyID> set = new HashSet<>();
                             Set<InferredOWLOntologyID> putIfAbsent = artifactsToUpdate.putIfAbsent(nextArtifact, set);
