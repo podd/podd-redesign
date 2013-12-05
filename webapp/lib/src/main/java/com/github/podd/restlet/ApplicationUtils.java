@@ -415,6 +415,12 @@ public class ApplicationUtils
             
             for(InferredOWLOntologyID nextArtifact : application.getPoddArtifactManager().getArtifacts())
             {
+                if(application.getPoddArtifactManager().isPublished(nextArtifact))
+                {
+                    // Must not update the schema imports for published artifacts
+                    continue;
+                }
+                
                 Set<InferredOWLOntologyID> schemaImports =
                         application.getPoddArtifactManager().getSchemaImports(nextArtifact);
                 
