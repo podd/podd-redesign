@@ -37,6 +37,7 @@ import org.restlet.representation.Variant;
 import org.restlet.resource.Get;
 import org.restlet.resource.ResourceException;
 
+import com.github.podd.exception.UnmanagedSchemaIRIException;
 import com.github.podd.restlet.PoddAction;
 import com.github.podd.restlet.RestletUtils;
 import com.github.podd.utils.InferredOWLOntologyID;
@@ -177,9 +178,12 @@ public class ListArtifactsResourceImpl extends AbstractPoddResourceImpl
     
     /**
      * Handle http GET request to serve the list artifacts page.
+     * 
+     * @throws UnmanagedSchemaIRIException
      */
     @Get(":html")
-    public Representation getListArtifactsPage(final Representation entity) throws ResourceException
+    public Representation getListArtifactsPage(final Representation entity) throws ResourceException,
+        UnmanagedSchemaIRIException
     {
         this.log.debug("@Get listArtifacts Page");
         
@@ -280,6 +284,10 @@ public class ListArtifactsResourceImpl extends AbstractPoddResourceImpl
         {
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL,
                     "Could not generate RDF output due to an exception in the writer", e);
+        }
+        catch(final UnmanagedSchemaIRIException e)
+        {
+            throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Could not find schema for artifact", e);
         }
         
         // this.log.info(new String(out.toByteArray(), StandardCharsets.UTF_8));

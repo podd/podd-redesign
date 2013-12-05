@@ -16,7 +16,6 @@
  */
 package com.github.podd.resources;
 
-import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
@@ -31,7 +30,6 @@ import org.restlet.resource.Get;
 import org.restlet.resource.Post;
 import org.restlet.resource.ResourceException;
 import org.semanticweb.owlapi.model.IRI;
-import org.semanticweb.owlapi.model.OWLOntologyID;
 
 import com.github.podd.exception.UnmanagedArtifactIRIException;
 import com.github.podd.exception.UnmanagedArtifactVersionException;
@@ -63,9 +61,12 @@ public class AddObjectResourceImpl extends AbstractPoddResourceImpl
     
     /**
      * Serve the "Add new object" HTML page
+     * 
+     * @throws UnmanagedSchemaIRIException
      */
     @Get("html")
-    public Representation getCreateObjectHtml(final Representation entity) throws ResourceException
+    public Representation getCreateObjectHtml(final Representation entity) throws ResourceException,
+        UnmanagedSchemaIRIException
     {
         this.log.info("@Get addObjectHtml Page");
         

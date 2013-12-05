@@ -31,6 +31,7 @@ import org.slf4j.LoggerFactory;
 
 import com.github.ansell.restletutils.RestletUtilRole;
 import com.github.podd.exception.UnmanagedArtifactIRIException;
+import com.github.podd.exception.UnmanagedSchemaIRIException;
 import com.github.podd.restlet.PoddAction;
 import com.github.podd.restlet.PoddWebServiceApplication;
 import com.github.podd.restlet.RestletUtils;
@@ -78,7 +79,7 @@ public class ArtifactRolesResourceImpl extends AbstractPoddResourceImpl
         {
             ontologyID = this.getPoddArtifactManager().getArtifact(IRI.create(artifactUri));
         }
-        catch(final UnmanagedArtifactIRIException e)
+        catch(final UnmanagedArtifactIRIException | UnmanagedSchemaIRIException e)
         {
             throw new ResourceException(Status.CLIENT_ERROR_NOT_FOUND, "Could not find the given artifact", e);
         }
@@ -162,7 +163,7 @@ public class ArtifactRolesResourceImpl extends AbstractPoddResourceImpl
         {
             ontologyID = this.getPoddArtifactManager().getArtifact(IRI.create(artifactUri));
         }
-        catch(final UnmanagedArtifactIRIException e)
+        catch(final UnmanagedArtifactIRIException | UnmanagedSchemaIRIException e)
         {
             throw new ResourceException(Status.CLIENT_ERROR_NOT_FOUND, "Could not find the given artifact", e);
         }
@@ -202,8 +203,10 @@ public class ArtifactRolesResourceImpl extends AbstractPoddResourceImpl
      * @param ontologyID
      * @return
      * @throws OpenRDFException
+     * @throws UnmanagedSchemaIRIException
      */
-    private PoddObjectLabel getProjectDetails(final InferredOWLOntologyID ontologyID) throws OpenRDFException
+    private PoddObjectLabel getProjectDetails(final InferredOWLOntologyID ontologyID) throws OpenRDFException,
+        UnmanagedSchemaIRIException
     {
         // find and set top-object of this artifact as the object to display
         final List<PoddObjectLabel> topObjectLabels =

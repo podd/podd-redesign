@@ -18,7 +18,6 @@ package com.github.podd.resources;
 
 import java.io.ByteArrayOutputStream;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -46,10 +45,10 @@ import org.restlet.resource.Post;
 import org.restlet.resource.ResourceException;
 import org.restlet.security.User;
 import org.semanticweb.owlapi.model.IRI;
-import org.semanticweb.owlapi.model.OWLOntologyID;
 
 import com.github.podd.exception.UnmanagedArtifactIRIException;
 import com.github.podd.exception.UnmanagedArtifactVersionException;
+import com.github.podd.exception.UnmanagedSchemaIRIException;
 import com.github.podd.restlet.PoddAction;
 import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.PoddWebConstants;
@@ -230,6 +229,11 @@ public class SparqlResourceImpl extends AbstractPoddResourceImpl
                 }
                 artifactIds.add(ontologyID);
             }
+            catch(final UnmanagedSchemaIRIException e)
+            {
+                throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST,
+                        "Could not find a requested schema ontology", e);
+            }
             catch(final UnmanagedArtifactIRIException e)
             {
                 throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Could not find a requested artifact", e);
@@ -288,6 +292,11 @@ public class SparqlResourceImpl extends AbstractPoddResourceImpl
                             "Could not determine contexts for artifact, or included an unsafe context: ontology=<{}> contexts=<{}>",
                             ontologyID, contextSet);
                 }
+            }
+            catch(final UnmanagedSchemaIRIException e)
+            {
+                throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST,
+                        "Could not find a requested schema ontology", e);
             }
             catch(final UnmanagedArtifactIRIException e)
             {

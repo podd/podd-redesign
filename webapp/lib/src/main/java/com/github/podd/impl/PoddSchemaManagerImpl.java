@@ -512,11 +512,30 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
     }
     
     @Override
-    public List<InferredOWLOntologyID> uploadSchemaOntologies(final Model model) throws OpenRDFException, IOException, OWLException,
-        PoddException
+    public List<InferredOWLOntologyID> uploadSchemaOntologies(final Model model) throws OpenRDFException, IOException,
+        OWLException, PoddException
     {
         final Set<URI> schemaOntologyUris = new HashSet<>();
         final Set<URI> schemaVersionUris = new HashSet<>();
+        
+        this.extractOntologyAndVersions(model, schemaOntologyUris, schemaVersionUris);
+        
+        this.validateSchemaManifestImports(model, schemaVersionUris);
+        
+        final List<URI> importOrder = this.orderImports(model, schemaOntologyUris, schemaVersionUris);
+        
+        return this.uploadSchemaOntologiesInOrder(model, importOrder);
+    }
+    
+    /**
+     * @param model
+     * @param schemaOntologyUris
+     * @param schemaVersionUris
+     * @throws SchemaManifestException
+     */
+    private void extractOntologyAndVersions(final Model model, final Set<URI> schemaOntologyUris,
+            final Set<URI> schemaVersionUris) throws SchemaManifestException
+    {
         for(final Resource nextOntology : model.filter(null, RDF.TYPE, OWL.ONTOLOGY).subjects())
         {
             if(nextOntology instanceof URI)
@@ -538,14 +557,27 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
                 }
             }
         }
-        
-        this.validateSchemaManifestImports(model, schemaVersionUris);
+    }
+    
+    /**
+     * Orders the schema ontology imports into list that can be uploaded in order to give a good
+     * chance that dependencies will be uploaded first.
+     * 
+     * @param model
+     * @param schemaOntologyUris
+     * @param schemaVersionUris
+     * @return An ordered list of {@link URI}s that determine a useful order for uploading schema
+     *         ontologies to ensure that dependencies are available internally when needed.
+     * @throws SchemaManifestException
+     */
+    private List<URI> orderImports(final Model model, final Set<URI> schemaOntologyUris,
+            final Set<URI> schemaVersionUris) throws SchemaManifestException
+    {
+        final List<URI> importOrder = new ArrayList<>(schemaOntologyUris.size());
         
         final ConcurrentMap<URI, URI> currentVersionsMap = new ConcurrentHashMap<>(schemaOntologyUris.size());
         final ConcurrentMap<URI, Set<URI>> allVersionsMap = new ConcurrentHashMap<>(schemaOntologyUris.size());
         final ConcurrentMap<URI, Set<URI>> importsMap = new ConcurrentHashMap<>(schemaOntologyUris.size());
-        
-        final List<URI> importOrder = new ArrayList<>(schemaOntologyUris.size());
         
         // Find current version for each schema ontology
         for(final URI nextSchemaOntologyUri : schemaOntologyUris)
@@ -567,8 +599,7 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
         }
         
         this.log.debug("importOrder: {}", importOrder);
-        
-        return this.uploadSchemaOntologiesInOrder(model, importOrder);
+        return importOrder;
     }
     
     /**
@@ -583,7 +614,7 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
     public List<InferredOWLOntologyID> uploadSchemaOntologiesInOrder(final Model model, final List<URI> importOrder)
         throws ModelException, OpenRDFException, IOException, OWLException, PoddException
     {
-        List<InferredOWLOntologyID> result = new ArrayList<>(importOrder.size());
+        final List<InferredOWLOntologyID> result = new ArrayList<>(importOrder.size());
         Objects.requireNonNull(model, "Schema Ontology model was null");
         
         RepositoryConnection conn = null;
@@ -608,16 +639,16 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
                         throw new SchemaManifestException(IRI.create(nextOrderedImport),
                                 "Could not find schema at designated classpath location: "
                                         + nextOrderedImport.stringValue());
-                        
                     }
+                    
                     // TODO: When this is supported we should fetch the current version if possible
                     // and use it here
-                    OWLOntologyID schemaOntologyID = null;
+                    final OWLOntologyID schemaOntologyID = null;
                     // TODO: Call this method directly from other methods so that the whole
                     // transaction can
                     // be rolled back if there are any failures!
-                    InferredOWLOntologyID nextResult =
-                            uploadSchemaOntologyInternal(schemaOntologyID, inputStream, fileFormat, conn,
+                    final InferredOWLOntologyID nextResult =
+                            this.uploadSchemaOntologyInternal(schemaOntologyID, inputStream, fileFormat, conn,
                                     this.repositoryManager.getSchemaManagementGraph());
                     
                     result.add(nextResult);
@@ -675,8 +706,8 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
             
             // TODO: Call this method directly from other methods so that the whole transaction can
             // be rolled back if there are any failures!
-            InferredOWLOntologyID result =
-                    uploadSchemaOntologyInternal(schemaOntologyID, inputStream, fileFormat, conn,
+            final InferredOWLOntologyID result =
+                    this.uploadSchemaOntologyInternal(schemaOntologyID, inputStream, fileFormat, conn,
                             this.repositoryManager.getSchemaManagementGraph());
             
             conn.commit();
@@ -717,8 +748,8 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
      * @throws OpenRDFException
      */
     private InferredOWLOntologyID uploadSchemaOntologyInternal(final OWLOntologyID schemaOntologyID,
-            final InputStream inputStream, final RDFFormat fileFormat, RepositoryConnection conn,
-            URI schemaManagementGraph) throws OWLException, IOException, PoddException, EmptyOntologyException,
+            final InputStream inputStream, final RDFFormat fileFormat, final RepositoryConnection conn,
+            final URI schemaManagementGraph) throws OWLException, IOException, PoddException, EmptyOntologyException,
         RepositoryException, OWLRuntimeException, OpenRDFException
     {
         final OWLOntologyDocumentSource owlSource =
@@ -754,7 +785,7 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
                 schemaManagementGraph);
         
         // TODO: Why are we not able to return nextInferredOntology here
-        InferredOWLOntologyID result =
+        final InferredOWLOntologyID result =
                 new InferredOWLOntologyID(baseOntologyID.getOntologyIRI(), baseOntologyID.getVersionIRI(),
                         nextInferredOntology.getOntologyIRI());
         return result;

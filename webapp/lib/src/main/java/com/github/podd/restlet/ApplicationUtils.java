@@ -24,7 +24,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -389,17 +388,17 @@ public class ApplicationUtils
             }
             
             // Returns an ordered list of the schema ontologies that were uploaded
-            List<InferredOWLOntologyID> schemaOntologies =
+            final List<InferredOWLOntologyID> schemaOntologies =
                     application.getPoddSchemaManager().uploadSchemaOntologies(model);
             
             // NOTE: The following is not ordered at this point in time
             // TODO: Do we gain anything from ordering this collection
-            Set<InferredOWLOntologyID> currentSchemaOntologies =
+            final Set<InferredOWLOntologyID> currentSchemaOntologies =
                     application.getPoddSchemaManager().getCurrentSchemaOntologies();
             
-            List<InferredOWLOntologyID> updatedCurrentSchemaOntologies = new ArrayList<>();
+            final List<InferredOWLOntologyID> updatedCurrentSchemaOntologies = new ArrayList<>();
             
-            for(InferredOWLOntologyID nextSchemaOntology : schemaOntologies)
+            for(final InferredOWLOntologyID nextSchemaOntology : schemaOntologies)
             {
                 if(currentSchemaOntologies.contains(nextSchemaOntology))
                 {
@@ -407,13 +406,14 @@ public class ApplicationUtils
                 }
             }
             
-            ConcurrentMap<InferredOWLOntologyID, Set<InferredOWLOntologyID>> currentArtifactImports =
+            final ConcurrentMap<InferredOWLOntologyID, Set<InferredOWLOntologyID>> currentArtifactImports =
                     new ConcurrentHashMap<>();
             
-            ConcurrentMap<InferredOWLOntologyID, Set<InferredOWLOntologyID>> artifactsToUpdate =
+            final ConcurrentMap<InferredOWLOntologyID, Set<InferredOWLOntologyID>> artifactsToUpdate =
                     new ConcurrentHashMap<>();
             
-            for(InferredOWLOntologyID nextArtifact : application.getPoddArtifactManager().listUnpublishedArtifacts())
+            for(final InferredOWLOntologyID nextArtifact : application.getPoddArtifactManager()
+                    .listUnpublishedArtifacts())
             {
                 if(application.getPoddArtifactManager().isPublished(nextArtifact))
                 {
@@ -421,16 +421,16 @@ public class ApplicationUtils
                     continue;
                 }
                 
-                Set<InferredOWLOntologyID> schemaImports =
+                final Set<InferredOWLOntologyID> schemaImports =
                         application.getPoddArtifactManager().getSchemaImports(nextArtifact);
                 
                 // Cache the current artifact imports so they are easily accessible without calling
                 // the above method again if they need to be updated
                 currentArtifactImports.put(nextArtifact, schemaImports);
                 
-                for(InferredOWLOntologyID nextUpdatedSchemaImport : updatedCurrentSchemaOntologies)
+                for(final InferredOWLOntologyID nextUpdatedSchemaImport : updatedCurrentSchemaOntologies)
                 {
-                    for(OWLOntologyID nextSchemaImport : schemaImports)
+                    for(final OWLOntologyID nextSchemaImport : schemaImports)
                     {
                         // If the ontology IRI of the artifacts schema import was in the updated
                         // list, then signal it for updating
@@ -438,7 +438,8 @@ public class ApplicationUtils
                                 && !nextUpdatedSchemaImport.getVersionIRI().equals(nextSchemaImport.getVersionIRI()))
                         {
                             Set<InferredOWLOntologyID> set = new HashSet<>();
-                            Set<InferredOWLOntologyID> putIfAbsent = artifactsToUpdate.putIfAbsent(nextArtifact, set);
+                            final Set<InferredOWLOntologyID> putIfAbsent =
+                                    artifactsToUpdate.putIfAbsent(nextArtifact, set);
                             if(putIfAbsent != null)
                             {
                                 set = putIfAbsent;
@@ -452,7 +453,7 @@ public class ApplicationUtils
                 
             }
             
-            for(InferredOWLOntologyID nextArtifactToUpdate : artifactsToUpdate.keySet())
+            for(final InferredOWLOntologyID nextArtifactToUpdate : artifactsToUpdate.keySet())
             {
                 application.getPoddArtifactManager().updateSchemaImports(nextArtifactToUpdate,
                         currentArtifactImports.get(nextArtifactToUpdate), artifactsToUpdate.get(nextArtifactToUpdate));

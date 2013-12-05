@@ -27,6 +27,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -431,7 +432,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
     
     @Override
     public Model fillMissingData(final InferredOWLOntologyID ontologyID, final Model inputModel)
-        throws OpenRDFException
+        throws OpenRDFException, UnmanagedSchemaIRIException
     {
         RepositoryConnection conn = null;
         
@@ -478,7 +479,8 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
     }
     
     @Override
-    public InferredOWLOntologyID getArtifact(final IRI artifactIRI) throws UnmanagedArtifactIRIException
+    public InferredOWLOntologyID getArtifact(final IRI artifactIRI) throws UnmanagedArtifactIRIException,
+        UnmanagedSchemaIRIException
     {
         try
         {
@@ -493,7 +495,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
     
     @Override
     public InferredOWLOntologyID getArtifact(final IRI artifactIRI, final IRI versionIRI)
-        throws UnmanagedArtifactIRIException, UnmanagedArtifactVersionException
+        throws UnmanagedArtifactIRIException, UnmanagedArtifactVersionException, UnmanagedSchemaIRIException
     {
         RepositoryConnection repositoryConnection = null;
         
@@ -562,7 +564,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
      */
     @Override
     public Set<URI> getChildObjects(final InferredOWLOntologyID ontologyID, final URI objectUri)
-        throws OpenRDFException
+        throws OpenRDFException, UnmanagedSchemaIRIException
     {
         RepositoryConnection conn = null;
         try
@@ -634,7 +636,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
      */
     @Override
     public Model getObjectDetailsForDisplay(final InferredOWLOntologyID ontologyID, final URI objectUri)
-        throws OpenRDFException
+        throws OpenRDFException, UnmanagedSchemaIRIException
     {
         RepositoryConnection conn = null;
         try
@@ -652,7 +654,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
     
     @Override
     public PoddObjectLabel getObjectLabel(final InferredOWLOntologyID ontologyID, final URI objectUri)
-        throws OpenRDFException
+        throws OpenRDFException, UnmanagedSchemaIRIException
     {
         RepositoryConnection conn = null;
         try
@@ -676,7 +678,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
      */
     @Override
     public List<PoddObjectLabel> getObjectTypes(final InferredOWLOntologyID artifactId, final URI objectUri)
-        throws OpenRDFException
+        throws OpenRDFException, UnmanagedSchemaIRIException
     {
         final List<PoddObjectLabel> results = new ArrayList<PoddObjectLabel>();
         RepositoryConnection conn = null;
@@ -711,7 +713,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
      */
     @Override
     public List<URI> getOrderedProperties(final InferredOWLOntologyID ontologyID, final URI objectUri,
-            final boolean excludeContainsProperties) throws OpenRDFException
+            final boolean excludeContainsProperties) throws OpenRDFException, UnmanagedSchemaIRIException
     {
         RepositoryConnection conn = null;
         try
@@ -749,7 +751,8 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
      * InferredOWLOntologyID, org.openrdf.model.URI)
      */
     @Override
-    public Model getParentDetails(final InferredOWLOntologyID ontologyID, final URI objectUri) throws OpenRDFException
+    public Model getParentDetails(final InferredOWLOntologyID ontologyID, final URI objectUri) throws OpenRDFException,
+        UnmanagedSchemaIRIException
     {
         RepositoryConnection conn = null;
         try
@@ -762,7 +765,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             
             return this.getSesameManager().getParentDetails(objectUri, conn, contexts);
         }
-        catch(final OpenRDFException e)
+        catch(final Throwable e)
         {
             try
             {
@@ -805,7 +808,8 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         return this.purlManager;
     }
     
-    public Model getReferenceLinks(final InferredOWLOntologyID ontologyID, final URI objectUri) throws OpenRDFException
+    public Model getReferenceLinks(final InferredOWLOntologyID ontologyID, final URI objectUri)
+        throws OpenRDFException, UnmanagedSchemaIRIException
     {
         RepositoryConnection conn = null;
         try
@@ -841,8 +845,34 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
     }
     
     @Override
-    public Set<InferredOWLOntologyID> getSchemaImports(final InferredOWLOntologyID artifactID)
+    public Set<InferredOWLOntologyID> getSchemaImports(final InferredOWLOntologyID artifactID) throws OpenRDFException,
+        UnmanagedSchemaIRIException
     {
+        final Set<InferredOWLOntologyID> results = new LinkedHashSet<InferredOWLOntologyID>();
+        
+        RepositoryConnection conn = null;
+        
+        try
+        {
+            conn = this.getRepositoryManager().getManagementRepository().getConnection();
+            
+            final Set<IRI> directImports =
+                    this.getSesameManager().getDirectImports(artifactID.getOntologyIRI(), conn,
+                            this.getRepositoryManager().getArtifactManagementGraph());
+            
+            for(final IRI nextDirectImport : directImports)
+            {
+                results.add(this.getSchemaManager().getSchemaOntologyVersion(nextDirectImport));
+            }
+        }
+        finally
+        {
+            if(conn != null)
+            {
+                conn.close();
+            }
+        }
+        
         throw new RuntimeException("TODO: Implement me!");
     }
     
@@ -860,7 +890,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
     
     @Override
     public List<PoddObjectLabel> getTopObjectLabels(final List<InferredOWLOntologyID> artifacts)
-        throws OpenRDFException
+        throws OpenRDFException, UnmanagedSchemaIRIException
     {
         final List<PoddObjectLabel> results = new ArrayList<PoddObjectLabel>();
         RepositoryConnection conn = null;
@@ -1531,7 +1561,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
      */
     @Override
     public InferredOWLOntologyID publishArtifact(final InferredOWLOntologyID ontologyId) throws OpenRDFException,
-        PublishArtifactException, UnmanagedArtifactIRIException
+        PublishArtifactException, UnmanagedArtifactIRIException, UnmanagedSchemaIRIException
     {
         final IRI ontologyIRI = ontologyId.getOntologyIRI();
         final IRI versionIRI = ontologyId.getVersionIRI();
@@ -1581,7 +1611,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             
             return published;
         }
-        catch(final OpenRDFException | PublishArtifactException | UnmanagedArtifactIRIException e)
+        catch(final Throwable e)
         {
             if(repositoryConnection != null && repositoryConnection.isActive())
             {
@@ -1615,7 +1645,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
      */
     @Override
     public Model searchForOntologyLabels(final InferredOWLOntologyID ontologyID, final String searchTerm,
-            final URI[] searchTypes) throws OpenRDFException
+            final URI[] searchTypes) throws OpenRDFException, UnmanagedSchemaIRIException
     {
         RepositoryConnection conn = null;
         
@@ -1630,7 +1660,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
                             this.getRepositoryManager().getSchemaManagementGraph());
             return this.getSesameManager().searchOntologyLabels(searchTerm, searchTypes, 1000, 0, conn, contexts);
         }
-        catch(final OpenRDFException e)
+        catch(final Throwable e)
         {
             try
             {

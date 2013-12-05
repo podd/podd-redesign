@@ -46,6 +46,7 @@ import com.github.podd.exception.PublishArtifactException;
 import com.github.podd.exception.UnmanagedArtifactIRIException;
 import com.github.podd.exception.UnmanagedArtifactVersionException;
 import com.github.podd.exception.UnmanagedSchemaException;
+import com.github.podd.exception.UnmanagedSchemaIRIException;
 import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.PoddObjectLabel;
 
@@ -186,8 +187,10 @@ public interface PoddArtifactManager
      * @return The statements with missing data completed. Any statements for which data could not
      *         be found are omitted from the results.
      * @throws OpenRDFException
+     * @throws UnmanagedSchemaIRIException
      */
-    Model fillMissingData(InferredOWLOntologyID ontologyID, Model inputModel) throws OpenRDFException;
+    Model fillMissingData(InferredOWLOntologyID ontologyID, Model inputModel) throws OpenRDFException,
+        UnmanagedSchemaIRIException;
     
     /**
      * Returns the {@link InferredOWLOntologyID} for the artifact identified by the given IRI.
@@ -200,8 +203,10 @@ public interface PoddArtifactManager
      * @return An {@link InferredOWLOntologyID} containing the full details for the artifact.
      * @throws UnmanagedArtifactIRIException
      *             If the artifact is not managed.
+     * @throws UnmanagedSchemaIRIException
      */
-    InferredOWLOntologyID getArtifact(IRI artifactIRI) throws UnmanagedArtifactIRIException;
+    InferredOWLOntologyID getArtifact(IRI artifactIRI) throws UnmanagedArtifactIRIException,
+        UnmanagedSchemaIRIException;
     
     /**
      * Returns the {@link InferredOWLOntologyID} for the artifact identified by the given IRI and
@@ -219,9 +224,10 @@ public interface PoddArtifactManager
      *             If the artifact is not managed.
      * @throws UnmanagedArtifactVersionException
      *             If the artifact is managed, but the version was not recognised.
+     * @throws UnmanagedSchemaIRIException
      */
     InferredOWLOntologyID getArtifact(IRI artifactIRI, IRI versionIRI) throws UnmanagedArtifactIRIException,
-        UnmanagedArtifactVersionException;
+        UnmanagedArtifactVersionException, UnmanagedSchemaIRIException;
     
     /**
      * Returns a {@link Set} containing the Object URIs of the given object's direct children.
@@ -234,8 +240,10 @@ public interface PoddArtifactManager
      *            The object whose children are sought.
      * @return A {@link Set} containing the Object URIs of the given object's children
      * @throws OpenRDFException
+     * @throws UnmanagedSchemaIRIException
      */
-    Set<URI> getChildObjects(InferredOWLOntologyID ontologyID, URI objectUri) throws OpenRDFException;
+    Set<URI> getChildObjects(InferredOWLOntologyID ontologyID, URI objectUri) throws OpenRDFException,
+        UnmanagedSchemaIRIException;
     
     /**
      * 
@@ -273,9 +281,10 @@ public interface PoddArtifactManager
      * @param contexts
      * @return
      * @throws OpenRDFException
+     * @throws UnmanagedSchemaIRIException
      */
     Model getObjectDetailsForDisplay(final InferredOWLOntologyID artifactID, final URI objectUri)
-        throws OpenRDFException;
+        throws OpenRDFException, UnmanagedSchemaIRIException;
     
     /**
      * 
@@ -285,8 +294,10 @@ public interface PoddArtifactManager
      *            URI of the object whose label is required
      * @return A {@link Model} containing a single statement which specifies the object's label.
      * @throws OpenRDFException
+     * @throws UnmanagedSchemaIRIException
      */
-    PoddObjectLabel getObjectLabel(InferredOWLOntologyID ontologyID, URI objectUri) throws OpenRDFException;
+    PoddObjectLabel getObjectLabel(InferredOWLOntologyID ontologyID, URI objectUri) throws OpenRDFException,
+        UnmanagedSchemaIRIException;
     
     /**
      * Retrieves a list of {@link PoddObjectLabel}s for the most-specific types to which the given
@@ -298,8 +309,10 @@ public interface PoddArtifactManager
      *            The object whose types are needed.
      * @return
      * @throws OpenRDFException
+     * @throws UnmanagedSchemaIRIException
      */
-    List<PoddObjectLabel> getObjectTypes(InferredOWLOntologyID artifactId, URI objectUri) throws OpenRDFException;
+    List<PoddObjectLabel> getObjectTypes(InferredOWLOntologyID artifactId, URI objectUri) throws OpenRDFException,
+        UnmanagedSchemaIRIException;
     
     /**
      * Retrieve a list of <b>asserted</b> properties about the given object. The list is ordered
@@ -320,9 +333,10 @@ public interface PoddArtifactManager
      * @return A List containing URIs of sorted properties about the object
      * 
      * @throws OpenRDFException
+     * @throws UnmanagedSchemaIRIException
      */
     List<URI> getOrderedProperties(InferredOWLOntologyID ontologyID, URI objectUri, boolean excludeContainsProperties)
-        throws OpenRDFException;
+        throws OpenRDFException, UnmanagedSchemaIRIException;
     
     /**
      * 
@@ -344,8 +358,10 @@ public interface PoddArtifactManager
      * @return A {@link Model} containing a single statement which links the parent with the given
      *         object
      * @throws OpenRDFException
+     * @throws UnmanagedSchemaIRIException
      */
-    Model getParentDetails(InferredOWLOntologyID ontologyID, URI objectUri) throws OpenRDFException;
+    Model getParentDetails(InferredOWLOntologyID ontologyID, URI objectUri) throws OpenRDFException,
+        UnmanagedSchemaIRIException;
     
     /**
      * 
@@ -370,9 +386,11 @@ public interface PoddArtifactManager
      *             If the artifact is not managed.
      * @throws UnmanagedArtifactVersionException
      *             If the artifact is managed, but the version was not recognised.
+     * @throws OpenRDFException
+     * @throws UnmanagedSchemaIRIException
      */
     Set<InferredOWLOntologyID> getSchemaImports(InferredOWLOntologyID artifactID) throws UnmanagedArtifactIRIException,
-        UnmanagedArtifactVersionException;
+        UnmanagedArtifactVersionException, OpenRDFException, UnmanagedSchemaIRIException;
     
     /**
      * 
@@ -394,8 +412,10 @@ public interface PoddArtifactManager
      *            A sorted list of artifact identifiers that require labels.
      * @return A list of labels in the same order as the artifacts.
      * @throws OpenRDFException
+     * @throws UnmanagedSchemaIRIException
      */
-    List<PoddObjectLabel> getTopObjectLabels(List<InferredOWLOntologyID> artifacts) throws OpenRDFException;
+    List<PoddObjectLabel> getTopObjectLabels(List<InferredOWLOntologyID> artifacts) throws OpenRDFException,
+        UnmanagedSchemaIRIException;
     
     /**
      * Checks whether a given Ontology is Published.
@@ -458,9 +478,10 @@ public interface PoddArtifactManager
      * @throws OpenRDFException
      * @throws UnmanagedArtifactIRIException
      *             If this is not a managed artifact
+     * @throws UnmanagedSchemaIRIException
      */
     InferredOWLOntologyID publishArtifact(InferredOWLOntologyID ontologyId) throws PublishArtifactException,
-        OpenRDFException, UnmanagedArtifactIRIException;
+        OpenRDFException, UnmanagedArtifactIRIException, UnmanagedSchemaIRIException;
     
     /**
      * Carries out a case-insensitive search for objects whose labels match a given term. The search
@@ -476,9 +497,10 @@ public interface PoddArtifactManager
      * @return A {@link Model} containing the URI and Label of each matching object.
      * @throws OpenRDFException
      * @throws ResourceException
+     * @throws UnmanagedSchemaIRIException
      */
     Model searchForOntologyLabels(InferredOWLOntologyID ontologyID, String searchTerm, URI[] searchTypes)
-        throws OpenRDFException, ResourceException;
+        throws OpenRDFException, ResourceException, UnmanagedSchemaIRIException;
     
     /**
      * Sets the {@link DataReferenceManager} to use for verifying file references for PODD

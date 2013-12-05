@@ -166,8 +166,6 @@ public interface PoddSchemaManager
      * @return
      * @throws UnmanagedSchemaIRIException
      * @throws OpenRDFException
-     * 
-     * @since 04/03/2013
      */
     InferredOWLOntologyID getSchemaOntologyVersion(IRI schemaVersionIRI) throws UnmanagedSchemaIRIException,
         OpenRDFException;

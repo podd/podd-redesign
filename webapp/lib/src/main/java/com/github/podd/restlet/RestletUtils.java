@@ -62,6 +62,7 @@ import org.slf4j.LoggerFactory;
 import com.github.ansell.restletutils.RestletUtilRole;
 import com.github.podd.api.PoddArtifactManager;
 import com.github.podd.exception.UnmanagedArtifactIRIException;
+import com.github.podd.exception.UnmanagedSchemaIRIException;
 import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.PODD;
 import com.github.podd.utils.PoddObjectLabel;
@@ -212,10 +213,11 @@ public final class RestletUtils
      *             If there are errors getting the labels
      * @throws ResourceException
      *             If there is more than one top object.
+     * @throws UnmanagedSchemaIRIException
      */
     public static PoddObjectLabel getParentDetails(final PoddArtifactManager artifactManager,
             final InferredOWLOntologyID ontologyID, final String objectToView) throws OpenRDFException,
-        ResourceException
+        ResourceException, UnmanagedSchemaIRIException
     {
         PoddObjectLabel theObject = null;
         
@@ -304,7 +306,7 @@ public final class RestletUtils
                             poddObjectLabel = new PoddObjectLabelImpl(artifact, artifactUri, artifactUri.stringValue());
                         }
                     }
-                    catch(OpenRDFException | UnmanagedArtifactIRIException e)
+                    catch(OpenRDFException | UnmanagedArtifactIRIException | UnmanagedSchemaIRIException e)
                     {
                         // either the artifact mapped to this Role does not
                         // exist, or a Label for it
@@ -331,9 +333,11 @@ public final class RestletUtils
      *            The object whose parent details are required
      * @param dataModel
      * @throws OpenRDFException
+     * @throws UnmanagedSchemaIRIException
      */
     public static Map<String, String> populateParentDetails(final PoddArtifactManager artifactManager,
-            final InferredOWLOntologyID ontologyID, final URI objectUri) throws OpenRDFException
+            final InferredOWLOntologyID ontologyID, final URI objectUri) throws OpenRDFException,
+        UnmanagedSchemaIRIException
     {
         final Map<String, String> parentMap = new HashMap<>();
         

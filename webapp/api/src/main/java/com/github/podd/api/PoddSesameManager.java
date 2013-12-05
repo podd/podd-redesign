@@ -235,6 +235,9 @@ public interface PoddSesameManager
     Set<IRI> getDirectImports(final InferredOWLOntologyID ontologyID, final RepositoryConnection repositoryConnection)
         throws OpenRDFException;
     
+    Set<IRI> getDirectImports(IRI ontologyIRI, RepositoryConnection repositoryConnection, URI... contexts)
+        throws OpenRDFException;
+    
     Set<IRI> getDirectImports(RepositoryConnection repositoryConnection, URI... contexts) throws OpenRDFException;
     
     /**
@@ -441,6 +444,11 @@ public interface PoddSesameManager
     List<URI> getWeightedProperties(final URI objectUri, final boolean excludeContainsProperties,
             final RepositoryConnection repositoryConnection, final URI... contexts) throws OpenRDFException;
     
+    URI[] inferredAndSchemaContexts(InferredOWLOntologyID ontologyID, RepositoryConnection repositoryConnection,
+            URI schemaManagementGraph) throws OpenRDFException;
+    
+    URI[] inferredContexts(InferredOWLOntologyID ontologyID) throws OpenRDFException;
+    
     /**
      * Returns true if the combination of the Ontology IRI and the Version IRI in the given
      * ontologyID were previously published.
@@ -452,6 +460,9 @@ public interface PoddSesameManager
      */
     boolean isPublished(InferredOWLOntologyID ontologyID, RepositoryConnection repositoryConnection, final URI context)
         throws OpenRDFException;
+    
+    URI[] schemaContexts(InferredOWLOntologyID ontologyID, RepositoryConnection repositoryConnection,
+            URI schemaManagementGraph) throws OpenRDFException;
     
     /**
      * Carries out a case-insensitive search for objects whose labels match a given term. The search
@@ -532,19 +543,11 @@ public interface PoddSesameManager
     URI[] versionAndInferredAndSchemaContexts(InferredOWLOntologyID ontologyID,
             RepositoryConnection repositoryConnection, URI schemaManagementGraph) throws OpenRDFException;
     
-    URI[] inferredAndSchemaContexts(InferredOWLOntologyID ontologyID, RepositoryConnection repositoryConnection,
-            URI schemaManagementGraph) throws OpenRDFException;
-    
-    URI[] inferredContexts(InferredOWLOntologyID ontologyID) throws OpenRDFException;
-    
-    URI[] schemaContexts(InferredOWLOntologyID ontologyID, RepositoryConnection repositoryConnection,
-            URI schemaManagementGraph) throws OpenRDFException;
-    
-    URI[] versionContexts(InferredOWLOntologyID ontologyID);
-    
     URI[] versionAndInferredContexts(InferredOWLOntologyID ontologyID);
     
     URI[] versionAndSchemaContexts(InferredOWLOntologyID ontologyID, RepositoryConnection repositoryConnection,
             URI schemaManagementGraph) throws OpenRDFException;
+    
+    URI[] versionContexts(InferredOWLOntologyID ontologyID);
     
 }
