@@ -18,6 +18,7 @@ package com.github.podd.impl;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Set;
 
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.URI;
@@ -104,7 +105,7 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
     }
     
     @Override
-    public Repository getNewTemporaryRepository(final Collection<OWLOntologyID> ontologies) throws OpenRDFException
+    public Repository getNewTemporaryRepository(final Set<? extends OWLOntologyID> ontologies) throws OpenRDFException
     {
         final Repository result = new SailRepository(new MemoryStore());
         result.initialize();
@@ -113,7 +114,7 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
     }
     
     @Override
-    public Repository getPermanentRepository(final Collection<OWLOntologyID> ontologies) throws OpenRDFException
+    public Repository getPermanentRepository(final Set<? extends OWLOntologyID> ontologies) throws OpenRDFException
     {
         return this.repository;
     }

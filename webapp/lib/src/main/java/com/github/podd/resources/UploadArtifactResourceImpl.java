@@ -292,7 +292,7 @@ public class UploadArtifactResourceImpl extends AbstractPoddResourceImpl
             {
                 // FIXME: This should be a method inside of
                 // PoddArtifactManagerImpl
-                final Collection<OWLOntologyID> schemaImports =
+                final Set<InferredOWLOntologyID> schemaImports =
                         this.getPoddArtifactManager().getSchemaImports(artifactId);
                 conn = this.getPoddRepositoryManager().getPermanentRepository(schemaImports).getConnection();
                 final URI topObjectIRI =

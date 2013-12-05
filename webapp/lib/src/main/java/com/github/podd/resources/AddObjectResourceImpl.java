@@ -18,6 +18,7 @@ package com.github.podd.resources;
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.Set;
 
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.URI;
@@ -161,7 +162,7 @@ public class AddObjectResourceImpl extends AbstractPoddResourceImpl
                 ontologyID = this.getPoddArtifactManager().getArtifact(IRI.create(artifactUri));
             }
             
-            final Collection<OWLOntologyID> schemaImports = this.getPoddArtifactManager().getSchemaImports(ontologyID);
+            final Set<InferredOWLOntologyID> schemaImports = this.getPoddArtifactManager().getSchemaImports(ontologyID);
             final RepositoryConnection conn =
                     this.getPoddRepositoryManager().getPermanentRepository(schemaImports).getConnection();
             conn.begin();

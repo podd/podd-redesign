@@ -194,7 +194,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
                 throw new DeleteArtifactException("Published Artifacts cannot be deleted", artifactId);
             }
             
-            final Collection<OWLOntologyID> schemaImports = this.getSchemaImports(artifactId);
+            final Set<InferredOWLOntologyID> schemaImports = this.getSchemaImports(artifactId);
             connection = this.getRepositoryManager().getPermanentRepository(schemaImports).getConnection();
             connection.begin();
             
@@ -361,7 +361,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         
         try
         {
-            final Collection<OWLOntologyID> schemaImports = this.getSchemaImports(ontologyId);
+            final Set<InferredOWLOntologyID> schemaImports = this.getSchemaImports(ontologyId);
             conn = this.getRepositoryManager().getPermanentRepository(schemaImports).getConnection();
             
             final RepositoryResult<Statement> statements =
@@ -400,7 +400,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         
         try
         {
-            final Collection<OWLOntologyID> schemaImports = this.getSchemaImports(artifactID);
+            final Set<InferredOWLOntologyID> schemaImports = this.getSchemaImports(artifactID);
             conn = this.getRepositoryManager().getPermanentRepository(schemaImports).getConnection();
             
             final URI[] contexts =
@@ -437,7 +437,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         
         try
         {
-            final Collection<OWLOntologyID> schemaImports = this.getSchemaImports(ontologyID);
+            final Set<InferredOWLOntologyID> schemaImports = this.getSchemaImports(ontologyID);
             conn = this.getRepositoryManager().getPermanentRepository(schemaImports).getConnection();
             final URI[] contexts =
                     this.getSesameManager().versionAndSchemaContexts(ontologyID, conn,
@@ -499,7 +499,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         
         try
         {
-            final Collection<OWLOntologyID> schemaImports =
+            final Set<InferredOWLOntologyID> schemaImports =
                     this.getSchemaImports(new InferredOWLOntologyID(artifactIRI, versionIRI, null));
             repositoryConnection = this.getRepositoryManager().getPermanentRepository(schemaImports).getConnection();
             
@@ -567,7 +567,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         RepositoryConnection conn = null;
         try
         {
-            final Collection<OWLOntologyID> schemaImports = this.getSchemaImports(ontologyID);
+            final Set<InferredOWLOntologyID> schemaImports = this.getSchemaImports(ontologyID);
             conn = this.getRepositoryManager().getPermanentRepository(schemaImports).getConnection();
             
             final URI[] contexts =
@@ -639,7 +639,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         RepositoryConnection conn = null;
         try
         {
-            final Collection<OWLOntologyID> schemaImports = this.getSchemaImports(ontologyID);
+            final Set<InferredOWLOntologyID> schemaImports = this.getSchemaImports(ontologyID);
             conn = this.getRepositoryManager().getPermanentRepository(schemaImports).getConnection();
             return this.getSesameManager().getObjectDetailsForDisplay(ontologyID, objectUri, conn,
                     this.getRepositoryManager().getSchemaManagementGraph());
@@ -657,7 +657,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         RepositoryConnection conn = null;
         try
         {
-            final Collection<OWLOntologyID> schemaImports = this.getSchemaImports(ontologyID);
+            final Set<InferredOWLOntologyID> schemaImports = this.getSchemaImports(ontologyID);
             conn = this.getRepositoryManager().getPermanentRepository(schemaImports).getConnection();
             return this.getSesameManager().getObjectLabel(ontologyID, objectUri, conn,
                     this.getRepositoryManager().getSchemaManagementGraph());
@@ -683,7 +683,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         
         try
         {
-            final Collection<OWLOntologyID> schemaImports = this.getSchemaImports(artifactId);
+            final Set<InferredOWLOntologyID> schemaImports = this.getSchemaImports(artifactId);
             conn = this.getRepositoryManager().getPermanentRepository(schemaImports).getConnection();
             
             final List<URI> typesList =
@@ -716,7 +716,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         RepositoryConnection conn = null;
         try
         {
-            final Collection<OWLOntologyID> schemaImports = this.getSchemaImports(ontologyID);
+            final Set<InferredOWLOntologyID> schemaImports = this.getSchemaImports(ontologyID);
             conn = this.getRepositoryManager().getPermanentRepository(schemaImports).getConnection();
             
             final URI[] contexts =
@@ -754,7 +754,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         RepositoryConnection conn = null;
         try
         {
-            final Collection<OWLOntologyID> schemaImports = this.getSchemaImports(ontologyID);
+            final Set<InferredOWLOntologyID> schemaImports = this.getSchemaImports(ontologyID);
             conn = this.getRepositoryManager().getPermanentRepository(schemaImports).getConnection();
             final URI[] contexts =
                     this.getSesameManager().versionAndSchemaContexts(ontologyID, conn,
@@ -810,7 +810,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         RepositoryConnection conn = null;
         try
         {
-            final Collection<OWLOntologyID> schemaImports = this.getSchemaImports(ontologyID);
+            final Set<InferredOWLOntologyID> schemaImports = this.getSchemaImports(ontologyID);
             conn = this.getRepositoryManager().getPermanentRepository(schemaImports).getConnection();
             final URI[] contexts =
                     this.getSesameManager().versionAndSchemaContexts(ontologyID, conn,
@@ -841,10 +841,9 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
     }
     
     @Override
-    public Collection<OWLOntologyID> getSchemaImports(final InferredOWLOntologyID artifactID)
+    public Set<InferredOWLOntologyID> getSchemaImports(final InferredOWLOntologyID artifactID)
     {
-        // FIXME: Implement me!
-        return null;
+        throw new RuntimeException("TODO: Implement me!");
     }
     
     @Override
@@ -870,7 +869,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         {
             try
             {
-                final Collection<OWLOntologyID> schemaImports = this.getSchemaImports(artifactId);
+                final Set<InferredOWLOntologyID> schemaImports = this.getSchemaImports(artifactId);
                 // TODO: Should be a simple way to avoid creating multiple
                 // connections here
                 conn = this.getRepositoryManager().getPermanentRepository(schemaImports).getConnection();
@@ -1247,7 +1246,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         // FIXME: This method only works if the imports are already in a
         // repository somewhere, need
         // to fix the Sesame manager to look for imports in Models also
-        final Collection<OWLOntologyID> schemaImports = this.getSchemaImports(ontologyIDs.get(0));
+        final Set<InferredOWLOntologyID> schemaImports = this.getSchemaImports(ontologyIDs.get(0));
         
         // connection to the temporary repository that the artifact RDF triples
         // will be stored while they are initially parsed by OWLAPI.
@@ -1546,7 +1545,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         RepositoryConnection repositoryConnection = null;
         try
         {
-            final Collection<OWLOntologyID> currentSchemaImports = this.getSchemaImports(ontologyId);
+            final Set<InferredOWLOntologyID> currentSchemaImports = this.getSchemaImports(ontologyId);
             
             repository = this.getRepositoryManager().getPermanentRepository(currentSchemaImports);
             repositoryConnection = repository.getConnection();
@@ -1622,7 +1621,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         
         try
         {
-            final Collection<OWLOntologyID> currentSchemaImports = this.getSchemaImports(ontologyID);
+            final Set<InferredOWLOntologyID> currentSchemaImports = this.getSchemaImports(ontologyID);
             
             conn = this.getRepositoryManager().getPermanentRepository(currentSchemaImports).getConnection();
             // FIXME: Cannot use contexts like this for a federated method
@@ -1806,7 +1805,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             // the update.
         }
         
-        final Collection<OWLOntologyID> currentSchemaImports = this.getSchemaImports(artifactID);
+        final Set<InferredOWLOntologyID> currentSchemaImports = this.getSchemaImports(artifactID);
         
         final Repository tempRepository = this.getRepositoryManager().getNewTemporaryRepository(currentSchemaImports);
         RepositoryConnection tempRepositoryConnection = null;
@@ -2032,8 +2031,9 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
     
     @Override
     public InferredOWLOntologyID updateSchemaImports(final InferredOWLOntologyID artifactId,
-            final Set<OWLOntologyID> oldSchemaOntologyIds, final Set<OWLOntologyID> newSchemaOntologyIds)
-        throws OpenRDFException, PoddException, IOException, OWLException
+            final Set<? extends OWLOntologyID> oldSchemaOntologyIds,
+            final Set<? extends OWLOntologyID> newSchemaOntologyIds) throws OpenRDFException, PoddException,
+        IOException, OWLException
     {
         if(artifactId == null)
         {
@@ -2134,6 +2134,12 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
                 tempRepository.shutDown();
             }
         }
+    }
+    
+    @Override
+    public Collection<InferredOWLOntologyID> getArtifacts()
+    {
+        throw new RuntimeException("TODO: Implement me!");
     }
     
 }

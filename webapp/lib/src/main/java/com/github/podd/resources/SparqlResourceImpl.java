@@ -245,7 +245,7 @@ public class SparqlResourceImpl extends AbstractPoddResourceImpl
             RepositoryConnection conn = null;
             try
             {
-                final Collection<OWLOntologyID> schemaImports =
+                final Set<InferredOWLOntologyID> schemaImports =
                         this.getPoddArtifactManager().getSchemaImports(ontologyID);
                 conn = this.getPoddRepositoryManager().getPermanentRepository(schemaImports).getConnection();
                 final Set<URI> contextSet = new HashSet<>();

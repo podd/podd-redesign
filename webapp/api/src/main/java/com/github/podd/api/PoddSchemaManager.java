@@ -22,6 +22,7 @@ package com.github.podd.api;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.List;
 import java.util.Set;
 
 import org.openrdf.OpenRDFException;
@@ -220,12 +221,13 @@ public interface PoddSchemaManager
      * 
      * @param manifest
      *            A Model containing RDF statements describing the schema ontologies to upload.
+     * @return The ordered list of schema ontologies that were uploaded.
      * @throws PoddException
      * @throws OWLException
      * @throws IOException
      * @throws OpenRDFException
      */
-    void uploadSchemaOntologies(Model manifest) throws OpenRDFException, IOException, OWLException, PoddException;
+    List<InferredOWLOntologyID> uploadSchemaOntologies(Model manifest) throws OpenRDFException, IOException, OWLException, PoddException;
     
     /**
      * Loads a Schema Ontology into the internal repository, computes inferences on the schema

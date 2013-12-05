@@ -512,7 +512,7 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
     }
     
     @Override
-    public void uploadSchemaOntologies(final Model model) throws OpenRDFException, IOException, OWLException,
+    public List<InferredOWLOntologyID> uploadSchemaOntologies(final Model model) throws OpenRDFException, IOException, OWLException,
         PoddException
     {
         final Set<URI> schemaOntologyUris = new HashSet<>();
@@ -568,7 +568,7 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
         
         this.log.debug("importOrder: {}", importOrder);
         
-        this.uploadSchemaOntologiesInOrder(model, importOrder);
+        return this.uploadSchemaOntologiesInOrder(model, importOrder);
     }
     
     /**

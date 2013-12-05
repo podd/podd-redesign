@@ -224,6 +224,12 @@ public interface PoddArtifactManager
         UnmanagedArtifactVersionException;
     
     /**
+     * 
+     * @return A complete set of artifact descriptions.
+     */
+    Collection<InferredOWLOntologyID> getArtifacts();
+    
+    /**
      * Returns a {@link Set} containing the Object URIs of the given object's direct children.
      * Direct children are objects that are linked from the given object by a property which is a
      * sub-property of <code>PODDBase:contains</code>. An empty Set is returned if the given object
@@ -371,7 +377,7 @@ public interface PoddArtifactManager
      * @throws UnmanagedArtifactVersionException
      *             If the artifact is managed, but the version was not recognised.
      */
-    Collection<OWLOntologyID> getSchemaImports(InferredOWLOntologyID artifactID) throws UnmanagedArtifactIRIException,
+    Set<InferredOWLOntologyID> getSchemaImports(InferredOWLOntologyID artifactID) throws UnmanagedArtifactIRIException,
         UnmanagedArtifactVersionException;
     
     /**
@@ -630,7 +636,7 @@ public interface PoddArtifactManager
      *             updates.
      */
     InferredOWLOntologyID updateSchemaImports(InferredOWLOntologyID artifactId,
-            Set<OWLOntologyID> oldSchemaOntologyIds, Set<OWLOntologyID> newSchemaOntologyIds)
+            Set<? extends OWLOntologyID> oldSchemaOntologyIds, Set<? extends OWLOntologyID> newSchemaOntologyIds)
         throws UnmanagedSchemaException, OpenRDFException, PoddException, IOException, OWLException;
     
 }
