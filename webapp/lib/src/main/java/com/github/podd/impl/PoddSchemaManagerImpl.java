@@ -26,6 +26,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -579,24 +580,68 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
      * @throws OWLException
      * @throws PoddException
      */
-    public void uploadSchemaOntologiesInOrder(final Model model, final List<URI> importOrder) throws ModelException,
-        OpenRDFException, IOException, OWLException, PoddException
+    public List<InferredOWLOntologyID> uploadSchemaOntologiesInOrder(final Model model, final List<URI> importOrder)
+        throws ModelException, OpenRDFException, IOException, OWLException, PoddException
     {
-        for(final URI nextOrderedImport : importOrder)
+        List<InferredOWLOntologyID> result = new ArrayList<>(importOrder.size());
+        Objects.requireNonNull(model, "Schema Ontology model was null");
+        
+        RepositoryConnection conn = null;
+        
+        try
         {
-            final String classpathLocation =
-                    model.filter(nextOrderedImport, PODD.PODD_SCHEMA_CLASSPATH, null).objectLiteral().stringValue();
-            final RDFFormat format = Rio.getParserFormatForFileName(classpathLocation, RDFFormat.RDFXML);
-            try (final InputStream input = ApplicationUtils.class.getResourceAsStream(classpathLocation);)
+            // TODO: Should we store these copies in a separate repository
+            // again, to reduce bloat in
+            // the management repository??
+            conn = this.repositoryManager.getManagementRepository().getConnection();
+            conn.begin();
+            
+            for(final URI nextOrderedImport : importOrder)
             {
-                if(input == null)
+                final String classpathLocation =
+                        model.filter(nextOrderedImport, PODD.PODD_SCHEMA_CLASSPATH, null).objectLiteral().stringValue();
+                final RDFFormat fileFormat = Rio.getParserFormatForFileName(classpathLocation, RDFFormat.RDFXML);
+                try (final InputStream inputStream = ApplicationUtils.class.getResourceAsStream(classpathLocation);)
                 {
-                    throw new SchemaManifestException(IRI.create(nextOrderedImport),
-                            "Could not find schema at designated classpath location: "
-                                    + nextOrderedImport.stringValue());
+                    if(inputStream == null)
+                    {
+                        throw new SchemaManifestException(IRI.create(nextOrderedImport),
+                                "Could not find schema at designated classpath location: "
+                                        + nextOrderedImport.stringValue());
+                        
+                    }
+                    // TODO: When this is supported we should fetch the current version if possible
+                    // and use it here
+                    OWLOntologyID schemaOntologyID = null;
+                    // TODO: Call this method directly from other methods so that the whole
+                    // transaction can
+                    // be rolled back if there are any failures!
+                    InferredOWLOntologyID nextResult =
+                            uploadSchemaOntologyInternal(schemaOntologyID, inputStream, fileFormat, conn,
+                                    this.repositoryManager.getSchemaManagementGraph());
                     
+                    result.add(nextResult);
                 }
-                this.uploadSchemaOntology(input, format);
+            }
+            
+            conn.commit();
+            
+            return result;
+        }
+        catch(final Throwable e)
+        {
+            if(conn != null && conn.isActive())
+            {
+                conn.rollback();
+            }
+            
+            throw e;
+        }
+        finally
+        {
+            if(conn != null && conn.isOpen())
+            {
+                conn.close();
             }
         }
     }
@@ -616,10 +661,7 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
             final InputStream inputStream, final RDFFormat fileFormat) throws OpenRDFException, IOException,
         OWLException, PoddException
     {
-        if(inputStream == null)
-        {
-            throw new NullPointerException("Schema Ontology input stream was null");
-        }
+        Objects.requireNonNull(inputStream, "Schema Ontology input stream was null");
         
         RepositoryConnection conn = null;
         
@@ -634,7 +676,8 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
             // TODO: Call this method directly from other methods so that the whole transaction can
             // be rolled back if there are any failures!
             InferredOWLOntologyID result =
-                    uploadSchemaOntologyInternal(schemaOntologyID, inputStream, fileFormat, conn);
+                    uploadSchemaOntologyInternal(schemaOntologyID, inputStream, fileFormat, conn,
+                            this.repositoryManager.getSchemaManagementGraph());
             
             conn.commit();
             
@@ -674,8 +717,9 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
      * @throws OpenRDFException
      */
     private InferredOWLOntologyID uploadSchemaOntologyInternal(final OWLOntologyID schemaOntologyID,
-            final InputStream inputStream, final RDFFormat fileFormat, RepositoryConnection conn) throws OWLException,
-        IOException, PoddException, EmptyOntologyException, RepositoryException, OWLRuntimeException, OpenRDFException
+            final InputStream inputStream, final RDFFormat fileFormat, RepositoryConnection conn,
+            URI schemaManagementGraph) throws OWLException, IOException, PoddException, EmptyOntologyException,
+        RepositoryException, OWLRuntimeException, OpenRDFException
     {
         final OWLOntologyDocumentSource owlSource =
                 new StreamDocumentSource(inputStream, fileFormat.getDefaultMIMEType());
@@ -699,20 +743,17 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
             
             this.owlManager.dumpOntologyToRepository(ontology, conn);
             
-            // FIXME: Remove the following once it is not needed and OWL
-            // databases are being used
+            // NOTE: The following will not do anything once OWL databases are being used, but it
+            // should still be in the API for compatibility with the OWLAPI version
             nextInferredOntology = this.owlManager.inferStatements(ontology, conn);
         }
         
         // update the link in the schema ontology management graph
+        // TODO: This may not be the right method for this purpose
         this.sesameManager.updateCurrentManagedSchemaOntologyVersion(nextInferredOntology, true, conn,
-                this.repositoryManager.getSchemaManagementGraph());
+                schemaManagementGraph);
         
-        // update the link in the schema ontology management graph
-        // TODO: This is probably not the right method for this purpose
-        this.sesameManager.updateCurrentManagedSchemaOntologyVersion(nextInferredOntology, true, conn,
-                this.repositoryManager.getSchemaManagementGraph());
-        
+        // TODO: Why are we not able to return nextInferredOntology here
         InferredOWLOntologyID result =
                 new InferredOWLOntologyID(baseOntologyID.getOntologyIRI(), baseOntologyID.getVersionIRI(),
                         nextInferredOntology.getOntologyIRI());

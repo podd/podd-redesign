@@ -2098,6 +2098,8 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             }
             
             tempRepositoryConnection.commit();
+            // If the following does not succeed, then it throws an exception and we rollback
+            // permanentRepositoryConnection
             final InferredOWLOntologyID result =
                     this.loadInferStoreArtifact(tempRepositoryConnection, permanentRepositoryConnection,
                             newVersionIRI.toOpenRDFURI(), DataReferenceVerificationPolicy.DO_NOT_VERIFY, false);
