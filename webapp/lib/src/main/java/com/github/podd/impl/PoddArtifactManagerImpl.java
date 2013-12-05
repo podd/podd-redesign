@@ -2136,10 +2136,4 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         }
     }
     
-    @Override
-    public Collection<InferredOWLOntologyID> getArtifacts()
-    {
-        throw new RuntimeException("TODO: Implement me!");
-    }
-    
 }

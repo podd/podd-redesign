@@ -413,7 +413,7 @@ public class ApplicationUtils
             ConcurrentMap<InferredOWLOntologyID, Set<InferredOWLOntologyID>> artifactsToUpdate =
                     new ConcurrentHashMap<>();
             
-            for(InferredOWLOntologyID nextArtifact : application.getPoddArtifactManager().getArtifacts())
+            for(InferredOWLOntologyID nextArtifact : application.getPoddArtifactManager().listUnpublishedArtifacts())
             {
                 if(application.getPoddArtifactManager().isPublished(nextArtifact))
                 {
