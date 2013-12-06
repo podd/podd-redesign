@@ -873,7 +873,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             }
         }
         
-        throw new RuntimeException("TODO: Implement me!");
+        return results;
     }
     
     @Override
