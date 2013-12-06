@@ -1200,7 +1200,7 @@ public abstract class AbstractPoddSesameManagerTest
                         { PODD.VF.createURI(PODD.PODD_PLANT, "FieldConditions"), false, MetadataPolicy.ONLY_CONTAINS,
                                 29, 4, 0 },
                         
-                        { PODD.VF.createURI(PODD.PODD_SCIENCE, "Material"), false, MetadataPolicy.INCLUDE_ALL, 217, 24,
+                        { PODD.VF.createURI(PODD.PODD_SCIENCE, "Material"), false, MetadataPolicy.INCLUDE_ALL, 199, 22,
                                 0 },
                 
                 };
