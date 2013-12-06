@@ -163,9 +163,10 @@ public class PoddSchemaManagerImplTest extends AbstractPoddSchemaManagerTest
                     e.getMessage().contains("http://example.org/podd/ns/version/poddB/1"));
         }
         
-        // verify: schemas successfully loaded
-        Assert.assertEquals("Expected 2 current schemas", 2, this.testSchemaManager.getCurrentSchemaOntologies().size());
-        Assert.assertEquals("Expected 2 schema ontology versions", 2, this.testSchemaManager.getSchemaOntologies()
+        // verify: no schemas loaded at all if any of the bulk upload failed, to ensure that we
+        // don't have partial schema updates
+        Assert.assertEquals("Expected 0 current schemas", 0, this.testSchemaManager.getCurrentSchemaOntologies().size());
+        Assert.assertEquals("Expected 0 schema ontology versions", 0, this.testSchemaManager.getSchemaOntologies()
                 .size());
     }
     
