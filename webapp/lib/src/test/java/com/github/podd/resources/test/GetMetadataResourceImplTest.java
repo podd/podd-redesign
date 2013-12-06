@@ -91,7 +91,7 @@ public class GetMetadataResourceImplTest extends AbstractResourceImplTest
                             MediaType.APPLICATION_RDF_TURTLE, Status.SUCCESS_OK, this.testWithAdminPrivileges);
             
             // verify:
-            final Model model = this.assertRdf(results, RDFFormat.TURTLE, 95);
+            final Model model = this.assertRdf(results, RDFFormat.TURTLE, 89);
             
             Assert.assertEquals("GrowthConditions not found", 1,
                     model.filter(null, OWL.ALLVALUESFROM, PODD.VF.createURI(PODD.PODD_PLANT, "GrowthConditions"))
@@ -101,7 +101,7 @@ public class GetMetadataResourceImplTest extends AbstractResourceImplTest
                     model.filter(PODD.VF.createURI(PODD.PODD_PLANT, "FieldConditions"), RDFS.LABEL, null).objects()
                             .size());
             
-            Assert.assertEquals("Unexpected no. of properties", 18,
+            Assert.assertEquals("Unexpected no. of properties", 17,
                     model.filter(PODD.VF.createURI(objectType), null, null).size());
             Assert.assertEquals("Expected no Do-Not-Display properties", 0,
                     model.filter(null, PODD.PODD_BASE_DO_NOT_DISPLAY, null).size());
@@ -119,7 +119,7 @@ public class GetMetadataResourceImplTest extends AbstractResourceImplTest
         
         { PODD.PODD_SCIENCE + "Project", 63, 11, 0 },
         
-        { PODD.PODD_SCIENCE + "Investigation", 95, 18, 0 },
+        { PODD.PODD_SCIENCE + "Investigation", 89, 17, 0 },
         
         };
         

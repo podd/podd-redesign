@@ -40,6 +40,7 @@ import org.restlet.security.User;
 import org.semanticweb.owlapi.model.IRI;
 
 import com.github.podd.exception.UnmanagedArtifactIRIException;
+import com.github.podd.exception.UnmanagedSchemaIRIException;
 import com.github.podd.restlet.PoddAction;
 import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.PODD;
@@ -76,7 +77,7 @@ public class SearchOntologyResourceImpl extends AbstractPoddResourceImpl
             {
                 ontologyID = this.getPoddArtifactManager().getArtifact(IRI.create(artifactUri));
             }
-            catch(final UnmanagedArtifactIRIException e)
+            catch(final UnmanagedArtifactIRIException | UnmanagedSchemaIRIException e)
             {
                 throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Could not find the given artifact", e);
             }
@@ -116,7 +117,7 @@ public class SearchOntologyResourceImpl extends AbstractPoddResourceImpl
                     this.getPoddArtifactManager().searchForOntologyLabels(ontologyID, searchTerm,
                             set.toArray(new URI[0]));
         }
-        catch(final OpenRDFException e)
+        catch(final OpenRDFException | UnmanagedSchemaIRIException e)
         {
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Failed searching for Ontology Labels", e);
         }
@@ -153,7 +154,7 @@ public class SearchOntologyResourceImpl extends AbstractPoddResourceImpl
             {
                 ontologyID = this.getPoddArtifactManager().getArtifact(IRI.create(artifactUri));
             }
-            catch(final UnmanagedArtifactIRIException e)
+            catch(final UnmanagedArtifactIRIException | UnmanagedSchemaIRIException e)
             {
                 throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Could not find the given artifact", e);
             }
@@ -206,6 +207,10 @@ public class SearchOntologyResourceImpl extends AbstractPoddResourceImpl
         catch(final IOException e)
         {
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Could not parse input", e);
+        }
+        catch(final UnmanagedSchemaIRIException e)
+        {
+            throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Could not find necessary schema ontology", e);
         }
         
         return new ByteArrayRepresentation(output.toByteArray(), MediaType.valueOf(outputFormat.getDefaultMIMEType()));

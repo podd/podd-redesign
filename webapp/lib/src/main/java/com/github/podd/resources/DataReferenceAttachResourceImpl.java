@@ -50,6 +50,7 @@ import com.github.podd.exception.OntologyNotInProfileException;
 import com.github.podd.exception.PoddException;
 import com.github.podd.exception.UnmanagedArtifactIRIException;
 import com.github.podd.exception.UnmanagedArtifactVersionException;
+import com.github.podd.exception.UnmanagedSchemaIRIException;
 import com.github.podd.restlet.PoddAction;
 import com.github.podd.restlet.RestletUtils;
 import com.github.podd.utils.InferredOWLOntologyID;
@@ -78,11 +79,12 @@ public class DataReferenceAttachResourceImpl extends AbstractPoddResourceImpl
      * @throws UnsupportedRDFormatException
      * @throws RDFParseException
      * @throws UnmanagedArtifactIRIException
+     * @throws UnmanagedSchemaIRIException
      */
     private InferredOWLOntologyID attachDataReference(final Representation entity, final String artifactUriString,
             final String versionUriString, final DataReferenceVerificationPolicy verificationPolicy)
         throws ResourceException, RDFParseException, UnsupportedRDFormatException, IOException,
-        UnmanagedArtifactIRIException
+        UnmanagedArtifactIRIException, UnmanagedSchemaIRIException
     {
         // get input stream containing RDF statements
         InputStream inputStream = null;
@@ -167,7 +169,7 @@ public class DataReferenceAttachResourceImpl extends AbstractPoddResourceImpl
         {
             artifact = this.getPoddArtifactManager().getArtifact(IRI.create(artifactUri));
         }
-        catch(final UnmanagedArtifactIRIException e)
+        catch(final UnmanagedArtifactIRIException | UnmanagedSchemaIRIException e)
         {
             this.log.error("Artifact IRI not recognised");
             throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Artifact IRI not recognised");
@@ -183,7 +185,7 @@ public class DataReferenceAttachResourceImpl extends AbstractPoddResourceImpl
         {
             parentDetails = RestletUtils.getParentDetails(this.getPoddArtifactManager(), artifact, objectUri);
         }
-        catch(final OpenRDFException e)
+        catch(final OpenRDFException | UnmanagedSchemaIRIException e)
         {
             this.log.error("Could not find parent details", e);
             throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Could not find parent details", e);
@@ -242,7 +244,7 @@ public class DataReferenceAttachResourceImpl extends AbstractPoddResourceImpl
         {
             artifactMap = this.attachDataReference(entity, artifactUri, versionUri, verificationPolicy);
         }
-        catch(final UnmanagedArtifactIRIException e1)
+        catch(final UnmanagedArtifactIRIException | UnmanagedSchemaIRIException e1)
         {
             this.log.error("Artifact IRI not managed");
             throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Artifact IRI not managed");

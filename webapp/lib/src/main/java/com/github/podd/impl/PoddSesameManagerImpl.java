@@ -688,16 +688,30 @@ public class PoddSesameManagerImpl implements PoddSesameManager
     public Set<IRI> getDirectImports(final InferredOWLOntologyID ontologyID,
             final RepositoryConnection repositoryConnection) throws OpenRDFException
     {
-        return this.getDirectImports(repositoryConnection, this.versionAndInferredContexts(ontologyID));
+        return this.getDirectImports(ontologyID.getOntologyIRI(), repositoryConnection,
+                this.versionAndInferredContexts(ontologyID));
     }
     
     @Override
     public Set<IRI> getDirectImports(final RepositoryConnection repositoryConnection, final URI... contexts)
         throws OpenRDFException
     {
-        final String sparqlQuery = "SELECT ?x WHERE { ?y <" + OWL.IMPORTS.stringValue() + "> ?x ." + " }";
+        return this.getDirectImports(null, repositoryConnection, contexts);
+    }
+    
+    @Override
+    public Set<IRI> getDirectImports(final IRI ontologyIRI, final RepositoryConnection repositoryConnection,
+            final URI... contexts) throws OpenRDFException
+    {
+        final String sparqlQuery =
+                "SELECT ?import WHERE { ?ontology <" + OWL.IMPORTS.stringValue() + "> ?import ." + " }";
         this.log.debug("Generated SPARQL {}", sparqlQuery);
         final TupleQuery query = repositoryConnection.prepareTupleQuery(QueryLanguage.SPARQL, sparqlQuery);
+        
+        if(ontologyIRI != null)
+        {
+            query.setBinding("ontology", ontologyIRI.toOpenRDFURI());
+        }
         
         final DatasetImpl dataset = new DatasetImpl();
         for(final URI nextContext : contexts)
@@ -712,9 +726,11 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         while(queryResults.hasNext())
         {
             final BindingSet nextResult = queryResults.next();
-            final String ontologyIRI = nextResult.getValue("x").stringValue();
-            results.add(IRI.create(ontologyIRI));
-            
+            final Value importIRI = nextResult.getValue("import");
+            if(importIRI instanceof URI)
+            {
+                results.add(IRI.create((URI)importIRI));
+            }
         }
         return results;
     }

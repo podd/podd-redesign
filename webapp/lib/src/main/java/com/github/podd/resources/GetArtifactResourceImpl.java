@@ -39,6 +39,7 @@ import org.semanticweb.owlapi.model.IRI;
 import com.github.podd.exception.PoddException;
 import com.github.podd.exception.UnmanagedArtifactIRIException;
 import com.github.podd.exception.UnmanagedArtifactVersionException;
+import com.github.podd.exception.UnmanagedSchemaIRIException;
 import com.github.podd.restlet.PoddAction;
 import com.github.podd.restlet.RestletUtils;
 import com.github.podd.utils.FreemarkerUtil;
@@ -99,7 +100,7 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
                 }
             }
         }
-        catch(final UnmanagedArtifactIRIException | UnmanagedArtifactVersionException e)
+        catch(final UnmanagedArtifactIRIException | UnmanagedArtifactVersionException | UnmanagedSchemaIRIException e)
         {
             if(this.getRequest().getClientInfo().isAuthenticated())
             {
@@ -153,7 +154,7 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
         {
             this.populateDataModelWithArtifactData(ontologyID, objectToView, dataModel, isPublished);
         }
-        catch(final OpenRDFException e)
+        catch(final OpenRDFException | UnmanagedSchemaIRIException e)
         {
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Failed to populate data model", e);
         }
@@ -247,9 +248,11 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
      * @param isPublished
      *            True if the Project is Published
      * @throws OpenRDFException
+     * @throws UnmanagedSchemaIRIException
      */
     private void populateDataModelWithArtifactData(final InferredOWLOntologyID ontologyID, final String objectToView,
-            final Map<String, Object> dataModel, final boolean isPublished) throws OpenRDFException
+            final Map<String, Object> dataModel, final boolean isPublished) throws OpenRDFException,
+        UnmanagedSchemaIRIException
     {
         
         final PoddObjectLabel theObject =

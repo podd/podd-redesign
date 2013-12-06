@@ -20,6 +20,7 @@
 package com.github.podd.api;
 
 import java.util.Collection;
+import java.util.Set;
 
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.URI;
@@ -65,7 +66,7 @@ public interface PoddRepositoryManager
      *         temporarily while validating them before uploading them to a permanent repository.
      * @throws OpenRDFException
      */
-    Repository getNewTemporaryRepository(Collection<OWLOntologyID> schemaOntologies) throws OpenRDFException;
+    Repository getNewTemporaryRepository(Set<? extends OWLOntologyID> schemaOntologies) throws OpenRDFException;
     
     /**
      * 
@@ -76,7 +77,7 @@ public interface PoddRepositoryManager
      * @throws OpenRDFException
      *             If there are any errors with the repository at this stage.
      */
-    Repository getPermanentRepository(Collection<OWLOntologyID> schemaOntologies) throws OpenRDFException;
+    Repository getPermanentRepository(Set<? extends OWLOntologyID> schemaOntologies) throws OpenRDFException;
     
     /**
      * 

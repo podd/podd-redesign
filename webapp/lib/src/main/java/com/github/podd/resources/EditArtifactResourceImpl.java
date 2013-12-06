@@ -49,6 +49,7 @@ import com.github.podd.api.UpdatePolicy;
 import com.github.podd.exception.PoddException;
 import com.github.podd.exception.UnmanagedArtifactIRIException;
 import com.github.podd.exception.UnmanagedArtifactVersionException;
+import com.github.podd.exception.UnmanagedSchemaIRIException;
 import com.github.podd.restlet.PoddAction;
 import com.github.podd.restlet.RestletUtils;
 import com.github.podd.utils.InferredOWLOntologyID;
@@ -213,7 +214,7 @@ public class EditArtifactResourceImpl extends AbstractPoddResourceImpl
         {
             ontologyID = this.getPoddArtifactManager().getArtifact(IRI.create(artifactUri));
         }
-        catch(final UnmanagedArtifactIRIException e)
+        catch(final UnmanagedArtifactIRIException | UnmanagedSchemaIRIException e)
         {
             throw new ResourceException(Status.CLIENT_ERROR_NOT_FOUND, "Could not find the given artifact", e);
         }
@@ -275,7 +276,7 @@ public class EditArtifactResourceImpl extends AbstractPoddResourceImpl
                 dataModel.put("parentPredicateUri", statement.getPredicate().stringValue());
             }
         }
-        catch(final OpenRDFException e)
+        catch(final OpenRDFException | UnmanagedSchemaIRIException e)
         {
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Failed to populate data model");
         }

@@ -23,8 +23,12 @@ import info.aduna.iteration.Iterations;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.Model;
@@ -49,6 +53,7 @@ import org.restlet.security.LocalVerifier;
 import org.restlet.security.Realm;
 import org.restlet.security.Role;
 import org.semanticweb.owlapi.model.OWLException;
+import org.semanticweb.owlapi.model.OWLOntologyID;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.OWLOntologyManagerFactoryRegistry;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
@@ -79,6 +84,7 @@ import com.github.podd.impl.file.PoddFileRepositoryManagerImpl;
 import com.github.podd.impl.file.SSHFileReferenceProcessorFactoryImpl;
 import com.github.podd.impl.purl.PoddPurlManagerImpl;
 import com.github.podd.impl.purl.UUIDPurlProcessorFactoryImpl;
+import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.PODD;
 import com.github.podd.utils.PoddRoles;
 import com.github.podd.utils.PoddUser;
@@ -281,6 +287,7 @@ public class ApplicationUtils
         ApplicationUtils.log.debug("applicationContext {}", applicationContext);
         
         final List<Role> roles = application.getRoles();
+        // FIXME: Why does the list need to be cleared here?
         roles.clear();
         roles.addAll(PoddRoles.getRoles());
         
@@ -293,9 +300,8 @@ public class ApplicationUtils
         
         // File Reference manager
         final DataReferenceProcessorRegistry nextFileRegistry = new DataReferenceProcessorRegistry();
-        // clear any automatically added entries that may come from
-        // META-INF/services entries on the
-        // classpath
+        // FIXME: This clears any automatically added entries that come from META-INF/services
+        // entries on the classpath
         nextFileRegistry.clear();
         final DataReferenceProcessorFactory nextFileProcessorFactory = new SSHFileReferenceProcessorFactoryImpl();
         nextFileRegistry.add(nextFileProcessorFactory);
@@ -304,6 +310,7 @@ public class ApplicationUtils
         final DataReferenceManager nextDataReferenceManager = new FileReferenceManagerImpl();
         nextDataReferenceManager.setDataProcessorRegistry(nextFileRegistry);
         
+        // TODO: Use the automatically loaded registry
         // PURL manager
         final PoddPurlProcessorFactoryRegistry nextPurlRegistry = new PoddPurlProcessorFactoryRegistry();
         nextPurlRegistry.clear();
@@ -364,36 +371,93 @@ public class ApplicationUtils
         
         /*
          * Since the schema ontology upload feature is not yet supported, necessary schemas are
-         * uploaded here at application starts up.
+         * uploaded here at application start up.
          */
         try
         {
             final String schemaManifest = props.get(PODD.KEY_SCHEMAS, PODD.PATH_DEFAULT_SCHEMAS);
+            final RDFFormat format = Rio.getParserFormatForFileName(schemaManifest, RDFFormat.RDFXML);
             Model model = null;
-            
             try (final InputStream schemaManifestStream = application.getClass().getResourceAsStream(schemaManifest);)
             {
-                final RDFFormat format = Rio.getParserFormatForFileName(schemaManifest, RDFFormat.RDFXML);
+                if(schemaManifestStream == null)
+                {
+                    throw new RuntimeException("Could not find the schema ontology manifest: " + schemaManifest);
+                }
                 model = Rio.parse(schemaManifestStream, "", format);
             }
             
-            application.getPoddSchemaManager().uploadSchemaOntologies(model);
+            // Returns an ordered list of the schema ontologies that were uploaded
+            final List<InferredOWLOntologyID> schemaOntologies =
+                    application.getPoddSchemaManager().uploadSchemaOntologies(model);
             
-            // TODO: Use a manifest file to load up the current versions here
-            /*
-             * application.getPoddSchemaManager().uploadSchemaOntology( ApplicationUtils
-             * .class.getResourceAsStream(PoddRdfConstants.PATH_PODD_DCTERMS), RDFFormat.RDFXML);
-             * application.getPoddSchemaManager().uploadSchemaOntology( ApplicationUtils
-             * .class.getResourceAsStream(PoddRdfConstants.PATH_PODD_FOAF), RDFFormat.RDFXML);
-             * application.getPoddSchemaManager().uploadSchemaOntology( ApplicationUtils
-             * .class.getResourceAsStream(PoddRdfConstants.PATH_PODD_USER), RDFFormat.RDFXML);
-             * application.getPoddSchemaManager().uploadSchemaOntology( ApplicationUtils
-             * .class.getResourceAsStream(PoddRdfConstants.PATH_PODD_BASE), RDFFormat.RDFXML);
-             * application.getPoddSchemaManager().uploadSchemaOntology( ApplicationUtils
-             * .class.getResourceAsStream(PoddRdfConstants.PATH_PODD_SCIENCE), RDFFormat.RDFXML);
-             * application.getPoddSchemaManager().uploadSchemaOntology( ApplicationUtils
-             * .class.getResourceAsStream(PoddRdfConstants.PATH_PODD_PLANT), RDFFormat.RDFXML);
-             */
+            // NOTE: The following is not ordered at this point in time
+            // TODO: Do we gain anything from ordering this collection
+            final Set<InferredOWLOntologyID> currentSchemaOntologies =
+                    application.getPoddSchemaManager().getCurrentSchemaOntologies();
+            
+            final List<InferredOWLOntologyID> updatedCurrentSchemaOntologies = new ArrayList<>();
+            
+            for(final InferredOWLOntologyID nextSchemaOntology : schemaOntologies)
+            {
+                if(currentSchemaOntologies.contains(nextSchemaOntology))
+                {
+                    updatedCurrentSchemaOntologies.add(nextSchemaOntology);
+                }
+            }
+            
+            final ConcurrentMap<InferredOWLOntologyID, Set<InferredOWLOntologyID>> currentArtifactImports =
+                    new ConcurrentHashMap<>();
+            
+            final ConcurrentMap<InferredOWLOntologyID, Set<InferredOWLOntologyID>> artifactsToUpdate =
+                    new ConcurrentHashMap<>();
+            
+            for(final InferredOWLOntologyID nextArtifact : application.getPoddArtifactManager()
+                    .listUnpublishedArtifacts())
+            {
+                if(application.getPoddArtifactManager().isPublished(nextArtifact))
+                {
+                    // Must not update the schema imports for published artifacts
+                    continue;
+                }
+                
+                final Set<InferredOWLOntologyID> schemaImports =
+                        application.getPoddArtifactManager().getSchemaImports(nextArtifact);
+                
+                // Cache the current artifact imports so they are easily accessible without calling
+                // the above method again if they need to be updated
+                currentArtifactImports.put(nextArtifact, schemaImports);
+                
+                for(final InferredOWLOntologyID nextUpdatedSchemaImport : updatedCurrentSchemaOntologies)
+                {
+                    for(final OWLOntologyID nextSchemaImport : schemaImports)
+                    {
+                        // If the ontology IRI of the artifacts schema import was in the updated
+                        // list, then signal it for updating
+                        if(nextUpdatedSchemaImport.getOntologyIRI().equals(nextSchemaImport.getOntologyIRI())
+                                && !nextUpdatedSchemaImport.getVersionIRI().equals(nextSchemaImport.getVersionIRI()))
+                        {
+                            Set<InferredOWLOntologyID> set = new HashSet<>();
+                            final Set<InferredOWLOntologyID> putIfAbsent =
+                                    artifactsToUpdate.putIfAbsent(nextArtifact, set);
+                            if(putIfAbsent != null)
+                            {
+                                set = putIfAbsent;
+                            }
+                            // FIXME: Naive strategy to ensure that we get all of the imports that
+                            // users expect is to add all of the current schema ontologies here
+                            set.addAll(updatedCurrentSchemaOntologies);
+                        }
+                    }
+                }
+                
+            }
+            
+            for(final InferredOWLOntologyID nextArtifactToUpdate : artifactsToUpdate.keySet())
+            {
+                application.getPoddArtifactManager().updateSchemaImports(nextArtifactToUpdate,
+                        currentArtifactImports.get(nextArtifactToUpdate), artifactsToUpdate.get(nextArtifactToUpdate));
+            }
             // Enable the following for debugging
             // dumpSchemaGraph(application, nextRepository);
         }
@@ -402,16 +466,12 @@ public class ApplicationUtils
             ApplicationUtils.log.error("Fatal Error!!! Could not load schema ontologies", e);
         }
         
-        // OasMemoryRealm has extensions so that getClientInfo().getUser() will
-        // contain first name,
-        // last name, and email address as necessary
         final PoddSesameRealm nextRealm = new PoddSesameRealm(nextRepository, PODD.DEFAULT_USER_MANAGEMENT_GRAPH);
         
         // FIXME: Make this configurable
         nextRealm.setName("PODDRealm");
         
-        // Check if there is a current admin, and only add our test admin user
-        // if there is no admin
+        // Check if there is a current admin, and only add our test admin user if there is no admin
         // in the system
         boolean foundCurrentAdmin = false;
         for(final RestletUtilUser nextUser : nextRealm.getUsers())
@@ -442,56 +502,22 @@ public class ApplicationUtils
             
             ApplicationUtils.log.debug("testAdminUserRoles: {}, {}", testAdminUserRoles, testAdminUserRoles.size());
             
-            // FIXME: Should put the application in maintenance mode at this
-            // point (when that is
-            // supported), to require password/username change before opening up
-            // to other users
+            // FIXME: Should put the application in maintenance mode at this point (when that is
+            // supported), to require password/username change before opening up to other users
             
         }
-        // final User findUser = nextRealm.findUser("testAdminUser");
-        
-        // ApplicationUtils.log.debug("findUser: {}", findUser);
-        // ApplicationUtils.log.debug("findUser.getFirstName: {}",
-        // findUser.getFirstName());
-        // ApplicationUtils.log.debug("findUser.getLastName: {}",
-        // findUser.getLastName());
-        // ApplicationUtils.log.debug("findUser.getName: {}",
-        // findUser.getName());
-        // ApplicationUtils.log.debug("findUser.getIdentifier: {}",
-        // findUser.getIdentifier());
-        
-        // TODO: Define groups here also
-        
-        // final MapVerifier verifier = new MapVerifier();
-        // final ConcurrentHashMap<String, char[]> hardcodedLocalSecrets = new
-        // ConcurrentHashMap<String, char[]>();
-        // hardcodedLocalSecrets.put("testUser", "testPassword".toCharArray());
-        // verifier.setLocalSecrets(hardcodedLocalSecrets);
-        
-        // final Context authenticatorChildContext =
-        // applicationContext.createChildContext();
         final ChallengeAuthenticator newAuthenticator =
                 ApplicationUtils.getNewAuthenticator(nextRealm, applicationContext, props);
         application.setAuthenticator(newAuthenticator);
         
         application.setRealm(nextRealm);
         
-        // TODO: Is this necessary?
-        // FIXME: Is this safe?
-        // applicationContext.setDefaultVerifier(newAuthenticator.getVerifier());
-        // applicationContext.setDefaultEnroler(newAuthenticator.getEnroler());
-        
-        // applicationContext.setDefaultVerifier(nextRealm.getVerifier());
-        // applicationContext.setDefaultEnroler(nextRealm.getEnroler());
-        
-        // final Context templateChildContext =
-        // applicationContext.createChildContext();
+        // Setup the Freemarker configuration
         final Configuration newTemplateConfiguration = ApplicationUtils.getNewTemplateConfiguration(applicationContext);
         application.setTemplateConfiguration(newTemplateConfiguration);
         
-        // create a custom error handler using our overridden PoddStatusService
-        // together with the
-        // freemarker configuration
+        // Create a custom error handler using our overridden PoddStatusService together with the
+        // Freemarker configuration
         final PoddStatusService statusService = new PoddStatusService(newTemplateConfiguration);
         application.setStatusService(statusService);
     }
