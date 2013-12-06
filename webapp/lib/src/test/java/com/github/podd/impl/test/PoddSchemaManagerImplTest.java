@@ -119,6 +119,45 @@ public class PoddSchemaManagerImplTest extends AbstractPoddSchemaManagerTest
     }
     
     @Test
+    public void testUploadSchemaOntologiesInOrderRepeat() throws Exception
+    {
+        // prepare: Model containing schema-manifest
+        final String schemaManifest = "/test/schema-manifest-a1b2c3.ttl";
+        Model model = null;
+        try (final InputStream schemaManifestStream = this.getClass().getResourceAsStream(schemaManifest);)
+        {
+            final RDFFormat format = Rio.getParserFormatForFileName(schemaManifest, RDFFormat.RDFXML);
+            model = Rio.parse(schemaManifestStream, "", format);
+        }
+        
+        // prepare: order of imports
+        final String[] testImportOrderArray =
+                { "http://example.org/podd/ns/version/poddA/1", "http://example.org/podd/ns/version/poddB/2",
+                        "http://example.org/podd/ns/version/poddB/1", "http://example.org/podd/ns/version/poddC/3",
+                        "http://example.org/podd/ns/version/poddC/1", };
+        
+        final List<URI> testImportOrder = new ArrayList<>();
+        for(final String s : testImportOrderArray)
+        {
+            testImportOrder.add(PODD.VF.createURI(s));
+        }
+        
+        ((PoddSchemaManagerImpl)this.testSchemaManager).uploadSchemaOntologiesInOrder(model, testImportOrder);
+        
+        // verify: schemas successfully loaded
+        Assert.assertEquals("Expected 3 current schemas", 3, this.testSchemaManager.getCurrentSchemaOntologies().size());
+        Assert.assertEquals("Expected 5 schema ontology versions", 5, this.testSchemaManager.getSchemaOntologies()
+                .size());
+        
+        ((PoddSchemaManagerImpl)this.testSchemaManager).uploadSchemaOntologiesInOrder(model, testImportOrder);
+        
+        // verify: schemas in memory not modified
+        Assert.assertEquals("Expected 3 current schemas", 3, this.testSchemaManager.getCurrentSchemaOntologies().size());
+        Assert.assertEquals("Expected 5 schema ontology versions", 5, this.testSchemaManager.getSchemaOntologies()
+                .size());
+    }
+    
+    @Test
     public void testUploadSchemaOntologiesInOrderInvalid() throws Exception
     {
         // prepare: Model containing schema-manifest

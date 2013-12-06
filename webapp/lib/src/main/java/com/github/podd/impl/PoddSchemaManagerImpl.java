@@ -604,16 +604,34 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
     
     /**
      * @param model
-     * @param importOrder
+     * @param nextImportOrder
      * @throws ModelException
      * @throws OpenRDFException
      * @throws IOException
      * @throws OWLException
      * @throws PoddException
      */
-    public List<InferredOWLOntologyID> uploadSchemaOntologiesInOrder(final Model model, final List<URI> importOrder)
+    public List<InferredOWLOntologyID> uploadSchemaOntologiesInOrder(final Model model, final List<URI> nextImportOrder)
         throws ModelException, OpenRDFException, IOException, OWLException, PoddException
     {
+        List<URI> importOrder = new ArrayList<>(nextImportOrder);
+        
+        Set<InferredOWLOntologyID> currentSchemaOntologies = getSchemaOntologies();
+        
+        for(InferredOWLOntologyID nextCurrentSchemaOntology : currentSchemaOntologies)
+        {
+            List<URI> tempList = new ArrayList<>(importOrder);
+            for(int i = 0; i < tempList.size(); i++)
+            {
+                URI nextImport = tempList.get(i);
+                if(nextImport.equals(nextCurrentSchemaOntology.getVersionIRI().toOpenRDFURI()))
+                {
+                    // Do not reimport schema ontologies that we already have
+                    importOrder.remove(i);
+                }
+            }
+        }
+        
         final List<InferredOWLOntologyID> result = new ArrayList<>(importOrder.size());
         Objects.requireNonNull(model, "Schema Ontology model was null");
         
