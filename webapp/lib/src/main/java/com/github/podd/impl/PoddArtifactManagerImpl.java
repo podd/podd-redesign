@@ -401,7 +401,18 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         
         try
         {
-            final Set<InferredOWLOntologyID> schemaImports = this.getSchemaImports(artifactID);
+            Set<InferredOWLOntologyID> schemaImports;
+            
+            if(artifactID != null)
+            {
+                schemaImports = this.getSchemaImports(artifactID);
+            }
+            else
+            {
+                // If they don't have an artifact yet, we return the set of current schema
+                // ontologies
+                schemaImports = this.getSchemaManager().getCurrentSchemaOntologies();
+            }
             conn = this.getRepositoryManager().getPermanentRepository(schemaImports).getConnection();
             
             final URI[] contexts =

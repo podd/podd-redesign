@@ -1113,7 +1113,7 @@ public abstract class AbstractPoddSesameManagerTest
         // object type count
         final Object[][] testData =
                 { { PODD.VF.createURI(PODD.PODD_SCIENCE, "Investigation"), 89, 10, 17 },
-                        { PODD.VF.createURI(PODD.PODD_SCIENCE, "Material"), 61, 7, 10 }, };
+                        { PODD.VF.createURI(PODD.PODD_SCIENCE, "Material"), 61, 7, 9 }, };
         
         for(final Object[] element : testData)
         {

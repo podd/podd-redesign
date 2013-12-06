@@ -599,11 +599,12 @@ public abstract class AbstractPoddArtifactManagerTest
         Assert.assertNotNull("Null implementation of OWLOntologymanager", manager);
         final PoddOWLManager testOWLManager = this.getNewOWLManager(manager, this.getNewReasonerFactory());
         
+        this.testSesameManager = this.getNewSesameManager();
+        
         this.testSchemaManager = this.getNewSchemaManager();
         this.testSchemaManager.setOwlManager(testOWLManager);
         this.testSchemaManager.setRepositoryManager(this.testRepositoryManager);
-        
-        this.testSesameManager = this.getNewSesameManager();
+        this.testSchemaManager.setSesameManager(this.testSesameManager);
         
         this.testArtifactManager = this.getNewArtifactManager();
         this.testArtifactManager.setRepositoryManager(this.testRepositoryManager);
@@ -1116,7 +1117,7 @@ public abstract class AbstractPoddArtifactManagerTest
         final URI objectType = PODD.VF.createURI(PODD.PODD_SCIENCE, "Process");
         
         this.testArtifactManager.exportObjectMetadata(objectType, output, RDFFormat.TURTLE, false,
-                MetadataPolicy.EXCLUDE_CONTAINS, null);
+                MetadataPolicy.EXCLUDE_CONTAINS, artifactIDv1);
         
         // parse output into a Model
         final ByteArrayInputStream bin = new ByteArrayInputStream(output.toByteArray());

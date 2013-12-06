@@ -55,7 +55,7 @@ public interface TestConstants
     /** Test resource: artifact with 1 internal object, slightly different */
     public static final String TEST_ARTIFACT_BASIC_PROJECT_2 = "/test/artifacts/basicProject-2.rdf";
     public static final int TEST_ARTIFACT_BASIC_PROJECT_2_CONCRETE_TRIPLES = 24;
-    public static final int TEST_ARTIFACT_BASIC_PROJECT_2_INFERRED_TRIPLES = 346;
+    public static final int TEST_ARTIFACT_BASIC_PROJECT_2_INFERRED_TRIPLES = 348;
     
     /** Test resource: (in RDF/XML) artifact with published status */
     public static final String TEST_ARTIFACT_BASIC_PROJECT_PUBLISHED = "/test/artifacts/basicProject-1-published.rdf";
@@ -92,7 +92,7 @@ public interface TestConstants
     /** Test resource (in RDF/XML): artifact imports v1 of PODD Science schema ontology */
     public static final String TEST_ARTIFACT_PURLS_v1 = "/test/artifacts/project-with-purls-v1.rdf";
     public static final int TEST_ARTIFACT_PURLS_v1_CONCRETE_TRIPLES = 24;
-    public static final int TEST_ARTIFACT_PURLS_v1_INFERRED_TRIPLES = 346;
+    public static final int TEST_ARTIFACT_PURLS_v1_INFERRED_TRIPLES = 348;
     
     /** Test resource (in Turtle): artifact with temporary URIs and 1 internal object having a PURL */
     public static final String TEST_ARTIFACT_TTL_1_INTERNAL_OBJECT = "/test/artifacts/connected-1-object.ttl";
