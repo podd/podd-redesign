@@ -40,7 +40,7 @@ public interface TestConstants
     public static final int EXPECTED_TRIPLE_COUNT_PODD_SCIENCE_INFERRED = 229;
     
     public static final int EXPECTED_TRIPLE_COUNT_PODD_PLANT_CONCRETE = 214;
-    public static final int EXPECTED_TRIPLE_COUNT_PODD_PLANT_INFERRED = 383;
+    public static final int EXPECTED_TRIPLE_COUNT_PODD_PLANT_INFERRED = 385;
     
     /** Test resource: artifact with no internal objects */
     public static final String TEST_ARTIFACT_BASIC_PROJECT_1 = "/test/artifacts/basicProject-1.rdf";
@@ -50,7 +50,7 @@ public interface TestConstants
     /** Test resource: artifact with 1 internal object */
     public static final String TEST_ARTIFACT_BASIC_1_INTERNAL_OBJECT = "/test/artifacts/basic-1-internal-object.rdf";
     public static final int TEST_ARTIFACT_BASIC_1_INTERNAL_OBJECT_CONCRETE_TRIPLES = 28;
-    public static final int TEST_ARTIFACT_BASIC_1_INTERNAL_OBJECT_INFERRED_TRIPLES = 352;
+    public static final int TEST_ARTIFACT_BASIC_1_INTERNAL_OBJECT_INFERRED_TRIPLES = 354;
     
     /** Test resource: artifact with 1 internal object, slightly different */
     public static final String TEST_ARTIFACT_BASIC_PROJECT_2 = "/test/artifacts/basicProject-2.rdf";
@@ -60,7 +60,7 @@ public interface TestConstants
     /** Test resource: (in RDF/XML) artifact with published status */
     public static final String TEST_ARTIFACT_BASIC_PROJECT_PUBLISHED = "/test/artifacts/basicProject-1-published.rdf";
     public static final int TEST_ARTIFACT_BASIC_PROJECT_PUBLISHED_CONCRETE_TRIPLES = 24;
-    public static final int TEST_ARTIFACT_BASIC_PROJECT_PUBLISHED_INFERRED_TRIPLES = 346;
+    public static final int TEST_ARTIFACT_BASIC_PROJECT_PUBLISHED_INFERRED_TRIPLES = 348;
     
     public static final String TEST_ARTIFACT_PURLS_2_FILE_REFS = "/test/artifacts/project-purls-file-ref.rdf";
     
@@ -82,7 +82,7 @@ public interface TestConstants
     public static final String TEST_ARTIFACT_IMPORT_PSCIENCEv1 =
             "/test/artifacts/project-imports-sciencev1-version.rdf";
     public static final int TEST_ARTIFACT_IMPORT_PSCIENCEv1_CONCRETE_TRIPLES = 28;
-    public static final int TEST_ARTIFACT_IMPORT_PSCIENCEv1_INFERRED_TRIPLES = 352;
+    public static final int TEST_ARTIFACT_IMPORT_PSCIENCEv1_INFERRED_TRIPLES = 354;
     
     /** Test resource (in RDF/XML): artifact imports v1 of PODD Science schema ontology */
     public static final String TEST_ARTIFACT_NO_VERSION_INFO = "/test/artifacts/project-with-no-version-info.rdf";
@@ -100,12 +100,12 @@ public interface TestConstants
     /** Test resource: artifact with PURLs and multiple internal objects in Turtle format */
     public static final String TEST_ARTIFACT_20130206 = "/test/artifacts/basic-20130206.ttl";
     public static final int TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES = 90;
-    public static final int TEST_ARTIFACT_BASIC_1_20130206_INFERRED_TRIPLES = 584;
+    public static final int TEST_ARTIFACT_BASIC_1_20130206_INFERRED_TRIPLES = 586;
     
     /** Test resource: artifact with PURLs and a refersTo link in Turtle format */
     public static final String TEST_ARTIFACT_WITH_REFERSTO = "/test/artifacts/artifact-with-refers-to.ttl";
     public static final int TEST_ARTIFACT_WITH_REFERSTO_CONCRETE_TRIPLES = 81;
-    public static final int TEST_ARTIFACT_WITH_REFERSTO_INFERRED_TRIPLES = 578;
+    public static final int TEST_ARTIFACT_WITH_REFERSTO_INFERRED_TRIPLES = 580;
     
     /** Test resource (in Turtle): inferred artifact with PURLs and multiple internal objects */
     public static final String TEST_ARTIFACT_20130206_INFERRED = "/test/artifacts/basic-20130206-inferred.ttl";
