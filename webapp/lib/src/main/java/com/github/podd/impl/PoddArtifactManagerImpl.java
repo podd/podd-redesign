@@ -29,6 +29,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 
@@ -859,6 +860,10 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
     public Set<InferredOWLOntologyID> getSchemaImports(final InferredOWLOntologyID artifactID) throws OpenRDFException,
         UnmanagedSchemaIRIException
     {
+        Objects.requireNonNull(
+                artifactID,
+                "Cannot get schema imports without an artifact reference. May need to try PoddSchemaManager.getCurrentSchemaOntologies instead.");
+        
         final Set<InferredOWLOntologyID> results = new LinkedHashSet<InferredOWLOntologyID>();
         
         RepositoryConnection conn = null;
@@ -1662,9 +1667,18 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         
         try
         {
-            final Set<InferredOWLOntologyID> currentSchemaImports = this.getSchemaImports(ontologyID);
+            Set<InferredOWLOntologyID> schemaImports;
             
-            conn = this.getRepositoryManager().getPermanentRepository(currentSchemaImports).getConnection();
+            if(ontologyID != null)
+            {
+                schemaImports = this.getSchemaImports(ontologyID);
+            }
+            else
+            {
+                schemaImports = this.getSchemaManager().getCurrentSchemaOntologies();
+            }
+            
+            conn = this.getRepositoryManager().getPermanentRepository(schemaImports).getConnection();
             // FIXME: Cannot use contexts like this for a federated method
             final URI[] contexts =
                     this.getSesameManager().versionAndInferredAndSchemaContexts(ontologyID, conn,
