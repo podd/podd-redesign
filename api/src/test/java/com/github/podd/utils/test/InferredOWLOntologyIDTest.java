@@ -126,9 +126,11 @@ public class InferredOWLOntologyIDTest
                 new InferredOWLOntologyID(this.testBaseOntologyIRI, this.testOntologyVersionIRI,
                         this.testInferredOntologyIRI);
         
-        Assert.assertFalse(onto1.equals(onto2));
-        Assert.assertFalse(onto2.equals(onto1));
-        
+        // Assert.assertFalse(onto1.equals(onto2));
+        // Assert.assertFalse(onto2.equals(onto1));
+        // The API changed to allow this explicitly
+        Assert.assertTrue(onto1.equals(onto2));
+        Assert.assertTrue(onto2.equals(onto1));
     }
     
     @Test
@@ -188,7 +190,9 @@ public class InferredOWLOntologyIDTest
                         this.testInferredOntologyIRI);
         final OWLOntologyID onto2 = new OWLOntologyID(this.testBaseOntologyIRI, this.testOntologyVersionIRI);
         
-        Assert.assertFalse(onto1.equals(onto2));
+        // Assert.assertFalse(onto1.equals(onto2));
+        // The API changed to require that this returns true to ease set integration
+        Assert.assertTrue(onto1.equals(onto2));
     }
     
     /**
