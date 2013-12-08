@@ -90,36 +90,37 @@ public class InferredOWLOntologyID extends OWLOntologyID
         
         // make sure that we can still be equal to OWLOntologyID instances if we did not get an
         // InferredOntologyIRI
-        if(obj instanceof InferredOWLOntologyID)
-        {
-            final InferredOWLOntologyID other = (InferredOWLOntologyID)obj;
-            if(this.inferredOntologyIRI == null)
-            {
-                if(other.inferredOntologyIRI == null)
-                {
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
-            }
-            else if(other.inferredOntologyIRI == null)
-            {
-                return false;
-            }
-            else
-            {
-                return this.inferredOntologyIRI.equals(other.inferredOntologyIRI);
-            }
-        }
-        else
-        {
-            // if the other object was not an InferredOWLOntogyID then we will only be equal if we
-            // do not have an inferred ontologyIRI ourselves
-            return this.inferredOntologyIRI == null;
-        }
+//        if(obj instanceof InferredOWLOntologyID)
+//        {
+//            final InferredOWLOntologyID other = (InferredOWLOntologyID)obj;
+//            if(this.inferredOntologyIRI == null)
+//            {
+//                if(other.inferredOntologyIRI == null)
+//                {
+//                    return true;
+//                }
+//                else
+//                {
+//                    return false;
+//                }
+//            }
+//            else if(other.inferredOntologyIRI == null)
+//            {
+//                return false;
+//            }
+//            else
+//            {
+//                return this.inferredOntologyIRI.equals(other.inferredOntologyIRI);
+//            }
+//        }
+//        else
+//        {
+//            // if the other object was not an InferredOWLOntogyID then we will only be equal if we
+//            // do not have an inferred ontologyIRI ourselves
+//            return this.inferredOntologyIRI == null;
+//        }
         
+        return true;
     }
     
     /**
