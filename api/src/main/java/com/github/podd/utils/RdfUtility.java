@@ -324,7 +324,10 @@ public class RdfUtility
                     connection.rollback();
                     connection.close();
                 }
-                tempRepository.shutDown();
+                if(tempRepository != null)
+                {
+                    tempRepository.shutDown();
+                }
             }
             catch(final Exception e)
             {
