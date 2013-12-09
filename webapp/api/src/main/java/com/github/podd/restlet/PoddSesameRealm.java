@@ -1617,7 +1617,7 @@ public class PoddSesameRealm extends Realm
         return result;
     }
     
-    public URI[] getContexts()
+    protected URI[] getContexts()
     {
         return this.userManagerContexts;
     }
