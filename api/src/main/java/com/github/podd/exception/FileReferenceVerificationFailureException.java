@@ -72,10 +72,8 @@ public class FileReferenceVerificationFailureException extends PoddException
         
         // FIXME - untested and incomplete
         final Map<DataReference, Throwable> validationFailures = this.getValidationFailures();
-        final Iterator<DataReference> iterator = validationFailures.keySet().iterator();
-        while(iterator.hasNext())
+        for(DataReference dataReference : validationFailures.keySet())
         {
-            final DataReference dataReference = iterator.next();
             final Throwable throwable = validationFailures.get(dataReference);
             // TODO
             model.add(dataReference.getObjectIri().toOpenRDFURI(), RDFS.LABEL,
