@@ -1340,13 +1340,16 @@ public class PoddSesameRealm extends Realm
         catch(final OpenRDFException e)
         {
             this.log.error("Found repository exception while adding user", e);
-            try
+            if(conn != null)
             {
-                conn.rollback();
-            }
-            catch(final RepositoryException e1)
-            {
-                this.log.error("Found unexpected exception while rolling back repository connection after exception");
+                try
+                {
+                    conn.rollback();
+                }
+                catch(final RepositoryException e1)
+                {
+                    this.log.error("Found unexpected exception while rolling back repository connection after exception");
+                }
             }
             throw new RuntimeException("Found repository exception while adding user", e);
         }
@@ -1647,7 +1650,7 @@ public class PoddSesameRealm extends Realm
         return nextStandardRole;
     }
     
-    private List<RoleMapping> getRoleMappings()
+    protected List<RoleMapping> getRoleMappings()
     {
         RepositoryConnection conn = null;
         try
@@ -2069,7 +2072,7 @@ public class PoddSesameRealm extends Realm
         // return this.rootGroups;
     }
     
-    private Dataset getSesameDataset()
+    protected Dataset getSesameDataset()
     {
         final DatasetImpl result = new DatasetImpl();
         
@@ -2117,13 +2120,16 @@ public class PoddSesameRealm extends Realm
         }
         finally
         {
-            try
+            if(conn != null)
             {
-                conn.close();
-            }
-            catch(final RepositoryException e)
-            {
-                this.log.error("Failure to close connection", e);
+                try
+                {
+                    conn.close();
+                }
+                catch(final RepositoryException e)
+                {
+                    this.log.error("Failure to close connection", e);
+                }
             }
         }
         
@@ -2154,13 +2160,16 @@ public class PoddSesameRealm extends Realm
         catch(final RepositoryException e)
         {
             this.log.error("Found repository exception while adding user", e);
-            try
+            if(conn != null)
             {
-                conn.rollback();
-            }
-            catch(final RepositoryException e1)
-            {
-                this.log.error("Found unexpected exception while rolling back repository connection after exception");
+                try
+                {
+                    conn.rollback();
+                }
+                catch(final RepositoryException e1)
+                {
+                    this.log.error("Found unexpected exception while rolling back repository connection after exception");
+                }
             }
             
             throw new RuntimeException(e);
@@ -2203,13 +2212,16 @@ public class PoddSesameRealm extends Realm
         }
         finally
         {
-            try
+            if(conn != null)
             {
-                conn.close();
-            }
-            catch(final RepositoryException e)
-            {
-                this.log.error("Failure to close connection", e);
+                try
+                {
+                    conn.close();
+                }
+                catch(final RepositoryException e)
+                {
+                    this.log.error("Failure to close connection", e);
+                }
             }
         }
         
@@ -2301,13 +2313,16 @@ public class PoddSesameRealm extends Realm
         }
         finally
         {
-            try
+            if(conn != null)
             {
-                conn.close();
-            }
-            catch(final RepositoryException e)
-            {
-                this.log.error("Failure to close connection", e);
+                try
+                {
+                    conn.close();
+                }
+                catch(final RepositoryException e)
+                {
+                    this.log.error("Failure to close connection", e);
+                }
             }
         }
         
@@ -2373,15 +2388,17 @@ public class PoddSesameRealm extends Realm
         catch(final RepositoryException e)
         {
             this.log.error("Found repository exception while adding user", e);
-            try
+            if(conn != null)
             {
-                conn.rollback();
+                try
+                {
+                    conn.rollback();
+                }
+                catch(final RepositoryException e1)
+                {
+                    this.log.error("Found unexpected exception while rolling back repository connection after exception");
+                }
             }
-            catch(final RepositoryException e1)
-            {
-                this.log.error("Found unexpected exception while rolling back repository connection after exception");
-            }
-            
             throw new RuntimeException(e);
         }
         finally
@@ -2542,13 +2559,16 @@ public class PoddSesameRealm extends Realm
         }
         finally
         {
-            try
+            if(conn != null)
             {
-                conn.close();
-            }
-            catch(final RepositoryException e)
-            {
-                this.log.error("Failure to close connection", e);
+                try
+                {
+                    conn.close();
+                }
+                catch(final RepositoryException e)
+                {
+                    this.log.error("Failure to close connection", e);
+                }
             }
         }
         return result;
@@ -2752,25 +2772,31 @@ public class PoddSesameRealm extends Realm
         }
         catch(final OpenRDFException e)
         {
-            try
+            if(conn != null)
             {
-                conn.rollback();
-            }
-            catch(final RepositoryException e1)
-            {
-                this.log.error("Repository Exception while rolling back connection");
+                try
+                {
+                    conn.rollback();
+                }
+                catch(final RepositoryException e1)
+                {
+                    this.log.error("Repository Exception while rolling back connection");
+                }
             }
             throw new RuntimeException("Failure finding user in repository", e);
         }
         finally
         {
-            try
+            if(conn != null)
             {
-                conn.close();
-            }
-            catch(final RepositoryException e)
-            {
-                this.log.error("Failure to close connection", e);
+                try
+                {
+                    conn.close();
+                }
+                catch(final RepositoryException e)
+                {
+                    this.log.error("Failure to close connection", e);
+                }
             }
         }
         
@@ -2852,25 +2878,31 @@ public class PoddSesameRealm extends Realm
             }
             catch(final OpenRDFException e)
             {
-                try
+                if(conn != null)
                 {
-                    conn.rollback();
-                }
-                catch(final RepositoryException e1)
-                {
-                    this.log.error("Repository Exception while rolling back connection");
+                    try
+                    {
+                        conn.rollback();
+                    }
+                    catch(final RepositoryException e1)
+                    {
+                        this.log.error("Repository Exception while rolling back connection");
+                    }
                 }
                 throw new RuntimeException("Failure finding user in repository", e);
             }
             finally
             {
-                try
+                if(conn != null)
                 {
-                    conn.close();
-                }
-                catch(final RepositoryException e)
-                {
-                    this.log.error("Failure to close connection", e);
+                    try
+                    {
+                        conn.close();
+                    }
+                    catch(final RepositoryException e)
+                    {
+                        this.log.error("Failure to close connection", e);
+                    }
                 }
             }
         }
