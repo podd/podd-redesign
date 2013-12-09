@@ -27,8 +27,8 @@ public class InvalidUserDetailsException extends PoddException
     
     private static final long serialVersionUID = 6740075721656072394L;
     
-    private PoddUser user;
-    private String[] errorFields;
+    private final PoddUser user;
+    private final String[] errorFields;
     
     /**
      * 
