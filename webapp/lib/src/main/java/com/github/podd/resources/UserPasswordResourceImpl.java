@@ -143,12 +143,11 @@ public class UserPasswordResourceImpl extends AbstractUserResourceImpl
         
         final PoddSesameRealm nextRealm = ((PoddWebServiceApplication)this.getApplication()).getRealm();
         
-        final RestletUtilUser changePwdUser = nextRealm.findUser(requestedUserIdentifier);
-        if(changePwdUser == null || !(changePwdUser instanceof PoddUser))
+        final PoddUser poddUser = nextRealm.findUser(requestedUserIdentifier);
+        if(poddUser == null)
         {
             throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "User not found");
         }
-        final PoddUser poddUser = (PoddUser)changePwdUser;
         
         URI userUri = null;
         try

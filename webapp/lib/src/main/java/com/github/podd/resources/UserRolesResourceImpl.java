@@ -89,12 +89,11 @@ public class UserRolesResourceImpl extends AbstractUserResourceImpl
         }
         
         final PoddSesameRealm nextRealm = ((PoddWebServiceApplication)this.getApplication()).getRealm();
-        final RestletUtilUser restletUserToUpdate = nextRealm.findUser(userIdentifier);
-        if(restletUserToUpdate == null || !(restletUserToUpdate instanceof PoddUser))
+        final PoddUser poddUser = nextRealm.findUser(userIdentifier);
+        if(poddUser == null)
         {
             throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "User not found");
         }
-        final PoddUser poddUser = (PoddUser)restletUserToUpdate;
         
         // - retrieve 'delete' parameter
         boolean isDelete = false;

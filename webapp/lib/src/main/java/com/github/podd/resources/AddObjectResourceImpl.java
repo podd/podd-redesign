@@ -164,11 +164,10 @@ public class AddObjectResourceImpl extends AbstractPoddResourceImpl
             }
             
             final Set<InferredOWLOntologyID> schemaImports = this.getPoddArtifactManager().getSchemaImports(ontologyID);
-            final RepositoryConnection conn =
-                    this.getPoddRepositoryManager().getPermanentRepository(schemaImports).getConnection();
-            conn.begin();
+            RepositoryConnection conn = null;
             try
             {
+                conn = this.getPoddRepositoryManager().getPermanentRepository(schemaImports).getConnection();
                 objectLabel =
                         this.getPoddSesameManager().getObjectLabel(ontologyID, PODD.VF.createURI(objectType), conn,
                                 this.getPoddRepositoryManager().getSchemaManagementGraph());

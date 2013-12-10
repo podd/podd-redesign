@@ -190,9 +190,12 @@ public class PoddFileRepositoryManagerImpl implements PoddDataRepositoryManager
             }
             conn.commit();
         }
-        catch(final Exception e)
+        catch(final Throwable e)
         {
-            conn.rollback();
+            if(conn != null)
+            {
+                conn.rollback();
+            }
             throw e;
         }
         finally

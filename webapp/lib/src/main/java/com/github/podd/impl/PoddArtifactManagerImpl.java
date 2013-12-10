@@ -592,7 +592,10 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         }
         finally
         {
-            conn.close();
+            if(conn != null)
+            {
+                conn.close();
+            }
         }
     }
     
@@ -660,7 +663,10 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         }
         finally
         {
-            conn.close();
+            if(conn != null)
+            {
+                conn.close();
+            }
         }
     }
     
@@ -678,7 +684,10 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         }
         finally
         {
-            conn.close();
+            if(conn != null)
+            {
+                conn.close();
+            }
         }
     }
     
@@ -711,8 +720,12 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         }
         finally
         {
-            conn.close();
+            if(conn != null)
+            {
+                conn.close();
+            }
         }
+        
         return results;
     }
     
@@ -741,7 +754,10 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         }
         finally
         {
-            conn.close();
+            if(conn != null)
+            {
+                conn.close();
+            }
         }
     }
     

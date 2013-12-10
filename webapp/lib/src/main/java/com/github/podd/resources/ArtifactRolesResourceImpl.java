@@ -124,7 +124,7 @@ public class ArtifactRolesResourceImpl extends AbstractPoddResourceImpl
             dataModel.put("members", roleUserMap.get(PoddRoles.PROJECT_MEMBER));
             dataModel.put("observers", roleUserMap.get(PoddRoles.PROJECT_OBSERVER));
         }
-        catch(final Exception e)
+        catch(final UnmanagedSchemaIRIException | OpenRDFException e)
         {
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Failed to populate data model", e);
         }
