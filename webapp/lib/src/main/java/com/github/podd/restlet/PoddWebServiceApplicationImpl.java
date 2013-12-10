@@ -459,7 +459,7 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
     }
     
     @Override
-    public Model getAliasesConfiguration(final PropertyUtil propertyUtil)
+    public Model getDataRepositoryConfig()
     {
         // If the aliasConfiguration is empty then populate it with the default
         // aliases here
@@ -580,7 +580,7 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
     }
     
     @Override
-    public void setAliasesConfiguration(final Model aliasesConfiguration)
+    public void setDataRepositoryConfig(final Model aliasesConfiguration)
     {
         this.aliasesConfiguration = aliasesConfiguration;
     }

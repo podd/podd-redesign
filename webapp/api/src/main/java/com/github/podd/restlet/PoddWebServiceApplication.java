@@ -35,11 +35,10 @@ import freemarker.template.Configuration;
 
 /**
  * The application which is the parent of all Podd Restlet resources. It provides the application
- * level functions for restlets including the DataHandler and the authentication implementation.
+ * level functions for restlets including the {@link PoddArtifactManager} and the authentication
+ * implementation.
  * 
  * @author Peter Ansell p_ansell@yahoo.com
- * 
- *         Copied from OAS project (https://github.com/ansell/oas)
  */
 public abstract class PoddWebServiceApplication extends Application
 {
@@ -56,7 +55,9 @@ public abstract class PoddWebServiceApplication extends Application
      * @param action
      *            The action to perform
      * @param request
+     *            The Restlet {@link Request} matching the given action.
      * @param response
+     *            The Restlet {@link Response} matching the given action.
      * @param optionalObjectUris
      *            Optional set of Object URIs on which the action is to be performed. If present,
      *            these should be used to check client authority.
@@ -64,7 +65,13 @@ public abstract class PoddWebServiceApplication extends Application
      */
     public abstract boolean authenticate(PoddAction action, Request request, Response response, URI optionalObjectUri);
     
-    public abstract Model getAliasesConfiguration(PropertyUtil propertyUtil);
+    /**
+     * Retrieves the data repository configuration used by this server.
+     * 
+     * @return A {@link Model} containing the RDF statements for the data repository configuration
+     *         for this server.
+     */
+    public abstract Model getDataRepositoryConfig();
     
     /**
      * 
@@ -73,15 +80,38 @@ public abstract class PoddWebServiceApplication extends Application
      */
     public abstract ChallengeAuthenticator getAuthenticator();
     
+    /**
+     * Get the {@link PoddArtifactManager} used by this application to manage artifacts.
+     * 
+     * @return The {@link PoddArtifactManager} used by this application.
+     */
     public abstract PoddArtifactManager getPoddArtifactManager();
     
+    /**
+     * Get the {@link PoddDataRepositoryManager} used by this application to manage data repository
+     * access and verification.
+     * 
+     * @return The {@link PoddDataRepositoryManager} used by this application.
+     */
     public abstract PoddDataRepositoryManager getPoddDataRepositoryManager();
     
+    /**
+     * Get the {@link PoddRepositoryManager} used by this application to manage access to OpenRDF
+     * Sesame {@link Repository} objects.
+     * 
+     * @return The {@link PoddRepositoryManager} used by this application.
+     */
     public abstract PoddRepositoryManager getPoddRepositoryManager();
     
+    /**
+     * Get the {@link PoddSchemaManager} used by this application to manage schema ontologies.
+     * 
+     * @return The {@link PoddSchemaManager} used by this application.
+     */
     public abstract PoddSchemaManager getPoddSchemaManager();
     
     /**
+     * Get the {@link PropertyUtil} used by this application for contextual settings.
      * 
      * @return The {@link PropertyUtil} instance for this {@link PoddWebServiceApplication}.
      */
@@ -101,7 +131,13 @@ public abstract class PoddWebServiceApplication extends Application
      */
     public abstract Configuration getTemplateConfiguration();
     
-    public abstract void setAliasesConfiguration(Model aliasesConfiguration);
+    /**
+     * Sets the {@link PoddDataRepository} mapping information for this application.
+     * 
+     * @param aliasesConfiguration
+     *            The mappings for data repositories that are relevant to this application.
+     */
+    public abstract void setDataRepositoryConfig(Model aliasesConfiguration);
     
     /**
      * 
@@ -111,6 +147,13 @@ public abstract class PoddWebServiceApplication extends Application
      */
     public abstract void setAuthenticator(ChallengeAuthenticator auth);
     
+    /**
+     * Set a new {@link PoddArtifactManager} to use for managing PODD artifacts for this
+     * application.
+     * 
+     * @param poddArtifactManager
+     *            The artifact manager
+     */
     public abstract void setPoddArtifactManager(PoddArtifactManager poddArtifactManager);
     
     /**
@@ -129,8 +172,21 @@ public abstract class PoddWebServiceApplication extends Application
      */
     public abstract void setPoddRepositoryManager(PoddRepositoryManager poddRepositoryManager);
     
+    /**
+     * Set a new {@link PoddSchemaManager} to use for managing schema ontologies for this
+     * application.
+     * 
+     * @param poddSchemaManager
+     *            The schema ontology manager
+     */
     public abstract void setPoddSchemaManager(PoddSchemaManager poddSchemaManager);
     
+    /**
+     * Set a new {@link PoddSesameRealm} to use for authentication for this application.
+     * 
+     * @param realm
+     *            The authentication realm.
+     */
     public abstract void setRealm(PoddSesameRealm realm);
     
     /**

@@ -343,7 +343,8 @@ public class ApplicationUtils
         nextDataRepositoryManager.setOWLManager(nextOWLManager);
         try
         {
-            final Model aliasConfiguration = application.getAliasesConfiguration(props);
+            // TODO: Configure data repositories in a cleaner manner than this
+            final Model aliasConfiguration = application.getDataRepositoryConfig();
             nextDataRepositoryManager.initialise(aliasConfiguration);
         }
         catch(PoddException | IOException e)
