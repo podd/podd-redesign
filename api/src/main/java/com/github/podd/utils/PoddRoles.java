@@ -21,6 +21,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -101,9 +102,10 @@ public enum PoddRoles implements RestletUtilRole
     public static void dumpRoleMappingsArtifact(final Map<RestletUtilRole, Collection<String>> mappings,
             final Model model, final URI... contexts)
     {
-        for(final RestletUtilRole nextRole : mappings.keySet())
+        for(final Entry<RestletUtilRole, Collection<String>> nextEntry : mappings.entrySet())
         {
-            for(final String nextUserIdentifier : mappings.get(nextRole))
+            final RestletUtilRole nextRole = nextEntry.getKey();
+            for(final String nextUserIdentifier : nextEntry.getValue())
             {
                 final BNode mappingUri = PODD.VF.createBNode();
                 
@@ -122,9 +124,10 @@ public enum PoddRoles implements RestletUtilRole
     public static void dumpRoleMappingsUser(final Map<RestletUtilRole, Collection<URI>> mappings, final Model model,
             final URI... contexts)
     {
-        for(final RestletUtilRole nextRole : mappings.keySet())
+        for(final Entry<RestletUtilRole, Collection<URI>> nextEntry : mappings.entrySet())
         {
-            for(final URI nextObjectUri : mappings.get(nextRole))
+            final RestletUtilRole nextRole = nextEntry.getKey();
+            for(final URI nextObjectUri : nextEntry.getValue())
             {
                 final BNode mappingUri = PODD.VF.createBNode();
                 
