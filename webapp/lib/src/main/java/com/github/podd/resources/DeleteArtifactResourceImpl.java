@@ -19,6 +19,8 @@ package com.github.podd.resources;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
 import org.openrdf.model.URI;
 import org.restlet.data.MediaType;
@@ -78,9 +80,10 @@ public class DeleteArtifactResourceImpl extends AbstractPoddResourceImpl
                 final PoddSesameRealm realm = this.getPoddApplication().getRealm();
                 final Map<String, Collection<Role>> roleMap = realm.getRolesForObjectAlternate(null, artifactUri);
                 
-                for(final String userIdentifier : roleMap.keySet())
+                for(Entry<String, Collection<Role>> nextEntry : roleMap.entrySet())
                 {
-                    for(final Role nextRole : roleMap.get(userIdentifier))
+                    final String userIdentifier = nextEntry.getKey();
+                    for(final Role nextRole : nextEntry.getValue())
                     {
                         try
                         {
