@@ -26,6 +26,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -245,9 +246,7 @@ public final class RestletUtils
     {
         final ConcurrentMap<RestletUtilRole, Collection<URI>> results = new ConcurrentHashMap<>();
         
-        // extract Role Mapping info (User details are ignored as multiple users
-        // are not
-        // supported)
+        // extract Role Mapping info (User details are ignored as multiple users are not supported
         final Collection<Entry<Role, URI>> rolesWithObjectMappings = realm.getRolesWithObjectMappings(poddUser);
         for(final Entry<Role, URI> entry : rolesWithObjectMappings)
         {
@@ -282,9 +281,11 @@ public final class RestletUtils
         final List<Entry<RestletUtilRole, PoddObjectLabel>> results =
                 new LinkedList<Entry<RestletUtilRole, PoddObjectLabel>>();
         
-        for(final RestletUtilRole role : roles.keySet())
+        for(Entry<RestletUtilRole, Collection<URI>> nextEntry : roles.entrySet())
         {
-            for(final URI artifactUri : roles.get(role))
+            final RestletUtilRole nextRole = nextEntry.getKey();
+            
+            for(final URI artifactUri : nextEntry.getValue())
             {
                 PoddObjectLabel poddObjectLabel = null;
                 
@@ -314,7 +315,7 @@ public final class RestletUtils
                         RestletUtils.log.warn("Failed to retrieve Role Mapped Object [{}]", artifactUri);
                     }
                 }
-                results.add(new AbstractMap.SimpleEntry<RestletUtilRole, PoddObjectLabel>(role, poddObjectLabel));
+                results.add(new AbstractMap.SimpleEntry<RestletUtilRole, PoddObjectLabel>(nextRole, poddObjectLabel));
             }
         }
         return results;
