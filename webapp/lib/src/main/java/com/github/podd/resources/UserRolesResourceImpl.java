@@ -24,6 +24,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.Model;
@@ -125,11 +126,11 @@ public class UserRolesResourceImpl extends AbstractUserResourceImpl
             throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST,
                     "Did not specify any role edits in body of request");
         }
-        
         // - check authorization for each Role mapping
-        for(final RestletUtilRole role : rolesToEdit.keySet())
+        for(Entry<RestletUtilRole, Collection<URI>> nextEntry : rolesToEdit.entrySet())
         {
-            for(final URI mappedUri : rolesToEdit.get(role))
+            final RestletUtilRole role = nextEntry.getKey();
+            for(final URI mappedUri : nextEntry.getValue())
             {
                 PoddAction action = PoddAction.PROJECT_ROLE_EDIT;
                 if(PoddRoles.getRepositoryRoles().contains(role))
@@ -145,10 +146,11 @@ public class UserRolesResourceImpl extends AbstractUserResourceImpl
             }
         }
         
-        // - do the mapping/unmapping of Roles
-        for(final RestletUtilRole role : rolesToEdit.keySet())
+        // - do the mapping/unmapping of Roles only if all of the authorisations succeeded
+        for(Entry<RestletUtilRole, Collection<URI>> nextEntry : rolesToEdit.entrySet())
         {
-            for(final URI mappedUri : rolesToEdit.get(role))
+            final RestletUtilRole role = nextEntry.getKey();
+            for(final URI mappedUri : nextEntry.getValue())
             {
                 if(isDelete)
                 {
