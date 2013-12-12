@@ -85,12 +85,11 @@ public class UserEditResourceImpl extends AbstractUserResourceImpl
         
         final PoddSesameRealm nextRealm = ((PoddWebServiceApplication)this.getApplication()).getRealm();
         
-        final RestletUtilUser currentUser = nextRealm.findUser(requestedUserIdentifier);
-        if(currentUser == null || !(currentUser instanceof PoddUser))
+        final PoddUser poddUser = nextRealm.findUser(requestedUserIdentifier);
+        if(poddUser == null)
         {
             throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "User not found");
         }
-        final PoddUser poddUser = (PoddUser)currentUser;
         URI userUri = null;
         try
         {
@@ -109,7 +108,7 @@ public class UserEditResourceImpl extends AbstractUserResourceImpl
             this.log.debug("Updated User <{}>", poddUser);
             
             // - check the User was successfully added to the Realm
-            final RestletUtilUser findUser = nextRealm.findUser(poddUser.getIdentifier());
+            final PoddUser findUser = nextRealm.findUser(poddUser.getIdentifier());
             if(findUser == null)
             {
                 throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Failed to add user");

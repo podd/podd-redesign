@@ -82,7 +82,7 @@ import com.github.podd.utils.PoddWebConstants;
  */
 public class RestletPoddClientImpl implements PoddClient
 {
-    protected final String TEMP_UUID_PREFIX = "urn:temp:uuid:";
+    protected final static String TEMP_UUID_PREFIX = "urn:temp:uuid:";
     
     protected final Logger log = LoggerFactory.getLogger(this.getClass());
     
@@ -93,7 +93,7 @@ public class RestletPoddClientImpl implements PoddClient
     /**
      * Shortcut to {@link PODD#VF}
      */
-    protected ValueFactory vf = PODD.VF;
+    protected final static ValueFactory vf = PODD.VF;
     
     public RestletPoddClientImpl()
     {

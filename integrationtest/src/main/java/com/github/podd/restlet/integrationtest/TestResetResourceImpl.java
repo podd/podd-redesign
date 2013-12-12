@@ -67,7 +67,7 @@ public class TestResetResourceImpl extends Restlet
         try
         {
             // Reset the aliases configuration
-            this.application.setAliasesConfiguration(Rio.parse(this.getClass().getResourceAsStream("/test-alias.ttl"),
+            this.application.setDataRepositoryConfig(Rio.parse(this.getClass().getResourceAsStream("/test-alias.ttl"),
                     "", RDFFormat.TURTLE));
             ApplicationUtils.setupApplication(this.application, this.application.getContext());
             TestUtils.setupTestUser(this.application);

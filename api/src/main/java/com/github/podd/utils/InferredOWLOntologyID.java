@@ -78,50 +78,6 @@ public class InferredOWLOntologyID extends OWLOntologyID
         }
     }
     
-    @Override
-    public boolean equals(final Object obj)
-    {
-        // super must be equals or we cannot be equals, which also takes into account anonymous
-        // ontologies
-        if(!super.equals(obj))
-        {
-            return false;
-        }
-        
-        // make sure that we can still be equal to OWLOntologyID instances if we did not get an
-        // InferredOntologyIRI
-        if(obj instanceof InferredOWLOntologyID)
-        {
-            final InferredOWLOntologyID other = (InferredOWLOntologyID)obj;
-            if(this.inferredOntologyIRI == null)
-            {
-                if(other.inferredOntologyIRI == null)
-                {
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
-            }
-            else if(other.inferredOntologyIRI == null)
-            {
-                return false;
-            }
-            else
-            {
-                return this.inferredOntologyIRI.equals(other.inferredOntologyIRI);
-            }
-        }
-        else
-        {
-            // if the other object was not an InferredOWLOntogyID then we will only be equal if we
-            // do not have an inferred ontologyIRI ourselves
-            return this.inferredOntologyIRI == null;
-        }
-        
-    }
-    
     /**
      * Returns the OWLOntologyID representing the base ontology, ie, without the inferred ontology,
      * so that the hashcode will match that of the real OWLOntologyID for the base ontology.

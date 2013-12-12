@@ -26,6 +26,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -343,7 +344,8 @@ public class ApplicationUtils
         nextDataRepositoryManager.setOWLManager(nextOWLManager);
         try
         {
-            final Model aliasConfiguration = application.getAliasesConfiguration(props);
+            // TODO: Configure data repositories in a cleaner manner than this
+            final Model aliasConfiguration = application.getDataRepositoryConfig();
             nextDataRepositoryManager.initialise(aliasConfiguration);
         }
         catch(PoddException | IOException e)
@@ -453,10 +455,11 @@ public class ApplicationUtils
                 
             }
             
-            for(final InferredOWLOntologyID nextArtifactToUpdate : artifactsToUpdate.keySet())
+            for(Entry<InferredOWLOntologyID, Set<InferredOWLOntologyID>> nextEntry : artifactsToUpdate.entrySet())
             {
+                final InferredOWLOntologyID nextArtifactToUpdate = nextEntry.getKey();
                 application.getPoddArtifactManager().updateSchemaImports(nextArtifactToUpdate,
-                        currentArtifactImports.get(nextArtifactToUpdate), artifactsToUpdate.get(nextArtifactToUpdate));
+                        currentArtifactImports.get(nextArtifactToUpdate), nextEntry.getValue());
             }
             // Enable the following for debugging
             // dumpSchemaGraph(application, nextRepository);

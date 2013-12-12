@@ -26,6 +26,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -405,17 +406,19 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
                     {
                         boolean foundAllVersion = false;
                         // Attempt to verify if the version exists
-                        for(final URI nextAllVersions : allVersionsMap.keySet())
+                        for(Entry<URI, Set<URI>> nextEntry : allVersionsMap.entrySet())
                         {
+                            final URI nextAllVersions = nextEntry.getKey();
+                            
                             if(nextAllVersions.equals(nextImport))
                             {
-                                foundAllVersion = true;
                                 // this should not normally occur, as the current versions map
                                 // should also contain this key
                                 nextImport = currentVersionsMap.get(nextAllVersions);
                                 nextImportsSet.add((URI)nextImport);
+                                foundAllVersion = true;
                             }
-                            else if(allVersionsMap.get(nextAllVersions).contains(nextImport))
+                            else if(nextEntry.getValue().contains(nextImport))
                             {
                                 nextImportsSet.add((URI)nextImport);
                                 foundAllVersion = true;
@@ -496,7 +499,10 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
     @Override
     public void setOwlManager(final PoddOWLManager owlManager)
     {
-        this.owlManager = owlManager;
+        synchronized(this)
+        {
+            this.owlManager = owlManager;
+        }
     }
     
     @Override

@@ -118,27 +118,29 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
             }
         }
         
+        if(ontologyID == null)
+        {
+            throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Could not find the given artifact");
+        }
+        
         // FIXME: Test this after publish artifact is implemented
         boolean isPublished = false;
         try
         {
-            if(ontologyID != null)
+            isPublished = this.getPoddArtifactManager().isPublished(ontologyID);
+            if(isPublished)
             {
-                isPublished = this.getPoddArtifactManager().isPublished(ontologyID);
+                this.checkAuthentication(PoddAction.PUBLISHED_ARTIFACT_READ, ontologyID.getOntologyIRI().toOpenRDFURI());
+            }
+            else
+            {
+                this.checkAuthentication(PoddAction.UNPUBLISHED_ARTIFACT_READ, ontologyID.getOntologyIRI()
+                        .toOpenRDFURI());
             }
         }
         catch(final OpenRDFException e)
         {
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Repository exception", e);
-        }
-        
-        if(isPublished)
-        {
-            this.checkAuthentication(PoddAction.PUBLISHED_ARTIFACT_READ, ontologyID.getOntologyIRI().toOpenRDFURI());
-        }
-        else
-        {
-            this.checkAuthentication(PoddAction.UNPUBLISHED_ARTIFACT_READ, ontologyID.getOntologyIRI().toOpenRDFURI());
         }
         
         // completed checking authorization

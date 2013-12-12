@@ -9,6 +9,8 @@ import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -124,7 +126,7 @@ public class ArtifactRolesResourceImpl extends AbstractPoddResourceImpl
             dataModel.put("members", roleUserMap.get(PoddRoles.PROJECT_MEMBER));
             dataModel.put("observers", roleUserMap.get(PoddRoles.PROJECT_OBSERVER));
         }
-        catch(final Exception e)
+        catch(final UnmanagedSchemaIRIException | OpenRDFException e)
         {
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Failed to populate data model", e);
         }
@@ -222,8 +224,10 @@ public class ArtifactRolesResourceImpl extends AbstractPoddResourceImpl
     {
         final ConcurrentMap<RestletUtilRole, Collection<String>> userList = new ConcurrentHashMap<>();
         
-        for(final RestletUtilRole nextRole : input.keySet())
+        for(Entry<RestletUtilRole, Collection<PoddUser>> nextEntry : input.entrySet())
         {
+            final RestletUtilRole nextRole = nextEntry.getKey();
+            
             Collection<String> nextRoles = new LinkedHashSet<String>();
             final Collection<String> putIfAbsent = userList.putIfAbsent(nextRole, nextRoles);
             if(putIfAbsent != null)
@@ -231,7 +235,7 @@ public class ArtifactRolesResourceImpl extends AbstractPoddResourceImpl
                 nextRoles = putIfAbsent;
             }
             
-            for(final PoddUser nextUser : input.get(nextRole))
+            for(final PoddUser nextUser : nextEntry.getValue())
             {
                 nextRoles.add(nextUser.getIdentifier());
             }

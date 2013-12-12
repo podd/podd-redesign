@@ -670,7 +670,7 @@ public class AbstractResourceImplTest
         // OasProps.DEF_WS_URI_PATH),
                 "/podd/", nextApplication);
         
-        nextApplication.setAliasesConfiguration(this.getTestAliases());
+        nextApplication.setDataRepositoryConfig(this.getTestAliases());
         
         // The application cannot be setup properly until it is attached, as it
         // requires
