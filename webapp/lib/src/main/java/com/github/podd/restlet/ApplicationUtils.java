@@ -392,6 +392,7 @@ public class ApplicationUtils
             
             log.info("Schema manifest contents");
             DebugUtils.printContents(model);
+            log.info("About to upload schema ontologies");
             
             // Returns an ordered list of the schema ontologies that were uploaded
             final List<InferredOWLOntologyID> schemaOntologies =
@@ -410,6 +411,15 @@ public class ApplicationUtils
             // TODO: Do we gain anything from ordering this collection
             final Set<InferredOWLOntologyID> currentSchemaOntologies =
                     application.getPoddSchemaManager().getCurrentSchemaOntologies();
+            
+            if(!currentSchemaOntologies.isEmpty())
+            {
+                log.info("Existing current schema ontologies: {}", currentSchemaOntologies);
+            }
+            else
+            {
+                log.info("Found no existing current schema ontologies");
+            }
             
             final List<InferredOWLOntologyID> updatedCurrentSchemaOntologies = new ArrayList<>();
             
