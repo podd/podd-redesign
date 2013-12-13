@@ -259,13 +259,7 @@ public class RdfUtility
         {
             throw new IOException("Inputstream was null");
         }
-        
-        final Model concreteModel = new LinkedHashModel();
-        final RDFParser parser = Rio.createParser(format);
-        parser.setRDFHandler(new StatementCollector(concreteModel));
-        parser.parse(resourceStream, "");
-        
-        return concreteModel;
+        return Rio.parse(resourceStream, "", format);
     }
     
     /**
