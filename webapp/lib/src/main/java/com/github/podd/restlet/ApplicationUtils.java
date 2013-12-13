@@ -85,6 +85,7 @@ import com.github.podd.impl.file.PoddFileRepositoryManagerImpl;
 import com.github.podd.impl.file.SSHFileReferenceProcessorFactoryImpl;
 import com.github.podd.impl.purl.PoddPurlManagerImpl;
 import com.github.podd.impl.purl.UUIDPurlProcessorFactoryImpl;
+import com.github.podd.utils.DebugUtils;
 import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.PODD;
 import com.github.podd.utils.PoddRoles;
@@ -389,9 +390,21 @@ public class ApplicationUtils
                 model = Rio.parse(schemaManifestStream, "", format);
             }
             
+            log.info("Schema manifest contents");
+            DebugUtils.printContents(model);
+            
             // Returns an ordered list of the schema ontologies that were uploaded
             final List<InferredOWLOntologyID> schemaOntologies =
                     application.getPoddSchemaManager().uploadSchemaOntologies(model);
+            
+            if(!schemaOntologies.isEmpty())
+            {
+                log.info("Uploaded new schema ontologies: {}", schemaOntologies);
+            }
+            else
+            {
+                log.info("No new schema ontologies uploaded this time");
+            }
             
             // NOTE: The following is not ordered at this point in time
             // TODO: Do we gain anything from ordering this collection
@@ -408,20 +421,38 @@ public class ApplicationUtils
                 }
             }
             
+            if(!updatedCurrentSchemaOntologies.isEmpty())
+            {
+                log.info("Found new versions of existing schema ontologies: {}", updatedCurrentSchemaOntologies);
+            }
+            
+            // TODO: Offer one-time migration based on updatedCurrentSchemaOntologies
+            // For now, we always attempt to update all artifacts to the current schema ontologies
+            // Once the upgrade process is well developed, may want to streamline application
+            // startup to avoid attempting to do this every time
+            
             final ConcurrentMap<InferredOWLOntologyID, Set<InferredOWLOntologyID>> currentArtifactImports =
                     new ConcurrentHashMap<>();
             
             final ConcurrentMap<InferredOWLOntologyID, Set<InferredOWLOntologyID>> artifactsToUpdate =
                     new ConcurrentHashMap<>();
             
-            for(final InferredOWLOntologyID nextArtifact : application.getPoddArtifactManager()
-                    .listUnpublishedArtifacts())
+            final List<InferredOWLOntologyID> unpublishedArtifacts =
+                    application.getPoddArtifactManager().listUnpublishedArtifacts();
+            
+            log.info("Existing unpublished artifacts: \n{}", unpublishedArtifacts);
+            
+            for(final InferredOWLOntologyID nextArtifact : unpublishedArtifacts)
             {
                 if(application.getPoddArtifactManager().isPublished(nextArtifact))
                 {
+                    log.info("Not attempting to update ontologies for published artifact: {}",
+                            nextArtifact.getOntologyIRI());
                     // Must not update the schema imports for published artifacts
                     continue;
                 }
+                
+                log.info("Fetching schema imports for unpublished artifact: {}", nextArtifact.getOntologyIRI());
                 
                 final Set<InferredOWLOntologyID> schemaImports =
                         application.getPoddArtifactManager().getSchemaImports(nextArtifact);
@@ -430,8 +461,11 @@ public class ApplicationUtils
                 // the above method again if they need to be updated
                 currentArtifactImports.put(nextArtifact, schemaImports);
                 
-                for(final InferredOWLOntologyID nextUpdatedSchemaImport : updatedCurrentSchemaOntologies)
+                for(final InferredOWLOntologyID nextUpdatedSchemaImport : currentSchemaOntologies)
                 {
+                    boolean foundNonCurrentVersion = false;
+                    OWLOntologyID matchingSchema = null;
+                    
                     for(final OWLOntologyID nextSchemaImport : schemaImports)
                     {
                         // If the ontology IRI of the artifacts schema import was in the updated
@@ -439,30 +473,62 @@ public class ApplicationUtils
                         if(nextUpdatedSchemaImport.getOntologyIRI().equals(nextSchemaImport.getOntologyIRI())
                                 && !nextUpdatedSchemaImport.getVersionIRI().equals(nextSchemaImport.getVersionIRI()))
                         {
-                            Set<InferredOWLOntologyID> set = new HashSet<>();
-                            final Set<InferredOWLOntologyID> putIfAbsent =
-                                    artifactsToUpdate.putIfAbsent(nextArtifact, set);
-                            if(putIfAbsent != null)
-                            {
-                                set = putIfAbsent;
-                            }
-                            // FIXME: Naive strategy to ensure that we get all of the imports that
-                            // users expect is to add all of the current schema ontologies here
-                            set.addAll(updatedCurrentSchemaOntologies);
+                            foundNonCurrentVersion = true;
                         }
+                        
+                        if(nextUpdatedSchemaImport.getOntologyIRI().equals(nextSchemaImport.getOntologyIRI()))
+                        {
+                            matchingSchema = nextSchemaImport;
+                        }
+                    }
+                    
+                    // If there is a new schema, or they import an old version of one of the
+                    // schemas, then import all of the current schemas
+                    // FIXME: Naive strategy to ensure that we get all of the imports that
+                    // users expect is to add all of the current schema ontologies here
+                    // Need to customise strategies for users here, or in the GUI to select the
+                    // schema ontologies that they wish to use for each artifact
+                    if(foundNonCurrentVersion || matchingSchema == null)
+                    {
+                        log.info("Found out of date or missing schema version: {}", nextUpdatedSchemaImport);
+                        Set<InferredOWLOntologyID> set = new HashSet<>();
+                        final Set<InferredOWLOntologyID> putIfAbsent = artifactsToUpdate.putIfAbsent(nextArtifact, set);
+                        if(putIfAbsent != null)
+                        {
+                            set = putIfAbsent;
+                        }
+                        set.addAll(currentSchemaOntologies);
+                        // Do not continue this loop in this naive strategy
+                        break;
                     }
                 }
                 
             }
             
+            log.info("Unpublished artifacts requiring schema updates: \n{}", artifactsToUpdate);
+            
             for(Entry<InferredOWLOntologyID, Set<InferredOWLOntologyID>> nextEntry : artifactsToUpdate.entrySet())
             {
-                final InferredOWLOntologyID nextArtifactToUpdate = nextEntry.getKey();
-                application.getPoddArtifactManager().updateSchemaImports(nextArtifactToUpdate,
-                        currentArtifactImports.get(nextArtifactToUpdate), nextEntry.getValue());
+                // FIXME: Naive strategy is to fail for each import
+                // If/When we support linked artifacts, this logic will need to be improved to
+                // ensure that both parents and dependencies are not updated if any of them are not
+                // consistent with the new schema versions
+                try
+                {
+                    final InferredOWLOntologyID nextArtifactToUpdate = nextEntry.getKey();
+                    log.info("About to update schema imports for: {}", nextArtifactToUpdate);
+                    application.getPoddArtifactManager().updateSchemaImports(nextArtifactToUpdate,
+                            currentArtifactImports.get(nextArtifactToUpdate), nextEntry.getValue());
+                    log.info("Completed updating schema imports for: {}", nextArtifactToUpdate);
+                }
+                catch(Throwable e)
+                {
+                    log.error("Could not update schema imports automatically due to exception: ", e);
+                }
             }
             // Enable the following for debugging
             // dumpSchemaGraph(application, nextRepository);
+            
         }
         catch(IOException | OpenRDFException | OWLException | PoddException e)
         {
