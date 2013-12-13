@@ -93,6 +93,11 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>podd-ontologies</artifactId>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
 			<groupId>com.github.ansell.restlet-utils</groupId>
 			<artifactId>restlet-utils</artifactId>
 			<scope>compile</scope>
