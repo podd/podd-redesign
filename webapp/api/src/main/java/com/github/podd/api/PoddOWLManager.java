@@ -22,6 +22,7 @@ package com.github.podd.api;
 import java.io.IOException;
 import java.util.List;
 
+import org.coode.owlapi.rdfxml.parser.TPVersionIRIHandler;
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.Model;
 import org.openrdf.model.URI;
@@ -239,5 +240,20 @@ public interface PoddOWLManager
     void verifyAgainstSchema(Model model, Model schemaModel) throws OntologyNotInProfileException;
     
     OWLReasonerFactory getReasonerFactory();
+    
+    /**
+     * Loads the ontology, using the given ontologyID as the identifier. <br>
+     * This is necessary to enable the loading of ontologies that differ only in their version IRI,
+     * due to a bug in {@link TPVersionIRIHandler}.
+     * 
+     * @param ontologyID
+     * @param owlSource
+     * @return The ontology.
+     * @throws PoddException
+     * @throws IOException
+     * @throws OWLException
+     */
+    OWLOntology loadOntology(OWLOntologyID ontologyID, OWLOntologyDocumentSource owlSource) throws OWLException,
+        IOException, PoddException;
     
 }

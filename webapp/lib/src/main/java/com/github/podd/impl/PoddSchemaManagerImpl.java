@@ -782,7 +782,7 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
         OWLOntologyID baseOntologyID;
         synchronized(this)
         {
-            final OWLOntology ontology = this.owlManager.loadOntology(owlSource);
+            final OWLOntology ontology = this.owlManager.loadOntology(schemaOntologyID, owlSource);
             
             if(ontology.isEmpty())
             {

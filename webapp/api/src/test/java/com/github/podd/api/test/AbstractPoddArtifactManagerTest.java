@@ -1712,7 +1712,7 @@ public abstract class AbstractPoddArtifactManagerTest
         
         // prepare: load poddScience v2
         final InferredOWLOntologyID inferredPScienceOntologyID =
-                this.loadInferStoreOntology("/test/ontologies/poddScienceV2.owl", RDFFormat.RDFXML, 1265, 220,
+                this.loadInferStoreOntology("/test/ontologies/poddScienceVXYZ.owl", RDFFormat.RDFXML, 1265, 220,
                         this.testRepositoryConnection);
         this.testSesameManager.updateCurrentManagedSchemaOntologyVersion(inferredPScienceOntologyID, true,
                 this.testRepositoryConnection, this.schemaGraph);

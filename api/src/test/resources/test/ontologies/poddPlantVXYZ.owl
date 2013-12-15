@@ -26,8 +26,8 @@
     <owl:Ontology rdf:about="http://purl.org/podd/ns/poddPlant">
         <owl:imports rdf:resource="http://purl.org/podd/ns/version/poddBase/1"/>
         <owl:imports rdf:resource="http://purl.org/podd/ns/version/poddScience/1"/>
-		<!-- The Version IRI is set to "2" here. -->
-        <owl:versionIRI rdf:resource="http://purl.org/podd/ns/version/poddPlant/2"/>
+		<!-- The Version IRI is set to "XYZ" here. -->
+        <owl:versionIRI rdf:resource="http://purl.org/podd/ns/version/poddPlant/XYZ"/>
     </owl:Ontology>
     
 

@@ -40,7 +40,9 @@ import org.openrdf.rio.RDFFormat;
 import org.semanticweb.owlapi.formats.OWLOntologyFormatFactoryRegistry;
 import org.semanticweb.owlapi.formats.RioRDFOntologyFormatFactory;
 import org.semanticweb.owlapi.io.OWLOntologyDocumentSource;
+import org.semanticweb.owlapi.io.OWLParser;
 import org.semanticweb.owlapi.io.OWLParserException;
+import org.semanticweb.owlapi.io.OWLParserFactoryRegistry;
 import org.semanticweb.owlapi.model.AddImport;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLAxiom;
@@ -48,6 +50,7 @@ import org.semanticweb.owlapi.model.OWLException;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyChangeException;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
+import org.semanticweb.owlapi.model.OWLOntologyFormat;
 import org.semanticweb.owlapi.model.OWLOntologyID;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.OWLRuntimeException;
@@ -620,30 +623,77 @@ public class PoddOWLManagerImpl implements PoddOWLManager
     public OWLOntology loadOntology(final OWLOntologyDocumentSource owlSource) throws OWLException, IOException,
         PoddException
     {
+        return loadOntologyInternal(null, owlSource);
+    }
+    
+    @Override
+    public OWLOntology loadOntology(final OWLOntologyID ontologyID, final OWLOntologyDocumentSource owlSource)
+        throws OWLException, IOException, PoddException
+    {
+        return loadOntologyInternal(ontologyID, owlSource);
+    }
+    
+    private OWLOntology loadOntologyInternal(final OWLOntologyID ontologyID, final OWLOntologyDocumentSource owlSource)
+        throws OWLException, IOException, PoddException
+    {
         synchronized(this.owlOntologyManager)
         {
-            OWLOntology nextOntology;
-            if(owlSource instanceof RioMemoryTripleSource)
+            try
             {
-                final RioRDFOntologyFormatFactory ontologyFormatFactory =
-                        (RioRDFOntologyFormatFactory)OWLOntologyFormatFactoryRegistry.getInstance().getByMIMEType(
-                                "application/rdf+xml");
-                final RioParserImpl owlParser = new RioParserImpl(ontologyFormatFactory);
+                OWLOntology nextOntology;
+                if(owlSource instanceof RioMemoryTripleSource)
+                {
+                    final RioRDFOntologyFormatFactory ontologyFormatFactory =
+                            (RioRDFOntologyFormatFactory)OWLOntologyFormatFactoryRegistry.getInstance().getByMIMEType(
+                                    "application/rdf+xml");
+                    final RioParserImpl owlParser = new RioParserImpl(ontologyFormatFactory);
+                    
+                    if(ontologyID == null)
+                    {
+                        nextOntology = this.owlOntologyManager.createOntology();
+                    }
+                    else
+                    {
+                        nextOntology = this.owlOntologyManager.createOntology(ontologyID);
+                    }
+                    
+                    owlParser.parse(owlSource, nextOntology);
+                }
+                else
+                {
+                    if(ontologyID == null)
+                    {
+                        nextOntology = this.owlOntologyManager.createOntology();
+                    }
+                    else
+                    {
+                        nextOntology = this.owlOntologyManager.createOntology(ontologyID);
+                    }
+                    
+                    if(owlSource.isFormatKnown())
+                    {
+                        OWLParser parser =
+                                OWLParserFactoryRegistry.getInstance().getParserFactory(owlSource.getFormatFactory())
+                                        .createParser(this.owlOntologyManager);
+                        parser.parse(owlSource, nextOntology);
+                    }
+                    else
+                    {
+                        // FIXME: loadOntologyFromOntologyDocument does not allow for this case
+                        nextOntology = this.owlOntologyManager.loadOntologyFromOntologyDocument(owlSource);
+                    }
+                }
                 
-                nextOntology = this.owlOntologyManager.createOntology();
-                
-                owlParser.parse(owlSource, nextOntology);
+                if(nextOntology.isEmpty())
+                {
+                    throw new EmptyOntologyException(nextOntology, "Loaded ontology is empty");
+                }
+                return nextOntology;
             }
-            else
+            catch(OWLRuntimeException e)
             {
-                nextOntology = this.owlOntologyManager.loadOntologyFromOntologyDocument(owlSource);
+                throw new OWLOntologyCreationException("Could not load ontology", e);
             }
-            
-            if(nextOntology.isEmpty())
-            {
-                throw new EmptyOntologyException(nextOntology, "Loaded ontology is empty");
-            }
-            return nextOntology;
         }
     }
     
