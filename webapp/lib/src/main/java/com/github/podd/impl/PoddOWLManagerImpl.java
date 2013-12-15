@@ -222,8 +222,7 @@ public class PoddOWLManagerImpl implements PoddOWLManager
         synchronized(this.owlOntologyManager)
         {
             // -- check if already cached and silently return.
-            if(this.owlOntologyManager.contains(baseOntologyIRI)
-                    || this.owlOntologyManager.contains(baseOntologyVersionIRI))
+            if(this.owlOntologyManager.contains(baseOntologyVersionIRI))
             {
                 return;
             }
