@@ -74,7 +74,7 @@ public class UserPasswordResourceImplTest extends AbstractResourceImplTest
             
             final Representation modifiedResults =
                     RestletTestUtils.doTestAuthenticatedRequest(userPasswordClientResource, Method.POST, input,
-                            mediaType, Status.SUCCESS_OK, this.testWithAdminPrivileges);
+                            mediaType, Status.SUCCESS_OK, this.WITH_ADMIN);
             
             // verify: response has correct identifier
             final Model model = this.assertRdf(new StringReader(this.getText(modifiedResults)), RDFFormat.RDFXML, 1);
@@ -88,7 +88,7 @@ public class UserPasswordResourceImplTest extends AbstractResourceImplTest
             try
             {
                 RestletTestUtils.doTestAuthenticatedRequest(userDetailsClientResource2, Method.GET, null, mediaType,
-                        Status.CLIENT_ERROR_UNAUTHORIZED, this.testNoAdminPrivileges);
+                        Status.CLIENT_ERROR_UNAUTHORIZED, this.NO_ADMIN);
                 Assert.fail("Should have thrown a ResourceException as password should now be invalid");
             }
             catch(final ResourceException e)
@@ -137,7 +137,7 @@ public class UserPasswordResourceImplTest extends AbstractResourceImplTest
             
             final Representation modifiedResults =
                     RestletTestUtils.doTestAuthenticatedRequest(userPasswordClientResource, Method.POST, input,
-                            mediaType, Status.SUCCESS_OK, this.testWithAdminPrivileges);
+                            mediaType, Status.SUCCESS_OK, this.WITH_ADMIN);
             
             // verify: response has correct identifier
             final Model model = this.assertRdf(modifiedResults, RDFFormat.RDFXML, 1);
@@ -152,7 +152,7 @@ public class UserPasswordResourceImplTest extends AbstractResourceImplTest
             try
             {
                 RestletTestUtils.doTestAuthenticatedRequest(userDetailsClientResource2, Method.GET, null, mediaType,
-                        Status.CLIENT_ERROR_UNAUTHORIZED, this.testWithAdminPrivileges);
+                        Status.CLIENT_ERROR_UNAUTHORIZED, this.WITH_ADMIN);
                 Assert.fail("Should have thrown a ResourceException as password should now be invalid");
             }
             catch(final ResourceException e)
@@ -183,7 +183,7 @@ public class UserPasswordResourceImplTest extends AbstractResourceImplTest
             
             final Representation results =
                     RestletTestUtils.doTestAuthenticatedRequest(userPasswordClientResource, Method.GET, null,
-                            MediaType.TEXT_HTML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
+                            MediaType.TEXT_HTML, Status.SUCCESS_OK, this.WITH_ADMIN);
             
             final String body = this.getText(results);
             // System.out.println(body);

@@ -53,7 +53,7 @@ public class DeleteArtifactResourceImplTest extends AbstractResourceImplTest
                     .getVersionIRI().toString());
             
             RestletTestUtils.doTestAuthenticatedRequest(deleteArtifactClientResource, Method.DELETE, null,
-                    MediaType.APPLICATION_RDF_XML, Status.SUCCESS_NO_CONTENT, this.testWithAdminPrivileges);
+                    MediaType.APPLICATION_RDF_XML, Status.SUCCESS_NO_CONTENT, this.WITH_ADMIN);
         }
         finally
         {
@@ -69,7 +69,7 @@ public class DeleteArtifactResourceImplTest extends AbstractResourceImplTest
             getArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactID
                     .getOntologyIRI().toString());
             RestletTestUtils.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null,
-                    MediaType.APPLICATION_RDF_XML, Status.CLIENT_ERROR_NOT_FOUND, this.testWithAdminPrivileges);
+                    MediaType.APPLICATION_RDF_XML, Status.CLIENT_ERROR_NOT_FOUND, this.WITH_ADMIN);
             Assert.fail("Should have failed with a NOT_FOUND error");
         }
         catch(final ResourceException e)

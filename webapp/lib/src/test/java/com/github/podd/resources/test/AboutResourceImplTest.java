@@ -48,7 +48,7 @@ public class AboutResourceImplTest extends AbstractResourceImplTest
         
         final Representation results =
                 RestletTestUtils.doTestAuthenticatedRequest(aboutClientResource, Method.GET, null, MediaType.TEXT_HTML,
-                        Status.SUCCESS_OK, this.testNoAdminPrivileges);
+                        Status.SUCCESS_OK, this.NO_ADMIN);
         
     }
     
@@ -92,7 +92,7 @@ public class AboutResourceImplTest extends AbstractResourceImplTest
         
         final Representation results =
                 RestletTestUtils.doTestAuthenticatedRequest(creationClientResource, Method.POST, form,
-                        MediaType.TEXT_HTML, Status.SUCCESS_OK, this.testNoAdminPrivileges);
+                        MediaType.TEXT_HTML, Status.SUCCESS_OK, this.NO_ADMIN);
         
     }
     

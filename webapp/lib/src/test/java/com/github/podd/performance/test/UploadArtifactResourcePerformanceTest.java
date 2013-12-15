@@ -129,7 +129,7 @@ public class UploadArtifactResourcePerformanceTest extends AbstractResourceImplT
             
             final Representation results =
                     RestletTestUtils.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null,
-                            MediaType.APPLICATION_RDF_TURTLE, Status.SUCCESS_OK, this.testWithAdminPrivileges);
+                            MediaType.APPLICATION_RDF_TURTLE, Status.SUCCESS_OK, this.WITH_ADMIN);
             
             // load into a Model and find statement count
             final Model model = Rio.parse(new StringReader(this.getText(results)), "", RDFFormat.TURTLE);
@@ -158,7 +158,7 @@ public class UploadArtifactResourcePerformanceTest extends AbstractResourceImplT
         
         final Representation results =
                 RestletTestUtils.doTestAuthenticatedRequest(uploadArtifactClientResource, Method.POST, input,
-                        MediaType.TEXT_PLAIN, Status.SUCCESS_OK, this.testWithAdminPrivileges);
+                        MediaType.TEXT_PLAIN, Status.SUCCESS_OK, this.WITH_ADMIN);
         
         // verify: results (expecting the added artifact's ontology IRI)
         final String body = this.getText(results);

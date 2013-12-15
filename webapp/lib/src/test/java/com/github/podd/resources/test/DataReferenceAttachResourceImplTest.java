@@ -171,7 +171,7 @@ public class DataReferenceAttachResourceImplTest extends AbstractResourceImplTes
             
             final Representation results =
                     RestletTestUtils.doTestAuthenticatedRequest(fileRefAttachClientResource, Method.POST, input,
-                            MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
+                            MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK, this.WITH_ADMIN);
             
             final Model ontologyIDModel = this.assertRdf(results, RDFFormat.RDFXML, 3);
             
@@ -258,7 +258,7 @@ public class DataReferenceAttachResourceImplTest extends AbstractResourceImplTes
                 
                 final Representation results =
                         RestletTestUtils.doTestAuthenticatedRequest(fileRefAttachClientResource, Method.POST, input,
-                                MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
+                                MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK, this.WITH_ADMIN);
                 
                 final String body = this.getText(results);
                 
@@ -317,7 +317,7 @@ public class DataReferenceAttachResourceImplTest extends AbstractResourceImplTes
             
             final Representation results =
                     RestletTestUtils.doTestAuthenticatedRequest(fileRefAttachClientResource, Method.POST, input,
-                            MediaType.APPLICATION_RDF_TURTLE, Status.SUCCESS_OK, this.testWithAdminPrivileges);
+                            MediaType.APPLICATION_RDF_TURTLE, Status.SUCCESS_OK, this.WITH_ADMIN);
             
             final String body = this.getText(results);
             
@@ -378,7 +378,7 @@ public class DataReferenceAttachResourceImplTest extends AbstractResourceImplTes
                 
                 final Representation results =
                         RestletTestUtils.doTestAuthenticatedRequest(fileRefAttachClientResource, Method.POST, input,
-                                MediaType.APPLICATION_RDF_TURTLE, Status.SUCCESS_OK, this.testWithAdminPrivileges);
+                                MediaType.APPLICATION_RDF_TURTLE, Status.SUCCESS_OK, this.WITH_ADMIN);
                 
                 final String body = this.getText(results);
                 
@@ -438,7 +438,7 @@ public class DataReferenceAttachResourceImplTest extends AbstractResourceImplTes
                     Boolean.toString(true));
             
             RestletTestUtils.doTestAuthenticatedRequest(fileRefAttachClientResource, Method.POST, input,
-                    MediaType.APPLICATION_RDF_XML, Status.CLIENT_ERROR_BAD_REQUEST, this.testWithAdminPrivileges);
+                    MediaType.APPLICATION_RDF_XML, Status.CLIENT_ERROR_BAD_REQUEST, this.WITH_ADMIN);
             Assert.fail("Should have thrown a ResourceException");
         }
         catch(final ResourceException e)
@@ -551,7 +551,7 @@ public class DataReferenceAttachResourceImplTest extends AbstractResourceImplTes
                     Boolean.toString(true));
             
             RestletTestUtils.doTestAuthenticatedRequest(fileRefAttachClientResource, Method.POST, input,
-                    MediaType.APPLICATION_RDF_XML, Status.CLIENT_ERROR_BAD_REQUEST, this.testWithAdminPrivileges);
+                    MediaType.APPLICATION_RDF_XML, Status.CLIENT_ERROR_BAD_REQUEST, this.WITH_ADMIN);
             Assert.fail("Should have thrown a ResourceException");
         }
         catch(final ResourceException e)

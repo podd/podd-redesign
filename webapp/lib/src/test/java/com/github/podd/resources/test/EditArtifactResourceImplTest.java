@@ -81,7 +81,7 @@ public class EditArtifactResourceImplTest extends AbstractResourceImplTest
             
             final Representation results =
                     RestletTestUtils.doTestAuthenticatedRequest(editArtifactClientResource, Method.POST, input,
-                            MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
+                            MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK, this.WITH_ADMIN);
             
             final String body = this.getText(results);
             
@@ -130,7 +130,7 @@ public class EditArtifactResourceImplTest extends AbstractResourceImplTest
             
             final Representation results =
                     RestletTestUtils.doTestAuthenticatedRequest(editArtifactClientResource, Method.POST, input,
-                            MediaType.APPLICATION_RDF_TURTLE, Status.SUCCESS_OK, this.testWithAdminPrivileges);
+                            MediaType.APPLICATION_RDF_TURTLE, Status.SUCCESS_OK, this.WITH_ADMIN);
             
             final String updatedArtifactDetails = this.getText(results);
             
@@ -182,7 +182,7 @@ public class EditArtifactResourceImplTest extends AbstractResourceImplTest
             
             final Representation results =
                     RestletTestUtils.doTestAuthenticatedRequest(editArtifactClientResource, Method.POST, input,
-                            MediaType.APPLICATION_RDF_TURTLE, Status.SUCCESS_OK, this.testWithAdminPrivileges);
+                            MediaType.APPLICATION_RDF_TURTLE, Status.SUCCESS_OK, this.WITH_ADMIN);
             
             final String updatedArtifactDetails = this.getText(results);
             
@@ -248,7 +248,7 @@ public class EditArtifactResourceImplTest extends AbstractResourceImplTest
             
             final Representation results =
                     RestletTestUtils.doTestAuthenticatedRequest(editArtifactClientResource, Method.POST, input,
-                            MediaType.APPLICATION_RDF_TURTLE, Status.SUCCESS_OK, this.testWithAdminPrivileges);
+                            MediaType.APPLICATION_RDF_TURTLE, Status.SUCCESS_OK, this.WITH_ADMIN);
             
             final String updatedArtifactDetails = this.getText(results);
             
@@ -319,7 +319,7 @@ public class EditArtifactResourceImplTest extends AbstractResourceImplTest
                             MediaType.APPLICATION_RDF_XML);
             
             RestletTestUtils.doTestAuthenticatedRequest(editArtifactClientResource, Method.POST, input,
-                    MediaType.APPLICATION_RDF_XML, Status.CLIENT_ERROR_NOT_FOUND, this.testWithAdminPrivileges);
+                    MediaType.APPLICATION_RDF_XML, Status.CLIENT_ERROR_NOT_FOUND, this.WITH_ADMIN);
             Assert.fail("Should have failed due to incorrect artifact IRI");
         }
         catch(final ResourceException e)
@@ -370,7 +370,7 @@ public class EditArtifactResourceImplTest extends AbstractResourceImplTest
                     this.buildRepresentationFromResource(TestConstants.TEST_ARTIFACT_FRAGMENT_NEW_FILE_REF_OBJECT,
                             MediaType.APPLICATION_RDF_XML);
             RestletTestUtils.doTestAuthenticatedRequest(editArtifactClientResource, Method.POST, input,
-                    MediaType.APPLICATION_RDF_XML, Status.CLIENT_ERROR_CONFLICT, this.testWithAdminPrivileges);
+                    MediaType.APPLICATION_RDF_XML, Status.CLIENT_ERROR_CONFLICT, this.WITH_ADMIN);
             Assert.fail("Should have failed due to incorrect version IRI");
         }
         catch(final ResourceException e)
@@ -475,7 +475,7 @@ public class EditArtifactResourceImplTest extends AbstractResourceImplTest
                             MediaType.APPLICATION_RDF_TURTLE);
             
             RestletTestUtils.doTestAuthenticatedRequest(editArtifactClientResource, Method.POST, input,
-                    MediaType.APPLICATION_RDF_TURTLE, Status.SERVER_ERROR_INTERNAL, this.testWithAdminPrivileges);
+                    MediaType.APPLICATION_RDF_TURTLE, Status.SERVER_ERROR_INTERNAL, this.WITH_ADMIN);
             Assert.fail("Should have failed when dangling objects were identified");
         }
         catch(final ResourceException e)
@@ -510,7 +510,7 @@ public class EditArtifactResourceImplTest extends AbstractResourceImplTest
             
             final Representation results =
                     RestletTestUtils.doTestAuthenticatedRequest(editArtifactClientResource, Method.GET, null,
-                            MediaType.TEXT_HTML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
+                            MediaType.TEXT_HTML, Status.SUCCESS_OK, this.WITH_ADMIN);
             
             final String body = this.getText(results);
             
@@ -544,7 +544,7 @@ public class EditArtifactResourceImplTest extends AbstractResourceImplTest
             
             final Representation results =
                     RestletTestUtils.doTestAuthenticatedRequest(editArtifactClientResource, Method.GET, null,
-                            MediaType.TEXT_HTML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
+                            MediaType.TEXT_HTML, Status.SUCCESS_OK, this.WITH_ADMIN);
             
             final String body = this.getText(results);
             

@@ -50,7 +50,7 @@ public class DeleteObjectResourceImplTest extends AbstractResourceImplTest
             
             final Representation getArtifactResult =
                     RestletTestUtils.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null,
-                            MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
+                            MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK, this.WITH_ADMIN);
             
             final Model model = this.assertRdf(getArtifactResult, RDFFormat.RDFXML, expectedStatementCount);
             
@@ -84,7 +84,7 @@ public class DeleteObjectResourceImplTest extends AbstractResourceImplTest
             
             final Representation results =
                     RestletTestUtils.doTestAuthenticatedRequest(deleteObjectClientResource, Method.DELETE, null,
-                            MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
+                            MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK, this.WITH_ADMIN);
             
             // verify: response contains updated artifact's ID
             final String updatedArtifactDetails = this.getText(results);

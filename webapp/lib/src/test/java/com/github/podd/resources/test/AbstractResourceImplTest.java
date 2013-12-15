@@ -166,13 +166,13 @@ public class AbstractResourceImplTest
      * A constant used to make requests that require admin privileges easier to recognise inside
      * tests.
      */
-    protected final boolean testWithAdminPrivileges = true;
+    protected static final boolean WITH_ADMIN = true;
     
     /**
      * A constant used to make requests that do not require admin privileges easier to recognise
      * inside tests.
      */
-    protected final boolean testNoAdminPrivileges = false;
+    protected static final boolean NO_ADMIN = false;
     
     private Component component;
     
@@ -293,7 +293,7 @@ public class AbstractResourceImplTest
             
             final Representation results =
                     RestletTestUtils.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null,
-                            RestletUtilMediaType.APPLICATION_RDF_JSON, Status.SUCCESS_OK, this.testWithAdminPrivileges);
+                            RestletUtilMediaType.APPLICATION_RDF_JSON, Status.SUCCESS_OK, this.WITH_ADMIN);
             
             return this.getModel(results);
         }
@@ -324,7 +324,7 @@ public class AbstractResourceImplTest
             
             final Representation results =
                     RestletTestUtils.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null, mediaType,
-                            Status.SUCCESS_OK, this.testWithAdminPrivileges);
+                            Status.SUCCESS_OK, this.WITH_ADMIN);
             
             return this.getText(results);
         }
@@ -445,7 +445,7 @@ public class AbstractResourceImplTest
             
             final Representation results =
                     RestletTestUtils.doTestAuthenticatedRequest(uploadArtifactClientResource, Method.POST, input,
-                            MediaType.APPLICATION_RDF_TURTLE, Status.SUCCESS_OK, this.testWithAdminPrivileges);
+                            MediaType.APPLICATION_RDF_TURTLE, Status.SUCCESS_OK, this.WITH_ADMIN);
             final String body = this.getText(results);
             // this.log.info(body);
             this.assertFreemarker(body);
@@ -565,7 +565,7 @@ public class AbstractResourceImplTest
             
             final Representation results =
                     RestletTestUtils.doTestAuthenticatedRequest(userAddClientResource, Method.POST, input, mediaType,
-                            Status.SUCCESS_OK, this.testWithAdminPrivileges);
+                            Status.SUCCESS_OK, this.WITH_ADMIN);
             
             // verify: response has 1 statement and identifier is correct
             final Model model = this.assertRdf(results, RDFFormat.RDFXML, 1);
@@ -619,7 +619,7 @@ public class AbstractResourceImplTest
             final Representation input = new StringRepresentation(out.toString(), mediaType);
             final Representation modifiedResults =
                     RestletTestUtils.doTestAuthenticatedRequest(userRolesClientResource, Method.POST, input, mediaType,
-                            Status.SUCCESS_OK, this.testWithAdminPrivileges);
+                            Status.SUCCESS_OK, this.WITH_ADMIN);
             final Model model = this.assertRdf(modifiedResults, RDFFormat.RDFXML, 1);
             Assert.assertEquals("Unexpected user identifier", userIdentifier,
                     model.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).objectString());
@@ -665,10 +665,7 @@ public class AbstractResourceImplTest
         final PoddWebServiceApplication nextApplication = new PoddWebServiceApplicationImpl();
         
         // Attach the sample application.
-        this.component.getDefaultHost().attach(
-        // PropertyUtil.get(OasProps.PROP_WS_URI_PATH,
-        // OasProps.DEF_WS_URI_PATH),
-                "/podd/", nextApplication);
+        this.component.getDefaultHost().attach("/podd/", nextApplication);
         
         nextApplication.setDataRepositoryConfig(this.getTestAliases());
         

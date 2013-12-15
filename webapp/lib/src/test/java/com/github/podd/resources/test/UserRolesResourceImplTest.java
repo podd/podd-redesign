@@ -116,7 +116,7 @@ public class UserRolesResourceImplTest extends AbstractResourceImplTest
             final Representation input = new StringRepresentation(out.toString(), mediaType);
             final Representation modifiedResults =
                     RestletTestUtils.doTestAuthenticatedRequest(userRolesClientResource, Method.POST, input, mediaType,
-                            Status.SUCCESS_OK, this.testWithAdminPrivileges);
+                            Status.SUCCESS_OK, this.WITH_ADMIN);
             final Model model = this.assertRdf(modifiedResults, RDFFormat.RDFXML, 1);
             Assert.assertEquals("Unexpected user identifier", testIdentifier,
                     model.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).objectString());
@@ -130,7 +130,7 @@ public class UserRolesResourceImplTest extends AbstractResourceImplTest
                 
                 final Representation updatedResults =
                         RestletTestUtils.doTestAuthenticatedRequest(userDetailsClientResource, Method.GET, null,
-                                mediaType, Status.SUCCESS_OK, this.testWithAdminPrivileges);
+                                mediaType, Status.SUCCESS_OK, this.WITH_ADMIN);
                 final Model resultsModel = this.assertRdf(updatedResults, format, 43);
                 Assert.assertEquals("Unexpected user identifier", testIdentifier,
                         resultsModel.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).objectString());
@@ -205,7 +205,7 @@ public class UserRolesResourceImplTest extends AbstractResourceImplTest
             final Representation input = new StringRepresentation(out.toString(), mediaType);
             final Representation modifiedResults =
                     RestletTestUtils.doTestAuthenticatedRequest(userRolesClientResource, Method.POST, input, mediaType,
-                            Status.SUCCESS_OK, this.testWithAdminPrivileges);
+                            Status.SUCCESS_OK, this.WITH_ADMIN);
             final Model model = this.assertRdf(modifiedResults, RDFFormat.RDFXML, 1);
             Assert.assertEquals("Unexpected user identifier", testIdentifier,
                     model.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).objectString());
@@ -219,7 +219,7 @@ public class UserRolesResourceImplTest extends AbstractResourceImplTest
                 
                 final Representation updatedResults =
                         RestletTestUtils.doTestAuthenticatedRequest(userDetailsClientResource, Method.GET, null,
-                                mediaType, Status.SUCCESS_OK, this.testWithAdminPrivileges);
+                                mediaType, Status.SUCCESS_OK, this.WITH_ADMIN);
                 final Model resultsModel = this.assertRdf(updatedResults, format, 31);
                 Assert.assertEquals("Unexpected user identifier", testIdentifier,
                         resultsModel.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).objectString());
@@ -297,7 +297,7 @@ public class UserRolesResourceImplTest extends AbstractResourceImplTest
             try
             {
                 RestletTestUtils.doTestAuthenticatedRequest(userRolesClientResource, Method.POST, input, mediaType,
-                        Status.CLIENT_ERROR_UNAUTHORIZED, this.testNoAdminPrivileges);
+                        Status.CLIENT_ERROR_UNAUTHORIZED, this.NO_ADMIN);
                 Assert.fail("Should have failed authorization");
             }
             catch(final ResourceException e)
@@ -314,7 +314,7 @@ public class UserRolesResourceImplTest extends AbstractResourceImplTest
                 
                 final Representation updatedResults =
                         RestletTestUtils.doTestAuthenticatedRequest(userDetailsClientResource, Method.GET, null,
-                                mediaType, Status.SUCCESS_OK, this.testWithAdminPrivileges);
+                                mediaType, Status.SUCCESS_OK, this.WITH_ADMIN);
                 final Model resultsModel = this.assertRdf(updatedResults, format, 15);
                 Assert.assertEquals("Unexpected user identifier", testIdentifier,
                         resultsModel.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).objectString());
@@ -390,7 +390,7 @@ public class UserRolesResourceImplTest extends AbstractResourceImplTest
             userRolesClientResource.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, testIdentifier);
             userRolesClientResource.addQueryParameter(PoddWebConstants.KEY_DELETE, "true");
             RestletTestUtils.doTestAuthenticatedRequest(userRolesClientResource, Method.POST, input, mediaType,
-                    Status.CLIENT_ERROR_UNAUTHORIZED, this.testNoAdminPrivileges);
+                    Status.CLIENT_ERROR_UNAUTHORIZED, this.NO_ADMIN);
             Assert.fail("Should have failed authorization");
         }
         catch(final ResourceException e)
@@ -411,7 +411,7 @@ public class UserRolesResourceImplTest extends AbstractResourceImplTest
             
             final Representation updatedResults =
                     RestletTestUtils.doTestAuthenticatedRequest(userDetailsClientResource, Method.GET, null, mediaType,
-                            Status.SUCCESS_OK, this.testWithAdminPrivileges);
+                            Status.SUCCESS_OK, this.WITH_ADMIN);
             final Model resultsModel = this.assertRdf(updatedResults, format, 20);
             Assert.assertEquals("Unexpected user identifier", testIdentifier,
                     resultsModel.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).objectString());
@@ -439,7 +439,7 @@ public class UserRolesResourceImplTest extends AbstractResourceImplTest
         {
             final Representation results =
                     RestletTestUtils.doTestAuthenticatedRequest(userRolesClientResource, Method.GET, null,
-                            MediaType.TEXT_HTML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
+                            MediaType.TEXT_HTML, Status.SUCCESS_OK, this.WITH_ADMIN);
             
             final String body = results.getText();
             System.out.println(body);
@@ -479,7 +479,7 @@ public class UserRolesResourceImplTest extends AbstractResourceImplTest
             
             final Representation results =
                     RestletTestUtils.doTestAuthenticatedRequest(userRolesClientResource, Method.GET, null,
-                            MediaType.TEXT_HTML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
+                            MediaType.TEXT_HTML, Status.SUCCESS_OK, this.WITH_ADMIN);
             
             final String body = results.getText();
             System.out.println(body);

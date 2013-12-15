@@ -75,7 +75,7 @@ public class UploadArtifactResourceImplTest extends AbstractResourceImplTest
                             MediaType.APPLICATION_RDF_XML);
             
             RestletTestUtils.doTestAuthenticatedRequest(uploadArtifactClientResource, Method.POST, input, mediaType,
-                    Status.SERVER_ERROR_INTERNAL, this.testWithAdminPrivileges);
+                    Status.SERVER_ERROR_INTERNAL, this.WITH_ADMIN);
         }
         catch(final ResourceException e)
         {
@@ -141,7 +141,7 @@ public class UploadArtifactResourceImplTest extends AbstractResourceImplTest
         try
         {
             RestletTestUtils.doTestAuthenticatedRequest(uploadArtifactClientResource, Method.POST, input, mediaType,
-                    Status.SERVER_ERROR_INTERNAL, this.testWithAdminPrivileges);
+                    Status.SERVER_ERROR_INTERNAL, this.WITH_ADMIN);
         }
         catch(final ResourceException e)
         {
@@ -226,7 +226,7 @@ public class UploadArtifactResourceImplTest extends AbstractResourceImplTest
             form.setMultipart(true);
             
             RestletTestUtils.doTestAuthenticatedRequest(uploadArtifactClientResource, Method.POST, form,
-                    MediaType.TEXT_HTML, Status.CLIENT_ERROR_BAD_REQUEST, this.testWithAdminPrivileges);
+                    MediaType.TEXT_HTML, Status.CLIENT_ERROR_BAD_REQUEST, this.WITH_ADMIN);
             Assert.fail("Should have thrown a ResourceException with Status Code 400");
         }
         catch(final ResourceException e)
@@ -253,7 +253,7 @@ public class UploadArtifactResourceImplTest extends AbstractResourceImplTest
         {
             final Representation results =
                     RestletTestUtils.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null,
-                            MediaType.TEXT_HTML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
+                            MediaType.TEXT_HTML, Status.SUCCESS_OK, this.WITH_ADMIN);
             
             final String body = this.getText(results);
             Assert.assertTrue(body.contains("Upload new artifact"));
@@ -325,7 +325,7 @@ public class UploadArtifactResourceImplTest extends AbstractResourceImplTest
                                             RestletTestUtils.doTestAuthenticatedRequest(uploadArtifactClientResource,
                                                     Method.POST, input, MediaType.APPLICATION_RDF_XML,
                                                     Status.SUCCESS_OK,
-                                                    UploadArtifactResourceImplTest.this.testWithAdminPrivileges);
+                                                    UploadArtifactResourceImplTest.this.WITH_ADMIN);
                                     
                                     // verify: results (expecting the added
                                     // artifact's ontology IRI)
@@ -398,7 +398,7 @@ public class UploadArtifactResourceImplTest extends AbstractResourceImplTest
             
             final Representation results =
                     RestletTestUtils.doTestAuthenticatedRequest(uploadArtifactClientResource, Method.POST, form,
-                            MediaType.TEXT_HTML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
+                            MediaType.TEXT_HTML, Status.SUCCESS_OK, this.WITH_ADMIN);
             
             // TODO: verify results once a proper success page is incorporated.
             final String body = this.getText(results);
@@ -428,7 +428,7 @@ public class UploadArtifactResourceImplTest extends AbstractResourceImplTest
             
             final Representation results =
                     RestletTestUtils.doTestAuthenticatedRequest(uploadArtifactClientResource, Method.POST, input,
-                            MediaType.TEXT_PLAIN, Status.SUCCESS_OK, this.testWithAdminPrivileges);
+                            MediaType.TEXT_PLAIN, Status.SUCCESS_OK, this.WITH_ADMIN);
             
             // verify: results (expecting the added artifact's ontology IRI)
             final String body = this.getText(results);
@@ -464,7 +464,7 @@ public class UploadArtifactResourceImplTest extends AbstractResourceImplTest
             
             final Representation results =
                     RestletTestUtils.doTestAuthenticatedRequest(uploadArtifactClientResource, Method.POST, form,
-                            MediaType.TEXT_PLAIN, Status.SUCCESS_OK, this.testWithAdminPrivileges);
+                            MediaType.TEXT_PLAIN, Status.SUCCESS_OK, this.WITH_ADMIN);
             
             // verify: results (expecting the added artifact's ontology IRI)
             final String body = this.getText(results);
@@ -496,7 +496,7 @@ public class UploadArtifactResourceImplTest extends AbstractResourceImplTest
             
             final Representation results =
                     RestletTestUtils.doTestAuthenticatedRequest(uploadArtifactClientResource, Method.POST, input,
-                            MediaType.APPLICATION_RDF_TURTLE, Status.SUCCESS_OK, this.testWithAdminPrivileges);
+                            MediaType.APPLICATION_RDF_TURTLE, Status.SUCCESS_OK, this.WITH_ADMIN);
             
             // verify: results (expecting the added artifact's ontology IRI)
             final String body = this.getText(results);
