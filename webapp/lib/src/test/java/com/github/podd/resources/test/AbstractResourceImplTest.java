@@ -178,6 +178,11 @@ public class AbstractResourceImplTest
     
     protected Path testDir;
     
+    /**
+     * Store this for testing restarting the application for consistency and correctness.
+     */
+    private PoddWebServiceApplication poddApplication;
+    
     public AbstractResourceImplTest()
     {
         super();
@@ -293,7 +298,8 @@ public class AbstractResourceImplTest
             
             final Representation results =
                     RestletTestUtils.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null,
-                            RestletUtilMediaType.APPLICATION_RDF_JSON, Status.SUCCESS_OK, this.WITH_ADMIN);
+                            RestletUtilMediaType.APPLICATION_RDF_JSON, Status.SUCCESS_OK,
+                            AbstractResourceImplTest.WITH_ADMIN);
             
             return this.getModel(results);
         }
@@ -324,7 +330,7 @@ public class AbstractResourceImplTest
             
             final Representation results =
                     RestletTestUtils.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null, mediaType,
-                            Status.SUCCESS_OK, this.WITH_ADMIN);
+                            Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
             
             return this.getText(results);
         }
@@ -445,7 +451,7 @@ public class AbstractResourceImplTest
             
             final Representation results =
                     RestletTestUtils.doTestAuthenticatedRequest(uploadArtifactClientResource, Method.POST, input,
-                            MediaType.APPLICATION_RDF_TURTLE, Status.SUCCESS_OK, this.WITH_ADMIN);
+                            MediaType.APPLICATION_RDF_TURTLE, Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
             final String body = this.getText(results);
             // this.log.info(body);
             this.assertFreemarker(body);
@@ -565,7 +571,7 @@ public class AbstractResourceImplTest
             
             final Representation results =
                     RestletTestUtils.doTestAuthenticatedRequest(userAddClientResource, Method.POST, input, mediaType,
-                            Status.SUCCESS_OK, this.WITH_ADMIN);
+                            Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
             
             // verify: response has 1 statement and identifier is correct
             final Model model = this.assertRdf(results, RDFFormat.RDFXML, 1);
@@ -619,7 +625,7 @@ public class AbstractResourceImplTest
             final Representation input = new StringRepresentation(out.toString(), mediaType);
             final Representation modifiedResults =
                     RestletTestUtils.doTestAuthenticatedRequest(userRolesClientResource, Method.POST, input, mediaType,
-                            Status.SUCCESS_OK, this.WITH_ADMIN);
+                            Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
             final Model model = this.assertRdf(modifiedResults, RDFFormat.RDFXML, 1);
             Assert.assertEquals("Unexpected user identifier", userIdentifier,
                     model.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).objectString());
@@ -662,23 +668,22 @@ public class AbstractResourceImplTest
         this.component.getClients().add(Protocol.CLAP);
         this.component.getClients().add(Protocol.HTTP);
         
-        final PoddWebServiceApplication nextApplication = new PoddWebServiceApplicationImpl();
+        this.poddApplication = new PoddWebServiceApplicationImpl();
         
         // Attach the sample application.
-        this.component.getDefaultHost().attach("/podd/", nextApplication);
+        this.component.getDefaultHost().attach("/podd/", this.poddApplication);
         
-        nextApplication.setDataRepositoryConfig(this.getTestAliases());
+        this.poddApplication.setDataRepositoryConfig(this.getTestAliases());
         
         // The application cannot be setup properly until it is attached, as it
-        // requires
-        // Application.getContext() to not return null
-        ApplicationUtils.setupApplication(nextApplication, nextApplication.getContext());
-        TestUtils.setupTestUser(nextApplication);
+        // requires Application.getContext() to not return null
+        ApplicationUtils.setupApplication(this.poddApplication, this.poddApplication.getContext());
+        TestUtils.setupTestUser(this.poddApplication);
         
         // Start the component.
         this.component.start();
         
-        AbstractResourceImplTest.setupThreading(nextApplication.getContext());
+        AbstractResourceImplTest.setupThreading(this.poddApplication.getContext());
         AbstractResourceImplTest.setupThreading(this.component.getContext());
         for(final Client nextClient : this.component.getClients())
         {
@@ -686,6 +691,11 @@ public class AbstractResourceImplTest
         }
         
         this.testDir = this.tempDirectory.newFolder(this.getClass().getSimpleName()).toPath();
+    }
+    
+    protected final PoddWebServiceApplication getPoddApplication()
+    {
+        return this.poddApplication;
     }
     
     /**
