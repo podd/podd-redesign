@@ -618,10 +618,10 @@ public abstract class AbstractPoddOWLManagerTest
         final OWLOntologyManager testOWLOntologyManager = OWLOntologyManagerFactoryRegistry.createOWLOntologyManager();
         testOWLOntologyManager.loadOntologyFromOntologyDocument(this.getClass().getResourceAsStream(
                 PODD.PATH_PODD_DCTERMS_V1));
-        testOWLOntologyManager.loadOntologyFromOntologyDocument(this.getClass()
-                .getResourceAsStream(PODD.PATH_PODD_FOAF_V1));
-        testOWLOntologyManager.loadOntologyFromOntologyDocument(this.getClass()
-                .getResourceAsStream(PODD.PATH_PODD_USER_V1));
+        testOWLOntologyManager.loadOntologyFromOntologyDocument(this.getClass().getResourceAsStream(
+                PODD.PATH_PODD_FOAF_V1));
+        testOWLOntologyManager.loadOntologyFromOntologyDocument(this.getClass().getResourceAsStream(
+                PODD.PATH_PODD_USER_V1));
         
         // prepare: load Podd-Base Ontology independently
         final InputStream inputStream = this.getClass().getResourceAsStream(PODD.PATH_PODD_BASE_V1);
@@ -674,10 +674,10 @@ public abstract class AbstractPoddOWLManagerTest
         final OWLOntologyManager testOWLOntologyManager = OWLOntologyManagerFactoryRegistry.createOWLOntologyManager();
         testOWLOntologyManager.loadOntologyFromOntologyDocument(this.getClass().getResourceAsStream(
                 PODD.PATH_PODD_DCTERMS_V1));
-        testOWLOntologyManager.loadOntologyFromOntologyDocument(this.getClass()
-                .getResourceAsStream(PODD.PATH_PODD_FOAF_V1));
-        testOWLOntologyManager.loadOntologyFromOntologyDocument(this.getClass()
-                .getResourceAsStream(PODD.PATH_PODD_USER_V1));
+        testOWLOntologyManager.loadOntologyFromOntologyDocument(this.getClass().getResourceAsStream(
+                PODD.PATH_PODD_FOAF_V1));
+        testOWLOntologyManager.loadOntologyFromOntologyDocument(this.getClass().getResourceAsStream(
+                PODD.PATH_PODD_USER_V1));
         
         // prepare: load an Ontology independently
         final InputStream inputStream = this.getClass().getResourceAsStream(PODD.PATH_PODD_BASE_V1);
@@ -1025,7 +1025,8 @@ public abstract class AbstractPoddOWLManagerTest
         }
         catch(final OWLException e)
         {
-            //Assert.assertTrue("Exception not expected type", e instanceof UnparsableOntologyException);
+            // Assert.assertTrue("Exception not expected type", e instanceof
+            // UnparsableOntologyException);
         }
     }
     
@@ -1084,7 +1085,7 @@ public abstract class AbstractPoddOWLManagerTest
         Assert.assertEquals("<http://purl.org/podd/ns/version/poddBase/1>", loadedOntologyID.getVersionIRI()
                 .toQuotedString());
         
-        final OWLOntology loadedOntology = this.testOWLManager.getOntology(loadedOntologyID);
+        final OWLOntology loadedOntology = this.manager.getOntology(loadedOntologyID);
         Assert.assertNotNull("Ontology not in memory", loadedOntology);
         
         final URI contextOwlapi = ValueFactoryImpl.getInstance().createURI("urn:test:context:owlapi:");
@@ -1194,7 +1195,7 @@ public abstract class AbstractPoddOWLManagerTest
         Assert.assertNull("Was not an anonymous ontology", loadedOntologyID.getOntologyIRI());
         Assert.assertNull("Was not an anonymous ontology", loadedOntologyID.getVersionIRI());
         
-        final OWLOntology loadedOntology = this.testOWLManager.getOntology(loadedOntologyID);
+        final OWLOntology loadedOntology = this.manager.getOntology(loadedOntologyID);
         Assert.assertNotNull("Ontology not in memory", loadedOntology);
         Assert.assertFalse("Ontology is empty", loadedOntology.isEmpty());
         Assert.assertEquals("Not the expected number of axioms", 1, loadedOntology.getAxiomCount());
@@ -1220,7 +1221,7 @@ public abstract class AbstractPoddOWLManagerTest
         final OWLOntology loadedOntology = this.testOWLManager.loadOntology(owlSource);
         
         final OWLOntologyID ontologyID = loadedOntology.getOntologyID();
-        final OWLOntology ontologyLoadedFromMemory = this.testOWLManager.getOntology(ontologyID);
+        final OWLOntology ontologyLoadedFromMemory = this.manager.getOntology(ontologyID);
         Assert.assertNotNull("Ontology should be in memory", ontologyLoadedFromMemory);
         
         final boolean removed = this.testOWLManager.removeCache(ontologyID);
@@ -1228,7 +1229,7 @@ public abstract class AbstractPoddOWLManagerTest
         // verify:
         Assert.assertTrue("Ontology could not be removed from cache", removed);
         
-        final OWLOntology ontologyFromMemoryShouldBeNull = this.testOWLManager.getOntology(ontologyID);
+        final OWLOntology ontologyFromMemoryShouldBeNull = this.manager.getOntology(ontologyID);
         Assert.assertNull("Ontology is still in cache", ontologyFromMemoryShouldBeNull);
     }
     
@@ -1243,7 +1244,7 @@ public abstract class AbstractPoddOWLManagerTest
     {
         // prepare: create an empty ontology inside this OWLManager
         final OWLOntologyID ontologyID = this.manager.createOntology().getOntologyID();
-        final OWLOntology theOntologyFromMemory = this.testOWLManager.getOntology(ontologyID);
+        final OWLOntology theOntologyFromMemory = this.manager.getOntology(ontologyID);
         Assert.assertNotNull("The ontology was not in memory", theOntologyFromMemory);
         Assert.assertTrue("Ontology was not empty", theOntologyFromMemory.isEmpty());
         
@@ -1252,7 +1253,7 @@ public abstract class AbstractPoddOWLManagerTest
         // verify:
         Assert.assertTrue("Ontology could not be removed from cache", removed);
         
-        final OWLOntology ontologyFromMemoryShouldBeNull = this.testOWLManager.getOntology(ontologyID);
+        final OWLOntology ontologyFromMemoryShouldBeNull = this.manager.getOntology(ontologyID);
         Assert.assertNull("Ontology is still in cache", ontologyFromMemoryShouldBeNull);
     }
     

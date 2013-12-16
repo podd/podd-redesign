@@ -115,22 +115,6 @@ public interface PoddOWLManager
     InferredOWLOntologyID generateInferredOntologyID(OWLOntologyID ontologyID);
     
     /**
-     * NOTE: Restrict usage of this method, as it will always fetch the entire OWLOntology into
-     * memory. Use getCurrentVersion or getVersions in most cases.
-     * 
-     * @param ontologyID
-     *            The full OWLOntologyID, containing both Ontology IRI and Version IRI for the
-     *            ontology to fetch.
-     * @return An instance of OWLOntology that contains all of the OWL Axioms for the given
-     *         ontology.
-     * @throws IllegalArgumentException
-     *             If the OWLOntologyID does not contain both Ontology IRI and Version IRI.
-     * @throws OWLException
-     *             If there was an error while attempting to get the Ontology.
-     */
-    OWLOntology getOntology(OWLOntologyID ontologyID) throws IllegalArgumentException, OWLException;
-    
-    /**
      * 
      * @return The {@link OWLProfile} used by the reasoner attached to this PoddOWLManager.
      */

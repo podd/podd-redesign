@@ -418,15 +418,6 @@ public class PoddOWLManagerImpl implements PoddOWLManager
     }
     
     @Override
-    public OWLOntology getOntology(final OWLOntologyID ontologyID) throws IllegalArgumentException, OWLException
-    {
-        synchronized(this.owlOntologyManager)
-        {
-            return this.owlOntologyManager.getOntology(ontologyID);
-        }
-    }
-    
-    @Override
     public void verifyAgainstSchema(final Model model, final Model schemaModel) throws OntologyNotInProfileException
     {
         OWLOntology dataRepositoryOntology = null;
