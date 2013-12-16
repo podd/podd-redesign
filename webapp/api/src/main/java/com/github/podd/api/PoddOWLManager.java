@@ -61,7 +61,7 @@ public interface PoddOWLManager
      * @throws IOException
      * @throws OWLException
      */
-    void cacheSchemaOntology(InferredOWLOntologyID ontologyID, RepositoryConnection conn, URI context)
+    void cacheSchemaOntology(OWLOntologyID ontologyID, RepositoryConnection conn, URI context)
         throws OpenRDFException, OWLException, IOException, PoddException;
     
     /**

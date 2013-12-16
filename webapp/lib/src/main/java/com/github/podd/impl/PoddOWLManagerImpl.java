@@ -125,7 +125,7 @@ public class PoddOWLManagerImpl implements PoddOWLManager
         this.reasonerFactory = nextReasonerFactory;
     }
     
-    private List<InferredOWLOntologyID> buildDirectImportsList(final InferredOWLOntologyID ontologyID,
+    private List<InferredOWLOntologyID> buildDirectImportsList(final OWLOntologyID ontologyID,
             final RepositoryConnection conn, final URI context) throws OpenRDFException
     {
         final List<InferredOWLOntologyID> importsList = new ArrayList<InferredOWLOntologyID>();
@@ -162,7 +162,7 @@ public class PoddOWLManagerImpl implements PoddOWLManager
         return importsList;
     }
     
-    private List<InferredOWLOntologyID> buildTwoLevelOrderedImportsList(final InferredOWLOntologyID ontologyID,
+    private List<InferredOWLOntologyID> buildTwoLevelOrderedImportsList(final OWLOntologyID ontologyID,
             final RepositoryConnection conn, final URI context) throws OpenRDFException
     {
         // -- find ontologies directly imported by this schema ontology
@@ -204,8 +204,8 @@ public class PoddOWLManagerImpl implements PoddOWLManager
     }
     
     @Override
-    public void cacheSchemaOntology(final InferredOWLOntologyID ontologyID, final RepositoryConnection conn,
-            final URI context) throws OpenRDFException, OWLException, IOException, PoddException
+    public void cacheSchemaOntology(final OWLOntologyID ontologyID, final RepositoryConnection conn, final URI context)
+        throws OpenRDFException, OWLException, IOException, PoddException
     {
         // -- validate input
         if(ontologyID == null || ontologyID.getOntologyIRI() == null)
@@ -217,7 +217,7 @@ public class PoddOWLManagerImpl implements PoddOWLManager
         
         final IRI baseOntologyIRI = ontologyID.getOntologyIRI();
         final IRI baseOntologyVersionIRI = ontologyID.getVersionIRI();
-        final IRI inferredOntologyIRI = ontologyID.getInferredOntologyIRI();
+        // final IRI inferredOntologyIRI = ontologyID.getInferredOntologyIRI();
         
         synchronized(this.owlOntologyManager)
         {
@@ -254,9 +254,10 @@ public class PoddOWLManagerImpl implements PoddOWLManager
         // -- load the requested schema ontology (and inferred statements if they exist) into the
         // Manager's cache
         this.parseRDFStatements(conn, baseOntologyVersionIRI.toOpenRDFURI());
-        if(inferredOntologyIRI != null)
+        if(ontologyID instanceof InferredOWLOntologyID
+                && ((InferredOWLOntologyID)ontologyID).getInferredOntologyIRI() != null)
         {
-            this.parseRDFStatements(conn, inferredOntologyIRI.toOpenRDFURI());
+            this.parseRDFStatements(conn, ((InferredOWLOntologyID)ontologyID).getInferredOntologyIRI().toOpenRDFURI());
         }
     }
     

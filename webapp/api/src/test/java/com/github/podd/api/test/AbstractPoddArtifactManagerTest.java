@@ -600,8 +600,8 @@ public abstract class AbstractPoddArtifactManagerTest
     @Before
     public void setUp() throws Exception
     {
-        this.schemaGraph = ValueFactoryImpl.getInstance().createURI("urn:test:schema-graph");
-        this.artifactGraph = ValueFactoryImpl.getInstance().createURI("urn:test:artifact-graph");
+        this.schemaGraph = PODD.VF.createURI("urn:test:schema-graph");
+        this.artifactGraph = PODD.VF.createURI("urn:test:artifact-graph");
         
         this.testRepositoryManager = this.getNewRepositoryManager();
         this.testRepositoryManager.setSchemaManagementGraph(this.schemaGraph);
@@ -609,43 +609,28 @@ public abstract class AbstractPoddArtifactManagerTest
         
         this.testRepositoryConnection = this.testRepositoryManager.getManagementRepository().getConnection();
         
+        this.setupNonRepositoryManagers();
+    }
+    
+    /**
+     * @param testFileRegistry
+     */
+    private final void setupNonRepositoryManagers()
+    {
         final DataReferenceProcessorRegistry testFileRegistry = new DataReferenceProcessorRegistry();
-        // clear any automatically added entries that may come from META-INF/services entries on the
-        // classpath
+        // FIXME: Why are we clearing here
         testFileRegistry.clear();
         
         final PoddPurlProcessorFactoryRegistry testPurlRegistry = new PoddPurlProcessorFactoryRegistry();
+        // FIXME: Why are we clearing here
         testPurlRegistry.clear();
+        
         final PoddPurlProcessorFactory uuidFactory = this.getNewUUIDPurlProcessorFactory();
         Assert.assertNotNull("UUID factory was null", uuidFactory);
         testPurlRegistry.add(uuidFactory);
         
-        /**
-         * // In practice, the following factories would be automatically added to the registry, //
-         * however for testing we want to explicitly add the ones we want to support for each test
-         * PoddFileReferenceProcessorFactory sshFactory =
-         * this.getNewSSHFileReferenceProcessorFactory();
-         * Assert.assertNotNull("SSH factory was null", sshFactory);
-         * testFileRegistry.add(sshFactory);
-         * 
-         * PoddFileReferenceProcessorFactory httpFactory =
-         * this.getNewHttpFileReferenceProcessorFactory();
-         * Assert.assertNotNull("HTTP factory was null", httpFactory);
-         * testFileRegistry.add(httpFactory);
-         */
-        
         final DataReferenceManager testFileReferenceManager = this.getNewFileReferenceManager();
         testFileReferenceManager.setDataProcessorRegistry(testFileRegistry);
-        
-        /**
-         * // FIXME: Implement these purl processor factories PoddPurlProcessorFactory doiFactory =
-         * this.getNewDoiPurlProcessorFactory(); testPurlRegistry.add(doiFactory);
-         * Assert.assertNotNull("DOI factory was null", httpFactory);
-         * 
-         * PoddPurlProcessorFactory handleFactory = this.getNewHandlePurlProcessorFactory();
-         * testPurlRegistry.add(handleFactory); Assert.assertNotNull("Handle factory was null",
-         * handleFactory);
-         **/
         
         final PoddPurlManager testPurlManager = this.getNewPurlManager();
         testPurlManager.setPurlProcessorFactoryRegistry(testPurlRegistry);
@@ -657,18 +642,34 @@ public abstract class AbstractPoddArtifactManagerTest
         this.testSesameManager = this.getNewSesameManager();
         
         this.testSchemaManager = this.getNewSchemaManager();
-        this.testSchemaManager.setOwlManager(testOWLManager);
-        this.testSchemaManager.setRepositoryManager(this.testRepositoryManager);
-        this.testSchemaManager.setSesameManager(this.testSesameManager);
+        AbstractPoddArtifactManagerTest.setupTestSchemaManager(this.testSchemaManager, testOWLManager,
+                this.testRepositoryManager, this.testSesameManager);
         
         this.testArtifactManager = this.getNewArtifactManager();
-        this.testArtifactManager.setRepositoryManager(this.testRepositoryManager);
-        this.testArtifactManager.setDataReferenceManager(testFileReferenceManager);
-        this.testArtifactManager.setPurlManager(testPurlManager);
-        this.testArtifactManager.setOwlManager(testOWLManager);
-        this.testArtifactManager.setSchemaManager(this.testSchemaManager);
-        this.testArtifactManager.setSesameManager(this.testSesameManager);
-        
+        AbstractPoddArtifactManagerTest.setupTestArtifactManager(this.testArtifactManager, this.testRepositoryManager,
+                testFileReferenceManager, testPurlManager, testOWLManager, this.testSchemaManager,
+                this.testSesameManager);
+    }
+    
+    private static final void setupTestSchemaManager(final PoddSchemaManager result, final PoddOWLManager owlManager,
+            final PoddRepositoryManager repositoryManager, final PoddSesameManager sesameManager)
+    {
+        result.setOwlManager(owlManager);
+        result.setRepositoryManager(repositoryManager);
+        result.setSesameManager(sesameManager);
+    }
+    
+    private static final void setupTestArtifactManager(final PoddArtifactManager result,
+            final PoddRepositoryManager repositoryManager, final DataReferenceManager dataReferenceManager,
+            final PoddPurlManager purlManager, final PoddOWLManager owlManager, final PoddSchemaManager schemaManager,
+            final PoddSesameManager sesameManager)
+    {
+        result.setRepositoryManager(repositoryManager);
+        result.setDataReferenceManager(dataReferenceManager);
+        result.setPurlManager(purlManager);
+        result.setOwlManager(owlManager);
+        result.setSchemaManager(schemaManager);
+        result.setSesameManager(sesameManager);
     }
     
     /**
@@ -2655,7 +2656,85 @@ public abstract class AbstractPoddArtifactManagerTest
                 artifactIDv1.getVersionIRI(), artifactIDv1.getInferredOntologyIRI()), new LinkedHashSet<OWLOntologyID>(
                 version1SchemaOntologies), new LinkedHashSet<OWLOntologyID>(version2SchemaOntologies));
         
-        InferredOWLOntologyID afterUpdate = this.testArtifactManager.getArtifact(artifactIDv1.getOntologyIRI());
+        final InferredOWLOntologyID afterUpdate = this.testArtifactManager.getArtifact(artifactIDv1.getOntologyIRI());
+        
+        Assert.assertEquals(afterUpdate.getOntologyIRI(), artifactIDv1.getOntologyIRI());
+        // Verify version for artifact changed after the schema import update, to ensure that they
+        // are distinct internally
+        Assert.assertNotEquals(afterUpdate.getVersionIRI(), artifactIDv1.getVersionIRI());
+    }
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddArtifactManager#updateSchemaImports(InferredOWLOntologyID, Set, Set)}
+     * .
+     */
+    @Test
+    public final void testUpdateSchemaImportsToVersion2AfterReload() throws Exception
+    {
+        final List<InferredOWLOntologyID> version1SchemaOntologies = this.loadVersion1SchemaOntologies();
+        
+        // upload artifact while we only have version 1 schemas loaded
+        final InputStream inputStream1 = this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_20130206);
+        final InferredOWLOntologyID artifactIDv1 =
+                this.testArtifactManager.loadArtifact(inputStream1, RDFFormat.TURTLE);
+        this.verifyLoadedArtifact(artifactIDv1, 7, TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES,
+                TestConstants.TEST_ARTIFACT_BASIC_1_20130206_INFERRED_TRIPLES, false);
+        
+        // Simulate reloading all of the application except for the repository, which is independent
+        // and should be long lived in practice
+        this.setupNonRepositoryManagers();
+        
+        // Upload version 2 schemas
+        final List<InferredOWLOntologyID> version2SchemaOntologies = this.loadVersion2SchemaOntologies();
+        
+        // Update from version 1 to version 2
+        this.testArtifactManager.updateSchemaImports(new InferredOWLOntologyID(artifactIDv1.getOntologyIRI(),
+                artifactIDv1.getVersionIRI(), artifactIDv1.getInferredOntologyIRI()), new LinkedHashSet<OWLOntologyID>(
+                version1SchemaOntologies), new LinkedHashSet<OWLOntologyID>(version2SchemaOntologies));
+        
+        final InferredOWLOntologyID afterUpdate = this.testArtifactManager.getArtifact(artifactIDv1.getOntologyIRI());
+        
+        Assert.assertEquals(afterUpdate.getOntologyIRI(), artifactIDv1.getOntologyIRI());
+        // Verify version for artifact changed after the schema import update, to ensure that they
+        // are distinct internally
+        Assert.assertNotEquals(afterUpdate.getVersionIRI(), artifactIDv1.getVersionIRI());
+    }
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddArtifactManager#updateSchemaImports(InferredOWLOntologyID, Set, Set)}
+     * .
+     */
+    @Test
+    public final void testUpdateSchemaImportsToVersion2AfterReload2() throws Exception
+    {
+        final List<InferredOWLOntologyID> version1SchemaOntologies = this.loadVersion1SchemaOntologies();
+        
+        // upload artifact while we only have version 1 schemas loaded
+        final InputStream inputStream1 = this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_20130206);
+        final InferredOWLOntologyID artifactIDv1 =
+                this.testArtifactManager.loadArtifact(inputStream1, RDFFormat.TURTLE);
+        this.verifyLoadedArtifact(artifactIDv1, 7, TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES,
+                TestConstants.TEST_ARTIFACT_BASIC_1_20130206_INFERRED_TRIPLES, false);
+        
+        // Simulate reloading all of the application except for the repository, which is independent
+        // and should be long lived in practice
+        this.setupNonRepositoryManagers();
+        
+        // Upload version 2 schemas
+        final List<InferredOWLOntologyID> version2SchemaOntologies = this.loadVersion2SchemaOntologies();
+        
+        // Simulate reloading all of the application except for the repository, which is independent
+        // and should be long lived in practice
+        this.setupNonRepositoryManagers();
+        
+        // Update from version 1 to version 2
+        this.testArtifactManager.updateSchemaImports(new InferredOWLOntologyID(artifactIDv1.getOntologyIRI(),
+                artifactIDv1.getVersionIRI(), artifactIDv1.getInferredOntologyIRI()), new LinkedHashSet<OWLOntologyID>(
+                version1SchemaOntologies), new LinkedHashSet<OWLOntologyID>(version2SchemaOntologies));
+        
+        final InferredOWLOntologyID afterUpdate = this.testArtifactManager.getArtifact(artifactIDv1.getOntologyIRI());
         
         Assert.assertEquals(afterUpdate.getOntologyIRI(), artifactIDv1.getOntologyIRI());
         // Verify version for artifact changed after the schema import update, to ensure that they

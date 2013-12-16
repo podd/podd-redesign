@@ -1583,7 +1583,10 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         }
         catch(final Throwable e)
         {
-            this.getOWLManager().removeCache(nextOntology.getOntologyID());
+            if(nextOntology != null)
+            {
+                this.getOWLManager().removeCache(nextOntology.getOntologyID());
+            }
             throw e;
         }
     }
@@ -2169,9 +2172,12 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
                 // Add import to the specific version
                 tempRepositoryConnection.add(artifactVersion.getOntologyIRI().toOpenRDFURI(), OWL.IMPORTS,
                         nextNewSchemaOntologyID.getVersionIRI().toOpenRDFURI(), newVersionIRI.toOpenRDFURI());
+                this.getOWLManager().cacheSchemaOntology(nextNewSchemaOntologyID, permanentRepositoryConnection,
+                        nextNewSchemaOntologyID.getVersionIRI().toOpenRDFURI());
             }
             
             tempRepositoryConnection.commit();
+            
             // If the following does not succeed, then it throws an exception and we rollback
             // permanentRepositoryConnection
             final InferredOWLOntologyID result =
