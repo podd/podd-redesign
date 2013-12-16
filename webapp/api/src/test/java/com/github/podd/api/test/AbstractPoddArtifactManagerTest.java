@@ -2654,6 +2654,13 @@ public abstract class AbstractPoddArtifactManagerTest
         this.testArtifactManager.updateSchemaImports(new InferredOWLOntologyID(artifactIDv1.getOntologyIRI(),
                 artifactIDv1.getVersionIRI(), artifactIDv1.getInferredOntologyIRI()), new LinkedHashSet<OWLOntologyID>(
                 version1SchemaOntologies), new LinkedHashSet<OWLOntologyID>(version2SchemaOntologies));
+        
+        InferredOWLOntologyID afterUpdate = this.testArtifactManager.getArtifact(artifactIDv1.getOntologyIRI());
+        
+        Assert.assertEquals(afterUpdate.getOntologyIRI(), artifactIDv1.getOntologyIRI());
+        // Verify version for artifact changed after the schema import update, to ensure that they
+        // are distinct internally
+        Assert.assertNotEquals(afterUpdate.getVersionIRI(), artifactIDv1.getVersionIRI());
     }
     
     /**
