@@ -64,8 +64,8 @@ public class PoddSesameManagerImplTest extends AbstractPoddSesameManagerTest
         
         // - schema ontologies to be loaded
         final String[] schemaResourcePaths =
-                { PODD.PATH_PODD_DCTERMS, PODD.PATH_PODD_FOAF, PODD.PATH_PODD_USER, PODD.PATH_PODD_BASE,
-                        PODD.PATH_PODD_SCIENCE, PODD.PATH_PODD_PLANT,
+                { PODD.PATH_PODD_DCTERMS_V1, PODD.PATH_PODD_FOAF_V1, PODD.PATH_PODD_USER_V1, PODD.PATH_PODD_BASE_V1,
+                        PODD.PATH_PODD_SCIENCE_V1, PODD.PATH_PODD_PLANT_V1,
                 // PoddRdfConstants.PATH_PODD_ANIMAL,
                 };
         

@@ -388,7 +388,7 @@ public abstract class AbstractPoddArtifactManagerTest
             final DataReferenceVerificationPolicy verifyFileReferences, final Collection<URI> updateObjectUris)
         throws Exception
     {
-        this.loadSchemaOntologies();
+        this.loadVersion1SchemaOntologies();
         
         final InputStream inputStream = this.getClass().getResourceAsStream(resourcePath);
         
@@ -485,39 +485,94 @@ public abstract class AbstractPoddArtifactManagerTest
     }
     
     /**
-     * Helper method which loads the three PODD schema ontologies (and their dependencies):
-     * PODD-Base, PODD-Science and PODD-Plant.
+     * Helper method which loads version 1 for the three PODD schema ontologies (and their
+     * dependencies): PODD-Base, PODD-Science and PODD-Plant.
      * 
      * This method is not called from the setUp() method since some tests require not loading all
      * schema ontologies.
      * 
      * @throws Exception
      */
-    private List<InferredOWLOntologyID> loadSchemaOntologies() throws Exception
+    private List<InferredOWLOntologyID> loadVersion1SchemaOntologies() throws Exception
     {
         // prepare: load schema ontologies
         final InferredOWLOntologyID inferredDctermsOntologyID =
-                this.loadInferStoreOntology(PODD.PATH_PODD_DCTERMS, RDFFormat.RDFXML,
+                this.loadInferStoreOntology(PODD.PATH_PODD_DCTERMS_V1, RDFFormat.RDFXML,
                         TestConstants.EXPECTED_TRIPLE_COUNT_DC_TERMS_CONCRETE,
                         TestConstants.EXPECTED_TRIPLE_COUNT_DC_TERMS_INFERRED, this.testRepositoryConnection);
         final InferredOWLOntologyID inferredFoafOntologyID =
-                this.loadInferStoreOntology(PODD.PATH_PODD_FOAF, RDFFormat.RDFXML,
+                this.loadInferStoreOntology(PODD.PATH_PODD_FOAF_V1, RDFFormat.RDFXML,
                         TestConstants.EXPECTED_TRIPLE_COUNT_FOAF_CONCRETE,
                         TestConstants.EXPECTED_TRIPLE_COUNT_FOAF_INFERRED, this.testRepositoryConnection);
         final InferredOWLOntologyID inferredPUserOntologyID =
-                this.loadInferStoreOntology(PODD.PATH_PODD_USER, RDFFormat.RDFXML,
+                this.loadInferStoreOntology(PODD.PATH_PODD_USER_V1, RDFFormat.RDFXML,
                         TestConstants.EXPECTED_TRIPLE_COUNT_PODD_USER_CONCRETE,
                         TestConstants.EXPECTED_TRIPLE_COUNT_PODD_USER_INFERRED, this.testRepositoryConnection);
         final InferredOWLOntologyID inferredPBaseOntologyID =
-                this.loadInferStoreOntology(PODD.PATH_PODD_BASE, RDFFormat.RDFXML,
+                this.loadInferStoreOntology(PODD.PATH_PODD_BASE_V1, RDFFormat.RDFXML,
                         TestConstants.EXPECTED_TRIPLE_COUNT_PODD_BASE_CONCRETE,
                         TestConstants.EXPECTED_TRIPLE_COUNT_PODD_BASE_INFERRED, this.testRepositoryConnection);
         final InferredOWLOntologyID inferredPScienceOntologyID =
-                this.loadInferStoreOntology(PODD.PATH_PODD_SCIENCE, RDFFormat.RDFXML,
+                this.loadInferStoreOntology(PODD.PATH_PODD_SCIENCE_V1, RDFFormat.RDFXML,
                         TestConstants.EXPECTED_TRIPLE_COUNT_PODD_SCIENCE_CONCRETE,
                         TestConstants.EXPECTED_TRIPLE_COUNT_PODD_SCIENCE_INFERRED, this.testRepositoryConnection);
         final InferredOWLOntologyID inferredPPlantOntologyID =
-                this.loadInferStoreOntology(PODD.PATH_PODD_PLANT, RDFFormat.RDFXML,
+                this.loadInferStoreOntology(PODD.PATH_PODD_PLANT_V1, RDFFormat.RDFXML,
+                        TestConstants.EXPECTED_TRIPLE_COUNT_PODD_PLANT_CONCRETE,
+                        TestConstants.EXPECTED_TRIPLE_COUNT_PODD_PLANT_INFERRED, this.testRepositoryConnection);
+        
+        // prepare: update schema management graph
+        this.testSesameManager.updateCurrentManagedSchemaOntologyVersion(inferredDctermsOntologyID, false,
+                this.testRepositoryConnection, this.schemaGraph);
+        this.testSesameManager.updateCurrentManagedSchemaOntologyVersion(inferredFoafOntologyID, false,
+                this.testRepositoryConnection, this.schemaGraph);
+        this.testSesameManager.updateCurrentManagedSchemaOntologyVersion(inferredPUserOntologyID, false,
+                this.testRepositoryConnection, this.schemaGraph);
+        this.testSesameManager.updateCurrentManagedSchemaOntologyVersion(inferredPBaseOntologyID, false,
+                this.testRepositoryConnection, this.schemaGraph);
+        this.testSesameManager.updateCurrentManagedSchemaOntologyVersion(inferredPScienceOntologyID, false,
+                this.testRepositoryConnection, this.schemaGraph);
+        this.testSesameManager.updateCurrentManagedSchemaOntologyVersion(inferredPPlantOntologyID, false,
+                this.testRepositoryConnection, this.schemaGraph);
+        
+        return Arrays.asList(inferredDctermsOntologyID, inferredFoafOntologyID, inferredPUserOntologyID,
+                inferredPBaseOntologyID, inferredPScienceOntologyID, inferredPPlantOntologyID);
+    }
+    
+    /**
+     * Helper method which loads version 1 for the three PODD schema ontologies (and their
+     * dependencies): PODD-Base, PODD-Science and PODD-Plant.
+     * 
+     * This method is not called from the setUp() method since some tests require not loading all
+     * schema ontologies.
+     * 
+     * @throws Exception
+     */
+    private List<InferredOWLOntologyID> loadVersion2SchemaOntologies() throws Exception
+    {
+        // prepare: load schema ontologies
+        final InferredOWLOntologyID inferredDctermsOntologyID =
+                this.loadInferStoreOntology(PODD.PATH_PODD_DCTERMS_V2, RDFFormat.RDFXML,
+                        TestConstants.EXPECTED_TRIPLE_COUNT_DC_TERMS_CONCRETE,
+                        TestConstants.EXPECTED_TRIPLE_COUNT_DC_TERMS_INFERRED, this.testRepositoryConnection);
+        final InferredOWLOntologyID inferredFoafOntologyID =
+                this.loadInferStoreOntology(PODD.PATH_PODD_FOAF_V2, RDFFormat.RDFXML,
+                        TestConstants.EXPECTED_TRIPLE_COUNT_FOAF_CONCRETE,
+                        TestConstants.EXPECTED_TRIPLE_COUNT_FOAF_INFERRED, this.testRepositoryConnection);
+        final InferredOWLOntologyID inferredPUserOntologyID =
+                this.loadInferStoreOntology(PODD.PATH_PODD_USER_V2, RDFFormat.RDFXML,
+                        TestConstants.EXPECTED_TRIPLE_COUNT_PODD_USER_CONCRETE,
+                        TestConstants.EXPECTED_TRIPLE_COUNT_PODD_USER_INFERRED, this.testRepositoryConnection);
+        final InferredOWLOntologyID inferredPBaseOntologyID =
+                this.loadInferStoreOntology(PODD.PATH_PODD_BASE_V2, RDFFormat.RDFXML,
+                        TestConstants.EXPECTED_TRIPLE_COUNT_PODD_BASE_CONCRETE,
+                        TestConstants.EXPECTED_TRIPLE_COUNT_PODD_BASE_INFERRED, this.testRepositoryConnection);
+        final InferredOWLOntologyID inferredPScienceOntologyID =
+                this.loadInferStoreOntology(PODD.PATH_PODD_SCIENCE_V2, RDFFormat.RDFXML,
+                        TestConstants.EXPECTED_TRIPLE_COUNT_PODD_SCIENCE_CONCRETE,
+                        TestConstants.EXPECTED_TRIPLE_COUNT_PODD_SCIENCE_INFERRED, this.testRepositoryConnection);
+        final InferredOWLOntologyID inferredPPlantOntologyID =
+                this.loadInferStoreOntology(PODD.PATH_PODD_PLANT_V2, RDFFormat.RDFXML,
                         TestConstants.EXPECTED_TRIPLE_COUNT_PODD_PLANT_CONCRETE,
                         TestConstants.EXPECTED_TRIPLE_COUNT_PODD_PLANT_INFERRED, this.testRepositoryConnection);
         
@@ -658,7 +713,7 @@ public abstract class AbstractPoddArtifactManagerTest
     @Test
     public final void testAttachFileReferencesWithoutVerification() throws Exception
     {
-        this.loadSchemaOntologies();
+        this.loadVersion1SchemaOntologies();
         
         final InputStream inputStream = this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_20130206);
         
@@ -722,7 +777,7 @@ public abstract class AbstractPoddArtifactManagerTest
     @Test
     public final void testDeleteArtifactClearsOntologyManager() throws Exception
     {
-        this.loadSchemaOntologies();
+        this.loadVersion1SchemaOntologies();
         
         final InputStream inputStream = this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_20130206);
         
@@ -766,7 +821,7 @@ public abstract class AbstractPoddArtifactManagerTest
     @Test
     public final void testDeleteArtifactWhenPublished() throws Exception
     {
-        this.loadSchemaOntologies();
+        this.loadVersion1SchemaOntologies();
         
         final InputStream inputStream =
                 this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_BASIC_1_INTERNAL_OBJECT);
@@ -807,7 +862,7 @@ public abstract class AbstractPoddArtifactManagerTest
     @Test
     public final void testDeleteArtifactWhenUnmanaged() throws Exception
     {
-        this.loadSchemaOntologies();
+        this.loadVersion1SchemaOntologies();
         
         final InputStream inputStream =
                 this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_BASIC_1_INTERNAL_OBJECT);
@@ -840,7 +895,7 @@ public abstract class AbstractPoddArtifactManagerTest
     @Test
     public final void testDeleteArtifactWithVersionSingle() throws Exception
     {
-        this.loadSchemaOntologies();
+        this.loadVersion1SchemaOntologies();
         
         final InputStream inputStream =
                 this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_BASIC_1_INTERNAL_OBJECT);
@@ -886,7 +941,7 @@ public abstract class AbstractPoddArtifactManagerTest
     public final void testDeleteObjectSuccess() throws Exception
     {
         // prepare: load schema ontologies and test artifact
-        this.loadSchemaOntologies();
+        this.loadVersion1SchemaOntologies();
         final InputStream inputStream = this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_20130206);
         final InferredOWLOntologyID artifactID = this.testArtifactManager.loadArtifact(inputStream, RDFFormat.TURTLE);
         this.verifyLoadedArtifact(artifactID, 7, TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES,
@@ -931,7 +986,7 @@ public abstract class AbstractPoddArtifactManagerTest
     public final void testDeleteObjectWithChildrenNoCascade() throws Exception
     {
         // prepare: load schema ontologies and test artifact
-        this.loadSchemaOntologies();
+        this.loadVersion1SchemaOntologies();
         final InputStream inputStream = this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_20130206);
         final InferredOWLOntologyID artifactID = this.testArtifactManager.loadArtifact(inputStream, RDFFormat.TURTLE);
         this.verifyLoadedArtifact(artifactID, 7, TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES,
@@ -971,7 +1026,7 @@ public abstract class AbstractPoddArtifactManagerTest
     public final void testDeleteObjectWithPublishedArtifact() throws Exception
     {
         // prepare: load schema ontologies and test artifact
-        this.loadSchemaOntologies();
+        this.loadVersion1SchemaOntologies();
         final InputStream inputStream = this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_20130206);
         final InferredOWLOntologyID artifactID = this.testArtifactManager.loadArtifact(inputStream, RDFFormat.TURTLE);
         this.verifyLoadedArtifact(artifactID, 7, TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES,
@@ -1010,7 +1065,7 @@ public abstract class AbstractPoddArtifactManagerTest
     public final void testDeleteObjectWithReferredToLinks() throws Exception
     {
         // prepare: load schema ontologies and test artifact
-        this.loadSchemaOntologies();
+        this.loadVersion1SchemaOntologies();
         final InputStream inputStream = this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_WITH_REFERSTO);
         final InferredOWLOntologyID artifactID = this.testArtifactManager.loadArtifact(inputStream, RDFFormat.TURTLE);
         this.verifyLoadedArtifact(artifactID, 7, TestConstants.TEST_ARTIFACT_WITH_REFERSTO_CONCRETE_TRIPLES,
@@ -1045,7 +1100,7 @@ public abstract class AbstractPoddArtifactManagerTest
     public final void testDeleteObjectWithTopObject() throws Exception
     {
         // prepare: load schema ontologies and test artifact
-        this.loadSchemaOntologies();
+        this.loadVersion1SchemaOntologies();
         final InputStream inputStream = this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_20130206);
         final InferredOWLOntologyID artifactID = this.testArtifactManager.loadArtifact(inputStream, RDFFormat.TURTLE);
         this.verifyLoadedArtifact(artifactID, 7, TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES,
@@ -1076,7 +1131,7 @@ public abstract class AbstractPoddArtifactManagerTest
     @Test
     public final void testExportArtifact() throws Exception
     {
-        this.loadSchemaOntologies();
+        this.loadVersion1SchemaOntologies();
         
         // prepare: upload a test artifact
         final InputStream inputStream1 = this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_20130206);
@@ -1103,7 +1158,7 @@ public abstract class AbstractPoddArtifactManagerTest
     @Test
     public final void testExportObjectMetadataForProjectPlan() throws Exception
     {
-        this.loadSchemaOntologies();
+        this.loadVersion1SchemaOntologies();
         
         // prepare: upload a test artifact
         final InputStream inputStream1 = this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_20130206);
@@ -1141,7 +1196,7 @@ public abstract class AbstractPoddArtifactManagerTest
     @Test
     public final void testExportObjectMetadataWithArtifact() throws Exception
     {
-        this.loadSchemaOntologies();
+        this.loadVersion1SchemaOntologies();
         
         // prepare: upload a test artifact
         final InputStream inputStream1 = this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_20130206);
@@ -1161,7 +1216,7 @@ public abstract class AbstractPoddArtifactManagerTest
     @Test
     public final void testExportObjectMetadataWithArtifactOther() throws Exception
     {
-        this.loadSchemaOntologies();
+        this.loadVersion1SchemaOntologies();
         
         // prepare: upload a test artifact
         final InputStream inputStream1 = this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_20130206);
@@ -1192,7 +1247,7 @@ public abstract class AbstractPoddArtifactManagerTest
     @Test
     public final void testExportObjectMetadataWithoutArtifact() throws Exception
     {
-        this.loadSchemaOntologies();
+        this.loadVersion1SchemaOntologies();
         
         this.internalTestExportObjectmetadata(null);
     }
@@ -1200,7 +1255,7 @@ public abstract class AbstractPoddArtifactManagerTest
     @Test
     public final void testFillMissingData() throws Exception
     {
-        this.loadSchemaOntologies();
+        this.loadVersion1SchemaOntologies();
         
         // prepare: upload a test artifact
         final InputStream inputStream1 = this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_20130206);
@@ -1242,7 +1297,7 @@ public abstract class AbstractPoddArtifactManagerTest
     @Test
     public final void testGetChildObjects() throws Exception
     {
-        this.loadSchemaOntologies();
+        this.loadVersion1SchemaOntologies();
         
         // prepare: upload a test artifact
         final InputStream inputStream1 = this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_20130206);
@@ -1278,7 +1333,7 @@ public abstract class AbstractPoddArtifactManagerTest
     @Test
     public final void testGetObjectTypes() throws Exception
     {
-        this.loadSchemaOntologies();
+        this.loadVersion1SchemaOntologies();
         
         // prepare: upload a test artifact
         final InputStream inputStream1 = this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_20130206);
@@ -1327,7 +1382,7 @@ public abstract class AbstractPoddArtifactManagerTest
     @Test
     public final void testGetParentDetails() throws Exception
     {
-        this.loadSchemaOntologies();
+        this.loadVersion1SchemaOntologies();
         
         // prepare: upload a test artifact
         final InputStream inputStream1 = this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_20130206);
@@ -1387,7 +1442,7 @@ public abstract class AbstractPoddArtifactManagerTest
     @Test
     public final void testListPublishedArtifacts() throws Exception
     {
-        this.loadSchemaOntologies();
+        this.loadVersion1SchemaOntologies();
         
         final InputStream inputStream =
                 this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_BASIC_1_INTERNAL_OBJECT);
@@ -1427,7 +1482,7 @@ public abstract class AbstractPoddArtifactManagerTest
     @Test
     public final void testListUnpublishedArtifacts() throws Exception
     {
-        this.loadSchemaOntologies();
+        this.loadVersion1SchemaOntologies();
         
         final InputStream inputStream =
                 this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_BASIC_1_INTERNAL_OBJECT);
@@ -1466,7 +1521,7 @@ public abstract class AbstractPoddArtifactManagerTest
     @Test
     public final void testLoadArtifactBasicSuccess() throws Exception
     {
-        this.loadSchemaOntologies();
+        this.loadVersion1SchemaOntologies();
         
         final InputStream inputStream =
                 this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_BASIC_1_INTERNAL_OBJECT);
@@ -1490,7 +1545,7 @@ public abstract class AbstractPoddArtifactManagerTest
     public final void testLoadArtifactConcurrency() throws Exception
     {
         // prepare:
-        this.loadSchemaOntologies();
+        this.loadVersion1SchemaOntologies();
         
         // load test artifact
         final InputStream inputStream4Artifact =
@@ -1586,7 +1641,7 @@ public abstract class AbstractPoddArtifactManagerTest
     @Test
     public final void testLoadArtifactWithInconsistency() throws Exception
     {
-        this.loadSchemaOntologies();
+        this.loadVersion1SchemaOntologies();
         
         final InputStream inputStream =
                 this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_BAD_2_LEAD_INSTITUTES);
@@ -1648,23 +1703,23 @@ public abstract class AbstractPoddArtifactManagerTest
     {
         // prepare: load schema ontologies
         final InferredOWLOntologyID inferredDctermsOntologyID =
-                this.loadInferStoreOntology(PODD.PATH_PODD_DCTERMS, RDFFormat.RDFXML,
+                this.loadInferStoreOntology(PODD.PATH_PODD_DCTERMS_V1, RDFFormat.RDFXML,
                         TestConstants.EXPECTED_TRIPLE_COUNT_DC_TERMS_CONCRETE,
                         TestConstants.EXPECTED_TRIPLE_COUNT_DC_TERMS_INFERRED, this.testRepositoryConnection);
         final InferredOWLOntologyID inferredFoafOntologyID =
-                this.loadInferStoreOntology(PODD.PATH_PODD_FOAF, RDFFormat.RDFXML,
+                this.loadInferStoreOntology(PODD.PATH_PODD_FOAF_V1, RDFFormat.RDFXML,
                         TestConstants.EXPECTED_TRIPLE_COUNT_FOAF_CONCRETE,
                         TestConstants.EXPECTED_TRIPLE_COUNT_FOAF_INFERRED, this.testRepositoryConnection);
         final InferredOWLOntologyID inferredPUserOntologyID =
-                this.loadInferStoreOntology(PODD.PATH_PODD_USER, RDFFormat.RDFXML,
+                this.loadInferStoreOntology(PODD.PATH_PODD_USER_V1, RDFFormat.RDFXML,
                         TestConstants.EXPECTED_TRIPLE_COUNT_PODD_USER_CONCRETE,
                         TestConstants.EXPECTED_TRIPLE_COUNT_PODD_USER_INFERRED, this.testRepositoryConnection);
         final InferredOWLOntologyID inferredPBaseOntologyID =
-                this.loadInferStoreOntology(PODD.PATH_PODD_BASE, RDFFormat.RDFXML,
+                this.loadInferStoreOntology(PODD.PATH_PODD_BASE_V1, RDFFormat.RDFXML,
                         TestConstants.EXPECTED_TRIPLE_COUNT_PODD_BASE_CONCRETE,
                         TestConstants.EXPECTED_TRIPLE_COUNT_PODD_BASE_INFERRED, this.testRepositoryConnection);
         final InferredOWLOntologyID inferredPScienceOntologyID =
-                this.loadInferStoreOntology(PODD.PATH_PODD_SCIENCE, RDFFormat.RDFXML,
+                this.loadInferStoreOntology(PODD.PATH_PODD_SCIENCE_V1, RDFFormat.RDFXML,
                         TestConstants.EXPECTED_TRIPLE_COUNT_PODD_SCIENCE_CONCRETE,
                         TestConstants.EXPECTED_TRIPLE_COUNT_PODD_SCIENCE_INFERRED, this.testRepositoryConnection);
         
@@ -1708,7 +1763,7 @@ public abstract class AbstractPoddArtifactManagerTest
     public final void testLoadArtifactWithNonCurrentSchemaVersionImport() throws Exception
     {
         // prepare:
-        this.loadSchemaOntologies();
+        this.loadVersion1SchemaOntologies();
         
         // prepare: load poddScience v2
         final InferredOWLOntologyID inferredPScienceOntologyID =
@@ -1782,7 +1837,7 @@ public abstract class AbstractPoddArtifactManagerTest
     @Test
     public final void testLoadArtifactWithNoVersionIRIInSource() throws Exception
     {
-        this.loadSchemaOntologies();
+        this.loadVersion1SchemaOntologies();
         
         // load artifact
         final InputStream inputStream4FirstArtifact =
@@ -1811,7 +1866,7 @@ public abstract class AbstractPoddArtifactManagerTest
     @Test
     public final void testLoadArtifactWithSameArtifactTwiceFails() throws Exception
     {
-        this.loadSchemaOntologies();
+        this.loadVersion1SchemaOntologies();
         
         // load 1st artifact
         final InputStream inputStream4FirstArtifact =
@@ -1848,7 +1903,7 @@ public abstract class AbstractPoddArtifactManagerTest
     @Test
     public final void testLoadArtifactWithTwoDistinctArtifacts() throws Exception
     {
-        this.loadSchemaOntologies();
+        this.loadVersion1SchemaOntologies();
         
         // load 1st artifact
         final InputStream inputStream4FirstArtifact =
@@ -1884,7 +1939,7 @@ public abstract class AbstractPoddArtifactManagerTest
     @Test
     public final void testLoadArtifactWithVersionIRIInSourceIgnored() throws Exception
     {
-        this.loadSchemaOntologies();
+        this.loadVersion1SchemaOntologies();
         
         // load 1st artifact
         final InputStream inputStream4Artifact =
@@ -1909,7 +1964,7 @@ public abstract class AbstractPoddArtifactManagerTest
     @Test
     public final void testPublishArtifactBasicSuccess() throws Exception
     {
-        this.loadSchemaOntologies();
+        this.loadVersion1SchemaOntologies();
         
         final InputStream inputStream =
                 this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_BASIC_1_INTERNAL_OBJECT);
@@ -1970,7 +2025,7 @@ public abstract class AbstractPoddArtifactManagerTest
     @Test
     public final void testSearchForOntologyLabelsWithPlatforms() throws Exception
     {
-        this.loadSchemaOntologies();
+        this.loadVersion1SchemaOntologies();
         
         // prepare: upload a test artifact
         final InputStream inputStream1 = this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_20130206);
@@ -2264,7 +2319,7 @@ public abstract class AbstractPoddArtifactManagerTest
     @Test
     public final void testUpdateArtifactAddToNonExistentArtifact() throws Exception
     {
-        this.loadSchemaOntologies();
+        this.loadVersion1SchemaOntologies();
         
         final URI nonExistentArtifactURI =
                 ValueFactoryImpl.getInstance().createURI("http://purl.org/podd/basic-3-no-such-artifact");
@@ -2504,7 +2559,7 @@ public abstract class AbstractPoddArtifactManagerTest
     @Test
     public final void testUpdateArtifactWithOldVersion() throws Exception
     {
-        this.loadSchemaOntologies();
+        this.loadVersion1SchemaOntologies();
         
         // upload artifact
         final InputStream inputStream1 = this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_20130206);
@@ -2553,7 +2608,7 @@ public abstract class AbstractPoddArtifactManagerTest
     @Test
     public final void testUpdateSchemaImportsEmptyNewSchemas() throws Exception
     {
-        final List<InferredOWLOntologyID> schemaOntologies = this.loadSchemaOntologies();
+        final List<InferredOWLOntologyID> schemaOntologies = this.loadVersion1SchemaOntologies();
         
         // upload artifact
         final InputStream inputStream1 = this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_20130206);
@@ -2581,9 +2636,35 @@ public abstract class AbstractPoddArtifactManagerTest
      * .
      */
     @Test
+    public final void testUpdateSchemaImportsToVersion2() throws Exception
+    {
+        final List<InferredOWLOntologyID> version1SchemaOntologies = this.loadVersion1SchemaOntologies();
+        
+        // upload artifact while we only have version 1 schemas loaded
+        final InputStream inputStream1 = this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_20130206);
+        final InferredOWLOntologyID artifactIDv1 =
+                this.testArtifactManager.loadArtifact(inputStream1, RDFFormat.TURTLE);
+        this.verifyLoadedArtifact(artifactIDv1, 7, TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES,
+                TestConstants.TEST_ARTIFACT_BASIC_1_20130206_INFERRED_TRIPLES, false);
+        
+        // Upload version 2 schemas
+        final List<InferredOWLOntologyID> version2SchemaOntologies = this.loadVersion2SchemaOntologies();
+        
+        // Update from version 1 to version 2
+        this.testArtifactManager.updateSchemaImports(new InferredOWLOntologyID(artifactIDv1.getOntologyIRI(),
+                artifactIDv1.getVersionIRI(), artifactIDv1.getInferredOntologyIRI()), new LinkedHashSet<OWLOntologyID>(
+                version1SchemaOntologies), new LinkedHashSet<OWLOntologyID>(version2SchemaOntologies));
+    }
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddArtifactManager#updateSchemaImports(InferredOWLOntologyID, Set, Set)}
+     * .
+     */
+    @Test
     public final void testUpdateSchemaImportsEmptyOldSchemas() throws Exception
     {
-        final List<InferredOWLOntologyID> schemaOntologies = this.loadSchemaOntologies();
+        final List<InferredOWLOntologyID> schemaOntologies = this.loadVersion1SchemaOntologies();
         
         // upload artifact
         final InputStream inputStream1 = this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_20130206);
@@ -2609,7 +2690,7 @@ public abstract class AbstractPoddArtifactManagerTest
     @Test
     public final void testUpdateSchemaImportsEmptySchemas() throws Exception
     {
-        final List<InferredOWLOntologyID> schemaOntologies = this.loadSchemaOntologies();
+        final List<InferredOWLOntologyID> schemaOntologies = this.loadVersion1SchemaOntologies();
         
         // upload artifact
         final InputStream inputStream1 = this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_20130206);
@@ -2679,7 +2760,7 @@ public abstract class AbstractPoddArtifactManagerTest
     @Test
     public final void testUpdateSchemaImportsUnmanagedVersion() throws Exception
     {
-        this.loadSchemaOntologies();
+        this.loadVersion1SchemaOntologies();
         
         // upload artifact
         final InputStream inputStream1 = this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_20130206);
@@ -2718,7 +2799,7 @@ public abstract class AbstractPoddArtifactManagerTest
     @Test
     public final void testWriteInferredOntologyToFile() throws Exception
     {
-        this.loadSchemaOntologies();
+        this.loadVersion1SchemaOntologies();
         final InputStream inputStream = this.getClass().getResourceAsStream("/test/artifacts/basic-20130206.ttl");
         final RDFFormat readFormat = RDFFormat.TURTLE;
         final InferredOWLOntologyID resultArtifactId = this.testArtifactManager.loadArtifact(inputStream, readFormat);

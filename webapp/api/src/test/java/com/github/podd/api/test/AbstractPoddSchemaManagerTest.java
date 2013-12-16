@@ -1250,7 +1250,7 @@ public abstract class AbstractPoddSchemaManagerTest
     public final void testUploadSchemaOntologyWithOntologyIRIAndVersionIRI() throws Exception
     {
         final String[] resourcePaths =
-                { PODD.PATH_PODD_DCTERMS, PODD.PATH_PODD_FOAF, PODD.PATH_PODD_USER, PODD.PATH_PODD_BASE, };
+                { PODD.PATH_PODD_DCTERMS_V1, PODD.PATH_PODD_FOAF_V1, PODD.PATH_PODD_USER_V1, PODD.PATH_PODD_BASE_V1, };
         
         for(final String path : resourcePaths)
         {

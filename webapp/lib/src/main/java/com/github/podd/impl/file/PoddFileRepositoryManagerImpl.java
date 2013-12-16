@@ -89,7 +89,7 @@ public class PoddFileRepositoryManagerImpl implements PoddDataRepositoryManager
      */
     public PoddFileRepositoryManagerImpl()
     {
-        try (final InputStream inputA = this.getClass().getResourceAsStream(PODD.PATH_PODD_DATA_REPOSITORY);)
+        try (final InputStream inputA = this.getClass().getResourceAsStream(PODD.PATH_PODD_DATA_REPOSITORY_V1);)
         {
             // load poddDataRepository.owl into a Model
             this.dataRepositorySchema = Rio.parse(inputA, "", RDFFormat.RDFXML);
