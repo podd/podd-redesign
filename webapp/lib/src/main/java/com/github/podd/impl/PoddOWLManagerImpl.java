@@ -512,14 +512,7 @@ public class PoddOWLManagerImpl implements PoddOWLManager
         return new InferredOWLOntologyID(ontologyID.getOntologyIRI(), ontologyID.getVersionIRI(), inferredOntologyIRI);
     }
     
-    private OWLOntologyManager getOWLOntologyManager()
-    {
-        // TODO: Also do not let OWLOntology objects escape as they contain references to
-        // OWLOntologyManager that can also be used in the same way
-        return this.owlOntologyManager;
-    }
-    
-    public OWLReasonerFactory getReasonerFactory()
+    private OWLReasonerFactory getReasonerFactory()
     {
         return this.reasonerFactory;
     }
@@ -582,8 +575,8 @@ public class PoddOWLManagerImpl implements PoddOWLManager
      * @throws Throwable
      */
     public InferredOWLOntologyID loadAndInfer(final RepositoryConnection permanentRepositoryConnection,
-            final OWLOntologyID ontologyID, final OWLOntologyDocumentSource owlSource, final boolean removeFromCacheOnException)
-        throws OWLException, PoddException, OpenRDFException, IOException
+            final OWLOntologyID ontologyID, final OWLOntologyDocumentSource owlSource,
+            final boolean removeFromCacheOnException) throws OWLException, PoddException, OpenRDFException, IOException
     {
         InferredOWLOntologyID inferredOWLOntologyID = null;
         OWLOntology nextOntology = null;
