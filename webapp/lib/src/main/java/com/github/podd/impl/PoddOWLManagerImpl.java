@@ -687,12 +687,6 @@ public class PoddOWLManagerImpl implements PoddOWLManager
     }
     
     @Override
-    public List<OWLOntologyID> getVersions(final IRI ontologyIRI)
-    {
-        throw new RuntimeException("TODO: Implement getVersions");
-    }
-    
-    @Override
     public InferredOWLOntologyID inferStatements(final OWLOntology nextOntology,
             final RepositoryConnection nextRepositoryConnection) throws OWLRuntimeException, OWLException,
         OpenRDFException, IOException

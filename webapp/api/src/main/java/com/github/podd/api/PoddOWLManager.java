@@ -113,21 +113,6 @@ public interface PoddOWLManager
     OWLProfile getReasonerProfile();
     
     /**
-     * Returns a list of versions where one of the ontology IRI or version IRI match the ontology.
-     * 
-     * The most current version of the ontology is returned first in the list.
-     * 
-     * NOTE: The list of {@link OWLOntologyID} instances that are returned may not all contain the
-     * given IRI in cases where the given IRI is one of many different Version IRIs.
-     * 
-     * @param ontologyIRI
-     *            Either the Ontology IRI or the Version IRI of an ontology to match against.
-     * @return A list of versions for all ontologies, where the version either matches the Ontology
-     *         IRI or the Version IRI.
-     */
-    List<OWLOntologyID> getVersions(IRI ontologyIRI);
-    
-    /**
      * Infer statements for the given {@link OWLOntology} into the given permanent repository
      * connection.
      * 
