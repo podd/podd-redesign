@@ -550,6 +550,15 @@ public class PoddOWLManagerImpl implements PoddOWLManager
         return inferredOntologyID;
     }
     
+    @Override
+    public boolean isCached(final OWLOntologyID ontologyID)
+    {
+        synchronized(this.owlOntologyManager)
+        {
+            return this.owlOntologyManager.contains(ontologyID.getVersionIRI());
+        }
+    }
+    
     /**
      * @param owlSource
      * @param permanentRepositoryConnection

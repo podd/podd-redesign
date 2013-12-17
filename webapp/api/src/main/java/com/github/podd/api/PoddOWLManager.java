@@ -56,6 +56,15 @@ public interface PoddOWLManager
         OWLException, IOException, PoddException;
     
     /**
+     * Determing if the ontology is cached in memory.
+     * 
+     * @param ontologyID
+     *            The ontology IRI and version IRI to check for caching.
+     * @return True if the ontology is cached in memory and false otherwise.
+     */
+    boolean isCached(OWLOntologyID ontologyID);
+    
+    /**
      * Loads an ontology from the given {@link OWLOntologyDocumentSource} into the given
      * {@link RepositoryConnection}, using the optional {@link OWLOntologyID} to relabel the
      * ontology IRI and version IRI.
