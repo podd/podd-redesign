@@ -55,8 +55,27 @@ public interface PoddOWLManager
     void cacheSchemaOntology(OWLOntologyID ontologyID, RepositoryConnection conn, URI context) throws OpenRDFException,
         OWLException, IOException, PoddException;
     
-    InferredOWLOntologyID loadAndInfer(RepositoryConnection permanentRepositoryConnection, OWLOntologyID ontologyID,
-            OWLOntologyDocumentSource owlSource) throws OWLException, PoddException, OpenRDFException, IOException;
+    /**
+     * Loads an ontology from the given {@link OWLOntologyDocumentSource} into the given
+     * {@link RepositoryConnection}, using the optional {@link OWLOntologyID} to relabel the
+     * ontology IRI and version IRI.
+     * 
+     * @param owlSource
+     *            The source of the OWL ontology to be loaded.
+     * @param permanentRepositoryConnection
+     *            A connection to the repository where the ontology will be stored.
+     * @param replacementOntologyID
+     *            (Optional) A replacement ontology IRI and version IRI for the loaded ontology.
+     * @return An {@link InferredOWLOntologyID} object containing the details of the loaded
+     *         ontology.
+     * @throws OWLException
+     * @throws PoddException
+     * @throws OpenRDFException
+     * @throws IOException
+     */
+    InferredOWLOntologyID loadAndInfer(OWLOntologyDocumentSource owlSource,
+            RepositoryConnection permanentRepositoryConnection, OWLOntologyID replacementOntologyID)
+        throws OWLException, PoddException, OpenRDFException, IOException;
     
     /**
      * Attempts to regain memory in the underlying OWLOntologyManager by removing the ontology from

@@ -424,7 +424,7 @@ public abstract class AbstractPoddArtifactManagerTest
                         format.getDefaultMIMEType()));
         
         final InferredOWLOntologyID inferredOntologyID =
-                this.testArtifactManager.getOWLManager().loadAndInfer(repositoryConnection, null, owlSource);
+                this.testArtifactManager.getOWLManager().loadAndInfer(owlSource, repositoryConnection, null);
         
         // verify statement counts
         final URI versionURI = inferredOntologyID.getVersionIRI().toOpenRDFURI();

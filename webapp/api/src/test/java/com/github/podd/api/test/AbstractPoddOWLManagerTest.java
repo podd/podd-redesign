@@ -122,7 +122,7 @@ public abstract class AbstractPoddOWLManagerTest
                         format.getDefaultMIMEType()));
         
         final InferredOWLOntologyID inferredOntologyID =
-                this.testOWLManager.loadAndInfer(this.testRepositoryConnection, null, owlSource);
+                this.testOWLManager.loadAndInfer(owlSource, this.testRepositoryConnection, null);
         
         // verify statement counts
         final URI versionURI = inferredOntologyID.getVersionIRI().toOpenRDFURI();

@@ -550,19 +550,19 @@ public class PoddOWLManagerImpl implements PoddOWLManager
     }
     
     /**
-     * @param permanentRepositoryConnection
      * @param owlSource
+     * @param permanentRepositoryConnection
      * @param inferredOWLOntologyID
      * @return
      * @throws OWLException
      * @throws Throwable
      */
     @Override
-    public InferredOWLOntologyID loadAndInfer(final RepositoryConnection permanentRepositoryConnection,
-            final OWLOntologyID ontologyID, final OWLOntologyDocumentSource owlSource) throws OWLException,
+    public InferredOWLOntologyID loadAndInfer(final OWLOntologyDocumentSource owlSource,
+            final RepositoryConnection permanentRepositoryConnection, final OWLOntologyID replacementOntologyID) throws OWLException,
         PoddException, OpenRDFException, IOException
     {
-        return this.loadAndInfer(permanentRepositoryConnection, ontologyID, owlSource, true);
+        return this.loadAndInfer(permanentRepositoryConnection, replacementOntologyID, owlSource, true);
     }
     
     /**

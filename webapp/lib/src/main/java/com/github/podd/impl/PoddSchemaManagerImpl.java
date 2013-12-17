@@ -781,7 +781,7 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
         InferredOWLOntologyID nextInferredOntology;
         synchronized(this)
         {
-            nextInferredOntology = this.owlManager.loadAndInfer(conn, schemaOntologyID, owlSource);
+            nextInferredOntology = this.owlManager.loadAndInfer(owlSource, conn, schemaOntologyID);
         }
         
         // update the link in the schema ontology management graph

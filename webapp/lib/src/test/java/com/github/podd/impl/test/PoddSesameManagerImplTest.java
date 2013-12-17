@@ -87,7 +87,7 @@ public class PoddSesameManagerImplTest extends AbstractPoddSesameManagerTest
             final InputStream resourceStream = this.getClass().getResourceAsStream(schemaResourcePath);
             final OWLOntologyDocumentSource owlSource =
                     new StreamDocumentSource(resourceStream, RDFFormat.RDFXML.getDefaultMIMEType());
-            final InferredOWLOntologyID nextInferredOntology = testPoddOWLManager.loadAndInfer(conn, null, owlSource);
+            final InferredOWLOntologyID nextInferredOntology = testPoddOWLManager.loadAndInfer(owlSource, conn, null);
             
             schemaList.add(nextInferredOntology);
         }
