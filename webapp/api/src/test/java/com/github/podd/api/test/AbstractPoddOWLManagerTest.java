@@ -544,69 +544,6 @@ public abstract class AbstractPoddOWLManagerTest
     
     /**
      * Test method for
-     * {@link com.github.podd.api.PoddOWLManager#createReasoner(org.semanticweb.owlapi.model.OWLOntology)}
-     * .
-     * 
-     */
-    @Test
-    public void testCreateReasoner() throws Exception
-    {
-        // prepare: load an Ontology independently
-        final InputStream inputStream = this.getClass().getResourceAsStream(PODD.PATH_PODD_DCTERMS_V1);
-        Assert.assertNotNull("Could not find resource", inputStream);
-        final OWLOntologyManager testOWLOntologyManager = OWLOntologyManagerFactoryRegistry.createOWLOntologyManager();
-        final OWLOntology loadedOntology = testOWLOntologyManager.loadOntologyFromOntologyDocument(inputStream);
-        
-        final OWLReasoner reasoner = this.testOWLManager.createReasoner(loadedOntology);
-        
-        // verify:
-        Assert.assertNotNull("Created reasoner was NULL", reasoner);
-        Assert.assertEquals(this.getNewOWLReasonerFactoryInstance().getReasonerName(), reasoner.getReasonerName());
-    }
-    
-    /**
-     * Test method for
-     * {@link com.github.podd.api.PoddOWLManager#createReasoner(org.semanticweb.owlapi.model.OWLOntology)}
-     * .
-     * 
-     */
-    @Test
-    public void testCreateReasonerFromEmptyOntology() throws Exception
-    {
-        // prepare: load an Ontology independently
-        final OWLOntologyManager testOWLOntologyManager = OWLOntologyManagerFactoryRegistry.createOWLOntologyManager();
-        final OWLOntology emptyOntology = testOWLOntologyManager.createOntology();
-        
-        final OWLReasoner reasoner = this.testOWLManager.createReasoner(emptyOntology);
-        
-        // verify:
-        Assert.assertNotNull("Created reasoner was NULL", reasoner);
-        Assert.assertEquals(this.getNewOWLReasonerFactoryInstance().getReasonerName(), reasoner.getReasonerName());
-    }
-    
-    /**
-     * Test method for
-     * {@link com.github.podd.api.PoddOWLManager#createReasoner(org.semanticweb.owlapi.model.OWLOntology)}
-     * .
-     * 
-     */
-    @Test
-    public void testCreateReasonerWithNull() throws Exception
-    {
-        try
-        {
-            this.testOWLManager.createReasoner(null);
-            Assert.fail("Should have thrown a Runtime Exception");
-        }
-        catch(final RuntimeException e)
-        {
-            Assert.assertTrue("Exception not expected type", e instanceof NullPointerException);
-            // this exception is thrown by the OWL API with a null message
-        }
-    }
-    
-    /**
-     * Test method for
      * {@link com.github.podd.api.PoddOWLManager#dumpOntologyToRepository(OWLOntology, RepositoryConnection, URI...)}
      * .
      * 

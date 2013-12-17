@@ -16,13 +16,21 @@
  */
 package com.github.podd.impl.test;
 
+import java.io.InputStream;
+
+import org.junit.Assert;
+import org.junit.Test;
+import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
+import org.semanticweb.owlapi.model.OWLOntologyManagerFactoryRegistry;
+import org.semanticweb.owlapi.reasoner.OWLReasoner;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactoryRegistry;
 
 import com.github.podd.api.PoddOWLManager;
 import com.github.podd.api.test.AbstractPoddOWLManagerTest;
 import com.github.podd.impl.PoddOWLManagerImpl;
+import com.github.podd.utils.PODD;
 
 /**
  * @author kutila
@@ -39,10 +47,73 @@ public class PoddOWLManagerImplTest extends AbstractPoddOWLManagerTest
     }
     
     @Override
-    protected PoddOWLManager getNewPoddOWLManagerInstance(final OWLOntologyManager manager,
+    protected PoddOWLManagerImpl getNewPoddOWLManagerInstance(final OWLOntologyManager manager,
             final OWLReasonerFactory reasonerFactory)
     {
         return new PoddOWLManagerImpl(manager, reasonerFactory);
+    }
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddOWLManager#createReasoner(org.semanticweb.owlapi.model.OWLOntology)}
+     * .
+     * 
+     */
+    @Test
+    public void testCreateReasonerWithNull() throws Exception
+    {
+        try
+        {
+            ((PoddOWLManagerImpl)this.testOWLManager).createReasoner(null);
+            Assert.fail("Should have thrown a Runtime Exception");
+        }
+        catch(final RuntimeException e)
+        {
+            Assert.assertTrue("Exception not expected type", e instanceof NullPointerException);
+            // this exception is thrown by the OWL API with a null message
+        }
+    }
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddOWLManager#createReasoner(org.semanticweb.owlapi.model.OWLOntology)}
+     * .
+     * 
+     */
+    @Test
+    public void testCreateReasoner() throws Exception
+    {
+        // prepare: load an Ontology independently
+        final InputStream inputStream = this.getClass().getResourceAsStream(PODD.PATH_PODD_DCTERMS_V1);
+        Assert.assertNotNull("Could not find resource", inputStream);
+        final OWLOntologyManager testOWLOntologyManager = OWLOntologyManagerFactoryRegistry.createOWLOntologyManager();
+        final OWLOntology loadedOntology = testOWLOntologyManager.loadOntologyFromOntologyDocument(inputStream);
+        
+        final OWLReasoner reasoner = ((PoddOWLManagerImpl)this.testOWLManager).createReasoner(loadedOntology);
+        
+        // verify:
+        Assert.assertNotNull("Created reasoner was NULL", reasoner);
+        Assert.assertEquals(this.getNewOWLReasonerFactoryInstance().getReasonerName(), reasoner.getReasonerName());
+    }
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddOWLManager#createReasoner(org.semanticweb.owlapi.model.OWLOntology)}
+     * .
+     * 
+     */
+    @Test
+    public void testCreateReasonerFromEmptyOntology() throws Exception
+    {
+        // prepare: load an Ontology independently
+        final OWLOntologyManager testOWLOntologyManager = OWLOntologyManagerFactoryRegistry.createOWLOntologyManager();
+        final OWLOntology emptyOntology = testOWLOntologyManager.createOntology();
+        
+        final OWLReasoner reasoner = ((PoddOWLManagerImpl)this.testOWLManager).createReasoner(emptyOntology);
+        
+        // verify:
+        Assert.assertNotNull("Created reasoner was NULL", reasoner);
+        Assert.assertEquals(this.getNewOWLReasonerFactoryInstance().getReasonerName(), reasoner.getReasonerName());
     }
     
 }

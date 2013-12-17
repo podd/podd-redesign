@@ -65,14 +65,6 @@ public interface PoddOWLManager
         throws OpenRDFException, OWLException, IOException, PoddException;
     
     /**
-     * Creates a reasoner over the given OWLOntology
-     * 
-     * @param nextOntology
-     * @return
-     */
-    OWLReasoner createReasoner(OWLOntology nextOntology);
-    
-    /**
      * Dump ontology to the given repository connection, using the Version IRI from the given
      * ontology as the context if a context is not given.
      * 
