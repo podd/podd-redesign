@@ -63,7 +63,6 @@ public abstract class AbstractPoddSchemaManagerTest
     protected PoddSchemaManager testSchemaManager;
     private PoddOWLManager testOwlManager;
     private PoddRepositoryManager testRepositoryManager;
-    private OWLOntologyManager owlapiManager;
     private PoddSesameManager testSesameManager;
     
     /**
@@ -1095,7 +1094,6 @@ public abstract class AbstractPoddSchemaManagerTest
             final IRI emptyOntologyIRI = IRI.create("urn:test:empty:ontology:");
             final IRI emptyVersionIRI = IRI.create("urn:test:empty:version:");
             final OWLOntologyID emptyOntologyID = new OWLOntologyID(emptyOntologyIRI, emptyVersionIRI);
-            this.owlapiManager.createOntology(emptyOntologyID);
             
             this.testSchemaManager.uploadSchemaOntology(emptyOntologyID, null, RDFFormat.RDFXML);
             
@@ -1103,7 +1101,7 @@ public abstract class AbstractPoddSchemaManagerTest
         }
         catch(final NullPointerException e)
         {
-            //Assert.assertEquals("Message was not as expected", "Schema Ontology input stream was null", e.getMessage());
+            Assert.assertEquals("Message was not as expected", "Schema Ontology input stream was null", e.getMessage());
         }
     }
     
