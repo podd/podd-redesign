@@ -269,6 +269,101 @@ public class PoddOWLManagerImpl implements PoddOWLManager
     }
     
     /**
+     * Helper method to verify that the statements of a given {@link Model} make up a consistent
+     * OWL-DL Ontology.
+     * 
+     * <br>
+     * 
+     * NOTES: Any ontologies imported must be already loaded into the OWLOntologyManager's memory
+     * before invoking this method. When this method returns, the ontology built from the input
+     * Model is in the OWLOntologyManager's memory.
+     * 
+     * User MUST synchronize on owlOntologyManager before entering this method if the
+     * OWLOntologyManager implementation is not threadsafe.
+     * 
+     * @param model
+     *            A Model which should contain an Ontology
+     * @return The loaded Ontology if verification succeeds
+     * @throws DataRepositoryException
+     *             If verification fails
+     */
+    private OWLOntology checkForConsistentOwlDlOntology(final Model model) throws EmptyOntologyException,
+        OntologyNotInProfileException, InconsistentOntologyException
+    {
+        final RioRDFOntologyFormatFactory ontologyFormatFactory =
+                (RioRDFOntologyFormatFactory)OWLOntologyFormatFactoryRegistry.getInstance().getByMIMEType(
+                        RDFFormat.RDFXML.getDefaultMIMEType());
+        final RioParserImpl owlParser = new RioParserImpl(ontologyFormatFactory);
+        
+        OWLOntology nextOntology = null;
+        
+        try
+        {
+            try
+            {
+                nextOntology = this.owlOntologyManager.createOntology();
+                final RioMemoryTripleSource owlSource = new RioMemoryTripleSource(model.iterator());
+                
+                owlParser.parse(owlSource, nextOntology);
+            }
+            catch(OWLOntologyCreationException | OWLParserException | IOException e)
+            {
+                // throwing up the original Exceptions is also a possibility
+                // here.
+                throw new EmptyOntologyException(nextOntology, "Error parsing Model to create an Ontology");
+            }
+            
+            // Repository configuration can be an empty ontology
+            // if(nextOntology.isEmpty())
+            // {
+            // throw new EmptyOntologyException(nextOntology,
+            // "Ontology was empty");
+            // }
+            
+            // verify that the ontology in OWL-DL profile
+            final OWLProfile nextProfile = OWLProfileRegistry.getInstance().getProfile(OWLProfile.OWL2_DL);
+            final OWLProfileReport profileReport = nextProfile.checkOntology(nextOntology);
+            if(!profileReport.isInProfile())
+            {
+                if(this.log.isDebugEnabled())
+                {
+                    for(final OWLProfileViolation violation : profileReport.getViolations())
+                    {
+                        this.log.debug(violation.toString());
+                    }
+                }
+                throw new OntologyNotInProfileException(nextOntology, profileReport, "Ontology not in OWL-DL profile");
+            }
+            
+            // check consistency
+            final OWLReasonerFactory reasonerFactory =
+                    OWLReasonerFactoryRegistry.getInstance().getReasonerFactory("Pellet");
+            final OWLReasoner reasoner = reasonerFactory.createReasoner(nextOntology);
+            
+            if(!reasoner.isConsistent())
+            {
+                final PelletExplanation exp = new PelletExplanation((PelletReasoner)reasoner);
+                // Get 100 inconsistency explanations, any more than that and they need to make
+                // modifications and try again
+                final RDFXMLExplanationRenderer renderer = new RDFXMLExplanationRenderer();
+                final Set<Set<OWLAxiom>> inconsistencyExplanations = exp.getInconsistencyExplanations(100);
+                throw new InconsistentOntologyException(inconsistencyExplanations, nextOntology.getOntologyID(),
+                        renderer, "Ontology is inconsistent");
+            }
+        }
+        catch(final Throwable e)
+        {
+            if(nextOntology != null)
+            {
+                this.owlOntologyManager.removeOntology(nextOntology);
+            }
+            throw e;
+        }
+        
+        return nextOntology;
+    }
+    
+    /**
      * Computes the inferences using the given reasoner, which has previously been setup based on an
      * ontology.
      * 
@@ -417,6 +512,50 @@ public class PoddOWLManagerImpl implements PoddOWLManager
         return new InferredOWLOntologyID(ontologyID.getOntologyIRI(), ontologyID.getVersionIRI(), inferredOntologyIRI);
     }
     
+    private OWLOntologyManager getOWLOntologyManager()
+    {
+        // TODO: Also do not let OWLOntology objects escape as they contain references to
+        // OWLOntologyManager that can also be used in the same way
+        return this.owlOntologyManager;
+    }
+    
+    public OWLReasonerFactory getReasonerFactory()
+    {
+        return this.reasonerFactory;
+    }
+    
+    public Set<OWLProfile> getReasonerProfiles()
+    {
+        final Set<OWLProfile> profiles = this.reasonerFactory.getSupportedProfiles();
+        if(profiles.isEmpty())
+        {
+            this.log.warn("Could not find any supported OWL Profiles");
+        }
+        return profiles;
+    }
+    
+    public InferredOWLOntologyID inferStatements(final OWLOntology nextOntology,
+            final RepositoryConnection nextRepositoryConnection, OWLReasoner nextReasoner) throws OWLRuntimeException,
+        OWLException, OpenRDFException, IOException
+    {
+        final InferredOWLOntologyID inferredOntologyID = this.generateInferredOntologyID(nextOntology.getOntologyID());
+        if(nextReasoner == null)
+        {
+            nextReasoner = this.createReasoner(nextOntology);
+        }
+        // final OWLReasoner nextReasoner = this.createReasoner(nextOntology);
+        
+        final OWLOntology nextInferredAxiomsOntology =
+                this.computeInferences(nextReasoner, nextOntology.getOntologyID(),
+                        inferredOntologyID.getInferredOWLOntologyID());
+        
+        this.dumpOntologyToRepositoryWithoutDuplication(inferredOntologyID.getVersionIRI().toOpenRDFURI(),
+                nextInferredAxiomsOntology, nextRepositoryConnection, nextInferredAxiomsOntology.getOntologyID()
+                        .getOntologyIRI().toOpenRDFURI());
+        
+        return inferredOntologyID;
+    }
+    
     /**
      * @param permanentRepositoryConnection
      * @param owlSource
@@ -533,186 +672,6 @@ public class PoddOWLManagerImpl implements PoddOWLManager
         }
     }
     
-    @Override
-    public void verifyAgainstSchema(final Model model, final Model schemaModel) throws OntologyNotInProfileException
-    {
-        OWLOntology dataRepositoryOntology = null;
-        OWLOntology defaultAliasOntology = null;
-        
-        synchronized(this.owlOntologyManager)
-        {
-            try
-            // (final InputStream inputA =
-            // this.getClass().getResourceAsStream(PoddRdfConstants.PATH_PODD_DATA_REPOSITORY);)
-            {
-                // load poddDataRepository.owl into a Model
-                // final Model schemaModel = Rio.parse(inputA, "", RDFFormat.RDFXML);
-                // Rio.parse(inputA, null, RDFFormat.RDFXML);
-                // verify & load poddDataRepository.owl into OWLAPI
-                dataRepositoryOntology = this.checkForConsistentOwlDlOntology(schemaModel);
-                
-                defaultAliasOntology = this.checkForConsistentOwlDlOntology(model);
-            }
-            catch(final PoddException e)// | OpenRDFException | IOException e)
-            {
-                final String msg = "Failed verification of the DataRepsitory against poddDataRepository.owl";
-                this.log.error(msg, e);
-                throw new OntologyNotInProfileException(null, null, msg, e);
-            }
-            finally
-            {
-                // clear OWLAPI memory
-                if(defaultAliasOntology != null)
-                {
-                    this.owlOntologyManager.removeOntology(defaultAliasOntology);
-                }
-                if(dataRepositoryOntology != null)
-                {
-                    this.owlOntologyManager.removeOntology(dataRepositoryOntology);
-                }
-            }
-        }
-    }
-    
-    /**
-     * Helper method to verify that the statements of a given {@link Model} make up a consistent
-     * OWL-DL Ontology.
-     * 
-     * <br>
-     * 
-     * NOTES: Any ontologies imported must be already loaded into the OWLOntologyManager's memory
-     * before invoking this method. When this method returns, the ontology built from the input
-     * Model is in the OWLOntologyManager's memory.
-     * 
-     * User MUST synchronize on owlOntologyManager before entering this method if the
-     * OWLOntologyManager implementation is not threadsafe.
-     * 
-     * @param model
-     *            A Model which should contain an Ontology
-     * @return The loaded Ontology if verification succeeds
-     * @throws DataRepositoryException
-     *             If verification fails
-     */
-    private OWLOntology checkForConsistentOwlDlOntology(final Model model) throws EmptyOntologyException,
-        OntologyNotInProfileException, InconsistentOntologyException
-    {
-        final RioRDFOntologyFormatFactory ontologyFormatFactory =
-                (RioRDFOntologyFormatFactory)OWLOntologyFormatFactoryRegistry.getInstance().getByMIMEType(
-                        RDFFormat.RDFXML.getDefaultMIMEType());
-        final RioParserImpl owlParser = new RioParserImpl(ontologyFormatFactory);
-        
-        OWLOntology nextOntology = null;
-        
-        try
-        {
-            try
-            {
-                nextOntology = this.owlOntologyManager.createOntology();
-                final RioMemoryTripleSource owlSource = new RioMemoryTripleSource(model.iterator());
-                
-                owlParser.parse(owlSource, nextOntology);
-            }
-            catch(OWLOntologyCreationException | OWLParserException | IOException e)
-            {
-                // throwing up the original Exceptions is also a possibility
-                // here.
-                throw new EmptyOntologyException(nextOntology, "Error parsing Model to create an Ontology");
-            }
-            
-            // Repository configuration can be an empty ontology
-            // if(nextOntology.isEmpty())
-            // {
-            // throw new EmptyOntologyException(nextOntology,
-            // "Ontology was empty");
-            // }
-            
-            // verify that the ontology in OWL-DL profile
-            final OWLProfile nextProfile = OWLProfileRegistry.getInstance().getProfile(OWLProfile.OWL2_DL);
-            final OWLProfileReport profileReport = nextProfile.checkOntology(nextOntology);
-            if(!profileReport.isInProfile())
-            {
-                if(this.log.isDebugEnabled())
-                {
-                    for(final OWLProfileViolation violation : profileReport.getViolations())
-                    {
-                        this.log.debug(violation.toString());
-                    }
-                }
-                throw new OntologyNotInProfileException(nextOntology, profileReport, "Ontology not in OWL-DL profile");
-            }
-            
-            // check consistency
-            final OWLReasonerFactory reasonerFactory =
-                    OWLReasonerFactoryRegistry.getInstance().getReasonerFactory("Pellet");
-            final OWLReasoner reasoner = reasonerFactory.createReasoner(nextOntology);
-            
-            if(!reasoner.isConsistent())
-            {
-                final PelletExplanation exp = new PelletExplanation((PelletReasoner)reasoner);
-                // Get 100 inconsistency explanations, any more than that and they need to make
-                // modifications and try again
-                final RDFXMLExplanationRenderer renderer = new RDFXMLExplanationRenderer();
-                final Set<Set<OWLAxiom>> inconsistencyExplanations = exp.getInconsistencyExplanations(100);
-                throw new InconsistentOntologyException(inconsistencyExplanations, nextOntology.getOntologyID(),
-                        renderer, "Ontology is inconsistent");
-            }
-        }
-        catch(final Throwable e)
-        {
-            if(nextOntology != null)
-            {
-                this.owlOntologyManager.removeOntology(nextOntology);
-            }
-            throw e;
-        }
-        
-        return nextOntology;
-    }
-    
-    private OWLOntologyManager getOWLOntologyManager()
-    {
-        // TODO: Also do not let OWLOntology objects escape as they contain references to
-        // OWLOntologyManager that can also be used in the same way
-        return this.owlOntologyManager;
-    }
-    
-    public OWLReasonerFactory getReasonerFactory()
-    {
-        return this.reasonerFactory;
-    }
-    
-    public Set<OWLProfile> getReasonerProfiles()
-    {
-        final Set<OWLProfile> profiles = this.reasonerFactory.getSupportedProfiles();
-        if(profiles.isEmpty())
-        {
-            this.log.warn("Could not find any supported OWL Profiles");
-        }
-        return profiles;
-    }
-    
-    public InferredOWLOntologyID inferStatements(final OWLOntology nextOntology,
-            final RepositoryConnection nextRepositoryConnection, OWLReasoner nextReasoner) throws OWLRuntimeException,
-        OWLException, OpenRDFException, IOException
-    {
-        final InferredOWLOntologyID inferredOntologyID = this.generateInferredOntologyID(nextOntology.getOntologyID());
-        if(nextReasoner == null)
-        {
-            nextReasoner = this.createReasoner(nextOntology);
-        }
-        // final OWLReasoner nextReasoner = this.createReasoner(nextOntology);
-        
-        final OWLOntology nextInferredAxiomsOntology =
-                this.computeInferences(nextReasoner, nextOntology.getOntologyID(),
-                        inferredOntologyID.getInferredOWLOntologyID());
-        
-        this.dumpOntologyToRepositoryWithoutDuplication(inferredOntologyID.getVersionIRI().toOpenRDFURI(),
-                nextInferredAxiomsOntology, nextRepositoryConnection, nextInferredAxiomsOntology.getOntologyID()
-                        .getOntologyIRI().toOpenRDFURI());
-        
-        return inferredOntologyID;
-    }
-    
     public OWLOntology loadOntologyInternal(final OWLOntologyID ontologyID, final OWLOntologyDocumentSource owlSource)
         throws OWLException, IOException, PoddException
     {
@@ -777,17 +736,6 @@ public class PoddOWLManagerImpl implements PoddOWLManager
         }
     }
     
-    public OWLOntologyID parseRDFStatements(final RepositoryConnection conn, final URI... contexts)
-        throws OpenRDFException, OWLException, IOException, PoddException
-    {
-        OpenRDFUtil.verifyContextNotNull(contexts);
-        
-        final Model model = new LinkedHashModel();
-        conn.export(new StatementCollector(model), contexts);
-        
-        return this.parseRDFStatements(model);
-    }
-    
     public OWLOntologyID parseRDFStatements(final Model model) throws OpenRDFException, OWLException, IOException,
         PoddException
     {
@@ -814,6 +762,17 @@ public class PoddOWLManagerImpl implements PoddOWLManager
             
             return nextOntology.getOntologyID();
         }
+    }
+    
+    public OWLOntologyID parseRDFStatements(final RepositoryConnection conn, final URI... contexts)
+        throws OpenRDFException, OWLException, IOException, PoddException
+    {
+        OpenRDFUtil.verifyContextNotNull(contexts);
+        
+        final Model model = new LinkedHashModel();
+        conn.export(new StatementCollector(model), contexts);
+        
+        return this.parseRDFStatements(model);
     }
     
     @Override
@@ -861,6 +820,47 @@ public class PoddOWLManagerImpl implements PoddOWLManager
                 else
                 {
                     return false;
+                }
+            }
+        }
+    }
+    
+    @Override
+    public void verifyAgainstSchema(final Model model, final Model schemaModel) throws OntologyNotInProfileException
+    {
+        OWLOntology dataRepositoryOntology = null;
+        OWLOntology defaultAliasOntology = null;
+        
+        synchronized(this.owlOntologyManager)
+        {
+            try
+            // (final InputStream inputA =
+            // this.getClass().getResourceAsStream(PoddRdfConstants.PATH_PODD_DATA_REPOSITORY);)
+            {
+                // load poddDataRepository.owl into a Model
+                // final Model schemaModel = Rio.parse(inputA, "", RDFFormat.RDFXML);
+                // Rio.parse(inputA, null, RDFFormat.RDFXML);
+                // verify & load poddDataRepository.owl into OWLAPI
+                dataRepositoryOntology = this.checkForConsistentOwlDlOntology(schemaModel);
+                
+                defaultAliasOntology = this.checkForConsistentOwlDlOntology(model);
+            }
+            catch(final PoddException e)// | OpenRDFException | IOException e)
+            {
+                final String msg = "Failed verification of the DataRepsitory against poddDataRepository.owl";
+                this.log.error(msg, e);
+                throw new OntologyNotInProfileException(null, null, msg, e);
+            }
+            finally
+            {
+                // clear OWLAPI memory
+                if(defaultAliasOntology != null)
+                {
+                    this.owlOntologyManager.removeOntology(defaultAliasOntology);
+                }
+                if(dataRepositoryOntology != null)
+                {
+                    this.owlOntologyManager.removeOntology(dataRepositoryOntology);
                 }
             }
         }
