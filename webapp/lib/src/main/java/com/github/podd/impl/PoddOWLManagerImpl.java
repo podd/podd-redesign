@@ -457,7 +457,7 @@ public class PoddOWLManagerImpl implements PoddOWLManager
                     }
                 }
                 throw new OntologyNotInProfileException(nextOntology, profileReport,
-                        "Ontology is not in required OWL Profile");
+                        "Ontology is not in required OWL Profile: " + profileReport.getProfile().getName());
             }
             
             // Use the OWLManager to create a reasoner over the ontology
