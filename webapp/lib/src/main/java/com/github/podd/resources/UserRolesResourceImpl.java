@@ -24,7 +24,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.Model;
@@ -45,7 +44,6 @@ import org.restlet.resource.ResourceException;
 import org.restlet.security.User;
 
 import com.github.ansell.restletutils.RestletUtilRole;
-import com.github.ansell.restletutils.RestletUtilUser;
 import com.github.ansell.restletutils.SesameRealmConstants;
 import com.github.podd.restlet.PoddAction;
 import com.github.podd.restlet.PoddSesameRealm;
@@ -127,7 +125,7 @@ public class UserRolesResourceImpl extends AbstractUserResourceImpl
                     "Did not specify any role edits in body of request");
         }
         // - check authorization for each Role mapping
-        for(Entry<RestletUtilRole, Collection<URI>> nextEntry : rolesToEdit.entrySet())
+        for(final Entry<RestletUtilRole, Collection<URI>> nextEntry : rolesToEdit.entrySet())
         {
             final RestletUtilRole role = nextEntry.getKey();
             for(final URI mappedUri : nextEntry.getValue())
@@ -147,7 +145,7 @@ public class UserRolesResourceImpl extends AbstractUserResourceImpl
         }
         
         // - do the mapping/unmapping of Roles only if all of the authorisations succeeded
-        for(Entry<RestletUtilRole, Collection<URI>> nextEntry : rolesToEdit.entrySet())
+        for(final Entry<RestletUtilRole, Collection<URI>> nextEntry : rolesToEdit.entrySet())
         {
             final RestletUtilRole role = nextEntry.getKey();
             for(final URI mappedUri : nextEntry.getValue())

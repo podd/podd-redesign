@@ -58,7 +58,7 @@ public class UserSearchResourceImplTest extends AbstractResourceImplTest
             
             final Representation results =
                     RestletTestUtils.doTestAuthenticatedRequest(userSearchClientResource, Method.GET, null, mediaType,
-                            Status.SUCCESS_OK, this.WITH_ADMIN);
+                            Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
             
             final Model resultsModel = this.assertRdf(results, format, 2);
             

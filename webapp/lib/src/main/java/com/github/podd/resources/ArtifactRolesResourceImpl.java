@@ -10,7 +10,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -224,7 +223,7 @@ public class ArtifactRolesResourceImpl extends AbstractPoddResourceImpl
     {
         final ConcurrentMap<RestletUtilRole, Collection<String>> userList = new ConcurrentHashMap<>();
         
-        for(Entry<RestletUtilRole, Collection<PoddUser>> nextEntry : input.entrySet())
+        for(final Entry<RestletUtilRole, Collection<PoddUser>> nextEntry : input.entrySet())
         {
             final RestletUtilRole nextRole = nextEntry.getKey();
             

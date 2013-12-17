@@ -111,7 +111,7 @@ public class UserAddResourceImplTest extends AbstractResourceImplTest
             
             final Representation results =
                     RestletTestUtils.doTestAuthenticatedRequest(userAddClientResource, Method.POST, input, mediaType,
-                            Status.SUCCESS_OK, this.WITH_ADMIN);
+                            Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
             
             // verify: response has same correct identifier
             final Model model = this.assertRdf(new StringReader(this.getText(results)), RDFFormat.RDFXML, 1);
@@ -136,7 +136,7 @@ public class UserAddResourceImplTest extends AbstractResourceImplTest
         {
             final Representation results =
                     RestletTestUtils.doTestAuthenticatedRequest(userAddClientResource, Method.GET, null,
-                            MediaType.TEXT_HTML, Status.SUCCESS_OK, this.WITH_ADMIN);
+                            MediaType.TEXT_HTML, Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
             
             final String body = this.getText(results);
             this.assertFreemarker(body);
@@ -179,7 +179,7 @@ public class UserAddResourceImplTest extends AbstractResourceImplTest
             
             final Representation results =
                     RestletTestUtils.doTestAuthenticatedRequest(userDetailsClientResource, Method.GET, null, mediaType,
-                            Status.SUCCESS_OK, this.WITH_ADMIN);
+                            Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
             
             final Model resultsModel = this.assertRdf(new StringReader(this.getText(results)), format, 19);
             
@@ -224,7 +224,7 @@ public class UserAddResourceImplTest extends AbstractResourceImplTest
             
             final Representation results =
                     RestletTestUtils.doTestAuthenticatedRequest(userDetailsClientResource, Method.GET, null, mediaType,
-                            Status.SUCCESS_OK, this.WITH_ADMIN);
+                            Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
             
             final Model resultsModel = this.assertRdf(results, format, 8);
             
@@ -276,7 +276,7 @@ public class UserAddResourceImplTest extends AbstractResourceImplTest
             
             final Representation results =
                     RestletTestUtils.doTestAuthenticatedRequest(userDetailsClientResource, Method.GET, null, mediaType,
-                            Status.SUCCESS_OK, this.WITH_ADMIN);
+                            Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
             
             final Model resultsModel = this.assertRdf(results, format, 12);
             
@@ -333,7 +333,7 @@ public class UserAddResourceImplTest extends AbstractResourceImplTest
         try
         {
             RestletTestUtils.doTestAuthenticatedRequest(userAddClientResource, Method.POST, input, mediaType,
-                    Status.CLIENT_ERROR_CONFLICT, this.WITH_ADMIN);
+                    Status.CLIENT_ERROR_CONFLICT, AbstractResourceImplTest.WITH_ADMIN);
             Assert.fail("Should throw an exception because Identifier already used");
         }
         catch(final ResourceException e)
@@ -362,7 +362,7 @@ public class UserAddResourceImplTest extends AbstractResourceImplTest
         try
         {
             RestletTestUtils.doTestAuthenticatedRequest(userAddClientResource, Method.GET, null, MediaType.TEXT_HTML,
-                    Status.CLIENT_ERROR_UNAUTHORIZED, this.NO_ADMIN);
+                    Status.CLIENT_ERROR_UNAUTHORIZED, AbstractResourceImplTest.NO_ADMIN);
             Assert.fail("Should have thrown a ResourceException");
         }
         catch(final ResourceException e)
@@ -409,7 +409,7 @@ public class UserAddResourceImplTest extends AbstractResourceImplTest
         try
         {
             RestletTestUtils.doTestAuthenticatedRequest(userAddClientResource, Method.POST, input, mediaType,
-                    Status.SUCCESS_OK, this.WITH_ADMIN);
+                    Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
             Assert.fail("Should have failed due to missing email");
         }
         catch(final ResourceException e)

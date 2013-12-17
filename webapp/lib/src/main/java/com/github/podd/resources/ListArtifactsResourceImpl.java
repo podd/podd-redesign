@@ -22,7 +22,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.Model;
@@ -210,7 +209,7 @@ public class ListArtifactsResourceImpl extends AbstractPoddResourceImpl
         
         this.log.trace("artifacts: {}", artifactsInternal);
         
-        for(Entry<String, List<InferredOWLOntologyID>> nextEntry : artifactsInternal.entrySet())
+        for(final Entry<String, List<InferredOWLOntologyID>> nextEntry : artifactsInternal.entrySet())
         {
             final String nextKey = nextEntry.getKey();
             try
@@ -257,7 +256,7 @@ public class ListArtifactsResourceImpl extends AbstractPoddResourceImpl
         
         try
         {
-            for(List<InferredOWLOntologyID> nextArtifacts : artifactsInternal.values())
+            for(final List<InferredOWLOntologyID> nextArtifacts : artifactsInternal.values())
             {
                 OntologyUtils.ontologyIDsToModel(nextArtifacts, model);
                 

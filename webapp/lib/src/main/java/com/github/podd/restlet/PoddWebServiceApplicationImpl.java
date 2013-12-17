@@ -465,7 +465,7 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
         // aliases here
         if(this.aliasesConfiguration.isEmpty())
         {
-            final String aliasesFile = propertyUtil.get(PODD.KEY_ALIASES, PODD.PATH_DEFAULT_ALIASES_FILE);
+            final String aliasesFile = this.propertyUtil.get(PODD.KEY_ALIASES, PODD.PATH_DEFAULT_ALIASES_FILE);
             try (final InputStream input = ApplicationUtils.class.getResourceAsStream(aliasesFile);)
             {
                 if(input != null)

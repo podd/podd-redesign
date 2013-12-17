@@ -150,7 +150,7 @@ public class SparqlResourceImplTest extends AbstractResourceImplTest
             // invoke service
             final Representation results =
                     RestletTestUtils.doTestAuthenticatedRequest(searchClientResource, Method.GET, null,
-                            MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK, this.WITH_ADMIN);
+                            MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
             
             // verify: response
             final Model resultModel = this.assertRdf(results, RDFFormat.RDFXML, 860);
@@ -188,7 +188,7 @@ public class SparqlResourceImplTest extends AbstractResourceImplTest
             // invoke service
             final Representation results =
                     RestletTestUtils.doTestAuthenticatedRequest(searchClientResource, Method.POST, postQuery,
-                            MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK, this.WITH_ADMIN);
+                            MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
             
             // verify: response
             final Model resultModel = this.assertRdf(results, RDFFormat.RDFXML, 860);
@@ -227,7 +227,7 @@ public class SparqlResourceImplTest extends AbstractResourceImplTest
             // invoke service
             final Representation results =
                     RestletTestUtils.doTestAuthenticatedRequest(searchClientResource, Method.GET, null,
-                            MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK, this.WITH_ADMIN);
+                            MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
             
             // verify: response
             final Model resultModel = this.assertRdf(results, RDFFormat.RDFXML, 315);
@@ -266,7 +266,7 @@ public class SparqlResourceImplTest extends AbstractResourceImplTest
             // invoke service
             final Representation results =
                     RestletTestUtils.doTestAuthenticatedRequest(searchClientResource, Method.GET, null,
-                            MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK, this.WITH_ADMIN);
+                            MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
             
             // verify: response
             final Model resultModel = this.assertRdf(results, RDFFormat.RDFXML, 705);
@@ -305,7 +305,7 @@ public class SparqlResourceImplTest extends AbstractResourceImplTest
             // invoke service
             final Representation results =
                     RestletTestUtils.doTestAuthenticatedRequest(searchClientResource, Method.GET, null,
-                            MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK, this.WITH_ADMIN);
+                            MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
             
             // verify: response
             // TODO: Deduplicate statements so they don't appear in both the

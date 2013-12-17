@@ -37,7 +37,7 @@ public class UserListResourceImplTest extends AbstractResourceImplTest
         try
         {
             RestletTestUtils.doTestAuthenticatedRequest(userListClientResource, Method.GET, null,
-                    MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK, this.NO_ADMIN);
+                    MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK, AbstractResourceImplTest.NO_ADMIN);
             Assert.fail("Should've failed due to lack of authorization");
         }
         catch(final ResourceException e)
@@ -59,7 +59,7 @@ public class UserListResourceImplTest extends AbstractResourceImplTest
         {
             final Representation results =
                     RestletTestUtils.doTestAuthenticatedRequest(userListClientResource, Method.GET, null,
-                            MediaType.TEXT_HTML, Status.SUCCESS_OK, this.WITH_ADMIN);
+                            MediaType.TEXT_HTML, Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
             
             final String body = this.getText(results);
             System.out.println(body);
@@ -82,7 +82,7 @@ public class UserListResourceImplTest extends AbstractResourceImplTest
         {
             final Representation results =
                     RestletTestUtils.doTestAuthenticatedRequest(userListClientResource, Method.GET, null, mediaType,
-                            Status.SUCCESS_OK, this.WITH_ADMIN);
+                            Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
             
             final Model resultsModel = this.assertRdf(results, format, 16);
             

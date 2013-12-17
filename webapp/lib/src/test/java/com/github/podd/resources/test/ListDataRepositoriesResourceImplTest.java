@@ -53,7 +53,7 @@ public class ListDataRepositoriesResourceImplTest extends AbstractResourceImplTe
         {
             final Representation result =
                     RestletTestUtils.doTestAuthenticatedRequest(dataRepositoriesClientResource, Method.GET, null,
-                            MediaType.TEXT_HTML, Status.SUCCESS_OK, this.WITH_ADMIN);
+                            MediaType.TEXT_HTML, Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
             final String body = this.getText(result);
             
             // System.out.println(body);
@@ -84,7 +84,7 @@ public class ListDataRepositoriesResourceImplTest extends AbstractResourceImplTe
         {
             final Representation result =
                     RestletTestUtils.doTestAuthenticatedRequest(dataRepositoriesClientResource, Method.GET, null,
-                            MediaType.TEXT_HTML, Status.SUCCESS_OK, this.NO_ADMIN);
+                            MediaType.TEXT_HTML, Status.SUCCESS_OK, AbstractResourceImplTest.NO_ADMIN);
             final String body = this.getText(result);
             
             // System.out.println(body);
@@ -139,7 +139,8 @@ public class ListDataRepositoriesResourceImplTest extends AbstractResourceImplTe
         {
             final Representation results =
                     RestletTestUtils.doTestAuthenticatedRequest(dataRepositoriesClientResource, Method.GET, null,
-                            RestletUtilMediaType.APPLICATION_RDF_JSON, Status.SUCCESS_OK, this.WITH_ADMIN);
+                            RestletUtilMediaType.APPLICATION_RDF_JSON, Status.SUCCESS_OK,
+                            AbstractResourceImplTest.WITH_ADMIN);
             
             // verify:
             final Model model = this.assertRdf(results, RDFFormat.RDFJSON, 4);
@@ -168,7 +169,8 @@ public class ListDataRepositoriesResourceImplTest extends AbstractResourceImplTe
         {
             final Representation results =
                     RestletTestUtils.doTestAuthenticatedRequest(dataRepositoriesClientResource, Method.GET, null,
-                            RestletUtilMediaType.APPLICATION_RDF_JSON, Status.SUCCESS_OK, this.NO_ADMIN);
+                            RestletUtilMediaType.APPLICATION_RDF_JSON, Status.SUCCESS_OK,
+                            AbstractResourceImplTest.NO_ADMIN);
             final Model model = this.assertRdf(results, RDFFormat.RDFJSON, 4);
             
             Assert.assertEquals(2, model.filter(null, RDF.TYPE, null).size());
@@ -220,7 +222,7 @@ public class ListDataRepositoriesResourceImplTest extends AbstractResourceImplTe
         {
             final Representation results =
                     RestletTestUtils.doTestAuthenticatedRequest(dataRepositoriesClientResource, Method.GET, null,
-                            MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK, this.WITH_ADMIN);
+                            MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
             
             // verify:
             final Model model = this.assertRdf(results, RDFFormat.RDFXML, 4);
@@ -250,7 +252,7 @@ public class ListDataRepositoriesResourceImplTest extends AbstractResourceImplTe
         {
             final Representation results =
                     RestletTestUtils.doTestAuthenticatedRequest(dataRepositoriesClientResource, Method.GET, null,
-                            MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK, this.NO_ADMIN);
+                            MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK, AbstractResourceImplTest.NO_ADMIN);
             final Model model = this.assertRdf(results, RDFFormat.RDFXML, 4);
             
             Assert.assertEquals(2, model.filter(null, RDF.TYPE, null).size());

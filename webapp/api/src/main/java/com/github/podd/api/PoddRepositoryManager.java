@@ -19,7 +19,6 @@
  */
 package com.github.podd.api;
 
-import java.util.Collection;
 import java.util.Set;
 
 import org.openrdf.OpenRDFException;

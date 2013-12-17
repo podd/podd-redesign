@@ -122,7 +122,8 @@ public class RdfUtilityTest
     @Test
     public void testInputStreamToModel() throws Exception
     {
-        final InputStream resourceStream = this.getClass().getResourceAsStream(TEST_ARTIFACT_INVALID_3_TOP_OBJECTS);
+        final InputStream resourceStream =
+                this.getClass().getResourceAsStream(RdfUtilityTest.TEST_ARTIFACT_INVALID_3_TOP_OBJECTS);
         Assert.assertNotNull("Missing test resource", resourceStream);
         
         final Model model = RdfUtility.inputStreamToModel(resourceStream, RDFFormat.TURTLE);

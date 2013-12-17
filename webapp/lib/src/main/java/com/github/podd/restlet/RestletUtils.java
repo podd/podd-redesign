@@ -26,7 +26,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -281,7 +280,7 @@ public final class RestletUtils
         final List<Entry<RestletUtilRole, PoddObjectLabel>> results =
                 new LinkedList<Entry<RestletUtilRole, PoddObjectLabel>>();
         
-        for(Entry<RestletUtilRole, Collection<URI>> nextEntry : roles.entrySet())
+        for(final Entry<RestletUtilRole, Collection<URI>> nextEntry : roles.entrySet())
         {
             final RestletUtilRole nextRole = nextEntry.getKey();
             

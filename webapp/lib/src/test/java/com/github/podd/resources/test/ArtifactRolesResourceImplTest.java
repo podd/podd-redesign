@@ -46,7 +46,7 @@ public class ArtifactRolesResourceImplTest extends AbstractResourceImplTest
             
             final Representation results =
                     RestletTestUtils.doTestAuthenticatedRequest(getArtifactRolesClientResource, Method.GET, null,
-                            MediaType.TEXT_HTML, Status.SUCCESS_OK, this.WITH_ADMIN);
+                            MediaType.TEXT_HTML, Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
             
             final String body = this.getText(results);
             
@@ -78,7 +78,8 @@ public class ArtifactRolesResourceImplTest extends AbstractResourceImplTest
             
             final Representation results =
                     RestletTestUtils.doTestAuthenticatedRequest(getArtifactRolesClientResource, Method.GET, null,
-                            RestletUtilMediaType.APPLICATION_RDF_JSON, Status.SUCCESS_OK, this.WITH_ADMIN);
+                            RestletUtilMediaType.APPLICATION_RDF_JSON, Status.SUCCESS_OK,
+                            AbstractResourceImplTest.WITH_ADMIN);
             
             final String body = this.getText(results);
             

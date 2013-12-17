@@ -171,7 +171,7 @@ public class DataReferenceAttachResourceImplTest extends AbstractResourceImplTes
             
             final Representation results =
                     RestletTestUtils.doTestAuthenticatedRequest(fileRefAttachClientResource, Method.POST, input,
-                            MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK, this.WITH_ADMIN);
+                            MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
             
             final Model ontologyIDModel = this.assertRdf(results, RDFFormat.RDFXML, 3);
             
@@ -258,7 +258,7 @@ public class DataReferenceAttachResourceImplTest extends AbstractResourceImplTes
                 
                 final Representation results =
                         RestletTestUtils.doTestAuthenticatedRequest(fileRefAttachClientResource, Method.POST, input,
-                                MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK, this.WITH_ADMIN);
+                                MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
                 
                 final String body = this.getText(results);
                 
@@ -317,7 +317,7 @@ public class DataReferenceAttachResourceImplTest extends AbstractResourceImplTes
             
             final Representation results =
                     RestletTestUtils.doTestAuthenticatedRequest(fileRefAttachClientResource, Method.POST, input,
-                            MediaType.APPLICATION_RDF_TURTLE, Status.SUCCESS_OK, this.WITH_ADMIN);
+                            MediaType.APPLICATION_RDF_TURTLE, Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
             
             final String body = this.getText(results);
             
@@ -378,7 +378,8 @@ public class DataReferenceAttachResourceImplTest extends AbstractResourceImplTes
                 
                 final Representation results =
                         RestletTestUtils.doTestAuthenticatedRequest(fileRefAttachClientResource, Method.POST, input,
-                                MediaType.APPLICATION_RDF_TURTLE, Status.SUCCESS_OK, this.WITH_ADMIN);
+                                MediaType.APPLICATION_RDF_TURTLE, Status.SUCCESS_OK,
+                                AbstractResourceImplTest.WITH_ADMIN);
                 
                 final String body = this.getText(results);
                 
@@ -437,8 +438,10 @@ public class DataReferenceAttachResourceImplTest extends AbstractResourceImplTes
             fileRefAttachClientResource.addQueryParameter(PoddWebConstants.KEY_VERIFICATION_POLICY,
                     Boolean.toString(true));
             
-            RestletTestUtils.doTestAuthenticatedRequest(fileRefAttachClientResource, Method.POST, input,
-                    MediaType.APPLICATION_RDF_XML, Status.CLIENT_ERROR_BAD_REQUEST, this.WITH_ADMIN);
+            RestletTestUtils
+                    .doTestAuthenticatedRequest(fileRefAttachClientResource, Method.POST, input,
+                            MediaType.APPLICATION_RDF_XML, Status.CLIENT_ERROR_BAD_REQUEST,
+                            AbstractResourceImplTest.WITH_ADMIN);
             Assert.fail("Should have thrown a ResourceException");
         }
         catch(final ResourceException e)
@@ -550,8 +553,10 @@ public class DataReferenceAttachResourceImplTest extends AbstractResourceImplTes
             fileRefAttachClientResource.addQueryParameter(PoddWebConstants.KEY_VERIFICATION_POLICY,
                     Boolean.toString(true));
             
-            RestletTestUtils.doTestAuthenticatedRequest(fileRefAttachClientResource, Method.POST, input,
-                    MediaType.APPLICATION_RDF_XML, Status.CLIENT_ERROR_BAD_REQUEST, this.WITH_ADMIN);
+            RestletTestUtils
+                    .doTestAuthenticatedRequest(fileRefAttachClientResource, Method.POST, input,
+                            MediaType.APPLICATION_RDF_XML, Status.CLIENT_ERROR_BAD_REQUEST,
+                            AbstractResourceImplTest.WITH_ADMIN);
             Assert.fail("Should have thrown a ResourceException");
         }
         catch(final ResourceException e)

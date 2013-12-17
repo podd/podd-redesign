@@ -52,7 +52,7 @@ public class GetMetadataResourceImplTest extends AbstractResourceImplTest
             
             final Representation results =
                     RestletTestUtils.doTestAuthenticatedRequest(createObjectClientResource, Method.GET, null,
-                            MediaType.APPLICATION_RDF_TURTLE, Status.SUCCESS_OK, this.WITH_ADMIN);
+                            MediaType.APPLICATION_RDF_TURTLE, Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
             
             // FIXME: Is there a better way to do this
             // verify: response is empty as no such object exists
@@ -88,7 +88,7 @@ public class GetMetadataResourceImplTest extends AbstractResourceImplTest
             
             final Representation results =
                     RestletTestUtils.doTestAuthenticatedRequest(createObjectClientResource, Method.GET, null,
-                            MediaType.APPLICATION_RDF_TURTLE, Status.SUCCESS_OK, this.WITH_ADMIN);
+                            MediaType.APPLICATION_RDF_TURTLE, Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
             
             // verify:
             final Model model = this.assertRdf(results, RDFFormat.TURTLE, 89);
@@ -144,7 +144,8 @@ public class GetMetadataResourceImplTest extends AbstractResourceImplTest
                 
                 final Representation results =
                         RestletTestUtils.doTestAuthenticatedRequest(createObjectClientResource, Method.GET, null,
-                                MediaType.APPLICATION_RDF_TURTLE, Status.SUCCESS_OK, this.WITH_ADMIN);
+                                MediaType.APPLICATION_RDF_TURTLE, Status.SUCCESS_OK,
+                                AbstractResourceImplTest.WITH_ADMIN);
                 
                 // verify:
                 final Model model = this.assertRdf(results, RDFFormat.TURTLE, expectedModelSize);
@@ -178,7 +179,7 @@ public class GetMetadataResourceImplTest extends AbstractResourceImplTest
             
             final Representation results =
                     RestletTestUtils.doTestAuthenticatedRequest(createObjectClientResource, Method.GET, null,
-                            MediaType.APPLICATION_RDF_TURTLE, Status.SUCCESS_OK, this.WITH_ADMIN);
+                            MediaType.APPLICATION_RDF_TURTLE, Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
             
             // final String body = getText(results);
             // verify:
@@ -225,7 +226,7 @@ public class GetMetadataResourceImplTest extends AbstractResourceImplTest
             
             final Representation results =
                     RestletTestUtils.doTestAuthenticatedRequest(createObjectClientResource, Method.GET, null,
-                            MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK, this.WITH_ADMIN);
+                            MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
             
             // verify: received contents are in RDF
             final Model model = this.assertRdf(results, RDFFormat.RDFXML, 174);
@@ -258,7 +259,7 @@ public class GetMetadataResourceImplTest extends AbstractResourceImplTest
             
             final Representation results =
                     RestletTestUtils.doTestAuthenticatedRequest(createObjectClientResource, Method.GET, null,
-                            MediaType.APPLICATION_RDF_TURTLE, Status.SUCCESS_OK, this.WITH_ADMIN);
+                            MediaType.APPLICATION_RDF_TURTLE, Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
             
             // verify:
             final Model model = this.assertRdf(results, RDFFormat.TURTLE, 54);
@@ -296,7 +297,7 @@ public class GetMetadataResourceImplTest extends AbstractResourceImplTest
             
             final Representation results =
                     RestletTestUtils.doTestAuthenticatedRequest(createObjectClientResource, Method.GET, null,
-                            MediaType.APPLICATION_RDF_TURTLE, Status.SUCCESS_OK, this.WITH_ADMIN);
+                            MediaType.APPLICATION_RDF_TURTLE, Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
             
             // verify:
             final Model model = this.assertRdf(results, RDFFormat.TURTLE, 18);
@@ -329,7 +330,7 @@ public class GetMetadataResourceImplTest extends AbstractResourceImplTest
             
             final Representation results =
                     RestletTestUtils.doTestAuthenticatedRequest(createObjectClientResource, Method.GET, null,
-                            MediaType.APPLICATION_RDF_TURTLE, Status.SUCCESS_OK, this.WITH_ADMIN);
+                            MediaType.APPLICATION_RDF_TURTLE, Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
             
             // verify:
             final Model model = this.assertRdf(results, RDFFormat.TURTLE, 88);

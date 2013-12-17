@@ -51,7 +51,6 @@ import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactoryRegistry;
 import org.semanticweb.owlapi.rio.RioMemoryTripleSource;
 
-import com.github.podd.api.PoddOWLManager;
 import com.github.podd.api.test.AbstractPoddOWLManagerTest;
 import com.github.podd.api.test.TestConstants;
 import com.github.podd.exception.EmptyOntologyException;
@@ -645,7 +644,7 @@ public class PoddOWLManagerImplTest extends AbstractPoddOWLManagerTest
                 new StreamDocumentSource(inputStream, OWLOntologyFormatFactoryRegistry.getInstance().getByMIMEType(
                         RDFFormat.RDFXML.getDefaultMIMEType()));
         
-        InferredOWLOntologyID ontologyID =
+        final InferredOWLOntologyID ontologyID =
                 this.loadInferStoreOntology(PODD.PATH_PODD_BASE_V1, RDFFormat.RDFXML,
                         TestConstants.EXPECTED_TRIPLE_COUNT_PODD_BASE_CONCRETE,
                         TestConstants.EXPECTED_TRIPLE_COUNT_PODD_BASE_INFERRED);

@@ -406,7 +406,7 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
                     {
                         boolean foundAllVersion = false;
                         // Attempt to verify if the version exists
-                        for(Entry<URI, Set<URI>> nextEntry : allVersionsMap.entrySet())
+                        for(final Entry<URI, Set<URI>> nextEntry : allVersionsMap.entrySet())
                         {
                             final URI nextAllVersions = nextEntry.getKey();
                             
@@ -620,16 +620,16 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
     public List<InferredOWLOntologyID> uploadSchemaOntologiesInOrder(final Model model, final List<URI> nextImportOrder)
         throws ModelException, OpenRDFException, IOException, OWLException, PoddException
     {
-        List<URI> importOrder = new ArrayList<>(nextImportOrder);
+        final List<URI> importOrder = new ArrayList<>(nextImportOrder);
         
-        Set<InferredOWLOntologyID> currentSchemaOntologies = getSchemaOntologies();
+        final Set<InferredOWLOntologyID> currentSchemaOntologies = this.getSchemaOntologies();
         
-        for(InferredOWLOntologyID nextCurrentSchemaOntology : currentSchemaOntologies)
+        for(final InferredOWLOntologyID nextCurrentSchemaOntology : currentSchemaOntologies)
         {
-            List<URI> tempList = new ArrayList<>(importOrder);
+            final List<URI> tempList = new ArrayList<>(importOrder);
             for(int i = 0; i < tempList.size(); i++)
             {
-                URI nextImport = tempList.get(i);
+                final URI nextImport = tempList.get(i);
                 if(nextImport.equals(nextCurrentSchemaOntology.getVersionIRI().toOpenRDFURI()))
                 {
                     // Do not reimport schema ontologies that we already have

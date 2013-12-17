@@ -87,7 +87,7 @@ public class ExampleResourceImplTest extends AbstractResourceImplTest
         
         final Representation results =
                 RestletTestUtils.doTestAuthenticatedRequest(creationClientResource, Method.PUT, form,
-                        MediaType.TEXT_HTML, Status.SUCCESS_OK, this.WITH_ADMIN);
+                        MediaType.TEXT_HTML, Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
         
     }
     
@@ -109,7 +109,7 @@ public class ExampleResourceImplTest extends AbstractResourceImplTest
         
         final Representation results =
                 RestletTestUtils.doTestAuthenticatedRequest(creationClientResource, Method.PUT, form,
-                        MediaType.TEXT_HTML, Status.SUCCESS_OK, this.WITH_ADMIN);
+                        MediaType.TEXT_HTML, Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
         
     }
     
@@ -125,7 +125,7 @@ public class ExampleResourceImplTest extends AbstractResourceImplTest
             
             final Representation results =
                     RestletTestUtils.doTestAuthenticatedRequest(creationClientResource, Method.PUT, null,
-                            MediaType.MULTIPART_FORM_DATA, Status.SUCCESS_CREATED, this.WITH_ADMIN);
+                            MediaType.MULTIPART_FORM_DATA, Status.SUCCESS_CREATED, AbstractResourceImplTest.WITH_ADMIN);
             
             Assert.fail("Did not receive expected exception");
         }
@@ -180,7 +180,7 @@ public class ExampleResourceImplTest extends AbstractResourceImplTest
             
             final Representation results =
                     RestletTestUtils.doTestAuthenticatedRequest(creationClientResource, Method.PUT, null,
-                            MediaType.TEXT_HTML, Status.CLIENT_ERROR_UNAUTHORIZED, this.NO_ADMIN);
+                            MediaType.TEXT_HTML, Status.CLIENT_ERROR_UNAUTHORIZED, AbstractResourceImplTest.NO_ADMIN);
             
             Assert.fail("Did not receive expected exception");
         }
@@ -201,7 +201,7 @@ public class ExampleResourceImplTest extends AbstractResourceImplTest
         
         final Representation results =
                 RestletTestUtils.doTestAuthenticatedRequest(creationClientResource, Method.GET, null,
-                        MediaType.TEXT_HTML, Status.SUCCESS_OK, this.WITH_ADMIN);
+                        MediaType.TEXT_HTML, Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
         
     }
     
@@ -216,7 +216,7 @@ public class ExampleResourceImplTest extends AbstractResourceImplTest
         
         final Representation results =
                 RestletTestUtils.doTestAuthenticatedRequest(creationClientResource, Method.GET, null,
-                        MediaType.TEXT_HTML, Status.SUCCESS_OK, this.NO_ADMIN);
+                        MediaType.TEXT_HTML, Status.SUCCESS_OK, AbstractResourceImplTest.NO_ADMIN);
         
     }
     

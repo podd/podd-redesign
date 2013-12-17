@@ -16,10 +16,8 @@
  */
 package com.github.podd.exception;
 
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 
 import org.openrdf.model.BNode;
 import org.openrdf.model.Model;
@@ -74,7 +72,7 @@ public class FileReferenceVerificationFailureException extends PoddException
         
         // FIXME - untested and incomplete
         final Map<DataReference, Throwable> validationFailures = this.getValidationFailures();
-        for(Entry<DataReference, Throwable> nextEntry : validationFailures.entrySet())
+        for(final Entry<DataReference, Throwable> nextEntry : validationFailures.entrySet())
         {
             final DataReference dataReference = nextEntry.getKey();
             final Throwable throwable = nextEntry.getValue();

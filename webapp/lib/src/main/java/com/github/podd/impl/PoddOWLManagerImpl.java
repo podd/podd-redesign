@@ -18,7 +18,6 @@ package com.github.podd.impl;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -30,7 +29,6 @@ import org.mindswap.pellet.exceptions.PelletRuntimeException;
 import org.openrdf.OpenRDFException;
 import org.openrdf.OpenRDFUtil;
 import org.openrdf.model.Model;
-import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.openrdf.model.impl.LinkedHashModel;
 import org.openrdf.model.util.Namespaces;
@@ -58,7 +56,6 @@ import org.semanticweb.owlapi.model.OWLException;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyChangeException;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
-import org.semanticweb.owlapi.model.OWLOntologyFormat;
 import org.semanticweb.owlapi.model.OWLOntologyID;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.OWLRuntimeException;
@@ -433,7 +430,7 @@ public class PoddOWLManagerImpl implements PoddOWLManager
             final OWLOntologyID ontologyID, final OWLOntologyDocumentSource owlSource) throws OWLException,
         PoddException, OpenRDFException, IOException
     {
-        return loadAndInfer(permanentRepositoryConnection, ontologyID, owlSource, true);
+        return this.loadAndInfer(permanentRepositoryConnection, ontologyID, owlSource, true);
     }
     
     /**
@@ -755,7 +752,7 @@ public class PoddOWLManagerImpl implements PoddOWLManager
                     
                     if(owlSource.isFormatKnown())
                     {
-                        OWLParser parser =
+                        final OWLParser parser =
                                 OWLParserFactoryRegistry.getInstance().getParserFactory(owlSource.getFormatFactory())
                                         .createParser(this.owlOntologyManager);
                         parser.parse(owlSource, nextOntology);
@@ -773,7 +770,7 @@ public class PoddOWLManagerImpl implements PoddOWLManager
                 }
                 return nextOntology;
             }
-            catch(OWLRuntimeException e)
+            catch(final OWLRuntimeException e)
             {
                 throw new OWLOntologyCreationException("Could not load ontology", e);
             }
@@ -785,10 +782,10 @@ public class PoddOWLManagerImpl implements PoddOWLManager
     {
         OpenRDFUtil.verifyContextNotNull(contexts);
         
-        Model model = new LinkedHashModel();
+        final Model model = new LinkedHashModel();
         conn.export(new StatementCollector(model), contexts);
         
-        return parseRDFStatements(model);
+        return this.parseRDFStatements(model);
     }
     
     public OWLOntologyID parseRDFStatements(final Model model) throws OpenRDFException, OWLException, IOException,

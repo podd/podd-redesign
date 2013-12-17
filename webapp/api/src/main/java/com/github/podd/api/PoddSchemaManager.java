@@ -225,7 +225,8 @@ public interface PoddSchemaManager
      * @throws IOException
      * @throws OpenRDFException
      */
-    List<InferredOWLOntologyID> uploadSchemaOntologies(Model manifest) throws OpenRDFException, IOException, OWLException, PoddException;
+    List<InferredOWLOntologyID> uploadSchemaOntologies(Model manifest) throws OpenRDFException, IOException,
+        OWLException, PoddException;
     
     /**
      * Loads a Schema Ontology into the internal repository, computes inferences on the schema

@@ -94,7 +94,7 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
                     "http://purl.org/podd/ns/artifact/artifact89");
             
             RestletTestUtils.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null,
-                    MediaType.APPLICATION_RDF_XML, Status.CLIENT_ERROR_NOT_FOUND, this.WITH_ADMIN);
+                    MediaType.APPLICATION_RDF_XML, Status.CLIENT_ERROR_NOT_FOUND, AbstractResourceImplTest.WITH_ADMIN);
             Assert.fail("Should have thrown a ResourceException with Status Code 404");
         }
         catch(final ResourceException e)
@@ -122,7 +122,7 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
                     "http://purl.org/podd/ns/artifact/artifact89");
             
             RestletTestUtils.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null,
-                    MediaType.APPLICATION_RDF_XML, Status.CLIENT_ERROR_NOT_FOUND, this.NO_ADMIN);
+                    MediaType.APPLICATION_RDF_XML, Status.CLIENT_ERROR_NOT_FOUND, AbstractResourceImplTest.NO_ADMIN);
             Assert.fail("Should have thrown a ResourceException with Status Code 404");
         }
         catch(final ResourceException e)
@@ -203,7 +203,7 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
             
             final Representation results =
                     RestletTestUtils.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null,
-                            MediaType.TEXT_HTML, Status.SUCCESS_OK, this.WITH_ADMIN);
+                            MediaType.TEXT_HTML, Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
             
             final String body = this.getText(results);
             
@@ -242,7 +242,7 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
             
             final Representation results =
                     RestletTestUtils.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null,
-                            MediaType.TEXT_HTML, Status.SUCCESS_OK, this.WITH_ADMIN);
+                            MediaType.TEXT_HTML, Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
             
             final String body = this.getText(results);
             
@@ -294,7 +294,8 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
             
             final Representation results =
                     RestletTestUtils.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null,
-                            RestletUtilMediaType.APPLICATION_RDF_JSON, Status.SUCCESS_OK, this.WITH_ADMIN);
+                            RestletUtilMediaType.APPLICATION_RDF_JSON, Status.SUCCESS_OK,
+                            AbstractResourceImplTest.WITH_ADMIN);
             
             final String body = this.getText(results);
             
@@ -341,7 +342,7 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
             
             final Representation results =
                     RestletTestUtils.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null,
-                            MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK, this.WITH_ADMIN);
+                            MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
             
             final String body = this.getText(results);
             
@@ -387,7 +388,7 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
             
             final Representation results =
                     RestletTestUtils.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null,
-                            MediaType.APPLICATION_RDF_TURTLE, Status.SUCCESS_OK, this.WITH_ADMIN);
+                            MediaType.APPLICATION_RDF_TURTLE, Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
             
             final String body = this.getText(results).trim();
             
@@ -437,7 +438,7 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
             
             final Representation results =
                     RestletTestUtils.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null,
-                            MediaType.TEXT_HTML, Status.SUCCESS_OK, this.WITH_ADMIN);
+                            MediaType.TEXT_HTML, Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
             
             final String body = this.getText(results);
             
@@ -476,7 +477,7 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
             
             final Representation results =
                     RestletTestUtils.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null,
-                            MediaType.TEXT_HTML, Status.SUCCESS_OK, this.WITH_ADMIN);
+                            MediaType.TEXT_HTML, Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
             
             final String body = this.getText(results);
             
@@ -518,7 +519,7 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
             
             final Representation results =
                     RestletTestUtils.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null,
-                            MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK, this.NO_ADMIN);
+                            MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK, AbstractResourceImplTest.NO_ADMIN);
             
             final String body = this.getText(results);
             
@@ -566,7 +567,7 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
             
             final Representation results =
                     RestletTestUtils.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null,
-                            MediaType.TEXT_HTML, Status.SUCCESS_OK, this.NO_ADMIN);
+                            MediaType.TEXT_HTML, Status.SUCCESS_OK, AbstractResourceImplTest.NO_ADMIN);
             
             final String body = this.getText(results);
             
@@ -608,7 +609,7 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
             
             final Representation results =
                     RestletTestUtils.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null,
-                            MediaType.TEXT_HTML, Status.SUCCESS_OK, this.NO_ADMIN);
+                            MediaType.TEXT_HTML, Status.SUCCESS_OK, AbstractResourceImplTest.NO_ADMIN);
             
             final String body = this.getText(results);
             
