@@ -121,21 +121,6 @@ public interface PoddOWLManager
             OWLOntologyDocumentSource owlSource) throws OWLException, PoddException, OpenRDFException, IOException;
     
     /**
-     * Loads the ontology, using the given ontologyID as the identifier. <br>
-     * This is necessary to enable the loading of ontologies that differ only in their version IRI,
-     * due to a bug in {@link TPVersionIRIHandler}.
-     * 
-     * @param ontologyID
-     * @param owlSource
-     * @return The ontology.
-     * @throws PoddException
-     * @throws IOException
-     * @throws OWLException
-     */
-    OWLOntology loadOntology(OWLOntologyID ontologyID, OWLOntologyDocumentSource owlSource) throws OWLException,
-        IOException, PoddException;
-    
-    /**
      * Attempts to regain memory in the underlying OWLOntologyManager by removing the ontology from
      * the in-memory cache.
      * 

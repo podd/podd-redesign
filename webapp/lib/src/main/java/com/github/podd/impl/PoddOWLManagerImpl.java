@@ -457,7 +457,7 @@ public class PoddOWLManagerImpl implements PoddOWLManager
         OWLOntology nextOntology = null;
         try
         {
-            nextOntology = this.loadOntology(ontologyID, owlSource);
+            nextOntology = this.loadOntologyInternal(ontologyID, owlSource);
             
             // Check the OWLAPI OWLOntology against an OWLProfile to make sure
             // it is in profile
@@ -718,14 +718,7 @@ public class PoddOWLManagerImpl implements PoddOWLManager
         return inferredOntologyID;
     }
     
-    @Override
-    public OWLOntology loadOntology(final OWLOntologyID ontologyID, final OWLOntologyDocumentSource owlSource)
-        throws OWLException, IOException, PoddException
-    {
-        return loadOntologyInternal(ontologyID, owlSource);
-    }
-    
-    private OWLOntology loadOntologyInternal(final OWLOntologyID ontologyID, final OWLOntologyDocumentSource owlSource)
+    public OWLOntology loadOntologyInternal(final OWLOntologyID ontologyID, final OWLOntologyDocumentSource owlSource)
         throws OWLException, IOException, PoddException
     {
         synchronized(this.owlOntologyManager)
