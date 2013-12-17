@@ -711,8 +711,8 @@ public class PoddOWLManagerImpl implements PoddOWLManager
         return inferredOntologyID;
     }
     
-    @Override
-    public OWLOntology loadOntology(final OWLOntologyDocumentSource owlSource) throws OWLException, IOException,
+    @Deprecated
+    private OWLOntology loadOntology(final OWLOntologyDocumentSource owlSource) throws OWLException, IOException,
         PoddException
     {
         return loadOntologyInternal(null, owlSource);

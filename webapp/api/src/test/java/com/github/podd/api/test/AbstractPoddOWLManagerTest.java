@@ -140,7 +140,7 @@ public abstract class AbstractPoddOWLManagerTest
         final OWLOntologyDocumentSource owlSource =
                 new StreamDocumentSource(inputStream, OWLOntologyFormatFactoryRegistry.getInstance().getByMIMEType(
                         format.getDefaultMIMEType()));
-        final OWLOntology loadedBaseOntology = this.testOWLManager.loadOntology(owlSource);
+        final OWLOntology loadedBaseOntology = this.testOWLManager.loadOntology(null, owlSource);
         
         this.testOWLManager.dumpOntologyToRepository(loadedBaseOntology, this.testRepositoryConnection);
         
@@ -763,7 +763,7 @@ public abstract class AbstractPoddOWLManagerTest
                 new StreamDocumentSource(inputStream, OWLOntologyFormatFactoryRegistry.getInstance().getByMIMEType(
                         RDFFormat.RDFXML.getDefaultMIMEType()));
         
-        final OWLOntology loadedOntology = this.testOWLManager.loadOntology(owlSource);
+        final OWLOntology loadedOntology = this.testOWLManager.loadOntology(null, owlSource);
         Assert.assertEquals("Nothing should be in the Repository at this stage", 0,
                 this.testRepositoryConnection.size());
         
@@ -801,7 +801,7 @@ public abstract class AbstractPoddOWLManagerTest
                 new StreamDocumentSource(inputStream, OWLOntologyFormatFactoryRegistry.getInstance().getByMIMEType(
                         RDFFormat.RDFXML.getDefaultMIMEType()));
         
-        final OWLOntology loadedOntology = this.testOWLManager.loadOntology(owlSource);
+        final OWLOntology loadedOntology = this.testOWLManager.loadOntology(null, owlSource);
         Assert.assertEquals("Repository should not have changed at this stage", repoSizeAfterPreparation,
                 this.testRepositoryConnection.size());
         
@@ -866,7 +866,7 @@ public abstract class AbstractPoddOWLManagerTest
         
         try
         {
-            this.testOWLManager.loadOntology(owlSource);
+            this.testOWLManager.loadOntology(null, owlSource);
             Assert.fail("Should have thrown an OWLOntologyCreationException");
         }
         catch(final EmptyOntologyException e)
@@ -894,7 +894,7 @@ public abstract class AbstractPoddOWLManagerTest
                 new StreamDocumentSource(inputStream, OWLOntologyFormatFactoryRegistry.getInstance().getByMIMEType(
                         RDFFormat.RDFXML.getDefaultMIMEType()));
         
-        final OWLOntology loadedOntology = this.testOWLManager.loadOntology(owlSource);
+        final OWLOntology loadedOntology = this.testOWLManager.loadOntology(null, owlSource);
         
         // verify:
         Assert.assertNotNull(loadedOntology);
@@ -929,7 +929,7 @@ public abstract class AbstractPoddOWLManagerTest
         
         final RioMemoryTripleSource owlSource = new RioMemoryTripleSource(statements.iterator());
         
-        final OWLOntology loadedOntology = this.testOWLManager.loadOntology(owlSource);
+        final OWLOntology loadedOntology = this.testOWLManager.loadOntology(null, owlSource);
         
         // verify:
         Assert.assertNotNull(loadedOntology);
@@ -957,7 +957,7 @@ public abstract class AbstractPoddOWLManagerTest
         
         try
         {
-            this.testOWLManager.loadOntology(owlSource);
+            this.testOWLManager.loadOntology(null, owlSource);
             Assert.fail("Should have thrown an OWLOntologyCreationException");
         }
         catch(final OWLException e)
@@ -977,7 +977,7 @@ public abstract class AbstractPoddOWLManagerTest
     {
         try
         {
-            this.testOWLManager.loadOntology(null);
+            this.testOWLManager.loadOntology(null, null);
             Assert.fail("Should have thrown a RuntimeException");
         }
         catch(final RuntimeException e)
@@ -1155,7 +1155,7 @@ public abstract class AbstractPoddOWLManagerTest
         final OWLOntologyDocumentSource owlSource =
                 new StreamDocumentSource(inputStream, OWLOntologyFormatFactoryRegistry.getInstance().getByMIMEType(
                         RDFFormat.RDFXML.getDefaultMIMEType()));
-        final OWLOntology loadedOntology = this.testOWLManager.loadOntology(owlSource);
+        final OWLOntology loadedOntology = this.testOWLManager.loadOntology(null, owlSource);
         
         final OWLOntologyID ontologyID = loadedOntology.getOntologyID();
         final OWLOntology ontologyLoadedFromMemory = this.manager.getOntology(ontologyID);

@@ -52,7 +52,7 @@ public class TestOntologyUtils
         final InputStream resourceStream = TestOntologyUtils.class.getResourceAsStream(resourcePath);
         final OWLOntologyDocumentSource owlSource =
                 new StreamDocumentSource(resourceStream, fileFormat.getDefaultMIMEType());
-        final OWLOntology assertedOntology = poddOWLManager.loadOntology(owlSource);
+        final OWLOntology assertedOntology = poddOWLManager.loadOntology(null, owlSource);
         poddOWLManager.dumpOntologyToRepository(assertedOntology, testRepositoryConnection);
         
         final InferredOWLOntologyID nextInferredOntology =

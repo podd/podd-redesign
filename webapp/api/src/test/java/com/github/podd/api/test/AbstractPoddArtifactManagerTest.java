@@ -424,7 +424,7 @@ public abstract class AbstractPoddArtifactManagerTest
                 new StreamDocumentSource(inputStream, OWLOntologyFormatFactoryRegistry.getInstance().getByMIMEType(
                         format.getDefaultMIMEType()));
         
-        final OWLOntology loadedBaseOntology = this.testArtifactManager.getOWLManager().loadOntology(owlSource);
+        final OWLOntology loadedBaseOntology = this.testArtifactManager.getOWLManager().loadOntology(null, owlSource);
         
         repositoryConnection.begin();
         

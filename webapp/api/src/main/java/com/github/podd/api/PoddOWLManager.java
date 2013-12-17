@@ -146,16 +146,23 @@ public interface PoddOWLManager
     InferredOWLOntologyID inferStatements(OWLOntology ontology, RepositoryConnection permanentRepositoryConnection)
         throws OWLRuntimeException, OWLException, OpenRDFException, IOException;
     
+    InferredOWLOntologyID loadAndInfer(RepositoryConnection permanentRepositoryConnection,
+            OWLOntologyDocumentSource owlSource) throws OWLException, PoddException, OpenRDFException, IOException;
+    
     /**
-     * Loads an ontology into memory from an OWLOntologyDocumentSource.
+     * Loads the ontology, using the given ontologyID as the identifier. <br>
+     * This is necessary to enable the loading of ontologies that differ only in their version IRI,
+     * due to a bug in {@link TPVersionIRIHandler}.
      * 
+     * @param ontologyID
      * @param owlSource
-     * @return The OWLOntology that was loaded into memory
-     * @throws OWLException
-     * @throws IOException
+     * @return The ontology.
      * @throws PoddException
+     * @throws IOException
+     * @throws OWLException
      */
-    OWLOntology loadOntology(OWLOntologyDocumentSource owlSource) throws OWLException, IOException, PoddException;
+    OWLOntology loadOntology(OWLOntologyID ontologyID, OWLOntologyDocumentSource owlSource) throws OWLException,
+        IOException, PoddException;
     
     /**
      * Parses RDF statements into an ontology, and returns the OWLOntologyID for the resulting
@@ -204,7 +211,7 @@ public interface PoddOWLManager
      *             If the ontologyID does not have a version.
      */
     void setCurrentVersion(OWLOntologyID ontologyID);
-    
+
     /**
      * Helper method to verify that a given {@link Model} represents an ontology which complies with
      * the given schema OWL Ontology.
@@ -214,23 +221,5 @@ public interface PoddOWLManager
      * @throws OntologyNotInProfileException
      */
     void verifyAgainstSchema(Model model, Model schemaModel) throws OntologyNotInProfileException;
-    
-    /**
-     * Loads the ontology, using the given ontologyID as the identifier. <br>
-     * This is necessary to enable the loading of ontologies that differ only in their version IRI,
-     * due to a bug in {@link TPVersionIRIHandler}.
-     * 
-     * @param ontologyID
-     * @param owlSource
-     * @return The ontology.
-     * @throws PoddException
-     * @throws IOException
-     * @throws OWLException
-     */
-    OWLOntology loadOntology(OWLOntologyID ontologyID, OWLOntologyDocumentSource owlSource) throws OWLException,
-        IOException, PoddException;
-
-    InferredOWLOntologyID loadAndInfer(RepositoryConnection permanentRepositoryConnection,
-            OWLOntologyDocumentSource owlSource) throws OWLException, PoddException, OpenRDFException, IOException;
     
 }
