@@ -400,7 +400,8 @@ public class PoddOWLManagerImplTest extends AbstractPoddOWLManagerTest
         this.testOWLManager.dumpOntologyToRepository(loadedOntology, this.testRepositoryConnection);
         
         final InferredOWLOntologyID inferredOntologyID =
-                this.testOWLManager.inferStatements(loadedOntology, this.testRepositoryConnection);
+                ((PoddOWLManagerImpl)this.testOWLManager).inferStatements(loadedOntology,
+                        this.testRepositoryConnection, null);
         
         // verify:
         Assert.assertNotNull("Inferred Ontology ID was null", inferredOntologyID);
@@ -439,7 +440,8 @@ public class PoddOWLManagerImplTest extends AbstractPoddOWLManagerTest
         this.testOWLManager.dumpOntologyToRepository(loadedOntology, this.testRepositoryConnection);
         
         final InferredOWLOntologyID inferredOntologyID =
-                this.testOWLManager.inferStatements(loadedOntology, this.testRepositoryConnection);
+                ((PoddOWLManagerImpl)this.testOWLManager).inferStatements(loadedOntology,
+                        this.testRepositoryConnection, null);
         
         Assert.assertNotNull("Inferred Ontology ID was null", inferredOntologyID);
         Assert.assertNotNull("Inferred Ontology Version IRI was null", inferredOntologyID.getVersionIRI());
@@ -450,7 +452,8 @@ public class PoddOWLManagerImplTest extends AbstractPoddOWLManagerTest
         // try to infer same ontology again
         try
         {
-            this.testOWLManager.inferStatements(loadedOntology, this.testRepositoryConnection);
+            ((PoddOWLManagerImpl)this.testOWLManager).inferStatements(loadedOntology, this.testRepositoryConnection,
+                    null);
             Assert.fail("Should have thrown an OWLOntologyAlreadyExistsException");
         }
         catch(final OWLOntologyAlreadyExistsException e)
@@ -470,7 +473,7 @@ public class PoddOWLManagerImplTest extends AbstractPoddOWLManagerTest
     {
         try
         {
-            this.testOWLManager.inferStatements(null, this.testRepositoryConnection);
+            ((PoddOWLManagerImpl)this.testOWLManager).inferStatements(null, this.testRepositoryConnection, null);
             Assert.fail("Should have thrown a NullPointerException");
         }
         catch(final NullPointerException e)

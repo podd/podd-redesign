@@ -20,24 +20,16 @@
 package com.github.podd.api;
 
 import java.io.IOException;
-import java.util.List;
-import java.util.Set;
 
-import org.coode.owlapi.rdfxml.parser.TPVersionIRIHandler;
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.Model;
 import org.openrdf.model.URI;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
 import org.semanticweb.owlapi.io.OWLOntologyDocumentSource;
-import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLException;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyID;
-import org.semanticweb.owlapi.model.OWLRuntimeException;
-import org.semanticweb.owlapi.profiles.OWLProfile;
-import org.semanticweb.owlapi.reasoner.OWLReasoner;
-import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
 
 import com.github.podd.exception.OntologyNotInProfileException;
 import com.github.podd.exception.PoddException;
@@ -97,25 +89,6 @@ public interface PoddOWLManager
      */
     void dumpOntologyToRepositoryWithoutDuplication(URI contextToDeduplicate, OWLOntology nextOntology,
             RepositoryConnection nextRepositoryConnection, URI... contexts) throws IOException, RepositoryException;
-    
-    /**
-     * Infer statements for the given {@link OWLOntology} into the given permanent repository
-     * connection.
-     * 
-     * TODO: Decide the behaviour if the asserted statements of the Ontology are not in the
-     * Repository when this method is invoked.
-     * 
-     * @param ontology
-     * @param permanentRepositoryConnection
-     * @return The InferredOWLOntologyID representing the ontology, along with the IRI of the
-     *         Inferred Ontology.
-     * @throws OWLException
-     * @throws OWLRuntimeException
-     * @throws IOException
-     * @throws OpenRDFException
-     */
-    InferredOWLOntologyID inferStatements(OWLOntology ontology, RepositoryConnection permanentRepositoryConnection)
-        throws OWLRuntimeException, OWLException, OpenRDFException, IOException;
     
     InferredOWLOntologyID loadAndInfer(RepositoryConnection permanentRepositoryConnection, OWLOntologyID ontologyID,
             OWLOntologyDocumentSource owlSource) throws OWLException, PoddException, OpenRDFException, IOException;

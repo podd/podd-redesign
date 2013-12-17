@@ -529,7 +529,7 @@ public class PoddOWLManagerImpl implements PoddOWLManager
             // are all encapsulated
             // in the InferredOWLOntologyID object.
             
-            return this.inferStatements(nextOntology, permanentRepositoryConnection);
+            return this.inferStatements(nextOntology, permanentRepositoryConnection, nextReasoner);
         }
         catch(final Throwable e)
         {
@@ -699,13 +699,16 @@ public class PoddOWLManagerImpl implements PoddOWLManager
         return profiles;
     }
     
-    @Override
     public InferredOWLOntologyID inferStatements(final OWLOntology nextOntology,
-            final RepositoryConnection nextRepositoryConnection) throws OWLRuntimeException, OWLException,
-        OpenRDFException, IOException
+            final RepositoryConnection nextRepositoryConnection, OWLReasoner nextReasoner) throws OWLRuntimeException,
+        OWLException, OpenRDFException, IOException
     {
         final InferredOWLOntologyID inferredOntologyID = this.generateInferredOntologyID(nextOntology.getOntologyID());
-        final OWLReasoner nextReasoner = this.createReasoner(nextOntology);
+        if(nextReasoner == null)
+        {
+            nextReasoner = this.createReasoner(nextOntology);
+        }
+        // final OWLReasoner nextReasoner = this.createReasoner(nextOntology);
         
         final OWLOntology nextInferredAxiomsOntology =
                 this.computeInferences(nextReasoner, nextOntology.getOntologyID(),
