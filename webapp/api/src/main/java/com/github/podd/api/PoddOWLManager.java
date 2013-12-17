@@ -150,46 +150,6 @@ public interface PoddOWLManager
         IOException, PoddException;
     
     /**
-     * Parses RDF statements into an ontology, and returns the OWLOntologyID for the resulting
-     * ontology.
-     * 
-     * NOTE: The Ontology is managed by the internal OWLOntologyManager, and will still be in memory
-     * after this call.
-     * 
-     * @param conn
-     *            Repository Connection that can be used to access the RDF statements.
-     * @param contexts
-     *            The Contexts inside of the Repository Connection that contain the relevant RDF
-     *            statements.
-     * @return The OWLOntologyID that was created by the internal OWLOntologyManager for the
-     *         ontology that was parsed.
-     * @throws OWLException
-     * @throws IOException
-     * @throws PoddException
-     * @throws OpenRDFException
-     */
-    OWLOntologyID parseRDFStatements(RepositoryConnection conn, URI... contexts) throws OWLException, IOException,
-        PoddException, OpenRDFException;
-    
-    /**
-     * Parses RDF statements into an ontology, and returns the OWLOntologyID for the resulting
-     * ontology.
-     * 
-     * NOTE: The Ontology is managed by the internal OWLOntologyManager, and will still be in memory
-     * after this call.
-     * 
-     * @param model
-     *            The {@link Model} containing the statements.
-     * @return The OWLOntologyID that was created by the internal OWLOntologyManager for the
-     *         ontology that was parsed.
-     * @throws OWLException
-     * @throws IOException
-     * @throws PoddException
-     * @throws OpenRDFException
-     */
-    OWLOntologyID parseRDFStatements(Model model) throws OWLException, IOException, PoddException, OpenRDFException;
-    
-    /**
      * Attempts to regain memory in the underlying OWLOntologyManager by removing the ontology from
      * the in-memory cache.
      * 
