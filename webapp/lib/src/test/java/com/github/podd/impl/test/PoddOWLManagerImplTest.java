@@ -652,10 +652,10 @@ public class PoddOWLManagerImplTest extends AbstractPoddOWLManagerTest
         final boolean removed = this.testOWLManager.removeCache(ontologyID);
         
         // verify:
-        // Assert.assertTrue("Ontology could not be removed from cache", removed);
+        Assert.assertTrue("Ontology could not be removed from cache", removed);
         
-        // final OWLOntology ontologyFromMemoryShouldBeNull = this.manager.getOntology(ontologyID);
-        // Assert.assertNull("Ontology is still in cache", ontologyFromMemoryShouldBeNull);
+        final OWLOntology ontologyFromMemoryShouldBeNull = this.manager.getOntology(ontologyID);
+        Assert.assertNull("Ontology is still in cache", ontologyFromMemoryShouldBeNull);
     }
     
     /**
