@@ -353,7 +353,6 @@ public class PoddOWLManagerImpl implements PoddOWLManager
      * @throws IOException
      * @throws RepositoryException
      */
-    @Override
     public void dumpOntologyToRepository(final OWLOntology nextOntology,
             final RepositoryConnection nextRepositoryConnection, final URI... contexts) throws IOException,
         RepositoryException
@@ -825,21 +824,47 @@ public class PoddOWLManagerImpl implements PoddOWLManager
     {
         synchronized(this.owlOntologyManager)
         {
-            // TODO: Verify that this .contains method matches our desired
-            // semantics
-            final boolean containsOntology = this.owlOntologyManager.contains(ontologyID);
-            
-            if(containsOntology)
+            if(ontologyID instanceof InferredOWLOntologyID)
             {
-                this.owlOntologyManager.removeOntology(ontologyID);
+                final boolean containsInferredOntology =
+                        this.owlOntologyManager.contains(((InferredOWLOntologyID)ontologyID).getInferredOntologyIRI());
+                if(containsInferredOntology)
+                {
+                    this.owlOntologyManager.removeOntology(this.owlOntologyManager
+                            .getOntology(((InferredOWLOntologyID)ontologyID).getInferredOntologyIRI()));
+                }
+                // TODO: Verify that this .contains method matches our desired
+                // semantics
+                final boolean containsOntology =
+                        this.owlOntologyManager.contains(((InferredOWLOntologyID)ontologyID).getBaseOWLOntologyID());
                 
-                // return true if the ontology manager does not contain the
-                // ontology at this point
-                return !this.owlOntologyManager.contains(ontologyID);
+                if(containsOntology)
+                {
+                    this.owlOntologyManager.removeOntology(((InferredOWLOntologyID)ontologyID).getBaseOWLOntologyID());
+                    return !this.owlOntologyManager
+                            .contains(((InferredOWLOntologyID)ontologyID).getBaseOWLOntologyID());
+                }
+                
+                return containsInferredOntology || containsOntology;
             }
             else
             {
-                return false;
+                // TODO: Verify that this .contains method matches our desired
+                // semantics
+                final boolean containsOntology = this.owlOntologyManager.contains(ontologyID);
+                
+                if(containsOntology)
+                {
+                    this.owlOntologyManager.removeOntology(ontologyID);
+                    
+                    // return true if the ontology manager does not contain the
+                    // ontology at this point
+                    return !this.owlOntologyManager.contains(ontologyID);
+                }
+                else
+                {
+                    return false;
+                }
             }
         }
     }

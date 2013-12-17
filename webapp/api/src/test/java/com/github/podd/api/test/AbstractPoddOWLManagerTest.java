@@ -419,27 +419,20 @@ public abstract class AbstractPoddOWLManagerTest
     {
         this.loadDcFoafAndPoddUserSchemaOntologies();
         
-        // prepare: load and store a schema ontology
-        final InputStream inputStream = this.getClass().getResourceAsStream(PODD.PATH_PODD_BASE_V1);
-        Assert.assertNotNull("Could not find resource", inputStream);
-        final OWLOntology loadedOntology = this.manager.loadOntologyFromOntologyDocument(inputStream);
-        this.testOWLManager.dumpOntologyToRepository(loadedOntology, this.testRepositoryConnection);
+        InferredOWLOntologyID inferredOntologyID =
+                this.loadInferStoreOntology(PODD.PATH_PODD_BASE_V1, RDFFormat.RDFXML,
+                        TestConstants.EXPECTED_TRIPLE_COUNT_PODD_BASE_CONCRETE,
+                        TestConstants.EXPECTED_TRIPLE_COUNT_PODD_BASE_INFERRED);
         
-        final InferredOWLOntologyID inferredOntologyID =
-                new InferredOWLOntologyID(loadedOntology.getOntologyID().getOntologyIRI(), loadedOntology
-                        .getOntologyID().getVersionIRI(), null);
+        this.testOWLManager.removeCache(inferredOntologyID);
         
-        this.testOWLManager.removeCache(inferredOntologyID.getBaseOWLOntologyID());
-        
-        Assert.assertFalse("Ontology should not be in memory",
-                this.manager.contains(inferredOntologyID.getBaseOWLOntologyID()));
+        Assert.assertFalse("Ontology should not be in memory", this.manager.contains(inferredOntologyID));
         
         // invoke method to test
         this.testOWLManager.cacheSchemaOntology(inferredOntologyID, this.testRepositoryConnection, null);
         
         // verify:
-        Assert.assertTrue("Ontology should be in memory",
-                this.manager.contains(inferredOntologyID.getBaseOWLOntologyID()));
+        Assert.assertTrue("Ontology should be in memory", this.manager.contains(inferredOntologyID));
     }
     
     /**
@@ -538,90 +531,4 @@ public abstract class AbstractPoddOWLManagerTest
                 this.manager.contains(pbInferredOntologyID.getBaseOWLOntologyID()));
     }
     
-    /**
-     * Test method for
-     * {@link com.github.podd.api.PoddOWLManager#dumpOntologyToRepository(OWLOntology, RepositoryConnection, URI...)}
-     * .
-     * 
-     */
-    @Test
-    public void testDumpOntologyToRepository() throws Exception
-    {
-        // prepare: load, infer and store PODD:dcTerms, foaf and User ontologies to testOWLManager
-        final OWLOntologyManager testOWLOntologyManager = OWLOntologyManagerFactoryRegistry.createOWLOntologyManager();
-        testOWLOntologyManager.loadOntologyFromOntologyDocument(this.getClass().getResourceAsStream(
-                PODD.PATH_PODD_DCTERMS_V1));
-        testOWLOntologyManager.loadOntologyFromOntologyDocument(this.getClass().getResourceAsStream(
-                PODD.PATH_PODD_FOAF_V1));
-        testOWLOntologyManager.loadOntologyFromOntologyDocument(this.getClass().getResourceAsStream(
-                PODD.PATH_PODD_USER_V1));
-        
-        // prepare: load Podd-Base Ontology independently
-        final InputStream inputStream = this.getClass().getResourceAsStream(PODD.PATH_PODD_BASE_V1);
-        Assert.assertNotNull("Could not find resource", inputStream);
-        final OWLOntology nextOntology = testOWLOntologyManager.loadOntologyFromOntologyDocument(inputStream);
-        
-        final URI context = ValueFactoryImpl.getInstance().createURI("urn:test:dump:context:");
-        
-        this.testOWLManager.dumpOntologyToRepository(nextOntology, this.testRepositoryConnection, context);
-        
-        // verify:
-        Assert.assertEquals("Dumped statement count not expected value",
-                TestConstants.EXPECTED_TRIPLE_COUNT_PODD_BASE_CONCRETE, this.testRepositoryConnection.size(context));
-        
-    }
-    
-    /**
-     * Test method for
-     * {@link com.github.podd.api.PoddOWLManager#dumpOntologyToRepository(OWLOntology, RepositoryConnection, URI...)}
-     * .
-     * 
-     */
-    @Test
-    public void testDumpOntologyToRepositoryWithEmptyOntology() throws Exception
-    {
-        // prepare: load an Ontology independently
-        final OWLOntology nextOntology = this.manager.createOntology();
-        
-        try
-        {
-            this.testOWLManager.dumpOntologyToRepository(nextOntology, this.testRepositoryConnection);
-            Assert.fail("Should have thrown an IllegalArgumentException");
-        }
-        catch(final IllegalArgumentException e)
-        {
-            Assert.assertEquals("Cannot dump anonymous ontologies to repository", e.getMessage());
-        }
-    }
-    
-    /**
-     * Test method for
-     * {@link com.github.podd.api.PoddOWLManager#dumpOntologyToRepository(OWLOntology, RepositoryConnection, URI...)}
-     * .
-     * 
-     */
-    @Test
-    public void testDumpOntologyToRepositoryWithoutContext() throws Exception
-    {
-        // prepare: load, infer and store PODD:dcTerms, foaf and User ontologies to testOWLManager
-        final OWLOntologyManager testOWLOntologyManager = OWLOntologyManagerFactoryRegistry.createOWLOntologyManager();
-        testOWLOntologyManager.loadOntologyFromOntologyDocument(this.getClass().getResourceAsStream(
-                PODD.PATH_PODD_DCTERMS_V1));
-        testOWLOntologyManager.loadOntologyFromOntologyDocument(this.getClass().getResourceAsStream(
-                PODD.PATH_PODD_FOAF_V1));
-        testOWLOntologyManager.loadOntologyFromOntologyDocument(this.getClass().getResourceAsStream(
-                PODD.PATH_PODD_USER_V1));
-        
-        // prepare: load an Ontology independently
-        final InputStream inputStream = this.getClass().getResourceAsStream(PODD.PATH_PODD_BASE_V1);
-        Assert.assertNotNull("Could not find resource", inputStream);
-        final OWLOntology nextOntology = testOWLOntologyManager.loadOntologyFromOntologyDocument(inputStream);
-        
-        this.testOWLManager.dumpOntologyToRepository(nextOntology, this.testRepositoryConnection);
-        
-        // verify:
-        final URI context = nextOntology.getOntologyID().getVersionIRI().toOpenRDFURI();
-        Assert.assertEquals("Dumped statement count not expected value",
-                TestConstants.EXPECTED_TRIPLE_COUNT_PODD_BASE_CONCRETE, this.testRepositoryConnection.size(context));
-    }
 }

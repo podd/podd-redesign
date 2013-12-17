@@ -31,6 +31,7 @@ import org.openrdf.model.impl.LinkedHashModel;
 import org.openrdf.model.impl.TreeModel;
 import org.openrdf.model.impl.ValueFactoryImpl;
 import org.openrdf.model.vocabulary.RDF;
+import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.Rio;
 import org.openrdf.rio.helpers.StatementCollector;
@@ -183,7 +184,8 @@ public class PoddOWLManagerImplTest extends AbstractPoddOWLManagerTest
         Assert.assertNotNull("Ontology not in memory", loadedOntology);
         
         final URI contextOwlapi = ValueFactoryImpl.getInstance().createURI("urn:test:context:owlapi:");
-        this.testOWLManager.dumpOntologyToRepository(loadedOntology, this.testRepositoryConnection, contextOwlapi);
+        ((PoddOWLManagerImpl)this.testOWLManager).dumpOntologyToRepository(loadedOntology,
+                this.testRepositoryConnection, contextOwlapi);
         
         // verify:
         Assert.assertEquals("Dumped statement count not expected value",
@@ -397,7 +399,8 @@ public class PoddOWLManagerImplTest extends AbstractPoddOWLManagerTest
         Assert.assertEquals("Nothing should be in the Repository at this stage", 0,
                 this.testRepositoryConnection.size());
         
-        this.testOWLManager.dumpOntologyToRepository(loadedOntology, this.testRepositoryConnection);
+        ((PoddOWLManagerImpl)this.testOWLManager).dumpOntologyToRepository(loadedOntology,
+                this.testRepositoryConnection);
         
         final InferredOWLOntologyID inferredOntologyID =
                 ((PoddOWLManagerImpl)this.testOWLManager).inferStatements(loadedOntology,
@@ -437,7 +440,8 @@ public class PoddOWLManagerImplTest extends AbstractPoddOWLManagerTest
         Assert.assertEquals("Repository should not have changed at this stage", repoSizeAfterPreparation,
                 this.testRepositoryConnection.size());
         
-        this.testOWLManager.dumpOntologyToRepository(loadedOntology, this.testRepositoryConnection);
+        ((PoddOWLManagerImpl)this.testOWLManager).dumpOntologyToRepository(loadedOntology,
+                this.testRepositoryConnection);
         
         final InferredOWLOntologyID inferredOntologyID =
                 ((PoddOWLManagerImpl)this.testOWLManager).inferStatements(loadedOntology,
@@ -719,5 +723,94 @@ public class PoddOWLManagerImplTest extends AbstractPoddOWLManagerTest
         
         // verify:
         Assert.assertFalse("Ontology should not have existed in memory/cache", removed);
+    }
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddOWLManager#dumpOntologyToRepository(OWLOntology, RepositoryConnection, URI...)}
+     * .
+     * 
+     */
+    @Test
+    public void testDumpOntologyToRepository() throws Exception
+    {
+        // prepare: load, infer and store PODD:dcTerms, foaf and User ontologies to testOWLManager
+        final OWLOntologyManager testOWLOntologyManager = OWLOntologyManagerFactoryRegistry.createOWLOntologyManager();
+        testOWLOntologyManager.loadOntologyFromOntologyDocument(this.getClass().getResourceAsStream(
+                PODD.PATH_PODD_DCTERMS_V1));
+        testOWLOntologyManager.loadOntologyFromOntologyDocument(this.getClass().getResourceAsStream(
+                PODD.PATH_PODD_FOAF_V1));
+        testOWLOntologyManager.loadOntologyFromOntologyDocument(this.getClass().getResourceAsStream(
+                PODD.PATH_PODD_USER_V1));
+        
+        // prepare: load Podd-Base Ontology independently
+        final InputStream inputStream = this.getClass().getResourceAsStream(PODD.PATH_PODD_BASE_V1);
+        Assert.assertNotNull("Could not find resource", inputStream);
+        final OWLOntology nextOntology = testOWLOntologyManager.loadOntologyFromOntologyDocument(inputStream);
+        
+        final URI context = ValueFactoryImpl.getInstance().createURI("urn:test:dump:context:");
+        
+        ((PoddOWLManagerImpl)this.testOWLManager).dumpOntologyToRepository(nextOntology, this.testRepositoryConnection,
+                context);
+        
+        // verify:
+        Assert.assertEquals("Dumped statement count not expected value",
+                TestConstants.EXPECTED_TRIPLE_COUNT_PODD_BASE_CONCRETE, this.testRepositoryConnection.size(context));
+        
+    }
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddOWLManager#dumpOntologyToRepository(OWLOntology, RepositoryConnection, URI...)}
+     * .
+     * 
+     */
+    @Test
+    public void testDumpOntologyToRepositoryWithEmptyOntology() throws Exception
+    {
+        // prepare: load an Ontology independently
+        final OWLOntology nextOntology = this.manager.createOntology();
+        
+        try
+        {
+            ((PoddOWLManagerImpl)this.testOWLManager).dumpOntologyToRepository(nextOntology,
+                    this.testRepositoryConnection);
+            Assert.fail("Should have thrown an IllegalArgumentException");
+        }
+        catch(final IllegalArgumentException e)
+        {
+            Assert.assertEquals("Cannot dump anonymous ontologies to repository", e.getMessage());
+        }
+    }
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddOWLManager#dumpOntologyToRepository(OWLOntology, RepositoryConnection, URI...)}
+     * .
+     * 
+     */
+    @Test
+    public void testDumpOntologyToRepositoryWithoutContext() throws Exception
+    {
+        // prepare: load, infer and store PODD:dcTerms, foaf and User ontologies to testOWLManager
+        final OWLOntologyManager testOWLOntologyManager = OWLOntologyManagerFactoryRegistry.createOWLOntologyManager();
+        testOWLOntologyManager.loadOntologyFromOntologyDocument(this.getClass().getResourceAsStream(
+                PODD.PATH_PODD_DCTERMS_V1));
+        testOWLOntologyManager.loadOntologyFromOntologyDocument(this.getClass().getResourceAsStream(
+                PODD.PATH_PODD_FOAF_V1));
+        testOWLOntologyManager.loadOntologyFromOntologyDocument(this.getClass().getResourceAsStream(
+                PODD.PATH_PODD_USER_V1));
+        
+        // prepare: load an Ontology independently
+        final InputStream inputStream = this.getClass().getResourceAsStream(PODD.PATH_PODD_BASE_V1);
+        Assert.assertNotNull("Could not find resource", inputStream);
+        final OWLOntology nextOntology = testOWLOntologyManager.loadOntologyFromOntologyDocument(inputStream);
+        
+        ((PoddOWLManagerImpl)this.testOWLManager).dumpOntologyToRepository(nextOntology, this.testRepositoryConnection);
+        
+        // verify:
+        final URI context = nextOntology.getOntologyID().getVersionIRI().toOpenRDFURI();
+        Assert.assertEquals("Dumped statement count not expected value",
+                TestConstants.EXPECTED_TRIPLE_COUNT_PODD_BASE_CONCRETE, this.testRepositoryConnection.size(context));
     }
 }

@@ -57,21 +57,6 @@ public interface PoddOWLManager
     void cacheSchemaOntology(OWLOntologyID ontologyID, RepositoryConnection conn, URI context) throws OpenRDFException,
         OWLException, IOException, PoddException;
     
-    /**
-     * Dump ontology to the given repository connection, using the Version IRI from the given
-     * ontology as the context if a context is not given.
-     * 
-     * @param nextOntology
-     * @param nextRepositoryConnection
-     * @param contexts
-     *            If this is not null, it is used as the contexts, otherwise the Version IRI from
-     *            the ontology is used as the context.
-     * @throws IOException
-     * @throws RepositoryException
-     */
-    void dumpOntologyToRepository(OWLOntology nextOntology, RepositoryConnection nextRepositoryConnection,
-            URI... contexts) throws IOException, RepositoryException;
-    
     InferredOWLOntologyID loadAndInfer(RepositoryConnection permanentRepositoryConnection, OWLOntologyID ontologyID,
             OWLOntologyDocumentSource owlSource) throws OWLException, PoddException, OpenRDFException, IOException;
     
