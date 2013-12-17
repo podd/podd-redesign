@@ -203,16 +203,6 @@ public interface PoddOWLManager
     boolean removeCache(OWLOntologyID ontologyID) throws OWLException;
     
     /**
-     * Sets the current version for the Ontology {@link IRI} in the given {@link OWLOntologyID} to
-     * be the given version.
-     * 
-     * @param ontologyID
-     * @throws IllegalArgumentException
-     *             If the ontologyID does not have a version.
-     */
-    void setCurrentVersion(OWLOntologyID ontologyID);
-
-    /**
      * Helper method to verify that a given {@link Model} represents an ontology which complies with
      * the given schema OWL Ontology.
      * 

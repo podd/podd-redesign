@@ -840,10 +840,4 @@ public class PoddOWLManagerImpl implements PoddOWLManager
             }
         }
     }
-    
-    @Override
-    public void setCurrentVersion(final OWLOntologyID ontologyID)
-    {
-        throw new RuntimeException("TODO: Implement setCurrentVersion");
-    }
 }
