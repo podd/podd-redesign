@@ -424,16 +424,11 @@ public abstract class AbstractPoddArtifactManagerTest
                 new StreamDocumentSource(inputStream, OWLOntologyFormatFactoryRegistry.getInstance().getByMIMEType(
                         format.getDefaultMIMEType()));
         
-        final OWLOntology loadedBaseOntology = this.testArtifactManager.getOWLManager().loadOntology(null, owlSource);
-        
-        this.testArtifactManager.getOWLManager().dumpOntologyToRepository(loadedBaseOntology, repositoryConnection);
-        
-        // infer statements and dump to repository
         final InferredOWLOntologyID inferredOntologyID =
-                this.testArtifactManager.getOWLManager().inferStatements(loadedBaseOntology, repositoryConnection);
+                this.testArtifactManager.getOWLManager().loadAndInfer(repositoryConnection, null, owlSource);
         
         // verify statement counts
-        final URI versionURI = loadedBaseOntology.getOntologyID().getVersionIRI().toOpenRDFURI();
+        final URI versionURI = inferredOntologyID.getVersionIRI().toOpenRDFURI();
         
         final long assertedSize = repositoryConnection.size(versionURI);
         // Assert.assertEquals("Wrong statement count", assertedStatementCount, assertedSize);
