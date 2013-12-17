@@ -781,23 +781,7 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
         InferredOWLOntologyID nextInferredOntology;
         synchronized(this)
         {
-            final OWLOntology ontology = this.owlManager.loadOntology(schemaOntologyID, owlSource);
-            
-            if(ontology.isEmpty())
-            {
-                throw new EmptyOntologyException(ontology, "Schema Ontology contained no axioms");
-            }
-            
-            if(schemaOntologyID != null)
-            {
-                // FIXME: Change OWLOntologyID to schemaOntologyID in this case
-            }
-            
-            this.owlManager.dumpOntologyToRepository(ontology, conn);
-            
-            // NOTE: The following will not do anything once OWL databases are being used, but it
-            // should still be in the API for compatibility with the OWLAPI version
-            nextInferredOntology = this.owlManager.inferStatements(ontology, conn);
+            nextInferredOntology = this.owlManager.loadAndInfer(conn, schemaOntologyID, owlSource);
         }
         
         // update the link in the schema ontology management graph
