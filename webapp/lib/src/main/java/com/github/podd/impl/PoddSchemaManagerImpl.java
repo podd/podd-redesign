@@ -779,7 +779,6 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
         final OWLOntologyDocumentSource owlSource =
                 new StreamDocumentSource(inputStream, fileFormat.getDefaultMIMEType());
         InferredOWLOntologyID nextInferredOntology;
-        OWLOntologyID baseOntologyID;
         synchronized(this)
         {
             final OWLOntology ontology = this.owlManager.loadOntology(schemaOntologyID, owlSource);
@@ -793,8 +792,6 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
             {
                 // FIXME: Change OWLOntologyID to schemaOntologyID in this case
             }
-            
-            baseOntologyID = ontology.getOntologyID();
             
             this.owlManager.dumpOntologyToRepository(ontology, conn);
             
@@ -810,7 +807,7 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
         
         // TODO: Why are we not able to return nextInferredOntology here
         final InferredOWLOntologyID result =
-                new InferredOWLOntologyID(baseOntologyID.getOntologyIRI(), baseOntologyID.getVersionIRI(),
+                new InferredOWLOntologyID(nextInferredOntology.getOntologyIRI(), nextInferredOntology.getVersionIRI(),
                         nextInferredOntology.getOntologyIRI());
         return result;
     }
