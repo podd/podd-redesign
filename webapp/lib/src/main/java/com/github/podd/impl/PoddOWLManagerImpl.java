@@ -18,6 +18,7 @@ package com.github.podd.impl;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -27,8 +28,12 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.mindswap.pellet.exceptions.PelletRuntimeException;
 import org.openrdf.OpenRDFException;
+import org.openrdf.OpenRDFUtil;
 import org.openrdf.model.Model;
+import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
+import org.openrdf.model.impl.LinkedHashModel;
+import org.openrdf.model.util.Namespaces;
 import org.openrdf.model.vocabulary.OWL;
 import org.openrdf.query.BindingSet;
 import org.openrdf.query.QueryLanguage;
@@ -39,6 +44,7 @@ import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.util.RDFInserter;
 import org.openrdf.rio.RDFFormat;
+import org.openrdf.rio.helpers.StatementCollector;
 import org.semanticweb.owlapi.formats.OWLOntologyFormatFactoryRegistry;
 import org.semanticweb.owlapi.formats.RioRDFOntologyFormatFactory;
 import org.semanticweb.owlapi.io.OWLOntologyDocumentSource;
@@ -787,8 +793,13 @@ public class PoddOWLManagerImpl implements PoddOWLManager
     public OWLOntologyID parseRDFStatements(final RepositoryConnection conn, final URI... contexts)
         throws OpenRDFException, OWLException, IOException, PoddException
     {
+        OpenRDFUtil.verifyContextNotNull(contexts);
+        
+        Model model = new LinkedHashModel();
+        conn.export(new StatementCollector(model), contexts);
+        
         final RioMemoryTripleSource owlSource =
-                new RioMemoryTripleSource(conn.getStatements(null, null, null, true, contexts));
+                new RioMemoryTripleSource(model.iterator(), Namespaces.asMap(model.getNamespaces()));
         
         final RioParserImpl owlParser = new RioParserImpl(null);
         
