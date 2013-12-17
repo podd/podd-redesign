@@ -22,6 +22,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -227,13 +228,9 @@ public class PoddOWLManagerImpl implements PoddOWLManager
         final IRI baseOntologyVersionIRI = ontologyID.getVersionIRI();
         // final IRI inferredOntologyIRI = ontologyID.getInferredOntologyIRI();
         
-        synchronized(this.owlOntologyManager)
+        if(isCached(ontologyID))
         {
-            // -- check if already cached and silently return.
-            if(this.owlOntologyManager.contains(baseOntologyVersionIRI))
-            {
-                return;
-            }
+            return;
         }
         
         // Only direct imports and first-level indirect imports are identified.
@@ -553,9 +550,18 @@ public class PoddOWLManagerImpl implements PoddOWLManager
     @Override
     public boolean isCached(final OWLOntologyID ontologyID)
     {
+        Objects.requireNonNull(ontologyID, "Ontology ID cannot be null");
+        
         synchronized(this.owlOntologyManager)
         {
-            return this.owlOntologyManager.contains(ontologyID.getVersionIRI());
+            if(ontologyID.getVersionIRI() != null)
+            {
+                return this.owlOntologyManager.contains(ontologyID.getVersionIRI());
+            }
+            else
+            {
+                return this.owlOntologyManager.contains(ontologyID.getOntologyIRI());
+            }
         }
     }
     
