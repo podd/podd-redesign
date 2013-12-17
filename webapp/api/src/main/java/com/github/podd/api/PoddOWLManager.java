@@ -117,7 +117,7 @@ public interface PoddOWLManager
     InferredOWLOntologyID inferStatements(OWLOntology ontology, RepositoryConnection permanentRepositoryConnection)
         throws OWLRuntimeException, OWLException, OpenRDFException, IOException;
     
-    InferredOWLOntologyID loadAndInfer(RepositoryConnection permanentRepositoryConnection,
+    InferredOWLOntologyID loadAndInfer(RepositoryConnection permanentRepositoryConnection, OWLOntologyID ontologyID,
             OWLOntologyDocumentSource owlSource) throws OWLException, PoddException, OpenRDFException, IOException;
     
     /**

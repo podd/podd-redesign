@@ -1498,7 +1498,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
                         .asSet(tempRepositoryConnection.getNamespaces())));
         
         final InferredOWLOntologyID inferredOWLOntologyID =
-                this.getOWLManager().loadAndInfer(permanentRepositoryConnection, owlSource);
+                this.getOWLManager().loadAndInfer(permanentRepositoryConnection, null, owlSource);
         
         // Check file references after inferencing to accurately identify
         // the parent object

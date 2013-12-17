@@ -435,13 +435,13 @@ public class PoddOWLManagerImpl implements PoddOWLManager
      */
     @Override
     public InferredOWLOntologyID loadAndInfer(final RepositoryConnection permanentRepositoryConnection,
-            final OWLOntologyDocumentSource owlSource) throws OWLException, PoddException, OpenRDFException,
-        IOException
+            final OWLOntologyID ontologyID, final OWLOntologyDocumentSource owlSource) throws OWLException,
+        PoddException, OpenRDFException, IOException
     {
         OWLOntology nextOntology = null;
         try
         {
-            nextOntology = this.loadOntology(owlSource);
+            nextOntology = this.loadOntology(ontologyID, owlSource);
             
             // Check the OWLAPI OWLOntology against an OWLProfile to make sure
             // it is in profile
