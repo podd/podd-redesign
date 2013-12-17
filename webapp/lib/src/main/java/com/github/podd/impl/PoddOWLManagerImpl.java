@@ -798,6 +798,13 @@ public class PoddOWLManagerImpl implements PoddOWLManager
         Model model = new LinkedHashModel();
         conn.export(new StatementCollector(model), contexts);
         
+        return parseRDFStatements(model);
+    }
+    
+    @Override
+    public OWLOntologyID parseRDFStatements(final Model model) throws OpenRDFException, OWLException, IOException,
+        PoddException
+    {
         final RioMemoryTripleSource owlSource =
                 new RioMemoryTripleSource(model.iterator(), Namespaces.asMap(model.getNamespaces()));
         
@@ -807,12 +814,13 @@ public class PoddOWLManagerImpl implements PoddOWLManager
         {
             final OWLOntology nextOntology = this.owlOntologyManager.createOntology();
             
-            if(conn.size(contexts) == 0)
+            if(model.size() == 0)
             {
                 throw new EmptyOntologyException(nextOntology, "No statements to create an ontology");
             }
             
             owlParser.parse(owlSource, nextOntology);
+            
             if(nextOntology.isEmpty())
             {
                 throw new EmptyOntologyException(nextOntology, "Loaded ontology is empty");

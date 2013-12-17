@@ -61,8 +61,8 @@ public interface PoddOWLManager
      * @throws IOException
      * @throws OWLException
      */
-    void cacheSchemaOntology(OWLOntologyID ontologyID, RepositoryConnection conn, URI context)
-        throws OpenRDFException, OWLException, IOException, PoddException;
+    void cacheSchemaOntology(OWLOntologyID ontologyID, RepositoryConnection conn, URI context) throws OpenRDFException,
+        OWLException, IOException, PoddException;
     
     /**
      * Dump ontology to the given repository connection, using the Version IRI from the given
@@ -170,6 +170,24 @@ public interface PoddOWLManager
      */
     OWLOntologyID parseRDFStatements(RepositoryConnection conn, URI... contexts) throws OWLException, IOException,
         PoddException, OpenRDFException;
+    
+    /**
+     * Parses RDF statements into an ontology, and returns the OWLOntologyID for the resulting
+     * ontology.
+     * 
+     * NOTE: The Ontology is managed by the internal OWLOntologyManager, and will still be in memory
+     * after this call.
+     * 
+     * @param model
+     *            The {@link Model} containing the statements.
+     * @return The OWLOntologyID that was created by the internal OWLOntologyManager for the
+     *         ontology that was parsed.
+     * @throws OWLException
+     * @throws IOException
+     * @throws PoddException
+     * @throws OpenRDFException
+     */
+    OWLOntologyID parseRDFStatements(Model model) throws OWLException, IOException, PoddException, OpenRDFException;
     
     /**
      * Attempts to regain memory in the underlying OWLOntologyManager by removing the ontology from
