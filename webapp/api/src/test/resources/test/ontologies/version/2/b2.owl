@@ -37,7 +37,6 @@
     <owl:Class rdf:about="&poddB;ClassB">
         <rdfs:subClassOf rdf:resource="&poddA;ClassA"/>
         <rdfs:label>Class B (version 2)</rdfs:label>
-        <definition>Definition of Class B.</definition>
         <rdfs:comment>A detailed description of Class B. This is version 2.</rdfs:comment>
     </owl:Class>
 </rdf:RDF>

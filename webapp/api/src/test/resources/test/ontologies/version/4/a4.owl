@@ -34,7 +34,6 @@
 
     <owl:Class rdf:about="&poddA;ClassA">
         <rdfs:label>Class A (version 4)</rdfs:label>
-        <definition>Definition of Class A.</definition>
         <rdfs:comment>A detailed description of Class A.</rdfs:comment>
     </owl:Class>
 </rdf:RDF>
