@@ -140,16 +140,12 @@ public abstract class AbstractPoddOWLManagerTest
         final OWLOntologyDocumentSource owlSource =
                 new StreamDocumentSource(inputStream, OWLOntologyFormatFactoryRegistry.getInstance().getByMIMEType(
                         format.getDefaultMIMEType()));
-        final OWLOntology loadedBaseOntology = this.testOWLManager.loadOntology(null, owlSource);
         
-        this.testOWLManager.dumpOntologyToRepository(loadedBaseOntology, this.testRepositoryConnection);
-        
-        // infer statements and dump to repository
         final InferredOWLOntologyID inferredOntologyID =
-                this.testOWLManager.inferStatements(loadedBaseOntology, this.testRepositoryConnection);
+                this.testOWLManager.loadAndInfer(testRepositoryConnection, null, owlSource);
         
         // verify statement counts
-        final URI versionURI = loadedBaseOntology.getOntologyID().getVersionIRI().toOpenRDFURI();
+        final URI versionURI = inferredOntologyID.getVersionIRI().toOpenRDFURI();
         Assert.assertEquals("Wrong statement count", assertedStatements, this.testRepositoryConnection.size(versionURI));
         
         final URI inferredOntologyURI = inferredOntologyID.getInferredOntologyIRI().toOpenRDFURI();
