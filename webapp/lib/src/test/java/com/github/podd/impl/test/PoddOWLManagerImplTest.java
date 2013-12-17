@@ -33,6 +33,7 @@ import org.openrdf.model.vocabulary.RDF;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.Rio;
 import org.openrdf.rio.helpers.StatementCollector;
+import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyID;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
@@ -48,6 +49,7 @@ import com.github.podd.api.test.TestConstants;
 import com.github.podd.exception.EmptyOntologyException;
 import com.github.podd.impl.PoddOWLManagerImpl;
 import com.github.podd.utils.DebugUtils;
+import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.PODD;
 
 /**
@@ -296,6 +298,74 @@ public class PoddOWLManagerImplTest extends AbstractPoddOWLManagerTest
         final Set<OWLProfile> profiles = ((PoddOWLManagerImpl)this.testOWLManager).getReasonerProfiles();
         Assert.assertNotNull("OWLProfile was null", profiles);
         Assert.assertFalse("OWLProfiles were not found for reasoner", profiles.isEmpty());
+    }
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddOWLManager#generateInferredOntologyID(org.semanticweb.owlapi.model.OWLOntologyID)}
+     * .
+     * 
+     */
+    @Test
+    public void testGenerateInferredOntologyID() throws Exception
+    {
+        // prepare: create an OntologyID
+        final OWLOntologyID ontologyID =
+                new OWLOntologyID(IRI.create("http://purl.org/podd/ns/poddBase"),
+                        IRI.create("http://purl.org/podd/ns/version/poddBase/1"));
+        
+        final InferredOWLOntologyID inferredOntologyID =
+                ((PoddOWLManagerImpl)this.testOWLManager).generateInferredOntologyID(ontologyID);
+        
+        // verify:
+        Assert.assertNotNull("InferredOntologyID was null", inferredOntologyID);
+        Assert.assertNotNull("Inferred Ontology IRI was null", inferredOntologyID.getInferredOntologyIRI());
+        Assert.assertEquals("Inferred IRI was not as expected",
+                IRI.create(PODD.INFERRED_PREFIX + "http://purl.org/podd/ns/version/poddBase/1"),
+                inferredOntologyID.getInferredOntologyIRI());
+    }
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddOWLManager#generateInferredOntologyID(org.semanticweb.owlapi.model.OWLOntologyID)}
+     * .
+     * 
+     */
+    @Test
+    public void testGenerateInferredOntologyIDWithEmptyOntologyID() throws Exception
+    {
+        // prepare: create an OntologyID
+        final OWLOntologyID ontologyID = new OWLOntologyID();
+        
+        try
+        {
+            ((PoddOWLManagerImpl)this.testOWLManager).generateInferredOntologyID(ontologyID);
+            Assert.fail("Should have thrown a NullPointerException");
+        }
+        catch(final NullPointerException e)
+        {
+            Assert.assertEquals("Not the expected Exception", "OWLOntology is incomplete", e.getMessage());
+        }
+    }
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddOWLManager#generateInferredOntologyID(org.semanticweb.owlapi.model.OWLOntologyID)}
+     * .
+     * 
+     */
+    @Test
+    public void testGenerateInferredOntologyIDWithNullOntologyID() throws Exception
+    {
+        try
+        {
+            ((PoddOWLManagerImpl)this.testOWLManager).generateInferredOntologyID(null);
+            Assert.fail("Should have thrown a NullPointerException");
+        }
+        catch(final NullPointerException e)
+        {
+            Assert.assertEquals("Not the expected Exception", "OWLOntology is incomplete", e.getMessage());
+        }
     }
     
 }

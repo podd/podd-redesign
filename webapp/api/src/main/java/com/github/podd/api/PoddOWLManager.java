@@ -99,15 +99,6 @@ public interface PoddOWLManager
             RepositoryConnection nextRepositoryConnection, URI... contexts) throws IOException, RepositoryException;
     
     /**
-     * Generates a new unique IRI for inferred statements attached to the given OWLOntologyID, and
-     * returns the result inside of a new InferredOWLOntologyID object.
-     * 
-     * @param ontologyID
-     * @return
-     */
-    InferredOWLOntologyID generateInferredOntologyID(OWLOntologyID ontologyID);
-    
-    /**
      * Infer statements for the given {@link OWLOntology} into the given permanent repository
      * connection.
      * 
