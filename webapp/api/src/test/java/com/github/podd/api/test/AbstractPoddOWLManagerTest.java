@@ -66,8 +66,6 @@ public abstract class AbstractPoddOWLManagerTest
     
     protected RepositoryConnection testRepositoryConnection;
     
-    protected OWLOntologyManager manager;
-    
     /**
      * @return A new OWLReasonerFactory instance for use with the PoddOWLManager
      */
@@ -204,18 +202,15 @@ public abstract class AbstractPoddOWLManagerTest
         this.testOWLManager.removeCache(inferredOntologyID.getBaseOWLOntologyID());
         this.testOWLManager.removeCache(inferredOntologyID.getInferredOWLOntologyID());
         
-        Assert.assertFalse("Ontology should not be in memory",
-                this.manager.contains(inferredOntologyID.getBaseOWLOntologyID()));
-        Assert.assertFalse("Ontology should not be in memory",
-                this.manager.contains(inferredOntologyID.getInferredOntologyIRI()));
+        Assert.assertFalse("Ontology should not be in memory", this.testOWLManager.isCached(inferredOntologyID));
         
         this.testOWLManager.cacheSchemaOntology(inferredOntologyID, this.testRepositoryConnection, null);
         
         // verify:
         Assert.assertTrue("Ontology should be in memory",
-                this.manager.contains(inferredOntologyID.getBaseOWLOntologyID()));
+                this.testOWLManager.isCached(inferredOntologyID.getBaseOWLOntologyID()));
         Assert.assertTrue("Ontology should be in memory",
-                this.manager.contains(inferredOntologyID.getInferredOWLOntologyID()));
+                this.testOWLManager.isCached(inferredOntologyID.getInferredOWLOntologyID()));
     }
     
     /**
@@ -235,13 +230,13 @@ public abstract class AbstractPoddOWLManagerTest
                         TestConstants.EXPECTED_TRIPLE_COUNT_PODD_BASE_CONCRETE,
                         TestConstants.EXPECTED_TRIPLE_COUNT_PODD_BASE_INFERRED);
         
-        Assert.assertNotNull("Ontology should already be in memory", this.manager.getOntology(inferredOntologyID));
+        Assert.assertTrue("Ontology should already be in memory", this.testOWLManager.isCached(inferredOntologyID));
         
         // this call will silently return since the ontology is already in cache
         this.testOWLManager.cacheSchemaOntology(inferredOntologyID, this.testRepositoryConnection, null);
         
         // verify:
-        Assert.assertNotNull("Ontology should still be in memory", this.manager.getOntology(inferredOntologyID));
+        Assert.assertTrue("Ontology should still be in memory", this.testOWLManager.isCached(inferredOntologyID));
     }
     
     /**
@@ -259,7 +254,7 @@ public abstract class AbstractPoddOWLManagerTest
                         IRI.create("http://purl.org/podd/ns/version/poddBase/1"),
                         IRI.create("urn:inferred:http://purl.org/podd/ns/version/poddBase/1"));
         Assert.assertFalse("Ontology should not be in memory",
-                this.manager.contains(inferredOntologyID.getBaseOWLOntologyID()));
+                this.testOWLManager.isCached(inferredOntologyID.getBaseOWLOntologyID()));
         
         try
         {
@@ -359,12 +354,8 @@ public abstract class AbstractPoddOWLManagerTest
         this.testOWLManager.removeCache(pScienceInferredOntologyID.getBaseOWLOntologyID());
         this.testOWLManager.removeCache(pScienceInferredOntologyID.getInferredOWLOntologyID());
         
-        Assert.assertFalse("Ontology should not be in memory",
-                this.manager.contains(pbInferredOntologyID.getBaseOWLOntologyID()));
-        Assert.assertFalse("Ontology should not be in memory",
-                this.manager.contains(pScienceInferredOntologyID.getBaseOWLOntologyID()));
-        Assert.assertFalse("Ontology should not be in memory",
-                this.manager.contains(pScienceInferredOntologyID.getInferredOntologyIRI()));
+        Assert.assertFalse("Ontology should not be in memory", this.testOWLManager.isCached(pbInferredOntologyID));
+        Assert.assertFalse("Ontology should not be in memory", this.testOWLManager.isCached(pScienceInferredOntologyID));
         
         // prepare: 4) create schema management graph
         final URI schemaGraph = PODD.DEFAULT_SCHEMA_MANAGEMENT_GRAPH;
@@ -387,14 +378,8 @@ public abstract class AbstractPoddOWLManagerTest
         this.testOWLManager.cacheSchemaOntology(pScienceInferredOntologyID, this.testRepositoryConnection, schemaGraph);
         
         // verify:
-        Assert.assertTrue("Ontology should be in memory",
-                this.manager.contains(pScienceInferredOntologyID.getBaseOWLOntologyID()));
-        Assert.assertTrue("Ontology should be in memory",
-                this.manager.contains(pbInferredOntologyID.getInferredOntologyIRI()));
-        Assert.assertTrue("Ontology should be in memory",
-                this.manager.contains(pScienceInferredOntologyID.getInferredOWLOntologyID()));
-        Assert.assertTrue("Ontology should be in memory",
-                this.manager.contains(pbInferredOntologyID.getBaseOWLOntologyID()));
+        Assert.assertTrue("Ontology should be in memory", this.testOWLManager.isCached(pScienceInferredOntologyID));
+        Assert.assertTrue("Ontology should be in memory", this.testOWLManager.isCached(pbInferredOntologyID));
     }
     
     /**
@@ -417,13 +402,13 @@ public abstract class AbstractPoddOWLManagerTest
         
         this.testOWLManager.removeCache(inferredOntologyID);
         
-        Assert.assertFalse("Ontology should not be in memory", this.manager.contains(inferredOntologyID));
+        Assert.assertFalse("Ontology should not be in memory", this.testOWLManager.isCached(inferredOntologyID));
         
         // invoke method to test
         this.testOWLManager.cacheSchemaOntology(inferredOntologyID, this.testRepositoryConnection, null);
         
         // verify:
-        Assert.assertTrue("Ontology should be in memory", this.manager.contains(inferredOntologyID));
+        Assert.assertTrue("Ontology should be in memory", this.testOWLManager.isCached(inferredOntologyID));
     }
     
     /**
@@ -472,18 +457,9 @@ public abstract class AbstractPoddOWLManagerTest
         this.testOWLManager.removeCache(pPlantInferredOntologyID.getBaseOWLOntologyID());
         this.testOWLManager.removeCache(pPlantInferredOntologyID.getInferredOWLOntologyID());
         
-        Assert.assertFalse("Ontology should not be in memory",
-                this.manager.contains(pbInferredOntologyID.getBaseOWLOntologyID()));
-        Assert.assertFalse("Ontology should not be in memory",
-                this.manager.contains(pbInferredOntologyID.getInferredOntologyIRI()));
-        Assert.assertFalse("Ontology should not be in memory",
-                this.manager.contains(pScienceInferredOntologyID.getBaseOWLOntologyID()));
-        Assert.assertFalse("Ontology should not be in memory",
-                this.manager.contains(pScienceInferredOntologyID.getInferredOntologyIRI()));
-        Assert.assertFalse("Ontology should not be in memory",
-                this.manager.contains(pPlantInferredOntologyID.getBaseOWLOntologyID()));
-        Assert.assertFalse("Ontology should not be in memory",
-                this.manager.contains(pPlantInferredOntologyID.getInferredOntologyIRI()));
+        Assert.assertFalse("Ontology should not be in memory", this.testOWLManager.isCached(pbInferredOntologyID));
+        Assert.assertFalse("Ontology should not be in memory", this.testOWLManager.isCached(pScienceInferredOntologyID));
+        Assert.assertFalse("Ontology should not be in memory", this.testOWLManager.isCached(pPlantInferredOntologyID));
         
         // prepare: 4) create schema management graph
         final URI schemaGraph = PODD.DEFAULT_SCHEMA_MANAGEMENT_GRAPH;
@@ -515,11 +491,11 @@ public abstract class AbstractPoddOWLManagerTest
         
         // verify:
         Assert.assertTrue("Ontology should be in memory",
-                this.manager.contains(pScienceInferredOntologyID.getBaseOWLOntologyID()));
+                this.testOWLManager.isCached(pScienceInferredOntologyID.getBaseOWLOntologyID()));
         Assert.assertTrue("Ontology should be in memory",
-                this.manager.contains(pScienceInferredOntologyID.getInferredOWLOntologyID()));
+                this.testOWLManager.isCached(pScienceInferredOntologyID.getInferredOWLOntologyID()));
         Assert.assertTrue("Ontology should be in memory",
-                this.manager.contains(pbInferredOntologyID.getBaseOWLOntologyID()));
+                this.testOWLManager.isCached(pbInferredOntologyID.getBaseOWLOntologyID()));
     }
     
 }
