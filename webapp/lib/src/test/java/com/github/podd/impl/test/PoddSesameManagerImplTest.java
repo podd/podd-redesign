@@ -16,12 +16,16 @@
  */
 package com.github.podd.impl.test;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Assert;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.rio.RDFFormat;
+import org.semanticweb.owlapi.io.OWLOntologyDocumentSource;
+import org.semanticweb.owlapi.io.StreamDocumentSource;
+import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.OWLOntologyManagerFactoryRegistry;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
@@ -29,7 +33,6 @@ import org.semanticweb.owlapi.reasoner.OWLReasonerFactoryRegistry;
 
 import com.github.podd.api.PoddSesameManager;
 import com.github.podd.api.test.AbstractPoddSesameManagerTest;
-import com.github.podd.api.test.TestOntologyUtils;
 import com.github.podd.impl.PoddOWLManagerImpl;
 import com.github.podd.impl.PoddSesameManagerImpl;
 import com.github.podd.utils.InferredOWLOntologyID;
@@ -82,9 +85,15 @@ public class PoddSesameManagerImplTest extends AbstractPoddSesameManagerTest
         for(final String schemaResourcePath : schemaResourcePaths)
         {
             this.log.debug("Next paths: {} ", schemaResourcePath);
-            final InferredOWLOntologyID loadedOntologyID =
-                    TestOntologyUtils
-                            .loadSchemaOntology(schemaResourcePath, RDFFormat.RDFXML, testPoddOWLManager, conn);
+            final InputStream resourceStream = this.getClass().getResourceAsStream(schemaResourcePath);
+            final OWLOntologyDocumentSource owlSource =
+                    new StreamDocumentSource(resourceStream, RDFFormat.RDFXML.getDefaultMIMEType());
+            final OWLOntology assertedOntology = testPoddOWLManager.loadOntology(null, owlSource);
+            testPoddOWLManager.dumpOntologyToRepository(assertedOntology, conn);
+            
+            final InferredOWLOntologyID nextInferredOntology =
+                    testPoddOWLManager.inferStatements(assertedOntology, conn);
+            final InferredOWLOntologyID loadedOntologyID = nextInferredOntology;
             schemaList.add(loadedOntologyID);
         }
         
