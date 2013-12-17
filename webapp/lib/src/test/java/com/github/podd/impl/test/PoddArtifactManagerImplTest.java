@@ -16,10 +16,14 @@
  */
 package com.github.podd.impl.test;
 
+import java.util.Collection;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.openrdf.repository.RepositoryException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
+import org.semanticweb.owlapi.model.OWLOntologyManagerFactory;
+import org.semanticweb.owlapi.model.OWLOntologyManagerFactoryRegistry;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactoryRegistry;
 
@@ -42,6 +46,8 @@ import com.github.podd.impl.file.FileReferenceManagerImpl;
 import com.github.podd.impl.file.SSHFileReferenceProcessorFactoryImpl;
 import com.github.podd.impl.purl.PoddPurlManagerImpl;
 import com.github.podd.impl.purl.UUIDPurlProcessorFactoryImpl;
+import com.github.podd.restlet.ApplicationUtils;
+import com.github.podd.utils.PoddWebConstants;
 
 /**
  * @author Peter Ansell p_ansell@yahoo.com
@@ -83,7 +89,8 @@ public class PoddArtifactManagerImplTest extends AbstractPoddArtifactManagerTest
     }
     
     @Override
-    protected PoddOWLManager getNewOWLManager(final OWLOntologyManager manager, final OWLReasonerFactory reasonerFactory)
+    protected PoddOWLManager getNewOWLManager(final OWLOntologyManagerFactory manager,
+            final OWLReasonerFactory reasonerFactory)
     {
         return new PoddOWLManagerImpl(manager, reasonerFactory);
     }
@@ -144,6 +151,19 @@ public class PoddArtifactManagerImplTest extends AbstractPoddArtifactManagerTest
         // append a number when version number cannot be extracted
         final String newAppendedVersion = testArtifactManager.incrementVersion(artifactURI + ":v5");
         Assert.assertEquals("Version not incremented as expected", artifactURI + ":v51", newAppendedVersion);
+    }
+    
+    @Override
+    protected OWLOntologyManagerFactory getNewOWLOntologyManagerFactory()
+    {
+        Collection<OWLOntologyManagerFactory> ontologyManagers =
+                OWLOntologyManagerFactoryRegistry.getInstance().get(PoddWebConstants.DEFAULT_OWLAPI_MANAGER);
+        
+        if(ontologyManagers == null || ontologyManagers.isEmpty())
+        {
+            this.log.error("OWLOntologyManagerFactory was not found");
+        }
+        return ontologyManagers.iterator().next();
     }
     
 }

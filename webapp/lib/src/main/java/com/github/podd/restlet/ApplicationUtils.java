@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map.Entry;
@@ -57,6 +58,7 @@ import org.restlet.security.Role;
 import org.semanticweb.owlapi.model.OWLException;
 import org.semanticweb.owlapi.model.OWLOntologyID;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
+import org.semanticweb.owlapi.model.OWLOntologyManagerFactory;
 import org.semanticweb.owlapi.model.OWLOntologyManagerFactoryRegistry;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactoryRegistry;
@@ -329,18 +331,24 @@ public class ApplicationUtils
         final PoddPurlManager nextPurlManager = new PoddPurlManagerImpl();
         nextPurlManager.setPurlProcessorFactoryRegistry(nextPurlRegistry);
         
-        final OWLOntologyManager nextOWLOntologyManager = OWLOntologyManagerFactoryRegistry.createOWLOntologyManager();
-        if(nextOWLOntologyManager == null)
+        Collection<OWLOntologyManagerFactory> ontologyManagers =
+                OWLOntologyManagerFactoryRegistry.getInstance().get(
+                        props.get(PoddWebConstants.PROPERTY_OWLAPI_MANAGER, PoddWebConstants.DEFAULT_OWLAPI_MANAGER));
+        
+        if(ontologyManagers == null || ontologyManagers.isEmpty())
         {
-            ApplicationUtils.log.error("OWLOntologyManager was null");
+            ApplicationUtils.log.error("OWLOntologyManagerFactory was not found");
         }
+        
         final OWLReasonerFactory reasonerFactory =
                 OWLReasonerFactoryRegistry.getInstance().getReasonerFactory("Pellet");
         if(reasonerFactory == null)
         {
             ApplicationUtils.log.error("OWLReasonerFactory was null");
         }
-        final PoddOWLManager nextOWLManager = new PoddOWLManagerImpl(nextOWLOntologyManager, reasonerFactory);
+        
+        final PoddOWLManager nextOWLManager =
+                new PoddOWLManagerImpl(ontologyManagers.iterator().next(), reasonerFactory);
         
         // File Repository Manager
         final PoddDataRepositoryManager nextDataRepositoryManager = new PoddFileRepositoryManagerImpl();

@@ -67,6 +67,7 @@ import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLException;
 import org.semanticweb.owlapi.model.OWLOntologyID;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
+import org.semanticweb.owlapi.model.OWLOntologyManagerFactory;
 import org.semanticweb.owlapi.model.OWLOntologyManagerFactoryRegistry;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
 import org.slf4j.Logger;
@@ -218,7 +219,8 @@ public abstract class AbstractPoddArtifactManagerTest
      * 
      * @return A new empty instance of an implementation of PoddOWLManager.
      */
-    protected abstract PoddOWLManager getNewOWLManager(OWLOntologyManager manager, OWLReasonerFactory reasonerFactory);
+    protected abstract PoddOWLManager getNewOWLManager(OWLOntologyManagerFactory manager,
+            OWLReasonerFactory reasonerFactory);
     
     /**
      * Concrete tests must override this to provide a new, empty, instance of
@@ -227,6 +229,14 @@ public abstract class AbstractPoddArtifactManagerTest
      * @return A new empty instance of an implementation of PoddPurlManager.
      */
     protected abstract PoddPurlManager getNewPurlManager();
+    
+    /**
+     * Concrete tests must override this to provide a new, empty, instance of
+     * {@link OWLOntologyManagerFactory} that can be used with the {@link PoddOWLManager}.
+     * 
+     * @return A new empty instance of an implementation of {@link OWLOntologyManagerFactory}.
+     */
+    protected abstract OWLOntologyManagerFactory getNewOWLOntologyManagerFactory();
     
     /**
      * Concrete tests must override this to provide a new, empty, instance of
@@ -625,8 +635,8 @@ public abstract class AbstractPoddArtifactManagerTest
         final PoddPurlManager testPurlManager = this.getNewPurlManager();
         testPurlManager.setPurlProcessorFactoryRegistry(testPurlRegistry);
         
-        final OWLOntologyManager manager = OWLOntologyManagerFactoryRegistry.createOWLOntologyManager();
-        Assert.assertNotNull("Null implementation of OWLOntologymanager", manager);
+        OWLOntologyManagerFactory manager = getNewOWLOntologyManagerFactory();
+        Assert.assertNotNull("Null implementation of OWLOntologyManagerFactory", manager);
         final PoddOWLManager testOWLManager = this.getNewOWLManager(manager, this.getNewReasonerFactory());
         
         this.testSesameManager = this.getNewSesameManager();

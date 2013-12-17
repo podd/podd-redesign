@@ -18,6 +18,7 @@ package com.github.podd.impl.file.test;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.Collection;
 import java.util.Set;
 import java.util.UUID;
 
@@ -35,6 +36,7 @@ import org.openrdf.repository.Repository;
 import org.openrdf.repository.sail.SailRepository;
 import org.openrdf.sail.memory.MemoryStore;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
+import org.semanticweb.owlapi.model.OWLOntologyManagerFactory;
 import org.semanticweb.owlapi.model.OWLOntologyManagerFactoryRegistry;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactoryRegistry;
@@ -50,6 +52,7 @@ import com.github.podd.impl.PoddOWLManagerImpl;
 import com.github.podd.impl.PoddRepositoryManagerImpl;
 import com.github.podd.impl.file.PoddFileRepositoryManagerImpl;
 import com.github.podd.utils.PODD;
+import com.github.podd.utils.PoddWebConstants;
 
 /**
  * This concrete test class uses SSH File References and a test SSH file repository to run through
@@ -156,13 +159,8 @@ public class PoddFileRepositoryManagerImplTest extends AbstractPoddFileRepositor
         repositoryManager.setManagementRepository(testRepository);
         repositoryManager.setFileRepositoryManagementGraph(PODD.DEFAULT_FILE_REPOSITORY_MANAGEMENT_GRAPH);
         
-        // create an OWL Manager
-        final OWLOntologyManager manager = OWLOntologyManagerFactoryRegistry.createOWLOntologyManager();
-        Assert.assertNotNull("Null implementation of OWLOntologymanager", manager);
-        final OWLReasonerFactory reasonerFactory =
-                OWLReasonerFactoryRegistry.getInstance().getReasonerFactory("Pellet");
-        Assert.assertNotNull("Null implementation of OWLReasonerFactory", reasonerFactory);
-        final PoddOWLManager owlManager = new PoddOWLManagerImpl(manager, reasonerFactory);
+        final PoddOWLManager owlManager =
+                new PoddOWLManagerImpl(getNewOWLOntologyManagerFactory(), getNewReasonerFactory());
         
         // create the PoddDataRepositoryManager for testing
         final PoddDataRepositoryManager testFileRepositoryManager = new PoddFileRepositoryManagerImpl();
@@ -170,6 +168,23 @@ public class PoddFileRepositoryManagerImplTest extends AbstractPoddFileRepositor
         testFileRepositoryManager.setOWLManager(owlManager);
         
         return testFileRepositoryManager;
+    }
+    
+    protected OWLOntologyManagerFactory getNewOWLOntologyManagerFactory()
+    {
+        Collection<OWLOntologyManagerFactory> ontologyManagers =
+                OWLOntologyManagerFactoryRegistry.getInstance().get(PoddWebConstants.DEFAULT_OWLAPI_MANAGER);
+        
+        if(ontologyManagers == null || ontologyManagers.isEmpty())
+        {
+            this.log.error("OWLOntologyManagerFactory was not found");
+        }
+        return ontologyManagers.iterator().next();
+    }
+    
+    protected OWLReasonerFactory getNewReasonerFactory()
+    {
+        return OWLReasonerFactoryRegistry.getInstance().getReasonerFactory("Pellet");
     }
     
     @Override

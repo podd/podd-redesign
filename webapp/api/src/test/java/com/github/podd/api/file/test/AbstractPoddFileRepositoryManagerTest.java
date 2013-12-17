@@ -34,6 +34,8 @@ import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.Rio;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.github.podd.api.PoddRepositoryManager;
 import com.github.podd.api.file.DataReference;
@@ -55,6 +57,8 @@ import com.github.podd.utils.PODD;
  */
 public abstract class AbstractPoddFileRepositoryManagerTest
 {
+    protected final Logger log = LoggerFactory.getLogger(this.getClass());
+    
     public static final String TEST_ALIAS_1A = "alias-1-alpha";
     public static final String TEST_ALIAS_1B = "alias-1-beta";
     public static final String TEST_ALIAS_2A = "alias-2-alpha";

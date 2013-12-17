@@ -18,6 +18,7 @@ package com.github.podd.impl.test;
 
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.junit.Assert;
@@ -27,6 +28,7 @@ import org.openrdf.model.URI;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.Rio;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
+import org.semanticweb.owlapi.model.OWLOntologyManagerFactory;
 import org.semanticweb.owlapi.model.OWLOntologyManagerFactoryRegistry;
 import org.semanticweb.owlapi.model.UnloadableImportException;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
@@ -42,6 +44,7 @@ import com.github.podd.impl.PoddRepositoryManagerImpl;
 import com.github.podd.impl.PoddSchemaManagerImpl;
 import com.github.podd.impl.PoddSesameManagerImpl;
 import com.github.podd.utils.PODD;
+import com.github.podd.utils.PoddWebConstants;
 
 /**
  * @author Peter Ansell p_ansell@yahoo.com
@@ -50,13 +53,20 @@ import com.github.podd.utils.PODD;
 public class PoddSchemaManagerImplTest extends AbstractPoddSchemaManagerTest
 {
     @Override
-    protected OWLOntologyManager getNewOwlOntologyManagerInstance()
+    protected OWLOntologyManagerFactory getNewOWLOntologyManagerFactory()
     {
-        return OWLOntologyManagerFactoryRegistry.createOWLOntologyManager();
+        Collection<OWLOntologyManagerFactory> ontologyManagers =
+                OWLOntologyManagerFactoryRegistry.getInstance().get(PoddWebConstants.DEFAULT_OWLAPI_MANAGER);
+        
+        if(ontologyManagers == null || ontologyManagers.isEmpty())
+        {
+            this.log.error("OWLOntologyManagerFactory was not found");
+        }
+        return ontologyManagers.iterator().next();
     }
     
     @Override
-    protected PoddOWLManager getNewPoddOwlManagerInstance(final OWLOntologyManager manager,
+    protected PoddOWLManager getNewPoddOwlManagerInstance(final OWLOntologyManagerFactory manager,
             final OWLReasonerFactory reasonerFactory)
     {
         return new PoddOWLManagerImpl(manager, reasonerFactory);

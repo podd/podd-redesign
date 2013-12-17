@@ -18,6 +18,7 @@ package com.github.podd.impl.test;
 
 import java.io.InputStream;
 import java.io.StringWriter;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -44,6 +45,7 @@ import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyAlreadyExistsException;
 import org.semanticweb.owlapi.model.OWLOntologyID;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
+import org.semanticweb.owlapi.model.OWLOntologyManagerFactory;
 import org.semanticweb.owlapi.model.OWLOntologyManagerFactoryRegistry;
 import org.semanticweb.owlapi.profiles.OWLProfile;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
@@ -58,6 +60,7 @@ import com.github.podd.impl.PoddOWLManagerImpl;
 import com.github.podd.utils.DebugUtils;
 import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.PODD;
+import com.github.podd.utils.PoddWebConstants;
 
 /**
  * @author kutila
@@ -74,7 +77,20 @@ public class PoddOWLManagerImplTest extends AbstractPoddOWLManagerTest
     }
     
     @Override
-    protected PoddOWLManagerImpl getNewPoddOWLManagerInstance(final OWLOntologyManager manager,
+    protected OWLOntologyManagerFactory getNewOWLOntologyManagerFactory()
+    {
+        Collection<OWLOntologyManagerFactory> ontologyManagers =
+                OWLOntologyManagerFactoryRegistry.getInstance().get(PoddWebConstants.DEFAULT_OWLAPI_MANAGER);
+        
+        if(ontologyManagers == null || ontologyManagers.isEmpty())
+        {
+            this.log.error("OWLOntologyManagerFactory was not found");
+        }
+        return ontologyManagers.iterator().next();
+    }
+    
+    @Override
+    protected PoddOWLManagerImpl getNewPoddOWLManagerInstance(final OWLOntologyManagerFactory manager,
             final OWLReasonerFactory reasonerFactory)
     {
         return new PoddOWLManagerImpl(manager, reasonerFactory);

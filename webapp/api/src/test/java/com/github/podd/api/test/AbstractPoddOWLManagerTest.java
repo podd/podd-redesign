@@ -37,6 +37,7 @@ import org.semanticweb.owlapi.io.StreamDocumentSource;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
+import org.semanticweb.owlapi.model.OWLOntologyManagerFactory;
 import org.semanticweb.owlapi.model.OWLOntologyManagerFactoryRegistry;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
 import org.slf4j.Logger;
@@ -73,9 +74,17 @@ public abstract class AbstractPoddOWLManagerTest
     protected abstract OWLReasonerFactory getNewOWLReasonerFactoryInstance();
     
     /**
+     * Concrete tests must override this to provide a new, empty, instance of
+     * {@link OWLOntologyManagerFactory} that can be used with the {@link PoddOWLManager}.
+     * 
+     * @return A new empty instance of an implementation of {@link OWLOntologyManagerFactory}.
+     */
+    protected abstract OWLOntologyManagerFactory getNewOWLOntologyManagerFactory();
+    
+    /**
      * @return A new instance of PoddOWLManager, for each call to this method
      */
-    protected abstract PoddOWLManager getNewPoddOWLManagerInstance(OWLOntologyManager nextManager,
+    protected abstract PoddOWLManager getNewPoddOWLManagerInstance(OWLOntologyManagerFactory nextManager,
             OWLReasonerFactory nextReasonerFactory);
     
     protected OWLOntology independentlyLoadOntology(final OWLOntologyManager testOWLOntologyManager,
@@ -143,13 +152,15 @@ public abstract class AbstractPoddOWLManagerTest
     @Before
     public void setUp() throws Exception
     {
-        this.manager = OWLOntologyManagerFactoryRegistry.createOWLOntologyManager();
-        Assert.assertNotNull("Null implementation of OWLOntologymanager", this.manager);
+        // this.manager = OWLOntologyManagerFactoryRegistry.createOWLOntologyManager();
+        // Assert.assertNotNull("Null implementation of OWLOntologymanager", this.manager);
         
         final OWLReasonerFactory reasonerFactory = this.getNewOWLReasonerFactoryInstance();
         Assert.assertNotNull("Null implementation of reasoner factory", reasonerFactory);
         
-        this.testOWLManager = this.getNewPoddOWLManagerInstance(this.manager, reasonerFactory);
+        final OWLOntologyManagerFactory managerFactory = this.getNewOWLOntologyManagerFactory();
+        
+        this.testOWLManager = this.getNewPoddOWLManagerInstance(managerFactory, reasonerFactory);
         Assert.assertNotNull("Null implementation of test OWLManager", this.testOWLManager);
         
         // create a memory Repository for tests

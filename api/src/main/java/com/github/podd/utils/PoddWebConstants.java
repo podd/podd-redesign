@@ -240,6 +240,9 @@ public interface PoddWebConstants
     public static final String PROPERTY_OWLAPI_REASONER = "podd.owlreasoner";
     public static final String DEFAULT_OWLAPI_REASONER = "Pellet";
     
+    public static final String PROPERTY_OWLAPI_MANAGER = "podd.owlapimanager";
+    public static final String DEFAULT_OWLAPI_MANAGER = "org.semanticweb.owlapi.apibinding.OWLManager";
+    
     public static final String PROPERTY_SESAME_URL = "podd.sesamehttpurl";
     public static final String DEFAULT_SESAME_URL = "";
     

@@ -18,6 +18,7 @@ package com.github.podd.impl.test;
 
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.junit.Assert;
@@ -26,6 +27,7 @@ import org.openrdf.rio.RDFFormat;
 import org.semanticweb.owlapi.io.OWLOntologyDocumentSource;
 import org.semanticweb.owlapi.io.StreamDocumentSource;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
+import org.semanticweb.owlapi.model.OWLOntologyManagerFactory;
 import org.semanticweb.owlapi.model.OWLOntologyManagerFactoryRegistry;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactoryRegistry;
@@ -36,6 +38,7 @@ import com.github.podd.impl.PoddOWLManagerImpl;
 import com.github.podd.impl.PoddSesameManagerImpl;
 import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.PODD;
+import com.github.podd.utils.PoddWebConstants;
 
 /**
  * @author kutila
@@ -43,6 +46,17 @@ import com.github.podd.utils.PODD;
  */
 public class PoddSesameManagerImplTest extends AbstractPoddSesameManagerTest
 {
+    protected OWLOntologyManagerFactory getNewOWLOntologyManagerFactory()
+    {
+        Collection<OWLOntologyManagerFactory> ontologyManagers =
+                OWLOntologyManagerFactoryRegistry.getInstance().get(PoddWebConstants.DEFAULT_OWLAPI_MANAGER);
+        
+        if(ontologyManagers == null || ontologyManagers.isEmpty())
+        {
+            this.log.error("OWLOntologyManagerFactory was not found");
+        }
+        return ontologyManagers.iterator().next();
+    }
     
     @Override
     public PoddSesameManager getNewPoddSesameManagerInstance()
@@ -72,12 +86,11 @@ public class PoddSesameManagerImplTest extends AbstractPoddSesameManagerTest
                 };
         
         // - create a PODD OWLManager instance
-        final OWLOntologyManager manager = OWLOntologyManagerFactoryRegistry.createOWLOntologyManager();
-        Assert.assertNotNull("Null implementation of OWLOntologymanager", manager);
         final OWLReasonerFactory reasonerFactory =
                 OWLReasonerFactoryRegistry.getInstance().getReasonerFactory("Pellet");
         Assert.assertNotNull("Null implementation of OWLReasonerFactory", reasonerFactory);
-        final PoddOWLManagerImpl testPoddOWLManager = new PoddOWLManagerImpl(manager, reasonerFactory);
+        final PoddOWLManagerImpl testPoddOWLManager =
+                new PoddOWLManagerImpl(getNewOWLOntologyManagerFactory(), reasonerFactory);
         
         // - load each schema ontology (and its inferred ontology) to the
         // RepositoryConnection

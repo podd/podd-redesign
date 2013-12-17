@@ -33,7 +33,10 @@ import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLException;
 import org.semanticweb.owlapi.model.OWLOntologyID;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
+import org.semanticweb.owlapi.model.OWLOntologyManagerFactory;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.github.ansell.propertyutil.PropertyUtil;
 import com.github.podd.api.PoddOWLManager;
@@ -55,6 +58,8 @@ import com.github.podd.utils.PODD;
  */
 public abstract class AbstractPoddSchemaManagerTest
 {
+    protected final Logger log = LoggerFactory.getLogger(this.getClass());
+    
     protected PoddSchemaManager testSchemaManager;
     private PoddOWLManager testOwlManager;
     private PoddRepositoryManager testRepositoryManager;
@@ -62,16 +67,18 @@ public abstract class AbstractPoddSchemaManagerTest
     private PoddSesameManager testSesameManager;
     
     /**
+     * Concrete tests must override this to provide a new, empty, instance of
+     * {@link OWLOntologyManagerFactory} that can be used with the {@link PoddOWLManager}.
      * 
-     * @return A new instance of {@link OWLOntologyManager}, for each call to this method.
+     * @return A new empty instance of an implementation of {@link OWLOntologyManagerFactory}.
      */
-    protected abstract OWLOntologyManager getNewOwlOntologyManagerInstance();
+    protected abstract OWLOntologyManagerFactory getNewOWLOntologyManagerFactory();
     
     /**
      * 
      * @return A new instance of {@link PoddOWLManager}, for each call to this method.
      */
-    protected abstract PoddOWLManager getNewPoddOwlManagerInstance(OWLOntologyManager manager,
+    protected abstract PoddOWLManager getNewPoddOwlManagerInstance(OWLOntologyManagerFactory manager,
             OWLReasonerFactory reasonerFactory);
     
     /**
@@ -174,8 +181,8 @@ public abstract class AbstractPoddSchemaManagerTest
         this.testSesameManager = this.getNewPoddSesameManagerInstance();
         this.testSchemaManager.setSesameManager(this.testSesameManager);
         
-        this.owlapiManager = this.getNewOwlOntologyManagerInstance();
-        this.testOwlManager = this.getNewPoddOwlManagerInstance(this.owlapiManager, this.getNewReasonerFactory());
+        this.testOwlManager =
+                this.getNewPoddOwlManagerInstance(this.getNewOWLOntologyManagerFactory(), this.getNewReasonerFactory());
         
         this.testSchemaManager.setOwlManager(this.testOwlManager);
     }

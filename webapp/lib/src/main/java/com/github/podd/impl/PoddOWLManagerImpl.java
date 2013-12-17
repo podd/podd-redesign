@@ -58,6 +58,7 @@ import org.semanticweb.owlapi.model.OWLOntologyChangeException;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyID;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
+import org.semanticweb.owlapi.model.OWLOntologyManagerFactory;
 import org.semanticweb.owlapi.model.OWLRuntimeException;
 import org.semanticweb.owlapi.profiles.OWLProfile;
 import org.semanticweb.owlapi.profiles.OWLProfileRegistry;
@@ -118,7 +119,7 @@ public class PoddOWLManagerImpl implements PoddOWLManager
     
     private final OWLReasonerFactory reasonerFactory;
     
-    public PoddOWLManagerImpl(final OWLOntologyManager nextManager, final OWLReasonerFactory nextReasonerFactory)
+    public PoddOWLManagerImpl(final OWLOntologyManagerFactory nextManager, final OWLReasonerFactory nextReasonerFactory)
     {
         if(nextManager == null)
         {
@@ -128,7 +129,7 @@ public class PoddOWLManagerImpl implements PoddOWLManager
         {
             throw new IllegalArgumentException("OWLReasonerFactory was null");
         }
-        this.owlOntologyManager = nextManager;
+        this.owlOntologyManager = nextManager.buildOWLOntologyManager();
         this.reasonerFactory = nextReasonerFactory;
     }
     
@@ -559,8 +560,8 @@ public class PoddOWLManagerImpl implements PoddOWLManager
      */
     @Override
     public InferredOWLOntologyID loadAndInfer(final OWLOntologyDocumentSource owlSource,
-            final RepositoryConnection permanentRepositoryConnection, final OWLOntologyID replacementOntologyID) throws OWLException,
-        PoddException, OpenRDFException, IOException
+            final RepositoryConnection permanentRepositoryConnection, final OWLOntologyID replacementOntologyID)
+        throws OWLException, PoddException, OpenRDFException, IOException
     {
         return this.loadAndInfer(permanentRepositoryConnection, replacementOntologyID, owlSource, true);
     }
