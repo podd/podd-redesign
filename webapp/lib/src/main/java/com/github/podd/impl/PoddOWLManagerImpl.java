@@ -576,15 +576,16 @@ public class PoddOWLManagerImpl implements PoddOWLManager
      * @param permanentRepositoryConnection
      * @param owlSource
      * @param inferredOWLOntologyID
-     * @param removeFromCache
+     * @param removeFromCacheOnException
      * @return
      * @throws OWLException
      * @throws Throwable
      */
     public InferredOWLOntologyID loadAndInfer(final RepositoryConnection permanentRepositoryConnection,
-            final OWLOntologyID ontologyID, final OWLOntologyDocumentSource owlSource, final boolean removeFromCache)
+            final OWLOntologyID ontologyID, final OWLOntologyDocumentSource owlSource, final boolean removeFromCacheOnException)
         throws OWLException, PoddException, OpenRDFException, IOException
     {
+        InferredOWLOntologyID inferredOWLOntologyID = null;
         OWLOntology nextOntology = null;
         try
         {
@@ -660,14 +661,22 @@ public class PoddOWLManagerImpl implements PoddOWLManager
             // are all encapsulated
             // in the InferredOWLOntologyID object.
             
-            return this.inferStatements(nextOntology, permanentRepositoryConnection, nextReasoner);
+            inferredOWLOntologyID = this.inferStatements(nextOntology, permanentRepositoryConnection, nextReasoner);
+            
+            return inferredOWLOntologyID;
         }
         catch(final Throwable e)
         {
-            if(nextOntology != null && removeFromCache)
+            if(nextOntology != null && removeFromCacheOnException)
             {
                 this.removeCache(nextOntology.getOntologyID());
             }
+            
+            if(inferredOWLOntologyID != null && removeFromCacheOnException)
+            {
+                this.removeCache(inferredOWLOntologyID.getInferredOWLOntologyID());
+            }
+            
             throw e;
         }
     }
