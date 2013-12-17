@@ -215,8 +215,6 @@ public interface PoddOWLManager
      */
     void verifyAgainstSchema(Model model, Model schemaModel) throws OntologyNotInProfileException;
     
-    OWLReasonerFactory getReasonerFactory();
-    
     /**
      * Loads the ontology, using the given ontologyID as the identifier. <br>
      * This is necessary to enable the loading of ontologies that differ only in their version IRI,

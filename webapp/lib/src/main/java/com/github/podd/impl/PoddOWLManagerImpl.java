@@ -662,7 +662,6 @@ public class PoddOWLManagerImpl implements PoddOWLManager
         return this.owlOntologyManager;
     }
     
-    @Override
     public OWLReasonerFactory getReasonerFactory()
     {
         return this.reasonerFactory;
