@@ -27,8 +27,7 @@
         <rdfs:label>The PODD Science Ontology</rdfs:label>
         <owl:imports rdf:resource="http://purl.org/podd/ns/version/poddUser/1"/>
         <owl:imports rdf:resource="http://purl.org/podd/ns/version/poddBase/1"/>
-		<!-- The Version IRI is set to "2" for test purposes. -->
-        <owl:versionIRI rdf:resource="http://purl.org/podd/ns/version/poddScience/2"/>
+        <owl:versionIRI rdf:resource="http://purl.org/podd/ns/version/poddScience/XYZ"/>
     </owl:Ontology>
     
 
@@ -72,6 +71,8 @@
         <rdfs:label>ANZSRC FOR Code</rdfs:label>
         <rdfs:range rdf:resource="&poddScience;ANZSRC"/>
         <rdfs:domain rdf:resource="&poddScience;Project"/>
+        <poddBase:hasDisplayType rdf:resource="&poddBase;DisplayType_DropDownList"/>
+		<poddBase:weight>14</poddBase:weight>
     </owl:ObjectProperty>
     
 
@@ -79,7 +80,8 @@
     <!-- http://purl.org/podd/ns/poddScience#hasAccession -->
 
     <owl:ObjectProperty rdf:about="&poddScience;hasAccession">
-        <rdfs:label>Accession</rdfs:label>
+        <rdfs:label>has Accession</rdfs:label>
+        <rdfs:subPropertyOf rdf:resource="&poddBase;contains"/>
         <rdfs:range rdf:resource="&poddScience;Accession"/>
         <poddBase:weight>7</poddBase:weight>
     </owl:ObjectProperty>
@@ -102,6 +104,7 @@
         <rdfs:label>has Analysis</rdfs:label>
         <rdfs:subPropertyOf rdf:resource="&poddBase;contains"/>
         <rdfs:range rdf:resource="&poddScience;Analysis"/>
+		<poddBase:weight>10</poddBase:weight>
     </owl:ObjectProperty>
     
 
@@ -112,6 +115,7 @@
         <rdfs:label>has Container</rdfs:label>
         <rdfs:subPropertyOf rdf:resource="&poddBase;contains"/>
         <rdfs:range rdf:resource="&poddScience;Container"/>
+		<poddBase:weight>10</poddBase:weight>
     </owl:ObjectProperty>
     
 
@@ -120,6 +124,7 @@
 
     <owl:ObjectProperty rdf:about="&poddScience;hasControl">
         <rdfs:label>Control</rdfs:label>
+        <poddBase:hasDisplayType rdf:resource="&poddBase;DisplayType_DropDownList"/>
         <rdfs:range rdf:resource="&poddScience;HasControlAssertion"/>
         <rdfs:domain rdf:resource="&poddScience;Material"/>
         <poddBase:weight>6</poddBase:weight>
@@ -133,6 +138,7 @@
         <rdfs:label>has Data</rdfs:label>
         <rdfs:subPropertyOf rdf:resource="&poddBase;contains"/>
         <rdfs:range rdf:resource="&poddScience;Data"/>
+		<poddBase:weight>10</poddBase:weight>
     </owl:ObjectProperty>
     
 
@@ -143,6 +149,7 @@
         <rdfs:label>has Design</rdfs:label>
         <rdfs:subPropertyOf rdf:resource="&poddBase;contains"/>
         <rdfs:range rdf:resource="&poddScience;Design"/>
+		<poddBase:weight>10</poddBase:weight>
     </owl:ObjectProperty>
     
 
@@ -153,6 +160,7 @@
         <rdfs:label>has Environment</rdfs:label>
         <rdfs:subPropertyOf rdf:resource="&poddBase;contains"/>
         <rdfs:range rdf:resource="&poddScience;Environment"/>
+		<poddBase:weight>10</poddBase:weight>
     </owl:ObjectProperty>
     
 
@@ -161,8 +169,9 @@
 
     <owl:ObjectProperty rdf:about="&poddScience;hasEvent">
         <rdfs:label>has Event</rdfs:label>
+        <rdfs:subPropertyOf rdf:resource="&poddBase;contains"/>
         <rdfs:range rdf:resource="&poddScience;Event"/>
-	<poddBase:weight>13</poddBase:weight>
+		<poddBase:weight>13</poddBase:weight>
     </owl:ObjectProperty>
     
 
@@ -173,6 +182,7 @@
         <rdfs:label>has Gene</rdfs:label>
         <rdfs:subPropertyOf rdf:resource="&poddBase;contains"/>
         <rdfs:range rdf:resource="&poddScience;Gene"/>
+		<poddBase:weight>10</poddBase:weight>
     </owl:ObjectProperty>
     
 
@@ -183,6 +193,7 @@
         <rdfs:label>has Genotype</rdfs:label>
         <rdfs:subPropertyOf rdf:resource="&poddBase;contains"/>
         <rdfs:range rdf:resource="&poddScience;Genotype"/>
+		<poddBase:weight>10</poddBase:weight>
     </owl:ObjectProperty>
     
 
@@ -193,6 +204,7 @@
         <rdfs:label>has Investigation</rdfs:label>
         <rdfs:subPropertyOf rdf:resource="&poddBase;contains"/>
         <rdfs:range rdf:resource="&poddScience;Investigation"/>
+		<poddBase:weight>10</poddBase:weight>
     </owl:ObjectProperty>
     
 
@@ -213,6 +225,7 @@
         <rdfs:label>has Material</rdfs:label>
         <rdfs:subPropertyOf rdf:resource="&poddBase;contains"/>
         <rdfs:range rdf:resource="&poddScience;Material"/>
+		<poddBase:weight>10</poddBase:weight>
     </owl:ObjectProperty>
     
 
@@ -221,6 +234,7 @@
 
     <owl:ObjectProperty rdf:about="&poddScience;hasMeasurement">
         <rdfs:label>has Measurement</rdfs:label>
+        <rdfs:subPropertyOf rdf:resource="&poddBase;contains"/>
         <rdfs:range rdf:resource="&poddScience;Measurement"/>
         <poddBase:weight>15</poddBase:weight>
     </owl:ObjectProperty>
@@ -230,7 +244,8 @@
     <!-- http://purl.org/podd/ns/poddScience#hasMeasurementParameter -->
 
     <owl:ObjectProperty rdf:about="&poddScience;hasMeasurementParameter">
-        <rdfs:label>Measurement Parameter</rdfs:label>
+        <rdfs:label>has Measurement Parameter</rdfs:label>
+        <rdfs:subPropertyOf rdf:resource="&poddBase;contains"/>
         <rdfs:range rdf:resource="&poddScience;MeasurementParameter"/>
         <poddBase:weight>10</poddBase:weight>
     </owl:ObjectProperty>
@@ -243,6 +258,7 @@
         <rdfs:label>has Observation</rdfs:label>
         <rdfs:subPropertyOf rdf:resource="&poddBase;contains"/>
         <rdfs:range rdf:resource="&poddScience;Observation"/>
+		<poddBase:weight>10</poddBase:weight>
     </owl:ObjectProperty>
     
 
@@ -253,6 +269,7 @@
         <rdfs:label>has Phenotype</rdfs:label>
         <rdfs:subPropertyOf rdf:resource="&poddBase;contains"/>
         <rdfs:range rdf:resource="&poddScience;Phenotype"/>
+		<poddBase:weight>10</poddBase:weight>
     </owl:ObjectProperty>
     
 
@@ -263,6 +280,7 @@
         <rdfs:label>has Platform</rdfs:label>
         <rdfs:subPropertyOf rdf:resource="&poddBase;contains"/>
         <rdfs:range rdf:resource="&poddScience;Platform"/>
+		<poddBase:weight>10</poddBase:weight>
     </owl:ObjectProperty>
     
 
@@ -271,6 +289,7 @@
 
     <owl:ObjectProperty rdf:about="&poddScience;hasPlatformType">
         <rdfs:label>Platform Type</rdfs:label>
+        <poddBase:hasDisplayType rdf:resource="&poddBase;DisplayType_DropDownList"/>
         <rdfs:domain rdf:resource="&poddScience;Platform"/>
         <rdfs:range rdf:resource="&poddScience;PlatformType"/>
         <poddBase:weight>3</poddBase:weight>
@@ -284,6 +303,7 @@
         <rdfs:label>has Process</rdfs:label>
         <rdfs:subPropertyOf rdf:resource="&poddBase;contains"/>
         <rdfs:range rdf:resource="&poddScience;Process"/>
+		<poddBase:weight>10</poddBase:weight>
     </owl:ObjectProperty>
     
 
@@ -294,6 +314,7 @@
         <rdfs:label>has Project Plan</rdfs:label>
         <rdfs:subPropertyOf rdf:resource="&poddBase;contains"/>
         <rdfs:range rdf:resource="&poddScience;ProjectPlan"/>
+		<poddBase:weight>10</poddBase:weight>
     </owl:ObjectProperty>
     
 
@@ -304,6 +325,7 @@
         <rdfs:label>has Protocol</rdfs:label>
         <rdfs:subPropertyOf rdf:resource="&poddBase;contains"/>
         <rdfs:range rdf:resource="&poddScience;Protocol"/>
+		<poddBase:weight>10</poddBase:weight>
     </owl:ObjectProperty>
     
 
@@ -314,6 +336,7 @@
         <rdfs:label>has Publication</rdfs:label>
         <rdfs:subPropertyOf rdf:resource="&poddBase;contains"/>
         <rdfs:range rdf:resource="&poddScience;Publication"/>
+		<poddBase:weight>10</poddBase:weight>
     </owl:ObjectProperty>
     
 
@@ -324,6 +347,7 @@
         <rdfs:label>has Sequence</rdfs:label>
         <rdfs:subPropertyOf rdf:resource="&poddBase;contains"/>
         <rdfs:range rdf:resource="&poddScience;Sequence"/>
+		<poddBase:weight>10</poddBase:weight>
     </owl:ObjectProperty>
     
 
@@ -332,8 +356,9 @@
 
     <owl:ObjectProperty rdf:about="&poddScience;hasSex">
         <rdfs:label>Sex</rdfs:label>
+        <poddBase:hasDisplayType rdf:resource="&poddBase;DisplayType_DropDownList"/>
         <rdfs:range rdf:resource="&poddScience;Sex"/>
-        <poddBase:weight>9</poddBase:weight>
+        <poddBase:weight>10</poddBase:weight>
     </owl:ObjectProperty>
     
 
@@ -341,9 +366,32 @@
     <!-- http://purl.org/podd/ns/poddScience#hasSoftware -->
 
     <owl:ObjectProperty rdf:about="&poddScience;hasSoftware">
-        <rdfs:label>Software</rdfs:label>
+        <rdfs:label>has Software</rdfs:label>
+        <rdfs:subPropertyOf rdf:resource="&poddBase;contains"/>
         <rdfs:range rdf:resource="&poddScience;Software"/>
         <poddBase:weight>5</poddBase:weight>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddScience#hasTray -->
+
+    <owl:ObjectProperty rdf:about="&poddScience;hasTray">
+        <rdfs:label>has Tray</rdfs:label>
+        <rdfs:subPropertyOf rdf:resource="&poddScience;hasContainer"/>
+        <rdfs:range rdf:resource="&poddScience;Tray"/>
+		<poddBase:weight>10</poddBase:weight>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddScience#hasPot -->
+
+    <owl:ObjectProperty rdf:about="&poddScience;hasPot">
+        <rdfs:label>has Pot</rdfs:label>
+        <rdfs:subPropertyOf rdf:resource="&poddScience;hasContainer"/>
+        <rdfs:range rdf:resource="&poddScience;Pot"/>
+		<poddBase:weight>10</poddBase:weight>
     </owl:ObjectProperty>
     
 
@@ -354,6 +402,7 @@
         <rdfs:label>has Treatment</rdfs:label>
         <rdfs:subPropertyOf rdf:resource="&poddBase;contains"/>
         <rdfs:range rdf:resource="&poddScience;Treatment"/>
+		<poddBase:weight>10</poddBase:weight>
     </owl:ObjectProperty>
     
 
@@ -364,6 +413,7 @@
         <rdfs:label>has Treatment Material</rdfs:label>
         <rdfs:subPropertyOf rdf:resource="&poddBase;contains"/>
         <rdfs:range rdf:resource="&poddScience;TreatmentMaterial"/>
+		<poddBase:weight>10</poddBase:weight>
     </owl:ObjectProperty>
     
 
@@ -372,6 +422,7 @@
 
     <owl:ObjectProperty rdf:about="&poddScience;hasWildType">
         <rdfs:label>Wild Type</rdfs:label>
+        <poddBase:hasDisplayType rdf:resource="&poddBase;DisplayType_DropDownList"/>
         <rdfs:range rdf:resource="&poddScience;WildTypeAssertion"/>
         <rdfs:domain rdf:resource="&poddScience;Genotype"/>
         <poddBase:weight>3</poddBase:weight>
@@ -383,8 +434,10 @@
 
     <owl:ObjectProperty rdf:about="&poddScience;refersToAnalysis">
         <rdfs:label>Refers To Analysis</rdfs:label>
+        <poddBase:hasDisplayType rdf:resource="&poddBase;DisplayType_AutoComplete"/>
         <rdfs:subPropertyOf rdf:resource="&poddBase;refersTo"/>
         <rdfs:range rdf:resource="&poddScience;Analysis"/>
+		<poddBase:weight>50</poddBase:weight>
     </owl:ObjectProperty>
     
 
@@ -393,8 +446,10 @@
 
     <owl:ObjectProperty rdf:about="&poddScience;refersToContainer">
         <rdfs:label>Refers To Container</rdfs:label>
+        <poddBase:hasDisplayType rdf:resource="&poddBase;DisplayType_AutoComplete"/>
         <rdfs:subPropertyOf rdf:resource="&poddBase;refersTo"/>
         <rdfs:range rdf:resource="&poddScience;Container"/>
+		<poddBase:weight>50</poddBase:weight>
     </owl:ObjectProperty>
     
 
@@ -402,9 +457,11 @@
     <!-- http://purl.org/podd/ns/poddScience#refersToData -->
 
     <owl:ObjectProperty rdf:about="&poddScience;refersToData">
-        <rdfs:comment>Refers To Data</rdfs:comment>
+        <rdfs:label>Refers To Data</rdfs:label>
+        <poddBase:hasDisplayType rdf:resource="&poddBase;DisplayType_AutoComplete"/>
         <rdfs:subPropertyOf rdf:resource="&poddBase;refersTo"/>
         <rdfs:range rdf:resource="&poddScience;Data"/>
+		<poddBase:weight>50</poddBase:weight>
     </owl:ObjectProperty>
     
 
@@ -413,8 +470,10 @@
 
     <owl:ObjectProperty rdf:about="&poddScience;refersToEnvironment">
         <rdfs:label>Refers To Environment</rdfs:label>
+        <poddBase:hasDisplayType rdf:resource="&poddBase;DisplayType_AutoComplete"/>
         <rdfs:subPropertyOf rdf:resource="&poddBase;refersTo"/>
         <rdfs:range rdf:resource="&poddScience;Environment"/>
+		<poddBase:weight>50</poddBase:weight>
     </owl:ObjectProperty>
     
 
@@ -423,8 +482,10 @@
 
     <owl:ObjectProperty rdf:about="&poddScience;refersToGenotype">
         <rdfs:label>Refers To Genotype</rdfs:label>
+        <poddBase:hasDisplayType rdf:resource="&poddBase;DisplayType_AutoComplete"/>
         <rdfs:subPropertyOf rdf:resource="&poddBase;refersTo"/>
         <rdfs:range rdf:resource="&poddScience;Genotype"/>
+		<poddBase:weight>50</poddBase:weight>
     </owl:ObjectProperty>
     
 
@@ -433,8 +494,10 @@
 
     <owl:ObjectProperty rdf:about="&poddScience;refersToMaterial">
         <rdfs:label>Refers To Material</rdfs:label>
+        <poddBase:hasDisplayType rdf:resource="&poddBase;DisplayType_AutoComplete"/>
         <rdfs:subPropertyOf rdf:resource="&poddBase;refersTo"/>
         <rdfs:range rdf:resource="&poddScience;Material"/>
+		<poddBase:weight>50</poddBase:weight>
     </owl:ObjectProperty>
     
 
@@ -443,8 +506,10 @@
 
     <owl:ObjectProperty rdf:about="&poddScience;refersToPlatform">
         <rdfs:label>Refers To Platform</rdfs:label>
+        <poddBase:hasDisplayType rdf:resource="&poddBase;DisplayType_AutoComplete"/>
         <rdfs:subPropertyOf rdf:resource="&poddBase;refersTo"/>
         <rdfs:range rdf:resource="&poddScience;Platform"/>
+		<poddBase:weight>50</poddBase:weight>
     </owl:ObjectProperty>
     
 
@@ -453,8 +518,10 @@
 
     <owl:ObjectProperty rdf:about="&poddScience;refersToProcess">
         <rdfs:label>RefersTo Process</rdfs:label>
+        <poddBase:hasDisplayType rdf:resource="&poddBase;DisplayType_AutoComplete"/>
         <rdfs:subPropertyOf rdf:resource="&poddBase;refersTo"/>
         <rdfs:range rdf:resource="&poddScience;Process"/>
+		<poddBase:weight>50</poddBase:weight>
     </owl:ObjectProperty>
     
 
@@ -463,8 +530,10 @@
 
     <owl:ObjectProperty rdf:about="&poddScience;refersToProtocol">
         <rdfs:label>Refers To Protocol</rdfs:label>
+        <poddBase:hasDisplayType rdf:resource="&poddBase;DisplayType_AutoComplete"/>
         <rdfs:subPropertyOf rdf:resource="&poddBase;refersTo"/>
         <rdfs:range rdf:resource="&poddScience;Protocol"/>
+		<poddBase:weight>50</poddBase:weight>
     </owl:ObjectProperty>
     
 
@@ -473,8 +542,10 @@
 
     <owl:ObjectProperty rdf:about="&poddScience;refersToTreatmentMaterial">
         <rdfs:label>Refers To Treatment Material</rdfs:label>
+        <poddBase:hasDisplayType rdf:resource="&poddBase;DisplayType_AutoComplete"/>
         <rdfs:subPropertyOf rdf:resource="&poddBase;refersTo"/>
         <rdfs:range rdf:resource="&poddScience;TreatmentMaterial"/>
+		<poddBase:weight>50</poddBase:weight>
     </owl:ObjectProperty>
     
 
@@ -494,6 +565,7 @@
 
     <owl:DatatypeProperty rdf:about="&poddScience;hasAbstract">
         <rdfs:label>Abstract</rdfs:label>
+        <poddBase:hasDisplayType rdf:resource="&poddBase;DisplayType_LongText"/>
         <rdfs:range rdf:resource="&xsd;string"/>
         <poddBase:weight>3</poddBase:weight>
     </owl:DatatypeProperty>
@@ -503,7 +575,8 @@
     <!-- http://purl.org/podd/ns/poddScience#hasAccessionSource -->
 
     <owl:DatatypeProperty rdf:about="&poddScience;hasAccessionSource">
-        <rdfs:label>Source</rdfs:label>
+        <rdfs:label>Accession Source</rdfs:label>
+        <poddBase:hasDisplayType rdf:resource="&poddBase;DisplayType_ShortText"/>
         <rdfs:range rdf:resource="&xsd;string"/>
         <poddBase:weight>5</poddBase:weight>
     </owl:DatatypeProperty>
@@ -514,6 +587,7 @@
 
     <owl:DatatypeProperty rdf:about="&poddScience;hasAge">
         <rdfs:label>Age</rdfs:label>
+        <poddBase:hasDisplayType rdf:resource="&poddBase;DisplayType_ShortText"/>
         <rdfs:range rdf:resource="&xsd;string"/>
         <poddBase:weight>11</poddBase:weight>
     </owl:DatatypeProperty>
@@ -524,6 +598,7 @@
 
     <owl:DatatypeProperty rdf:about="&poddScience;hasAlias">
         <rdfs:label>Alias</rdfs:label>
+        <poddBase:hasDisplayType rdf:resource="&poddBase;DisplayType_ShortText"/>
         <rdfs:range rdf:resource="&xsd;string"/>
         <poddBase:weight>6</poddBase:weight>
     </owl:DatatypeProperty>
@@ -534,6 +609,7 @@
 
     <owl:DatatypeProperty rdf:about="&poddScience;hasAlleleSymbol">
         <rdfs:label>Symbol</rdfs:label>
+        <poddBase:hasDisplayType rdf:resource="&poddBase;DisplayType_ShortText"/>
         <rdfs:range rdf:resource="&xsd;string"/>
         <poddBase:weight>5</poddBase:weight>
     </owl:DatatypeProperty>
@@ -544,6 +620,7 @@
 
     <owl:DatatypeProperty rdf:about="&poddScience;hasAnatomicalPart">
         <rdfs:label>Anatomical Part</rdfs:label>
+        <poddBase:hasDisplayType rdf:resource="&poddBase;DisplayType_ShortText"/>
         <rdfs:range rdf:resource="&xsd;string"/>
         <poddBase:weight>5</poddBase:weight>
     </owl:DatatypeProperty>
@@ -554,6 +631,7 @@
 
     <owl:DatatypeProperty rdf:about="&poddScience;hasAuthors">
         <rdfs:label>Authors</rdfs:label>
+        <poddBase:hasDisplayType rdf:resource="&poddBase;DisplayType_LongText"/>
         <rdfs:range rdf:resource="&xsd;string"/>
         <poddBase:weight>5</poddBase:weight>
     </owl:DatatypeProperty>
@@ -564,6 +642,7 @@
 
     <owl:DatatypeProperty rdf:about="&poddScience;hasBarcode">
         <rdfs:label>Barcode</rdfs:label>
+        <poddBase:hasDisplayType rdf:resource="&poddBase;DisplayType_ShortText"/>
         <rdfs:range rdf:resource="&xsd;string"/>
         <poddBase:weight>4</poddBase:weight>
     </owl:DatatypeProperty>
@@ -574,6 +653,7 @@
 
     <owl:DatatypeProperty rdf:about="&poddScience;hasChromosome">
         <rdfs:label>Chromosome</rdfs:label>
+        <poddBase:hasDisplayType rdf:resource="&poddBase;DisplayType_ShortText"/>
         <rdfs:range rdf:resource="&xsd;string"/>
         <poddBase:weight>4</poddBase:weight>
     </owl:DatatypeProperty>
@@ -584,16 +664,27 @@
 
     <owl:DatatypeProperty rdf:about="&poddScience;hasChromosomeLocation">
         <rdfs:label>Chromosome Location</rdfs:label>
+        <poddBase:hasDisplayType rdf:resource="&poddBase;DisplayType_ShortText"/>
         <rdfs:range rdf:resource="&xsd;string"/>
         <poddBase:weight>5</poddBase:weight>
     </owl:DatatypeProperty>
     
 
+    <!-- http://purl.org/podd/ns/poddScience#hasContainerType -->
+
+    <owl:DatatypeProperty rdf:about="&poddScience;hasContainerType">
+        <rdfs:label>has Container Type</rdfs:label>
+        <poddBase:hasDisplayType rdf:resource="&poddBase;DisplayType_ShortText"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+		<poddBase:weight>3</poddBase:weight>
+    </owl:DatatypeProperty>
+    
 
     <!-- http://purl.org/podd/ns/poddScience#hasDOB -->
 
     <owl:DatatypeProperty rdf:about="&poddScience;hasDOB">
         <rdfs:label>DOB</rdfs:label>
+        <poddBase:hasDisplayType rdf:resource="&poddBase;DisplayType_ShortText"/>
         <rdfs:range rdf:resource="&xsd;date"/>
         <poddBase:weight>10</poddBase:weight>
     </owl:DatatypeProperty>
@@ -604,6 +695,7 @@
 
     <owl:DatatypeProperty rdf:about="&poddScience;hasDesignType">
         <rdfs:label>Design Type</rdfs:label>
+        <poddBase:hasDisplayType rdf:resource="&poddBase;DisplayType_ShortText"/>
         <rdfs:range rdf:resource="&xsd;string"/>
         <poddBase:weight>3</poddBase:weight>
     </owl:DatatypeProperty>
@@ -614,18 +706,31 @@
 
     <owl:DatatypeProperty rdf:about="&poddScience;hasEventDescription">
         <rdfs:label>Description of the Event</rdfs:label>
+        <poddBase:hasDisplayType rdf:resource="&poddBase;DisplayType_LongText"/>
         <rdfs:range rdf:resource="&xsd;string"/>
         <poddBase:weight>4</poddBase:weight>
     </owl:DatatypeProperty>
     
 
 
-    <!-- http://purl.org/podd/ns/poddScience#hasGenusSpecies -->
+    <!-- http://purl.org/podd/ns/poddScience#hasGenus -->
 
-    <owl:DatatypeProperty rdf:about="&poddScience;hasGenusSpecies">
-        <rdfs:label>Genus and Species</rdfs:label>
+    <owl:DatatypeProperty rdf:about="&poddScience;hasGenus">
+        <rdfs:label>Genus</rdfs:label>
+        <poddBase:hasDisplayType rdf:resource="&poddBase;DisplayType_ShortText"/>
         <rdfs:range rdf:resource="&xsd;string"/>
-        <poddBase:weight>7</poddBase:weight>
+        <poddBase:weight>8</poddBase:weight>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddScience#hasSpecies -->
+
+    <owl:DatatypeProperty rdf:about="&poddScience;hasSpecies">
+        <rdfs:label>Species</rdfs:label>
+        <poddBase:hasDisplayType rdf:resource="&poddBase;DisplayType_ShortText"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+        <poddBase:weight>9</poddBase:weight>
     </owl:DatatypeProperty>
     
 
@@ -634,6 +739,7 @@
 
     <owl:DatatypeProperty rdf:about="&poddScience;hasIssue">
         <rdfs:label>Issue</rdfs:label>
+        <poddBase:hasDisplayType rdf:resource="&poddBase;DisplayType_LongText"/>
         <rdfs:range rdf:resource="&xsd;string"/>
         <poddBase:weight>8</poddBase:weight>
     </owl:DatatypeProperty>
@@ -644,6 +750,174 @@
 
     <owl:DatatypeProperty rdf:about="&poddScience;hasLine">
         <rdfs:label>Line</rdfs:label>
+        <poddBase:hasDisplayType rdf:resource="&poddBase;DisplayType_ShortText"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+        <poddBase:weight>11</poddBase:weight>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddScience#hasLineNumber -->
+
+    <owl:DatatypeProperty rdf:about="&poddScience;hasLineNumber">
+        <rdfs:label>Line Number</rdfs:label>
+        <poddBase:hasDisplayType rdf:resource="&poddBase;DisplayType_ShortText"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+        <poddBase:weight>11</poddBase:weight>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddScience#hasTrayNumber -->
+
+    <owl:DatatypeProperty rdf:about="&poddScience;hasTrayNumber">
+        <rdfs:label>Tray Number</rdfs:label>
+        <poddBase:hasDisplayType rdf:resource="&poddBase;DisplayType_ShortText"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+        <poddBase:weight>11</poddBase:weight>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddScience#hasTrayRowNumber -->
+
+    <owl:DatatypeProperty rdf:about="&poddScience;hasTrayRowNumber">
+        <rdfs:label>Tray Row Number</rdfs:label>
+        <poddBase:hasDisplayType rdf:resource="&poddBase;DisplayType_ShortText"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+        <poddBase:weight>11</poddBase:weight>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddScience#hasPotNumber -->
+
+    <owl:DatatypeProperty rdf:about="&poddScience;hasPotNumber">
+        <rdfs:label>Pot Number</rdfs:label>
+        <poddBase:hasDisplayType rdf:resource="&poddBase;DisplayType_ShortText"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+        <poddBase:weight>11</poddBase:weight>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddScience#hasTrayType -->
+
+    <owl:DatatypeProperty rdf:about="&poddScience;hasTrayType">
+        <rdfs:subPropertyOf rdf:resource="&poddScience;hasContainerType"/>
+        <rdfs:label>Tray Type</rdfs:label>
+        <poddBase:hasDisplayType rdf:resource="&poddBase;DisplayType_ShortText"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+        <poddBase:weight>11</poddBase:weight>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddScience#hasPotType -->
+
+    <owl:DatatypeProperty rdf:about="&poddScience;hasPotType">
+        <rdfs:subPropertyOf rdf:resource="&poddScience;hasContainerType"/>
+        <rdfs:label>Pot Type</rdfs:label>
+        <poddBase:hasDisplayType rdf:resource="&poddBase;DisplayType_ShortText"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+        <poddBase:weight>11</poddBase:weight>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddScience#hasPotColumnNumberOverall -->
+
+    <owl:DatatypeProperty rdf:about="&poddScience;hasPotColumnNumberOverall">
+        <rdfs:label>Pot Column Number Overall</rdfs:label>
+        <poddBase:hasDisplayType rdf:resource="&poddBase;DisplayType_ShortText"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+        <poddBase:weight>11</poddBase:weight>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddScience#hasPotColumnNumberReplicate -->
+
+    <owl:DatatypeProperty rdf:about="&poddScience;hasPotColumnNumberReplicate">
+        <rdfs:label>Pot Column Number Replicate</rdfs:label>
+        <poddBase:hasDisplayType rdf:resource="&poddBase;DisplayType_ShortText"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+        <poddBase:weight>11</poddBase:weight>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddScience#hasPotColumnNumberTray -->
+
+    <owl:DatatypeProperty rdf:about="&poddScience;hasPotColumnNumberTray">
+        <rdfs:label>Pot Column Number Tray</rdfs:label>
+        <poddBase:hasDisplayType rdf:resource="&poddBase;DisplayType_ShortText"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+        <poddBase:weight>11</poddBase:weight>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddScience#hasPotColumnLetterTray -->
+
+    <owl:DatatypeProperty rdf:about="&poddScience;hasPotColumnLetterTray">
+        <rdfs:label>Pot Column Letter Tray</rdfs:label>
+        <poddBase:hasDisplayType rdf:resource="&poddBase;DisplayType_ShortText"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+        <poddBase:weight>11</poddBase:weight>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddScience#hasPotPositionTray -->
+
+    <owl:DatatypeProperty rdf:about="&poddScience;hasPotPositionTray">
+        <rdfs:label>Pot Position Tray</rdfs:label>
+        <poddBase:hasDisplayType rdf:resource="&poddBase;DisplayType_ShortText"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+        <poddBase:weight>11</poddBase:weight>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddScience#hasPotNumberTray -->
+
+    <owl:DatatypeProperty rdf:about="&poddScience;hasPotNumberTray">
+        <rdfs:label>Pot Number Tray</rdfs:label>
+        <poddBase:hasDisplayType rdf:resource="&poddBase;DisplayType_ShortText"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+        <poddBase:weight>11</poddBase:weight>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddScience#hasPotNumberReplicate -->
+
+    <owl:DatatypeProperty rdf:about="&poddScience;hasPotNumberReplicate">
+        <rdfs:label>Pot Number Replicate</rdfs:label>
+        <poddBase:hasDisplayType rdf:resource="&poddBase;DisplayType_ShortText"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+        <poddBase:weight>11</poddBase:weight>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddScience#hasPotRowNumberReplicate -->
+
+    <owl:DatatypeProperty rdf:about="&poddScience;hasPotRowNumberReplicate">
+        <rdfs:label>Pot Row Number Replicate</rdfs:label>
+        <poddBase:hasDisplayType rdf:resource="&poddBase;DisplayType_ShortText"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+        <poddBase:weight>11</poddBase:weight>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddScience#hasPotRowNumberTray -->
+
+    <owl:DatatypeProperty rdf:about="&poddScience;hasPotRowNumberTray">
+        <rdfs:label>Pot Row Number Tray</rdfs:label>
+        <poddBase:hasDisplayType rdf:resource="&poddBase;DisplayType_ShortText"/>
         <rdfs:range rdf:resource="&xsd;string"/>
         <poddBase:weight>11</poddBase:weight>
     </owl:DatatypeProperty>
@@ -654,8 +928,9 @@
 
     <owl:DatatypeProperty rdf:about="&poddScience;hasMarkerDirection">
         <rdfs:label>Direction</rdfs:label>
+        <poddBase:hasDisplayType rdf:resource="&poddBase;DisplayType_ShortText"/>
         <rdfs:range rdf:resource="&xsd;string"/>
-        <poddBase:weight>9</poddBase:weight>
+        <poddBase:weight>10</poddBase:weight>
     </owl:DatatypeProperty>
     
 
@@ -665,6 +940,7 @@
     <owl:DatatypeProperty rdf:about="&poddScience;hasMarkerType">
         <rdfs:label>Marker Type</rdfs:label>
         <rdfs:comment>Type of the Marker (e.g. QTL, phenotypic marker)</rdfs:comment>
+        <poddBase:hasDisplayType rdf:resource="&poddBase;DisplayType_ShortText"/>
         <rdfs:range rdf:resource="&xsd;string"/>
         <poddBase:weight>5</poddBase:weight>
     </owl:DatatypeProperty>
@@ -675,6 +951,7 @@
 
     <owl:DatatypeProperty rdf:about="&poddScience;hasMaterialStatus">
         <rdfs:label>Status</rdfs:label>
+        <poddBase:hasDisplayType rdf:resource="&poddBase;DisplayType_ShortText"/>
         <rdfs:range rdf:resource="&xsd;string"/>
         <poddBase:weight>8</poddBase:weight>
     </owl:DatatypeProperty>
@@ -685,6 +962,7 @@
 
     <owl:DatatypeProperty rdf:about="&poddScience;hasMutation">
         <rdfs:label>Mutation</rdfs:label>
+        <poddBase:hasDisplayType rdf:resource="&poddBase;DisplayType_ShortText"/>
         <rdfs:range rdf:resource="&xsd;string"/>
         <poddBase:weight>12</poddBase:weight>
     </owl:DatatypeProperty>
@@ -695,6 +973,7 @@
 
     <owl:DatatypeProperty rdf:about="&poddScience;hasName">
         <rdfs:label>Name</rdfs:label>
+        <poddBase:hasDisplayType rdf:resource="&poddBase;DisplayType_ShortText"/>
         <rdfs:range rdf:resource="&xsd;string"/>
         <poddBase:weight>3</poddBase:weight>
     </owl:DatatypeProperty>
@@ -705,27 +984,19 @@
 
     <owl:DatatypeProperty rdf:about="&poddScience;hasNickname">
         <rdfs:label>Nickname</rdfs:label>
+        <poddBase:hasDisplayType rdf:resource="&poddBase;DisplayType_ShortText"/>
         <rdfs:range rdf:resource="&xsd;string"/>
         <poddBase:weight>5</poddBase:weight>
     </owl:DatatypeProperty>
     
 
-
-    <!-- http://purl.org/podd/ns/poddScience#hasNotes -->
-
-    <owl:DatatypeProperty rdf:about="&poddScience;hasNotes">
-        <rdfs:label>Notes</rdfs:label>
-        <rdfs:range rdf:resource="&xsd;string"/>
-    </owl:DatatypeProperty>
-    
-
-
     <!-- http://purl.org/podd/ns/poddScience#hasPages -->
 
     <owl:DatatypeProperty rdf:about="&poddScience;hasPages">
         <rdfs:label>Pages</rdfs:label>
+        <poddBase:hasDisplayType rdf:resource="&poddBase;DisplayType_ShortText"/>
         <rdfs:range rdf:resource="&xsd;string"/>
-        <poddBase:weight>9</poddBase:weight>
+		<poddBase:weight>10</poddBase:weight>
     </owl:DatatypeProperty>
     
 
@@ -734,8 +1005,9 @@
 
     <owl:DatatypeProperty rdf:about="&poddScience;hasProcessVariation">
         <rdfs:label>Process Variation</rdfs:label>
+        <poddBase:hasDisplayType rdf:resource="&poddBase;DisplayType_ShortText"/>
         <rdfs:range rdf:resource="&xsd;string"/>
-        <poddBase:weight>9</poddBase:weight>
+        <poddBase:weight>10</poddBase:weight>
     </owl:DatatypeProperty>
     
 
@@ -744,6 +1016,7 @@
 
     <owl:DatatypeProperty rdf:about="&poddScience;hasProtocolVariation">
         <rdfs:label>Protocol Variation</rdfs:label>
+        <poddBase:hasDisplayType rdf:resource="&poddBase;DisplayType_ShortText"/>
         <rdfs:range rdf:resource="&xsd;string"/>
         <poddBase:weight>11</poddBase:weight>
     </owl:DatatypeProperty>
@@ -754,6 +1027,7 @@
 
     <owl:DatatypeProperty rdf:about="&poddScience;hasReferenceID">
         <rdfs:label>Reference ID</rdfs:label>
+        <poddBase:hasDisplayType rdf:resource="&poddBase;DisplayType_ShortText"/>
         <rdfs:range rdf:resource="&xsd;string"/>
         <poddBase:weight>7</poddBase:weight>
     </owl:DatatypeProperty>
@@ -764,7 +1038,8 @@
 
     <owl:DatatypeProperty rdf:about="&poddScience;hasReplicate">
         <rdfs:label>Replicate Number</rdfs:label>
-        <rdfs:range rdf:resource="&xsd;int"/>
+        <poddBase:hasDisplayType rdf:resource="&poddBase;DisplayType_ShortText"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
         <poddBase:weight>4</poddBase:weight>
     </owl:DatatypeProperty>
     
@@ -774,6 +1049,7 @@
 
     <owl:DatatypeProperty rdf:about="&poddScience;hasSequenceString">
         <rdfs:label>Sequence</rdfs:label>
+        <poddBase:hasDisplayType rdf:resource="&poddBase;DisplayType_ShortText"/>
         <rdfs:range rdf:resource="&xsd;string"/>
         <poddBase:weight>7</poddBase:weight>
     </owl:DatatypeProperty>
@@ -784,6 +1060,7 @@
 
     <owl:DatatypeProperty rdf:about="&poddScience;hasSoftwareVersion">
         <rdfs:label>Version</rdfs:label>
+        <poddBase:hasDisplayType rdf:resource="&poddBase;DisplayType_ShortText"/>
         <rdfs:range rdf:resource="&xsd;string"/>
         <poddBase:weight>5</poddBase:weight>
     </owl:DatatypeProperty>
@@ -794,6 +1071,7 @@
 
     <owl:DatatypeProperty rdf:about="&poddScience;hasSpeciesCommonName">
         <rdfs:label>Species Common Name</rdfs:label>
+        <poddBase:hasDisplayType rdf:resource="&poddBase;DisplayType_ShortText"/>
         <rdfs:range rdf:resource="&xsd;string"/>
         <poddBase:weight>8</poddBase:weight>
     </owl:DatatypeProperty>
@@ -804,8 +1082,9 @@
 
     <owl:DatatypeProperty rdf:about="&poddScience;hasSubspecies">
         <rdfs:label>Subspecies</rdfs:label>
+        <poddBase:hasDisplayType rdf:resource="&poddBase;DisplayType_ShortText"/>
         <rdfs:range rdf:resource="&xsd;string"/>
-        <poddBase:weight>9</poddBase:weight>
+        <poddBase:weight>10</poddBase:weight>
     </owl:DatatypeProperty>
     
 
@@ -814,6 +1093,7 @@
 
     <owl:DatatypeProperty rdf:about="&poddScience;hasSystem">
         <rdfs:label>System</rdfs:label>
+        <poddBase:hasDisplayType rdf:resource="&poddBase;DisplayType_ShortText"/>
         <rdfs:range rdf:resource="&xsd;string"/>
         <poddBase:weight>7</poddBase:weight>
     </owl:DatatypeProperty>
@@ -824,16 +1104,28 @@
 
     <owl:DatatypeProperty rdf:about="&poddScience;hasUnit">
         <rdfs:label>Unit</rdfs:label>
+        <poddBase:hasDisplayType rdf:resource="&poddBase;DisplayType_ShortText"/>
         <rdfs:range rdf:resource="&xsd;string"/>
         <poddBase:weight>8</poddBase:weight>
     </owl:DatatypeProperty>
     
 
 
+    <!-- http://purl.org/podd/ns/poddScience#hasTreatmentType -->
+
+    <owl:DatatypeProperty rdf:about="&poddScience;hasTreatmentType">
+        <rdfs:label>has Treatment Type</rdfs:label>
+        <poddBase:hasDisplayType rdf:resource="&poddBase;DisplayType_ShortText"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+		<poddBase:weight>3</poddBase:weight>
+    </owl:DatatypeProperty>
+    
+
     <!-- http://purl.org/podd/ns/poddScience#hasValue -->
 
     <owl:DatatypeProperty rdf:about="&poddScience;hasValue">
         <rdfs:label>Value</rdfs:label>
+        <poddBase:hasDisplayType rdf:resource="&poddBase;DisplayType_ShortText"/>
         <rdfs:range rdf:resource="&xsd;string"/>
         <poddBase:weight>5</poddBase:weight>
     </owl:DatatypeProperty>
@@ -844,6 +1136,7 @@
 
     <owl:DatatypeProperty rdf:about="&poddScience;hasVariationType">
         <rdfs:label>Variation Type</rdfs:label>
+        <poddBase:hasDisplayType rdf:resource="&poddBase;DisplayType_ShortText"/>
         <rdfs:range rdf:resource="&xsd;string"/>
         <poddBase:weight>10</poddBase:weight>
     </owl:DatatypeProperty>
@@ -854,6 +1147,7 @@
 
     <owl:DatatypeProperty rdf:about="&poddScience;hasVolume">
         <rdfs:label>Volume</rdfs:label>
+        <poddBase:hasDisplayType rdf:resource="&poddBase;DisplayType_LongText"/>
         <rdfs:range rdf:resource="&xsd;string"/>
         <poddBase:weight>7</poddBase:weight>
     </owl:DatatypeProperty>
@@ -864,6 +1158,7 @@
 
     <owl:DatatypeProperty rdf:about="&poddScience;hasYear">
         <rdfs:label>Year</rdfs:label>
+        <poddBase:hasDisplayType rdf:resource="&poddBase;DisplayType_ShortText"/>
         <rdfs:range rdf:resource="&xsd;int"/>
         <poddBase:weight>6</poddBase:weight>
     </owl:DatatypeProperty>
@@ -874,6 +1169,7 @@
 
     <owl:DatatypeProperty rdf:about="&poddScience;publishedIn">
         <rdfs:label>Publication Title</rdfs:label>
+        <poddBase:hasDisplayType rdf:resource="&poddBase;DisplayType_LongText"/>
         <rdfs:range rdf:resource="&xsd;string"/>
         <poddBase:weight>5</poddBase:weight>
     </owl:DatatypeProperty>
@@ -891,31 +1187,89 @@
     
 
 
-    <!-- http://purl.org/podd/ns/poddBase#PoddTopObject -->
-
-    <rdf:Description rdf:about="&poddBase;PoddTopObject">
-        <rdfs:subClassOf>
-            <owl:Restriction>
-                <owl:onProperty rdf:resource="&poddBase;hasLeadInstitution"/>
-                <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
-                <owl:onDataRange rdf:resource="&xsd;string"/>
-            </owl:Restriction>
-        </rdfs:subClassOf>
-    </rdf:Description>
-    
-
-
     <!-- http://purl.org/podd/ns/poddScience#ANZSRC -->
 
     <owl:Class rdf:about="&poddScience;ANZSRC">
+        <rdfs:label>ANZSRC</rdfs:label>
         <rdfs:comment>&quot;ANZSRC FOR Code&quot;</rdfs:comment>
+        <owl:equivalentClass>
+            <owl:Class>
+                <owl:oneOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="&poddScience;ANZSRC11-Medical-and-Health-Sciences"/>
+                    <rdf:Description rdf:about="&poddScience;ANZSRC07-Agriculture-and-Veterinary-Sciences"/>
+                    <rdf:Description rdf:about="&poddScience;ANZSRC-NotApplicable"/>
+                    <rdf:Description rdf:about="&poddScience;ANZSRC06-Biological-Sciences"/>
+                    <rdf:Description rdf:about="&poddScience;ANZSRC05-Environmental-Sciences"/>
+                    <rdf:Description rdf:about="&poddScience;ANZSRC10-Technology"/>
+                </owl:oneOf>
+            </owl:Class>
+        </owl:equivalentClass>
     </owl:Class>
     
+
+    <!-- http://purl.org/podd/ns/poddScience#ANZSRC-NotApplicable -->
+
+    <owl:Thing rdf:about="&poddScience;ANZSRC-NotApplicable">
+        <rdf:type rdf:resource="&poddScience;ANZSRC"/>
+		<rdfs:label>Not Applicable</rdfs:label>
+        <poddBase:weight>1</poddBase:weight>
+    </owl:Thing>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddScience#ANZSRC06-Biological-Sciences -->
+
+    <owl:Thing rdf:about="&poddScience;ANZSRC06-Biological-Sciences">
+        <rdf:type rdf:resource="&poddScience;ANZSRC"/>
+		<rdfs:label>06-Biological Sciences</rdfs:label>
+        <poddBase:weight>2</poddBase:weight>
+    </owl:Thing>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddScience#ANZSRC07-Agriculture-and-Veterinary-Sciences -->
+
+    <owl:Thing rdf:about="&poddScience;ANZSRC07-Agriculture-and-Veterinary-Sciences">
+        <rdf:type rdf:resource="&poddScience;ANZSRC"/>
+		<rdfs:label>07-Agricultural and Veterinary Sciences</rdfs:label>
+        <poddBase:weight>3</poddBase:weight>
+    </owl:Thing>
+
+
+    <!-- http://purl.org/podd/ns/poddModelAnimal#ANZSRC11-Medical-and-Health-Sciences -->
+
+    <owl:Thing rdf:about="&poddScience;ANZSRC11-Medical-and-Health-Sciences">
+        <rdf:type rdf:resource="&poddScience;ANZSRC"/>
+		<rdfs:label>11-Medical and Health Sciences</rdfs:label>
+        <poddBase:weight>4</poddBase:weight>
+    </owl:Thing>
+
+
+    <!-- http://purl.org/podd/ns/poddScience#ANZSRC05-Environmental-Sciences -->
+
+    <owl:Thing rdf:about="&poddScience;ANZSRC05-Environmental-Sciences">
+        <rdf:type rdf:resource="&poddScience;ANZSRC"/>
+		<rdfs:label>05-Environmental Sciences</rdfs:label>
+        <poddBase:weight>5</poddBase:weight>
+    </owl:Thing>
+
+
+
+    <!-- http://purl.org/podd/ns/poddScience#ANZSRC10-Technology -->
+
+    <owl:Thing rdf:about="&poddScience;ANZSRC10-Technology">
+        <rdf:type rdf:resource="&poddScience;ANZSRC"/>
+		<rdfs:label>10-Technology</rdfs:label>
+        <poddBase:weight>10</poddBase:weight>
+    </owl:Thing>
+
 
 
     <!-- http://purl.org/podd/ns/poddScience#Accession -->
 
     <owl:Class rdf:about="&poddScience;Accession">
+        <rdfs:label>Accession</rdfs:label>
+        <rdfs:subClassOf rdf:resource="&poddBase;PoddInternalObject"/>
         <rdfs:subClassOf>
             <owl:Restriction>
                 <owl:onProperty rdf:resource="&poddScience;hasAccessionSource"/>
@@ -937,6 +1291,7 @@
     <!-- http://purl.org/podd/ns/poddScience#Allele -->
 
     <owl:Class rdf:about="&poddScience;Allele">
+        <rdfs:label>Allele</rdfs:label>
         <rdfs:subClassOf>
             <owl:Restriction>
                 <owl:onProperty rdf:resource="&poddScience;hasName"/>
@@ -963,6 +1318,7 @@
     <!-- http://purl.org/podd/ns/poddScience#Analysis -->
 
     <owl:Class rdf:about="&poddScience;Analysis">
+        <rdfs:label>Analysis</rdfs:label>
         <rdfs:subClassOf rdf:resource="&poddBase;PoddInternalObject"/>
         <rdfs:subClassOf>
             <owl:Restriction>
@@ -991,21 +1347,6 @@
         </rdfs:subClassOf>
     </owl:Class>
     
-    <!-- http://purl.org/podd/ns/poddScience#ANZSRCAssertion -->
-
-    <owl:Class rdf:about="&poddScience;ANZSRCAssertion">
-        <owl:equivalentClass>
-            <owl:Class>
-                <owl:oneOf rdf:parseType="Collection">
-                    <rdf:Description rdf:about="&poddScience;ANZSRC_NotApplicable"/>
-                    <rdf:Description rdf:about="&poddScience;ANZSRC_Yes"/>
-                    <rdf:Description rdf:about="&poddScience;ANZSRC_Unknown"/>
-                    <rdf:Description rdf:about="&poddScience;ANZSRC_No"/>
-                </owl:oneOf>
-            </owl:Class>
-        </owl:equivalentClass>
-    </owl:Class>
-
     <!-- http://purl.org/podd/ns/poddScience#HasControlAssertion -->
 
     <owl:Class rdf:about="&poddScience;HasControlAssertion">
@@ -1036,28 +1377,57 @@
         </owl:equivalentClass>
     </owl:Class>
 
+    <!-- http://purl.org/podd/ns/poddScience#Tray -->
 
-    <!-- http://purl.org/podd/ns/poddScience#Container -->
-
-    <owl:Class rdf:about="&poddScience;Container">
-        <rdfs:subClassOf rdf:resource="&poddBase;PoddInternalObject"/>
+    <owl:Class rdf:about="&poddScience;Tray">
+        <rdfs:label>Tray</rdfs:label>
+        <rdfs:subClassOf rdf:resource="&poddScience;Container"/>
         <rdfs:subClassOf>
             <owl:Restriction>
-                <owl:onProperty rdf:resource="&poddScience;refersToMaterial"/>
-                <owl:allValuesFrom rdf:resource="&poddScience;Material"/>
+                <owl:onProperty rdf:resource="&poddScience;hasPot"/>
+                <owl:allValuesFrom rdf:resource="&poddScience;Pot"/>
             </owl:Restriction>
         </rdfs:subClassOf>
         <rdfs:subClassOf>
             <owl:Restriction>
-                <owl:onProperty rdf:resource="&poddBase;hasType"/>
+                <owl:onProperty rdf:resource="&poddScience;hasTrayType"/>
                 <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
                 <owl:onDataRange rdf:resource="&xsd;string"/>
             </owl:Restriction>
         </rdfs:subClassOf>
+	</owl:Class>
+	
+    <!-- http://purl.org/podd/ns/poddScience#Pot -->
+
+    <owl:Class rdf:about="&poddScience;Pot">
+        <rdfs:label>Pot</rdfs:label>
+        <rdfs:subClassOf rdf:resource="&poddScience;Container"/>
         <rdfs:subClassOf>
             <owl:Restriction>
-                <owl:onProperty rdf:resource="&poddScience;hasEvent"/>
-                <owl:allValuesFrom rdf:resource="&poddScience;Event"/>
+                <owl:onProperty rdf:resource="&poddScience;hasPotType"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;string"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+	</owl:Class>
+	
+    <!-- http://purl.org/podd/ns/poddScience#Container -->
+
+    <owl:Class rdf:about="&poddScience;Container">
+        <rdfs:label>Container</rdfs:label>
+        <rdfs:subClassOf rdf:resource="&poddBase;PoddInternalObject"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="&poddScience;hasMaterial"/>
+                <owl:allValuesFrom rdf:resource="&poddScience;Material"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="&poddScience;hasContainerType"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;string"/>
             </owl:Restriction>
         </rdfs:subClassOf>
         <rdfs:subClassOf>
@@ -1081,6 +1451,13 @@
         </rdfs:subClassOf>
         <rdfs:subClassOf>
             <owl:Restriction>
+                <owl:onProperty rdf:resource="&poddScience;hasReplicate"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;int"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
                 <owl:onProperty rdf:resource="&poddScience;hasContainer"/>
                 <owl:allValuesFrom rdf:resource="&poddScience;Container"/>
             </owl:Restriction>
@@ -1092,6 +1469,7 @@
     <!-- http://purl.org/podd/ns/poddScience#Data -->
 
     <owl:Class rdf:about="&poddScience;Data">
+        <rdfs:label>Data</rdfs:label>
         <rdfs:subClassOf rdf:resource="&poddBase;PoddTopObject"/>
         <rdfs:subClassOf>
             <owl:Restriction>
@@ -1115,13 +1493,6 @@
             <owl:Restriction>
                 <owl:onProperty rdf:resource="&poddScience;refersToPlatform"/>
                 <owl:allValuesFrom rdf:resource="&poddScience;Platform"/>
-            </owl:Restriction>
-        </rdfs:subClassOf>
-        <rdfs:subClassOf>
-            <owl:Restriction>
-                <owl:onProperty rdf:resource="&poddBase;hasType"/>
-                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
-                <owl:onDataRange rdf:resource="&xsd;string"/>
             </owl:Restriction>
         </rdfs:subClassOf>
         <rdfs:subClassOf>
@@ -1150,6 +1521,7 @@
     <!-- http://purl.org/podd/ns/poddScience#Design -->
 
     <owl:Class rdf:about="&poddScience;Design">
+        <rdfs:label>Design</rdfs:label>
         <rdfs:subClassOf rdf:resource="&poddBase;PoddInternalObject"/>
         <rdfs:subClassOf>
             <owl:Restriction>
@@ -1171,6 +1543,7 @@
     <!-- http://purl.org/podd/ns/poddScience#Environment -->
 
     <owl:Class rdf:about="&poddScience;Environment">
+        <rdfs:label>Environment</rdfs:label>
         <rdfs:subClassOf rdf:resource="&poddBase;PoddInternalObject"/>
         <rdfs:subClassOf>
             <owl:Restriction>
@@ -1211,21 +1584,8 @@
     <!-- http://purl.org/podd/ns/poddScience#Event -->
 
     <owl:Class rdf:about="&poddScience;Event">
-        <rdfs:subClassOf rdf:resource="&owl;Thing"/>
-        <rdfs:subClassOf>
-            <owl:Restriction>
-                <owl:onProperty rdf:resource="&poddScience;hasEventDescription"/>
-                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
-                <owl:onDataRange rdf:resource="&xsd;string"/>
-            </owl:Restriction>
-        </rdfs:subClassOf>
-        <rdfs:subClassOf>
-            <owl:Restriction>
-                <owl:onProperty rdf:resource="&poddScience;hasName"/>
-                <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
-                <owl:onDataRange rdf:resource="&xsd;string"/>
-            </owl:Restriction>
-        </rdfs:subClassOf>
+        <rdfs:label>Event</rdfs:label>
+        <rdfs:subClassOf rdf:resource="&poddBase;PoddInternalObject"/>
         <rdfs:subClassOf>
             <owl:Restriction>
                 <owl:onProperty rdf:resource="&poddBase;hasTimestamp"/>
@@ -1254,6 +1614,7 @@
     <!-- http://purl.org/podd/ns/poddScience#Gene -->
 
     <owl:Class rdf:about="&poddScience;Gene">
+        <rdfs:label>Gene</rdfs:label>
         <rdfs:subClassOf rdf:resource="&poddBase;PoddInternalObject"/>
         <rdfs:subClassOf>
             <owl:Restriction>
@@ -1313,6 +1674,7 @@
     <!-- http://purl.org/podd/ns/poddScience#Genotype -->
 
     <owl:Class rdf:about="&poddScience;Genotype">
+        <rdfs:label>Genotype</rdfs:label>
         <rdfs:subClassOf rdf:resource="&poddBase;PoddInternalObject"/>
         <rdfs:subClassOf>
             <owl:Restriction>
@@ -1330,8 +1692,15 @@
         </rdfs:subClassOf>
         <rdfs:subClassOf>
             <owl:Restriction>
-                <owl:onProperty rdf:resource="&poddScience;hasGenusSpecies"/>
-                <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
+                <owl:onProperty rdf:resource="&poddScience;hasGenus"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;string"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="&poddScience;hasSpecies"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
                 <owl:onDataRange rdf:resource="&xsd;string"/>
             </owl:Restriction>
         </rdfs:subClassOf>
@@ -1344,9 +1713,16 @@
         </rdfs:subClassOf>
         <rdfs:subClassOf>
             <owl:Restriction>
+                <owl:onProperty rdf:resource="&poddScience;hasLineNumber"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;string"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
                 <owl:onProperty rdf:resource="&poddScience;hasWildType"/>
                 <owl:onClass rdf:resource="&poddScience;WildTypeAssertion"/>
-                <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
             </owl:Restriction>
         </rdfs:subClassOf>
         <rdfs:subClassOf>
@@ -1381,6 +1757,7 @@
     <!-- http://purl.org/podd/ns/poddScience#Investigation -->
 
     <owl:Class rdf:about="&poddScience;Investigation">
+        <rdfs:label>Investigation</rdfs:label>
         <rdfs:subClassOf rdf:resource="&poddBase;PoddInternalObject"/>
         <rdfs:subClassOf>
             <owl:Restriction>
@@ -1408,12 +1785,6 @@
         </rdfs:subClassOf>
         <rdfs:subClassOf>
             <owl:Restriction>
-                <owl:onProperty rdf:resource="&poddScience;hasMaterial"/>
-                <owl:allValuesFrom rdf:resource="&poddScience;Material"/>
-            </owl:Restriction>
-        </rdfs:subClassOf>
-        <rdfs:subClassOf>
-            <owl:Restriction>
                 <owl:onProperty rdf:resource="&poddScience;hasAnalysis"/>
                 <owl:allValuesFrom rdf:resource="&poddScience;Analysis"/>
             </owl:Restriction>
@@ -1421,7 +1792,7 @@
         <rdfs:subClassOf>
             <owl:Restriction>
                 <owl:onProperty rdf:resource="&poddBase;hasStartDateTime"/>
-                <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
                 <owl:onDataRange rdf:resource="&xsd;dateTime"/>
             </owl:Restriction>
         </rdfs:subClassOf>
@@ -1468,6 +1839,7 @@
     <!-- http://purl.org/podd/ns/poddScience#Marker -->
 
     <owl:Class rdf:about="&poddScience;Marker">
+        <rdfs:label>Marker</rdfs:label>
         <rdfs:subClassOf rdf:resource="&owl;Thing"/>
         <rdfs:subClassOf>
             <owl:Restriction>
@@ -1504,6 +1876,8 @@
     <!-- http://purl.org/podd/ns/poddScience#Material -->
 
     <owl:Class rdf:about="&poddScience;Material">
+        <rdfs:label>Material</rdfs:label>
+        <rdfs:comment>A material that can be observed and treated.</rdfs:comment>
         <rdfs:subClassOf rdf:resource="&poddBase;PoddInternalObject"/>
         <rdfs:subClassOf>
             <owl:Restriction>
@@ -1528,7 +1902,7 @@
             <owl:Restriction>
                 <owl:onProperty rdf:resource="&poddScience;refersToGenotype"/>
                 <owl:onClass rdf:resource="&poddScience;Genotype"/>
-                <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
             </owl:Restriction>
         </rdfs:subClassOf>
         <rdfs:subClassOf>
@@ -1560,7 +1934,7 @@
             <owl:Restriction>
                 <owl:onProperty rdf:resource="&poddScience;hasSex"/>
                 <owl:onClass rdf:resource="&poddScience;Sex"/>
-                <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
             </owl:Restriction>
         </rdfs:subClassOf>
         <rdfs:subClassOf>
@@ -1586,7 +1960,7 @@
         <rdfs:subClassOf>
             <owl:Restriction>
                 <owl:onProperty rdf:resource="&poddScience;hasAnatomicalPart"/>
-                <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
                 <owl:onDataRange rdf:resource="&xsd;string"/>
             </owl:Restriction>
         </rdfs:subClassOf>
@@ -1594,7 +1968,7 @@
             <owl:Restriction>
                 <owl:onProperty rdf:resource="&poddScience;hasControl"/>
                 <owl:onClass rdf:resource="&poddScience;HasControlAssertion"/>
-                <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
             </owl:Restriction>
         </rdfs:subClassOf>
         <rdfs:subClassOf>
@@ -1615,20 +1989,6 @@
                 <owl:allValuesFrom rdf:resource="&poddScience;Material"/>
             </owl:Restriction>
         </rdfs:subClassOf>
-        <rdfs:subClassOf>
-            <owl:Restriction>
-                <owl:onProperty rdf:resource="&poddScience;hasReplicate"/>
-                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
-                <owl:onDataRange rdf:resource="&xsd;int"/>
-            </owl:Restriction>
-        </rdfs:subClassOf>
-        <rdfs:subClassOf>
-            <owl:Restriction>
-                <owl:onProperty rdf:resource="&poddScience;hasBarcode"/>
-                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
-                <owl:onDataRange rdf:resource="&xsd;string"/>
-            </owl:Restriction>
-        </rdfs:subClassOf>
     </owl:Class>
     
 
@@ -1636,21 +1996,8 @@
     <!-- http://purl.org/podd/ns/poddScience#Measurement -->
 
     <owl:Class rdf:about="&poddScience;Measurement">
-        <rdfs:subClassOf rdf:resource="&owl;Thing"/>
-        <rdfs:subClassOf>
-            <owl:Restriction>
-                <owl:onProperty rdf:resource="&poddScience;hasUnit"/>
-                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
-                <owl:onDataRange rdf:resource="&xsd;string"/>
-            </owl:Restriction>
-        </rdfs:subClassOf>
-        <rdfs:subClassOf>
-            <owl:Restriction>
-                <owl:onProperty rdf:resource="&poddBase;hasDescription"/>
-                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
-                <owl:onDataRange rdf:resource="&xsd;string"/>
-            </owl:Restriction>
-        </rdfs:subClassOf>
+        <rdfs:label>Measurement</rdfs:label>
+        <rdfs:subClassOf rdf:resource="&poddBase;PoddInternalObject"/>
         <rdfs:subClassOf>
             <owl:Restriction>
                 <owl:onProperty rdf:resource="&poddScience;hasMeasurementParameter"/>
@@ -1661,6 +2008,13 @@
             <owl:Restriction>
                 <owl:onProperty rdf:resource="&poddScience;hasValue"/>
                 <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;string"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="&poddScience;hasUnit"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
                 <owl:onDataRange rdf:resource="&xsd;string"/>
             </owl:Restriction>
         </rdfs:subClassOf>
@@ -1678,13 +2032,6 @@
                 <owl:onDataRange rdf:resource="&xsd;dateTime"/>
             </owl:Restriction>
         </rdfs:subClassOf>
-        <rdfs:subClassOf>
-            <owl:Restriction>
-                <owl:onProperty rdf:resource="&poddScience;hasName"/>
-                <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
-                <owl:onDataRange rdf:resource="&xsd;string"/>
-            </owl:Restriction>
-        </rdfs:subClassOf>
     </owl:Class>
     
 
@@ -1693,17 +2040,18 @@
 
     <owl:Class rdf:about="&poddScience;MeasurementParameter">
         <rdfs:label>Measurement Parameter</rdfs:label>
+        <rdfs:subClassOf rdf:resource="&poddBase;PoddInternalObject"/>
         <rdfs:subClassOf>
             <owl:Restriction>
-                <owl:onProperty rdf:resource="&poddScience;hasName"/>
+                <owl:onProperty rdf:resource="&poddScience;hasValue"/>
                 <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
                 <owl:onDataRange rdf:resource="&xsd;string"/>
             </owl:Restriction>
         </rdfs:subClassOf>
         <rdfs:subClassOf>
             <owl:Restriction>
-                <owl:onProperty rdf:resource="&poddScience;hasValue"/>
-                <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
+                <owl:onProperty rdf:resource="&poddScience;hasUnit"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
                 <owl:onDataRange rdf:resource="&xsd;string"/>
             </owl:Restriction>
         </rdfs:subClassOf>
@@ -1714,6 +2062,7 @@
     <!-- http://purl.org/podd/ns/poddScience#Observation -->
 
     <owl:Class rdf:about="&poddScience;Observation">
+        <rdfs:label>Observation</rdfs:label>
         <rdfs:subClassOf rdf:resource="&poddBase;PoddInternalObject"/>
         <rdfs:subClassOf>
             <owl:Restriction>
@@ -1741,6 +2090,7 @@
     <!-- http://purl.org/podd/ns/poddScience#Phenotype -->
 
     <owl:Class rdf:about="&poddScience;Phenotype">
+        <rdfs:label>Phenotype</rdfs:label>
         <rdfs:subClassOf rdf:resource="&poddScience;Observation"/>
     </owl:Class>
     
@@ -1749,6 +2099,7 @@
     <!-- http://purl.org/podd/ns/poddScience#Platform -->
 
     <owl:Class rdf:about="&poddScience;Platform">
+        <rdfs:label>Platform</rdfs:label>
         <rdfs:subClassOf rdf:resource="&poddBase;PoddInternalObject"/>
         <rdfs:subClassOf>
             <owl:Restriction>
@@ -1780,9 +2131,9 @@
         <owl:equivalentClass>
             <owl:Class>
                 <owl:oneOf rdf:parseType="Collection">
-                    <rdf:Description rdf:about="&poddScience;Software"/>
-                    <rdf:Description rdf:about="&poddScience;HardwareSoftware"/>
-                    <rdf:Description rdf:about="&poddScience;Hardware"/>
+                    <rdf:Description rdf:about="&poddScience;PlatformType_Software"/>
+                    <rdf:Description rdf:about="&poddScience;PlatformType_HardwareSoftware"/>
+                    <rdf:Description rdf:about="&poddScience;PlatformType_Hardware"/>
                 </owl:oneOf>
             </owl:Class>
         </owl:equivalentClass>
@@ -1793,6 +2144,8 @@
     <!-- http://purl.org/podd/ns/poddScience#Process -->
 
     <owl:Class rdf:about="&poddScience;Process">
+        <rdfs:label>Process</rdfs:label>
+        <rdfs:comment>Describes a scientific process that is to be followed by an investigation, including references to formal protocols where applicable.</rdfs:comment>
         <rdfs:subClassOf rdf:resource="&poddBase;PoddInternalObject"/>
         <rdfs:subClassOf>
             <owl:Restriction>
@@ -1807,20 +2160,9 @@
     <!-- http://purl.org/podd/ns/poddScience#Project -->
 
     <owl:Class rdf:about="&poddScience;Project">
+        <rdfs:label>Project</rdfs:label>
+        <rdfs:comment>The top level container for scientific projects.</rdfs:comment>
         <rdfs:subClassOf rdf:resource="&poddBase;PoddTopObject"/>
-        <rdfs:subClassOf>
-            <owl:Restriction>
-                <owl:onProperty rdf:resource="&poddBase;hasTopObjectMember"/>
-                <owl:allValuesFrom rdf:resource="&user;User"/>
-            </owl:Restriction>
-        </rdfs:subClassOf>
-        <rdfs:subClassOf>
-            <owl:Restriction>
-                <owl:onProperty rdf:resource="&poddBase;hasPublicationStatus"/>
-                <owl:onClass rdf:resource="&poddBase;PublicationStatus"/>
-                <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
-            </owl:Restriction>
-        </rdfs:subClassOf>
         <rdfs:subClassOf>
             <owl:Restriction>
                 <owl:onProperty rdf:resource="&poddScience;hasAnalysis"/>
@@ -1835,34 +2177,8 @@
         </rdfs:subClassOf>
         <rdfs:subClassOf>
             <owl:Restriction>
-                <owl:onProperty rdf:resource="&poddBase;hasCompletionDate"/>
-                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
-                <owl:onDataRange rdf:resource="&xsd;date"/>
-            </owl:Restriction>
-        </rdfs:subClassOf>
-        <rdfs:subClassOf>
-            <owl:Restriction>
                 <owl:onProperty rdf:resource="&poddScience;hasInvestigation"/>
                 <owl:allValuesFrom rdf:resource="&poddScience;Investigation"/>
-            </owl:Restriction>
-        </rdfs:subClassOf>
-        <rdfs:subClassOf>
-            <owl:Restriction>
-                <owl:onProperty rdf:resource="&poddBase;hasTopObjectStatus"/>
-                <owl:onClass rdf:resource="&poddBase;TopObjectStatus"/>
-                <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
-            </owl:Restriction>
-        </rdfs:subClassOf>
-        <rdfs:subClassOf>
-            <owl:Restriction>
-                <owl:onProperty rdf:resource="&poddScience;hasPublication"/>
-                <owl:allValuesFrom rdf:resource="&poddScience;Publication"/>
-            </owl:Restriction>
-        </rdfs:subClassOf>
-        <rdfs:subClassOf>
-            <owl:Restriction>
-                <owl:onProperty rdf:resource="&poddBase;hasTopObjectAdministrator"/>
-                <owl:allValuesFrom rdf:resource="&user;User"/>
             </owl:Restriction>
         </rdfs:subClassOf>
         <rdfs:subClassOf>
@@ -1873,42 +2189,8 @@
         </rdfs:subClassOf>
         <rdfs:subClassOf>
             <owl:Restriction>
-                <owl:onProperty rdf:resource="&poddBase;hasLeadInstitution"/>
-                <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
-                <owl:onDataRange rdf:resource="&xsd;string"/>
-            </owl:Restriction>
-        </rdfs:subClassOf>
-        <rdfs:subClassOf>
-            <owl:Restriction>
-                <owl:onProperty rdf:resource="&poddBase;hasTopObjectObserver"/>
-                <owl:allValuesFrom rdf:resource="&user;User"/>
-            </owl:Restriction>
-        </rdfs:subClassOf>
-        <rdfs:subClassOf>
-            <owl:Restriction>
-                <owl:onProperty rdf:resource="&poddBase;hasStartDate"/>
-                <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
-                <owl:onDataRange rdf:resource="&xsd;date"/>
-            </owl:Restriction>
-        </rdfs:subClassOf>
-        <rdfs:subClassOf>
-            <owl:Restriction>
-                <owl:onProperty rdf:resource="&poddBase;hasPublicationDate"/>
-                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
-                <owl:onDataRange rdf:resource="&xsd;date"/>
-            </owl:Restriction>
-        </rdfs:subClassOf>
-        <rdfs:subClassOf>
-            <owl:Restriction>
                 <owl:onProperty rdf:resource="&poddScience;hasProcess"/>
                 <owl:allValuesFrom rdf:resource="&poddScience;Process"/>
-            </owl:Restriction>
-        </rdfs:subClassOf>
-        <rdfs:subClassOf>
-            <owl:Restriction>
-                <owl:onProperty rdf:resource="&poddBase;hasPrincipalInvestigator"/>
-                <owl:onClass rdf:resource="&user;User"/>
-                <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
             </owl:Restriction>
         </rdfs:subClassOf>
         <rdfs:subClassOf>
@@ -1926,9 +2208,104 @@
         </rdfs:subClassOf>
         <rdfs:subClassOf>
             <owl:Restriction>
+                <owl:onProperty rdf:resource="&poddScience;hasPublication"/>
+                <owl:allValuesFrom rdf:resource="&poddScience;Publication"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="&poddBase;hasPrincipalInvestigator"/>
+                <owl:onClass rdf:resource="&user;User"/>
+                <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="&poddBase;hasTopObjectAdministrator"/>
+                <owl:allValuesFrom rdf:resource="&user;User"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="&poddBase;hasTopObjectMember"/>
+                <owl:allValuesFrom rdf:resource="&user;User"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="&poddBase;hasTopObjectObserver"/>
+                <owl:allValuesFrom rdf:resource="&user;User"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="&poddBase;hasTopObjectStatus"/>
+                <owl:onClass rdf:resource="&poddBase;TopObjectStatus"/>
+                <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="&poddBase;hasURL"/>
+                <owl:allValuesFrom rdf:resource="&xsd;anyURI"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="&poddBase;hasNotes"/>
+                <owl:allValuesFrom rdf:resource="&xsd;string"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="&poddBase;hasLeadInstitution"/>
+                <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;string"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="&poddBase;hasStartDate"/>
+                <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;date"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="&poddBase;hasCompletionDate"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;date"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="&poddBase;hasPublicationDate"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;date"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="&poddBase;hasPublicationStatus"/>
+                <owl:onClass rdf:resource="&poddBase;PublicationStatus"/>
+                <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
                 <owl:onProperty rdf:resource="&poddBase;hasDuration"/>
                 <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
                 <owl:onDataRange rdf:resource="&xsd;string"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="&poddBase;lastModified"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;dateTime"/>
             </owl:Restriction>
         </rdfs:subClassOf>
     </owl:Class>
@@ -1947,6 +2324,8 @@
     <!-- http://purl.org/podd/ns/poddScience#Protocol -->
 
     <owl:Class rdf:about="&poddScience;Protocol">
+        <rdfs:label>Protocol</rdfs:label>
+        <rdfs:comment>A textual description of the protocol used to perform an action such as an overall experiment or an individual measurement.</rdfs:comment>
         <rdfs:subClassOf rdf:resource="&poddBase;PoddInternalObject"/>
     </owl:Class>
     
@@ -1955,6 +2334,7 @@
     <!-- http://purl.org/podd/ns/poddScience#Publication -->
 
     <owl:Class rdf:about="&poddScience;Publication">
+        <rdfs:label>Publication</rdfs:label>
         <rdfs:subClassOf rdf:resource="&poddBase;PoddInternalObject"/>
         <rdfs:subClassOf>
             <owl:Restriction>
@@ -2012,6 +2392,7 @@
     <!-- http://purl.org/podd/ns/poddScience#Sequence -->
 
     <owl:Class rdf:about="&poddScience;Sequence">
+        <rdfs:label>Sequence</rdfs:label>
         <rdfs:subClassOf rdf:resource="&poddBase;PoddInternalObject"/>
         <rdfs:subClassOf>
             <owl:Restriction>
@@ -2033,6 +2414,7 @@
     <!-- http://purl.org/podd/ns/poddScience#Sex -->
 
     <owl:Class rdf:about="&poddScience;Sex">
+        <rdfs:label>Sex</rdfs:label>
         <owl:equivalentClass>
             <owl:Class>
                 <owl:oneOf rdf:parseType="Collection">
@@ -2052,14 +2434,7 @@
 
     <owl:Class rdf:about="&poddScience;Software">
         <rdfs:label>Software</rdfs:label>
-        <rdfs:subClassOf rdf:resource="&owl;Thing"/>
-        <rdfs:subClassOf>
-            <owl:Restriction>
-                <owl:onProperty rdf:resource="&poddScience;hasName"/>
-                <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
-                <owl:onDataRange rdf:resource="&xsd;string"/>
-            </owl:Restriction>
-        </rdfs:subClassOf>
+        <rdfs:subClassOf rdf:resource="&poddBase;PoddInternalObject"/>
         <rdfs:subClassOf>
             <owl:Restriction>
                 <owl:onProperty rdf:resource="&poddScience;hasSoftwareVersion"/>
@@ -2074,6 +2449,7 @@
     <!-- http://purl.org/podd/ns/poddScience#Treatment -->
 
     <owl:Class rdf:about="&poddScience;Treatment">
+        <rdfs:label>Treatment</rdfs:label>
         <rdfs:subClassOf rdf:resource="&poddBase;PoddInternalObject"/>
         <rdfs:subClassOf>
             <owl:Restriction>
@@ -2089,7 +2465,7 @@
         </rdfs:subClassOf>
         <rdfs:subClassOf>
             <owl:Restriction>
-                <owl:onProperty rdf:resource="&poddBase;hasType"/>
+                <owl:onProperty rdf:resource="&poddScience;hasTreatmentType"/>
                 <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
                 <owl:onDataRange rdf:resource="&xsd;string"/>
             </owl:Restriction>
@@ -2123,7 +2499,7 @@
         <rdfs:subClassOf rdf:resource="&poddBase;PoddInternalObject"/>
         <rdfs:subClassOf>
             <owl:Restriction>
-                <owl:onProperty rdf:resource="&poddBase;hasType"/>
+                <owl:onProperty rdf:resource="&poddScience;hasTreatmentType"/>
                 <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
                 <owl:onDataRange rdf:resource="&xsd;string"/>
             </owl:Restriction>
@@ -2181,64 +2557,32 @@
     
 
 
-    <!-- http://purl.org/podd/ns/poddScience#Hardware -->
+    <!-- http://purl.org/podd/ns/poddScience#PlatformType_Hardware -->
 
-    <owl:Thing rdf:about="&poddScience;Hardware">
+    <owl:Thing rdf:about="&poddScience;PlatformType_Hardware">
         <rdf:type rdf:resource="&poddScience;PlatformType"/>
         <rdf:type rdf:resource="&owl;NamedIndividual"/>
+        <rdfs:label>Hardware</rdfs:label>
     </owl:Thing>
     
 
 
-    <!-- http://purl.org/podd/ns/poddScience#HardwareSoftware -->
+    <!-- http://purl.org/podd/ns/poddScience#PlatformType_HardwareSoftware -->
 
-    <owl:Thing rdf:about="&poddScience;HardwareSoftware">
+    <owl:Thing rdf:about="&poddScience;PlatformType_HardwareSoftware">
         <rdf:type rdf:resource="&poddScience;PlatformType"/>
         <rdf:type rdf:resource="&owl;NamedIndividual"/>
+        <rdfs:label>Hardware and Software</rdfs:label>
     </owl:Thing>
     
 
+    <!-- http://purl.org/podd/ns/poddScience#PlatformType_Software -->
 
-    <!-- http://purl.org/podd/ns/poddScience#Software -->
-
-    <owl:Thing rdf:about="&poddScience;Software">
+    <owl:Thing rdf:about="&poddScience;PlatformType_Software">
         <rdf:type rdf:resource="&poddScience;PlatformType"/>
         <rdf:type rdf:resource="&owl;NamedIndividual"/>
         <rdfs:label>Software</rdfs:label>
     </owl:Thing>
-
-
-
-    <!-- http://purl.org/podd/ns/poddScience#ANZSRC_NotApplicable -->
-
-    <owl:NamedIndividual rdf:about="&poddScience;ANZSRC_NotApplicable">
-        <rdf:type rdf:resource="&poddScience;ANZSRCAssertion"/>
-        <rdfs:label>Not Applicable</rdfs:label>
-    </owl:NamedIndividual>
-
-
-    <!-- http://purl.org/podd/ns/poddScience#ANZSRC_No -->
-
-    <owl:NamedIndividual rdf:about="&poddScience;ANZSRC_No">
-        <rdf:type rdf:resource="&poddScience;ANZSRCAssertion"/>
-        <rdfs:label>No</rdfs:label>
-    </owl:NamedIndividual>
-
-
-    <!-- http://purl.org/podd/ns/poddScience#ANZSRC_Unknown -->
-
-    <owl:NamedIndividual rdf:about="&poddScience;ANZSRC_Unknown">
-        <rdf:type rdf:resource="&poddScience;ANZSRCAssertion"/>
-        <rdfs:label>Unknown</rdfs:label>
-    </owl:NamedIndividual>
-
-
-    <!-- http://purl.org/podd/ns/poddScience#ANZSRC_Yes -->
-
-    <owl:NamedIndividual rdf:about="&poddScience;ANZSRC_Yes">
-        <rdf:type rdf:resource="&poddScience;ANZSRCAssertion"/>
-        <rdfs:label>Yes</rdfs:label>
-    </owl:NamedIndividual>
 
 
 
@@ -2362,9 +2706,9 @@
     <rdf:Description>
         <rdf:type rdf:resource="&owl;AllDifferent"/>
         <owl:distinctMembers rdf:parseType="Collection">
-            <rdf:Description rdf:about="&poddScience;Hardware"/>
-            <rdf:Description rdf:about="&poddScience;HardwareSoftware"/>
-            <rdf:Description rdf:about="&poddScience;Software"/>
+            <rdf:Description rdf:about="&poddScience;PlatformType_Hardware"/>
+            <rdf:Description rdf:about="&poddScience;PlatformType_HardwareSoftware"/>
+            <rdf:Description rdf:about="&poddScience;PlatformType_Software"/>
         </owl:distinctMembers>
     </rdf:Description>
     <rdf:Description>
@@ -2375,15 +2719,6 @@
             <rdf:Description rdf:about="&poddScience;Sex_Female"/>
             <rdf:Description rdf:about="&poddScience;Sex_Hermaphrodite"/>
             <rdf:Description rdf:about="&poddScience;Sex_Male"/>
-        </owl:distinctMembers>
-    </rdf:Description>
-    <rdf:Description>
-        <rdf:type rdf:resource="&owl;AllDifferent"/>
-        <owl:distinctMembers rdf:parseType="Collection">
-            <rdf:Description rdf:about="&poddScience;ANZSRC_NotApplicable"/>
-            <rdf:Description rdf:about="&poddScience;ANZSRC_Unknown"/>
-            <rdf:Description rdf:about="&poddScience;ANZSRC_Yes"/>
-            <rdf:Description rdf:about="&poddScience;ANZSRC_No"/>
         </owl:distinctMembers>
     </rdf:Description>
     <rdf:Description>
