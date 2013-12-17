@@ -426,8 +426,6 @@ public abstract class AbstractPoddArtifactManagerTest
         
         final OWLOntology loadedBaseOntology = this.testArtifactManager.getOWLManager().loadOntology(null, owlSource);
         
-        repositoryConnection.begin();
-        
         this.testArtifactManager.getOWLManager().dumpOntologyToRepository(loadedBaseOntology, repositoryConnection);
         
         // infer statements and dump to repository
@@ -454,8 +452,6 @@ public abstract class AbstractPoddArtifactManagerTest
             this.log.warn("Wrong inferred statement count: expected={} actual={} ontology={}", inferredStatementCount,
                     inferredSize, inferredOntologyID);
         }
-        
-        repositoryConnection.commit();
         
         return inferredOntologyID;
     }
