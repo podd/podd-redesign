@@ -239,5 +239,8 @@ public interface PoddOWLManager
      */
     OWLOntology loadOntology(OWLOntologyID ontologyID, OWLOntologyDocumentSource owlSource) throws OWLException,
         IOException, PoddException;
+
+    InferredOWLOntologyID loadAndInfer(RepositoryConnection permanentRepositoryConnection,
+            OWLOntologyDocumentSource owlSource) throws OWLException, PoddException, OpenRDFException, IOException;
     
 }

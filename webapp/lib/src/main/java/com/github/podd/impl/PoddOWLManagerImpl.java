@@ -19,11 +19,13 @@ package com.github.podd.impl;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.mindswap.pellet.exceptions.PelletRuntimeException;
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.Model;
 import org.openrdf.model.URI;
@@ -79,6 +81,7 @@ import org.semanticweb.owlapi.util.InferredOntologyGenerator;
 import org.semanticweb.owlapi.util.InferredSubClassAxiomGenerator;
 import org.semanticweb.owlapi.util.InferredSubDataPropertyAxiomGenerator;
 import org.semanticweb.owlapi.util.InferredSubObjectPropertyAxiomGenerator;
+import org.semanticweb.owlapi.util.NullProgressMonitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -87,6 +90,7 @@ import uk.ac.manchester.cs.owl.owlapi.OWLImportsDeclarationImpl;
 import com.clarkparsia.owlapi.explanation.PelletExplanation;
 import com.clarkparsia.owlapi.explanation.io.rdfxml.RDFXMLExplanationRenderer;
 import com.clarkparsia.pellet.owlapiv3.PelletReasoner;
+import com.clarkparsia.pellet.owlapiv3.PelletReasonerFactory;
 import com.github.podd.api.PoddOWLManager;
 import com.github.podd.exception.DataRepositoryException;
 import com.github.podd.exception.EmptyOntologyException;
@@ -415,6 +419,105 @@ public class PoddOWLManagerImpl implements PoddOWLManager
         final IRI inferredOntologyIRI = IRI.create(PODD.INFERRED_PREFIX + ontologyID.getVersionIRI());
         
         return new InferredOWLOntologyID(ontologyID.getOntologyIRI(), ontologyID.getVersionIRI(), inferredOntologyIRI);
+    }
+    
+    /**
+     * @param permanentRepositoryConnection
+     * @param owlSource
+     * @param inferredOWLOntologyID
+     * @return
+     * @throws OWLException
+     * @throws Throwable
+     */
+    @Override
+    public InferredOWLOntologyID loadAndInfer(final RepositoryConnection permanentRepositoryConnection,
+            final OWLOntologyDocumentSource owlSource) throws OWLException, PoddException, OpenRDFException,
+        IOException
+    {
+        OWLOntology nextOntology = null;
+        try
+        {
+            nextOntology = this.loadOntology(owlSource);
+            
+            // Check the OWLAPI OWLOntology against an OWLProfile to make sure
+            // it is in profile
+            final OWLProfileReport profileReport = this.getReasonerProfile().checkOntology(nextOntology);
+            if(!profileReport.isInProfile())
+            {
+                if(this.log.isInfoEnabled())
+                {
+                    for(final OWLProfileViolation violation : profileReport.getViolations())
+                    {
+                        this.log.info(violation.toString());
+                    }
+                }
+                throw new OntologyNotInProfileException(nextOntology, profileReport,
+                        "Ontology is not in required OWL Profile");
+            }
+            
+            // Use the OWLManager to create a reasoner over the ontology
+            final OWLReasoner nextReasoner = this.createReasoner(nextOntology);
+            
+            // Test that the ontology was consistent with this reasoner
+            // This ensures in the case of Pellet that it is in the OWL2-DL
+            // profile
+            if(!nextReasoner.isConsistent())
+            {
+                final RDFXMLExplanationRenderer renderer = new RDFXMLExplanationRenderer();
+                // Get 100 inconsistency explanations, any more than that and they need to make
+                // modifications and try again
+                final ExplanationUtils exp =
+                        new ExplanationUtils((PelletReasoner)nextReasoner,
+                                (PelletReasonerFactory)this.getReasonerFactory(), renderer, new NullProgressMonitor(),
+                                100);
+                
+                try
+                {
+                    final Set<Set<OWLAxiom>> inconsistencyExplanations = exp.explainClassHierarchy();
+                    
+                    throw new InconsistentOntologyException(inconsistencyExplanations, nextOntology.getOntologyID(),
+                            renderer, "Ontology is inconsistent (explanation available)");
+                }
+                catch(final org.mindswap.pellet.exceptions.InconsistentOntologyException e)
+                {
+                    throw new InconsistentOntologyException(new HashSet<Set<OWLAxiom>>(), nextOntology.getOntologyID(),
+                            renderer, "Ontology is inconsistent (textual explanation available): " + e.getMessage());
+                }
+                catch(PelletRuntimeException | OWLRuntimeException e)
+                {
+                    throw new InconsistentOntologyException(new HashSet<Set<OWLAxiom>>(), nextOntology.getOntologyID(),
+                            renderer, "Ontology is inconsistent (no explanation available): " + e.getMessage());
+                }
+            }
+            
+            // Copy the statements to permanentRepositoryConnection
+            this.dumpOntologyToRepository(nextOntology, permanentRepositoryConnection, nextOntology.getOntologyID()
+                    .getVersionIRI().toOpenRDFURI());
+            
+            // NOTE: At this stage, a client could be notified, and the artifact
+            // could be streamed
+            // back to them from permanentRepositoryConnection
+            
+            // Use an OWLAPI InferredAxiomGenerator together with the reasoner
+            // to create inferred
+            // axioms to store in the database.
+            // Serialise the inferred statements back to a different context in
+            // the permanent
+            // repository connection.
+            // The contexts to use within the permanent repository connection
+            // are all encapsulated
+            // in the InferredOWLOntologyID object.
+            
+            return this.inferStatements(nextOntology, permanentRepositoryConnection);
+        }
+        catch(final Throwable e)
+        {
+            if(nextOntology != null)
+            {
+                this.removeCache(nextOntology.getOntologyID());
+            }
+            throw e;
+        }
     }
     
     @Override

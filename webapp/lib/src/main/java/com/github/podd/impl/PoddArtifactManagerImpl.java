@@ -53,6 +53,7 @@ import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.RepositoryResult;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.Rio;
+import org.semanticweb.owlapi.io.OWLOntologyDocumentSource;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLException;
@@ -1496,99 +1497,17 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
                 new RioMemoryTripleSource(statements.iterator(), Namespaces.asMap(Iterations
                         .asSet(tempRepositoryConnection.getNamespaces())));
         
-        OWLOntology nextOntology = null;
-        try
-        {
-            nextOntology = this.getOWLManager().loadOntology(owlSource);
-            
-            // Check the OWLAPI OWLOntology against an OWLProfile to make sure
-            // it is in profile
-            final OWLProfileReport profileReport =
-                    this.getOWLManager().getReasonerProfile().checkOntology(nextOntology);
-            if(!profileReport.isInProfile())
-            {
-                if(this.log.isInfoEnabled())
-                {
-                    for(final OWLProfileViolation violation : profileReport.getViolations())
-                    {
-                        this.log.info(violation.toString());
-                    }
-                }
-                throw new OntologyNotInProfileException(nextOntology, profileReport,
-                        "Ontology is not in required OWL Profile");
-            }
-            
-            // Use the OWLManager to create a reasoner over the ontology
-            final OWLReasoner nextReasoner = this.getOWLManager().createReasoner(nextOntology);
-            
-            // Test that the ontology was consistent with this reasoner
-            // This ensures in the case of Pellet that it is in the OWL2-DL
-            // profile
-            if(!nextReasoner.isConsistent())
-            {
-                final RDFXMLExplanationRenderer renderer = new RDFXMLExplanationRenderer();
-                // Get 100 inconsistency explanations, any more than that and they need to make
-                // modifications and try again
-                final ExplanationUtils exp =
-                        new ExplanationUtils((PelletReasoner)nextReasoner, (PelletReasonerFactory)this.getOWLManager()
-                                .getReasonerFactory(), renderer, new NullProgressMonitor(), 100);
-                
-                try
-                {
-                    final Set<Set<OWLAxiom>> inconsistencyExplanations = exp.explainClassHierarchy();
-                    
-                    throw new InconsistentOntologyException(inconsistencyExplanations, nextOntology.getOntologyID(),
-                            renderer, "Ontology is inconsistent (explanation available)");
-                }
-                catch(final org.mindswap.pellet.exceptions.InconsistentOntologyException e)
-                {
-                    throw new InconsistentOntologyException(new HashSet<Set<OWLAxiom>>(), nextOntology.getOntologyID(),
-                            renderer, "Ontology is inconsistent (textual explanation available): " + e.getMessage());
-                }
-                catch(PelletRuntimeException | OWLRuntimeException e)
-                {
-                    throw new InconsistentOntologyException(new HashSet<Set<OWLAxiom>>(), nextOntology.getOntologyID(),
-                            renderer, "Ontology is inconsistent (no explanation available): " + e.getMessage());
-                }
-            }
-            
-            // Copy the statements to permanentRepositoryConnection
-            this.getOWLManager().dumpOntologyToRepository(nextOntology, permanentRepositoryConnection,
-                    nextOntology.getOntologyID().getVersionIRI().toOpenRDFURI());
-            
-            // NOTE: At this stage, a client could be notified, and the artifact
-            // could be streamed
-            // back to them from permanentRepositoryConnection
-            
-            // Use an OWLAPI InferredAxiomGenerator together with the reasoner
-            // to create inferred
-            // axioms to store in the database.
-            // Serialise the inferred statements back to a different context in
-            // the permanent
-            // repository connection.
-            // The contexts to use within the permanent repository connection
-            // are all encapsulated
-            // in the InferredOWLOntologyID object.
-            final InferredOWLOntologyID inferredOWLOntologyID =
-                    this.getOWLManager().inferStatements(nextOntology, permanentRepositoryConnection);
-            
-            // Check file references after inferencing to accurately identify
-            // the parent object
-            this.handleFileReferences(permanentRepositoryConnection, fileReferencePolicy, inferredOWLOntologyID
-                    .getVersionIRI().toOpenRDFURI(), inferredOWLOntologyID.getInferredOntologyIRI().toOpenRDFURI());
-            
-            this.getSesameManager().updateManagedPoddArtifactVersion(inferredOWLOntologyID, true,
-                    permanentRepositoryConnection, this.getRepositoryManager().getArtifactManagementGraph());
-            return inferredOWLOntologyID;
-        }
-        catch(final Throwable e)
-        {
-            if(nextOntology != null)
-            {
-                this.getOWLManager().removeCache(nextOntology.getOntologyID());
-            }
-            throw e;
-        }
+        final InferredOWLOntologyID inferredOWLOntologyID =
+                this.getOWLManager().loadAndInfer(permanentRepositoryConnection, owlSource);
+        
+        // Check file references after inferencing to accurately identify
+        // the parent object
+        this.handleFileReferences(permanentRepositoryConnection, fileReferencePolicy, inferredOWLOntologyID
+                .getVersionIRI().toOpenRDFURI(), inferredOWLOntologyID.getInferredOntologyIRI().toOpenRDFURI());
+        
+        this.getSesameManager().updateManagedPoddArtifactVersion(inferredOWLOntologyID, true,
+                permanentRepositoryConnection, this.getRepositoryManager().getArtifactManagementGraph());
+        return inferredOWLOntologyID;
     }
     
     /*
