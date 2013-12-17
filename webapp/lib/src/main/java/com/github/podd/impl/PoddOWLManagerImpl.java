@@ -361,10 +361,6 @@ public class PoddOWLManagerImpl implements PoddOWLManager
         this.dumpOntologyToRepositoryWithoutDuplication(null, nextOntology, nextRepositoryConnection, contexts);
     }
     
-    /*
-     * @since 05/03/2013
-     */
-    @Override
     public void dumpOntologyToRepositoryWithoutDuplication(final URI contextToCompareWith,
             final OWLOntology nextOntology, final RepositoryConnection nextRepositoryConnection, final URI... contexts)
         throws IOException, RepositoryException

@@ -72,24 +72,6 @@ public interface PoddOWLManager
     void dumpOntologyToRepository(OWLOntology nextOntology, RepositoryConnection nextRepositoryConnection,
             URI... contexts) throws IOException, RepositoryException;
     
-    /**
-     * Dump ontology to the given repository connection, using the Version IRI from the given
-     * ontology as the context if a context is not given.
-     * 
-     * @param contextToDeduplicate
-     *            If this is not null, statements available in this context are not dumped to the
-     *            given repository connection.
-     * @param nextOntology
-     * @param nextRepositoryConnection
-     * @param contexts
-     *            If this is not null, it is used as the contexts, otherwise the Version IRI from
-     *            the ontology is used as the context.
-     * @throws IOException
-     * @throws RepositoryException
-     */
-    void dumpOntologyToRepositoryWithoutDuplication(URI contextToDeduplicate, OWLOntology nextOntology,
-            RepositoryConnection nextRepositoryConnection, URI... contexts) throws IOException, RepositoryException;
-    
     InferredOWLOntologyID loadAndInfer(RepositoryConnection permanentRepositoryConnection, OWLOntologyID ontologyID,
             OWLOntologyDocumentSource owlSource) throws OWLException, PoddException, OpenRDFException, IOException;
     
