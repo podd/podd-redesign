@@ -624,45 +624,4 @@ public abstract class AbstractPoddOWLManagerTest
         Assert.assertEquals("Dumped statement count not expected value",
                 TestConstants.EXPECTED_TRIPLE_COUNT_PODD_BASE_CONCRETE, this.testRepositoryConnection.size(context));
     }
-    
-    /**
-     * Test method for
-     * {@link com.github.podd.api.PoddOWLManager#getCurrentVersion(org.semanticweb.owlapi.model.IRI)}
-     * .
-     * 
-     */
-    @Ignore
-    @Test
-    public void testGetCurrentVersion() throws Exception
-    {
-        Assert.fail("TODO: Implement me");
-    }
-    
-    /**
-     * Test method for
-     * {@link com.github.podd.api.PoddOWLManager#getOntology(org.semanticweb.owlapi.model.OWLOntologyID)}
-     * .
-     * 
-     */
-    @Ignore
-    @Test
-    public void testGetOntology() throws Exception
-    {
-        Assert.fail("TODO: Implement me");
-    }
-    
-    /**
-     * Test method for
-     * {@link com.github.podd.api.PoddOWLManager#getVersions(org.semanticweb.owlapi.model.IRI)} .
-     * 
-     * @throws Exception
-     */
-    @Ignore
-    @Test
-    public void testGetVersion() throws Exception
-    {
-        Assert.fail("TODO: Implement me");
-    }
-    
-
 }
