@@ -21,6 +21,7 @@ package com.github.podd.api;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Set;
 
 import org.coode.owlapi.rdfxml.parser.TPVersionIRIHandler;
 import org.openrdf.OpenRDFException;
@@ -105,12 +106,6 @@ public interface PoddOWLManager
      * @return
      */
     InferredOWLOntologyID generateInferredOntologyID(OWLOntologyID ontologyID);
-    
-    /**
-     * 
-     * @return The {@link OWLProfile} used by the reasoner attached to this PoddOWLManager.
-     */
-    OWLProfile getReasonerProfile();
     
     /**
      * Infer statements for the given {@link OWLOntology} into the given permanent repository

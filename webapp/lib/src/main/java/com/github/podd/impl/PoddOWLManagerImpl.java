@@ -446,7 +446,8 @@ public class PoddOWLManagerImpl implements PoddOWLManager
             
             // Check the OWLAPI OWLOntology against an OWLProfile to make sure
             // it is in profile
-            final OWLProfileReport profileReport = this.getReasonerProfile().checkOntology(nextOntology);
+            final OWLProfileReport profileReport =
+                    this.getReasonerProfiles().iterator().next().checkOntology(nextOntology);
             if(!profileReport.isInProfile())
             {
                 if(this.log.isInfoEnabled())
@@ -673,23 +674,14 @@ public class PoddOWLManagerImpl implements PoddOWLManager
         return this.reasonerFactory;
     }
     
-    @Override
-    public OWLProfile getReasonerProfile()
+    public Set<OWLProfile> getReasonerProfiles()
     {
         final Set<OWLProfile> profiles = this.reasonerFactory.getSupportedProfiles();
-        if(!profiles.isEmpty())
-        {
-            if(profiles.size() > 1)
-            {
-                this.log.debug("Reasoner factory supports {} profiles. Returning one of: {}", profiles.size(), profiles);
-            }
-            return profiles.iterator().next();
-        }
-        else
+        if(profiles.isEmpty())
         {
             this.log.warn("Could not find any supported OWL Profiles");
-            return null;
         }
+        return profiles;
     }
     
     @Override

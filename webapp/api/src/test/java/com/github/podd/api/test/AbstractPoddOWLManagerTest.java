@@ -723,17 +723,6 @@ public abstract class AbstractPoddOWLManagerTest
     }
     
     /**
-     * Test method for {@link com.github.podd.api.PoddOWLManager#getReasonerProfile()} .
-     * 
-     */
-    @Test
-    public void testGetReasonerProfile() throws Exception
-    {
-        final OWLProfile profile = this.testOWLManager.getReasonerProfile();
-        Assert.assertNotNull("OWLProfile was null", profile);
-    }
-    
-    /**
      * Test method for
      * {@link com.github.podd.api.PoddOWLManager#getVersions(org.semanticweb.owlapi.model.IRI)} .
      * 

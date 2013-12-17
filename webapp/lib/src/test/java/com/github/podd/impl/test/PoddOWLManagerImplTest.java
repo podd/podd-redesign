@@ -37,6 +37,7 @@ import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyID;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.OWLOntologyManagerFactoryRegistry;
+import org.semanticweb.owlapi.profiles.OWLProfile;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactoryRegistry;
@@ -283,6 +284,18 @@ public class PoddOWLManagerImplTest extends AbstractPoddOWLManagerTest
         Assert.assertNotNull("Ontology not in memory", loadedOntology);
         Assert.assertFalse("Ontology is empty", loadedOntology.isEmpty());
         Assert.assertEquals("Not the expected number of axioms", 1, loadedOntology.getAxiomCount());
+    }
+    
+    /**
+     * Test method for {@link com.github.podd.api.PoddOWLManager#getReasonerProfiles()} .
+     * 
+     */
+    @Test
+    public void testGetReasonerProfile() throws Exception
+    {
+        final Set<OWLProfile> profiles = ((PoddOWLManagerImpl)this.testOWLManager).getReasonerProfiles();
+        Assert.assertNotNull("OWLProfile was null", profiles);
+        Assert.assertFalse("OWLProfiles were not found for reasoner", profiles.isEmpty());
     }
     
 }
