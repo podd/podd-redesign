@@ -180,6 +180,16 @@ public class PoddOWLManagerImpl implements PoddOWLManager
         return importsList;
     }
     
+    /**
+     * TODO: Integrate this with other imports identification code in
+     * {@link PoddSchemaManagerImpl#mapAndSortImports(Model, ConcurrentMap, ConcurrentMap, ConcurrentMap, List, URI)}
+     * 
+     * @param ontologyID
+     * @param conn
+     * @param context
+     * @return
+     * @throws OpenRDFException
+     */
     private List<InferredOWLOntologyID> buildTwoLevelOrderedImportsList(final OWLOntologyID ontologyID,
             final RepositoryConnection conn, final URI context) throws OpenRDFException
     {
@@ -187,8 +197,7 @@ public class PoddOWLManagerImpl implements PoddOWLManager
         final List<InferredOWLOntologyID> directImports = this.buildDirectImportsList(ontologyID, conn, context);
         
         // -- find second level imports
-        final Set<InferredOWLOntologyID> secondLevelImports =
-                Collections.newSetFromMap(new ConcurrentHashMap<InferredOWLOntologyID, Boolean>());
+        final Set<InferredOWLOntologyID> secondLevelImports = new LinkedHashSet<InferredOWLOntologyID>();
         for(final InferredOWLOntologyID inferredOntologyID : directImports)
         {
             final List<InferredOWLOntologyID> directImportsList =
