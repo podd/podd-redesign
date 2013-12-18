@@ -246,8 +246,11 @@ public class PoddOWLManagerImpl implements PoddOWLManager
                 throw new NullPointerException("OWLOntology is incomplete");
             }
             
+            this.log.info("Checking whether the schema ontology is already cached: {}", ontologyID);
+            
             if(isCached(ontologyID))
             {
+                this.log.info("Ontology was already cached: {}", ontologyID);
                 continue;
             }
             
@@ -261,9 +264,13 @@ public class PoddOWLManagerImpl implements PoddOWLManager
             // (PoddPlant -> PoddScience -> PoddBase)
             // TODO: Fix this using a SPARQL which identifies the complete imports closure and sorts
             // them in the proper order for loading.
+            
+            // FIXME: The following doesn't seem to work on the initial load for new schema
+            // ontologies, as it is identifying the foaf ontology as having no imports, yet it
+            // imports the dcterms ontology
             final List<InferredOWLOntologyID> imports =
                     this.buildTwoLevelOrderedImportsList(ontologyID, conn, schemaManagementContext);
-            this.log.debug("The schema ontology {} has {} imports.", baseOntologyVersionIRI, imports.size());
+            this.log.info("The schema ontology {} has {} imports.", baseOntologyVersionIRI, imports.size());
             
             // -- load the imported ontologies into the Manager's cache. It is expected that they
             // are
@@ -271,7 +278,7 @@ public class PoddOWLManagerImpl implements PoddOWLManager
             for(final InferredOWLOntologyID inferredOntologyID : imports)
             {
                 final URI contextToLoadFrom = inferredOntologyID.getVersionIRI().toOpenRDFURI();
-                this.log.debug("About to load {} from context {}", inferredOntologyID, contextToLoadFrom);
+                this.log.info("About to load {} from context {}", inferredOntologyID, contextToLoadFrom);
                 this.parseRDFStatements(conn, contextToLoadFrom);
                 
                 final URI inferredContextToLoadFrom = inferredOntologyID.getInferredOntologyIRI().toOpenRDFURI();
@@ -281,6 +288,8 @@ public class PoddOWLManagerImpl implements PoddOWLManager
                 }
             }
             
+            this.log.info("About to parse schema ontology into managers cache: {}", ontologyID);
+            
             // -- load the requested schema ontology (and inferred statements if they exist) into
             // the
             // Manager's cache
@@ -288,9 +297,13 @@ public class PoddOWLManagerImpl implements PoddOWLManager
             if(ontologyID instanceof InferredOWLOntologyID
                     && ((InferredOWLOntologyID)ontologyID).getInferredOntologyIRI() != null)
             {
+                this.log.info("About to parse inferred schema ontology into managers cache: {}", ontologyID);
+                
                 this.parseRDFStatements(conn, ((InferredOWLOntologyID)ontologyID).getInferredOntologyIRI()
                         .toOpenRDFURI());
             }
+            
+            this.log.info("Completed caching for schema ontology: {}", ontologyID);
         }
     }
     
@@ -591,15 +604,14 @@ public class PoddOWLManagerImpl implements PoddOWLManager
         
         synchronized(this.managerFactory)
         {
+            OWLOntologyManager cachedManager = this.getCachedManager(Collections.<OWLOntologyID> emptySet());
             if(ontologyID.getVersionIRI() != null)
             {
-                return this.getCachedManager(Collections.<OWLOntologyID> emptySet()).contains(
-                        ontologyID.getVersionIRI());
+                return cachedManager.contains(ontologyID.getVersionIRI());
             }
             else
             {
-                return this.getCachedManager(Collections.<OWLOntologyID> emptySet()).contains(
-                        ontologyID.getOntologyIRI());
+                return cachedManager.contains(ontologyID.getOntologyIRI());
             }
         }
     }
@@ -802,22 +814,29 @@ public class PoddOWLManagerImpl implements PoddOWLManager
     public OWLOntologyID parseRDFStatements(final Model model) throws OpenRDFException, OWLException, IOException,
         PoddException
     {
-        final RioMemoryTripleSource owlSource =
-                new RioMemoryTripleSource(model.iterator(), Namespaces.asMap(model.getNamespaces()));
-        
-        final RioParserImpl owlParser = new RioParserImpl(null);
-        
+        this.log.info("About to parse statements");
         synchronized(this.managerFactory)
         {
-            final OWLOntology nextOntology =
-                    this.getCachedManager(Collections.<OWLOntologyID> emptySet()).createOntology();
+            final RioMemoryTripleSource owlSource =
+                    new RioMemoryTripleSource(model.iterator(), Namespaces.asMap(model.getNamespaces()));
+            
+            final RioParserImpl owlParser = new RioParserImpl(null);
+            
+            OWLOntologyManager cachedManager = this.getCachedManager(Collections.<OWLOntologyID> emptySet());
+            
+            this.log.info("Creating new ontology");
+            final OWLOntology nextOntology = cachedManager.createOntology();
             
             if(model.size() == 0)
             {
                 throw new EmptyOntologyException(nextOntology, "No statements to create an ontology");
             }
             
+            this.log.info("Parsing into the new ontology");
+            
             owlParser.parse(owlSource, nextOntology);
+            
+            this.log.info("Finished parsing into the new ontology");
             
             if(nextOntology.isEmpty())
             {
@@ -833,6 +852,7 @@ public class PoddOWLManagerImpl implements PoddOWLManager
     {
         OpenRDFUtil.verifyContextNotNull(contexts);
         
+        this.log.info("Exporting statements to model for parsing");
         final Model model = new LinkedHashModel();
         conn.export(new StatementCollector(model), contexts);
         

@@ -2076,6 +2076,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
                         nextOldSchemaOntologyID.getVersionIRI().toOpenRDFURI());
             }
             
+            this.log.info("Started caching schema ontologies for artifact migration: {}", artifactVersion);
             // Even if the old version of the artifact did not import this
             // schema, we include it now
             // as it may be required by the others
@@ -2084,9 +2085,13 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
                 // Add import to the specific version
                 tempRepositoryConnection.add(artifactVersion.getOntologyIRI().toOpenRDFURI(), OWL.IMPORTS,
                         nextNewSchemaOntologyID.getVersionIRI().toOpenRDFURI(), newVersionIRI.toOpenRDFURI());
+                this.log.info("Started caching schema ontology: {}", nextNewSchemaOntologyID);
                 this.getOWLManager().cacheSchemaOntology(nextNewSchemaOntologyID, permanentRepositoryConnection,
                         nextNewSchemaOntologyID.getVersionIRI().toOpenRDFURI());
+                this.log.info("Finished caching schema ontology: {}", nextNewSchemaOntologyID);
             }
+            
+            this.log.info("Finished caching schema ontologies for artifact migration: {}", artifactVersion);
             
             tempRepositoryConnection.commit();
             
