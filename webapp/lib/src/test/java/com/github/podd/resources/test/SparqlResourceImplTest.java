@@ -48,8 +48,7 @@ public class SparqlResourceImplTest extends AbstractResourceImplTest
         final ClientResource searchClientResource = new ClientResource(this.getUrl(PoddWebConstants.PATH_SPARQL));
         
         // there is no need to authenticate or have a test artifact as the
-        // artifact ID is checked
-        // for first
+        // artifact ID is checked for first
         try
         {
             searchClientResource.addQueryParameter(PoddWebConstants.KEY_SPARQLQUERY,
@@ -60,7 +59,7 @@ public class SparqlResourceImplTest extends AbstractResourceImplTest
         }
         catch(final ResourceException e)
         {
-            Assert.assertEquals(Status.CLIENT_ERROR_BAD_REQUEST, e.getStatus());
+            Assert.assertEquals(Status.CLIENT_ERROR_PRECONDITION_FAILED, e.getStatus());
         }
         finally
         {

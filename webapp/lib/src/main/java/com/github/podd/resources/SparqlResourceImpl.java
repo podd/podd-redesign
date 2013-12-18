@@ -20,6 +20,7 @@ import java.io.ByteArrayOutputStream;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.openrdf.OpenRDFException;
@@ -57,8 +58,6 @@ import com.github.podd.utils.PoddWebConstants;
  * Service for executing SPARQL queries over specified artifacts (and their Schema ontologies) that
  * users have access to.
  * 
- * TODO: Support HTTP POST queries to allow for longer queries
- * 
  * @author Peter Ansell p_ansell@yahoo.com
  * 
  */
@@ -91,14 +90,6 @@ public class SparqlResourceImpl extends AbstractPoddResourceImpl
         
         // artifact ids to search across
         artifactUris = this.getQuery().getValuesArray(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER);
-        if(artifactUris == null || artifactUris.length == 0)
-        {
-            // TODO: Support execution of sparql queries over all accessible
-            // artifacts if they
-            // did
-            // not specify any artifacts
-            throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "No artifacts specified in request");
-        }
         
         final String includeConcreteStatements =
                 this.getQuery().getFirstValue(PoddWebConstants.KEY_INCLUDE_CONCRETE, true);
@@ -121,8 +112,15 @@ public class SparqlResourceImpl extends AbstractPoddResourceImpl
             includeSchema = Boolean.valueOf(includeSchemaStatements);
         }
         
-        return this.doSparqlInternal(sparqlQuery, includeConcrete, includeInferred, includeSchema, artifactUris,
-                variant);
+        try
+        {
+            return this.doSparqlInternal(sparqlQuery, includeConcrete, includeInferred, includeSchema, artifactUris,
+                    variant);
+        }
+        catch(OpenRDFException e)
+        {
+            throw new ResourceException(Status.SERVER_ERROR_INTERNAL, e);
+        }
     }
     
     @Post(":rdf|rj|json|ttl")
@@ -199,50 +197,100 @@ public class SparqlResourceImpl extends AbstractPoddResourceImpl
             }
         }
         
-        return this.doSparqlInternal(sparqlQuery, includeConcrete, includeInferred, includeSchema, artifactUris,
-                variant);
+        try
+        {
+            return this.doSparqlInternal(sparqlQuery, includeConcrete, includeInferred, includeSchema, artifactUris,
+                    variant);
+        }
+        catch(OpenRDFException e)
+        {
+            throw new ResourceException(Status.SERVER_ERROR_INTERNAL, e);
+        }
     }
     
     private Representation doSparqlInternal(final String sparqlQuery, final boolean includeConcrete,
             final boolean includeInferred, final boolean includeSchema, final String[] artifactUris,
-            final Variant variant) throws ResourceException
+            final Variant variant) throws ResourceException, OpenRDFException
     {
         final Set<InferredOWLOntologyID> artifactIds = new LinkedHashSet<>();
         
-        final Model results = new LinkedHashModel();
-        for(final String nextArtifactUri : artifactUris)
+        // If they didn't specify any artifacts, run the query across all of the artifacts that they
+        // have access to
+        if(artifactUris == null || artifactUris.length == 0)
         {
-            try
+            List<InferredOWLOntologyID> unpublishedArtifacts = this.getPoddArtifactManager().listUnpublishedArtifacts();
+            
+            for(InferredOWLOntologyID unpublishedArtifact : unpublishedArtifacts)
             {
-                final InferredOWLOntologyID ontologyID =
-                        this.getPoddArtifactManager().getArtifact(IRI.create(nextArtifactUri));
+                boolean checkAuthentication =
+                        this.checkAuthentication(PoddAction.UNPUBLISHED_ARTIFACT_READ, unpublishedArtifact
+                                .getOntologyIRI().toOpenRDFURI(), false);
                 
-                if(this.getPoddArtifactManager().isPublished(ontologyID))
+                if(checkAuthentication)
                 {
-                    this.checkAuthentication(PoddAction.PUBLISHED_ARTIFACT_READ, ontologyID.getOntologyIRI()
-                            .toOpenRDFURI());
+                    artifactIds.add(unpublishedArtifact);
                 }
-                else
+            }
+            
+            List<InferredOWLOntologyID> publishedArtifacts = this.getPoddArtifactManager().listPublishedArtifacts();
+            
+            for(InferredOWLOntologyID publishedArtifact : publishedArtifacts)
+            {
+                boolean checkAuthentication =
+                        this.checkAuthentication(PoddAction.PUBLISHED_ARTIFACT_READ, publishedArtifact.getOntologyIRI()
+                                .toOpenRDFURI(), false);
+                
+                if(checkAuthentication)
                 {
-                    this.checkAuthentication(PoddAction.UNPUBLISHED_ARTIFACT_READ, ontologyID.getOntologyIRI()
-                            .toOpenRDFURI());
+                    artifactIds.add(publishedArtifact);
                 }
-                artifactIds.add(ontologyID);
-            }
-            catch(final UnmanagedSchemaIRIException e)
-            {
-                throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST,
-                        "Could not find a requested schema ontology", e);
-            }
-            catch(final UnmanagedArtifactIRIException e)
-            {
-                throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Could not find a requested artifact", e);
-            }
-            catch(final OpenRDFException e)
-            {
-                throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Repository exception occurred", e);
             }
         }
+        else
+        {
+            for(final String nextArtifactUri : artifactUris)
+            {
+                try
+                {
+                    final InferredOWLOntologyID ontologyID =
+                            this.getPoddArtifactManager().getArtifact(IRI.create(nextArtifactUri));
+                    
+                    if(this.getPoddArtifactManager().isPublished(ontologyID))
+                    {
+                        this.checkAuthentication(PoddAction.PUBLISHED_ARTIFACT_READ, ontologyID.getOntologyIRI()
+                                .toOpenRDFURI());
+                    }
+                    else
+                    {
+                        this.checkAuthentication(PoddAction.UNPUBLISHED_ARTIFACT_READ, ontologyID.getOntologyIRI()
+                                .toOpenRDFURI());
+                    }
+                    artifactIds.add(ontologyID);
+                }
+                catch(final UnmanagedSchemaIRIException e)
+                {
+                    throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST,
+                            "Could not find a requested schema ontology", e);
+                }
+                catch(final UnmanagedArtifactIRIException e)
+                {
+                    throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Could not find a requested artifact",
+                            e);
+                }
+                catch(final OpenRDFException e)
+                {
+                    throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Repository exception occurred", e);
+                }
+            }
+        }
+        
+        if(artifactIds.isEmpty())
+        {
+            throw new ResourceException(Status.CLIENT_ERROR_PRECONDITION_FAILED,
+                    "Server does not contain any artifacts that you can view, so no SPARQL queries able to be performed right now.");
+        }
+        
+        final Model results = new LinkedHashModel();
         
         for(final InferredOWLOntologyID ontologyID : artifactIds)
         {
