@@ -20,6 +20,7 @@
 package com.github.podd.api;
 
 import java.io.IOException;
+import java.util.Set;
 
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.Model;
@@ -40,6 +41,21 @@ import com.github.podd.utils.InferredOWLOntologyID;
  */
 public interface PoddOWLManager
 {
+    /**
+     * Loads and caches the given schema ontologies in memory from a Repository. Silently returns if
+     * the ontologies are already cached.
+     * 
+     * @param ontologyIDs
+     * @param conn
+     * @param context
+     * @throws OpenRDFException
+     * @throws PoddException
+     * @throws IOException
+     * @throws OWLException
+     */
+    void cacheSchemaOntologies(Set<? extends OWLOntologyID> ontologyIDs, RepositoryConnection conn, URI schemaManagementContext)
+        throws OpenRDFException, OWLException, IOException, PoddException;
+    
     /**
      * Loads and caches the given schema ontology in memory from a Repository. Silently returns if
      * the ontology is already cached.

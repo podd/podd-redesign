@@ -30,6 +30,7 @@ import org.mindswap.pellet.exceptions.PelletRuntimeException;
 import org.openrdf.OpenRDFException;
 import org.openrdf.OpenRDFUtil;
 import org.openrdf.model.Model;
+import org.openrdf.model.Resource;
 import org.openrdf.model.URI;
 import org.openrdf.model.impl.LinkedHashModel;
 import org.openrdf.model.util.Namespaces;
@@ -213,57 +214,78 @@ public class PoddOWLManagerImpl implements PoddOWLManager
     }
     
     @Override
-    public void cacheSchemaOntology(final OWLOntologyID ontologyID, final RepositoryConnection conn, final URI context)
-        throws OpenRDFException, OWLException, IOException, PoddException
+    public void cacheSchemaOntologies(final Set<? extends OWLOntologyID> ontologyIDs, final RepositoryConnection conn,
+            final URI schemaManagementContext) throws OpenRDFException, OWLException, IOException, PoddException
     {
         // -- validate input
-        if(ontologyID == null || ontologyID.getOntologyIRI() == null)
+        if(ontologyIDs == null)
         {
-            throw new NullPointerException("OWLOntology is incomplete");
+            throw new NullPointerException("OWLOntology collection is incomplete");
         }
+        
         // NOTE: if InferredOntologyIRI is null, only the base ontology is
         // cached
         
-        final IRI baseOntologyIRI = ontologyID.getOntologyIRI();
-        final IRI baseOntologyVersionIRI = ontologyID.getVersionIRI();
-        // final IRI inferredOntologyIRI = ontologyID.getInferredOntologyIRI();
-        
-        if(isCached(ontologyID))
+        for(OWLOntologyID ontologyID : ontologyIDs)
         {
-            return;
-        }
-        
-        // Only direct imports and first-level indirect imports are identified.
-        // This works for the current PODD schema ontologies which have a maximum import depth of 3
-        // (PoddPlant -> PoddScience -> PoddBase)
-        // TODO: Fix this using a SPARQL which identifies the complete imports closure and sorts
-        // them in the proper order for loading.
-        final List<InferredOWLOntologyID> imports = this.buildTwoLevelOrderedImportsList(ontologyID, conn, context);
-        this.log.debug("The schema ontology {} has {} imports.", baseOntologyVersionIRI, imports.size());
-        
-        // -- load the imported ontologies into the Manager's cache. It is expected that they are
-        // already in the Repository
-        for(final InferredOWLOntologyID inferredOntologyID : imports)
-        {
-            final URI contextToLoadFrom = inferredOntologyID.getVersionIRI().toOpenRDFURI();
-            this.log.debug("About to load {} from context {}", inferredOntologyID, contextToLoadFrom);
-            this.parseRDFStatements(conn, contextToLoadFrom);
-            
-            final URI inferredContextToLoadFrom = inferredOntologyID.getInferredOntologyIRI().toOpenRDFURI();
-            if(inferredContextToLoadFrom != null)
+            if(ontologyID == null || ontologyID.getOntologyIRI() == null)
             {
-                this.parseRDFStatements(conn, inferredContextToLoadFrom);
+                throw new NullPointerException("OWLOntology is incomplete");
+            }
+            
+            if(isCached(ontologyID))
+            {
+                continue;
+            }
+            
+            final IRI baseOntologyIRI = ontologyID.getOntologyIRI();
+            final IRI baseOntologyVersionIRI = ontologyID.getVersionIRI();
+            // final IRI inferredOntologyIRI = ontologyID.getInferredOntologyIRI();
+            
+            // Only direct imports and first-level indirect imports are identified.
+            // This works for the current PODD schema ontologies which have a maximum import depth
+            // of 3
+            // (PoddPlant -> PoddScience -> PoddBase)
+            // TODO: Fix this using a SPARQL which identifies the complete imports closure and sorts
+            // them in the proper order for loading.
+            final List<InferredOWLOntologyID> imports =
+                    this.buildTwoLevelOrderedImportsList(ontologyID, conn, schemaManagementContext);
+            this.log.debug("The schema ontology {} has {} imports.", baseOntologyVersionIRI, imports.size());
+            
+            // -- load the imported ontologies into the Manager's cache. It is expected that they
+            // are
+            // already in the Repository
+            for(final InferredOWLOntologyID inferredOntologyID : imports)
+            {
+                final URI contextToLoadFrom = inferredOntologyID.getVersionIRI().toOpenRDFURI();
+                this.log.debug("About to load {} from context {}", inferredOntologyID, contextToLoadFrom);
+                this.parseRDFStatements(conn, contextToLoadFrom);
+                
+                final URI inferredContextToLoadFrom = inferredOntologyID.getInferredOntologyIRI().toOpenRDFURI();
+                if(inferredContextToLoadFrom != null)
+                {
+                    this.parseRDFStatements(conn, inferredContextToLoadFrom);
+                }
+            }
+            
+            // -- load the requested schema ontology (and inferred statements if they exist) into
+            // the
+            // Manager's cache
+            this.parseRDFStatements(conn, baseOntologyVersionIRI.toOpenRDFURI());
+            if(ontologyID instanceof InferredOWLOntologyID
+                    && ((InferredOWLOntologyID)ontologyID).getInferredOntologyIRI() != null)
+            {
+                this.parseRDFStatements(conn, ((InferredOWLOntologyID)ontologyID).getInferredOntologyIRI()
+                        .toOpenRDFURI());
             }
         }
-        
-        // -- load the requested schema ontology (and inferred statements if they exist) into the
-        // Manager's cache
-        this.parseRDFStatements(conn, baseOntologyVersionIRI.toOpenRDFURI());
-        if(ontologyID instanceof InferredOWLOntologyID
-                && ((InferredOWLOntologyID)ontologyID).getInferredOntologyIRI() != null)
-        {
-            this.parseRDFStatements(conn, ((InferredOWLOntologyID)ontologyID).getInferredOntologyIRI().toOpenRDFURI());
-        }
+    }
+    
+    @Override
+    public void cacheSchemaOntology(final OWLOntologyID ontologyID, final RepositoryConnection conn,
+            final URI schemaManagementContext) throws OpenRDFException, OWLException, IOException, PoddException
+    {
+        cacheSchemaOntologies(Collections.singleton(ontologyID), conn, schemaManagementContext);
     }
     
     /**
@@ -551,6 +573,7 @@ public class PoddOWLManagerImpl implements PoddOWLManager
     public boolean isCached(final OWLOntologyID ontologyID)
     {
         Objects.requireNonNull(ontologyID, "Ontology ID cannot be null");
+        Objects.requireNonNull(ontologyID.getOntologyIRI(), "Ontology IRI cannot be null");
         
         synchronized(this.owlOntologyManager)
         {

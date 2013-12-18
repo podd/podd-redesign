@@ -26,6 +26,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
@@ -949,15 +950,17 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         final Set<IRI> importedSchemas =
                 this.getSesameManager().getDirectImports(tempRepositoryConnection, tempContext);
         
+        final Set<InferredOWLOntologyID> importedSchemaOntologies = new HashSet<>();
+        
         for(final IRI importedSchemaIRI : importedSchemas)
         {
-            final InferredOWLOntologyID ontologyVersion =
-                    this.getSesameManager().getSchemaVersion(importedSchemaIRI, permanentRepositoryConnection,
-                            this.getRepositoryManager().getSchemaManagementGraph());
-            
-            this.getOWLManager().cacheSchemaOntology(ontologyVersion, permanentRepositoryConnection,
-                    this.getRepositoryManager().getSchemaManagementGraph());
+            importedSchemaOntologies.add(this.getSesameManager().getSchemaVersion(importedSchemaIRI,
+                    permanentRepositoryConnection, this.getRepositoryManager().getSchemaManagementGraph()));
         }
+        
+        this.getOWLManager().cacheSchemaOntologies(importedSchemaOntologies, permanentRepositoryConnection,
+                this.getRepositoryManager().getSchemaManagementGraph());
+        
     }
     
     /**
