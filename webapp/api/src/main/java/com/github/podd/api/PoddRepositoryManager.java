@@ -85,6 +85,28 @@ public interface PoddRepositoryManager
     URI getSchemaManagementGraph();
     
     /**
+     * Identfies the given repository as being a suitable target for artifacts importing the given
+     * schema ontologies.
+     * 
+     * @param schemaOntologies
+     *            A set of schema ontologies that match the given repository.
+     * @param repository
+     *            The repository target.
+     */
+    void mapPermanentRepository(Set<? extends OWLOntologyID> schemaOntologies, Repository repository)
+        throws OpenRDFException;
+    
+    /**
+     * Verifies that the context is not null, not the default graph (sesame:nil), and is not one of
+     * the management graphs.
+     * 
+     * @param contexts
+     *            The contexts to check.
+     * @return True if the contexts are not on the banned or protected list.
+     */
+    boolean safeContexts(URI... contexts);
+    
+    /**
      * Sets the artifact management graph URI for use with this repository manager.
      * 
      * @param artifactManagementGraph
@@ -122,15 +144,5 @@ public interface PoddRepositoryManager
      *             If there were issues shutting down the active repositories.
      */
     void shutDown() throws RepositoryException;
-    
-    /**
-     * Verifies that the context is not null, not the default graph (sesame:nil), and is not one of
-     * the management graphs.
-     * 
-     * @param contexts
-     *            The contexts to check.
-     * @return True if the contexts are not on the banned or protected list.
-     */
-    boolean safeContexts(URI... contexts);
     
 }

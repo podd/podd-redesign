@@ -17,7 +17,10 @@
 package com.github.podd.impl;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.URI;
@@ -39,31 +42,35 @@ import com.github.podd.utils.PODD;
  */
 public class PoddRepositoryManagerImpl implements PoddRepositoryManager
 {
-    private final Logger log = LoggerFactory.getLogger(this.getClass());
-    
-    private Repository repository;
-    
     private URI artifactGraph = PODD.DEFAULT_ARTIFACT_MANAGEMENT_GRAPH;
     
-    private URI schemaGraph = PODD.DEFAULT_SCHEMA_MANAGEMENT_GRAPH;
-    
     private URI dataRepositoryGraph = PODD.DEFAULT_FILE_REPOSITORY_MANAGEMENT_GRAPH;
+    
+    private final Logger log = LoggerFactory.getLogger(this.getClass());
+    
+    private Repository managementRepository;
+    
+    private ConcurrentMap<Set<? extends OWLOntologyID>, Repository> permanentRepositories = new ConcurrentHashMap<>();
+    
+    private URI schemaGraph = PODD.DEFAULT_SCHEMA_MANAGEMENT_GRAPH;
     
     /**
      * Default constructor, which sets up an in-memory MemoryStore repository.
      */
     public PoddRepositoryManagerImpl()
     {
-        this.repository = new SailRepository(new MemoryStore());
+        this.managementRepository = new SailRepository(new MemoryStore());
         try
         {
-            this.repository.initialize();
+            this.managementRepository.initialize();
+            // TODO: Use a non-stub mapping here
+            this.permanentRepositories.put(Collections.<OWLOntologyID> emptySet(), this.managementRepository);
         }
         catch(final RepositoryException e)
         {
             try
             {
-                this.repository.shutDown();
+                this.managementRepository.shutDown();
             }
             catch(final RepositoryException e1)
             {
@@ -77,12 +84,14 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
     
     /**
      * 
-     * @param repository
+     * @param managementRepository
      *            An initialized implementation of Repository.
      */
-    public PoddRepositoryManagerImpl(final Repository repository)
+    public PoddRepositoryManagerImpl(final Repository managementRepository)
     {
-        this.repository = repository;
+        this.managementRepository = managementRepository;
+        // TODO: Use a non-stub mapping here
+        this.permanentRepositories.put(Collections.<OWLOntologyID> emptySet(), managementRepository);
     }
     
     @Override
@@ -100,11 +109,12 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
     @Override
     public Repository getManagementRepository() throws OpenRDFException
     {
-        return this.repository;
+        return this.managementRepository;
     }
     
     @Override
-    public Repository getNewTemporaryRepository(final Set<? extends OWLOntologyID> ontologies) throws OpenRDFException
+    public Repository getNewTemporaryRepository(final Set<? extends OWLOntologyID> schemaOntologies)
+        throws OpenRDFException
     {
         final Repository result = new SailRepository(new MemoryStore());
         result.initialize();
@@ -113,9 +123,11 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
     }
     
     @Override
-    public Repository getPermanentRepository(final Set<? extends OWLOntologyID> ontologies) throws OpenRDFException
+    public Repository getPermanentRepository(final Set<? extends OWLOntologyID> schemaOntologies)
+        throws OpenRDFException
     {
-        return this.repository;
+        // TODO: Use a non-stub mapping here
+        return this.permanentRepositories.get(Collections.<OWLOntologyID> emptySet());
     }
     
     @Override
@@ -125,35 +137,15 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
     }
     
     @Override
-    public void setArtifactManagementGraph(final URI artifactManagementGraph)
+    public void mapPermanentRepository(final Set<? extends OWLOntologyID> schemaOntologies, final Repository repository)
     {
-        this.artifactGraph = artifactManagementGraph;
-    }
-    
-    @Override
-    public void setFileRepositoryManagementGraph(final URI dataRepositoryManagementGraph)
-    {
-        this.dataRepositoryGraph = dataRepositoryManagementGraph;
-    }
-    
-    @Override
-    public void setManagementRepository(final Repository repository) throws OpenRDFException
-    {
-        this.repository = repository;
-    }
-    
-    @Override
-    public void setSchemaManagementGraph(final URI schemaManagementGraph)
-    {
-        this.schemaGraph = schemaManagementGraph;
-    }
-    
-    @Override
-    public void shutDown() throws RepositoryException
-    {
-        if(this.repository != null)
+        // Override any previous repositories that were there
+        final Repository putIfAbsent = this.permanentRepositories.putIfAbsent(schemaOntologies, repository);
+        
+        // TODO: Shutdown putIfAbsent
+        if(putIfAbsent != null)
         {
-            this.repository.shutDown();
+            this.log.warn("Overriding previous repository for a set of schema ontologies: {}", schemaOntologies);
         }
     }
     
@@ -202,6 +194,39 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
         }
         
         return returnValue;
+    }
+    
+    @Override
+    public void setArtifactManagementGraph(final URI artifactManagementGraph)
+    {
+        this.artifactGraph = artifactManagementGraph;
+    }
+    
+    @Override
+    public void setFileRepositoryManagementGraph(final URI dataRepositoryManagementGraph)
+    {
+        this.dataRepositoryGraph = dataRepositoryManagementGraph;
+    }
+    
+    @Override
+    public void setManagementRepository(final Repository repository) throws OpenRDFException
+    {
+        this.managementRepository = repository;
+    }
+    
+    @Override
+    public void setSchemaManagementGraph(final URI schemaManagementGraph)
+    {
+        this.schemaGraph = schemaManagementGraph;
+    }
+    
+    @Override
+    public void shutDown() throws RepositoryException
+    {
+        if(this.managementRepository != null)
+        {
+            this.managementRepository.shutDown();
+        }
     }
     
 }
