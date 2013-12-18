@@ -104,9 +104,11 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
         PelletExplanation.setup();
     }
     
-    public static final URI ARTIFACT_MGT_GRAPH = ValueFactoryImpl.getInstance().createURI("urn:test:artifact-graph");
-    
-    public static final URI SCHEMA_MGT_GRAPH = ValueFactoryImpl.getInstance().createURI("urn:test:schema-graph");
+    // public static final URI ARTIFACT_MGT_GRAPH =
+    // ValueFactoryImpl.getInstance().createURI("urn:test:artifact-graph");
+    //
+    // public static final URI SCHEMA_MGT_GRAPH =
+    // ValueFactoryImpl.getInstance().createURI("urn:test:schema-graph");
     
     private final Logger log = LoggerFactory.getLogger(this.getClass());
     

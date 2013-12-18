@@ -301,9 +301,12 @@ public class ApplicationUtils
         final Repository nextRepository = ApplicationUtils.getNewRepository(props);
         
         application.setPoddRepositoryManager(new PoddRepositoryManagerImpl(nextRepository));
-        application.getPoddRepositoryManager().setSchemaManagementGraph(PoddWebServiceApplicationImpl.SCHEMA_MGT_GRAPH);
+        application.getPoddRepositoryManager().setSchemaManagementGraph(
+                PODD.VF.createURI(props.get(PoddWebConstants.PROPERTY_SCHEMA_GRAPH,
+                        PoddWebConstants.DEFAULT_SCHEMA_GRAPH)));
         application.getPoddRepositoryManager().setArtifactManagementGraph(
-                PoddWebServiceApplicationImpl.ARTIFACT_MGT_GRAPH);
+                PODD.VF.createURI(props.get(PoddWebConstants.PROPERTY_ARTIFACT_GRAPH,
+                        PoddWebConstants.DEFAULT_ARTIFACT_GRAPH)));
         
         // File Reference manager
         final DataReferenceProcessorRegistry nextFileRegistry = new DataReferenceProcessorRegistry();

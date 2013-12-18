@@ -246,6 +246,12 @@ public interface PoddWebConstants
     public static final String PROPERTY_SESAME_URL = "podd.sesamehttpurl";
     public static final String DEFAULT_SESAME_URL = "";
     
+    public static final String PROPERTY_SCHEMA_GRAPH = "podd.schemagraph";
+    public static final String DEFAULT_SCHEMA_GRAPH = "urn:podd:default:schemamanagementgraph";
+    
+    public static final String PROPERTY_ARTIFACT_GRAPH = "podd.artifactgraph";
+    public static final String DEFAULT_ARTIFACT_GRAPH = "urn:podd:default:artifactmanagementgraph";
+    
     /**
      * Key used to select published artifacts. Defaults to true.
      */
