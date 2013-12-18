@@ -2044,10 +2044,13 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
                         "Cannot update schema imports for artifact as the specified version was not found.");
             }
             
-            // Export the artifact without including the old inferred triples,
-            // and they will be
+            this.log.info("Starting exporting artifact to RDF: {}", artifactVersion);
+            
+            // Export the artifact without including the old inferred triples, and they will be
             // regenerated using the new schema ontologies
             final Model model = this.exportArtifact(artifactVersion, false);
+            
+            this.log.info("Finished exporting artifact to RDF: {}", artifactVersion);
             
             tempRepository = this.repositoryManager.getNewTemporaryRepository(newSchemaOntologyIds);
             tempRepositoryConnection = tempRepository.getConnection();
@@ -2087,11 +2090,16 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             
             tempRepositoryConnection.commit();
             
+            this.log.info("Starting reload of artifact to Repository: {}", artifactVersion);
+            
             // If the following does not succeed, then it throws an exception and we rollback
             // permanentRepositoryConnection
             final InferredOWLOntologyID result =
                     this.loadInferStoreArtifact(tempRepositoryConnection, permanentRepositoryConnection,
                             newVersionIRI.toOpenRDFURI(), DataReferenceVerificationPolicy.DO_NOT_VERIFY, false);
+            
+            this.log.info("Completed reload of artifact to Repository: {}", artifactVersion);
+            
             permanentRepositoryConnection.commit();
             
             return result;
