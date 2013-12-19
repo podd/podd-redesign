@@ -171,7 +171,7 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
     {
         if(schemaOntologyIRI == null)
         {
-            throw new UnmanagedSchemaIRIException(schemaOntologyIRI, "NULL is not a managed schema ontology");
+            throw new UnmanagedSchemaIRIException(null, "NULL is not a managed schema ontology");
         }
         
         RepositoryConnection conn = null;
@@ -218,7 +218,7 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
     }
     
     @Override
-    public OWLOntology getSchemaOntology(final IRI schemaOntologyIRI) throws UnmanagedSchemaIRIException
+    public OWLOntology getSchemaOntology(final URI schemaOntologyIRI) throws UnmanagedSchemaIRIException
     {
         throw new RuntimeException("TODO: Implement getSchemaOntology(IRI)");
     }
@@ -284,7 +284,7 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
     {
         if(schemaVersionIRI == null)
         {
-            throw new UnmanagedSchemaIRIException(schemaVersionIRI, "NULL is not a managed schema ontology");
+            throw new UnmanagedSchemaIRIException(null, "NULL is not a managed schema ontology");
         }
         
         RepositoryConnection conn = null;
@@ -350,7 +350,8 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
         
         final List<URI> importOrder = OntologyUtils.orderImports(model, schemaOntologyUris, schemaVersionUris);
         
-        Map<URI, Set<OWLOntologyID>> allImports = OntologyUtils.getImports(model, schemaVersionUris);
+        Map<URI, Set<OWLOntologyID>> allImports =
+                OntologyUtils.getImports(model, schemaOntologyUris, schemaVersionUris);
         
         return this.uploadSchemaOntologiesInOrder(model, importOrder);
     }

@@ -99,7 +99,7 @@ public interface PoddArtifactManager
      * @throws IOException
      * @throws RepositoryException
      */
-    InferredOWLOntologyID deleteObject(String artifactUri, String versionUri, String objectUri, boolean cascade)
+    InferredOWLOntologyID deleteObject(URI artifactUri, URI versionUri, URI objectUri, boolean cascade)
         throws PoddException, OpenRDFException, IOException, OWLException;
     
     /**

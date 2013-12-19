@@ -66,7 +66,7 @@ public class InferredOWLOntologyID extends OWLOntologyID
     public InferredOWLOntologyID(final URI baseOntologyIRI, final URI baseOntologyVersionIRI,
             final URI inferredOntologyIRI)
     {
-        super(IRI.create(baseOntologyIRI), IRI.create(baseOntologyVersionIRI));
+        super(baseOntologyIRI, baseOntologyVersionIRI);
         
         if(inferredOntologyIRI != null)
         {

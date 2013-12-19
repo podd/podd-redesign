@@ -232,13 +232,13 @@ public interface PoddSesameManager
      * @return A Set containing ontology IRIs for all import statements.
      * @throws OpenRDFException
      */
-    Set<IRI> getDirectImports(final InferredOWLOntologyID ontologyID, final RepositoryConnection repositoryConnection)
+    Set<URI> getDirectImports(final InferredOWLOntologyID ontologyID, final RepositoryConnection repositoryConnection)
         throws OpenRDFException;
     
-    Set<IRI> getDirectImports(IRI ontologyIRI, RepositoryConnection repositoryConnection, URI... contexts)
+    Set<URI> getDirectImports(IRI ontologyIRI, RepositoryConnection repositoryConnection, URI... contexts)
         throws OpenRDFException;
     
-    Set<IRI> getDirectImports(RepositoryConnection repositoryConnection, URI... contexts) throws OpenRDFException;
+    Set<URI> getDirectImports(RepositoryConnection repositoryConnection, URI... contexts) throws OpenRDFException;
     
     /**
      * For a given PODD Object, this method finds all property values associated with it and also

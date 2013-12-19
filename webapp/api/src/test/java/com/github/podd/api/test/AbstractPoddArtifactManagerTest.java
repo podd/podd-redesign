@@ -955,23 +955,21 @@ public abstract class AbstractPoddArtifactManagerTest
         
         for(final Object[] element : testData)
         {
-            final String objectToDelete = (String)element[0];
+            final URI objectToDelete = PODD.VF.createURI((String)element[0]);
             final int expectedArtifactSize = (int)element[1];
             final boolean cascade = (boolean)element[2];
             
             // perform test action: delete object
             final InferredOWLOntologyID modifiedArtifactId =
-                    this.testArtifactManager.deleteObject(artifactID.getOntologyIRI().toString(), artifactID
-                            .getVersionIRI().toString(), objectToDelete, cascade);
+                    this.testArtifactManager.deleteObject(artifactID.getOntologyIRI().toOpenRDFURI(), artifactID
+                            .getVersionIRI().toOpenRDFURI(), objectToDelete, cascade);
             
             // verify:
             final Model artifactModel = this.testArtifactManager.exportArtifact(modifiedArtifactId, false);
             Assert.assertEquals("Reduction in artifact size incorrect", expectedArtifactSize, artifactModel.size());
             
-            Assert.assertTrue("Object was not deleted",
-                    artifactModel.filter(PODD.VF.createURI(objectToDelete), null, null).isEmpty());
-            Assert.assertTrue("Object was not deleted",
-                    artifactModel.filter(null, null, PODD.VF.createURI(objectToDelete)).isEmpty());
+            Assert.assertTrue("Object was not deleted", artifactModel.filter(objectToDelete, null, null).isEmpty());
+            Assert.assertTrue("Object was not deleted", artifactModel.filter(null, null, objectToDelete).isEmpty());
         }
     }
     
@@ -993,14 +991,15 @@ public abstract class AbstractPoddArtifactManagerTest
         this.verifyLoadedArtifact(artifactID, 7, TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES,
                 TestConstants.TEST_ARTIFACT_BASIC_1_20130206_INFERRED_TRIPLES, false);
         
-        final String objectToDelete = "http://purl.org/podd/basic-2-20130206/artifact:1#SqueekeeMaterial";
+        final URI objectToDelete =
+                PODD.VF.createURI("http://purl.org/podd/basic-2-20130206/artifact:1#SqueekeeMaterial");
         final boolean cascade = false;
         
         // perform test action: delete object
         try
         {
-            this.testArtifactManager.deleteObject(artifactID.getOntologyIRI().toString(), artifactID.getVersionIRI()
-                    .toString(), objectToDelete, cascade);
+            this.testArtifactManager.deleteObject(artifactID.getOntologyIRI().toOpenRDFURI(), artifactID
+                    .getVersionIRI().toOpenRDFURI(), objectToDelete, cascade);
             Assert.fail("Should not have allowed deletion");
         }
         catch(final DisconnectedObjectException e)
@@ -1011,8 +1010,7 @@ public abstract class AbstractPoddArtifactManagerTest
             final Model artifactModel = this.testArtifactManager.exportArtifact(artifactID, false);
             Assert.assertEquals("Reduction in artifact size incorrect",
                     TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES, artifactModel.size());
-            Assert.assertFalse("Object was deleted", artifactModel
-                    .filter(PODD.VF.createURI(objectToDelete), null, null).isEmpty());
+            Assert.assertFalse("Object was deleted", artifactModel.filter(objectToDelete, null, null).isEmpty());
         }
     }
     
@@ -1035,13 +1033,13 @@ public abstract class AbstractPoddArtifactManagerTest
         
         final InferredOWLOntologyID publishedArtifact = this.testArtifactManager.publishArtifact(artifactID);
         
-        final String objectToDelete = "http://purl.org/podd/basic-2-20130206/artifact:1#publication45";
+        final URI objectToDelete = PODD.VF.createURI("http://purl.org/podd/basic-2-20130206/artifact:1#publication45");
         
         // perform test action: delete object
         try
         {
-            this.testArtifactManager.deleteObject(publishedArtifact.getOntologyIRI().toString(), publishedArtifact
-                    .getVersionIRI().toString(), objectToDelete, false);
+            this.testArtifactManager.deleteObject(publishedArtifact.getOntologyIRI().toOpenRDFURI(), publishedArtifact
+                    .getVersionIRI().toOpenRDFURI(), objectToDelete, false);
             Assert.fail("Should not have allowed deletion");
         }
         catch(final PublishedArtifactModifyException e)
@@ -1050,8 +1048,7 @@ public abstract class AbstractPoddArtifactManagerTest
             final Model artifactModel = this.testArtifactManager.exportArtifact(artifactID, false);
             Assert.assertEquals("Reduction in artifact size incorrect",
                     TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES, artifactModel.size());
-            Assert.assertFalse("Object was deleted", artifactModel
-                    .filter(PODD.VF.createURI(objectToDelete), null, null).isEmpty());
+            Assert.assertFalse("Object was deleted", artifactModel.filter(objectToDelete, null, null).isEmpty());
         }
     }
     
@@ -1072,21 +1069,22 @@ public abstract class AbstractPoddArtifactManagerTest
         this.verifyLoadedArtifact(artifactID, 7, TestConstants.TEST_ARTIFACT_WITH_REFERSTO_CONCRETE_TRIPLES,
                 TestConstants.TEST_ARTIFACT_WITH_REFERSTO_INFERRED_TRIPLES, false);
         
-        final String objectToDelete = "http://purl.org/podd/basic-2-20130206/artifact:1#Demo_genotype_3";
+        final URI objectToDelete =
+                PODD.VF.createURI("http://purl.org/podd/basic-2-20130206/artifact:1#Demo_genotype_3");
         final boolean cascade = true;
         
         // perform test action: delete object
         final InferredOWLOntologyID modifiedArtifactId =
-                this.testArtifactManager.deleteObject(artifactID.getOntologyIRI().toString(), artifactID
-                        .getVersionIRI().toString(), objectToDelete, cascade);
+                this.testArtifactManager.deleteObject(artifactID.getOntologyIRI().toOpenRDFURI(), artifactID
+                        .getVersionIRI().toOpenRDFURI(), objectToDelete, cascade);
         
         // verify:
         final Model artifactModel = this.testArtifactManager.exportArtifact(modifiedArtifactId, false);
         Assert.assertEquals("Reduction in artifact size incorrect", 72, artifactModel.size());
         Assert.assertTrue("Object still exists as an object of some statement",
-                artifactModel.filter(null, null, PODD.VF.createURI(objectToDelete)).isEmpty());
+                artifactModel.filter(null, null, objectToDelete).isEmpty());
         Assert.assertTrue("Object exists as a subject of some statement",
-                artifactModel.filter(PODD.VF.createURI(objectToDelete), null, null).isEmpty());
+                artifactModel.filter(objectToDelete, null, null).isEmpty());
     }
     
     /**
@@ -1107,25 +1105,24 @@ public abstract class AbstractPoddArtifactManagerTest
         this.verifyLoadedArtifact(artifactID, 7, TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES,
                 TestConstants.TEST_ARTIFACT_BASIC_1_20130206_INFERRED_TRIPLES, false);
         
-        final String objectToDelete = "http://purl.org/podd/basic-1-20130206/object:2966";
+        final URI objectToDelete = PODD.VF.createURI("http://purl.org/podd/basic-1-20130206/object:2966");
         final boolean cascade = true;
         
         // perform test action: delete object
         try
         {
-            this.testArtifactManager.deleteObject(artifactID.getOntologyIRI().toString(), artifactID.getVersionIRI()
-                    .toString(), objectToDelete, cascade);
+            this.testArtifactManager.deleteObject(artifactID.getOntologyIRI().toOpenRDFURI(), artifactID
+                    .getVersionIRI().toOpenRDFURI(), objectToDelete, cascade);
             Assert.fail("Should not have allowed deletion");
         }
         catch(final ArtifactModifyException e)
         {
-            Assert.assertEquals("Failure not due to object to delete", objectToDelete, e.getObjectUri().toString());
+            Assert.assertEquals("Failure not due to object to delete", objectToDelete, e.getObjectUri());
             
             final Model artifactModel = this.testArtifactManager.exportArtifact(artifactID, false);
             Assert.assertEquals("Reduction in artifact size incorrect",
                     TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES, artifactModel.size());
-            Assert.assertFalse("Object was deleted", artifactModel
-                    .filter(PODD.VF.createURI(objectToDelete), null, null).isEmpty());
+            Assert.assertFalse("Object was deleted", artifactModel.filter(objectToDelete, null, null).isEmpty());
         }
     }
     

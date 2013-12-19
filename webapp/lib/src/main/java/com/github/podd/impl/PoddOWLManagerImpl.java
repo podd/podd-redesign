@@ -22,6 +22,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -46,12 +47,16 @@ import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.util.RDFInserter;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.helpers.StatementCollector;
+import org.semanticweb.owlapi.formats.OWLOntologyFormat;
 import org.semanticweb.owlapi.formats.OWLOntologyFormatFactoryRegistry;
+import org.semanticweb.owlapi.formats.RDFXMLOntologyFormatFactory;
 import org.semanticweb.owlapi.formats.RioRDFOntologyFormatFactory;
 import org.semanticweb.owlapi.io.OWLOntologyDocumentSource;
 import org.semanticweb.owlapi.io.OWLParser;
 import org.semanticweb.owlapi.io.OWLParserException;
 import org.semanticweb.owlapi.io.OWLParserFactoryRegistry;
+import org.semanticweb.owlapi.io.RDFOntologyFormat;
+import org.semanticweb.owlapi.io.RDFResourceParseError;
 import org.semanticweb.owlapi.model.AddImport;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLAxiom;
@@ -60,6 +65,7 @@ import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyChangeException;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyID;
+import org.semanticweb.owlapi.model.OWLOntologyLoaderConfiguration;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.OWLOntologyManagerFactory;
 import org.semanticweb.owlapi.model.OWLRuntimeException;
@@ -261,14 +267,8 @@ public class PoddOWLManagerImpl implements PoddOWLManager
             
             this.log.info("Checking whether the schema ontology is already cached: {}", ontologyID);
             
-            if(isCached(ontologyID))
-            {
-                this.log.info("Ontology was already cached: {}", ontologyID);
-                continue;
-            }
-            
-            final IRI baseOntologyIRI = ontologyID.getOntologyIRI();
-            final IRI baseOntologyVersionIRI = ontologyID.getVersionIRI();
+            // final IRI baseOntologyIRI = ontologyID.getOntologyIRI();
+            // final IRI baseOntologyVersionIRI = ontologyID.getVersionIRI();
             // final IRI inferredOntologyIRI = ontologyID.getInferredOntologyIRI();
             
             // Only direct imports and first-level indirect imports are identified.
@@ -284,44 +284,95 @@ public class PoddOWLManagerImpl implements PoddOWLManager
             Model schemaManagement = new LinkedHashModel();
             conn.export(new StatementCollector(schemaManagement), schemaManagementContext);
             
-            final List<InferredOWLOntologyID> imports =
-                    this.buildTwoLevelOrderedImportsList(ontologyID, conn, schemaManagementContext);
-            this.log.info("The schema ontology {} has {} imports.", baseOntologyVersionIRI, imports.size());
+            final Set<URI> schemaOntologyUris = new LinkedHashSet<>();
+            final Set<URI> schemaVersionUris = new LinkedHashSet<>();
             
-            // -- load the imported ontologies into the Manager's cache. It is expected that they
-            // are already in the Repository
-            for(final InferredOWLOntologyID inferredOntologyID : imports)
+            OntologyUtils.extractOntologyAndVersions(schemaManagement, schemaOntologyUris, schemaVersionUris);
+            
+            Map<URI, Set<OWLOntologyID>> imports2 =
+                    OntologyUtils.getImports(schemaManagement, schemaOntologyUris, schemaVersionUris);
+            
+            if(imports2.containsKey(ontologyID.getVersionIRI().toOpenRDFURI()))
             {
-                if(!isCached(inferredOntologyID))
+                Set<OWLOntologyID> nextImports = imports2.get(ontologyID.getVersionIRI().toOpenRDFURI());
+                
+                // final List<InferredOWLOntologyID> imports =
+                // this.buildTwoLevelOrderedImportsList(ontologyID, conn, schemaManagementContext);
+                this.log.info("The schema ontology {} has {} imports.", ontologyID, nextImports.size());
+                
+                // -- load the imported ontologies into the Manager's cache. It is expected that
+                // they
+                // are already in the Repository
+                for(final OWLOntologyID inferredOntologyID : nextImports)
                 {
-                    final URI contextToLoadFrom = inferredOntologyID.getVersionIRI().toOpenRDFURI();
-                    this.log.info("About to load {} from context {}", inferredOntologyID, contextToLoadFrom);
-                    this.parseRDFStatements(conn, contextToLoadFrom);
-                    
-                    final URI inferredContextToLoadFrom = inferredOntologyID.getInferredOntologyIRI().toOpenRDFURI();
-                    if(inferredContextToLoadFrom != null)
-                    {
-                        this.parseRDFStatements(conn, inferredContextToLoadFrom);
-                    }
+                    this.log.info("Checking caching for imported schema: {}", inferredOntologyID);
+                    this.cacheSchemaOntologyInternal(conn, inferredOntologyID);
                 }
             }
-            
-            this.log.info("About to parse schema ontology into managers cache: {}", ontologyID);
-            
+            else
+            {
+                this.log.info("Did not find any imports for schema ontology: {}", ontologyID);
+            }
             // -- load the requested schema ontology (and inferred statements if they exist) into
             // the
             // Manager's cache
-            this.parseRDFStatements(conn, baseOntologyVersionIRI.toOpenRDFURI());
-            if(ontologyID instanceof InferredOWLOntologyID
-                    && ((InferredOWLOntologyID)ontologyID).getInferredOntologyIRI() != null)
-            {
-                this.log.info("About to parse inferred schema ontology into managers cache: {}", ontologyID);
-                
-                this.parseRDFStatements(conn, ((InferredOWLOntologyID)ontologyID).getInferredOntologyIRI()
-                        .toOpenRDFURI());
-            }
+            this.log.info("Checking caching for ontology: {}", ontologyID);
+            this.cacheSchemaOntologyInternal(conn, ontologyID);
             
             this.log.info("Completed caching for schema ontology: {}", ontologyID);
+        }
+    }
+    
+    /**
+     * Internal implementation checking for caching of both ontologies and their inferred ontologies
+     * 
+     * @param conn
+     * @param ontologyID
+     * @throws OpenRDFException
+     * @throws OWLException
+     * @throws IOException
+     * @throws PoddException
+     */
+    public void cacheSchemaOntologyInternal(final RepositoryConnection conn, OWLOntologyID ontologyID)
+        throws OpenRDFException, OWLException, IOException, PoddException
+    {
+        if(!isCached(ontologyID))
+        {
+            this.log.info("About to parse schema ontology into managers cache: {}", ontologyID);
+            
+            this.parseRDFStatements(conn, ontologyID.getVersionIRI().toOpenRDFURI());
+        }
+        else
+        {
+            this.log.info("Ontology was already cached: {}", ontologyID);
+        }
+        
+        if(ontologyID instanceof InferredOWLOntologyID)
+        {
+            this.log.info("Found inferred OWL ontology ID");
+            if(!isCached(((InferredOWLOntologyID)ontologyID).getInferredOWLOntologyID()))
+            {
+                this.log.info("About to parse inferred schema ontology into managers cache: {}",
+                        ((InferredOWLOntologyID)ontologyID).getInferredOWLOntologyID());
+                
+                if(((InferredOWLOntologyID)ontologyID).getInferredOntologyIRI() != null)
+                {
+                    this.parseRDFStatements(conn, ((InferredOWLOntologyID)ontologyID).getInferredOntologyIRI()
+                            .toOpenRDFURI());
+                }
+                else
+                {
+                    this.log.info("Inferred ontology IRI was missing/null: {}", ontologyID);
+                }
+            }
+            else
+            {
+                this.log.info("Inferred ontology was already cached: {}", ontologyID);
+            }
+        }
+        else
+        {
+            this.log.info("Was not an inferred OWL ontology ID: {}", ontologyID);
         }
     }
     
@@ -838,7 +889,7 @@ public class PoddOWLManagerImpl implements PoddOWLManager
             final RioMemoryTripleSource owlSource =
                     new RioMemoryTripleSource(model.iterator(), Namespaces.asMap(model.getNamespaces()));
             
-            final RioParserImpl owlParser = new RioParserImpl(null);
+            final RioParserImpl owlParser = new RioParserImpl(new RDFXMLOntologyFormatFactory());
             
             OWLOntologyManager cachedManager = this.getCachedManager(Collections.<OWLOntologyID> emptySet());
             
@@ -852,9 +903,24 @@ public class PoddOWLManagerImpl implements PoddOWLManager
             
             this.log.info("Parsing into the new ontology");
             
-            owlParser.parse(owlSource, nextOntology);
+            RDFOntologyFormat parse =
+                    (RDFOntologyFormat)owlParser.parse(owlSource, nextOntology, new OWLOntologyLoaderConfiguration()
+                            .setStrict(false).setReportStackTraces(true));
             
-            this.log.info("Finished parsing into the new ontology");
+            this.log.info("Finished parsing into the new ontology: {}", nextOntology.getOntologyID());
+            this.log.info("Parse error count: {}", parse.getErrors().size());
+            this.log.info("Ontology axiom count: {}", nextOntology.getAxiomCount());
+            
+            if(!parse.getErrors().isEmpty())
+            {
+                this.log.error("Parse had errors");
+                for(RDFResourceParseError nextError : parse.getErrors())
+                {
+                    this.log.error("Error node: {}", nextError.getMainNode());
+                    this.log.error("Error node triples: {}", nextError.getMainNodeTriples());
+                    this.log.error("OWL Entity: {}", nextError.getParserGeneratedErrorEntity());
+                }
+            }
             
             if(nextOntology.isEmpty())
             {

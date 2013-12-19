@@ -750,9 +750,8 @@ public abstract class AbstractPoddSesameManagerTest
             this.testPoddSesameManager.getCurrentSchemaVersion(null, this.testRepositoryConnection, schemaGraph);
             Assert.fail("Should have thrown a RuntimeException");
         }
-        catch(final RuntimeException e)
+        catch(final NullPointerException e)
         {
-            Assert.assertTrue("Not a NullPointerException as expected", e instanceof NullPointerException);
         }
     }
     
@@ -883,7 +882,7 @@ public abstract class AbstractPoddSesameManagerTest
         this.testRepositoryConnection.add(inputStream, "", RDFFormat.RDFXML, context);
         
         // invoke method under test:
-        final Set<IRI> importedOntologyIRIs =
+        final Set<URI> importedOntologyIRIs =
                 this.testPoddSesameManager.getDirectImports(this.testRepositoryConnection, context);
         
         // verify:
@@ -1103,13 +1102,9 @@ public abstract class AbstractPoddSesameManagerTest
         final InferredOWLOntologyID ontologyID =
                 this.loadOntologyFromResource(TestConstants.TEST_ARTIFACT_20130206,
                         TestConstants.TEST_ARTIFACT_20130206_INFERRED, RDFFormat.TURTLE);
-        final Set<IRI> directImports =
+        final Set<URI> directImports =
                 this.testPoddSesameManager.getDirectImports(ontologyID, this.testRepositoryConnection);
-        final List<URI> contexts = new ArrayList<URI>(directImports.size() + 2);
-        for(final IRI nextDirectImport : directImports)
-        {
-            contexts.add(nextDirectImport.toOpenRDFURI());
-        }
+        final List<URI> contexts = new ArrayList<URI>(directImports);
         
         // Format: Object Type, expected model size, expected relationship count, expected child
         // object type count
@@ -1156,13 +1151,9 @@ public abstract class AbstractPoddSesameManagerTest
         final InferredOWLOntologyID ontologyID =
                 this.loadOntologyFromResource(TestConstants.TEST_ARTIFACT_20130206,
                         TestConstants.TEST_ARTIFACT_20130206_INFERRED, RDFFormat.TURTLE);
-        final Set<IRI> directImports =
+        final Set<URI> directImports =
                 this.testPoddSesameManager.getDirectImports(ontologyID, this.testRepositoryConnection);
-        final List<URI> contexts = new ArrayList<URI>(directImports.size() + 2);
-        for(final IRI nextDirectImport : directImports)
-        {
-            contexts.add(nextDirectImport.toOpenRDFURI());
-        }
+        final List<URI> contexts = new ArrayList<URI>(directImports);
         
         // Format: Object Type, includeDoNotDisplayProperties, includeContainsSubProperties,
         // expected model size, expected property count, do-not-display statement count
@@ -1509,9 +1500,8 @@ public abstract class AbstractPoddSesameManagerTest
             Assert.fail("Should have thrown a RuntimeException");
             
         }
-        catch(final RuntimeException e)
+        catch(final NullPointerException e)
         {
-            Assert.assertTrue("Not a NullPointerException as expected", e instanceof NullPointerException);
         }
     }
     

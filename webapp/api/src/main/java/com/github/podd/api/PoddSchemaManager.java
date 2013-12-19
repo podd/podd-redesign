@@ -27,6 +27,7 @@ import java.util.Set;
 
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.Model;
+import org.openrdf.model.URI;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.rio.RDFFormat;
 import org.semanticweb.owlapi.model.IRI;
@@ -124,7 +125,7 @@ public interface PoddSchemaManager
      * @throws UnmanagedSchemaIRIException
      *             If the given schemaOntologyIRI is not recognised or managed.
      */
-    OWLOntology getSchemaOntology(IRI schemaOntologyIRI) throws UnmanagedSchemaIRIException;
+    OWLOntology getSchemaOntology(URI schemaOntologyIRI) throws UnmanagedSchemaIRIException;
     
     /**
      * Gets the PODD Schema Ontology based on the schemaOntologyID. If the schemaOntologyID does not

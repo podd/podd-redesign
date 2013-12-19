@@ -27,6 +27,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.Model;
+import org.openrdf.model.URI;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.Rio;
 import org.semanticweb.owlapi.model.IRI;
@@ -352,10 +353,11 @@ public abstract class AbstractPoddSchemaManagerTest
         
         for(int i = 0; i < testIRIs.length; i++)
         {
-            final IRI testIRI = IRI.create(testIRIs[i]);
-            final InferredOWLOntologyID ontologyID = this.testSchemaManager.getCurrentSchemaOntologyVersion(testIRI);
-            Assert.assertEquals("Input IRI does not match ontology IRI of current version", testIRI,
-                    ontologyID.getOntologyIRI());
+            final URI testIRI = PODD.VF.createURI(testIRIs[i]);
+            final InferredOWLOntologyID ontologyID =
+                    this.testSchemaManager.getCurrentSchemaOntologyVersion(IRI.create(testIRI));
+            Assert.assertEquals("Input IRI does not match ontology IRI of current version", testIRI, ontologyID
+                    .getOntologyIRI().toOpenRDFURI());
             Assert.assertEquals("Expected Version IRI does not match current version",
                     IRI.create(expectedVersionIRIs[i]), ontologyID.getVersionIRI());
         }
@@ -382,10 +384,11 @@ public abstract class AbstractPoddSchemaManagerTest
         
         for(final String testIRI2 : testIRIs)
         {
-            final IRI testIRI = IRI.create(testIRI2);
-            final InferredOWLOntologyID ontologyID = this.testSchemaManager.getCurrentSchemaOntologyVersion(testIRI);
-            Assert.assertEquals("Input IRI does not match Version IRI of current version", testIRI,
-                    ontologyID.getVersionIRI());
+            final URI testIRI = PODD.VF.createURI(testIRI2);
+            final InferredOWLOntologyID ontologyID =
+                    this.testSchemaManager.getCurrentSchemaOntologyVersion(IRI.create(testIRI));
+            Assert.assertEquals("Input IRI does not match Version IRI of current version", testIRI, ontologyID
+                    .getVersionIRI().toOpenRDFURI());
         }
     }
     
@@ -426,8 +429,9 @@ public abstract class AbstractPoddSchemaManagerTest
         
         for(int i = 0; i < testIRIs.length; i++)
         {
-            final IRI testIRI = IRI.create(testIRIs[i]);
-            final InferredOWLOntologyID ontologyID = this.testSchemaManager.getCurrentSchemaOntologyVersion(testIRI);
+            final URI testIRI = PODD.VF.createURI(testIRIs[i]);
+            final InferredOWLOntologyID ontologyID =
+                    this.testSchemaManager.getCurrentSchemaOntologyVersion(IRI.create(testIRI));
             Assert.assertEquals("Expected current version IRI does not match received value",
                     IRI.create(expectedVersionIRIs[i]), ontologyID.getVersionIRI());
         }
@@ -638,6 +642,7 @@ public abstract class AbstractPoddSchemaManagerTest
         // prepare: load schema ontologies into PODD
         this.loadSchemaOntologies();
         final InputStream in = this.getClass().getResourceAsStream("/test/ontologies/poddPlantVXYZ.owl");
+        Assert.assertNotNull("Could not find test resource", in);
         this.testSchemaManager.uploadSchemaOntology(in, RDFFormat.RDFXML);
         
         try

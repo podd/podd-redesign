@@ -146,8 +146,8 @@ public class DataReferenceAttachResourceImpl extends AbstractPoddResourceImpl
     public Representation attachDataReferencePageHtml(final Representation entity) throws ResourceException
     {
         // check mandatory parameter: artifact IRI
-        final String artifactUri = this.getQuery().getFirstValue(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, true);
-        if(artifactUri == null)
+        final String artifactUriString = this.getQuery().getFirstValue(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, true);
+        if(artifactUriString == null)
         {
             this.log.error("Artifact ID not submitted");
             throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Artifact IRI not submitted");
@@ -160,8 +160,8 @@ public class DataReferenceAttachResourceImpl extends AbstractPoddResourceImpl
             this.log.error("Object IRI not submitted");
             throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Object IRI not submitted");
         }
-        
-        this.checkAuthentication(PoddAction.ARTIFACT_EDIT, PODD.VF.createURI(artifactUri));
+        URI artifactUri = PODD.VF.createURI(artifactUriString);
+        this.checkAuthentication(PoddAction.ARTIFACT_EDIT, artifactUri);
         
         InferredOWLOntologyID artifact;
         

@@ -102,7 +102,8 @@ public class DeleteObjectResourceImpl extends AbstractPoddResourceImpl
             this.log.debug("authenticated user: {}", user);
             
             final InferredOWLOntologyID updatedOntologyID =
-                    this.getPoddArtifactManager().deleteObject(artifactUri, versionUri, objectUri, cascade);
+                    this.getPoddArtifactManager().deleteObject(PODD.VF.createURI(artifactUri),
+                            PODD.VF.createURI(versionUri), PODD.VF.createURI(objectUri), cascade);
             
             // - prepare response
             final ByteArrayOutputStream output = new ByteArrayOutputStream(8096);

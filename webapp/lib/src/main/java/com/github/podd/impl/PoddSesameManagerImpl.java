@@ -637,8 +637,8 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         
         for(final BindingSet nextResult : nextResults1.getBindingSets())
         {
-            final String nextVersionIRI = nextResult.getValue("cv").stringValue();
-            final String nextInferredIRI = nextResult.getValue("civ").stringValue();
+            final URI nextVersionIRI = (URI)nextResult.getValue("cv");
+            final URI nextInferredIRI = (URI)nextResult.getValue("civ");
             
             returnList.add(new InferredOWLOntologyID(ontologyIRI, IRI.create(nextVersionIRI), IRI
                     .create(nextInferredIRI)));
@@ -685,7 +685,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
      * RepositoryConnection, org.openrdf.model.URI)
      */
     @Override
-    public Set<IRI> getDirectImports(final InferredOWLOntologyID ontologyID,
+    public Set<URI> getDirectImports(final InferredOWLOntologyID ontologyID,
             final RepositoryConnection repositoryConnection) throws OpenRDFException
     {
         return this.getDirectImports(ontologyID.getOntologyIRI(), repositoryConnection,
@@ -693,14 +693,14 @@ public class PoddSesameManagerImpl implements PoddSesameManager
     }
     
     @Override
-    public Set<IRI> getDirectImports(final RepositoryConnection repositoryConnection, final URI... contexts)
+    public Set<URI> getDirectImports(final RepositoryConnection repositoryConnection, final URI... contexts)
         throws OpenRDFException
     {
         return this.getDirectImports(null, repositoryConnection, contexts);
     }
     
     @Override
-    public Set<IRI> getDirectImports(final IRI ontologyIRI, final RepositoryConnection repositoryConnection,
+    public Set<URI> getDirectImports(final IRI ontologyIRI, final RepositoryConnection repositoryConnection,
             final URI... contexts) throws OpenRDFException
     {
         final String sparqlQuery =
@@ -720,7 +720,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         }
         query.setDataset(dataset);
         
-        final Set<IRI> results = Collections.newSetFromMap(new ConcurrentHashMap<IRI, Boolean>());
+        final Set<URI> results = Collections.newSetFromMap(new ConcurrentHashMap<URI, Boolean>());
         
         final TupleQueryResult queryResults = query.evaluate();
         while(queryResults.hasNext())
@@ -729,7 +729,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
             final Value importIRI = nextResult.getValue("import");
             if(importIRI instanceof URI)
             {
-                results.add(IRI.create((URI)importIRI));
+                results.add((URI)importIRI);
             }
         }
         return results;
@@ -1582,8 +1582,8 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         
         for(final BindingSet nextResult : resultsCollector.getBindingSets())
         {
-            final String nextOntologyIRI = nextResult.getValue("ontologyIri").stringValue();
-            final String nextInferredIRI = nextResult.getValue("inferredIri").stringValue();
+            final URI nextOntologyIRI = (URI)nextResult.getValue("ontologyIri");
+            final URI nextInferredIRI = (URI)nextResult.getValue("inferredIri");
             
             // return the first solution since there should only be only one
             // result
@@ -2270,10 +2270,11 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         final Set<URI> contexts = new LinkedHashSet<URI>();
         if(ontologyID != null)
         {
-            final Set<IRI> directImports = this.getDirectImports(ontologyID, repositoryConnection);
-            for(final IRI directImport : directImports)
+            final Set<URI> directImports = this.getDirectImports(ontologyID, repositoryConnection);
+            
+            for(final URI directImport : directImports)
             {
-                contexts.add(directImport.toOpenRDFURI());
+                contexts.add(directImport);
             }
         }
         else
