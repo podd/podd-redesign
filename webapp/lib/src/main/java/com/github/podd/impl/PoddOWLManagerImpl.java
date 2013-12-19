@@ -106,6 +106,7 @@ import com.github.podd.exception.OntologyNotInProfileException;
 import com.github.podd.exception.PoddException;
 import com.github.podd.utils.DeduplicatingRDFInserter;
 import com.github.podd.utils.InferredOWLOntologyID;
+import com.github.podd.utils.OntologyUtils;
 import com.github.podd.utils.PODD;
 
 /**
@@ -182,7 +183,7 @@ public class PoddOWLManagerImpl implements PoddOWLManager
     
     /**
      * TODO: Integrate this with other imports identification code in
-     * {@link PoddSchemaManagerImpl#mapAndSortImports(Model, ConcurrentMap, ConcurrentMap, ConcurrentMap, List, URI)}
+     * {@link OntologyUtils#mapAndSortImports(Model, ConcurrentMap, ConcurrentMap, ConcurrentMap, List, URI)}
      * 
      * @param ontologyID
      * @param conn
@@ -279,6 +280,10 @@ public class PoddOWLManagerImpl implements PoddOWLManager
             // FIXME: The following doesn't seem to work on the initial load for new schema
             // ontologies, as it is identifying the foaf ontology as having no imports, yet it
             // imports the dcterms ontology
+            
+            Model schemaManagement = new LinkedHashModel();
+            conn.export(new StatementCollector(schemaManagement), schemaManagementContext);
+            
             final List<InferredOWLOntologyID> imports =
                     this.buildTwoLevelOrderedImportsList(ontologyID, conn, schemaManagementContext);
             this.log.info("The schema ontology {} has {} imports.", baseOntologyVersionIRI, imports.size());
