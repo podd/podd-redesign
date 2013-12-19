@@ -190,9 +190,12 @@ public class PoddOWLManagerImpl implements PoddOWLManager
      * @return
      * @throws OpenRDFException
      */
-    private List<InferredOWLOntologyID> buildTwoLevelOrderedImportsList(final OWLOntologyID ontologyID,
+    public List<InferredOWLOntologyID> buildTwoLevelOrderedImportsList(final OWLOntologyID ontologyID,
             final RepositoryConnection conn, final URI context) throws OpenRDFException
     {
+        Objects.requireNonNull(ontologyID, "Cannot build imports list for null ontology");
+        Objects.requireNonNull(ontologyID.getOntologyIRI(), "Cannot build imports list for null ontology IRI");
+        
         // -- find ontologies directly imported by this schema ontology
         final List<InferredOWLOntologyID> directImports = this.buildDirectImportsList(ontologyID, conn, context);
         
@@ -269,8 +272,7 @@ public class PoddOWLManagerImpl implements PoddOWLManager
             
             // Only direct imports and first-level indirect imports are identified.
             // This works for the current PODD schema ontologies which have a maximum import depth
-            // of 3
-            // (PoddPlant -> PoddScience -> PoddBase)
+            // of 3 (PoddPlant -> PoddScience -> PoddBase)
             // TODO: Fix this using a SPARQL which identifies the complete imports closure and sorts
             // them in the proper order for loading.
             
@@ -282,8 +284,7 @@ public class PoddOWLManagerImpl implements PoddOWLManager
             this.log.info("The schema ontology {} has {} imports.", baseOntologyVersionIRI, imports.size());
             
             // -- load the imported ontologies into the Manager's cache. It is expected that they
-            // are
-            // already in the Repository
+            // are already in the Repository
             for(final InferredOWLOntologyID inferredOntologyID : imports)
             {
                 if(!isCached(inferredOntologyID))

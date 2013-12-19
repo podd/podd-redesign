@@ -23,9 +23,11 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Set;
@@ -40,6 +42,8 @@ import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.openrdf.model.Value;
 import org.openrdf.model.impl.LinkedHashModel;
+import org.openrdf.model.util.GraphUtil;
+import org.openrdf.model.util.GraphUtilException;
 import org.openrdf.model.util.ModelException;
 import org.openrdf.model.vocabulary.OWL;
 import org.openrdf.model.vocabulary.RDF;
@@ -530,7 +534,87 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
         
         final List<URI> importOrder = this.orderImports(model, schemaOntologyUris, schemaVersionUris);
         
+        Map<URI, Set<OWLOntologyID>> allImports = this.getImports(model, schemaVersionUris);
+        
         return this.uploadSchemaOntologiesInOrder(model, importOrder);
+    }
+    
+    /**
+     * Retrieves imports specified using {@link OWL#IMPORTS}, based on the given version IRIs. Also
+     * checks to verify that there is an {@link OWL#VERSIONIRI} statement for each of the version
+     * IRIs. <br>
+     * This works with the format used by both the schema manifests and the schema management graph.
+     * 
+     * @param model
+     * @param schemaVersionUris
+     * @return
+     * @throws SchemaManifestException
+     */
+    private Map<URI, Set<OWLOntologyID>> getImports(Model model, Set<URI> schemaVersionUris)
+        throws SchemaManifestException
+    {
+        ConcurrentMap<URI, Set<OWLOntologyID>> result = new ConcurrentHashMap<>();
+        
+        for(URI nextSchemaVersionUri : schemaVersionUris)
+        {
+            Set<Resource> ontologies = model.filter(null, OWL.VERSIONIRI, nextSchemaVersionUri).subjects();
+            if(ontologies.isEmpty())
+            {
+                throw new SchemaManifestException(IRI.create(nextSchemaVersionUri),
+                        "No mapping from version IRI to an ontology IRI");
+            }
+            if(ontologies.size() > 1)
+            {
+                this.log.error("Found multiple mappings from version IRI to ontology IRI: {} {}", nextSchemaVersionUri,
+                        ontologies);
+                throw new SchemaManifestException(IRI.create(nextSchemaVersionUri),
+                        "Non-unique mapping from version IRI to an ontology IRI");
+            }
+            Resource uniqueOntology = ontologies.iterator().next();
+            
+            if(!(uniqueOntology instanceof URI))
+            {
+                this.log.error("Found non-URI mapping from version IRI to ontology IRI: {} {}", nextSchemaVersionUri,
+                        ontologies);
+                throw new SchemaManifestException(IRI.create(nextSchemaVersionUri),
+                        "Non-URI mapping from version IRI to an ontology IRI");
+            }
+            
+            Set<Value> imports = model.filter(nextSchemaVersionUri, OWL.IMPORTS, null).objects();
+            
+            for(Value nextImport : imports)
+            {
+                if(!(nextImport instanceof URI))
+                {
+                    this.log.error("Found non-URI import for version IRI: {} {}", nextSchemaVersionUri, nextImport);
+                    throw new SchemaManifestException(IRI.create(nextSchemaVersionUri),
+                            "Non-URI import for version IRI");
+                }
+                
+                URI nextImportVersionURI = (URI)nextImport;
+                
+                try
+                {
+                    URI nextImportOntologyURI =
+                            GraphUtil.getUniqueSubjectURI(model, OWL.VERSIONIRI, nextImportVersionURI);
+                    
+                    Set<OWLOntologyID> nextSet = new HashSet<>();
+                    Set<OWLOntologyID> putIfAbsent = result.putIfAbsent(nextSchemaVersionUri, nextSet);
+                    if(putIfAbsent != null)
+                    {
+                        nextSet = putIfAbsent;
+                    }
+                    nextSet.add(new OWLOntologyID(nextImportOntologyURI, nextImportVersionURI));
+                }
+                catch(GraphUtilException e)
+                {
+                    this.log.error("Found non-unique ontology IRI for imported version IRI: {}", nextImportVersionURI);
+                    throw new SchemaManifestException(IRI.create(nextImportVersionURI),
+                            "Non-URI import for version IRI");
+                }
+            }
+        }
+        return result;
     }
     
     /**
@@ -609,6 +693,9 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
     }
     
     /**
+     * Given the manifest {@link Model} and the overall order of imports based on ontology version
+     * IRIs, import all of the ontologies which have new versions.
+     * 
      * @param model
      * @param nextImportOrder
      * @throws ModelException
@@ -620,7 +707,9 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
     public List<InferredOWLOntologyID> uploadSchemaOntologiesInOrder(final Model model, final List<URI> nextImportOrder)
         throws ModelException, OpenRDFException, IOException, OWLException, PoddException
     {
-        final List<URI> importOrder = new ArrayList<>(nextImportOrder);
+        // Deduplicate the import list, preserving order for the first occurrences of the version
+        // URIs.
+        final List<URI> importOrder = new ArrayList<>(new LinkedHashSet<>(nextImportOrder));
         
         final Set<InferredOWLOntologyID> currentSchemaOntologies = this.getSchemaOntologies();
         
@@ -778,11 +867,7 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
     {
         final OWLOntologyDocumentSource owlSource =
                 new StreamDocumentSource(inputStream, fileFormat.getDefaultMIMEType());
-        InferredOWLOntologyID nextInferredOntology;
-        synchronized(this)
-        {
-            nextInferredOntology = this.owlManager.loadAndInfer(owlSource, conn, schemaOntologyID);
-        }
+        InferredOWLOntologyID nextInferredOntology = this.owlManager.loadAndInfer(owlSource, conn, schemaOntologyID);
         
         // update the link in the schema ontology management graph
         // TODO: This may not be the right method for this purpose

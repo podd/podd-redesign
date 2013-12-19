@@ -20,6 +20,7 @@ import java.io.InputStream;
 import java.io.StringWriter;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.junit.Assert;
@@ -834,5 +835,64 @@ public class PoddOWLManagerImplTest extends AbstractPoddOWLManagerTest
         final URI context = nextOntology.getOntologyID().getVersionIRI().toOpenRDFURI();
         Assert.assertEquals("Dumped statement count not expected value",
                 TestConstants.EXPECTED_TRIPLE_COUNT_PODD_BASE_CONCRETE, this.testRepositoryConnection.size(context));
+    }
+    
+    @Test
+    public void testBuildTwoLevelOrderedImportsListNull() throws Exception
+    {
+        OWLOntologyID ontologyId = new OWLOntologyID();
+        
+        try
+        {
+            ((PoddOWLManagerImpl)this.testOWLManager).buildTwoLevelOrderedImportsList(null, testRepositoryConnection,
+                    PODD.DEFAULT_SCHEMA_MANAGEMENT_GRAPH);
+            Assert.fail("Did not receive expected exception");
+        }
+        catch(NullPointerException e)
+        {
+            
+        }
+    }
+    
+    @Test
+    public void testBuildTwoLevelOrderedImportsListAnonymousOntology() throws Exception
+    {
+        OWLOntologyID ontologyId = new OWLOntologyID();
+        
+        try
+        {
+            ((PoddOWLManagerImpl)this.testOWLManager).buildTwoLevelOrderedImportsList(ontologyId,
+                    testRepositoryConnection, PODD.DEFAULT_SCHEMA_MANAGEMENT_GRAPH);
+            Assert.fail("Did not receive expected exception");
+        }
+        catch(NullPointerException e)
+        {
+            
+        }
+    }
+    
+    @Test
+    public void testBuildTwoLevelOrderedImportsListNonExistentOntologyNoVersion() throws Exception
+    {
+        OWLOntologyID ontologyId = new OWLOntologyID(IRI.create("urn:test:doesnotexist"));
+        
+        List<InferredOWLOntologyID> orderedImportsList =
+                ((PoddOWLManagerImpl)this.testOWLManager).buildTwoLevelOrderedImportsList(ontologyId,
+                        testRepositoryConnection, PODD.DEFAULT_SCHEMA_MANAGEMENT_GRAPH);
+        
+        Assert.assertTrue(orderedImportsList.isEmpty());
+    }
+    
+    @Test
+    public void testBuildTwoLevelOrderedImportsListNonExistentOntologyWithVersion() throws Exception
+    {
+        OWLOntologyID ontologyId =
+                new OWLOntologyID(IRI.create("urn:test:doesnotexist"), IRI.create("urn:test:withversion"));
+        
+        List<InferredOWLOntologyID> orderedImportsList =
+                ((PoddOWLManagerImpl)this.testOWLManager).buildTwoLevelOrderedImportsList(ontologyId,
+                        testRepositoryConnection, PODD.DEFAULT_SCHEMA_MANAGEMENT_GRAPH);
+        
+        Assert.assertTrue(orderedImportsList.isEmpty());
     }
 }
