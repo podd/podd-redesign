@@ -286,14 +286,17 @@ public class PoddOWLManagerImpl implements PoddOWLManager
             // already in the Repository
             for(final InferredOWLOntologyID inferredOntologyID : imports)
             {
-                final URI contextToLoadFrom = inferredOntologyID.getVersionIRI().toOpenRDFURI();
-                this.log.info("About to load {} from context {}", inferredOntologyID, contextToLoadFrom);
-                this.parseRDFStatements(conn, contextToLoadFrom);
-                
-                final URI inferredContextToLoadFrom = inferredOntologyID.getInferredOntologyIRI().toOpenRDFURI();
-                if(inferredContextToLoadFrom != null)
+                if(!isCached(inferredOntologyID))
                 {
-                    this.parseRDFStatements(conn, inferredContextToLoadFrom);
+                    final URI contextToLoadFrom = inferredOntologyID.getVersionIRI().toOpenRDFURI();
+                    this.log.info("About to load {} from context {}", inferredOntologyID, contextToLoadFrom);
+                    this.parseRDFStatements(conn, contextToLoadFrom);
+                    
+                    final URI inferredContextToLoadFrom = inferredOntologyID.getInferredOntologyIRI().toOpenRDFURI();
+                    if(inferredContextToLoadFrom != null)
+                    {
+                        this.parseRDFStatements(conn, inferredContextToLoadFrom);
+                    }
                 }
             }
             
