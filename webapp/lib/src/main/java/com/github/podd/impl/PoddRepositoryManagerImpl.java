@@ -21,6 +21,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -33,10 +34,12 @@ import org.openrdf.model.URI;
 import org.openrdf.model.vocabulary.SESAME;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryException;
+import org.openrdf.repository.config.RepositoryConfig;
 import org.openrdf.repository.config.RepositoryConfigException;
 import org.openrdf.repository.config.RepositoryFactory;
 import org.openrdf.repository.config.RepositoryImplConfig;
 import org.openrdf.repository.config.RepositoryRegistry;
+import org.openrdf.repository.manager.RepositoryManager;
 import org.openrdf.repository.sail.SailRepository;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.Rio;
@@ -67,7 +70,9 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
     
     private URI schemaGraph = PODD.DEFAULT_SCHEMA_MANAGEMENT_GRAPH;
     
-    private String permanentRepositoryType;
+    private RepositoryImplConfig permanentRepositoryConfig;
+    
+    private RepositoryManager sesameRepositoryManager;
     
     // /**
     // * Default constructor, which sets up an in-memory MemoryStore repository.
@@ -119,24 +124,15 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
     /**
      * 
      * @param managementRepository
-     *            An initialized implementation of Repository.
-     * @throws OpenRDFException
-     * @throws IOException
-     * @throws UnsupportedRDFormatException
+     * @param permanentRepository
+     * @throws RepositoryConfigException
      */
-    public PoddRepositoryManagerImpl(final Repository managementRepository, final String permanentRepositoryType,
-            final String permanentRepositoryConfigClasspath, final URI permanentRepositoryConfigURI)
-        throws OpenRDFException, UnsupportedRDFormatException, IOException
+    public PoddRepositoryManagerImpl(final Repository managementRepository, final RepositoryManager repositoryManager,
+            final RepositoryImplConfig permanentRepositoryConfig) throws RepositoryConfigException
     {
         this.managementRepository = managementRepository;
-        this.permanentRepositoryType = permanentRepositoryType;
-        RepositoryFactory repositoryFactory = RepositoryRegistry.getInstance().get(permanentRepositoryType);
-        RepositoryImplConfig config = repositoryFactory.getConfig();
-        Model configGraph =
-                Rio.parse(this.getClass().getResourceAsStream(permanentRepositoryConfigClasspath), "", RDFFormat.TURTLE);
-        config.parse(configGraph, permanentRepositoryConfigURI);
-        // TODO: Use a non-stub mapping here
-        this.permanentRepositories.put(Collections.<OWLOntologyID> emptySet(), repositoryFactory.getRepository(config));
+        this.sesameRepositoryManager = repositoryManager;
+        this.permanentRepositoryConfig = permanentRepositoryConfig;
     }
     
     @Override
@@ -171,17 +167,51 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
     public Repository getPermanentRepository(final Set<? extends OWLOntologyID> schemaOntologies)
         throws OpenRDFException
     {
-        Collection<String> allRepositoryTypes = RepositoryRegistry.getInstance().getKeys();
+        Objects.requireNonNull(schemaOntologies, "Schema ontologies must not be null");
         
-        this.log.error("{}", allRepositoryTypes);
-        
-        for(Entry<Set<? extends OWLOntologyID>, Repository> nextRepository : permanentRepositories.entrySet())
+        Repository repository = this.permanentRepositories.get(schemaOntologies);
+        // This synchronisation should not inhibit most operations, but is necessary to prevent
+        // multiple repositories with the same schema ontologies, given that there is a relatively
+        // large latency in the new repository create process
+        // ConcurrentMap.putIfAbsent is not applicable to the initial situation as it is very costly
+        // to create a repository if it is not needed
+        if(repository == null)
         {
-            // TODO: Use a non-stub mapping here
-            return this.permanentRepositories.get(Collections.<OWLOntologyID> emptySet());
+            synchronized(this.permanentRepositories)
+            {
+                repository = this.permanentRepositories.get(schemaOntologies);
+                if(repository == null)
+                {
+                    // Create a new one
+                    // Get a new repository ID using our base name as the starting point
+                    String newRepositoryID = this.sesameRepositoryManager.getNewRepositoryID("poddredesignrepository");
+                    RepositoryConfig config =
+                            new RepositoryConfig(newRepositoryID, "PODD Redesign Repository (Automatically created)",
+                                    permanentRepositoryConfig);
+                    this.sesameRepositoryManager.addRepositoryConfig(config);
+                    
+                    Repository nextRepository = this.sesameRepositoryManager.getRepository(newRepositoryID);
+                    // If we somehow created a new repository since we entered this section, we need
+                    // to remove the new repository to cleanup
+                    Repository putIfAbsent = this.permanentRepositories.putIfAbsent(schemaOntologies, nextRepository);
+                    if(putIfAbsent != null)
+                    {
+                        this.log.error("Created a duplicate repository that must now be removed: {}", newRepositoryID);
+                        boolean removeRepository = this.sesameRepositoryManager.removeRepository(newRepositoryID);
+                        if(!removeRepository)
+                        {
+                            this.log.warn("Could not remove repository");
+                        }
+                        repository = putIfAbsent;
+                    }
+                    else
+                    {
+                        repository = nextRepository;
+                    }
+                }
+            }
         }
-        
-        throw new RuntimeException("TODO: Complete implementation");
+        return repository;
     }
     
     @Override
@@ -193,13 +223,16 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
     @Override
     public void mapPermanentRepository(final Set<? extends OWLOntologyID> schemaOntologies, final Repository repository)
     {
-        // Override any previous repositories that were there
-        final Repository putIfAbsent = this.permanentRepositories.putIfAbsent(schemaOntologies, repository);
-        
-        // TODO: Shutdown putIfAbsent
-        if(putIfAbsent != null)
+        synchronized(this.permanentRepositories)
         {
-            this.log.warn("Overriding previous repository for a set of schema ontologies: {}", schemaOntologies);
+            // Override any previous repositories that were there
+            final Repository putIfAbsent = this.permanentRepositories.putIfAbsent(schemaOntologies, repository);
+            
+            // TODO: Shutdown putIfAbsent
+            if(putIfAbsent != null)
+            {
+                this.log.warn("Overriding previous repository for a set of schema ontologies: {}", schemaOntologies);
+            }
         }
     }
     

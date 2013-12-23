@@ -22,7 +22,10 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
+import org.junit.rules.Timeout;
 import org.openrdf.model.URI;
 import org.openrdf.model.impl.ValueFactoryImpl;
 import org.openrdf.repository.Repository;
@@ -36,16 +39,22 @@ import com.github.podd.api.PoddRepositoryManager;
  * @author kutila
  * 
  */
-@Ignore
 public abstract class AbstractPoddRepositoryManagerTest
 {
+    @Rule
+    public Timeout timeout = new Timeout(30000);
+    
+    @Rule
+    public TemporaryFolder tempDir = new TemporaryFolder();
     
     private PoddRepositoryManager testRepositoryManager;
     
     /**
      * @return A new instance of PoddOWLManager, for each call to this method
+     * @throws Exception
      */
-    protected abstract PoddRepositoryManager getNewPoddRepositoryManagerInstance() throws RepositoryException;
+    protected abstract PoddRepositoryManager getNewPoddRepositoryManagerInstance() throws RepositoryException,
+        Exception;
     
     /**
      * @throws java.lang.Exception

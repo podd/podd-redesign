@@ -35,13 +35,21 @@ import java.util.concurrent.ConcurrentMap;
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.Model;
 import org.openrdf.model.Namespace;
+import org.openrdf.model.Resource;
 import org.openrdf.model.URI;
 import org.openrdf.model.impl.LinkedHashModel;
+import org.openrdf.model.util.GraphUtil;
+import org.openrdf.model.vocabulary.RDF;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
+import org.openrdf.repository.config.RepositoryConfig;
+import org.openrdf.repository.config.RepositoryConfigSchema;
+import org.openrdf.repository.config.RepositoryFactory;
+import org.openrdf.repository.config.RepositoryRegistry;
 import org.openrdf.repository.http.HTTPRepository;
 import org.openrdf.repository.sail.SailRepository;
+import org.openrdf.repository.sail.config.SailRepositoryFactory;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.RDFHandlerException;
 import org.openrdf.rio.Rio;
@@ -316,8 +324,19 @@ public class ApplicationUtils
                 props.get(PoddWebConstants.PROPERTY_PERMANENT_SESAME_REPOSITORY_CONFIG_URI,
                         PoddWebConstants.DEFAULT_PERMANENT_SESAME_REPOSITORY_CONFIG_URI);
         URI permanentRepositoryConfigURI = PODD.VF.createURI(permanentRepositoryConfigURIString);
-        application.setPoddRepositoryManager(new PoddRepositoryManagerImpl(nextManagementRepository,
-                permanentRepositoryType, permanentRepositoryConfigPath, permanentRepositoryConfigURI));
+        final Model graph =
+                Rio.parse(ApplicationUtils.class.getResourceAsStream("/memorystoreconfig.ttl"), "", RDFFormat.TURTLE);
+        final Resource repositoryNode = GraphUtil.getUniqueSubject(graph, RDF.TYPE, RepositoryConfigSchema.REPOSITORY);
+        RepositoryConfig repositoryConfig = RepositoryConfig.create(graph, repositoryNode);
+        
+        RepositoryFactory repositoryFactory =
+                RepositoryRegistry.getInstance().get(repositoryConfig.getRepositoryImplConfig().getType());
+        
+        application.setPoddRepositoryManager(new PoddRepositoryManagerImpl(nextManagementRepository, repositoryFactory,
+                repositoryConfig.getRepositoryImplConfig()));
+        // application.setPoddRepositoryManager(new
+        // PoddRepositoryManagerImpl(nextManagementRepository,
+        // permanentRepositoryType, permanentRepositoryConfigPath, permanentRepositoryConfigURI));
         application.getPoddRepositoryManager().setSchemaManagementGraph(
                 PODD.VF.createURI(props.get(PoddWebConstants.PROPERTY_SCHEMA_GRAPH,
                         PoddWebConstants.DEFAULT_SCHEMA_GRAPH)));

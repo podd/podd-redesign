@@ -476,6 +476,11 @@
 				<artifactId>sesame-rio-nquads</artifactId>
 				<version>${sesame.version}</version>
 			</dependency>
+			<dependency>
+				<groupId>org.openrdf.sesame</groupId>
+				<artifactId>sesame-repository-manager</artifactId>
+				<version>${sesame.version}</version>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
 	<build>
