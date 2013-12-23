@@ -1,0 +1,14 @@
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>.
+@prefix rep: <http://www.openrdf.org/config/repository#>.
+@prefix sr: <http://www.openrdf.org/config/repository/sail#>.
+@prefix sail: <http://www.openrdf.org/config/sail#>.
+
+[] a rep:Repository ;
+   rep:repositoryID "testSailRepositoryMemoryStore" ;
+   rdfs:label "Test SailRepository for a MemoryStore" ;
+   rep:repositoryImpl [
+      rep:repositoryType "openrdf:SailRepository" ;
+      sr:sailImpl [
+         sail:sailType "openrdf:MemoryStore"
+      ]
+   ].
