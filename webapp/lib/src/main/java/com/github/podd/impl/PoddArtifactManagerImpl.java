@@ -435,25 +435,26 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
     public Model fillMissingData(final InferredOWLOntologyID ontologyID, final Model inputModel)
         throws OpenRDFException, UnmanagedSchemaIRIException
     {
-        RepositoryConnection conn = null;
-        
+        RepositoryConnection permanentConnection = null;
+        RepositoryConnection managementConnection = null;
         try
         {
             final Set<InferredOWLOntologyID> schemaImports = this.getSchemaImports(ontologyID);
-            conn = this.getRepositoryManager().getPermanentRepository(schemaImports).getConnection();
+            permanentConnection = this.getRepositoryManager().getPermanentRepository(schemaImports).getConnection();
+            managementConnection = this.getRepositoryManager().getManagementRepository().getConnection();
             final URI[] contexts =
-                    this.getSesameManager().versionAndSchemaContexts(ontologyID, conn,
+                    this.getSesameManager().versionAndSchemaContexts(ontologyID, managementConnection,
                             this.getRepositoryManager().getSchemaManagementGraph());
             
-            return this.getSesameManager().fillMissingLabels(inputModel, conn, contexts);
+            return this.getSesameManager().fillMissingLabels(inputModel, permanentConnection, contexts);
         }
         catch(final OpenRDFException e)
         {
             try
             {
-                if(conn != null && conn.isActive())
+                if(permanentConnection != null && permanentConnection.isActive())
                 {
-                    conn.rollback();
+                    permanentConnection.rollback();
                 }
             }
             catch(final RepositoryException e1)
@@ -467,14 +468,17 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         {
             try
             {
-                if(conn != null && conn.isOpen())
+                if(permanentConnection != null && permanentConnection.isOpen())
                 {
-                    conn.close();
+                    permanentConnection.close();
                 }
             }
-            catch(final RepositoryException e)
+            finally
             {
-                throw e;
+                if(managementConnection != null && managementConnection.isOpen())
+                {
+                    managementConnection.close();
+                }
             }
         }
     }
