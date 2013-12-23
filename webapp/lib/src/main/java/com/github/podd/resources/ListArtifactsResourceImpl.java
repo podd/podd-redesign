@@ -17,6 +17,7 @@
 package com.github.podd.resources;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -30,6 +31,7 @@ import org.openrdf.model.vocabulary.RDF;
 import org.openrdf.model.vocabulary.RDFS;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.Rio;
+import org.openrdf.rio.UnsupportedRDFormatException;
 import org.restlet.data.MediaType;
 import org.restlet.data.Status;
 import org.restlet.representation.ByteArrayRepresentation;
@@ -38,6 +40,7 @@ import org.restlet.representation.Variant;
 import org.restlet.resource.Get;
 import org.restlet.resource.ResourceException;
 
+import com.github.podd.exception.SchemaManifestException;
 import com.github.podd.exception.UnmanagedSchemaIRIException;
 import com.github.podd.restlet.PoddAction;
 import com.github.podd.restlet.RestletUtils;
@@ -218,7 +221,7 @@ public class ListArtifactsResourceImpl extends AbstractPoddResourceImpl
                         this.getPoddArtifactManager().getTopObjectLabels(nextEntry.getValue());
                 dataModel.put(nextKey + "ArtifactsList", results);
             }
-            catch(final OpenRDFException e)
+            catch(final OpenRDFException | SchemaManifestException | UnsupportedRDFormatException | IOException e)
             {
                 throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Could not find labels for " + nextKey
                         + " artifacts", e);
@@ -280,14 +283,11 @@ public class ListArtifactsResourceImpl extends AbstractPoddResourceImpl
             }
             Rio.write(model, out, resultFormat);
         }
-        catch(final OpenRDFException e)
+        catch(final OpenRDFException | UnmanagedSchemaIRIException | SchemaManifestException
+                | UnsupportedRDFormatException | IOException e)
         {
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL,
-                    "Could not generate RDF output due to an exception in the writer", e);
-        }
-        catch(final UnmanagedSchemaIRIException e)
-        {
-            throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Could not find schema for artifact", e);
+                    "Could not generate RDF output due to an exception", e);
         }
         
         // this.log.info(new String(out.toByteArray(), StandardCharsets.UTF_8));

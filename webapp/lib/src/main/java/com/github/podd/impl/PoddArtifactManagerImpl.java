@@ -29,6 +29,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
@@ -52,6 +53,7 @@ import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.RepositoryResult;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.Rio;
+import org.openrdf.rio.UnsupportedRDFormatException;
 import org.openrdf.rio.helpers.StatementCollector;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLException;
@@ -88,9 +90,11 @@ import com.github.podd.exception.PoddRuntimeException;
 import com.github.podd.exception.PublishArtifactException;
 import com.github.podd.exception.PublishedArtifactModifyException;
 import com.github.podd.exception.PurlProcessorNotHandledException;
+import com.github.podd.exception.SchemaManifestException;
 import com.github.podd.exception.UnmanagedArtifactIRIException;
 import com.github.podd.exception.UnmanagedArtifactVersionException;
 import com.github.podd.exception.UnmanagedSchemaIRIException;
+import com.github.podd.utils.DebugUtils;
 import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.OntologyUtils;
 import com.github.podd.utils.PODD;
@@ -223,7 +227,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             
             return !requestedArtifactIds.isEmpty();
         }
-        catch(final OpenRDFException | OWLException e)
+        catch(final OpenRDFException | OWLException | UnsupportedRDFormatException | IOException e)
         {
             try
             {
@@ -290,7 +294,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         final Model parentDetails = this.getParentDetails(artifactID, objectToDelete);
         if(parentDetails.subjects().size() != 1)
         {
-            this.log.error("Object {} cannot be deleted. (No parent) {}", objectUri, artifactUri);
+            this.log.error("Object {} cannot be deleted. (No parent) {} {}", objectUri, artifactUri, parentDetails);
             throw new ArtifactModifyException("Object cannot be deleted. (No parent)", artifactID, objectToDelete);
         }
         final Resource parent = parentDetails.subjects().iterator().next();
@@ -435,7 +439,8 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
     
     @Override
     public Model fillMissingData(final InferredOWLOntologyID ontologyID, final Model inputModel)
-        throws OpenRDFException, UnmanagedSchemaIRIException
+        throws OpenRDFException, UnmanagedSchemaIRIException, SchemaManifestException, UnsupportedRDFormatException,
+        IOException
     {
         RepositoryConnection permanentConnection = null;
         RepositoryConnection managementConnection = null;
@@ -449,22 +454,6 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
                             this.getRepositoryManager().getSchemaManagementGraph());
             
             return this.getSesameManager().fillMissingLabels(inputModel, permanentConnection, contexts);
-        }
-        catch(final OpenRDFException e)
-        {
-            try
-            {
-                if(permanentConnection != null && permanentConnection.isActive())
-                {
-                    permanentConnection.rollback();
-                }
-            }
-            catch(final RepositoryException e1)
-            {
-                this.log.error("Found error rolling back repository connection", e1);
-            }
-            
-            throw e;
         }
         finally
         {
@@ -569,7 +558,8 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
      */
     @Override
     public Set<URI> getChildObjects(final InferredOWLOntologyID ontologyID, final URI objectUri)
-        throws OpenRDFException, UnmanagedSchemaIRIException
+        throws OpenRDFException, UnmanagedSchemaIRIException, SchemaManifestException, UnsupportedRDFormatException,
+        IOException
     {
         RepositoryConnection permanentConnection = null;
         RepositoryConnection managementConnection = null;
@@ -650,7 +640,8 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
      */
     @Override
     public Model getObjectDetailsForDisplay(final InferredOWLOntologyID ontologyID, final URI objectUri)
-        throws OpenRDFException, UnmanagedSchemaIRIException
+        throws OpenRDFException, UnmanagedSchemaIRIException, SchemaManifestException, UnsupportedRDFormatException,
+        IOException
     {
         RepositoryConnection conn = null;
         try
@@ -671,7 +662,8 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
     
     @Override
     public PoddObjectLabel getObjectLabel(final InferredOWLOntologyID ontologyID, final URI objectUri)
-        throws OpenRDFException, UnmanagedSchemaIRIException
+        throws OpenRDFException, UnmanagedSchemaIRIException, SchemaManifestException, UnsupportedRDFormatException,
+        IOException
     {
         RepositoryConnection conn = null;
         try
@@ -698,7 +690,8 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
      */
     @Override
     public List<PoddObjectLabel> getObjectTypes(final InferredOWLOntologyID artifactId, final URI objectUri)
-        throws OpenRDFException, UnmanagedSchemaIRIException
+        throws OpenRDFException, UnmanagedSchemaIRIException, SchemaManifestException, UnsupportedRDFormatException,
+        IOException
     {
         final List<PoddObjectLabel> results = new ArrayList<PoddObjectLabel>();
         RepositoryConnection conn = null;
@@ -737,7 +730,8 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
      */
     @Override
     public List<URI> getOrderedProperties(final InferredOWLOntologyID ontologyID, final URI objectUri,
-            final boolean excludeContainsProperties) throws OpenRDFException, UnmanagedSchemaIRIException
+            final boolean excludeContainsProperties) throws OpenRDFException, UnmanagedSchemaIRIException,
+        SchemaManifestException, UnsupportedRDFormatException, IOException
     {
         RepositoryConnection conn = null;
         try
@@ -779,7 +773,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
      */
     @Override
     public Model getParentDetails(final InferredOWLOntologyID ontologyID, final URI objectUri) throws OpenRDFException,
-        UnmanagedSchemaIRIException
+        UnmanagedSchemaIRIException, SchemaManifestException, UnsupportedRDFormatException, IOException
     {
         RepositoryConnection permanentConnection = null;
         RepositoryConnection managementConnection = null;
@@ -791,6 +785,8 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             final URI[] contexts =
                     this.getSesameManager().versionAndSchemaContexts(ontologyID, managementConnection,
                             this.getRepositoryManager().getSchemaManagementGraph());
+            
+            DebugUtils.printContexts(permanentConnection);
             
             return this.getSesameManager().getParentDetails(objectUri, permanentConnection, contexts);
         }
@@ -824,8 +820,9 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         return this.purlManager;
     }
     
-    public Model getReferenceLinks(final InferredOWLOntologyID ontologyID, final URI objectUri)
-        throws OpenRDFException, UnmanagedSchemaIRIException
+    private Model getReferenceLinks(final InferredOWLOntologyID ontologyID, final URI objectUri)
+        throws OpenRDFException, UnmanagedSchemaIRIException, SchemaManifestException, UnsupportedRDFormatException,
+        IOException
     {
         RepositoryConnection conn = null;
         try
@@ -862,7 +859,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
     
     @Override
     public Set<InferredOWLOntologyID> getSchemaImports(final InferredOWLOntologyID artifactID) throws OpenRDFException,
-        UnmanagedSchemaIRIException
+        UnmanagedSchemaIRIException, SchemaManifestException, UnsupportedRDFormatException, IOException
     {
         Objects.requireNonNull(
                 artifactID,
@@ -870,15 +867,33 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         
         final Set<InferredOWLOntologyID> results = new LinkedHashSet<InferredOWLOntologyID>();
         
-        RepositoryConnection conn = null;
+        RepositoryConnection managementConnection = null;
         
         try
         {
-            conn = this.getRepositoryManager().getManagementRepository().getConnection();
+            managementConnection = this.getRepositoryManager().getManagementRepository().getConnection();
+            
+            final Model model = new LinkedHashModel();
+            managementConnection.export(new StatementCollector(), this.getRepositoryManager()
+                    .getArtifactManagementGraph());
+            managementConnection.export(new StatementCollector(), this.getRepositoryManager()
+                    .getSchemaManagementGraph());
             
             final Set<URI> directImports =
-                    this.getSesameManager().getDirectImports(artifactID.getOntologyIRI(), conn,
+                    this.getSesameManager().getDirectImports(artifactID.getOntologyIRI(), managementConnection,
                             this.getRepositoryManager().getArtifactManagementGraph());
+            
+            final Set<URI> schemaOntologyUris = new HashSet<>();
+            final Set<URI> schemaVersionUris = new HashSet<>();
+            
+            OntologyUtils.extractOntologyAndVersions(model, schemaOntologyUris, schemaVersionUris);
+            
+            OntologyUtils.validateSchemaManifestImports(model, schemaVersionUris);
+            
+            final List<URI> importOrder = OntologyUtils.orderImports(model, schemaOntologyUris, schemaVersionUris);
+            
+            Map<URI, Set<OWLOntologyID>> allImports =
+                    OntologyUtils.getImports(model, schemaOntologyUris, schemaVersionUris);
             
             for(final URI nextDirectImport : directImports)
             {
@@ -887,9 +902,9 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         }
         finally
         {
-            if(conn != null)
+            if(managementConnection != null)
             {
-                conn.close();
+                managementConnection.close();
             }
         }
         
@@ -910,7 +925,8 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
     
     @Override
     public List<PoddObjectLabel> getTopObjectLabels(final List<InferredOWLOntologyID> artifacts)
-        throws OpenRDFException, UnmanagedSchemaIRIException
+        throws OpenRDFException, UnmanagedSchemaIRIException, SchemaManifestException, UnsupportedRDFormatException,
+        IOException
     {
         final List<PoddObjectLabel> results = new ArrayList<PoddObjectLabel>();
         RepositoryConnection conn = null;
@@ -1294,8 +1310,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             this.log.warn("Found multiple ontologies when we were only expecting a single ontology: {}", ontologyIDs);
         }
         
-        // FIXME: This method only works if the imports are already in a
-        // repository somewhere, need
+        // FIXME: This method only works if the imports are already in a repository somewhere, need
         // to fix the Sesame manager to look for imports in Models also
         final Set<InferredOWLOntologyID> schemaImports = this.getSchemaImports(ontologyIDs.get(0));
         
@@ -1405,7 +1420,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             
             return inferredOWLOntologyID;
         }
-        catch(final Exception e)
+        catch(final Throwable e)
         {
             if(temporaryRepositoryConnection != null && temporaryRepositoryConnection.isActive())
             {
@@ -1618,7 +1633,8 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
      */
     @Override
     public Model searchForOntologyLabels(final InferredOWLOntologyID ontologyID, final String searchTerm,
-            final URI[] searchTypes) throws OpenRDFException, UnmanagedSchemaIRIException
+            final URI[] searchTypes) throws OpenRDFException, UnmanagedSchemaIRIException, SchemaManifestException,
+        UnsupportedRDFormatException, IOException
     {
         RepositoryConnection conn = null;
         

@@ -16,12 +16,14 @@
  */
 package com.github.podd.resources;
 
+import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
 
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.URI;
 import org.openrdf.repository.RepositoryConnection;
+import org.openrdf.rio.UnsupportedRDFormatException;
 import org.restlet.data.MediaType;
 import org.restlet.data.Status;
 import org.restlet.representation.Representation;
@@ -31,6 +33,7 @@ import org.restlet.resource.Post;
 import org.restlet.resource.ResourceException;
 import org.semanticweb.owlapi.model.IRI;
 
+import com.github.podd.exception.SchemaManifestException;
 import com.github.podd.exception.UnmanagedArtifactIRIException;
 import com.github.podd.exception.UnmanagedArtifactVersionException;
 import com.github.podd.exception.UnmanagedSchemaIRIException;
@@ -63,10 +66,12 @@ public class AddObjectResourceImpl extends AbstractPoddResourceImpl
      * Serve the "Add new object" HTML page
      * 
      * @throws UnmanagedSchemaIRIException
+     * @throws IOException
+     * @throws UnsupportedRDFormatException
      */
     @Get("html")
     public Representation getCreateObjectHtml(final Representation entity) throws ResourceException,
-        UnmanagedSchemaIRIException
+        UnmanagedSchemaIRIException, UnsupportedRDFormatException, IOException
     {
         this.log.info("@Get addObjectHtml Page");
         
@@ -146,6 +151,7 @@ public class AddObjectResourceImpl extends AbstractPoddResourceImpl
      * API.
      */
     private PoddObjectLabel getObjectTypeLabel(final String artifactUri, final String objectType)
+        throws UnsupportedRDFormatException, IOException
     {
         PoddObjectLabel objectLabel;
         try
@@ -182,7 +188,7 @@ public class AddObjectResourceImpl extends AbstractPoddResourceImpl
             }
         }
         catch(UnmanagedArtifactIRIException | UnmanagedSchemaIRIException | OpenRDFException
-                | UnmanagedArtifactVersionException e)
+                | UnmanagedArtifactVersionException | SchemaManifestException e)
         {
             e.printStackTrace();
             // failed to find Label

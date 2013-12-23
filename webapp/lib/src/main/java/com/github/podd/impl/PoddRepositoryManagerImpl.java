@@ -119,6 +119,7 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
     public PoddRepositoryManagerImpl(final Repository managementRepository, final Repository permanentRepository)
     {
         this.managementRepository = managementRepository;
+        // FIXME: This method should be removed
         this.permanentRepositories.put(Collections.<OWLOntologyID> emptySet(), permanentRepository);
     }
     
@@ -170,18 +171,18 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
     {
         Objects.requireNonNull(schemaOntologies, "Schema ontologies must not be null");
         
-        Repository repository = this.permanentRepositories.get(schemaOntologies);
+        Repository permanentRepository = this.permanentRepositories.get(schemaOntologies);
         // This synchronisation should not inhibit most operations, but is necessary to prevent
         // multiple repositories with the same schema ontologies, given that there is a relatively
         // large latency in the new repository create process
         // ConcurrentMap.putIfAbsent is not applicable to the initial situation as it is very costly
         // to create a repository if it is not needed
-        if(repository == null)
+        if(permanentRepository == null)
         {
             synchronized(this.permanentRepositories)
             {
-                repository = this.permanentRepositories.get(schemaOntologies);
-                if(repository == null)
+                permanentRepository = this.permanentRepositories.get(schemaOntologies);
+                if(permanentRepository == null)
                 {
                     // Create a new one
                     // Get a new repository ID using our base name as the starting point
@@ -203,29 +204,29 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
                         {
                             this.log.warn("Could not remove repository");
                         }
-                        repository = putIfAbsent;
+                        permanentRepository = putIfAbsent;
                     }
                     else
                     {
-                        repository = nextRepository;
+                        permanentRepository = nextRepository;
                         
                         // In this case, we need to copy the relevant schema ontologies over to the
                         // new repository
-                        
-                        Repository managementRepository = getManagementRepository();
                         RepositoryConnection managementConnection = null;
-                        RepositoryConnection repositoryConnection = null;
+                        RepositoryConnection permanentConnection = null;
                         try
                         {
-                            repositoryConnection = repository.getConnection();
-                            managementConnection = managementRepository.getConnection();
+                            permanentConnection = permanentRepository.getConnection();
+                            permanentConnection.begin();
+                            managementConnection = getManagementRepository().getConnection();
                             for(OWLOntologyID nextSchemaOntology : schemaOntologies)
                             {
-                                if(!repositoryConnection.hasStatement(null, null, null, false, nextSchemaOntology
+                                if(!permanentConnection.hasStatement(null, null, null, false, nextSchemaOntology
                                         .getVersionIRI().toOpenRDFURI()))
                                 {
-                                    repositoryConnection.add(managementConnection.getStatements(null, null, null,
-                                            false, nextSchemaOntology.getVersionIRI().toOpenRDFURI()));
+                                    permanentConnection.add(managementConnection.getStatements(null, null, null, false,
+                                            nextSchemaOntology.getVersionIRI().toOpenRDFURI()), nextSchemaOntology
+                                            .getVersionIRI().toOpenRDFURI());
                                 }
                                 
                                 RepositoryResult<Statement> statements =
@@ -237,16 +238,25 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
                                 {
                                     if(nextInferredStatement.getObject() instanceof URI)
                                     {
-                                        if(!repositoryConnection.hasStatement(null, null, null, false,
+                                        if(!permanentConnection.hasStatement(null, null, null, false,
                                                 (URI)nextInferredStatement.getObject()))
                                         {
-                                            repositoryConnection.add(managementConnection.getStatements(null, null,
-                                                    null, false, (URI)nextInferredStatement.getObject()));
+                                            permanentConnection.add(managementConnection.getStatements(null, null,
+                                                    null, false, (URI)nextInferredStatement.getObject()),
+                                                    (URI)nextInferredStatement.getObject());
                                         }
                                     }
                                 }
                             }
-                            repositoryConnection.commit();
+                            permanentConnection.commit();
+                        }
+                        catch(Throwable e)
+                        {
+                            if(permanentConnection != null)
+                            {
+                                permanentConnection.rollback();
+                            }
+                            throw e;
                         }
                         finally
                         {
@@ -254,16 +264,16 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
                             {
                                 managementConnection.close();
                             }
-                            if(repositoryConnection != null)
+                            if(permanentConnection != null)
                             {
-                                repositoryConnection.close();
+                                permanentConnection.close();
                             }
                         }
                     }
                 }
             }
         }
-        return repository;
+        return permanentRepository;
     }
     
     @Override

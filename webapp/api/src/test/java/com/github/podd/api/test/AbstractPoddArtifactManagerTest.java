@@ -61,6 +61,7 @@ import org.openrdf.rio.RDFParseException;
 import org.openrdf.rio.RDFParser;
 import org.openrdf.rio.RDFWriter;
 import org.openrdf.rio.Rio;
+import org.openrdf.rio.UnsupportedRDFormatException;
 import org.openrdf.rio.helpers.StatementCollector;
 import org.openrdf.sail.memory.MemoryStore;
 import org.semanticweb.owlapi.formats.OWLOntologyFormatFactoryRegistry;
@@ -100,6 +101,7 @@ import com.github.podd.exception.InconsistentOntologyException;
 import com.github.podd.exception.OntologyNotInProfileException;
 import com.github.podd.exception.PoddException;
 import com.github.podd.exception.PublishedArtifactModifyException;
+import com.github.podd.exception.SchemaManifestException;
 import com.github.podd.exception.UnmanagedArtifactIRIException;
 import com.github.podd.exception.UnmanagedArtifactVersionException;
 import com.github.podd.exception.UnmanagedSchemaIRIException;
@@ -2956,7 +2958,7 @@ public abstract class AbstractPoddArtifactManagerTest
      * @param repositoryConnection
      * @param graphSize
      *            Expected size of the graph
-     * @param testGraph
+     * @param managementGraph
      *            The Graph/context to be tested
      * @param ontologyIRI
      *            The ontology/artifact
@@ -2968,15 +2970,15 @@ public abstract class AbstractPoddArtifactManagerTest
      * @throws Exception
      */
     private void verifyArtifactManagementGraphContents(final RepositoryConnection repositoryConnection,
-            final int graphSize, final URI testGraph, final IRI ontologyIRI, final IRI versionIRI,
+            final int graphSize, final URI managementGraph, final IRI ontologyIRI, final IRI versionIRI,
             final IRI inferredVersionIRI) throws RepositoryException
     {
-        Assert.assertEquals("Graph not of expected size", graphSize, repositoryConnection.size(testGraph));
+        Assert.assertEquals("Graph not of expected size", graphSize, repositoryConnection.size(managementGraph));
         
         // verify: OWL_VERSION
         final List<Statement> stmtList =
                 Iterations.asList(repositoryConnection.getStatements(ontologyIRI.toOpenRDFURI(), PODD.OWL_VERSION_IRI,
-                        null, false, testGraph));
+                        null, false, managementGraph));
         Assert.assertEquals("Graph should have one OWL_VERSION statement", 1, stmtList.size());
         Assert.assertEquals("Wrong OWL_VERSION in Object", versionIRI.toString(), stmtList.get(0).getObject()
                 .toString());
@@ -2984,7 +2986,7 @@ public abstract class AbstractPoddArtifactManagerTest
         // verify: OMV_CURRENT_VERSION
         final List<Statement> currentVersionStatementList =
                 Iterations.asList(repositoryConnection.getStatements(ontologyIRI.toOpenRDFURI(),
-                        PODD.OMV_CURRENT_VERSION, null, false, testGraph));
+                        PODD.OMV_CURRENT_VERSION, null, false, managementGraph));
         Assert.assertEquals("Graph should have one OMV_CURRENT_VERSION statement", 1,
                 currentVersionStatementList.size());
         Assert.assertEquals("Wrong OMV_CURRENT_VERSION in Object", versionIRI.toString(), currentVersionStatementList
@@ -2993,7 +2995,7 @@ public abstract class AbstractPoddArtifactManagerTest
         // verify: INFERRED_VERSION
         final List<Statement> inferredVersionStatementList =
                 Iterations.asList(repositoryConnection.getStatements(versionIRI.toOpenRDFURI(),
-                        PODD.PODD_BASE_INFERRED_VERSION, null, false, testGraph));
+                        PODD.PODD_BASE_INFERRED_VERSION, null, false, managementGraph));
         Assert.assertEquals("Graph should have one INFERRED_VERSION statement", 1, inferredVersionStatementList.size());
         Assert.assertEquals("Wrong INFERRED_VERSION in Object", inferredVersionIRI.toString(),
                 inferredVersionStatementList.get(0).getObject().toString());
@@ -3001,7 +3003,7 @@ public abstract class AbstractPoddArtifactManagerTest
         // verify: CURRENT_INFERRED_VERSION
         final List<Statement> currentInferredVersionStatementList =
                 Iterations.asList(repositoryConnection.getStatements(ontologyIRI.toOpenRDFURI(),
-                        PODD.PODD_BASE_CURRENT_INFERRED_VERSION, null, false, testGraph));
+                        PODD.PODD_BASE_CURRENT_INFERRED_VERSION, null, false, managementGraph));
         Assert.assertEquals("Graph should have one CURRENT_INFERRED_VERSION statement", 1,
                 currentInferredVersionStatementList.size());
         Assert.assertEquals("Wrong CURRENT_INFERRED_VERSION in Object", inferredVersionIRI.toString(),
@@ -3027,11 +3029,14 @@ public abstract class AbstractPoddArtifactManagerTest
      * @throws UnmanagedSchemaIRIException
      * @throws UnmanagedArtifactVersionException
      * @throws UnmanagedArtifactIRIException
+     * @throws SchemaManifestException
+     * @throws IOException
+     * @throws UnsupportedRDFormatException
      */
     private void verifyLoadedArtifact(final InferredOWLOntologyID inferredOntologyId, final int mgtGraphSize,
             final long assertedStatementCount, final long inferredStatementCount, final boolean isPublished)
         throws RepositoryException, OpenRDFException, UnmanagedArtifactIRIException, UnmanagedArtifactVersionException,
-        UnmanagedSchemaIRIException
+        UnmanagedSchemaIRIException, SchemaManifestException, UnsupportedRDFormatException, IOException
     
     {
         // verify: ontology ID has all details
@@ -3048,14 +3053,12 @@ public abstract class AbstractPoddArtifactManagerTest
                     this.testArtifactManager.getSchemaImports(inferredOntologyId);
             
             managementConnection = this.testRepositoryManager.getManagementRepository().getConnection();
-            managementConnection.begin();
             
             permanentConnection = this.testRepositoryManager.getPermanentRepository(schemaOntologies).getConnection();
-            permanentConnection.begin();
             
             if(permanentConnection.size(inferredOntologyId.getVersionIRI().toOpenRDFURI()) != assertedStatementCount)
             {
-                DebugUtils.printContents(managementConnection, inferredOntologyId.getVersionIRI().toOpenRDFURI());
+                DebugUtils.printContents(permanentConnection, inferredOntologyId.getVersionIRI().toOpenRDFURI());
             }
             // verify: size of asserted graph
             Assert.assertEquals("Incorrect number of asserted statements for artifact", assertedStatementCount,
@@ -3072,19 +3075,11 @@ public abstract class AbstractPoddArtifactManagerTest
         }
         finally
         {
-            if(permanentConnection != null && permanentConnection.isActive())
-            {
-                permanentConnection.rollback();
-            }
             if(permanentConnection != null && permanentConnection.isOpen())
             {
                 permanentConnection.close();
             }
             permanentConnection = null;
-            if(managementConnection != null && managementConnection.isActive())
-            {
-                managementConnection.rollback();
-            }
             if(managementConnection != null && managementConnection.isOpen())
             {
                 managementConnection.close();

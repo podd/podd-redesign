@@ -4,6 +4,7 @@
 package com.github.podd.resources;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedHashSet;
@@ -18,6 +19,7 @@ import org.openrdf.model.Model;
 import org.openrdf.model.impl.LinkedHashModel;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.Rio;
+import org.openrdf.rio.UnsupportedRDFormatException;
 import org.restlet.data.MediaType;
 import org.restlet.data.Status;
 import org.restlet.representation.ByteArrayRepresentation;
@@ -31,6 +33,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.github.ansell.restletutils.RestletUtilRole;
+import com.github.podd.exception.SchemaManifestException;
 import com.github.podd.exception.UnmanagedArtifactIRIException;
 import com.github.podd.exception.UnmanagedSchemaIRIException;
 import com.github.podd.restlet.PoddAction;
@@ -125,7 +128,8 @@ public class ArtifactRolesResourceImpl extends AbstractPoddResourceImpl
             dataModel.put("members", roleUserMap.get(PoddRoles.PROJECT_MEMBER));
             dataModel.put("observers", roleUserMap.get(PoddRoles.PROJECT_OBSERVER));
         }
-        catch(final UnmanagedSchemaIRIException | OpenRDFException e)
+        catch(final UnmanagedSchemaIRIException | OpenRDFException | SchemaManifestException
+                | UnsupportedRDFormatException | IOException e)
         {
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Failed to populate data model", e);
         }
@@ -205,9 +209,12 @@ public class ArtifactRolesResourceImpl extends AbstractPoddResourceImpl
      * @return
      * @throws OpenRDFException
      * @throws UnmanagedSchemaIRIException
+     * @throws IOException
+     * @throws UnsupportedRDFormatException
+     * @throws SchemaManifestException
      */
     private PoddObjectLabel getProjectDetails(final InferredOWLOntologyID ontologyID) throws OpenRDFException,
-        UnmanagedSchemaIRIException
+        UnmanagedSchemaIRIException, SchemaManifestException, UnsupportedRDFormatException, IOException
     {
         // find and set top-object of this artifact as the object to display
         final List<PoddObjectLabel> topObjectLabels =

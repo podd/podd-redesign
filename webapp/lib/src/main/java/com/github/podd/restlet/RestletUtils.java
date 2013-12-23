@@ -16,6 +16,7 @@
  */
 package com.github.podd.restlet;
 
+import java.io.IOException;
 import java.io.StringWriter;
 import java.util.AbstractMap;
 import java.util.Arrays;
@@ -42,6 +43,7 @@ import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.RDFHandler;
 import org.openrdf.rio.RDFHandlerException;
 import org.openrdf.rio.Rio;
+import org.openrdf.rio.UnsupportedRDFormatException;
 import org.restlet.Request;
 import org.restlet.data.CharacterSet;
 import org.restlet.data.ClientInfo;
@@ -61,6 +63,7 @@ import org.slf4j.LoggerFactory;
 
 import com.github.ansell.restletutils.RestletUtilRole;
 import com.github.podd.api.PoddArtifactManager;
+import com.github.podd.exception.SchemaManifestException;
 import com.github.podd.exception.UnmanagedArtifactIRIException;
 import com.github.podd.exception.UnmanagedSchemaIRIException;
 import com.github.podd.utils.InferredOWLOntologyID;
@@ -214,10 +217,14 @@ public final class RestletUtils
      * @throws ResourceException
      *             If there is more than one top object.
      * @throws UnmanagedSchemaIRIException
+     * @throws IOException
+     * @throws UnsupportedRDFormatException
+     * @throws SchemaManifestException
      */
     public static PoddObjectLabel getParentDetails(final PoddArtifactManager artifactManager,
             final InferredOWLOntologyID ontologyID, final String objectToView) throws OpenRDFException,
-        ResourceException, UnmanagedSchemaIRIException
+        ResourceException, UnmanagedSchemaIRIException, SchemaManifestException, UnsupportedRDFormatException,
+        IOException
     {
         PoddObjectLabel theObject = null;
         
@@ -306,7 +313,8 @@ public final class RestletUtils
                             poddObjectLabel = new PoddObjectLabelImpl(artifact, artifactUri, artifactUri.stringValue());
                         }
                     }
-                    catch(OpenRDFException | UnmanagedArtifactIRIException | UnmanagedSchemaIRIException e)
+                    catch(OpenRDFException | UnmanagedArtifactIRIException | UnmanagedSchemaIRIException
+                            | SchemaManifestException | UnsupportedRDFormatException | IOException e)
                     {
                         // either the artifact mapped to this Role does not
                         // exist, or a Label for it
@@ -334,10 +342,13 @@ public final class RestletUtils
      * @param dataModel
      * @throws OpenRDFException
      * @throws UnmanagedSchemaIRIException
+     * @throws IOException
+     * @throws UnsupportedRDFormatException
+     * @throws SchemaManifestException
      */
     public static Map<String, String> populateParentDetails(final PoddArtifactManager artifactManager,
             final InferredOWLOntologyID ontologyID, final URI objectUri) throws OpenRDFException,
-        UnmanagedSchemaIRIException
+        UnmanagedSchemaIRIException, SchemaManifestException, UnsupportedRDFormatException, IOException
     {
         final Map<String, String> parentMap = new HashMap<>();
         

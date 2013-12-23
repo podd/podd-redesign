@@ -48,6 +48,7 @@ import com.github.podd.api.PoddArtifactManager;
 import com.github.podd.exception.FileReferenceVerificationFailureException;
 import com.github.podd.exception.OntologyNotInProfileException;
 import com.github.podd.exception.PoddException;
+import com.github.podd.exception.SchemaManifestException;
 import com.github.podd.exception.UnmanagedArtifactIRIException;
 import com.github.podd.exception.UnmanagedArtifactVersionException;
 import com.github.podd.exception.UnmanagedSchemaIRIException;
@@ -185,7 +186,8 @@ public class DataReferenceAttachResourceImpl extends AbstractPoddResourceImpl
         {
             parentDetails = RestletUtils.getParentDetails(this.getPoddArtifactManager(), artifact, objectUri);
         }
-        catch(final OpenRDFException | UnmanagedSchemaIRIException e)
+        catch(final OpenRDFException | UnmanagedSchemaIRIException | SchemaManifestException
+                | UnsupportedRDFormatException | IOException e)
         {
             this.log.error("Could not find parent details", e);
             throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Could not find parent details", e);

@@ -39,6 +39,7 @@ import org.restlet.resource.ResourceException;
 import org.restlet.security.User;
 import org.semanticweb.owlapi.model.IRI;
 
+import com.github.podd.exception.SchemaManifestException;
 import com.github.podd.exception.UnmanagedArtifactIRIException;
 import com.github.podd.exception.UnmanagedSchemaIRIException;
 import com.github.podd.restlet.PoddAction;
@@ -117,7 +118,8 @@ public class SearchOntologyResourceImpl extends AbstractPoddResourceImpl
                     this.getPoddArtifactManager().searchForOntologyLabels(ontologyID, searchTerm,
                             set.toArray(new URI[0]));
         }
-        catch(final OpenRDFException | UnmanagedSchemaIRIException e)
+        catch(final OpenRDFException | UnmanagedSchemaIRIException | SchemaManifestException
+                | UnsupportedRDFormatException | IOException e)
         {
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Failed searching for Ontology Labels", e);
         }
@@ -209,6 +211,10 @@ public class SearchOntologyResourceImpl extends AbstractPoddResourceImpl
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Could not parse input", e);
         }
         catch(final UnmanagedSchemaIRIException e)
+        {
+            throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Could not find necessary schema ontology", e);
+        }
+        catch(SchemaManifestException e)
         {
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Could not find necessary schema ontology", e);
         }
