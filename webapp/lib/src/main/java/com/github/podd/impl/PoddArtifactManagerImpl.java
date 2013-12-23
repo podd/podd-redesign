@@ -52,6 +52,7 @@ import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.RepositoryResult;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.Rio;
+import org.openrdf.rio.helpers.StatementCollector;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLException;
 import org.semanticweb.owlapi.model.OWLOntologyID;
@@ -287,7 +288,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         final Model parentDetails = this.getParentDetails(artifactID, objectToDelete);
         if(parentDetails.subjects().size() != 1)
         {
-            this.log.error("Object {} cannot be deleted. (No parent)", objectUri, artifactUri);
+            this.log.error("Object {} cannot be deleted. (No parent) {}", objectUri, artifactUri);
             throw new ArtifactModifyException("Object cannot be deleted. (No parent)", artifactID, objectToDelete);
         }
         final Resource parent = parentDetails.subjects().iterator().next();
@@ -354,14 +355,9 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             final Set<InferredOWLOntologyID> schemaImports = this.getSchemaImports(ontologyId);
             conn = this.getRepositoryManager().getPermanentRepository(schemaImports).getConnection();
             
-            final RepositoryResult<Statement> statements =
-                    conn.getStatements(null, null, null, includeInferred, contexts.toArray(new Resource[] {}));
-            final Model model = new LinkedHashModel(Iterations.asList(statements));
-            final RepositoryResult<Namespace> namespaces = conn.getNamespaces();
-            for(final Namespace nextNs : Iterations.asSet(namespaces))
-            {
-                model.setNamespace(nextNs);
-            }
+            final Model model = new LinkedHashModel();
+            conn.exportStatements(null, null, null, includeInferred, new StatementCollector(model),
+                    contexts.toArray(new Resource[] {}));
             return model;
         }
         finally
