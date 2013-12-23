@@ -559,7 +559,7 @@ public class ApplicationUtils
             // Once the upgrade process is well developed, may want to streamline application
             // startup to avoid attempting to do this every time
             
-            final ConcurrentMap<InferredOWLOntologyID, Set<InferredOWLOntologyID>> currentArtifactImports =
+            final ConcurrentMap<InferredOWLOntologyID, Set<? extends OWLOntologyID>> currentArtifactImports =
                     new ConcurrentHashMap<>();
             
             final ConcurrentMap<InferredOWLOntologyID, Set<InferredOWLOntologyID>> artifactsToUpdate =
@@ -582,7 +582,7 @@ public class ApplicationUtils
                 ApplicationUtils.log.info("Fetching schema imports for unpublished artifact: {}",
                         nextArtifact.getOntologyIRI());
                 
-                final Set<InferredOWLOntologyID> schemaImports = poddArtifactManager.getSchemaImports(nextArtifact);
+                final Set<? extends OWLOntologyID> schemaImports = poddArtifactManager.getSchemaImports(nextArtifact);
                 
                 // Cache the current artifact imports so they are easily accessible without calling
                 // the above method again if they need to be updated

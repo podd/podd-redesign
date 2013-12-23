@@ -48,6 +48,7 @@ import org.restlet.resource.Post;
 import org.restlet.resource.ResourceException;
 import org.restlet.security.User;
 import org.semanticweb.owlapi.model.IRI;
+import org.semanticweb.owlapi.model.OWLOntologyID;
 
 import com.github.podd.exception.SchemaManifestException;
 import com.github.podd.exception.UnmanagedArtifactIRIException;
@@ -301,7 +302,7 @@ public class SparqlResourceImpl extends AbstractPoddResourceImpl
             RepositoryConnection conn = null;
             try
             {
-                final Set<InferredOWLOntologyID> schemaImports =
+                final Set<? extends OWLOntologyID> schemaImports =
                         this.getPoddArtifactManager().getSchemaImports(ontologyID);
                 conn = this.getPoddRepositoryManager().getPermanentRepository(schemaImports).getConnection();
                 final Set<URI> contextSet = new HashSet<>();

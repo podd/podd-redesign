@@ -1790,7 +1790,7 @@ public abstract class AbstractPoddArtifactManagerTest
         {
             managementConnection = this.testRepositoryManager.getManagementRepository().getConnection();
             
-            Set<InferredOWLOntologyID> schemaImports = this.testArtifactManager.getSchemaImports(artifactId);
+            Set<? extends OWLOntologyID> schemaImports = this.testArtifactManager.getSchemaImports(artifactId);
             permanentConnection = this.testRepositoryManager.getPermanentRepository(schemaImports).getConnection();
             
             final String[] expectedImports =
@@ -2109,7 +2109,7 @@ public abstract class AbstractPoddArtifactManagerTest
         {
             managementConnection = this.testRepositoryManager.getManagementRepository().getConnection();
             
-            Set<InferredOWLOntologyID> schemaImports = this.testArtifactManager.getSchemaImports(updatedArtifact);
+            Set<? extends OWLOntologyID> schemaImports = this.testArtifactManager.getSchemaImports(updatedArtifact);
             permanentConnection = this.testRepositoryManager.getPermanentRepository(schemaImports).getConnection();
             
             this.verifyUpdatedArtifact(updatedArtifact, "http://purl.org/podd/basic-2-20130206/artifact:1:version:2",
@@ -2174,7 +2174,7 @@ public abstract class AbstractPoddArtifactManagerTest
         try
         {
             managementConnection = this.testRepositoryManager.getManagementRepository().getConnection();
-            Set<InferredOWLOntologyID> schemaImports = this.testArtifactManager.getSchemaImports(updatedArtifact);
+            Set<? extends OWLOntologyID> schemaImports = this.testArtifactManager.getSchemaImports(updatedArtifact);
             permanentConnection = this.testRepositoryManager.getPermanentRepository(schemaImports).getConnection();
             
             this.verifyUpdatedArtifact(updatedArtifact, "http://purl.org/podd/basic-2-20130206/artifact:1:version:2",
@@ -2244,7 +2244,7 @@ public abstract class AbstractPoddArtifactManagerTest
         try
         {
             managementConnection = this.testRepositoryManager.getManagementRepository().getConnection();
-            Set<InferredOWLOntologyID> schemaImports = this.testArtifactManager.getSchemaImports(updatedArtifact);
+            Set<? extends OWLOntologyID> schemaImports = this.testArtifactManager.getSchemaImports(updatedArtifact);
             permanentConnection = this.testRepositoryManager.getPermanentRepository(schemaImports).getConnection();
             
             this.verifyUpdatedArtifact(updatedArtifact, "http://purl.org/podd/basic-2-20130206/artifact:1:version:2",
@@ -2299,7 +2299,7 @@ public abstract class AbstractPoddArtifactManagerTest
         try
         {
             managementConnection = this.testRepositoryManager.getManagementRepository().getConnection();
-            Set<InferredOWLOntologyID> schemaImports = this.testArtifactManager.getSchemaImports(updatedArtifact);
+            Set<? extends OWLOntologyID> schemaImports = this.testArtifactManager.getSchemaImports(updatedArtifact);
             permanentConnection = this.testRepositoryManager.getPermanentRepository(schemaImports).getConnection();
             
             this.verifyUpdatedArtifact(updatedArtifact, "http://purl.org/podd/basic-2-20130206/artifact:1:version:2",
@@ -2385,7 +2385,7 @@ public abstract class AbstractPoddArtifactManagerTest
         try
         {
             managementConnection = this.testRepositoryManager.getManagementRepository().getConnection();
-            Set<InferredOWLOntologyID> schemaImports = this.testArtifactManager.getSchemaImports(updatedArtifact);
+            Set<? extends OWLOntologyID> schemaImports = this.testArtifactManager.getSchemaImports(updatedArtifact);
             permanentConnection = this.testRepositoryManager.getPermanentRepository(schemaImports).getConnection();
             
             this.verifyUpdatedArtifact(updatedArtifact, "http://purl.org/podd/basic-2-20130206/artifact:1:version:2",
@@ -2446,7 +2446,7 @@ public abstract class AbstractPoddArtifactManagerTest
         try
         {
             managementConnection = this.testRepositoryManager.getManagementRepository().getConnection();
-            Set<InferredOWLOntologyID> schemaImports = this.testArtifactManager.getSchemaImports(updatedArtifact);
+            Set<? extends OWLOntologyID> schemaImports = this.testArtifactManager.getSchemaImports(updatedArtifact);
             permanentConnection = this.testRepositoryManager.getPermanentRepository(schemaImports).getConnection();
             
             this.verifyUpdatedArtifact(updatedArtifact, "http://purl.org/podd/basic-2-20130206/artifact:1:version:2",
@@ -2508,7 +2508,7 @@ public abstract class AbstractPoddArtifactManagerTest
         try
         {
             managementConnection = this.testRepositoryManager.getManagementRepository().getConnection();
-            Set<InferredOWLOntologyID> schemaImports = this.testArtifactManager.getSchemaImports(updatedArtifact);
+            Set<? extends OWLOntologyID> schemaImports = this.testArtifactManager.getSchemaImports(updatedArtifact);
             permanentConnection = this.testRepositoryManager.getPermanentRepository(schemaImports).getConnection();
             
             this.verifyUpdatedArtifact(updatedArtifact, "http://purl.org/podd/basic-2-20130206/artifact:1:version:2",
@@ -3101,7 +3101,7 @@ public abstract class AbstractPoddArtifactManagerTest
             final long expectedConcreteStatementCount, final RepositoryConnection managementConnection)
         throws Exception
     {
-        Set<InferredOWLOntologyID> schemaImports = this.testArtifactManager.getSchemaImports(updatedArtifact);
+        Set<? extends OWLOntologyID> schemaImports = this.testArtifactManager.getSchemaImports(updatedArtifact);
         
         RepositoryConnection permanentConnection =
                 this.testRepositoryManager.getPermanentRepository(schemaImports).getConnection();

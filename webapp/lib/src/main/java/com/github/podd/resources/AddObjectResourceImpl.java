@@ -32,6 +32,7 @@ import org.restlet.resource.Get;
 import org.restlet.resource.Post;
 import org.restlet.resource.ResourceException;
 import org.semanticweb.owlapi.model.IRI;
+import org.semanticweb.owlapi.model.OWLOntologyID;
 
 import com.github.podd.exception.SchemaManifestException;
 import com.github.podd.exception.UnmanagedArtifactIRIException;
@@ -169,7 +170,8 @@ public class AddObjectResourceImpl extends AbstractPoddResourceImpl
                 ontologyID = this.getPoddArtifactManager().getArtifact(IRI.create(artifactUri));
             }
             
-            final Set<InferredOWLOntologyID> schemaImports = this.getPoddArtifactManager().getSchemaImports(ontologyID);
+            final Set<? extends OWLOntologyID> schemaImports =
+                    this.getPoddArtifactManager().getSchemaImports(ontologyID);
             RepositoryConnection conn = null;
             try
             {

@@ -417,9 +417,9 @@ public interface PoddArtifactManager
      * @throws IOException
      * @throws UnsupportedRDFormatException
      */
-    Set<InferredOWLOntologyID> getSchemaImports(InferredOWLOntologyID artifactID) throws UnmanagedArtifactIRIException,
-        UnmanagedArtifactVersionException, OpenRDFException, UnmanagedSchemaIRIException, SchemaManifestException,
-        UnsupportedRDFormatException, IOException;
+    Set<? extends OWLOntologyID> getSchemaImports(InferredOWLOntologyID artifactID)
+        throws UnmanagedArtifactIRIException, UnmanagedArtifactVersionException, OpenRDFException,
+        UnmanagedSchemaIRIException, SchemaManifestException, UnsupportedRDFormatException, IOException;
     
     /**
      * 
