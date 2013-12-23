@@ -225,8 +225,12 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
                             managementConnection = managementRepository.getConnection();
                             for(OWLOntologyID nextSchemaOntology : schemaOntologies)
                             {
-                                repositoryConnection.add(managementConnection.getStatements(null, null, null, false,
-                                        nextSchemaOntology.getVersionIRI().toOpenRDFURI()));
+                                if(!repositoryConnection.hasStatement(null, null, null, false, nextSchemaOntology
+                                        .getVersionIRI().toOpenRDFURI()))
+                                {
+                                    repositoryConnection.add(managementConnection.getStatements(null, null, null,
+                                            false, nextSchemaOntology.getVersionIRI().toOpenRDFURI()));
+                                }
                                 
                                 RepositoryResult<Statement> statements =
                                         managementConnection.getStatements(nextSchemaOntology.getVersionIRI()
@@ -237,8 +241,12 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
                                 {
                                     if(nextInferredStatement.getObject() instanceof URI)
                                     {
-                                        repositoryConnection.add(managementConnection.getStatements(null, null, null,
-                                                false, (URI)nextInferredStatement.getObject()));
+                                        if(!repositoryConnection.hasStatement(null, null, null, false,
+                                                (URI)nextInferredStatement.getObject()))
+                                        {
+                                            repositoryConnection.add(managementConnection.getStatements(null, null,
+                                                    null, false, (URI)nextInferredStatement.getObject()));
+                                        }
                                     }
                                 }
                             }
