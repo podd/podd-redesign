@@ -1782,11 +1782,14 @@ public abstract class AbstractPoddArtifactManagerTest
                 TestConstants.TEST_ARTIFACT_IMPORT_PSCIENCEv1_INFERRED_TRIPLES, false);
         
         // verify:
-        RepositoryConnection nextRepositoryConnection = null;
+        RepositoryConnection managementConnection = null;
+        RepositoryConnection permanentConnection = null;
         try
         {
-            nextRepositoryConnection = this.testRepositoryManager.getManagementRepository().getConnection();
-            nextRepositoryConnection.begin();
+            managementConnection = this.testRepositoryManager.getManagementRepository().getConnection();
+            
+            Set<InferredOWLOntologyID> schemaImports = this.testArtifactManager.getSchemaImports(artifactId);
+            permanentConnection = this.testRepositoryManager.getPermanentRepository(schemaImports).getConnection();
             
             final String[] expectedImports =
                     { "http://purl.org/podd/ns/version/dcTerms/1", "http://purl.org/podd/ns/version/poddUser/1",
@@ -1797,14 +1800,14 @@ public abstract class AbstractPoddArtifactManagerTest
             // verify: no. of import statements
             final int importStatementCount =
                     Iterations.asList(
-                            nextRepositoryConnection.getStatements(null, OWL.IMPORTS, null, false, artifactId
+                            permanentConnection.getStatements(null, OWL.IMPORTS, null, false, artifactId
                                     .getVersionIRI().toOpenRDFURI())).size();
             Assert.assertEquals("Graph should have 4 import statements", 4, importStatementCount);
             
             for(final String expectedImport : expectedImports)
             {
                 final List<Statement> importStatements =
-                        Iterations.asList(nextRepositoryConnection.getStatements(null, OWL.IMPORTS, ValueFactoryImpl
+                        Iterations.asList(permanentConnection.getStatements(null, OWL.IMPORTS, ValueFactoryImpl
                                 .getInstance().createURI(expectedImport), false, artifactId.getVersionIRI()
                                 .toOpenRDFURI()));
                 
@@ -1813,15 +1816,16 @@ public abstract class AbstractPoddArtifactManagerTest
         }
         finally
         {
-            if(nextRepositoryConnection != null && nextRepositoryConnection.isActive())
+            if(permanentConnection != null && permanentConnection.isOpen())
             {
-                nextRepositoryConnection.rollback();
+                permanentConnection.close();
             }
-            if(nextRepositoryConnection != null && nextRepositoryConnection.isOpen())
+            permanentConnection = null;
+            if(managementConnection != null && managementConnection.isOpen())
             {
-                nextRepositoryConnection.close();
+                managementConnection.close();
             }
-            nextRepositoryConnection = null;
+            managementConnection = null;
         }
     }
     
