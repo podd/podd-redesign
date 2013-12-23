@@ -152,11 +152,14 @@ public class PoddFileRepositoryManagerImplTest extends AbstractPoddFileRepositor
     protected PoddDataRepositoryManager getNewPoddFileRepositoryManager() throws OpenRDFException
     {
         // create a Repository Manager with an internal memory Repository
-        final Repository testRepository = new SailRepository(new MemoryStore());
-        testRepository.initialize();
+        Repository managementRepository = new SailRepository(new MemoryStore());
+        managementRepository.initialize();
+        Repository permanentRepository = new SailRepository(new MemoryStore());
+        permanentRepository.initialize();
         
-        final PoddRepositoryManager repositoryManager = new PoddRepositoryManagerImpl();
-        repositoryManager.setManagementRepository(testRepository);
+        final PoddRepositoryManager repositoryManager =
+                new PoddRepositoryManagerImpl(managementRepository, permanentRepository);
+        repositoryManager.setManagementRepository(permanentRepository);
         repositoryManager.setFileRepositoryManagementGraph(PODD.DEFAULT_FILE_REPOSITORY_MANAGEMENT_GRAPH);
         
         final PoddOWLManager owlManager =

@@ -54,12 +54,14 @@ import org.openrdf.model.vocabulary.RDFS;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
+import org.openrdf.repository.sail.SailRepository;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.RDFParseException;
 import org.openrdf.rio.RDFParser;
 import org.openrdf.rio.RDFWriter;
 import org.openrdf.rio.Rio;
 import org.openrdf.rio.helpers.StatementCollector;
+import org.openrdf.sail.memory.MemoryStore;
 import org.semanticweb.owlapi.formats.OWLOntologyFormatFactoryRegistry;
 import org.semanticweb.owlapi.io.OWLOntologyDocumentSource;
 import org.semanticweb.owlapi.io.StreamDocumentSource;
@@ -254,7 +256,8 @@ public abstract class AbstractPoddArtifactManagerTest
      * @throws OpenRDFException
      *             If there were problems creating or initialising the Repository.
      */
-    protected abstract PoddRepositoryManager getNewRepositoryManager() throws OpenRDFException;
+    protected abstract PoddRepositoryManager getNewRepositoryManager(Repository managementRepository,
+            Repository permanentRepository) throws OpenRDFException;
     
     /**
      * Concrete tests must override this to provide a new, empty, instance of
@@ -603,7 +606,12 @@ public abstract class AbstractPoddArtifactManagerTest
         this.schemaGraph = PODD.VF.createURI("urn:test:schema-graph");
         this.artifactGraph = PODD.VF.createURI("urn:test:artifact-graph");
         
-        this.testRepositoryManager = this.getNewRepositoryManager();
+        Repository managementRepository = new SailRepository(new MemoryStore());
+        managementRepository.initialize();
+        Repository permanentRepository = new SailRepository(new MemoryStore());
+        permanentRepository.initialize();
+        
+        this.testRepositoryManager = this.getNewRepositoryManager(managementRepository, permanentRepository);
         this.testRepositoryManager.setSchemaManagementGraph(this.schemaGraph);
         this.testRepositoryManager.setArtifactManagementGraph(this.artifactGraph);
         

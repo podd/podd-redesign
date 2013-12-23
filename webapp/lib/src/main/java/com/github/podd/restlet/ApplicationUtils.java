@@ -224,11 +224,25 @@ public class ApplicationUtils
         return result;
     }
     
-    public static Repository getNewRepository(final PropertyUtil props) throws RepositoryException
+    public static Repository getNewPermanentRepository(final PropertyUtil props) throws RepositoryException
     {
         final String repositoryUrl =
-                props.get(PoddWebConstants.PROPERTY_SESAME_URL, PoddWebConstants.DEFAULT_SESAME_URL);
+                props.get(PoddWebConstants.PROPERTY_PERMANENT_SESAME_URL, PoddWebConstants.DEFAULT_PERMANENT_SESAME_URL);
         
+        return getNewRepositoryInternal(repositoryUrl);
+    }
+    
+    public static Repository getNewManagementRepository(final PropertyUtil props) throws RepositoryException
+    {
+        final String repositoryUrl =
+                props.get(PoddWebConstants.PROPERTY_MANAGEMENT_SESAME_URL,
+                        PoddWebConstants.DEFAULT_MANAGEMENT_SESAME_URL);
+        
+        return getNewRepositoryInternal(repositoryUrl);
+    }
+    
+    private static Repository getNewRepositoryInternal(final String repositoryUrl) throws RepositoryException
+    {
         // if we weren't able to find a repository URL in the configuration, we
         // setup an
         // in-memory store
@@ -299,9 +313,11 @@ public class ApplicationUtils
         roles.clear();
         roles.addAll(PoddRoles.getRoles());
         
-        final Repository nextRepository = ApplicationUtils.getNewRepository(props);
+        final Repository nextManagementRepository = ApplicationUtils.getNewManagementRepository(props);
+        final Repository nextPermanentRepository = ApplicationUtils.getNewPermanentRepository(props);
         
-        application.setPoddRepositoryManager(new PoddRepositoryManagerImpl(nextRepository));
+        application.setPoddRepositoryManager(new PoddRepositoryManagerImpl(nextManagementRepository,
+                nextPermanentRepository));
         application.getPoddRepositoryManager().setSchemaManagementGraph(
                 PODD.VF.createURI(props.get(PoddWebConstants.PROPERTY_SCHEMA_GRAPH,
                         PoddWebConstants.DEFAULT_SCHEMA_GRAPH)));
@@ -389,7 +405,8 @@ public class ApplicationUtils
         
         ApplicationUtils.setupSchemas(application);
         
-        final PoddSesameRealm nextRealm = new PoddSesameRealm(nextRepository, PODD.DEFAULT_USER_MANAGEMENT_GRAPH);
+        final PoddSesameRealm nextRealm =
+                new PoddSesameRealm(nextManagementRepository, PODD.DEFAULT_USER_MANAGEMENT_GRAPH);
         
         // FIXME: Make this configurable
         nextRealm.setName("PODDRealm");

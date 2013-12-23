@@ -25,6 +25,7 @@ import org.openrdf.model.URI;
 import org.openrdf.model.impl.ValueFactoryImpl;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
+import org.openrdf.repository.RepositoryException;
 
 import com.github.podd.api.PoddRepositoryManager;
 
@@ -41,7 +42,7 @@ public abstract class AbstractPoddRepositoryManagerTest
     /**
      * @return A new instance of PoddOWLManager, for each call to this method
      */
-    protected abstract PoddRepositoryManager getNewPoddRepositoryManagerInstance();
+    protected abstract PoddRepositoryManager getNewPoddRepositoryManagerInstance() throws RepositoryException;
     
     /**
      * @throws java.lang.Exception

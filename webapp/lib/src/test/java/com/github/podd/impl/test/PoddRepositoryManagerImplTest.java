@@ -16,6 +16,11 @@
  */
 package com.github.podd.impl.test;
 
+import org.openrdf.repository.Repository;
+import org.openrdf.repository.RepositoryException;
+import org.openrdf.repository.sail.SailRepository;
+import org.openrdf.sail.memory.MemoryStore;
+
 import com.github.podd.api.PoddRepositoryManager;
 import com.github.podd.api.test.AbstractPoddRepositoryManagerTest;
 import com.github.podd.impl.PoddRepositoryManagerImpl;
@@ -28,9 +33,14 @@ public class PoddRepositoryManagerImplTest extends AbstractPoddRepositoryManager
 {
     
     @Override
-    protected PoddRepositoryManager getNewPoddRepositoryManagerInstance()
+    protected PoddRepositoryManager getNewPoddRepositoryManagerInstance() throws RepositoryException
     {
-        return new PoddRepositoryManagerImpl();
+        Repository managementRepository = new SailRepository(new MemoryStore());
+        managementRepository.initialize();
+        Repository permanentRepository = new SailRepository(new MemoryStore());
+        permanentRepository.initialize();
+        
+        return new PoddRepositoryManagerImpl(managementRepository, permanentRepository);
     }
     
 }

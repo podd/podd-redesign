@@ -54,44 +54,47 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
     
     private URI schemaGraph = PODD.DEFAULT_SCHEMA_MANAGEMENT_GRAPH;
     
-    /**
-     * Default constructor, which sets up an in-memory MemoryStore repository.
-     */
-    public PoddRepositoryManagerImpl()
-    {
-        this.managementRepository = new SailRepository(new MemoryStore());
-        try
-        {
-            this.managementRepository.initialize();
-            // TODO: Use a non-stub mapping here
-            this.permanentRepositories.put(Collections.<OWLOntologyID> emptySet(), this.managementRepository);
-        }
-        catch(final RepositoryException e)
-        {
-            try
-            {
-                this.managementRepository.shutDown();
-            }
-            catch(final RepositoryException e1)
-            {
-                // TODO Auto-generated catch block
-                e1.printStackTrace();
-            }
-            
-            throw new RuntimeException("Could not initialise PoddRepositoryManager with an in-memory repository", e);
-        }
-    }
-    
+    // /**
+    // * Default constructor, which sets up an in-memory MemoryStore repository.
+    // */
+    // public PoddRepositoryManagerImpl()
+    // {
+    // this.managementRepository = new SailRepository(new MemoryStore());
+    // try
+    // {
+    // this.managementRepository.initialize();
+    // // TODO: Use a non-stub mapping here
+    // this.permanentRepositories.put(Collections.<OWLOntologyID> emptySet(),
+    // this.managementRepository);
+    // }
+    // catch(final RepositoryException e)
+    // {
+    // try
+    // {
+    // this.managementRepository.shutDown();
+    // }
+    // catch(final RepositoryException e1)
+    // {
+    // // TODO Auto-generated catch block
+    // e1.printStackTrace();
+    // }
+    //
+    // throw new
+    // RuntimeException("Could not initialise PoddRepositoryManager with an in-memory repository",
+    // e);
+    // }
+    // }
+    //
     /**
      * 
      * @param managementRepository
      *            An initialized implementation of Repository.
      */
-    public PoddRepositoryManagerImpl(final Repository managementRepository)
+    public PoddRepositoryManagerImpl(final Repository managementRepository, final Repository permanentRepository)
     {
         this.managementRepository = managementRepository;
         // TODO: Use a non-stub mapping here
-        this.permanentRepositories.put(Collections.<OWLOntologyID> emptySet(), managementRepository);
+        this.permanentRepositories.put(Collections.<OWLOntologyID> emptySet(), permanentRepository);
     }
     
     @Override

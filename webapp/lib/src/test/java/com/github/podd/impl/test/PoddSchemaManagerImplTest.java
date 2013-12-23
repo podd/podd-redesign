@@ -25,8 +25,12 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.openrdf.model.Model;
 import org.openrdf.model.URI;
+import org.openrdf.repository.Repository;
+import org.openrdf.repository.RepositoryException;
+import org.openrdf.repository.sail.SailRepository;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.Rio;
+import org.openrdf.sail.memory.MemoryStore;
 import org.semanticweb.owlapi.model.OWLOntologyManagerFactory;
 import org.semanticweb.owlapi.model.OWLOntologyManagerFactoryRegistry;
 import org.semanticweb.owlapi.model.UnloadableImportException;
@@ -72,9 +76,14 @@ public class PoddSchemaManagerImplTest extends AbstractPoddSchemaManagerTest
     }
     
     @Override
-    protected PoddRepositoryManager getNewPoddRepositoryManagerInstance()
+    protected PoddRepositoryManager getNewPoddRepositoryManagerInstance() throws RepositoryException
     {
-        return new PoddRepositoryManagerImpl();
+        Repository managementRepository = new SailRepository(new MemoryStore());
+        managementRepository.initialize();
+        Repository permanentRepository = new SailRepository(new MemoryStore());
+        permanentRepository.initialize();
+        
+        return new PoddRepositoryManagerImpl(managementRepository, permanentRepository);
     }
     
     @Override

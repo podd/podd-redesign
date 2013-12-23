@@ -243,8 +243,19 @@ public interface PoddWebConstants
     public static final String PROPERTY_OWLAPI_MANAGER = "podd.owlapimanager";
     public static final String DEFAULT_OWLAPI_MANAGER = "org.semanticweb.owlapi.apibinding.OWLManager";
     
-    public static final String PROPERTY_SESAME_URL = "podd.sesamehttpurl";
-    public static final String DEFAULT_SESAME_URL = "";
+    /**
+     * Link to a single permanent repository.
+     * 
+     * TODO: This needs to be extensible so that new repositories can be created at runtime based on schema ontology profiles.
+     */
+    public static final String PROPERTY_PERMANENT_SESAME_URL = "podd.permanentsesamehttpurl";
+    public static final String DEFAULT_PERMANENT_SESAME_URL = "";
+    
+    /**
+     * Link to a single management repository.
+     */
+    public static final String PROPERTY_MANAGEMENT_SESAME_URL = "podd.managementsesamehttpurl";
+    public static final String DEFAULT_MANAGEMENT_SESAME_URL = "";
     
     public static final String PROPERTY_SCHEMA_GRAPH = "podd.schemagraph";
     public static final String DEFAULT_SCHEMA_GRAPH = "urn:podd:default:schemamanagementgraph";

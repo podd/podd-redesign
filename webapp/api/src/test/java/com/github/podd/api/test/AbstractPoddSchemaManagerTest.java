@@ -28,6 +28,7 @@ import org.junit.Test;
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.Model;
 import org.openrdf.model.URI;
+import org.openrdf.repository.RepositoryException;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.Rio;
 import org.semanticweb.owlapi.model.IRI;
@@ -84,8 +85,9 @@ public abstract class AbstractPoddSchemaManagerTest
     /**
      * 
      * @return A new instance of {@link PoddRepositoryManager}, for each call to this method.
+     * @throws RepositoryException
      */
-    protected abstract PoddRepositoryManager getNewPoddRepositoryManagerInstance();
+    protected abstract PoddRepositoryManager getNewPoddRepositoryManagerInstance() throws RepositoryException;
     
     /**
      * 

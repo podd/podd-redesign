@@ -20,6 +20,7 @@ import java.util.Collection;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.OWLOntologyManagerFactory;
@@ -108,9 +109,10 @@ public class PoddArtifactManagerImplTest extends AbstractPoddArtifactManagerTest
     }
     
     @Override
-    protected PoddRepositoryManager getNewRepositoryManager() throws RepositoryException
+    protected PoddRepositoryManager getNewRepositoryManager(final Repository managementRepository,
+            final Repository permanentRepository) throws RepositoryException
     {
-        return new PoddRepositoryManagerImpl();
+        return new PoddRepositoryManagerImpl(managementRepository, permanentRepository);
     }
     
     @Override
