@@ -386,7 +386,8 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             final boolean includeDoNotDisplayProperties, final MetadataPolicy containsPropertyPolicy,
             final InferredOWLOntologyID artifactID) throws OpenRDFException, PoddException, IOException
     {
-        RepositoryConnection conn = null;
+        RepositoryConnection permanentConnection = null;
+        RepositoryConnection managementConnection = null;
         
         try
         {
@@ -402,30 +403,34 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
                 // ontologies
                 schemaImports = this.getSchemaManager().getCurrentSchemaOntologies();
             }
-            conn = this.getRepositoryManager().getPermanentRepository(schemaImports).getConnection();
-            
+            permanentConnection = this.getRepositoryManager().getPermanentRepository(schemaImports).getConnection();
+            managementConnection = this.getRepositoryManager().getManagementRepository().getConnection();
             final URI[] contexts =
-                    this.sesameManager.versionAndSchemaContexts(artifactID, conn,
+                    this.sesameManager.versionAndSchemaContexts(artifactID, managementConnection,
                             this.repositoryManager.getSchemaManagementGraph());
             
             Model model;
             if(containsPropertyPolicy == MetadataPolicy.ONLY_CONTAINS)
             {
-                model = this.sesameManager.getObjectTypeContainsMetadata(objectType, conn, contexts);
+                model = this.sesameManager.getObjectTypeContainsMetadata(objectType, permanentConnection, contexts);
             }
             else
             {
                 model =
                         this.sesameManager.getObjectTypeMetadata(objectType, includeDoNotDisplayProperties,
-                                containsPropertyPolicy, conn, contexts);
+                                containsPropertyPolicy, permanentConnection, contexts);
             }
             Rio.write(model, outputStream, format);
         }
         finally
         {
-            if(conn != null)
+            if(managementConnection != null)
             {
-                conn.close();
+                managementConnection.close();
+            }
+            if(permanentConnection != null)
+            {
+                permanentConnection.close();
             }
         }
     }

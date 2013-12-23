@@ -361,11 +361,7 @@ public abstract class AbstractPoddArtifactManagerTest
                     includeDoNotDisplayProperties, containsPropertyPolicy, artifactID);
             
             // parse output into a Model
-            final ByteArrayInputStream bin = new ByteArrayInputStream(output.toByteArray());
-            final RDFParser rdfParser = Rio.createParser(RDFFormat.TURTLE);
-            final Model model = new LinkedHashModel();
-            rdfParser.setRDFHandler(new StatementCollector(model));
-            rdfParser.parse(bin, "");
+            final Model model = Rio.parse(new ByteArrayInputStream(output.toByteArray()), "", RDFFormat.TURTLE);
             
             if(expectedTripleCount != model.size())
             {
