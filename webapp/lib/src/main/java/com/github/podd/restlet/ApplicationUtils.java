@@ -32,6 +32,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+import org.junit.Assert;
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.Model;
 import org.openrdf.model.Namespace;
@@ -46,8 +47,12 @@ import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.config.RepositoryConfig;
 import org.openrdf.repository.config.RepositoryConfigSchema;
 import org.openrdf.repository.config.RepositoryFactory;
+import org.openrdf.repository.config.RepositoryImplConfig;
+import org.openrdf.repository.config.RepositoryImplConfigBase;
 import org.openrdf.repository.config.RepositoryRegistry;
 import org.openrdf.repository.http.HTTPRepository;
+import org.openrdf.repository.manager.LocalRepositoryManager;
+import org.openrdf.repository.manager.RemoteRepositoryManager;
 import org.openrdf.repository.sail.SailRepository;
 import org.openrdf.repository.sail.config.SailRepositoryFactory;
 import org.openrdf.rio.RDFFormat;
@@ -314,29 +319,24 @@ public class ApplicationUtils
         
         final Repository nextManagementRepository = ApplicationUtils.getNewManagementRepository(props);
         
-        String permanentRepositoryType =
-                props.get(PoddWebConstants.PROPERTY_PERMANENT_SESAME_REPOSITORY_TYPE,
-                        PoddWebConstants.DEFAULT_PERMANENT_SESAME_REPOSITORY_TYPE);
         String permanentRepositoryConfigPath =
                 props.get(PoddWebConstants.PROPERTY_PERMANENT_SESAME_REPOSITORY_CONFIG,
                         PoddWebConstants.DEFAULT_PERMANENT_SESAME_REPOSITORY_CONFIG);
-        String permanentRepositoryConfigURIString =
-                props.get(PoddWebConstants.PROPERTY_PERMANENT_SESAME_REPOSITORY_CONFIG_URI,
-                        PoddWebConstants.DEFAULT_PERMANENT_SESAME_REPOSITORY_CONFIG_URI);
-        URI permanentRepositoryConfigURI = PODD.VF.createURI(permanentRepositoryConfigURIString);
         final Model graph =
-                Rio.parse(ApplicationUtils.class.getResourceAsStream("/memorystoreconfig.ttl"), "", RDFFormat.TURTLE);
-        final Resource repositoryNode = GraphUtil.getUniqueSubject(graph, RDF.TYPE, RepositoryConfigSchema.REPOSITORY);
-        RepositoryConfig repositoryConfig = RepositoryConfig.create(graph, repositoryNode);
+                Rio.parse(ApplicationUtils.class.getResourceAsStream(permanentRepositoryConfigPath), "",
+                        RDFFormat.TURTLE);
+        final Resource repositoryNode = GraphUtil.getUniqueSubject(graph, RepositoryConfigSchema.REPOSITORYTYPE, null);
+        RepositoryImplConfig repositoryImplConfig = RepositoryImplConfigBase.create(graph, repositoryNode);
+        Assert.assertNotNull(repositoryImplConfig);
+        Assert.assertNotNull(repositoryImplConfig.getType());
+        RemoteRepositoryManager repositoryManager =
+                new RemoteRepositoryManager(props.get(PoddWebConstants.PROPERTY_PERMANENT_SESAME_REPOSITORY_LOCATION,
+                        PoddWebConstants.DEFAULT_PERMANENT_SESAME_REPOSITORY_LOCATION));
+        repositoryManager.initialize();
         
-        RepositoryFactory repositoryFactory =
-                RepositoryRegistry.getInstance().get(repositoryConfig.getRepositoryImplConfig().getType());
+        application.setPoddRepositoryManager(new PoddRepositoryManagerImpl(nextManagementRepository, repositoryManager,
+                repositoryImplConfig));
         
-        application.setPoddRepositoryManager(new PoddRepositoryManagerImpl(nextManagementRepository, repositoryFactory,
-                repositoryConfig.getRepositoryImplConfig()));
-        // application.setPoddRepositoryManager(new
-        // PoddRepositoryManagerImpl(nextManagementRepository,
-        // permanentRepositoryType, permanentRepositoryConfigPath, permanentRepositoryConfigURI));
         application.getPoddRepositoryManager().setSchemaManagementGraph(
                 PODD.VF.createURI(props.get(PoddWebConstants.PROPERTY_SCHEMA_GRAPH,
                         PoddWebConstants.DEFAULT_SCHEMA_GRAPH)));

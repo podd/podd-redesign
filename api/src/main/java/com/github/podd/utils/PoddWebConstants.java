@@ -246,11 +246,8 @@ public interface PoddWebConstants
     public static final String PROPERTY_PERMANENT_SESAME_REPOSITORY_CONFIG = "podd.repository.permanent.config";
     public static final String DEFAULT_PERMANENT_SESAME_REPOSITORY_CONFIG = "";
     
-    public static final String PROPERTY_PERMANENT_SESAME_REPOSITORY_CONFIG_URI = "podd.repository.permanent.config.uri";
-    public static final String DEFAULT_PERMANENT_SESAME_REPOSITORY_CONFIG_URI = "";
-    
-    public static final String PROPERTY_PERMANENT_SESAME_REPOSITORY_TYPE = "podd.repository.permanent.type";
-    public static final String DEFAULT_PERMANENT_SESAME_REPOSITORY_TYPE = "openrdf:HTTPRepository";
+    public static final String PROPERTY_PERMANENT_SESAME_REPOSITORY_LOCATION = "podd.repository.permanent.location";
+    public static final String DEFAULT_PERMANENT_SESAME_REPOSITORY_LOCATION = "http://localhost:8080/openrdf-sesame/";
     
     /**
      * Link to a single management repository.
