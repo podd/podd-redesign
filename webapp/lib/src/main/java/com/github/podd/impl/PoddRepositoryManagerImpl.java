@@ -16,18 +16,31 @@
  */
 package com.github.podd.impl;
 
+import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 import org.openrdf.OpenRDFException;
+import org.openrdf.model.Graph;
+import org.openrdf.model.Model;
+import org.openrdf.model.Resource;
 import org.openrdf.model.URI;
 import org.openrdf.model.vocabulary.SESAME;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryException;
+import org.openrdf.repository.config.RepositoryConfigException;
+import org.openrdf.repository.config.RepositoryFactory;
+import org.openrdf.repository.config.RepositoryImplConfig;
+import org.openrdf.repository.config.RepositoryRegistry;
 import org.openrdf.repository.sail.SailRepository;
+import org.openrdf.rio.RDFFormat;
+import org.openrdf.rio.Rio;
+import org.openrdf.rio.UnsupportedRDFormatException;
 import org.openrdf.sail.memory.MemoryStore;
 import org.semanticweb.owlapi.model.OWLOntologyID;
 import org.slf4j.Logger;
@@ -53,6 +66,8 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
     private ConcurrentMap<Set<? extends OWLOntologyID>, Repository> permanentRepositories = new ConcurrentHashMap<>();
     
     private URI schemaGraph = PODD.DEFAULT_SCHEMA_MANAGEMENT_GRAPH;
+    
+    private String permanentRepositoryType;
     
     // /**
     // * Default constructor, which sets up an in-memory MemoryStore repository.
@@ -89,12 +104,23 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
      * 
      * @param managementRepository
      *            An initialized implementation of Repository.
+     * @throws OpenRDFException
+     * @throws IOException
+     * @throws UnsupportedRDFormatException
      */
-    public PoddRepositoryManagerImpl(final Repository managementRepository, final Repository permanentRepository)
+    public PoddRepositoryManagerImpl(final Repository managementRepository, final String permanentRepositoryType,
+            final String permanentRepositoryConfigClasspath, final URI permanentRepositoryConfigURI)
+        throws OpenRDFException, UnsupportedRDFormatException, IOException
     {
         this.managementRepository = managementRepository;
+        this.permanentRepositoryType = permanentRepositoryType;
+        RepositoryFactory repositoryFactory = RepositoryRegistry.getInstance().get(permanentRepositoryType);
+        RepositoryImplConfig config = repositoryFactory.getConfig();
+        Model configGraph =
+                Rio.parse(this.getClass().getResourceAsStream(permanentRepositoryConfigClasspath), "", RDFFormat.TURTLE);
+        config.parse(configGraph, permanentRepositoryConfigURI);
         // TODO: Use a non-stub mapping here
-        this.permanentRepositories.put(Collections.<OWLOntologyID> emptySet(), permanentRepository);
+        this.permanentRepositories.put(Collections.<OWLOntologyID> emptySet(), repositoryFactory.getRepository(config));
     }
     
     @Override
@@ -129,8 +155,17 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
     public Repository getPermanentRepository(final Set<? extends OWLOntologyID> schemaOntologies)
         throws OpenRDFException
     {
-        // TODO: Use a non-stub mapping here
-        return this.permanentRepositories.get(Collections.<OWLOntologyID> emptySet());
+        Collection<String> allRepositoryTypes = RepositoryRegistry.getInstance().getKeys();
+        
+        this.log.error("{}", allRepositoryTypes);
+        
+        for(Entry<Set<? extends OWLOntologyID>, Repository> nextRepository : permanentRepositories.entrySet())
+        {
+            // TODO: Use a non-stub mapping here
+            return this.permanentRepositories.get(Collections.<OWLOntologyID> emptySet());
+        }
+        
+        throw new RuntimeException("TODO: Complete implementation");
     }
     
     @Override

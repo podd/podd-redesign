@@ -394,15 +394,15 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
         final List<InferredOWLOntologyID> result = new ArrayList<>(importOrder.size());
         Objects.requireNonNull(model, "Schema Ontology model was null");
         
-        RepositoryConnection conn = null;
+        RepositoryConnection managementConnection = null;
         
         try
         {
             // TODO: Should we store these copies in a separate repository
             // again, to reduce bloat in
             // the management repository??
-            conn = this.repositoryManager.getManagementRepository().getConnection();
-            conn.begin();
+            managementConnection = this.repositoryManager.getManagementRepository().getConnection();
+            managementConnection.begin();
             
             for(final URI nextOrderedImport : importOrder)
             {
@@ -425,31 +425,31 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
                     // transaction can
                     // be rolled back if there are any failures!
                     final InferredOWLOntologyID nextResult =
-                            this.uploadSchemaOntologyInternal(schemaOntologyID, inputStream, fileFormat, conn,
+                            this.uploadSchemaOntologyInternal(schemaOntologyID, inputStream, fileFormat, managementConnection,
                                     this.repositoryManager.getSchemaManagementGraph());
                     
                     result.add(nextResult);
                 }
             }
             
-            conn.commit();
+            managementConnection.commit();
             
             return result;
         }
         catch(final Throwable e)
         {
-            if(conn != null && conn.isActive())
+            if(managementConnection != null && managementConnection.isActive())
             {
-                conn.rollback();
+                managementConnection.rollback();
             }
             
             throw e;
         }
         finally
         {
-            if(conn != null && conn.isOpen())
+            if(managementConnection != null && managementConnection.isOpen())
             {
-                conn.close();
+                managementConnection.close();
             }
         }
     }

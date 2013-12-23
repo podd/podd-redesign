@@ -16,6 +16,8 @@
  */
 package com.github.podd.api.test;
 
+import java.util.Collections;
+
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -26,6 +28,7 @@ import org.openrdf.model.impl.ValueFactoryImpl;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
+import org.semanticweb.owlapi.model.OWLOntologyID;
 
 import com.github.podd.api.PoddRepositoryManager;
 
@@ -130,7 +133,18 @@ public abstract class AbstractPoddRepositoryManagerTest
     @Test
     public final void testGetManagementRepository() throws Exception
     {
-        Assert.assertNotNull("Repository was null", this.testRepositoryManager.getManagementRepository());
+        Assert.assertNotNull("Management repository was null", this.testRepositoryManager.getManagementRepository());
+    }
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.impl.PoddRepositoryManagerImpl#getManagementRepository()}.
+     */
+    @Test
+    public final void testGetPermanentRepositoryEmptySchemaSet() throws Exception
+    {
+        Assert.assertNotNull("Permanent repository was null",
+                this.testRepositoryManager.getPermanentRepository(Collections.<OWLOntologyID> emptySet()));
     }
     
     /**

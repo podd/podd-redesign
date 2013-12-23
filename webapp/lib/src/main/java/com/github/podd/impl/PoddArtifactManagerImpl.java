@@ -497,27 +497,25 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
     public InferredOWLOntologyID getArtifact(final IRI artifactIRI, final IRI versionIRI)
         throws UnmanagedArtifactIRIException, UnmanagedArtifactVersionException, UnmanagedSchemaIRIException
     {
-        RepositoryConnection repositoryConnection = null;
+        RepositoryConnection managementConnection = null;
         
         try
         {
-            final Set<InferredOWLOntologyID> schemaImports =
-                    this.getSchemaImports(new InferredOWLOntologyID(artifactIRI, versionIRI, null));
-            repositoryConnection = this.getRepositoryManager().getPermanentRepository(schemaImports).getConnection();
+            managementConnection = this.getRepositoryManager().getManagementRepository().getConnection();
             
             InferredOWLOntologyID result = null;
             
             if(versionIRI != null)
             {
                 result =
-                        this.getSesameManager().getOntologyVersion(versionIRI, repositoryConnection,
+                        this.getSesameManager().getOntologyVersion(versionIRI, managementConnection,
                                 this.getRepositoryManager().getArtifactManagementGraph());
             }
             
             if(result == null)
             {
                 result =
-                        this.getSesameManager().getCurrentArtifactVersion(artifactIRI, repositoryConnection,
+                        this.getSesameManager().getCurrentArtifactVersion(artifactIRI, managementConnection,
                                 this.getRepositoryManager().getArtifactManagementGraph());
             }
             
@@ -541,11 +539,11 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         }
         finally
         {
-            if(repositoryConnection != null)
+            if(managementConnection != null)
             {
                 try
                 {
-                    repositoryConnection.close();
+                    managementConnection.close();
                 }
                 catch(final RepositoryException e)
                 {
@@ -770,45 +768,34 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
     public Model getParentDetails(final InferredOWLOntologyID ontologyID, final URI objectUri) throws OpenRDFException,
         UnmanagedSchemaIRIException
     {
-        RepositoryConnection conn = null;
+        RepositoryConnection permanentConnection = null;
+        RepositoryConnection managementConnection = null;
         try
         {
             final Set<InferredOWLOntologyID> schemaImports = this.getSchemaImports(ontologyID);
-            conn = this.getRepositoryManager().getPermanentRepository(schemaImports).getConnection();
+            permanentConnection = this.getRepositoryManager().getPermanentRepository(schemaImports).getConnection();
+            managementConnection = this.getRepositoryManager().getManagementRepository().getConnection();
             final URI[] contexts =
-                    this.getSesameManager().versionAndSchemaContexts(ontologyID, conn,
+                    this.getSesameManager().versionAndSchemaContexts(ontologyID, managementConnection,
                             this.getRepositoryManager().getSchemaManagementGraph());
             
-            return this.getSesameManager().getParentDetails(objectUri, conn, contexts);
-        }
-        catch(final Throwable e)
-        {
-            try
-            {
-                if(conn != null && conn.isActive())
-                {
-                    conn.rollback();
-                }
-            }
-            catch(final RepositoryException e1)
-            {
-                this.log.error("Found error rolling back repository connection", e1);
-            }
-            
-            throw e;
+            return this.getSesameManager().getParentDetails(objectUri, permanentConnection, contexts);
         }
         finally
         {
             try
             {
-                if(conn != null && conn.isOpen())
+                if(permanentConnection != null && permanentConnection.isOpen())
                 {
-                    conn.close();
+                    permanentConnection.close();
                 }
             }
-            catch(final RepositoryException e)
+            finally
             {
-                throw e;
+                if(managementConnection != null && managementConnection.isOpen())
+                {
+                    managementConnection.close();
+                }
             }
         }
     }
@@ -1945,7 +1932,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             // increment the version
             final OWLOntologyID currentManagedArtifactID =
                     this.getSesameManager().getCurrentArtifactVersion(IRI.create(artifactUri),
-                            permanentRepositoryConnection, this.getRepositoryManager().getArtifactManagementGraph());
+                            managementRepositoryConnection, this.getRepositoryManager().getArtifactManagementGraph());
             final URI newVersionIRI =
                     PODD.VF.createURI(this.incrementVersion(currentManagedArtifactID.getVersionIRI().toString()));
             

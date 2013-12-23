@@ -224,14 +224,6 @@ public class ApplicationUtils
         return result;
     }
     
-    public static Repository getNewPermanentRepository(final PropertyUtil props) throws RepositoryException
-    {
-        final String repositoryUrl =
-                props.get(PoddWebConstants.PROPERTY_PERMANENT_SESAME_URL, PoddWebConstants.DEFAULT_PERMANENT_SESAME_URL);
-        
-        return getNewRepositoryInternal(repositoryUrl);
-    }
-    
     public static Repository getNewManagementRepository(final PropertyUtil props) throws RepositoryException
     {
         final String repositoryUrl =
@@ -244,8 +236,7 @@ public class ApplicationUtils
     private static Repository getNewRepositoryInternal(final String repositoryUrl) throws RepositoryException
     {
         // if we weren't able to find a repository URL in the configuration, we
-        // setup an
-        // in-memory store
+        // setup an in-memory store
         if(repositoryUrl == null || repositoryUrl.trim().isEmpty())
         {
             final Repository repository = new SailRepository(new MemoryStore());
@@ -301,7 +292,7 @@ public class ApplicationUtils
     }
     
     public static void setupApplication(final PoddWebServiceApplication application, final Context applicationContext)
-        throws OpenRDFException
+        throws OpenRDFException, UnsupportedRDFormatException, IOException
     {
         final PropertyUtil props = application.getPropertyUtil();
         
@@ -314,10 +305,19 @@ public class ApplicationUtils
         roles.addAll(PoddRoles.getRoles());
         
         final Repository nextManagementRepository = ApplicationUtils.getNewManagementRepository(props);
-        final Repository nextPermanentRepository = ApplicationUtils.getNewPermanentRepository(props);
         
+        String permanentRepositoryType =
+                props.get(PoddWebConstants.PROPERTY_PERMANENT_SESAME_REPOSITORY_TYPE,
+                        PoddWebConstants.DEFAULT_PERMANENT_SESAME_REPOSITORY_TYPE);
+        String permanentRepositoryConfigPath =
+                props.get(PoddWebConstants.PROPERTY_PERMANENT_SESAME_REPOSITORY_CONFIG,
+                        PoddWebConstants.DEFAULT_PERMANENT_SESAME_REPOSITORY_CONFIG);
+        String permanentRepositoryConfigURIString =
+                props.get(PoddWebConstants.PROPERTY_PERMANENT_SESAME_REPOSITORY_CONFIG_URI,
+                        PoddWebConstants.DEFAULT_PERMANENT_SESAME_REPOSITORY_CONFIG_URI);
+        URI permanentRepositoryConfigURI = PODD.VF.createURI(permanentRepositoryConfigURIString);
         application.setPoddRepositoryManager(new PoddRepositoryManagerImpl(nextManagementRepository,
-                nextPermanentRepository));
+                permanentRepositoryType, permanentRepositoryConfigPath, permanentRepositoryConfigURI));
         application.getPoddRepositoryManager().setSchemaManagementGraph(
                 PODD.VF.createURI(props.get(PoddWebConstants.PROPERTY_SCHEMA_GRAPH,
                         PoddWebConstants.DEFAULT_SCHEMA_GRAPH)));
