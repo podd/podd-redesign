@@ -571,23 +571,29 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
     public Set<URI> getChildObjects(final InferredOWLOntologyID ontologyID, final URI objectUri)
         throws OpenRDFException, UnmanagedSchemaIRIException
     {
-        RepositoryConnection conn = null;
+        RepositoryConnection permanentConnection = null;
+        RepositoryConnection managementConnection = null;
         try
         {
             final Set<InferredOWLOntologyID> schemaImports = this.getSchemaImports(ontologyID);
-            conn = this.getRepositoryManager().getPermanentRepository(schemaImports).getConnection();
+            permanentConnection = this.getRepositoryManager().getPermanentRepository(schemaImports).getConnection();
+            managementConnection = this.getRepositoryManager().getManagementRepository().getConnection();
             
             final URI[] contexts =
-                    this.getSesameManager().versionAndSchemaContexts(ontologyID, conn,
+                    this.getSesameManager().versionAndSchemaContexts(ontologyID, managementConnection,
                             this.getRepositoryManager().getSchemaManagementGraph());
             
-            return this.getSesameManager().getChildObjects(objectUri, conn, contexts);
+            return this.getSesameManager().getChildObjects(objectUri, permanentConnection, contexts);
         }
         finally
         {
-            if(conn != null)
+            if(managementConnection != null)
             {
-                conn.close();
+                managementConnection.close();
+            }
+            if(permanentConnection != null)
+            {
+                permanentConnection.close();
             }
         }
     }
