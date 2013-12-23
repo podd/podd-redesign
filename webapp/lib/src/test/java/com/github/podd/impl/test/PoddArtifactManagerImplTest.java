@@ -20,8 +20,19 @@ import java.util.Collection;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.openrdf.model.Model;
+import org.openrdf.model.Resource;
+import org.openrdf.model.util.GraphUtil;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryException;
+import org.openrdf.repository.config.RepositoryConfigSchema;
+import org.openrdf.repository.config.RepositoryImplConfig;
+import org.openrdf.repository.config.RepositoryImplConfigBase;
+import org.openrdf.repository.manager.LocalRepositoryManager;
+import org.openrdf.repository.sail.SailRepository;
+import org.openrdf.rio.RDFFormat;
+import org.openrdf.rio.Rio;
+import org.openrdf.sail.memory.MemoryStore;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.OWLOntologyManagerFactory;
 import org.semanticweb.owlapi.model.OWLOntologyManagerFactoryRegistry;
@@ -109,10 +120,20 @@ public class PoddArtifactManagerImplTest extends AbstractPoddArtifactManagerTest
     }
     
     @Override
-    protected PoddRepositoryManager getNewRepositoryManager(final Repository managementRepository,
-            final Repository permanentRepository) throws RepositoryException
+    protected PoddRepositoryManager getNewRepositoryManager() throws Exception
     {
-        return new PoddRepositoryManagerImpl(managementRepository, permanentRepository);
+        Repository managementRepository = new SailRepository(new MemoryStore());
+        managementRepository.initialize();
+        
+        final Model graph =
+                Rio.parse(this.getClass().getResourceAsStream("/memorystoreconfig.ttl"), "", RDFFormat.TURTLE);
+        final Resource repositoryNode = GraphUtil.getUniqueSubject(graph, RepositoryConfigSchema.REPOSITORYTYPE, null);
+        RepositoryImplConfig repositoryImplConfig = RepositoryImplConfigBase.create(graph, repositoryNode);
+        Assert.assertNotNull(repositoryImplConfig);
+        Assert.assertNotNull(repositoryImplConfig.getType());
+        LocalRepositoryManager repositoryManager = new LocalRepositoryManager(tempDir.newFolder("repositorymanager"));
+        repositoryManager.initialize();
+        return new PoddRepositoryManagerImpl(managementRepository, repositoryManager, repositoryImplConfig);
     }
     
     @Override

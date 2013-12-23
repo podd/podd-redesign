@@ -41,6 +41,7 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 import org.junit.rules.Timeout;
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.Model;
@@ -119,6 +120,9 @@ public abstract class AbstractPoddArtifactManagerTest
      */
     @Rule
     public Timeout timeout = new Timeout(60000);
+    
+    @Rule
+    public TemporaryFolder tempDir = new TemporaryFolder();
     
     protected Logger log = LoggerFactory.getLogger(this.getClass());
     
@@ -253,11 +257,10 @@ public abstract class AbstractPoddArtifactManagerTest
      * {@link PoddRepositoryManager} with the desired {@link Repository} for this test.
      * 
      * @return A new, initialised. instance of {@link PoddRepositoryManager}
-     * @throws OpenRDFException
+     * @throws Exception
      *             If there were problems creating or initialising the Repository.
      */
-    protected abstract PoddRepositoryManager getNewRepositoryManager(Repository managementRepository,
-            Repository permanentRepository) throws OpenRDFException;
+    protected abstract PoddRepositoryManager getNewRepositoryManager() throws Exception;
     
     /**
      * Concrete tests must override this to provide a new, empty, instance of
@@ -606,12 +609,7 @@ public abstract class AbstractPoddArtifactManagerTest
         this.schemaGraph = PODD.VF.createURI("urn:test:schema-graph");
         this.artifactGraph = PODD.VF.createURI("urn:test:artifact-graph");
         
-        Repository managementRepository = new SailRepository(new MemoryStore());
-        managementRepository.initialize();
-        Repository permanentRepository = new SailRepository(new MemoryStore());
-        permanentRepository.initialize();
-        
-        this.testRepositoryManager = this.getNewRepositoryManager(managementRepository, permanentRepository);
+        this.testRepositoryManager = this.getNewRepositoryManager();
         this.testRepositoryManager.setSchemaManagementGraph(this.schemaGraph);
         this.testRepositoryManager.setArtifactManagementGraph(this.artifactGraph);
         
