@@ -2159,20 +2159,24 @@ public abstract class AbstractPoddArtifactManagerTest
                         DataReferenceVerificationPolicy.DO_NOT_VERIFY, objectUriList);
         
         // verify:
-        RepositoryConnection nextRepositoryConnection = null;
+        RepositoryConnection managementConnection = null;
+        RepositoryConnection permanentConnection = null;
         try
         {
-            nextRepositoryConnection = this.testRepositoryManager.getManagementRepository().getConnection();
-            nextRepositoryConnection.begin();
+            managementConnection = this.testRepositoryManager.getManagementRepository().getConnection();
+            
+            Set<InferredOWLOntologyID> schemaImports = this.testArtifactManager.getSchemaImports(updatedArtifact);
+            
+            permanentConnection = this.testRepositoryManager.getPermanentRepository(schemaImports).getConnection();
             
             this.verifyUpdatedArtifact(updatedArtifact, "http://purl.org/podd/basic-2-20130206/artifact:1:version:2",
-                    TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES + 8, nextRepositoryConnection);
+                    TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES + 8, managementConnection);
             
             // verify: platform object
             final List<Statement> platformList =
-                    Iterations.asList(nextRepositoryConnection.getStatements(null, ValueFactoryImpl.getInstance()
-                            .createURI(PODD.PODD_SCIENCE, "hasPlatform"), null, false, updatedArtifact.getVersionIRI()
-                            .toOpenRDFURI()));
+                    Iterations.asList(permanentConnection.getStatements(null,
+                            ValueFactoryImpl.getInstance().createURI(PODD.PODD_SCIENCE, "hasPlatform"), null, false,
+                            updatedArtifact.getVersionIRI().toOpenRDFURI()));
             
             // 2 added in the test plus a platform that was defined in the initially uploaded
             // artifact
@@ -2192,15 +2196,17 @@ public abstract class AbstractPoddArtifactManagerTest
         }
         finally
         {
-            if(nextRepositoryConnection != null && nextRepositoryConnection.isActive())
+            if(permanentConnection != null && permanentConnection.isOpen())
             {
-                nextRepositoryConnection.rollback();
+                permanentConnection.close();
             }
-            if(nextRepositoryConnection != null && nextRepositoryConnection.isOpen())
+            permanentConnection = null;
+            
+            if(managementConnection != null && managementConnection.isOpen())
             {
-                nextRepositoryConnection.close();
+                managementConnection.close();
             }
-            nextRepositoryConnection = null;
+            managementConnection = null;
         }
         
     }
