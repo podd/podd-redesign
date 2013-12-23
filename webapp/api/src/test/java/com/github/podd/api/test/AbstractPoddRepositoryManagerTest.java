@@ -158,6 +158,24 @@ public abstract class AbstractPoddRepositoryManagerTest
     
     /**
      * Test method for
+     * {@link com.github.podd.impl.PoddRepositoryManagerImpl#getManagementRepository()}.
+     */
+    @Test
+    public final void testGetPermanentRepositoryNull() throws Exception
+    {
+        try
+        {
+            this.testRepositoryManager.getPermanentRepository(null);
+            Assert.fail("Did not receive the expected exception");
+        }
+        catch(NullPointerException e)
+        {
+            
+        }
+    }
+    
+    /**
+     * Test method for
      * {@link com.github.podd.impl.PoddRepositoryManagerImpl#getSchemaManagementGraph()}.
      */
     @Test
