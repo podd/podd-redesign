@@ -32,7 +32,6 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-import org.junit.Assert;
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.Model;
 import org.openrdf.model.Namespace;
@@ -327,8 +326,6 @@ public class ApplicationUtils
                         RDFFormat.TURTLE);
         final Resource repositoryNode = GraphUtil.getUniqueSubject(graph, RepositoryConfigSchema.REPOSITORYTYPE, null);
         RepositoryImplConfig repositoryImplConfig = RepositoryImplConfigBase.create(graph, repositoryNode);
-        Assert.assertNotNull(repositoryImplConfig);
-        Assert.assertNotNull(repositoryImplConfig.getType());
         RemoteRepositoryManager repositoryManager =
                 new RemoteRepositoryManager(props.get(PoddWebConstants.PROPERTY_PERMANENT_SESAME_REPOSITORY_LOCATION,
                         PoddWebConstants.DEFAULT_PERMANENT_SESAME_REPOSITORY_LOCATION));
