@@ -2172,9 +2172,7 @@ public abstract class AbstractPoddArtifactManagerTest
         try
         {
             managementConnection = this.testRepositoryManager.getManagementRepository().getConnection();
-            
             Set<InferredOWLOntologyID> schemaImports = this.testArtifactManager.getSchemaImports(updatedArtifact);
-            
             permanentConnection = this.testRepositoryManager.getPermanentRepository(schemaImports).getConnection();
             
             this.verifyUpdatedArtifact(updatedArtifact, "http://purl.org/podd/basic-2-20130206/artifact:1:version:2",
@@ -2239,20 +2237,22 @@ public abstract class AbstractPoddArtifactManagerTest
                         DataReferenceVerificationPolicy.DO_NOT_VERIFY, Collections.<URI> emptyList());
         
         // verify:
-        RepositoryConnection nextRepositoryConnection = null;
+        RepositoryConnection managementConnection = null;
+        RepositoryConnection permanentConnection = null;
         try
         {
-            nextRepositoryConnection = this.testRepositoryManager.getManagementRepository().getConnection();
-            nextRepositoryConnection.begin();
+            managementConnection = this.testRepositoryManager.getManagementRepository().getConnection();
+            Set<InferredOWLOntologyID> schemaImports = this.testArtifactManager.getSchemaImports(updatedArtifact);
+            permanentConnection = this.testRepositoryManager.getPermanentRepository(schemaImports).getConnection();
             
             this.verifyUpdatedArtifact(updatedArtifact, "http://purl.org/podd/basic-2-20130206/artifact:1:version:2",
-                    TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES + 8, nextRepositoryConnection);
+                    TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES + 8, managementConnection);
             
             // verify: file reference object
             final List<Statement> fileRefList =
-                    Iterations.asList(nextRepositoryConnection.getStatements(null, ValueFactoryImpl.getInstance()
-                            .createURI(PODD.PODD_BASE, "hasDataReference"), null, false, updatedArtifact
-                            .getVersionIRI().toOpenRDFURI()));
+                    Iterations.asList(permanentConnection.getStatements(null,
+                            ValueFactoryImpl.getInstance().createURI(PODD.PODD_BASE, "hasDataReference"), null, false,
+                            updatedArtifact.getVersionIRI().toOpenRDFURI()));
             Assert.assertEquals("Graph should have 1 file reference", 1, fileRefList.size());
             
             Assert.assertTrue("File reference value incorrect",
@@ -2260,15 +2260,17 @@ public abstract class AbstractPoddArtifactManagerTest
         }
         finally
         {
-            if(nextRepositoryConnection != null && nextRepositoryConnection.isActive())
+            if(permanentConnection != null && permanentConnection.isOpen())
             {
-                nextRepositoryConnection.rollback();
+                permanentConnection.close();
             }
-            if(nextRepositoryConnection != null && nextRepositoryConnection.isOpen())
+            permanentConnection = null;
+            
+            if(managementConnection != null && managementConnection.isOpen())
             {
-                nextRepositoryConnection.close();
+                managementConnection.close();
             }
-            nextRepositoryConnection = null;
+            managementConnection = null;
         }
         
     }
@@ -2290,20 +2292,22 @@ public abstract class AbstractPoddArtifactManagerTest
                         DataReferenceVerificationPolicy.DO_NOT_VERIFY, Collections.<URI> emptyList());
         
         // verify:
-        RepositoryConnection nextRepositoryConnection = null;
+        RepositoryConnection managementConnection = null;
+        RepositoryConnection permanentConnection = null;
         try
         {
-            nextRepositoryConnection = this.testRepositoryManager.getManagementRepository().getConnection();
-            nextRepositoryConnection.begin();
+            managementConnection = this.testRepositoryManager.getManagementRepository().getConnection();
+            Set<InferredOWLOntologyID> schemaImports = this.testArtifactManager.getSchemaImports(updatedArtifact);
+            permanentConnection = this.testRepositoryManager.getPermanentRepository(schemaImports).getConnection();
             
             this.verifyUpdatedArtifact(updatedArtifact, "http://purl.org/podd/basic-2-20130206/artifact:1:version:2",
-                    TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES + 10, nextRepositoryConnection);
+                    TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES + 10, managementConnection);
             
             // verify: 2 publications exist
             final List<Statement> testList =
-                    Iterations.asList(nextRepositoryConnection.getStatements(null, ValueFactoryImpl.getInstance()
-                            .createURI(PODD.PODD_SCIENCE, "hasPublication"), null, false, updatedArtifact
-                            .getVersionIRI().toOpenRDFURI()));
+                    Iterations.asList(permanentConnection.getStatements(null,
+                            ValueFactoryImpl.getInstance().createURI(PODD.PODD_SCIENCE, "hasPublication"), null, false,
+                            updatedArtifact.getVersionIRI().toOpenRDFURI()));
             Assert.assertEquals("Graph should have 2 publications", 2, testList.size());
             
             // verify: newly added publication exists
@@ -2313,15 +2317,17 @@ public abstract class AbstractPoddArtifactManagerTest
         }
         finally
         {
-            if(nextRepositoryConnection != null && nextRepositoryConnection.isActive())
+            if(permanentConnection != null && permanentConnection.isOpen())
             {
-                nextRepositoryConnection.rollback();
+                permanentConnection.close();
             }
-            if(nextRepositoryConnection != null && nextRepositoryConnection.isOpen())
+            permanentConnection = null;
+            
+            if(managementConnection != null && managementConnection.isOpen())
             {
-                nextRepositoryConnection.close();
+                managementConnection.close();
             }
-            nextRepositoryConnection = null;
+            managementConnection = null;
         }
     }
     
@@ -2372,27 +2378,29 @@ public abstract class AbstractPoddArtifactManagerTest
                         DataReferenceVerificationPolicy.DO_NOT_VERIFY, Collections.<URI> emptyList());
         
         // verify:
-        RepositoryConnection nextRepositoryConnection = null;
+        RepositoryConnection managementConnection = null;
+        RepositoryConnection permanentConnection = null;
         try
         {
-            nextRepositoryConnection = this.testRepositoryManager.getManagementRepository().getConnection();
-            nextRepositoryConnection.begin();
+            managementConnection = this.testRepositoryManager.getManagementRepository().getConnection();
+            Set<InferredOWLOntologyID> schemaImports = this.testArtifactManager.getSchemaImports(updatedArtifact);
+            permanentConnection = this.testRepositoryManager.getPermanentRepository(schemaImports).getConnection();
             
             this.verifyUpdatedArtifact(updatedArtifact, "http://purl.org/podd/basic-2-20130206/artifact:1:version:2",
-                    TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES, nextRepositoryConnection);
+                    TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES, managementConnection);
             
             // verify: still only 1 publication
             final List<Statement> testList =
-                    Iterations.asList(nextRepositoryConnection.getStatements(null, ValueFactoryImpl.getInstance()
-                            .createURI(PODD.PODD_SCIENCE, "hasPublication"), null, false, updatedArtifact
-                            .getVersionIRI().toOpenRDFURI()));
+                    Iterations.asList(permanentConnection.getStatements(null,
+                            ValueFactoryImpl.getInstance().createURI(PODD.PODD_SCIENCE, "hasPublication"), null, false,
+                            updatedArtifact.getVersionIRI().toOpenRDFURI()));
             Assert.assertEquals("Incorrect no. of hasPublication statements", 1, testList.size());
             
             // verify: publication info has been updated
             final List<Statement> testList2 =
-                    Iterations.asList(nextRepositoryConnection.getStatements(null, ValueFactoryImpl.getInstance()
-                            .createURI(PODD.PODD_SCIENCE, "hasYear"), null, false, updatedArtifact.getVersionIRI()
-                            .toOpenRDFURI()));
+                    Iterations.asList(permanentConnection.getStatements(null,
+                            ValueFactoryImpl.getInstance().createURI(PODD.PODD_SCIENCE, "hasYear"), null, false,
+                            updatedArtifact.getVersionIRI().toOpenRDFURI()));
             Assert.assertEquals("Incorrect no. of hasYear statements", 1, testList2.size());
             Assert.assertEquals("Publication Year has not bee updated", "2011", testList2.get(0).getObject()
                     .stringValue());
@@ -2400,15 +2408,17 @@ public abstract class AbstractPoddArtifactManagerTest
         }
         finally
         {
-            if(nextRepositoryConnection != null && nextRepositoryConnection.isActive())
+            if(permanentConnection != null && permanentConnection.isOpen())
             {
-                nextRepositoryConnection.rollback();
+                permanentConnection.close();
             }
-            if(nextRepositoryConnection != null && nextRepositoryConnection.isOpen())
+            permanentConnection = null;
+            
+            if(managementConnection != null && managementConnection.isOpen())
             {
-                nextRepositoryConnection.close();
+                managementConnection.close();
             }
-            nextRepositoryConnection = null;
+            managementConnection = null;
         }
     }
     
@@ -2429,18 +2439,20 @@ public abstract class AbstractPoddArtifactManagerTest
                         DataReferenceVerificationPolicy.DO_NOT_VERIFY, Collections.<URI> emptyList());
         
         // verify:
-        RepositoryConnection nextRepositoryConnection = null;
+        RepositoryConnection managementConnection = null;
+        RepositoryConnection permanentConnection = null;
         try
         {
-            nextRepositoryConnection = this.testRepositoryManager.getManagementRepository().getConnection();
-            nextRepositoryConnection.begin();
+            managementConnection = this.testRepositoryManager.getManagementRepository().getConnection();
+            Set<InferredOWLOntologyID> schemaImports = this.testArtifactManager.getSchemaImports(updatedArtifact);
+            permanentConnection = this.testRepositoryManager.getPermanentRepository(schemaImports).getConnection();
             
             this.verifyUpdatedArtifact(updatedArtifact, "http://purl.org/podd/basic-2-20130206/artifact:1:version:2",
-                    TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES, nextRepositoryConnection);
+                    TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES, managementConnection);
             
             if(this.log.isDebugEnabled())
             {
-                DebugUtils.printContents(nextRepositoryConnection, updatedArtifact.getVersionIRI().toOpenRDFURI());
+                DebugUtils.printContents(permanentConnection, updatedArtifact.getVersionIRI().toOpenRDFURI());
             }
             
             // verify: SqueekeMaterial is now under My_Treatment1
@@ -2448,7 +2460,7 @@ public abstract class AbstractPoddArtifactManagerTest
                     "Graph should have 1 statement",
                     1,
                     Iterations.asList(
-                            nextRepositoryConnection.getStatements(
+                            permanentConnection.getStatements(
                                     ValueFactoryImpl.getInstance().createURI(
                                             "http://purl.org/podd/basic-2-20130206/artifact:1#My_Treatment1"),
                                     null,
@@ -2458,15 +2470,17 @@ public abstract class AbstractPoddArtifactManagerTest
         }
         finally
         {
-            if(nextRepositoryConnection != null && nextRepositoryConnection.isActive())
+            if(permanentConnection != null && permanentConnection.isOpen())
             {
-                nextRepositoryConnection.rollback();
+                permanentConnection.close();
             }
-            if(nextRepositoryConnection != null && nextRepositoryConnection.isOpen())
+            permanentConnection = null;
+            
+            if(managementConnection != null && managementConnection.isOpen())
             {
-                nextRepositoryConnection.close();
+                managementConnection.close();
             }
-            nextRepositoryConnection = null;
+            managementConnection = null;
         }
     }
     
@@ -2487,14 +2501,16 @@ public abstract class AbstractPoddArtifactManagerTest
                         DataReferenceVerificationPolicy.DO_NOT_VERIFY, Collections.<URI> emptyList());
         
         // verify:
-        RepositoryConnection nextRepositoryConnection = null;
+        RepositoryConnection managementConnection = null;
+        RepositoryConnection permanentConnection = null;
         try
         {
-            nextRepositoryConnection = this.testRepositoryManager.getManagementRepository().getConnection();
-            nextRepositoryConnection.begin();
+            managementConnection = this.testRepositoryManager.getManagementRepository().getConnection();
+            Set<InferredOWLOntologyID> schemaImports = this.testArtifactManager.getSchemaImports(updatedArtifact);
+            permanentConnection = this.testRepositoryManager.getPermanentRepository(schemaImports).getConnection();
             
             this.verifyUpdatedArtifact(updatedArtifact, "http://purl.org/podd/basic-2-20130206/artifact:1:version:2",
-                    TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES - 12, nextRepositoryConnection);
+                    TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES - 12, managementConnection);
             
             // verify: dangling objects are no longer in the updated artifact
             final String[] danglingObjects =
@@ -2508,21 +2524,23 @@ public abstract class AbstractPoddArtifactManagerTest
                         "Dangling object should not exist",
                         0,
                         Iterations.asList(
-                                nextRepositoryConnection.getStatements(deletedObjURI, null, null, false,
-                                        updatedArtifact.getVersionIRI().toOpenRDFURI())).size());
+                                permanentConnection.getStatements(deletedObjURI, null, null, false, updatedArtifact
+                                        .getVersionIRI().toOpenRDFURI())).size());
             }
         }
         finally
         {
-            if(nextRepositoryConnection != null && nextRepositoryConnection.isActive())
+            if(permanentConnection != null && permanentConnection.isOpen())
             {
-                nextRepositoryConnection.rollback();
+                permanentConnection.close();
             }
-            if(nextRepositoryConnection != null && nextRepositoryConnection.isOpen())
+            permanentConnection = null;
+            
+            if(managementConnection != null && managementConnection.isOpen())
             {
-                nextRepositoryConnection.close();
+                managementConnection.close();
             }
-            nextRepositoryConnection = null;
+            managementConnection = null;
         }
     }
     
