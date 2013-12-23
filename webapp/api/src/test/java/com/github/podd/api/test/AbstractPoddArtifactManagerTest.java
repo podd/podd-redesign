@@ -3067,30 +3067,42 @@ public abstract class AbstractPoddArtifactManagerTest
      * @param updatedArtifact
      * @param expectedVersionIri
      * @param expectedConcreteStatementCount
-     * @param nextRepositoryConnection
+     * @param managementConnection
      * @throws Exception
      */
     private void verifyUpdatedArtifact(final InferredOWLOntologyID updatedArtifact, final String expectedVersionIri,
-            final long expectedConcreteStatementCount, final RepositoryConnection nextRepositoryConnection)
+            final long expectedConcreteStatementCount, final RepositoryConnection managementConnection)
         throws Exception
     {
-        Assert.assertEquals("Unexpected concrete statement count", expectedConcreteStatementCount,
-                nextRepositoryConnection.size(updatedArtifact.getVersionIRI().toOpenRDFURI()));
+        Set<InferredOWLOntologyID> schemaImports = this.testArtifactManager.getSchemaImports(updatedArtifact);
         
-        // verify: owl:versionIRI incremented in graph
-        final List<Statement> versionIRIs =
-                Iterations.asList(nextRepositoryConnection.getStatements(null, PODD.OWL_VERSION_IRI, null, false,
-                        updatedArtifact.getVersionIRI().toOpenRDFURI()));
-        Assert.assertEquals("Should have only 1 version IRI", 1, versionIRIs.size());
-        Assert.assertEquals("Version IRI not expected value", expectedVersionIri, versionIRIs.get(0).getObject()
-                .stringValue());
+        RepositoryConnection permanentConnection =
+                this.testRepositoryManager.getPermanentRepository(schemaImports).getConnection();
         
-        // verify: current version updated in management graph
-        final InferredOWLOntologyID currentArtifactVersion =
-                this.testArtifactManager.getSesameManager().getCurrentArtifactVersion(updatedArtifact.getOntologyIRI(),
-                        nextRepositoryConnection, this.artifactGraph);
-        Assert.assertEquals("Unexpected Version IRI in management graph", expectedVersionIri, currentArtifactVersion
-                .getVersionIRI().toString());
+        try
+        {
+            Assert.assertEquals("Unexpected concrete statement count", expectedConcreteStatementCount,
+                    permanentConnection.size(updatedArtifact.getVersionIRI().toOpenRDFURI()));
+            
+            // verify: owl:versionIRI incremented in graph
+            final List<Statement> versionIRIs =
+                    Iterations.asList(permanentConnection.getStatements(null, PODD.OWL_VERSION_IRI, null, false,
+                            updatedArtifact.getVersionIRI().toOpenRDFURI()));
+            Assert.assertEquals("Should have only 1 version IRI", 1, versionIRIs.size());
+            Assert.assertEquals("Version IRI not expected value", expectedVersionIri, versionIRIs.get(0).getObject()
+                    .stringValue());
+            
+            // verify: current version updated in management graph
+            final InferredOWLOntologyID currentArtifactVersion =
+                    this.testArtifactManager.getSesameManager().getCurrentArtifactVersion(
+                            updatedArtifact.getOntologyIRI(), managementConnection, this.artifactGraph);
+            Assert.assertEquals("Unexpected Version IRI in management graph", expectedVersionIri,
+                    currentArtifactVersion.getVersionIRI().toString());
+        }
+        finally
+        {
+            permanentConnection.close();
+        }
     }
     
 }
