@@ -52,15 +52,18 @@ public interface PoddSesameManager
      * @param requestedArtifactIds
      *            A collection of InferredOWLOntologyID objects containing the ontologies to be
      *            deleted, including the inferred ontology IRIs.
-     * @param repositoryConnection
-     *            The connection to the repository to use.
+     * @param permanentConnection
+     *            The connection to the permanent storage repository.
+     * @param managementConnection
+     *            The connection to the management repository.
      * @param ontologyManagementGraph
      *            The URI of the context in the repository containing the management information for
      *            the ontologies.
      * @throws OpenRDFException
      */
     void deleteOntologies(Collection<InferredOWLOntologyID> requestedArtifactIds,
-            RepositoryConnection repositoryConnection, URI ontologyManagementGraph) throws OpenRDFException;
+            RepositoryConnection permanentConnection, RepositoryConnection managementConnection,
+            URI ontologyManagementGraph) throws OpenRDFException;
     
     /**
      * This method attempts to find the labels for a given collection of URIs. If a label could not

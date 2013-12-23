@@ -81,12 +81,13 @@ public class PoddSesameManagerImpl implements PoddSesameManager
     
     @Override
     public void deleteOntologies(final Collection<InferredOWLOntologyID> givenOntologies,
-            final RepositoryConnection repositoryConnection, final URI managementGraph) throws OpenRDFException
+            final RepositoryConnection permanentConnection, final RepositoryConnection managementConnection,
+            final URI managementGraph) throws OpenRDFException
     {
         for(final InferredOWLOntologyID nextOntologyID : givenOntologies)
         {
             final List<InferredOWLOntologyID> versionInternal =
-                    this.getCurrentVersionsInternal(nextOntologyID.getOntologyIRI(), repositoryConnection,
+                    this.getCurrentVersionsInternal(nextOntologyID.getOntologyIRI(), managementConnection,
                             managementGraph);
             boolean updateCurrentVersion = false;
             InferredOWLOntologyID newCurrentVersion = null;
@@ -108,27 +109,26 @@ public class PoddSesameManagerImpl implements PoddSesameManager
             }
             
             // clear out the direct and inferred ontology graphs
-            repositoryConnection.remove((URI)null, null, null, nextOntologyID.getInferredOntologyIRI().toOpenRDFURI());
-            repositoryConnection.remove((URI)null, null, null, nextOntologyID.getVersionIRI().toOpenRDFURI());
+            permanentConnection.remove((URI)null, null, null, nextOntologyID.getInferredOntologyIRI().toOpenRDFURI());
+            permanentConnection.remove((URI)null, null, null, nextOntologyID.getVersionIRI().toOpenRDFURI());
             
             // clear out references attached to the version and inferred IRIs in
-            // the management
-            // graph
-            repositoryConnection.remove(nextOntologyID.getVersionIRI().toOpenRDFURI(), null, null, managementGraph);
-            repositoryConnection.remove(nextOntologyID.getInferredOntologyIRI().toOpenRDFURI(), null, null,
+            // the management graph
+            managementConnection.remove(nextOntologyID.getVersionIRI().toOpenRDFURI(), null, null, managementGraph);
+            managementConnection.remove(nextOntologyID.getInferredOntologyIRI().toOpenRDFURI(), null, null,
                     managementGraph);
             
             // clear out references linked to the version and inferred IRIs in
             // the management graph
-            repositoryConnection
+            managementConnection
                     .remove((URI)null, null, nextOntologyID.getVersionIRI().toOpenRDFURI(), managementGraph);
-            repositoryConnection.remove((URI)null, null, nextOntologyID.getInferredOntologyIRI().toOpenRDFURI(),
+            managementConnection.remove((URI)null, null, nextOntologyID.getInferredOntologyIRI().toOpenRDFURI(),
                     managementGraph);
             
             if(updateCurrentVersion)
             {
                 final List<Statement> asList =
-                        Iterations.asList(repositoryConnection.getStatements(nextOntologyID.getOntologyIRI()
+                        Iterations.asList(managementConnection.getStatements(nextOntologyID.getOntologyIRI()
                                 .toOpenRDFURI(), PODD.OMV_CURRENT_VERSION, null, false, managementGraph));
                 
                 if(asList.size() != 1)
@@ -139,20 +139,20 @@ public class PoddSesameManagerImpl implements PoddSesameManager
                 }
                 
                 // remove the current versions from the management graph
-                repositoryConnection.remove(asList, managementGraph);
+                managementConnection.remove(asList, managementGraph);
                 
                 // If there is no replacement available, then wipe the slate
                 // clean in the management
                 // graph
                 if(newCurrentVersion == null)
                 {
-                    repositoryConnection.remove(nextOntologyID.getOntologyIRI().toOpenRDFURI(), null, null,
+                    managementConnection.remove(nextOntologyID.getOntologyIRI().toOpenRDFURI(), null, null,
                             managementGraph);
                 }
                 else
                 {
                     // Push the next current version into the management graph
-                    repositoryConnection.add(nextOntologyID.getOntologyIRI().toOpenRDFURI(), PODD.OMV_CURRENT_VERSION,
+                    managementConnection.add(nextOntologyID.getOntologyIRI().toOpenRDFURI(), PODD.OMV_CURRENT_VERSION,
                             newCurrentVersion.getVersionIRI().toOpenRDFURI(), managementGraph);
                 }
             }

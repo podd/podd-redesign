@@ -177,7 +177,8 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             throw new PoddRuntimeException("Ontology IRI cannot be null");
         }
         
-        RepositoryConnection connection = null;
+        RepositoryConnection permanentConnection = null;
+        RepositoryConnection managementConnection = null;
         
         try
         {
@@ -187,11 +188,12 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             }
             
             final Set<InferredOWLOntologyID> schemaImports = this.getSchemaImports(artifactId);
-            connection = this.getRepositoryManager().getPermanentRepository(schemaImports).getConnection();
-            connection.begin();
+            permanentConnection = this.getRepositoryManager().getPermanentRepository(schemaImports).getConnection();
+            permanentConnection.begin();
+            managementConnection = this.getRepositoryManager().getManagementRepository().getConnection();
             
             List<InferredOWLOntologyID> requestedArtifactIds =
-                    this.getSesameManager().getAllOntologyVersions(artifactId.getOntologyIRI(), connection,
+                    this.getSesameManager().getAllOntologyVersions(artifactId.getOntologyIRI(), managementConnection,
                             this.getRepositoryManager().getArtifactManagementGraph());
             
             if(artifactId.getVersionIRI() != null)
@@ -207,9 +209,9 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
                 }
             }
             
-            this.getSesameManager().deleteOntologies(requestedArtifactIds, connection,
+            this.getSesameManager().deleteOntologies(requestedArtifactIds, permanentConnection, managementConnection,
                     this.getRepositoryManager().getArtifactManagementGraph());
-            connection.commit();
+            permanentConnection.commit();
             
             // - ensure deleted ontologies are removed from the
             // OWLOntologyManager's cache
@@ -225,9 +227,9 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         {
             try
             {
-                if(connection != null && connection.isActive())
+                if(permanentConnection != null && permanentConnection.isActive())
                 {
-                    connection.rollback();
+                    permanentConnection.rollback();
                 }
             }
             catch(final RepositoryException e1)
@@ -241,9 +243,9 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         {
             try
             {
-                if(connection != null && connection.isOpen())
+                if(permanentConnection != null && permanentConnection.isOpen())
                 {
-                    connection.close();
+                    permanentConnection.close();
                 }
             }
             catch(final RepositoryException e)

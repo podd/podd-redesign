@@ -364,7 +364,7 @@ public abstract class AbstractPoddSesameManagerTest
                 inferredOntologyID.getInferredOntologyIRI());
         
         this.testPoddSesameManager.deleteOntologies(Arrays.asList(inferredOntologyID), this.testRepositoryConnection,
-                artifactGraph);
+                this.testRepositoryConnection, artifactGraph);
         
         try
         {
