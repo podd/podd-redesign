@@ -3,12 +3,14 @@
 @prefix sr: <http://www.openrdf.org/config/repository/sail#>.
 @prefix sail: <http://www.openrdf.org/config/sail#>.
 
-[] a rep:Repository ;
-   rep:repositoryID "testSailRepositoryMemoryStore" ;
-   rdfs:label "Test SailRepository for a MemoryStore" ;
-   rep:repositoryImpl [
+[] 
+
+#a rep:Repository ;
+#   rep:repositoryID "testSailRepositoryMemoryStore" ;
+#   rdfs:label "Test SailRepository for a MemoryStore" ;
+#   rep:repositoryImpl [
       rep:repositoryType "openrdf:SailRepository" ;
       sr:sailImpl [
          sail:sailType "openrdf:MemoryStore"
-      ]
-   ].
+      ].
+#   ].
