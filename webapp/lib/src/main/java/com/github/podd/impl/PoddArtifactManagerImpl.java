@@ -1546,17 +1546,15 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             throw new PublishArtifactException("Could not publish artifact as version was not specified.", ontologyId);
         }
         
-        Repository repository = null;
-        RepositoryConnection repositoryConnection = null;
+        Repository managementRepository = null;
+        RepositoryConnection managementConnection = null;
         try
         {
-            final Set<InferredOWLOntologyID> currentSchemaImports = this.getSchemaImports(ontologyId);
+            managementRepository = this.getRepositoryManager().getManagementRepository();
+            managementConnection = managementRepository.getConnection();
+            managementConnection.begin();
             
-            repository = this.getRepositoryManager().getPermanentRepository(currentSchemaImports);
-            repositoryConnection = repository.getConnection();
-            repositoryConnection.begin();
-            
-            if(this.getSesameManager().isPublished(ontologyId, repositoryConnection,
+            if(this.getSesameManager().isPublished(ontologyId, managementConnection,
                     this.getRepositoryManager().getArtifactManagementGraph()))
             {
                 // Cannot publish multiple versions of a single artifact
@@ -1565,7 +1563,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             }
             
             final InferredOWLOntologyID currentVersion =
-                    this.getSesameManager().getCurrentArtifactVersion(ontologyIRI, repositoryConnection,
+                    this.getSesameManager().getCurrentArtifactVersion(ontologyIRI, managementConnection,
                             this.getRepositoryManager().getArtifactManagementGraph());
             
             if(!currentVersion.getVersionIRI().equals(versionIRI))
@@ -1579,18 +1577,18 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             }
             
             final InferredOWLOntologyID published =
-                    this.getSesameManager().setPublished(true, currentVersion, repositoryConnection,
+                    this.getSesameManager().setPublished(true, currentVersion, managementConnection,
                             this.getRepositoryManager().getArtifactManagementGraph());
             
-            repositoryConnection.commit();
+            managementConnection.commit();
             
             return published;
         }
         catch(final Throwable e)
         {
-            if(repositoryConnection != null && repositoryConnection.isActive())
+            if(managementConnection != null && managementConnection.isActive())
             {
-                repositoryConnection.rollback();
+                managementConnection.rollback();
             }
             
             throw e;
@@ -1600,9 +1598,9 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             // release resources
             try
             {
-                if(repositoryConnection != null && repositoryConnection.isOpen())
+                if(managementConnection != null && managementConnection.isOpen())
                 {
-                    repositoryConnection.close();
+                    managementConnection.close();
                 }
             }
             catch(final RepositoryException e)

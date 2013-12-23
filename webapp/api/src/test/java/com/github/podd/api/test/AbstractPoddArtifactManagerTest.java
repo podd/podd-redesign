@@ -2998,10 +2998,14 @@ public abstract class AbstractPoddArtifactManagerTest
      *            True if the artifact is Published, false otherwise
      * @throws OpenRDFException
      * @throws RepositoryException
+     * @throws UnmanagedSchemaIRIException
+     * @throws UnmanagedArtifactVersionException
+     * @throws UnmanagedArtifactIRIException
      */
     private void verifyLoadedArtifact(final InferredOWLOntologyID inferredOntologyId, final int mgtGraphSize,
             final long assertedStatementCount, final long inferredStatementCount, final boolean isPublished)
-        throws RepositoryException, OpenRDFException
+        throws RepositoryException, OpenRDFException, UnmanagedArtifactIRIException, UnmanagedArtifactVersionException,
+        UnmanagedSchemaIRIException
     
     {
         // verify: ontology ID has all details
@@ -3010,40 +3014,56 @@ public abstract class AbstractPoddArtifactManagerTest
         Assert.assertNotNull("Null ontology version IRI", inferredOntologyId.getVersionIRI());
         Assert.assertNotNull("Null inferred ontology IRI", inferredOntologyId.getInferredOntologyIRI());
         
-        RepositoryConnection nextRepositoryConnection = null;
+        RepositoryConnection managementConnection = null;
+        RepositoryConnection permanentConnection = null;
         try
         {
-            nextRepositoryConnection = this.testRepositoryManager.getManagementRepository().getConnection();
-            nextRepositoryConnection.begin();
+            Set<? extends OWLOntologyID> schemaOntologies =
+                    this.testArtifactManager.getSchemaImports(inferredOntologyId);
             
-            if(nextRepositoryConnection.size(inferredOntologyId.getVersionIRI().toOpenRDFURI()) != assertedStatementCount)
+            managementConnection = this.testRepositoryManager.getManagementRepository().getConnection();
+            managementConnection.begin();
+            
+            permanentConnection = this.testRepositoryManager.getPermanentRepository(schemaOntologies).getConnection();
+            permanentConnection.begin();
+            
+            if(permanentConnection.size(inferredOntologyId.getVersionIRI().toOpenRDFURI()) != assertedStatementCount)
             {
-                DebugUtils.printContents(nextRepositoryConnection, inferredOntologyId.getVersionIRI().toOpenRDFURI());
+                DebugUtils.printContents(managementConnection, inferredOntologyId.getVersionIRI().toOpenRDFURI());
             }
             // verify: size of asserted graph
             Assert.assertEquals("Incorrect number of asserted statements for artifact", assertedStatementCount,
-                    nextRepositoryConnection.size(inferredOntologyId.getVersionIRI().toOpenRDFURI()));
+                    permanentConnection.size(inferredOntologyId.getVersionIRI().toOpenRDFURI()));
             
             // verify: size of inferred graph
             Assert.assertEquals("Incorrect number of inferred statements for artifact", inferredStatementCount,
-                    nextRepositoryConnection.size(inferredOntologyId.getInferredOntologyIRI().toOpenRDFURI()));
+                    permanentConnection.size(inferredOntologyId.getInferredOntologyIRI().toOpenRDFURI()));
             
             // verify: artifact management graph contents
-            this.verifyArtifactManagementGraphContents(nextRepositoryConnection, mgtGraphSize,
+            this.verifyArtifactManagementGraphContents(managementConnection, mgtGraphSize,
                     this.testRepositoryManager.getArtifactManagementGraph(), inferredOntologyId.getOntologyIRI(),
                     inferredOntologyId.getVersionIRI(), inferredOntologyId.getInferredOntologyIRI());
         }
         finally
         {
-            if(nextRepositoryConnection != null && nextRepositoryConnection.isActive())
+            if(permanentConnection != null && permanentConnection.isActive())
             {
-                nextRepositoryConnection.rollback();
+                permanentConnection.rollback();
             }
-            if(nextRepositoryConnection != null && nextRepositoryConnection.isOpen())
+            if(permanentConnection != null && permanentConnection.isOpen())
             {
-                nextRepositoryConnection.close();
+                permanentConnection.close();
             }
-            nextRepositoryConnection = null;
+            permanentConnection = null;
+            if(managementConnection != null && managementConnection.isActive())
+            {
+                managementConnection.rollback();
+            }
+            if(managementConnection != null && managementConnection.isOpen())
+            {
+                managementConnection.close();
+            }
+            managementConnection = null;
         }
     }
     
