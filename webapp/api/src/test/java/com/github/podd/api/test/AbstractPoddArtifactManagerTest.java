@@ -2101,20 +2101,23 @@ public abstract class AbstractPoddArtifactManagerTest
                         DataReferenceVerificationPolicy.DO_NOT_VERIFY, objectUriList);
         
         // verify:
-        RepositoryConnection nextRepositoryConnection = null;
+        RepositoryConnection managementConnection = null;
+        RepositoryConnection permanentConnection = null;
         try
         {
-            nextRepositoryConnection = this.testRepositoryManager.getManagementRepository().getConnection();
-            nextRepositoryConnection.begin();
+            managementConnection = this.testRepositoryManager.getManagementRepository().getConnection();
+            
+            Set<InferredOWLOntologyID> schemaImports = this.testArtifactManager.getSchemaImports(updatedArtifact);
+            permanentConnection = this.testRepositoryManager.getPermanentRepository(schemaImports).getConnection();
             
             this.verifyUpdatedArtifact(updatedArtifact, "http://purl.org/podd/basic-2-20130206/artifact:1:version:2",
-                    TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES + 28, nextRepositoryConnection);
+                    TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES + 28, managementConnection);
             
             // verify: 2 publications exist
             final List<Statement> testList =
-                    Iterations.asList(nextRepositoryConnection.getStatements(null, ValueFactoryImpl.getInstance()
-                            .createURI(PODD.PODD_SCIENCE, "hasPublication"), null, false, updatedArtifact
-                            .getVersionIRI().toOpenRDFURI()));
+                    Iterations.asList(permanentConnection.getStatements(null,
+                            ValueFactoryImpl.getInstance().createURI(PODD.PODD_SCIENCE, "hasPublication"), null, false,
+                            updatedArtifact.getVersionIRI().toOpenRDFURI()));
             Assert.assertEquals("Graph should have 2 publications", 3, testList.size());
             
             // verify: newly added publication exists
@@ -2125,15 +2128,16 @@ public abstract class AbstractPoddArtifactManagerTest
         }
         finally
         {
-            if(nextRepositoryConnection != null && nextRepositoryConnection.isActive())
+            if(permanentConnection != null && permanentConnection.isOpen())
             {
-                nextRepositoryConnection.rollback();
+                permanentConnection.close();
             }
-            if(nextRepositoryConnection != null && nextRepositoryConnection.isOpen())
+            permanentConnection = null;
+            if(managementConnection != null && managementConnection.isOpen())
             {
-                nextRepositoryConnection.close();
+                managementConnection.close();
             }
-            nextRepositoryConnection = null;
+            managementConnection = null;
         }
     }
     
