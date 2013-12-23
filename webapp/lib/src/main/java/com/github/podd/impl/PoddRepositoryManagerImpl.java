@@ -100,6 +100,22 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
     // }
     // }
     //
+    
+    /**
+     * 
+     * @param managementRepository
+     * @param permanentRepository
+     * @deprecated Use
+     *             {@link PoddRepositoryManagerImpl#PoddRepositoryManagerImpl(Repository, String, String, URI)}
+     *             instead.
+     */
+    @Deprecated
+    public PoddRepositoryManagerImpl(final Repository managementRepository, final Repository permanentRepository)
+    {
+        this.managementRepository = managementRepository;
+        this.permanentRepositories.put(Collections.<OWLOntologyID> emptySet(), permanentRepository);
+    }
+    
     /**
      * 
      * @param managementRepository
