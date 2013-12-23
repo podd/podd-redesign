@@ -244,7 +244,7 @@ public interface PoddWebConstants
     public static final String DEFAULT_OWLAPI_MANAGER = "org.semanticweb.owlapi.apibinding.OWLManager";
     
     public static final String PROPERTY_PERMANENT_SESAME_REPOSITORY_CONFIG = "podd.repository.permanent.config";
-    public static final String DEFAULT_PERMANENT_SESAME_REPOSITORY_CONFIG = "";
+    public static final String DEFAULT_PERMANENT_SESAME_REPOSITORY_CONFIG = "/memorystoreconfig.ttl";
     
     public static final String PROPERTY_PERMANENT_SESAME_REPOSITORY_LOCATION = "podd.repository.permanent.location";
     public static final String DEFAULT_PERMANENT_SESAME_REPOSITORY_LOCATION = "http://localhost:8080/openrdf-sesame/";

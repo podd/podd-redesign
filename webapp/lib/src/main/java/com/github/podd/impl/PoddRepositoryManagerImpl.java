@@ -16,6 +16,8 @@
  */
 package com.github.podd.impl;
 
+import info.aduna.iteration.Iterations;
+
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
@@ -30,10 +32,13 @@ import org.openrdf.OpenRDFException;
 import org.openrdf.model.Graph;
 import org.openrdf.model.Model;
 import org.openrdf.model.Resource;
+import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.openrdf.model.vocabulary.SESAME;
 import org.openrdf.repository.Repository;
+import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
+import org.openrdf.repository.RepositoryResult;
 import org.openrdf.repository.config.RepositoryConfig;
 import org.openrdf.repository.config.RepositoryConfigException;
 import org.openrdf.repository.config.RepositoryFactory;
@@ -207,6 +212,49 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
                     else
                     {
                         repository = nextRepository;
+                        
+                        // In this case, we need to copy the relevant schema ontologies over to the
+                        // new repository
+                        
+                        Repository managementRepository = getManagementRepository();
+                        RepositoryConnection managementConnection = null;
+                        RepositoryConnection repositoryConnection = null;
+                        try
+                        {
+                            repositoryConnection = repository.getConnection();
+                            managementConnection = managementRepository.getConnection();
+                            for(OWLOntologyID nextSchemaOntology : schemaOntologies)
+                            {
+                                repositoryConnection.add(managementConnection.getStatements(null, null, null, false,
+                                        nextSchemaOntology.getVersionIRI().toOpenRDFURI()));
+                                
+                                RepositoryResult<Statement> statements =
+                                        managementConnection.getStatements(nextSchemaOntology.getVersionIRI()
+                                                .toOpenRDFURI(), PODD.PODD_BASE_INFERRED_VERSION, null, false, this
+                                                .getSchemaManagementGraph());
+                                
+                                for(Statement nextInferredStatement : Iterations.asList(statements))
+                                {
+                                    if(nextInferredStatement.getObject() instanceof URI)
+                                    {
+                                        repositoryConnection.add(managementConnection.getStatements(null, null, null,
+                                                false, (URI)nextInferredStatement.getObject()));
+                                    }
+                                }
+                            }
+                            repositoryConnection.commit();
+                        }
+                        finally
+                        {
+                            if(managementConnection != null)
+                            {
+                                managementConnection.close();
+                            }
+                            if(repositoryConnection != null)
+                            {
+                                repositoryConnection.close();
+                            }
+                        }
                     }
                 }
             }
