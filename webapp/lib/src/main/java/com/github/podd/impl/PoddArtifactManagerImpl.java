@@ -52,6 +52,7 @@ import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.RepositoryResult;
 import org.openrdf.rio.RDFFormat;
+import org.openrdf.rio.RDFParseException;
 import org.openrdf.rio.Rio;
 import org.openrdf.rio.UnsupportedRDFormatException;
 import org.openrdf.rio.helpers.StatementCollector;
@@ -880,44 +881,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             managementConnection.export(new StatementCollector(), this.getRepositoryManager()
                     .getSchemaManagementGraph());
             
-            final Set<URI> directImports =
-                    this.getSesameManager().getDirectImports(artifactID.getOntologyIRI(), managementConnection,
-                            this.getRepositoryManager().getArtifactManagementGraph());
-            
-            final Set<URI> schemaOntologyUris = new HashSet<>();
-            final Set<URI> schemaVersionUris = new HashSet<>();
-            
-            OntologyUtils.extractOntologyAndVersions(model, schemaOntologyUris, schemaVersionUris);
-            
-            OntologyUtils.validateSchemaManifestImports(model, schemaVersionUris);
-            
-            final List<URI> importOrder = OntologyUtils.orderImports(model, schemaOntologyUris, schemaVersionUris);
-            
-            Map<URI, Set<OWLOntologyID>> allImports =
-                    OntologyUtils.getImports(model, schemaOntologyUris, schemaVersionUris);
-            
-            if(allImports.containsKey(artifactID.getVersionIRI().toOpenRDFURI()))
-            {
-                results.addAll(allImports.get(artifactID.getVersionIRI().toOpenRDFURI()));
-            }
-            else
-            {
-                this.log.warn("Could not find imports for artifact: {}", artifactID);
-            }
-            
-            for(final URI nextDirectImport : directImports)
-            {
-                if(allImports.containsKey(nextDirectImport))
-                {
-                    results.addAll(allImports.get(nextDirectImport));
-                }
-                else
-                {
-                    this.log.warn("Could not find imports for schema for artifact: {} {}", artifactID, nextDirectImport);
-                }
-                // results.add(this.getSchemaManager().getSchemaOntologyVersion(IRI.create(nextDirectImport)));
-                
-            }
+            getSchemaImportsInternal(artifactID, results, managementConnection, model);
         }
         finally
         {
@@ -928,6 +892,61 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         }
         
         return results;
+    }
+    
+    /**
+     * @param artifactID
+     * @param results
+     * @param managementConnection
+     * @param model
+     * @throws OpenRDFException
+     * @throws SchemaManifestException
+     * @throws IOException
+     * @throws RDFParseException
+     * @throws UnsupportedRDFormatException
+     */
+    public void getSchemaImportsInternal(final InferredOWLOntologyID artifactID, final Set<OWLOntologyID> results,
+            RepositoryConnection managementConnection, final Model model) throws OpenRDFException,
+        SchemaManifestException, IOException, RDFParseException, UnsupportedRDFormatException
+    {
+        final Set<URI> directImports =
+                this.getSesameManager().getDirectImports(artifactID.getOntologyIRI(), managementConnection,
+                        this.getRepositoryManager().getArtifactManagementGraph());
+        
+        final Set<URI> schemaOntologyUris = new HashSet<>();
+        final Set<URI> schemaVersionUris = new HashSet<>();
+        
+        OntologyUtils.extractOntologyAndVersions(model, schemaOntologyUris, schemaVersionUris);
+        
+        OntologyUtils.validateSchemaManifestImports(model, schemaVersionUris);
+        
+        final List<URI> importOrder = OntologyUtils.orderImports(model, schemaOntologyUris, schemaVersionUris);
+        
+        Map<URI, Set<OWLOntologyID>> allImports =
+                OntologyUtils.getImports(model, schemaOntologyUris, schemaVersionUris);
+        
+        if(allImports.containsKey(artifactID.getVersionIRI().toOpenRDFURI()))
+        {
+            results.addAll(allImports.get(artifactID.getVersionIRI().toOpenRDFURI()));
+        }
+        else
+        {
+            this.log.warn("Could not find imports for artifact: {}", artifactID);
+        }
+        
+        for(final URI nextDirectImport : directImports)
+        {
+            if(allImports.containsKey(nextDirectImport))
+            {
+                results.addAll(allImports.get(nextDirectImport));
+            }
+            else
+            {
+                this.log.warn("Could not find imports for schema for artifact: {} {}", artifactID, nextDirectImport);
+            }
+            // results.add(this.getSchemaManager().getSchemaOntologyVersion(IRI.create(nextDirectImport)));
+            
+        }
     }
     
     @Override
