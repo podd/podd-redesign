@@ -1438,6 +1438,30 @@ public abstract class AbstractPoddArtifactManagerTest
         Assert.assertNotNull("Schema Manager was null", this.testArtifactManager.getSchemaManager());
     }
     
+    @Test
+    public final void testGetSchemaImportsNull() throws Exception
+    {
+        try
+        {
+            this.testArtifactManager.getSchemaImports(null);
+            Assert.fail("Did not receive expected exception");
+        }
+        catch(NullPointerException e)
+        {
+            
+        }
+    }
+    
+    @Test
+    public final void testGetSchemaImportsNonExistingArtifact() throws Exception
+    {
+        Set<? extends OWLOntologyID> schemaImports =
+                this.testArtifactManager.getSchemaImports(new InferredOWLOntologyID(IRI
+                        .create("urn:artifact:does:not:exist"), IRI.create("urn:artifact:version:does:not:exist"), IRI
+                        .create("urn:inferred:artifact:does:not:exist")));
+        Assert.assertTrue(schemaImports.isEmpty());
+    }
+    
     /**
      * Test method for {@link com.github.podd.api.PoddArtifactManager#listPublishedArtifacts()}. .
      */
