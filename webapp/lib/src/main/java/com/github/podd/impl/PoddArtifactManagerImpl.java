@@ -866,7 +866,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
                 artifactID,
                 "Cannot get schema imports without an artifact reference. May need to try PoddSchemaManager.getCurrentSchemaOntologies instead.");
         
-        final Set<InferredOWLOntologyID> results = new LinkedHashSet<InferredOWLOntologyID>();
+        final Set<OWLOntologyID> results = new LinkedHashSet<>();
         
         RepositoryConnection managementConnection = null;
         
@@ -896,8 +896,25 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             Map<URI, Set<OWLOntologyID>> allImports =
                     OntologyUtils.getImports(model, schemaOntologyUris, schemaVersionUris);
             
+            if(allImports.containsKey(artifactID.getVersionIRI().toOpenRDFURI()))
+            {
+                results.addAll(allImports.get(artifactID.getVersionIRI().toOpenRDFURI()));
+            }
+            else
+            {
+                this.log.warn("Could not find imports for artifact: {}", artifactID);
+            }
+            
             for(final URI nextDirectImport : directImports)
             {
+                if(allImports.containsKey(nextDirectImport))
+                {
+                    results.addAll(allImports.get(nextDirectImport));
+                }
+                else
+                {
+                    this.log.warn("Could not find imports for schema for artifact: {} {}", artifactID, nextDirectImport);
+                }
                 // results.add(this.getSchemaManager().getSchemaOntologyVersion(IRI.create(nextDirectImport)));
                 
             }
