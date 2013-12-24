@@ -1462,6 +1462,22 @@ public abstract class AbstractPoddArtifactManagerTest
         Assert.assertTrue(schemaImports.isEmpty());
     }
     
+    @Test
+    public final void testGetSchemaImportsVersion1Artifact() throws Exception
+    {
+        this.loadVersion1SchemaOntologies();
+        
+        final InputStream inputStream =
+                this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_BASIC_1_INTERNAL_OBJECT);
+        final InferredOWLOntologyID artifactID = this.testArtifactManager.loadArtifact(inputStream, RDFFormat.RDFXML);
+        this.verifyLoadedArtifact(artifactID, 7, TestConstants.TEST_ARTIFACT_BASIC_1_INTERNAL_OBJECT_CONCRETE_TRIPLES,
+                TestConstants.TEST_ARTIFACT_BASIC_1_INTERNAL_OBJECT_INFERRED_TRIPLES, false);
+        
+        Set<? extends OWLOntologyID> schemaImports = this.testArtifactManager.getSchemaImports(artifactID);
+        
+        Assert.assertFalse("No schema imports detected", schemaImports.isEmpty());
+    }
+    
     /**
      * Test method for {@link com.github.podd.api.PoddArtifactManager#listPublishedArtifacts()}. .
      */
