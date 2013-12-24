@@ -536,19 +536,19 @@ public interface PoddSesameManager
      *            If true, will update the current version if it exists, and remove all statements
      *            relating to previous versions. If false it will only add the current version if it
      *            does not exist.
-     * @param repositoryConnection
+     * @param managementConnection
      * @param context
      * @throws OpenRDFException
      */
     void updateManagedPoddArtifactVersion(InferredOWLOntologyID nextOntologyID, boolean updateCurrentAndRemovePrevious,
-            RepositoryConnection repositoryConnection, URI context) throws OpenRDFException;
+            RepositoryConnection managementConnection, URI context) throws OpenRDFException;
     
     URI[] versionAndInferredAndSchemaContexts(InferredOWLOntologyID ontologyID,
-            RepositoryConnection repositoryConnection, URI schemaManagementGraph) throws OpenRDFException;
+            RepositoryConnection managementConnection, URI schemaManagementGraph) throws OpenRDFException;
     
     URI[] versionAndInferredContexts(InferredOWLOntologyID ontologyID);
     
-    URI[] versionAndSchemaContexts(InferredOWLOntologyID ontologyID, RepositoryConnection repositoryConnection,
+    URI[] versionAndSchemaContexts(InferredOWLOntologyID ontologyID, RepositoryConnection managementConnection,
             URI schemaManagementGraph) throws OpenRDFException;
     
     URI[] versionContexts(InferredOWLOntologyID ontologyID);
