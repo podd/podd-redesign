@@ -882,6 +882,12 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
                     .getSchemaManagementGraph());
             
             getSchemaImportsInternal(artifactID, results, managementConnection, model);
+            
+            // HACK:
+            // if(results.isEmpty())
+            // {
+            // return this.getSchemaManager().getCurrentSchemaOntologies();
+            // }
         }
         finally
         {
@@ -909,9 +915,10 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             RepositoryConnection managementConnection, final Model model) throws OpenRDFException,
         SchemaManifestException, IOException, RDFParseException, UnsupportedRDFormatException
     {
-        final Set<URI> directImports =
-                this.getSesameManager().getDirectImports(artifactID.getOntologyIRI(), managementConnection,
-                        this.getRepositoryManager().getArtifactManagementGraph());
+        // final Set<URI> directImports =
+        // this.getSesameManager().getDirectImports(artifactID.getOntologyIRI(),
+        // managementConnection,
+        // this.getRepositoryManager().getArtifactManagementGraph());
         
         final Set<URI> schemaOntologyUris = new HashSet<>();
         final Set<URI> schemaVersionUris = new HashSet<>();
@@ -920,7 +927,9 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         
         // OntologyUtils.validateSchemaManifestImports(model, schemaVersionUris);
         
-        final List<URI> importOrder = OntologyUtils.orderImports(model, schemaOntologyUris, schemaVersionUris);
+        final List<URI> importOrder =
+                OntologyUtils.orderImportsForOneOntology(model, schemaOntologyUris, schemaVersionUris, artifactID
+                        .getVersionIRI().toOpenRDFURI());
         
         Map<URI, Set<OWLOntologyID>> allImports =
                 OntologyUtils.getImports(model, schemaOntologyUris, schemaVersionUris);
@@ -934,15 +943,15 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             this.log.warn("Could not find imports for artifact: {}", artifactID);
         }
         
-        for(final URI nextDirectImport : directImports)
+        for(final URI nextImport : importOrder)
         {
-            if(allImports.containsKey(nextDirectImport))
+            if(allImports.containsKey(nextImport))
             {
-                results.addAll(allImports.get(nextDirectImport));
+                results.addAll(allImports.get(nextImport));
             }
             else
             {
-                this.log.warn("Could not find imports for schema for artifact: {} {}", artifactID, nextDirectImport);
+                this.log.warn("Could not find imports for schema for artifact: {} {}", artifactID, nextImport);
             }
             // results.add(this.getSchemaManager().getSchemaOntologyVersion(IRI.create(nextDirectImport)));
             
@@ -1350,7 +1359,6 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         
         // FIXME: This method only works if the imports are already in a repository somewhere, need
         // to fix the Sesame manager to look for imports in Models also
-        final Set<? extends OWLOntologyID> schemaImports = this.getSchemaImports(ontologyIDs.get(0));
         
         // connection to the temporary repository that the artifact RDF triples
         // will be stored while they are initially parsed by OWLAPI.
@@ -1361,6 +1369,12 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         InferredOWLOntologyID inferredOWLOntologyID = null;
         try
         {
+            final Repository managementRepository = this.getRepositoryManager().getManagementRepository();
+            managementRepositoryConnection = managementRepository.getConnection();
+            managementRepositoryConnection.begin();
+            
+            Set<OWLOntologyID> schemaImports = new HashSet<>();
+            // FIXME: Need schema imports before this stage...
             tempRepository = this.repositoryManager.getNewTemporaryRepository(schemaImports);
             temporaryRepositoryConnection = tempRepository.getConnection();
             
@@ -1376,9 +1390,11 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             
             this.handlePurls(temporaryRepositoryConnection, randomContext);
             
-            final Repository managementRepository = this.getRepositoryManager().getManagementRepository();
-            managementRepositoryConnection = managementRepository.getConnection();
-            managementRepositoryConnection.begin();
+            // check and ensure schema ontology imports are for version IRIs
+            this.handleSchemaImports(ontologyIDs.get(0).getOntologyIRI().toOpenRDFURI(),
+                    managementRepositoryConnection, temporaryRepositoryConnection, randomContext);
+            
+            this.getSchemaImportsInternal(ontologyIDs.get(0), schemaImports, temporaryRepositoryConnection, model);
             
             final Repository permanentRepository = this.getRepositoryManager().getPermanentRepository(schemaImports);
             permanentRepositoryConnection = permanentRepository.getConnection();
@@ -1439,10 +1455,6 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             this.handleTimestamps(temporaryRepositoryConnection, PODD.PODD_BASE_LAST_MODIFIED, now, randomContext);
             
             this.handleDanglingObjects(ontologyIRI, temporaryRepositoryConnection, randomContext, danglingObjectPolicy);
-            
-            // check and ensure schema ontology imports are for version IRIs
-            this.handleSchemaImports(ontologyIRI.toOpenRDFURI(), managementRepositoryConnection,
-                    temporaryRepositoryConnection, randomContext);
             
             // ensure schema ontologies are cached in memory before loading
             // statements into OWLAPI

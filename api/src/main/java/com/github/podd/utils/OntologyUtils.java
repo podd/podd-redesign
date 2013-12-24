@@ -88,11 +88,11 @@ public class OntologyUtils
                     schemaOntologyUris.add((URI)nextOntology);
                     // check ontology IRI does not have any associated
                     // owl:imports
-                    if(model.filter(nextOntology, OWL.IMPORTS, null).size() > 0)
-                    {
-                        throw new SchemaManifestException(IRI.create((URI)nextOntology),
-                                "Imports should be associated with version IRI");
-                    }
+                    // if(model.filter(nextOntology, OWL.IMPORTS, null).size() > 0)
+                    // {
+                    // throw new SchemaManifestException(IRI.create((URI)nextOntology),
+                    // "Imports should be associated with version IRI");
+                    // }
                 }
             }
         }
@@ -352,8 +352,9 @@ public class OntologyUtils
             {
                 OntologyUtils.log
                         .error("Did not find a current version for schema ontology: {}", nextSchemaOntologyUri);
-                //throw new SchemaManifestException(IRI.create(nextSchemaOntologyUri),
-                //        "Did not find a current version for schema ontology: " + nextSchemaOntologyUri.stringValue());
+                // throw new SchemaManifestException(IRI.create(nextSchemaOntologyUri),
+                // "Did not find a current version for schema ontology: " +
+                // nextSchemaOntologyUri.stringValue());
             }
             else
             {
@@ -627,6 +628,45 @@ public class OntologyUtils
             OntologyUtils.mapAndSortImports(model, currentVersionsMap, allVersionsMap, importsMap, importOrder,
                     nextVersionUri);
         }
+        
+        OntologyUtils.log.debug("importOrder: {}", importOrder);
+        return importOrder;
+    }
+    
+    /**
+     * Orders the schema ontology imports into list that can be uploaded in order to give a good
+     * chance that dependencies will be uploaded first.
+     * 
+     * @param model
+     * @param schemaOntologyUris
+     * @param schemaVersionUris
+     * @return An ordered list of {@link URI}s that determine a useful order for uploading schema
+     *         ontologies to ensure that dependencies are available internally when needed.
+     * @throws SchemaManifestException
+     */
+    public static List<URI> orderImportsForOneOntology(final Model model, final Set<URI> schemaOntologyUris,
+            final Set<URI> schemaVersionUris, final URI nextOntology) throws SchemaManifestException
+    {
+        final List<URI> importOrder = new ArrayList<>(schemaOntologyUris.size());
+        
+        final ConcurrentMap<URI, URI> currentVersionsMap = new ConcurrentHashMap<>(schemaOntologyUris.size());
+        final ConcurrentMap<URI, Set<URI>> allVersionsMap = new ConcurrentHashMap<>(schemaOntologyUris.size());
+        final ConcurrentMap<URI, Set<URI>> importsMap = new ConcurrentHashMap<>(schemaOntologyUris.size());
+        
+        // Find current version for each schema ontology
+        for(final URI nextSchemaOntologyUri : schemaOntologyUris)
+        {
+            OntologyUtils.mapCurrentVersion(model, currentVersionsMap, nextSchemaOntologyUri);
+        }
+        
+        // Find all versions for each schema ontology
+        for(final URI nextSchemaOntologyUri : schemaOntologyUris)
+        {
+            OntologyUtils.mapAllVersions(model, currentVersionsMap, allVersionsMap, nextSchemaOntologyUri);
+        }
+        
+        OntologyUtils.mapAndSortImports(model, currentVersionsMap, allVersionsMap, importsMap, importOrder,
+                nextOntology);
         
         OntologyUtils.log.debug("importOrder: {}", importOrder);
         return importOrder;
