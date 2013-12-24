@@ -918,7 +918,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         
         OntologyUtils.extractOntologyAndVersions(model, schemaOntologyUris, schemaVersionUris);
         
-        OntologyUtils.validateSchemaManifestImports(model, schemaVersionUris);
+        // OntologyUtils.validateSchemaManifestImports(model, schemaVersionUris);
         
         final List<URI> importOrder = OntologyUtils.orderImports(model, schemaOntologyUris, schemaVersionUris);
         

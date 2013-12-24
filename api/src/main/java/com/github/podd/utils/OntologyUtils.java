@@ -352,8 +352,8 @@ public class OntologyUtils
             {
                 OntologyUtils.log
                         .error("Did not find a current version for schema ontology: {}", nextSchemaOntologyUri);
-                throw new SchemaManifestException(IRI.create(nextSchemaOntologyUri),
-                        "Did not find a current version for schema ontology");
+                //throw new SchemaManifestException(IRI.create(nextSchemaOntologyUri),
+                //        "Did not find a current version for schema ontology: " + nextSchemaOntologyUri.stringValue());
             }
             else
             {
