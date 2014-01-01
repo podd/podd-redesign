@@ -23,6 +23,7 @@ import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Set;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.After;
@@ -40,6 +41,7 @@ import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.RDFHandler;
 import org.openrdf.rio.helpers.StatementCollector;
 import org.semanticweb.owlapi.model.IRI;
+import org.semanticweb.owlapi.model.OWLOntologyID;
 
 import com.github.podd.exception.SchemaManifestException;
 import com.github.podd.utils.InferredOWLOntologyID;
@@ -439,6 +441,17 @@ public class OntologyUtilsTest
         {
             
         }
+    }
+    
+    @Test
+    public final void testGetArtifactImportsNoImports() throws Exception
+    {
+        Model model = new LinkedHashModel();
+        OntologyUtils.ontologyIDsToModel(Arrays.asList(this.testOntologyID), model);
+        
+        Set<OWLOntologyID> imports = OntologyUtils.getArtifactImports(this.testOntologyID, model);
+        
+        Assert.assertTrue(imports.isEmpty());
     }
     
 }

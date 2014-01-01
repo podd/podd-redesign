@@ -558,7 +558,7 @@ public class OntologyUtils
         return results;
     }
     
-    public static Model ontologyIDsToModel(final List<InferredOWLOntologyID> input, final Model result)
+    public static Model ontologyIDsToModel(final Collection<InferredOWLOntologyID> input, final Model result)
     {
         return OntologyUtils.ontologyIDsToModel(input, result, true);
     }
