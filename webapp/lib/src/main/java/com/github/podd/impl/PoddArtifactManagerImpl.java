@@ -1386,8 +1386,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         InferredOWLOntologyID inferredOWLOntologyID = null;
         try
         {
-            final Repository managementRepository = this.getRepositoryManager().getManagementRepository();
-            managementRepositoryConnection = managementRepository.getConnection();
+            managementRepositoryConnection = this.getRepositoryManager().getManagementRepository().getConnection();
             managementRepositoryConnection.begin();
             
             Set<OWLOntologyID> schemaImports = new HashSet<>();
