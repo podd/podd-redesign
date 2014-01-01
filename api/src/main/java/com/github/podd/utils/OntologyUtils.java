@@ -69,13 +69,22 @@ public class OntologyUtils
     private static final Logger log = LoggerFactory.getLogger(OntologyUtils.class);
     
     /**
+     * Extracts ontology and version IRIs to separate sets, which are both given as parameters.
+     * 
+     * Only recognises ontology IRIs which have an "ontologyIRI, rdf:type, owl:Ontology" triple.
+     * 
+     * Only recognises version IRIs which have both "versionIRI, rdf:type, owl:Ontology" and
+     * "ontologyIRI, owl:versionIRI, versionIRI"
+     * 
      * @param model
+     *            The input statements.
      * @param schemaOntologyUris
+     *            An output container for all of the ontology IRIs which are not also version IRIs.
      * @param schemaVersionUris
-     * @throws SchemaManifestException
+     *            An output container for all of the ontology IRIs which are also versionIRIs.
      */
     public static void extractOntologyAndVersions(final Model model, final Set<URI> schemaOntologyUris,
-            final Set<URI> schemaVersionUris) throws SchemaManifestException
+            final Set<URI> schemaVersionUris)
     {
         for(final Resource nextOntology : model.filter(null, RDF.TYPE, OWL.ONTOLOGY).subjects())
         {
@@ -88,13 +97,6 @@ public class OntologyUtils
                 else
                 {
                     schemaOntologyUris.add((URI)nextOntology);
-                    // check ontology IRI does not have any associated
-                    // owl:imports
-                    // if(model.filter(nextOntology, OWL.IMPORTS, null).size() > 0)
-                    // {
-                    // throw new SchemaManifestException(IRI.create((URI)nextOntology),
-                    // "Imports should be associated with version IRI");
-                    // }
                 }
             }
         }
@@ -763,47 +765,11 @@ public class OntologyUtils
         throws OpenRDFException, SchemaManifestException, IOException, RDFParseException, UnsupportedRDFormatException
     {
         final Set<OWLOntologyID> results = new HashSet<OWLOntologyID>();
-        // final Set<URI> directImports =
-        // this.getSesameManager().getDirectImports(artifactID.getOntologyIRI(),
-        // managementConnection,
-        // this.getRepositoryManager().getArtifactManagementGraph());
         
         final Set<URI> schemaOntologyUris = new HashSet<>();
         final Set<URI> schemaVersionUris = new HashSet<>();
         
         OntologyUtils.extractOntologyAndVersions(model, schemaOntologyUris, schemaVersionUris);
-        
-        // OntologyUtils.validateSchemaManifestImports(model, schemaVersionUris);
-        
-        final List<URI> importOrder =
-                OntologyUtils.orderImportsForOneOntology(model, schemaOntologyUris, schemaVersionUris, artifactID
-                        .getVersionIRI().toOpenRDFURI());
-        
-        Map<URI, Set<OWLOntologyID>> allImports =
-                OntologyUtils.getSchemaManifestImports(model, schemaOntologyUris, schemaVersionUris);
-        
-        if(allImports.containsKey(artifactID.getVersionIRI().toOpenRDFURI()))
-        {
-            results.addAll(allImports.get(artifactID.getVersionIRI().toOpenRDFURI()));
-        }
-        else
-        {
-            OntologyUtils.log.warn("Could not find imports for artifact: {}", artifactID);
-        }
-        
-        for(final URI nextImport : importOrder)
-        {
-            if(allImports.containsKey(nextImport))
-            {
-                results.addAll(allImports.get(nextImport));
-            }
-            else
-            {
-                OntologyUtils.log.warn("Could not find imports for schema for artifact: {} {}", artifactID, nextImport);
-            }
-            // results.add(this.getSchemaManager().getSchemaOntologyVersion(IRI.create(nextDirectImport)));
-            
-        }
         
         return results;
     }
