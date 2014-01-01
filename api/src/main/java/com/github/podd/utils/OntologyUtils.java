@@ -26,6 +26,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -764,12 +765,53 @@ public class OntologyUtils
     public static Set<OWLOntologyID> getArtifactImports(final InferredOWLOntologyID artifactID, final Model model)
         throws OpenRDFException, SchemaManifestException, IOException, RDFParseException, UnsupportedRDFormatException
     {
-        final Set<OWLOntologyID> results = new HashSet<OWLOntologyID>();
+        Objects.requireNonNull(artifactID);
+        Objects.requireNonNull(model);
+        
+        final Set<OWLOntologyID> results = new LinkedHashSet<OWLOntologyID>();
         
         final Set<URI> schemaOntologyUris = new HashSet<>();
         final Set<URI> schemaVersionUris = new HashSet<>();
         
         OntologyUtils.extractOntologyAndVersions(model, schemaOntologyUris, schemaVersionUris);
+        
+        if(schemaOntologyUris.contains(artifactID.getOntologyIRI().toOpenRDFURI()))
+        {
+            List<URI> imports =
+                    orderImportsForOneOntology(model, schemaOntologyUris, schemaVersionUris, artifactID
+                            .getOntologyIRI().toOpenRDFURI());
+            
+            List<InferredOWLOntologyID> ontologyIDs = OntologyUtils.modelToOntologyIDs(model, true, false);
+            
+            for(URI nextImport : imports)
+            {
+                boolean foundImport = false;
+                for(InferredOWLOntologyID nextOntologyID : ontologyIDs)
+                {
+                    if(nextOntologyID.getOntologyIRI().toOpenRDFURI().equals(nextImport))
+                    {
+                        results.add(nextOntologyID);
+                        foundImport = true;
+                        break;
+                    }
+                    else if(nextOntologyID.getVersionIRI().toOpenRDFURI().equals(nextImport))
+                    {
+                        results.add(nextOntologyID);
+                        foundImport = true;
+                        break;
+                    }
+                }
+                if(!foundImport)
+                {
+                    throw new SchemaManifestException(artifactID.getOntologyIRI(), "Could not find import for artifact");
+                }
+            }
+        }
+        else
+        {
+            throw new SchemaManifestException(artifactID.getOntologyIRI(),
+                    "Did not find the given ontology IRI in the model");
+        }
         
         return results;
     }

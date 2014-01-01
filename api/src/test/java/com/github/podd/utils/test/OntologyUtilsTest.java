@@ -41,6 +41,7 @@ import org.openrdf.rio.RDFHandler;
 import org.openrdf.rio.helpers.StatementCollector;
 import org.semanticweb.owlapi.model.IRI;
 
+import com.github.podd.exception.SchemaManifestException;
 import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.OntologyUtils;
 import com.github.podd.utils.PODD;
@@ -56,15 +57,16 @@ public class OntologyUtilsTest
     private URI testVersionUri1;
     private URI testInferredUri1;
     private ValueFactory vf;
+    private InferredOWLOntologyID testOntologyID;
     
     @Before
     public void setUp() throws Exception
     {
-        this.vf = ValueFactoryImpl.getInstance();
+        this.vf = PODD.VF;
         this.testOntologyUri1 = this.vf.createURI("urn:test:ontology:uri:1");
         this.testVersionUri1 = this.vf.createURI("urn:test:ontology:uri:1:version:1");
         this.testInferredUri1 = this.vf.createURI("urn:inferred:test:ontology:uri:1:version:1");
-        
+        this.testOntologyID = new InferredOWLOntologyID(testOntologyUri1, testVersionUri1, testInferredUri1);
     }
     
     @After
@@ -74,6 +76,7 @@ public class OntologyUtilsTest
         this.testOntologyUri1 = null;
         this.testVersionUri1 = null;
         this.testInferredUri1 = null;
+        this.testOntologyID = null;
     }
     
     /**
@@ -395,9 +398,47 @@ public class OntologyUtilsTest
     }
     
     @Test
-    public final void testGetImportsEmpty() throws Exception
+    public final void testGetArtifactImportsNonExistent() throws Exception
     {
-        
+        Model model = new LinkedHashModel();
+        try
+        {
+            OntologyUtils.getArtifactImports(this.testOntologyID, model);
+            Assert.fail("Did not find expected exception");
+        }
+        catch(SchemaManifestException e)
+        {
+            
+        }
+    }
+    
+    @Test
+    public final void testGetArtifactImportsNullArtifact() throws Exception
+    {
+        Model model = new LinkedHashModel();
+        try
+        {
+            OntologyUtils.getArtifactImports(null, model);
+            Assert.fail("Did not find expected exception");
+        }
+        catch(NullPointerException e)
+        {
+            
+        }
+    }
+    
+    @Test
+    public final void testGetArtifactImportsNullModel() throws Exception
+    {
+        try
+        {
+            OntologyUtils.getArtifactImports(this.testOntologyID, null);
+            Assert.fail("Did not find expected exception");
+        }
+        catch(NullPointerException e)
+        {
+            
+        }
     }
     
 }
