@@ -781,6 +781,8 @@ public class OntologyUtils
                     orderImportsForOneOntology(model, schemaOntologyUris, schemaVersionUris, artifactID
                             .getOntologyIRI().toOpenRDFURI());
             
+            imports.remove(artifactID.getOntologyIRI().toOpenRDFURI());
+            
             List<InferredOWLOntologyID> ontologyIDs = OntologyUtils.modelToOntologyIDs(model, true, false);
             
             for(URI nextImport : imports)
