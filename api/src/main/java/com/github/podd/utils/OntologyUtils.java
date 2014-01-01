@@ -56,6 +56,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.github.podd.exception.SchemaManifestException;
+import com.github.podd.exception.UnmanagedArtifactIRIException;
+import com.github.podd.exception.UnmanagedArtifactVersionException;
 
 /**
  * Utilities for working with {@link InferredOWLOntologyID}
@@ -739,6 +741,71 @@ public class OntologyUtils
                 }
             }
         }
+    }
+    
+    /**
+     * Finds the schema imports for the given artifact.
+     * 
+     * Must not throw an {@link UnmanagedArtifactIRIException} or
+     * {@link UnmanagedArtifactVersionException} if the artifact does not exist globally, as long as
+     * it is managed correctly in the given model.
+     * 
+     * @param artifactID
+     * @param results
+     * @param model
+     * @throws OpenRDFException
+     * @throws SchemaManifestException
+     * @throws IOException
+     * @throws RDFParseException
+     * @throws UnsupportedRDFormatException
+     */
+    public static Set<OWLOntologyID> getImports(final InferredOWLOntologyID artifactID, final Model model)
+        throws OpenRDFException, SchemaManifestException, IOException, RDFParseException, UnsupportedRDFormatException
+    {
+        final Set<OWLOntologyID> results = new HashSet<OWLOntologyID>();
+        // final Set<URI> directImports =
+        // this.getSesameManager().getDirectImports(artifactID.getOntologyIRI(),
+        // managementConnection,
+        // this.getRepositoryManager().getArtifactManagementGraph());
+        
+        final Set<URI> schemaOntologyUris = new HashSet<>();
+        final Set<URI> schemaVersionUris = new HashSet<>();
+        
+        OntologyUtils.extractOntologyAndVersions(model, schemaOntologyUris, schemaVersionUris);
+        
+        // OntologyUtils.validateSchemaManifestImports(model, schemaVersionUris);
+        
+        final List<URI> importOrder =
+                OntologyUtils.orderImportsForOneOntology(model, schemaOntologyUris, schemaVersionUris, artifactID
+                        .getVersionIRI().toOpenRDFURI());
+        
+        Map<URI, Set<OWLOntologyID>> allImports =
+                OntologyUtils.getImports(model, schemaOntologyUris, schemaVersionUris);
+        
+        if(allImports.containsKey(artifactID.getVersionIRI().toOpenRDFURI()))
+        {
+            results.addAll(allImports.get(artifactID.getVersionIRI().toOpenRDFURI()));
+        }
+        else
+        {
+            OntologyUtils.log.warn("Could not find imports for artifact: {}", artifactID);
+        }
+        
+        for(final URI nextImport : importOrder)
+        {
+            if(allImports.containsKey(nextImport))
+            {
+                results.addAll(allImports.get(nextImport));
+            }
+            else
+            {
+                OntologyUtils.log.warn("Could not find imports for schema for artifact: {} {}", artifactID, nextImport);
+            }
+            // results.add(this.getSchemaManager().getSchemaOntologyVersion(IRI.create(nextDirectImport)));
+            
+        }
+        
+        return results;
     }
     
     private OntologyUtils()

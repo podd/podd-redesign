@@ -881,8 +881,6 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
                 artifactID,
                 "Cannot get schema imports without an artifact reference. May need to try PoddSchemaManager.getCurrentSchemaOntologies instead.");
         
-        final Set<OWLOntologyID> results = new LinkedHashSet<>();
-        
         RepositoryConnection managementConnection = null;
         
         try
@@ -899,7 +897,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             managementConnection.export(new StatementCollector(model), this.getRepositoryManager()
                     .getSchemaManagementGraph());
             
-            getSchemaImportsInternal(inferredOWLOntologyID, results, model);
+            return OntologyUtils.getImports(inferredOWLOntologyID, model);
         }
         finally
         {
@@ -907,71 +905,6 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             {
                 managementConnection.close();
             }
-        }
-        
-        return results;
-    }
-    
-    /**
-     * Finds the schema imports for the given artifact.
-     * 
-     * Must not throw an {@link UnmanagedArtifactIRIException} or
-     * {@link UnmanagedArtifactVersionException} if the artifact does not exist globally, as long as
-     * it is managed correctly in the given model.
-     * 
-     * @param artifactID
-     * @param results
-     * @param model
-     * @throws OpenRDFException
-     * @throws SchemaManifestException
-     * @throws IOException
-     * @throws RDFParseException
-     * @throws UnsupportedRDFormatException
-     */
-    private void getSchemaImportsInternal(final InferredOWLOntologyID artifactID, final Set<OWLOntologyID> results,
-            final Model model) throws OpenRDFException, SchemaManifestException, IOException, RDFParseException,
-        UnsupportedRDFormatException
-    {
-        // final Set<URI> directImports =
-        // this.getSesameManager().getDirectImports(artifactID.getOntologyIRI(),
-        // managementConnection,
-        // this.getRepositoryManager().getArtifactManagementGraph());
-        
-        final Set<URI> schemaOntologyUris = new HashSet<>();
-        final Set<URI> schemaVersionUris = new HashSet<>();
-        
-        OntologyUtils.extractOntologyAndVersions(model, schemaOntologyUris, schemaVersionUris);
-        
-        // OntologyUtils.validateSchemaManifestImports(model, schemaVersionUris);
-        
-        final List<URI> importOrder =
-                OntologyUtils.orderImportsForOneOntology(model, schemaOntologyUris, schemaVersionUris, artifactID
-                        .getVersionIRI().toOpenRDFURI());
-        
-        Map<URI, Set<OWLOntologyID>> allImports =
-                OntologyUtils.getImports(model, schemaOntologyUris, schemaVersionUris);
-        
-        if(allImports.containsKey(artifactID.getVersionIRI().toOpenRDFURI()))
-        {
-            results.addAll(allImports.get(artifactID.getVersionIRI().toOpenRDFURI()));
-        }
-        else
-        {
-            this.log.warn("Could not find imports for artifact: {}", artifactID);
-        }
-        
-        for(final URI nextImport : importOrder)
-        {
-            if(allImports.containsKey(nextImport))
-            {
-                results.addAll(allImports.get(nextImport));
-            }
-            else
-            {
-                this.log.warn("Could not find imports for schema for artifact: {} {}", artifactID, nextImport);
-            }
-            // results.add(this.getSchemaManager().getSchemaOntologyVersion(IRI.create(nextDirectImport)));
-            
         }
     }
     
@@ -1396,21 +1329,30 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             // repository, which may be shared between different uploads
             temporaryRepositoryConnection.add(model, randomContext);
             
-            // Remove any assertions that the user has made about publication status, as this
-            // information is a privileged operation that must be done through the designated API
-            // method
-            cleanPrivilegedAssertions(randomContext, temporaryRepositoryConnection);
+            // HACK: Clear the model to reuse it later
+            // There is a discontinuity between the use of the Model API and the
+            // RepositoryConnection API between OntologyUtils and PoddArtifactManager
+            // Need to create an contribute a Model view over a RepositoryConnection to OpenRDF
+            // Sesame to reduce issues like this
+            model.clear();
             
             // check and ensure schema ontology imports are for version IRIs
             this.handleSchemaImports(ontologyIDs.get(0).getOntologyIRI().toOpenRDFURI(),
                     managementRepositoryConnection, temporaryRepositoryConnection, randomContext);
             
-            Set<OWLOntologyID> schemaImports = new HashSet<>();
-            this.getSchemaImportsInternal(ontologyIDs.get(0), schemaImports, model);
+            // Repopulate model so it can be used by OntologyUtils in getSchemaImportsInternal
+            temporaryRepositoryConnection.export(new StatementCollector(model), randomContext);
+            
+            Set<OWLOntologyID> schemaImports = OntologyUtils.getImports(ontologyIDs.get(0), model);
             
             final Repository permanentRepository = this.getRepositoryManager().getPermanentRepository(schemaImports);
             permanentRepositoryConnection = permanentRepository.getConnection();
             permanentRepositoryConnection.begin();
+            
+            // Remove any assertions that the user has made about publication status, as this
+            // information is a privileged operation that must be done through the designated API
+            // method
+            cleanPrivilegedAssertions(randomContext, temporaryRepositoryConnection);
             
             // Replace temporary URIs with PURLs
             this.handlePurls(temporaryRepositoryConnection, randomContext);
