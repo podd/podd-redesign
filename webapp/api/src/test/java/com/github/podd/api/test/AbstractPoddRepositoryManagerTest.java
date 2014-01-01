@@ -114,7 +114,7 @@ public abstract class AbstractPoddRepositoryManagerTest
         RepositoryConnection tempRepositoryConnection = null;
         try
         {
-            newTempRepository = this.testRepositoryManager.getNewTemporaryRepository(null);
+            newTempRepository = this.testRepositoryManager.getNewTemporaryRepository();
             Assert.assertNotNull("New temporary repository was null", newTempRepository);
             Assert.assertTrue("New temporary repository was not initialized", newTempRepository.isInitialized());
             tempRepositoryConnection = newTempRepository.getConnection();

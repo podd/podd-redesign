@@ -156,8 +156,7 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
     }
     
     @Override
-    public Repository getNewTemporaryRepository(final Set<? extends OWLOntologyID> schemaOntologies)
-        throws OpenRDFException
+    public Repository getNewTemporaryRepository() throws OpenRDFException
     {
         final Repository result = new SailRepository(new MemoryStore());
         result.initialize();

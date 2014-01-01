@@ -1389,9 +1389,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             managementRepositoryConnection = this.getRepositoryManager().getManagementRepository().getConnection();
             managementRepositoryConnection.begin();
             
-            Set<OWLOntologyID> schemaImports = new HashSet<>();
-            // FIXME: Need schema imports before this stage...
-            tempRepository = this.repositoryManager.getNewTemporaryRepository(schemaImports);
+            tempRepository = this.repositoryManager.getNewTemporaryRepository();
             temporaryRepositoryConnection = tempRepository.getConnection();
             
             // Load the artifact RDF triples into a random context in the temp
@@ -1409,6 +1407,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             this.handleSchemaImports(ontologyIDs.get(0).getOntologyIRI().toOpenRDFURI(),
                     managementRepositoryConnection, temporaryRepositoryConnection, randomContext);
             
+            Set<OWLOntologyID> schemaImports = new HashSet<>();
             this.getSchemaImportsInternal(ontologyIDs.get(0), schemaImports, model);
             
             final Repository permanentRepository = this.getRepositoryManager().getPermanentRepository(schemaImports);
@@ -1910,9 +1909,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             // the update.
         }
         
-        final Set<? extends OWLOntologyID> currentSchemaImports = this.getSchemaImports(artifactID);
-        
-        final Repository tempRepository = this.getRepositoryManager().getNewTemporaryRepository(currentSchemaImports);
+        final Repository tempRepository = this.getRepositoryManager().getNewTemporaryRepository();
         RepositoryConnection tempRepositoryConnection = null;
         RepositoryConnection permanentRepositoryConnection = null;
         RepositoryConnection managementRepositoryConnection = null;
@@ -1925,6 +1922,8 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             tempRepositoryConnection.begin();
             
             managementRepositoryConnection = this.getRepositoryManager().getManagementRepository().getConnection();
+            
+            final Set<? extends OWLOntologyID> currentSchemaImports = this.getSchemaImports(artifactID);
             
             permanentRepositoryConnection =
                     this.getRepositoryManager().getPermanentRepository(currentSchemaImports).getConnection();
@@ -2170,7 +2169,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             
             this.log.info("Finished exporting artifact to RDF: {}", artifactVersion);
             
-            tempRepository = this.repositoryManager.getNewTemporaryRepository(newSchemaOntologyIds);
+            tempRepository = this.repositoryManager.getNewTemporaryRepository();
             tempRepositoryConnection = tempRepository.getConnection();
             tempRepositoryConnection.begin();
             // Bump the version identifier to a new value
