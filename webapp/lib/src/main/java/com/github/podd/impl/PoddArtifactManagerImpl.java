@@ -1173,10 +1173,10 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
                             managementRepositoryConnection, this.getRepositoryManager().getSchemaManagementGraph());
             
             // Always replace with the version IRI
-            if(!importedSchemaIRI.equals(schemaOntologyID.getVersionIRI()))
+            if(!importedSchemaIRI.equals(schemaOntologyID.getVersionIRI().toOpenRDFURI()))
             {
                 // modify import to be a specific version of the schema
-                this.log.debug("Updating import to version <{}>", schemaOntologyID.getVersionIRI());
+                this.log.info("Updating import to version <{}>", schemaOntologyID.getVersionIRI());
                 tempRepositoryConnection.remove(ontologyIRI, OWL.IMPORTS, importedSchemaIRI, tempContext);
                 tempRepositoryConnection.add(ontologyIRI, OWL.IMPORTS, schemaOntologyID.getVersionIRI().toOpenRDFURI(),
                         tempContext);
@@ -1401,8 +1401,6 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             // method
             cleanPrivilegedAssertions(randomContext, temporaryRepositoryConnection);
             
-            this.handlePurls(temporaryRepositoryConnection, randomContext);
-            
             // check and ensure schema ontology imports are for version IRIs
             this.handleSchemaImports(ontologyIDs.get(0).getOntologyIRI().toOpenRDFURI(),
                     managementRepositoryConnection, temporaryRepositoryConnection, randomContext);
@@ -1414,7 +1412,10 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             permanentRepositoryConnection = permanentRepository.getConnection();
             permanentRepositoryConnection.begin();
             
-            // Set a Version IRI for this artifact
+            // Replace temporary URIs with PURLs
+            this.handlePurls(temporaryRepositoryConnection, randomContext);
+            
+            // Set a Version IRI for this artifact based on the PURL
             /*
              * Version information need not be available in uploaded artifacts (any existing values
              * are ignored).
