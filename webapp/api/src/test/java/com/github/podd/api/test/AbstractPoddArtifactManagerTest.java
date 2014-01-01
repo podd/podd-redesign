@@ -872,10 +872,8 @@ public abstract class AbstractPoddArtifactManagerTest
         final InputStream inputStream =
                 this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_BASIC_1_INTERNAL_OBJECT);
         
-        final String mimeType = "application/rdf+xml";
-        final RDFFormat format = Rio.getParserFormatForMIMEType(mimeType, RDFFormat.RDFXML);
-        
-        final InferredOWLOntologyID resultArtifactId = this.testArtifactManager.loadArtifact(inputStream, format);
+        final InferredOWLOntologyID resultArtifactId =
+                this.testArtifactManager.loadArtifact(inputStream, RDFFormat.RDFXML);
         
         // verify:
         this.verifyLoadedArtifact(resultArtifactId, 7,
@@ -885,8 +883,15 @@ public abstract class AbstractPoddArtifactManagerTest
         boolean deleted = this.testArtifactManager.deleteArtifact(resultArtifactId);
         Assert.assertTrue("Should have deleted artifact successfully", deleted);
         
-        deleted = this.testArtifactManager.deleteArtifact(resultArtifactId);
-        Assert.assertFalse("Should fail as artifact no longer exists", deleted);
+        try
+        {
+            this.testArtifactManager.deleteArtifact(resultArtifactId);
+            Assert.fail("Did not find expected exception");
+        }
+        catch(UnmanagedArtifactIRIException e)
+        {
+            
+        }
     }
     
     /**
