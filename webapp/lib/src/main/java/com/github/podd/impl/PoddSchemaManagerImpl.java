@@ -351,7 +351,7 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
         final List<URI> importOrder = OntologyUtils.orderImports(model, schemaOntologyUris, schemaVersionUris);
         
         Map<URI, Set<OWLOntologyID>> allImports =
-                OntologyUtils.getImports(model, schemaOntologyUris, schemaVersionUris);
+                OntologyUtils.getSchemaManifestImports(model, schemaOntologyUris, schemaVersionUris);
         
         return this.uploadSchemaOntologiesInOrder(model, importOrder);
     }

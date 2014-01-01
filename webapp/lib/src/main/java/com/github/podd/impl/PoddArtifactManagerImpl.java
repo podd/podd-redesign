@@ -897,7 +897,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             managementConnection.export(new StatementCollector(model), this.getRepositoryManager()
                     .getSchemaManagementGraph());
             
-            return OntologyUtils.getImports(inferredOWLOntologyID, model);
+            return OntologyUtils.getArtifactImports(inferredOWLOntologyID, model);
         }
         finally
         {
@@ -1343,7 +1343,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             // Repopulate model so it can be used by OntologyUtils in getSchemaImportsInternal
             temporaryRepositoryConnection.export(new StatementCollector(model), randomContext);
             
-            Set<OWLOntologyID> schemaImports = OntologyUtils.getImports(ontologyIDs.get(0), model);
+            Set<OWLOntologyID> schemaImports = OntologyUtils.getArtifactImports(ontologyIDs.get(0), model);
             
             final Repository permanentRepository = this.getRepositoryManager().getPermanentRepository(schemaImports);
             permanentRepositoryConnection = permanentRepository.getConnection();

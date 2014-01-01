@@ -290,7 +290,7 @@ public class PoddOWLManagerImpl implements PoddOWLManager
             OntologyUtils.extractOntologyAndVersions(schemaManagement, schemaOntologyUris, schemaVersionUris);
             
             Map<URI, Set<OWLOntologyID>> imports2 =
-                    OntologyUtils.getImports(schemaManagement, schemaOntologyUris, schemaVersionUris);
+                    OntologyUtils.getSchemaManifestImports(schemaManagement, schemaOntologyUris, schemaVersionUris);
             
             if(imports2.containsKey(ontologyID.getVersionIRI().toOpenRDFURI()))
             {

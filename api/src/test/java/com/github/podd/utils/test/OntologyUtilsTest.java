@@ -394,4 +394,10 @@ public class OntologyUtilsTest
                         .iterator().next().getVersionIRI().toString());
     }
     
+    @Test
+    public final void testGetImportsEmpty() throws Exception
+    {
+        
+    }
+    
 }

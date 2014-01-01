@@ -111,8 +111,8 @@ public class OntologyUtils
      * @return
      * @throws SchemaManifestException
      */
-    public static Map<URI, Set<OWLOntologyID>> getImports(final Model model, final Set<URI> schemaOntologyUris,
-            final Set<URI> schemaVersionUris) throws SchemaManifestException
+    public static Map<URI, Set<OWLOntologyID>> getSchemaManifestImports(final Model model,
+            final Set<URI> schemaOntologyUris, final Set<URI> schemaVersionUris) throws SchemaManifestException
     {
         final ConcurrentMap<URI, Set<OWLOntologyID>> result = new ConcurrentHashMap<>();
         
@@ -759,7 +759,7 @@ public class OntologyUtils
      * @throws RDFParseException
      * @throws UnsupportedRDFormatException
      */
-    public static Set<OWLOntologyID> getImports(final InferredOWLOntologyID artifactID, final Model model)
+    public static Set<OWLOntologyID> getArtifactImports(final InferredOWLOntologyID artifactID, final Model model)
         throws OpenRDFException, SchemaManifestException, IOException, RDFParseException, UnsupportedRDFormatException
     {
         final Set<OWLOntologyID> results = new HashSet<OWLOntologyID>();
@@ -780,7 +780,7 @@ public class OntologyUtils
                         .getVersionIRI().toOpenRDFURI());
         
         Map<URI, Set<OWLOntologyID>> allImports =
-                OntologyUtils.getImports(model, schemaOntologyUris, schemaVersionUris);
+                OntologyUtils.getSchemaManifestImports(model, schemaOntologyUris, schemaVersionUris);
         
         if(allImports.containsKey(artifactID.getVersionIRI().toOpenRDFURI()))
         {
