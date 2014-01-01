@@ -892,6 +892,8 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
                             managementConnection);
             
             final Model model = new LinkedHashModel();
+            // NOTE: In future when we support imports to exist between artifacts, will be utilising
+            // the entire artifact management graph here, so exporting it all
             managementConnection.export(new StatementCollector(model), this.getRepositoryManager()
                     .getArtifactManagementGraph());
             managementConnection.export(new StatementCollector(model), this.getRepositoryManager()
