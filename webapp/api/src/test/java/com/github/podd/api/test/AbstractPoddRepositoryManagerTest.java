@@ -106,7 +106,6 @@ public abstract class AbstractPoddRepositoryManagerTest
      * Test method for
      * {@link com.github.podd.impl.PoddRepositoryManagerImpl#getNewTemporaryRepository()}.
      */
-    @Ignore("TODO: Migrate to new methodology")
     @Test
     public final void testGetNewTemporaryRepository() throws Exception
     {
@@ -126,6 +125,9 @@ public abstract class AbstractPoddRepositoryManagerTest
             if(tempRepositoryConnection != null && tempRepositoryConnection.isActive())
             {
                 tempRepositoryConnection.rollback();
+            }
+            if(tempRepositoryConnection != null && tempRepositoryConnection.isOpen())
+            {
                 tempRepositoryConnection.close();
             }
             if(newTempRepository != null)
