@@ -1460,11 +1460,17 @@ public abstract class AbstractPoddArtifactManagerTest
     @Test
     public final void testGetSchemaImportsNonExistingArtifact() throws Exception
     {
-        Set<? extends OWLOntologyID> schemaImports =
-                this.testArtifactManager.getSchemaImports(new InferredOWLOntologyID(IRI
-                        .create("urn:artifact:does:not:exist"), IRI.create("urn:artifact:version:does:not:exist"), IRI
-                        .create("urn:inferred:artifact:does:not:exist")));
-        Assert.assertTrue(schemaImports.isEmpty());
+        try
+        {
+            this.testArtifactManager.getSchemaImports(new InferredOWLOntologyID(IRI
+                    .create("urn:artifact:does:not:exist"), IRI.create("urn:artifact:version:does:not:exist"), IRI
+                    .create("urn:inferred:artifact:does:not:exist")));
+            Assert.fail("Did not receive expected exception");
+        }
+        catch(UnmanagedArtifactIRIException e)
+        {
+            
+        }
     }
     
     @Test
