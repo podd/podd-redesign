@@ -159,7 +159,8 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
             this.populateDataModelWithArtifactData(ontologyID, objectToView, dataModel, isPublished);
         }
         catch(final OpenRDFException | UnmanagedSchemaIRIException | SchemaManifestException
-                | UnsupportedRDFormatException | IOException e)
+                | UnsupportedRDFormatException | IOException | UnmanagedArtifactIRIException
+                | UnmanagedArtifactVersionException e)
         {
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Failed to populate data model", e);
         }
@@ -257,10 +258,14 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
      * @throws IOException
      * @throws UnsupportedRDFormatException
      * @throws SchemaManifestException
+     * @throws ResourceException
+     * @throws UnmanagedArtifactVersionException
+     * @throws UnmanagedArtifactIRIException
      */
     private void populateDataModelWithArtifactData(final InferredOWLOntologyID ontologyID, final String objectToView,
             final Map<String, Object> dataModel, final boolean isPublished) throws OpenRDFException,
-        UnmanagedSchemaIRIException, SchemaManifestException, UnsupportedRDFormatException, IOException
+        UnmanagedSchemaIRIException, SchemaManifestException, UnsupportedRDFormatException, IOException,
+        UnmanagedArtifactIRIException, UnmanagedArtifactVersionException, ResourceException
     {
         
         final PoddObjectLabel theObject =

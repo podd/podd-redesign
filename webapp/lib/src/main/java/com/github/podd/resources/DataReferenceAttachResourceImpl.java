@@ -187,7 +187,8 @@ public class DataReferenceAttachResourceImpl extends AbstractPoddResourceImpl
             parentDetails = RestletUtils.getParentDetails(this.getPoddArtifactManager(), artifact, objectUri);
         }
         catch(final OpenRDFException | UnmanagedSchemaIRIException | SchemaManifestException
-                | UnsupportedRDFormatException | IOException e)
+                | UnsupportedRDFormatException | IOException | UnmanagedArtifactIRIException
+                | UnmanagedArtifactVersionException e)
         {
             this.log.error("Could not find parent details", e);
             throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Could not find parent details", e);

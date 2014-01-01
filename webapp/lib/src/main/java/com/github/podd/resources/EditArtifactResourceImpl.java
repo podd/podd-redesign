@@ -279,7 +279,8 @@ public class EditArtifactResourceImpl extends AbstractPoddResourceImpl
             }
         }
         catch(final OpenRDFException | UnmanagedSchemaIRIException | SchemaManifestException
-                | UnsupportedRDFormatException | IOException e)
+                | UnsupportedRDFormatException | IOException | UnmanagedArtifactIRIException
+                | UnmanagedArtifactVersionException e)
         {
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Failed to populate data model");
         }

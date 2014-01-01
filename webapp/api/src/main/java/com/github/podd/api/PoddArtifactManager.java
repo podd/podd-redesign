@@ -193,9 +193,12 @@ public interface PoddArtifactManager
      * @throws IOException
      * @throws UnsupportedRDFormatException
      * @throws SchemaManifestException
+     * @throws UnmanagedArtifactVersionException
+     * @throws UnmanagedArtifactIRIException
      */
     Model fillMissingData(InferredOWLOntologyID ontologyID, Model inputModel) throws OpenRDFException,
-        UnmanagedSchemaIRIException, SchemaManifestException, UnsupportedRDFormatException, IOException;
+        UnmanagedSchemaIRIException, SchemaManifestException, UnsupportedRDFormatException, IOException,
+        UnmanagedArtifactIRIException, UnmanagedArtifactVersionException;
     
     /**
      * Returns the {@link InferredOWLOntologyID} for the artifact identified by the given IRI.
@@ -249,9 +252,12 @@ public interface PoddArtifactManager
      * @throws IOException
      * @throws UnsupportedRDFormatException
      * @throws SchemaManifestException
+     * @throws UnmanagedArtifactVersionException
+     * @throws UnmanagedArtifactIRIException
      */
     Set<URI> getChildObjects(InferredOWLOntologyID ontologyID, URI objectUri) throws OpenRDFException,
-        UnmanagedSchemaIRIException, SchemaManifestException, UnsupportedRDFormatException, IOException;
+        UnmanagedSchemaIRIException, SchemaManifestException, UnsupportedRDFormatException, IOException,
+        UnmanagedArtifactIRIException, UnmanagedArtifactVersionException;
     
     /**
      * 
@@ -293,10 +299,12 @@ public interface PoddArtifactManager
      * @throws IOException
      * @throws UnsupportedRDFormatException
      * @throws SchemaManifestException
+     * @throws UnmanagedArtifactVersionException
+     * @throws UnmanagedArtifactIRIException
      */
     Model getObjectDetailsForDisplay(final InferredOWLOntologyID artifactID, final URI objectUri)
         throws OpenRDFException, UnmanagedSchemaIRIException, SchemaManifestException, UnsupportedRDFormatException,
-        IOException;
+        IOException, UnmanagedArtifactIRIException, UnmanagedArtifactVersionException;
     
     /**
      * 
@@ -310,9 +318,12 @@ public interface PoddArtifactManager
      * @throws IOException
      * @throws UnsupportedRDFormatException
      * @throws SchemaManifestException
+     * @throws UnmanagedArtifactVersionException
+     * @throws UnmanagedArtifactIRIException
      */
     PoddObjectLabel getObjectLabel(InferredOWLOntologyID ontologyID, URI objectUri) throws OpenRDFException,
-        UnmanagedSchemaIRIException, SchemaManifestException, UnsupportedRDFormatException, IOException;
+        UnmanagedSchemaIRIException, SchemaManifestException, UnsupportedRDFormatException, IOException,
+        UnmanagedArtifactIRIException, UnmanagedArtifactVersionException;
     
     /**
      * Retrieves a list of {@link PoddObjectLabel}s for the most-specific types to which the given
@@ -328,9 +339,12 @@ public interface PoddArtifactManager
      * @throws IOException
      * @throws UnsupportedRDFormatException
      * @throws SchemaManifestException
+     * @throws UnmanagedArtifactVersionException
+     * @throws UnmanagedArtifactIRIException
      */
     List<PoddObjectLabel> getObjectTypes(InferredOWLOntologyID artifactId, URI objectUri) throws OpenRDFException,
-        UnmanagedSchemaIRIException, SchemaManifestException, UnsupportedRDFormatException, IOException;
+        UnmanagedSchemaIRIException, SchemaManifestException, UnsupportedRDFormatException, IOException,
+        UnmanagedArtifactIRIException, UnmanagedArtifactVersionException;
     
     /**
      * Retrieve a list of <b>asserted</b> properties about the given object. The list is ordered
@@ -355,10 +369,12 @@ public interface PoddArtifactManager
      * @throws IOException
      * @throws UnsupportedRDFormatException
      * @throws SchemaManifestException
+     * @throws UnmanagedArtifactVersionException
+     * @throws UnmanagedArtifactIRIException
      */
     List<URI> getOrderedProperties(InferredOWLOntologyID ontologyID, URI objectUri, boolean excludeContainsProperties)
         throws OpenRDFException, UnmanagedSchemaIRIException, SchemaManifestException, UnsupportedRDFormatException,
-        IOException;
+        IOException, UnmanagedArtifactIRIException, UnmanagedArtifactVersionException;
     
     /**
      * 
@@ -384,9 +400,12 @@ public interface PoddArtifactManager
      * @throws IOException
      * @throws UnsupportedRDFormatException
      * @throws SchemaManifestException
+     * @throws UnmanagedArtifactVersionException
+     * @throws UnmanagedArtifactIRIException
      */
     Model getParentDetails(InferredOWLOntologyID ontologyID, URI objectUri) throws OpenRDFException,
-        UnmanagedSchemaIRIException, SchemaManifestException, UnsupportedRDFormatException, IOException;
+        UnmanagedSchemaIRIException, SchemaManifestException, UnsupportedRDFormatException, IOException,
+        UnmanagedArtifactIRIException, UnmanagedArtifactVersionException;
     
     /**
      * 
@@ -445,9 +464,12 @@ public interface PoddArtifactManager
      * @throws IOException
      * @throws UnsupportedRDFormatException
      * @throws SchemaManifestException
+     * @throws UnmanagedArtifactVersionException
+     * @throws UnmanagedArtifactIRIException
      */
     List<PoddObjectLabel> getTopObjectLabels(List<InferredOWLOntologyID> artifacts) throws OpenRDFException,
-        UnmanagedSchemaIRIException, SchemaManifestException, UnsupportedRDFormatException, IOException;
+        UnmanagedSchemaIRIException, SchemaManifestException, UnsupportedRDFormatException, IOException,
+        UnmanagedArtifactIRIException, UnmanagedArtifactVersionException;
     
     /**
      * Checks whether a given Ontology is Published.
@@ -533,10 +555,12 @@ public interface PoddArtifactManager
      * @throws IOException
      * @throws UnsupportedRDFormatException
      * @throws SchemaManifestException
+     * @throws UnmanagedArtifactVersionException
+     * @throws UnmanagedArtifactIRIException
      */
     Model searchForOntologyLabels(InferredOWLOntologyID ontologyID, String searchTerm, URI[] searchTypes)
         throws OpenRDFException, ResourceException, UnmanagedSchemaIRIException, SchemaManifestException,
-        UnsupportedRDFormatException, IOException;
+        UnsupportedRDFormatException, IOException, UnmanagedArtifactIRIException, UnmanagedArtifactVersionException;
     
     /**
      * Sets the {@link DataReferenceManager} to use for verifying file references for PODD

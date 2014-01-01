@@ -41,6 +41,7 @@ import org.semanticweb.owlapi.model.IRI;
 
 import com.github.podd.exception.SchemaManifestException;
 import com.github.podd.exception.UnmanagedArtifactIRIException;
+import com.github.podd.exception.UnmanagedArtifactVersionException;
 import com.github.podd.exception.UnmanagedSchemaIRIException;
 import com.github.podd.restlet.PoddAction;
 import com.github.podd.utils.InferredOWLOntologyID;
@@ -119,7 +120,8 @@ public class SearchOntologyResourceImpl extends AbstractPoddResourceImpl
                             set.toArray(new URI[0]));
         }
         catch(final OpenRDFException | UnmanagedSchemaIRIException | SchemaManifestException
-                | UnsupportedRDFormatException | IOException e)
+                | UnsupportedRDFormatException | IOException | UnmanagedArtifactIRIException
+                | UnmanagedArtifactVersionException e)
         {
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Failed searching for Ontology Labels", e);
         }
@@ -217,6 +219,14 @@ public class SearchOntologyResourceImpl extends AbstractPoddResourceImpl
         catch(SchemaManifestException e)
         {
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Could not find necessary schema ontology", e);
+        }
+        catch(UnmanagedArtifactIRIException e)
+        {
+            throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Could not find artifact IRI", e);
+        }
+        catch(UnmanagedArtifactVersionException e)
+        {
+            throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Could not find artifact version", e);
         }
         
         return new ByteArrayRepresentation(output.toByteArray(), MediaType.valueOf(outputFormat.getDefaultMIMEType()));

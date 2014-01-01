@@ -35,6 +35,7 @@ import org.slf4j.LoggerFactory;
 import com.github.ansell.restletutils.RestletUtilRole;
 import com.github.podd.exception.SchemaManifestException;
 import com.github.podd.exception.UnmanagedArtifactIRIException;
+import com.github.podd.exception.UnmanagedArtifactVersionException;
 import com.github.podd.exception.UnmanagedSchemaIRIException;
 import com.github.podd.restlet.PoddAction;
 import com.github.podd.restlet.PoddWebServiceApplication;
@@ -129,7 +130,8 @@ public class ArtifactRolesResourceImpl extends AbstractPoddResourceImpl
             dataModel.put("observers", roleUserMap.get(PoddRoles.PROJECT_OBSERVER));
         }
         catch(final UnmanagedSchemaIRIException | OpenRDFException | SchemaManifestException
-                | UnsupportedRDFormatException | IOException e)
+                | UnsupportedRDFormatException | IOException | UnmanagedArtifactIRIException
+                | UnmanagedArtifactVersionException e)
         {
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Failed to populate data model", e);
         }
@@ -212,9 +214,12 @@ public class ArtifactRolesResourceImpl extends AbstractPoddResourceImpl
      * @throws IOException
      * @throws UnsupportedRDFormatException
      * @throws SchemaManifestException
+     * @throws UnmanagedArtifactVersionException
+     * @throws UnmanagedArtifactIRIException
      */
     private PoddObjectLabel getProjectDetails(final InferredOWLOntologyID ontologyID) throws OpenRDFException,
-        UnmanagedSchemaIRIException, SchemaManifestException, UnsupportedRDFormatException, IOException
+        UnmanagedSchemaIRIException, SchemaManifestException, UnsupportedRDFormatException, IOException,
+        UnmanagedArtifactIRIException, UnmanagedArtifactVersionException
     {
         // find and set top-object of this artifact as the object to display
         final List<PoddObjectLabel> topObjectLabels =
