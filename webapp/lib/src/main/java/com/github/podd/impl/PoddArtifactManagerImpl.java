@@ -494,18 +494,38 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
     public InferredOWLOntologyID getArtifact(final IRI artifactIRI, final IRI versionIRI)
         throws UnmanagedArtifactIRIException, UnmanagedArtifactVersionException, UnmanagedSchemaIRIException
     {
-        return getArtifactInternal(artifactIRI, versionIRI);
-    }
-    
-    private InferredOWLOntologyID getArtifactInternal(final IRI artifactIRI, final IRI versionIRI)
-        throws UnmanagedArtifactIRIException, UnmanagedArtifactVersionException
-    {
         RepositoryConnection managementConnection = null;
-        
         try
         {
             managementConnection = this.getRepositoryManager().getManagementRepository().getConnection();
-            
+            return getArtifactInternal(artifactIRI, versionIRI, managementConnection);
+        }
+        catch(final OpenRDFException e)
+        {
+            throw new UnmanagedArtifactIRIException(artifactIRI, e);
+        }
+        finally
+        {
+            if(managementConnection != null)
+            {
+                try
+                {
+                    managementConnection.close();
+                }
+                catch(final RepositoryException e)
+                {
+                    this.log.error("Failed to close repository connection", e);
+                }
+            }
+        }
+    }
+    
+    private InferredOWLOntologyID getArtifactInternal(final IRI artifactIRI, final IRI versionIRI,
+            final RepositoryConnection managementConnection) throws UnmanagedArtifactIRIException,
+        UnmanagedArtifactVersionException
+    {
+        try
+        {
             InferredOWLOntologyID result = null;
             
             if(versionIRI != null)
@@ -539,20 +559,6 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         catch(final OpenRDFException e)
         {
             throw new UnmanagedArtifactIRIException(artifactIRI, e);
-        }
-        finally
-        {
-            if(managementConnection != null)
-            {
-                try
-                {
-                    managementConnection.close();
-                }
-                catch(final RepositoryException e)
-                {
-                    this.log.error("Failed to close repository connection", e);
-                }
-            }
         }
     }
     
@@ -883,15 +889,17 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         {
             managementConnection = this.getRepositoryManager().getManagementRepository().getConnection();
             
+            InferredOWLOntologyID inferredOWLOntologyID =
+                    this.getArtifactInternal(artifactID.getOntologyIRI(), artifactID.getVersionIRI(),
+                            managementConnection);
+            
             final Model model = new LinkedHashModel();
             managementConnection.export(new StatementCollector(model), this.getRepositoryManager()
                     .getArtifactManagementGraph());
             managementConnection.export(new StatementCollector(model), this.getRepositoryManager()
                     .getSchemaManagementGraph());
             
-            this.getArtifactInternal(artifactID.getOntologyIRI(), artifactID.getVersionIRI());
-            
-            getSchemaImportsInternal(artifactID, results, managementConnection, model);
+            getSchemaImportsInternal(inferredOWLOntologyID, results, model);
         }
         finally
         {
@@ -905,9 +913,14 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
     }
     
     /**
+     * Finds the schema imports for the given artifact.
+     * 
+     * Must not throw an {@link UnmanagedArtifactIRIException} or
+     * {@link UnmanagedArtifactVersionException} if the artifact does not exist globally, as long as
+     * it is managed correctly in the given model.
+     * 
      * @param artifactID
      * @param results
-     * @param managementConnection
      * @param model
      * @throws OpenRDFException
      * @throws SchemaManifestException
@@ -915,9 +928,9 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
      * @throws RDFParseException
      * @throws UnsupportedRDFormatException
      */
-    public void getSchemaImportsInternal(final InferredOWLOntologyID artifactID, final Set<OWLOntologyID> results,
-            RepositoryConnection managementConnection, final Model model) throws OpenRDFException,
-        SchemaManifestException, IOException, RDFParseException, UnsupportedRDFormatException
+    private void getSchemaImportsInternal(final InferredOWLOntologyID artifactID, final Set<OWLOntologyID> results,
+            final Model model) throws OpenRDFException, SchemaManifestException, IOException, RDFParseException,
+        UnsupportedRDFormatException
     {
         // final Set<URI> directImports =
         // this.getSesameManager().getDirectImports(artifactID.getOntologyIRI(),
@@ -1389,8 +1402,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             // Remove any assertions that the user has made about publication status, as this
             // information is a privileged operation that must be done through the designated API
             // method
-            temporaryRepositoryConnection.remove((Resource)null, PODD.PODD_BASE_HAS_PUBLICATION_STATUS, (Resource)null,
-                    randomContext);
+            cleanPrivilegedAssertions(randomContext, temporaryRepositoryConnection);
             
             this.handlePurls(temporaryRepositoryConnection, randomContext);
             
@@ -1398,7 +1410,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             this.handleSchemaImports(ontologyIDs.get(0).getOntologyIRI().toOpenRDFURI(),
                     managementRepositoryConnection, temporaryRepositoryConnection, randomContext);
             
-            this.getSchemaImportsInternal(ontologyIDs.get(0), schemaImports, temporaryRepositoryConnection, model);
+            this.getSchemaImportsInternal(ontologyIDs.get(0), schemaImports, model);
             
             final Repository permanentRepository = this.getRepositoryManager().getPermanentRepository(schemaImports);
             permanentRepositoryConnection = permanentRepository.getConnection();
@@ -1560,6 +1572,18 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
                 }
             }
         }
+    }
+    
+    /**
+     * @param randomContext
+     * @param temporaryRepositoryConnection
+     * @throws RepositoryException
+     */
+    public void cleanPrivilegedAssertions(final URI randomContext, RepositoryConnection temporaryRepositoryConnection)
+        throws RepositoryException
+    {
+        temporaryRepositoryConnection.remove((Resource)null, PODD.PODD_BASE_HAS_PUBLICATION_STATUS, (Resource)null,
+                randomContext);
     }
     
     /**
@@ -1984,13 +2008,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             this.handleDanglingObjects(artifactID.getOntologyIRI(), tempRepositoryConnection, tempContext,
                     danglingObjectAction);
             
-            // Remove any assertions that the user has made about publication
-            // status, as this
-            // information is a privileged operation that must be done through
-            // the designated API
-            // method
-            tempRepositoryConnection.remove((Resource)null, PODD.PODD_BASE_HAS_PUBLICATION_STATUS, (Resource)null,
-                    tempContext);
+            cleanPrivilegedAssertions(tempContext, tempRepositoryConnection);
             
             final Set<PoddPurlReference> purls = this.handlePurls(tempRepositoryConnection, tempContext);
             
