@@ -1433,7 +1433,8 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             
             inferredOWLOntologyID =
                     this.loadInferStoreArtifact(temporaryRepositoryConnection, permanentRepositoryConnection,
-                            managementRepositoryConnection, randomContext, dataReferenceVerificationPolicy, false);
+                            managementRepositoryConnection, randomContext, dataReferenceVerificationPolicy, false,
+                            schemaImports);
             
             permanentRepositoryConnection.commit();
             managementRepositoryConnection.commit();
@@ -1545,13 +1546,14 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
      * and store in permanent repository.
      * 
      * @param fileReferencePolicy
+     * @param dependentSchemaOntologies
      */
     private InferredOWLOntologyID loadInferStoreArtifact(final RepositoryConnection tempRepositoryConnection,
             final RepositoryConnection permanentRepositoryConnection,
             final RepositoryConnection managementRepositoryConnection, final URI tempContext,
-            final DataReferenceVerificationPolicy fileReferencePolicy, final boolean asynchronousInferences)
-        throws OpenRDFException, OWLException, IOException, PoddException, OntologyNotInProfileException,
-        InconsistentOntologyException
+            final DataReferenceVerificationPolicy fileReferencePolicy, final boolean asynchronousInferences,
+            Set<? extends OWLOntologyID> dependentSchemaOntologies) throws OpenRDFException, OWLException, IOException,
+        PoddException, OntologyNotInProfileException, InconsistentOntologyException
     {
         // load into OWLAPI
         this.log.debug("Loading podd artifact from temp repository: {}", tempContext);
@@ -1563,7 +1565,9 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
                         .asSet(tempRepositoryConnection.getNamespaces())));
         
         final InferredOWLOntologyID inferredOWLOntologyID =
-                this.getOWLManager().loadAndInfer(owlSource, permanentRepositoryConnection, null);
+                this.getOWLManager().loadAndInfer(owlSource, permanentRepositoryConnection, null,
+                        dependentSchemaOntologies, managementRepositoryConnection,
+                        this.getRepositoryManager().getSchemaManagementGraph());
         
         // Check file references after inferencing to accurately identify
         // the parent object
@@ -2020,7 +2024,8 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             
             inferredOWLOntologyID =
                     this.loadInferStoreArtifact(tempRepositoryConnection, permanentRepositoryConnection,
-                            managementRepositoryConnection, tempContext, fileReferenceAction, false);
+                            managementRepositoryConnection, tempContext, fileReferenceAction, false,
+                            currentSchemaImports);
             
             permanentRepositoryConnection.commit();
             managementRepositoryConnection.commit();
@@ -2197,7 +2202,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             final InferredOWLOntologyID result =
                     this.loadInferStoreArtifact(tempRepositoryConnection, permanentRepositoryConnection,
                             managementRepositoryConnection, newVersionIRI.toOpenRDFURI(),
-                            DataReferenceVerificationPolicy.DO_NOT_VERIFY, false);
+                            DataReferenceVerificationPolicy.DO_NOT_VERIFY, false, newSchemaOntologyIds);
             
             this.log.info("Completed reload of artifact to Repository: {}", artifactVersion);
             
