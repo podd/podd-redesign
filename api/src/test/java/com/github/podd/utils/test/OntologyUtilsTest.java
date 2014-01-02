@@ -495,8 +495,10 @@ public class OntologyUtilsTest
         OntologyUtils.ontologyIDsToModel(Arrays.asList(this.testOntologyID), model);
         model.add(this.testImportOntologyUri1, RDF.TYPE, OWL.ONTOLOGY);
         model.add(this.testImportOntologyUri1, OWL.VERSIONIRI, this.testImportVersionUri1);
-        model.add(this.testImportOntologyUri1, OWL.IMPORTS, this.testImportVersionUri2);
+        model.add(this.testImportVersionUri1, RDF.TYPE, OWL.ONTOLOGY);
+        model.add(this.testImportVersionUri1, OWL.IMPORTS, this.testImportVersionUri2);
         model.add(this.testImportOntologyUri2, RDF.TYPE, OWL.ONTOLOGY);
+        model.add(this.testImportVersionUri2, RDF.TYPE, OWL.ONTOLOGY);
         model.add(this.testImportOntologyUri2, OWL.VERSIONIRI, this.testImportVersionUri2);
         model.add(this.testOntologyUri1, OWL.IMPORTS, this.testImportOntologyUri1);
         

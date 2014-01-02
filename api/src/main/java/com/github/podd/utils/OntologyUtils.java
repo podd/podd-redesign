@@ -788,47 +788,7 @@ public class OntologyUtils
         
         if(schemaOntologyUris.contains(artifactID.getOntologyIRI().toOpenRDFURI()))
         {
-            List<URI> imports =
-                    orderImportsForOneOntology(model, schemaOntologyUris, schemaVersionUris, artifactID
-                            .getOntologyIRI().toOpenRDFURI(), importsMap);
             
-            List<InferredOWLOntologyID> ontologyIDs = OntologyUtils.modelToOntologyIDs(model, true, false);
-            
-            for(URI nextImport : imports)
-            {
-                if(importsMap.containsKey(nextImport))
-                {
-                    for(URI nextTransitiveImport : importsMap.get(nextImport))
-                    {
-                        boolean foundImport = false;
-                        for(InferredOWLOntologyID nextOntologyID : ontologyIDs)
-                        {
-                            if(nextOntologyID.getOntologyIRI().toOpenRDFURI().equals(nextTransitiveImport))
-                            {
-                                results.add(nextOntologyID);
-                                foundImport = true;
-                                break;
-                            }
-                            else if(nextOntologyID.getVersionIRI() != null
-                                    && nextOntologyID.getVersionIRI().toOpenRDFURI().equals(nextTransitiveImport))
-                            {
-                                results.add(nextOntologyID);
-                                foundImport = true;
-                                break;
-                            }
-                        }
-                        if(!foundImport)
-                        {
-                            throw new SchemaManifestException(artifactID.getOntologyIRI(),
-                                    "Could not find transitive import for artifact");
-                        }
-                    }
-                }
-                else
-                {
-                    throw new SchemaManifestException(artifactID.getOntologyIRI(), "Could not find import for artifact");
-                }
-            }
         }
         else
         {
