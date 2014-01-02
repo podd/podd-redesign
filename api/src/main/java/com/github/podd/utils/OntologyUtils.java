@@ -250,15 +250,15 @@ public class OntologyUtils
      * @param allVersionsMap
      * @param importsMap
      * @param importOrder
-     * @param nextVersionUri
+     * @param nextOntologyUri
      */
     public static void mapAndSortImports(final Model model, final ConcurrentMap<URI, URI> currentVersionsMap,
             final ConcurrentMap<URI, Set<URI>> allVersionsMap, final ConcurrentMap<URI, Set<URI>> importsMap,
-            final List<URI> importOrder, final URI nextVersionUri)
+            final List<URI> importOrder, final URI nextOntologyUri)
     {
-        final Set<Value> imports = model.filter(nextVersionUri, OWL.IMPORTS, null).objects();
+        final Set<Value> imports = model.filter(nextOntologyUri, OWL.IMPORTS, null).objects();
         Set<URI> nextImportsSet = new LinkedHashSet<>();
-        final Set<URI> putIfAbsent = importsMap.putIfAbsent(nextVersionUri, nextImportsSet);
+        final Set<URI> putIfAbsent = importsMap.putIfAbsent(nextOntologyUri, nextImportsSet);
         if(putIfAbsent != null)
         {
             nextImportsSet = putIfAbsent;
@@ -268,12 +268,12 @@ public class OntologyUtils
         {
             if(!nextImportsSet.isEmpty())
             {
-                OntologyUtils.log.error("Found inconsistent imports set: {} {}", nextVersionUri, nextImportsSet);
+                OntologyUtils.log.error("Found inconsistent imports set: {} {}", nextOntologyUri, nextImportsSet);
             }
         }
         else
         {
-            for(Value nextImport : imports)
+            for(final Value nextImport : imports)
             {
                 if(nextImport instanceof URI)
                 {
@@ -303,10 +303,20 @@ public class OntologyUtils
                             
                             if(nextAllVersions.equals(nextImport))
                             {
-                                // this should not normally occur, as the current versions map
-                                // should also contain this key
-                                nextImport = currentVersionsMap.get(nextAllVersions);
-                                nextImportsSet.add((URI)nextImport);
+                                // TODO: Should we fail if we are importing ontologies without
+                                // current versions, such as this case
+                                if(nextEntry.getValue().isEmpty())
+                                {
+                                    nextImportsSet.add((URI)nextImport);
+                                }
+                                else
+                                {
+                                    // Randomly choose one, as the ontology does not have a current
+                                    // version, but it does have some version information
+                                    // TODO: Should we just use the import instead of randomly
+                                    // choosing here
+                                    nextImportsSet.add(nextEntry.getValue().iterator().next());
+                                }
                                 foundAllVersion = true;
                             }
                             else if(nextEntry.getValue().contains(nextImport))
@@ -318,7 +328,7 @@ public class OntologyUtils
                         
                         if(!foundAllVersion)
                         {
-                            OntologyUtils.log.warn("Could not find import: {} imports {}", nextVersionUri, nextImport);
+                            OntologyUtils.log.warn("Could not find import: {} imports {}", nextOntologyUri, nextImport);
                         }
                         else
                         {
@@ -333,10 +343,10 @@ public class OntologyUtils
                 }
             }
         }
-        OntologyUtils.log.debug("adding import for {} at {}", nextVersionUri, maxIndex);
+        OntologyUtils.log.debug("adding import for {} at {}", nextOntologyUri, maxIndex);
         // TODO: FIXME: This will not allow for multiple versions of a single schema ontology at the
         // same time if they have any shared import versions
-        importOrder.add(maxIndex, nextVersionUri);
+        importOrder.add(maxIndex, nextOntologyUri);
     }
     
     /**
@@ -650,13 +660,13 @@ public class OntologyUtils
      * @throws SchemaManifestException
      */
     public static List<URI> orderImportsForOneOntology(final Model model, final Set<URI> schemaOntologyUris,
-            final Set<URI> schemaVersionUris, final URI nextOntology) throws SchemaManifestException
+            final Set<URI> schemaVersionUris, final URI nextOntology, final ConcurrentMap<URI, Set<URI>> importsMap)
+        throws SchemaManifestException
     {
         final List<URI> importOrder = new ArrayList<>(schemaOntologyUris.size());
         
         final ConcurrentMap<URI, URI> currentVersionsMap = new ConcurrentHashMap<>(schemaOntologyUris.size());
         final ConcurrentMap<URI, Set<URI>> allVersionsMap = new ConcurrentHashMap<>(schemaOntologyUris.size());
-        final ConcurrentMap<URI, Set<URI>> importsMap = new ConcurrentHashMap<>(schemaOntologyUris.size());
         
         // Find current version for each schema ontology
         for(final URI nextSchemaOntologyUri : schemaOntologyUris)
@@ -772,6 +782,7 @@ public class OntologyUtils
         
         final Set<URI> schemaOntologyUris = new HashSet<>();
         final Set<URI> schemaVersionUris = new HashSet<>();
+        final ConcurrentMap<URI, Set<URI>> importsMap = new ConcurrentHashMap<>(schemaOntologyUris.size());
         
         OntologyUtils.extractOntologyAndVersions(model, schemaOntologyUris, schemaVersionUris);
         
@@ -779,31 +790,41 @@ public class OntologyUtils
         {
             List<URI> imports =
                     orderImportsForOneOntology(model, schemaOntologyUris, schemaVersionUris, artifactID
-                            .getOntologyIRI().toOpenRDFURI());
-            
-            imports.remove(artifactID.getOntologyIRI().toOpenRDFURI());
+                            .getOntologyIRI().toOpenRDFURI(), importsMap);
             
             List<InferredOWLOntologyID> ontologyIDs = OntologyUtils.modelToOntologyIDs(model, true, false);
             
             for(URI nextImport : imports)
             {
-                boolean foundImport = false;
-                for(InferredOWLOntologyID nextOntologyID : ontologyIDs)
+                if(importsMap.containsKey(nextImport))
                 {
-                    if(nextOntologyID.getOntologyIRI().toOpenRDFURI().equals(nextImport))
+                    for(URI nextTransitiveImport : importsMap.get(nextImport))
                     {
-                        results.add(nextOntologyID);
-                        foundImport = true;
-                        break;
-                    }
-                    else if(nextOntologyID.getVersionIRI().toOpenRDFURI().equals(nextImport))
-                    {
-                        results.add(nextOntologyID);
-                        foundImport = true;
-                        break;
+                        boolean foundImport = false;
+                        for(InferredOWLOntologyID nextOntologyID : ontologyIDs)
+                        {
+                            if(nextOntologyID.getOntologyIRI().toOpenRDFURI().equals(nextTransitiveImport))
+                            {
+                                results.add(nextOntologyID);
+                                foundImport = true;
+                                break;
+                            }
+                            else if(nextOntologyID.getVersionIRI() != null
+                                    && nextOntologyID.getVersionIRI().toOpenRDFURI().equals(nextTransitiveImport))
+                            {
+                                results.add(nextOntologyID);
+                                foundImport = true;
+                                break;
+                            }
+                        }
+                        if(!foundImport)
+                        {
+                            throw new SchemaManifestException(artifactID.getOntologyIRI(),
+                                    "Could not find transitive import for artifact");
+                        }
                     }
                 }
-                if(!foundImport)
+                else
                 {
                     throw new SchemaManifestException(artifactID.getOntologyIRI(), "Could not find import for artifact");
                 }
