@@ -87,6 +87,16 @@ public class OntologyUtils
     public static void extractOntologyAndVersions(final Model model, final Set<URI> schemaOntologyUris,
             final Set<URI> schemaVersionUris)
     {
+        for(final Statement nextImport : model.filter(null, OWL.VERSIONIRI, null))
+        {
+            if(nextImport.getObject() instanceof URI)
+            {
+                if(!model.contains((URI)nextImport.getObject(), RDF.TYPE, OWL.ONTOLOGY))
+                {
+                    model.add((URI)nextImport.getObject(), RDF.TYPE, OWL.ONTOLOGY);
+                }
+            }
+        }
         for(final Resource nextOntology : model.filter(null, RDF.TYPE, OWL.ONTOLOGY).subjects())
         {
             if(nextOntology instanceof URI)
@@ -367,8 +377,9 @@ public class OntologyUtils
             
             if(nextCurrentVersionURI == null)
             {
-                OntologyUtils.log
-                        .error("Did not find a current version for schema ontology: {}", nextSchemaOntologyUri);
+                // OntologyUtils.log
+                // .error("Did not find a current version for schema ontology: {}",
+                // nextSchemaOntologyUri);
                 // throw new SchemaManifestException(IRI.create(nextSchemaOntologyUri),
                 // "Did not find a current version for schema ontology: " +
                 // nextSchemaOntologyUri.stringValue());
@@ -378,10 +389,10 @@ public class OntologyUtils
                 final URI putIfAbsent = currentVersionsMap.putIfAbsent(nextSchemaOntologyUri, nextCurrentVersionURI);
                 if(putIfAbsent != null)
                 {
-                    OntologyUtils.log.error("Found multiple version URIs for schema ontology: {} old={} new={}",
+                    OntologyUtils.log.error("Found multiple version URIs for ontology: {} old={} new={}",
                             nextSchemaOntologyUri, putIfAbsent, nextCurrentVersionURI);
                     throw new SchemaManifestException(IRI.create(nextSchemaOntologyUri),
-                            "Found multiple version IRIs for schema ontology");
+                            "Found multiple version IRIs for ontology");
                 }
             }
         }

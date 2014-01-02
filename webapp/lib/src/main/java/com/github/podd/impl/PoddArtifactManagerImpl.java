@@ -1296,19 +1296,6 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             format = RDFFormat.RDFXML;
         }
         
-        final URI randomContext = ValueFactoryImpl.getInstance().createURI("urn:uuid:" + UUID.randomUUID().toString());
-        final Model model = Rio.parse(inputStream, "", format, randomContext);
-        
-        final List<InferredOWLOntologyID> ontologyIDs = OntologyUtils.modelToOntologyIDs(model);
-        if(ontologyIDs.isEmpty())
-        {
-            throw new EmptyOntologyException(null, "Loaded ontology is empty");
-        }
-        else if(ontologyIDs.size() > 1)
-        {
-            this.log.warn("Found multiple ontologies when we were only expecting a single ontology: {}", ontologyIDs);
-        }
-        
         // FIXME: This method only works if the imports are already in a repository somewhere, need
         // to fix the Sesame manager to look for imports in Models also
         
@@ -1321,6 +1308,21 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         InferredOWLOntologyID inferredOWLOntologyID = null;
         try
         {
+            final URI randomContext =
+                    ValueFactoryImpl.getInstance().createURI("urn:uuid:" + UUID.randomUUID().toString());
+            Model rawModel = Rio.parse(inputStream, "", format, randomContext);
+            
+            final List<InferredOWLOntologyID> ontologyIDs = OntologyUtils.modelToOntologyIDs(rawModel);
+            if(ontologyIDs.isEmpty())
+            {
+                throw new EmptyOntologyException(null, "Loaded ontology is empty");
+            }
+            else if(ontologyIDs.size() > 1)
+            {
+                this.log.warn("Found multiple ontologies when we were only expecting a single ontology: {}",
+                        ontologyIDs);
+            }
+            
             managementRepositoryConnection = this.getRepositoryManager().getManagementRepository().getConnection();
             managementRepositoryConnection.begin();
             
@@ -1329,23 +1331,30 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             
             // Load the artifact RDF triples into a random context in the temp
             // repository, which may be shared between different uploads
-            temporaryRepositoryConnection.add(model, randomContext);
+            temporaryRepositoryConnection.add(rawModel, randomContext);
             
-            // HACK: Clear the model to reuse it later
-            // There is a discontinuity between the use of the Model API and the
-            // RepositoryConnection API between OntologyUtils and PoddArtifactManager
-            // Need to create an contribute a Model view over a RepositoryConnection to OpenRDF
-            // Sesame to reduce issues like this
-            model.clear();
+            rawModel.clear();
+            rawModel = null;
             
             // check and ensure schema ontology imports are for version IRIs
             this.handleSchemaImports(ontologyIDs.get(0).getOntologyIRI().toOpenRDFURI(),
                     managementRepositoryConnection, temporaryRepositoryConnection, randomContext);
             
-            // Repopulate model so it can be used by OntologyUtils in getSchemaImportsInternal
-            temporaryRepositoryConnection.export(new StatementCollector(model), randomContext);
+            Model importsModel = new LinkedHashModel();
             
-            Set<OWLOntologyID> schemaImports = OntologyUtils.getArtifactImports(ontologyIDs.get(0), model);
+            // Repopulate model so it can be used by OntologyUtils in getSchemaImportsInternal
+            temporaryRepositoryConnection.exportStatements(null, OWL.IMPORTS, null, true, new StatementCollector(
+                    importsModel), randomContext);
+            temporaryRepositoryConnection.exportStatements(null, RDF.TYPE, OWL.ONTOLOGY, true, new StatementCollector(
+                    importsModel), randomContext);
+            temporaryRepositoryConnection.exportStatements(null, OWL.VERSIONIRI, null, true, new StatementCollector(
+                    importsModel), randomContext);
+            managementRepositoryConnection.export(new StatementCollector(importsModel), this.getRepositoryManager()
+                    .getSchemaManagementGraph());
+            
+            // Rio.write(model, Rio.createWriter(RDFFormat.NQUADS, System.out));
+            
+            Set<OWLOntologyID> schemaImports = OntologyUtils.getArtifactImports(ontologyIDs.get(0), importsModel);
             
             final Repository permanentRepository = this.getRepositoryManager().getPermanentRepository(schemaImports);
             permanentRepositoryConnection = permanentRepository.getConnection();

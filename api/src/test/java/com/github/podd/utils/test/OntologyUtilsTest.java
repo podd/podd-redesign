@@ -29,6 +29,7 @@ import org.apache.commons.io.IOUtils;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.openrdf.model.Model;
 import org.openrdf.model.Resource;
@@ -40,11 +41,13 @@ import org.openrdf.model.vocabulary.OWL;
 import org.openrdf.model.vocabulary.RDF;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.RDFHandler;
+import org.openrdf.rio.Rio;
 import org.openrdf.rio.helpers.StatementCollector;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLOntologyID;
 
 import com.github.podd.exception.SchemaManifestException;
+import com.github.podd.utils.DebugUtils;
 import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.OntologyUtils;
 import com.github.podd.utils.PODD;
@@ -497,6 +500,8 @@ public class OntologyUtilsTest
         model.add(this.testImportOntologyUri1, OWL.VERSIONIRI, this.testImportVersionUri1);
         model.add(this.testOntologyUri1, OWL.IMPORTS, this.testImportOntologyUri1);
         
+        DebugUtils.printContents(model);
+        
         Set<OWLOntologyID> imports = OntologyUtils.getArtifactImports(this.testOntologyID, model);
         
         Assert.assertEquals(1, imports.size());
@@ -656,4 +661,16 @@ public class OntologyUtilsTest
         Assert.assertTrue(imports.contains(this.testImportOntologyID4));
     }
     
+    @Ignore
+    @Test
+    public void testGetArtifactImportsRealistic() throws Exception
+    {
+        Model model =
+                Rio.parse(this.getClass().getResourceAsStream("/test/artifacts/artifact-imports-test.nq"), "",
+                        RDFFormat.NQUADS);
+        
+        Set<OWLOntologyID> imports = OntologyUtils.getArtifactImports(this.testOntologyID, model);
+        
+        Assert.assertEquals(4, imports.size());
+    }
 }
