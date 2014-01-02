@@ -937,7 +937,30 @@ public abstract class AbstractPoddSchemaManagerTest
         }
         catch(final SchemaManifestException e)
         {
-            Assert.assertTrue("Not the expected Exception", e.getMessage().contains("Did not find a current version"));
+            Assert.assertEquals("Failure not due to expected ontology", "http://example.org/podd/ns/poddB", e
+                    .getSchemaOntologyIRI().toString());
+        }
+    }
+    
+    @Test
+    public final void testUploadSchemaOntologiesMultipleCurrentVersionIRI() throws Exception
+    {
+        // prepare: load invalid test schema-manifest file
+        final String schemaManifest = "/test/bad-schema-manifest-multiple-current-version.ttl";
+        Model model = null;
+        try (final InputStream schemaManifestStream = this.getClass().getResourceAsStream(schemaManifest);)
+        {
+            final RDFFormat format = Rio.getParserFormatForFileName(schemaManifest, RDFFormat.RDFXML);
+            model = Rio.parse(schemaManifestStream, "", format);
+        }
+        
+        try
+        {
+            this.testSchemaManager.uploadSchemaOntologies(model);
+            Assert.fail("Should have failed to load schema ontologies");
+        }
+        catch(final SchemaManifestException e)
+        {
             Assert.assertEquals("Failure not due to expected ontology", "http://example.org/podd/ns/poddB", e
                     .getSchemaOntologyIRI().toString());
         }

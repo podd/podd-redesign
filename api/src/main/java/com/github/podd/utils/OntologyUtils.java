@@ -700,6 +700,22 @@ public class OntologyUtils
                 throw new SchemaManifestException(IRI.create(nextOntologyUri),
                         "Schema ontology in manifest has owl:imports coming directly from it");
             }
+            
+            Model currentVersion = manifestModel.filter(nextOntologyUri, PODD.OMV_CURRENT_VERSION, null);
+            
+            if(currentVersion.isEmpty())
+            {
+                OntologyUtils.log.error("Missing OMV current version for schema ontology: {}", nextOntologyUri);
+                throw new SchemaManifestException(IRI.create(nextOntologyUri),
+                        "Missing OMV current version for schema ontology");
+            }
+            
+            if(currentVersion.size() > 1)
+            {
+                OntologyUtils.log.error("Multiple OMV current versions for schema ontology: {}", nextOntologyUri);
+                throw new SchemaManifestException(IRI.create(nextOntologyUri),
+                        "Multiple OMV current versions for schema ontology");
+            }
         }
         
         for(final URI nextVersionUri : schemaVersionUris)
