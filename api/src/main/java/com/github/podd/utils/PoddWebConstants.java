@@ -247,7 +247,8 @@ public interface PoddWebConstants
     public static final String DEFAULT_PERMANENT_SESAME_REPOSITORY_CONFIG = "/memorystoreconfig.ttl";
     
     public static final String PROPERTY_PERMANENT_SESAME_REPOSITORY_LOCATION = "podd.repository.permanent.location";
-    public static final String DEFAULT_PERMANENT_SESAME_REPOSITORY_LOCATION = "http://localhost:8080/openrdf-sesame/";
+    public static final String DEFAULT_PERMANENT_SESAME_REPOSITORY_LOCATION = "";
+    //public static final String DEFAULT_PERMANENT_SESAME_REPOSITORY_LOCATION = "http://localhost:8080/openrdf-sesame/";
     
     /**
      * Link to a single management repository.

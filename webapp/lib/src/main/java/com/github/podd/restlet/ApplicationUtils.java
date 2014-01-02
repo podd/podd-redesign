@@ -23,6 +23,7 @@ import info.aduna.iteration.Iterations;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -52,6 +53,7 @@ import org.openrdf.repository.config.RepositoryRegistry;
 import org.openrdf.repository.http.HTTPRepository;
 import org.openrdf.repository.manager.LocalRepositoryManager;
 import org.openrdf.repository.manager.RemoteRepositoryManager;
+import org.openrdf.repository.manager.RepositoryManager;
 import org.openrdf.repository.sail.SailRepository;
 import org.openrdf.repository.sail.config.SailRepositoryFactory;
 import org.openrdf.rio.RDFFormat;
@@ -326,9 +328,19 @@ public class ApplicationUtils
                         RDFFormat.TURTLE);
         final Resource repositoryNode = GraphUtil.getUniqueSubject(graph, RepositoryConfigSchema.REPOSITORYTYPE, null);
         RepositoryImplConfig repositoryImplConfig = RepositoryImplConfigBase.create(graph, repositoryNode);
-        RemoteRepositoryManager repositoryManager =
-                new RemoteRepositoryManager(props.get(PoddWebConstants.PROPERTY_PERMANENT_SESAME_REPOSITORY_LOCATION,
-                        PoddWebConstants.DEFAULT_PERMANENT_SESAME_REPOSITORY_LOCATION));
+        RepositoryManager repositoryManager;
+        String repositoryManagerUrl =
+                props.get(PoddWebConstants.PROPERTY_PERMANENT_SESAME_REPOSITORY_LOCATION,
+                        PoddWebConstants.DEFAULT_PERMANENT_SESAME_REPOSITORY_LOCATION);
+        if(repositoryManagerUrl == null || repositoryManagerUrl.trim().isEmpty())
+        {
+            repositoryManager =
+                    new LocalRepositoryManager(Files.createTempDirectory("podd-temp-repositories-").toFile());
+        }
+        else
+        {
+            repositoryManager = new RemoteRepositoryManager(repositoryManagerUrl);
+        }
         repositoryManager.initialize();
         
         application.setPoddRepositoryManager(new PoddRepositoryManagerImpl(nextManagementRepository, repositoryManager,
