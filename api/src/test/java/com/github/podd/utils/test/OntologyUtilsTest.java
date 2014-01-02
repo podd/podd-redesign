@@ -510,4 +510,24 @@ public class OntologyUtilsTest
         Assert.assertTrue(imports.contains(this.testImportOntologyID2));
     }
     
+    @Test
+    public final void testGetArtifactImportsOneImportNonTransitiveSingle() throws Exception
+    {
+        Model model = new LinkedHashModel();
+        OntologyUtils.ontologyIDsToModel(Arrays.asList(this.testOntologyID), model);
+        model.add(this.testImportOntologyUri1, RDF.TYPE, OWL.ONTOLOGY);
+        model.add(this.testImportOntologyUri1, OWL.VERSIONIRI, this.testImportVersionUri1);
+        model.add(this.testImportVersionUri1, RDF.TYPE, OWL.ONTOLOGY);
+        model.add(this.testImportOntologyUri2, RDF.TYPE, OWL.ONTOLOGY);
+        model.add(this.testImportVersionUri2, RDF.TYPE, OWL.ONTOLOGY);
+        model.add(this.testImportOntologyUri2, OWL.VERSIONIRI, this.testImportVersionUri2);
+        model.add(this.testOntologyUri1, OWL.IMPORTS, this.testImportOntologyUri1);
+        
+        Set<OWLOntologyID> imports = OntologyUtils.getArtifactImports(this.testOntologyID, model);
+        
+        Assert.assertEquals(2, imports.size());
+        Assert.assertTrue(imports.contains(this.testImportOntologyID1));
+        Assert.assertTrue(imports.contains(this.testImportOntologyID2));
+    }
+    
 }
