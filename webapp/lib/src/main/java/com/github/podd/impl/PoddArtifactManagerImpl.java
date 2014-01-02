@@ -1095,7 +1095,8 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
      * Helper method to check schema ontology imports and update use of ontology IRIs to version
      * IRIs.
      */
-    private void useVersionsForSchemaImports(final URI ontologyIRI, final RepositoryConnection managementRepositoryConnection,
+    private void useVersionsForSchemaImports(final URI ontologyIRI,
+            final RepositoryConnection managementRepositoryConnection,
             final RepositoryConnection tempRepositoryConnection, final URI tempContext) throws OpenRDFException,
         UnmanagedSchemaIRIException
     {
@@ -2009,8 +2010,8 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
                     newVersionIRI, tempContext);
             
             // check and ensure schema ontology imports are for version IRIs
-            this.useVersionsForSchemaImports(artifactID.getOntologyIRI().toOpenRDFURI(), managementRepositoryConnection,
-                    tempRepositoryConnection, tempContext);
+            this.useVersionsForSchemaImports(artifactID.getOntologyIRI().toOpenRDFURI(),
+                    managementRepositoryConnection, tempRepositoryConnection, tempContext);
             
             // ensure schema ontologies are cached in memory before loading
             // statements into OWLAPI
@@ -2028,21 +2029,30 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         }
         catch(final Exception e)
         {
-            if(managementRepositoryConnection != null && managementRepositoryConnection.isActive())
+            try
             {
-                managementRepositoryConnection.rollback();
+                if(managementRepositoryConnection != null && managementRepositoryConnection.isActive())
+                {
+                    managementRepositoryConnection.rollback();
+                }
             }
-            
-            if(permanentRepositoryConnection != null && permanentRepositoryConnection.isActive())
+            finally
             {
-                permanentRepositoryConnection.rollback();
+                try
+                {
+                    if(permanentRepositoryConnection != null && permanentRepositoryConnection.isActive())
+                    {
+                        permanentRepositoryConnection.rollback();
+                    }
+                }
+                finally
+                {
+                    if(tempRepositoryConnection != null && tempRepositoryConnection.isActive())
+                    {
+                        tempRepositoryConnection.rollback();
+                    }
+                }
             }
-            
-            if(tempRepositoryConnection != null && tempRepositoryConnection.isActive())
-            {
-                tempRepositoryConnection.rollback();
-            }
-            
             throw e;
         }
         finally
