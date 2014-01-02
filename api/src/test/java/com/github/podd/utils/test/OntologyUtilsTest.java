@@ -504,6 +504,22 @@ public class OntologyUtilsTest
     }
     
     @Test
+    public final void testGetArtifactImportsOneImportVersion() throws Exception
+    {
+        Model model = new LinkedHashModel();
+        OntologyUtils.ontologyIDsToModel(Arrays.asList(this.testOntologyID), model);
+        model.add(this.testImportOntologyUri1, RDF.TYPE, OWL.ONTOLOGY);
+        model.add(this.testImportVersionUri1, RDF.TYPE, OWL.ONTOLOGY);
+        model.add(this.testImportOntologyUri1, OWL.VERSIONIRI, this.testImportVersionUri1);
+        model.add(this.testVersionUri1, OWL.IMPORTS, this.testImportOntologyUri1);
+        
+        Set<OWLOntologyID> imports = OntologyUtils.getArtifactImports(this.testOntologyID, model);
+        
+        Assert.assertEquals(1, imports.size());
+        Assert.assertTrue(imports.contains(this.testImportOntologyID1));
+    }
+    
+    @Test
     public final void testGetArtifactImportsOneImportTransitiveSingle() throws Exception
     {
         Model model = new LinkedHashModel();
