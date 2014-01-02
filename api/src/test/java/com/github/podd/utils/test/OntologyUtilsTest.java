@@ -63,10 +63,13 @@ public class OntologyUtilsTest
     private URI testImportVersionUri1;
     private URI testImportOntologyUri2;
     private URI testImportVersionUri2;
+    private URI testImportOntologyUri3;
+    private URI testImportVersionUri3;
     private ValueFactory vf;
     private InferredOWLOntologyID testOntologyID;
     private InferredOWLOntologyID testImportOntologyID1;
     private InferredOWLOntologyID testImportOntologyID2;
+    private InferredOWLOntologyID testImportOntologyID3;
     
     @Before
     public void setUp() throws Exception
@@ -84,6 +87,10 @@ public class OntologyUtilsTest
         this.testImportOntologyUri2 = this.vf.createURI("urn:test:import:ontology:uri:2");
         this.testImportVersionUri2 = this.vf.createURI("urn:test:import:ontology:uri:2:version:1");
         this.testImportOntologyID2 = new InferredOWLOntologyID(testImportOntologyUri2, testImportVersionUri2, null);
+        
+        this.testImportOntologyUri3 = this.vf.createURI("urn:test:import:ontology:uri:3");
+        this.testImportVersionUri3 = this.vf.createURI("urn:test:import:ontology:uri:3:version:1");
+        this.testImportOntologyID3 = new InferredOWLOntologyID(testImportOntologyUri3, testImportVersionUri3, null);
     }
     
     @After
@@ -528,6 +535,34 @@ public class OntologyUtilsTest
         Assert.assertEquals(2, imports.size());
         Assert.assertTrue(imports.contains(this.testImportOntologyID1));
         Assert.assertTrue(imports.contains(this.testImportOntologyID2));
+    }
+    
+    @Test
+    public final void testGetArtifactImportsOneImportTransitiveDouble() throws Exception
+    {
+        Model model = new LinkedHashModel();
+        OntologyUtils.ontologyIDsToModel(Arrays.asList(this.testOntologyID), model);
+        model.add(this.testOntologyUri1, OWL.IMPORTS, this.testImportOntologyUri1);
+        model.add(this.testImportOntologyUri1, RDF.TYPE, OWL.ONTOLOGY);
+        model.add(this.testImportOntologyUri1, OWL.VERSIONIRI, this.testImportVersionUri1);
+        model.add(this.testImportVersionUri1, RDF.TYPE, OWL.ONTOLOGY);
+        
+        model.add(this.testImportOntologyUri2, RDF.TYPE, OWL.ONTOLOGY);
+        model.add(this.testImportOntologyUri2, OWL.VERSIONIRI, this.testImportVersionUri2);
+        model.add(this.testImportVersionUri2, RDF.TYPE, OWL.ONTOLOGY);
+        model.add(this.testImportVersionUri1, OWL.IMPORTS, this.testImportVersionUri2);
+        
+        model.add(this.testImportOntologyUri3, RDF.TYPE, OWL.ONTOLOGY);
+        model.add(this.testImportOntologyUri3, OWL.VERSIONIRI, this.testImportVersionUri3);
+        model.add(this.testImportVersionUri3, RDF.TYPE, OWL.ONTOLOGY);
+        model.add(this.testImportVersionUri2, OWL.IMPORTS, this.testImportVersionUri3);
+        
+        Set<OWLOntologyID> imports = OntologyUtils.getArtifactImports(this.testOntologyID, model);
+        
+        Assert.assertEquals(3, imports.size());
+        Assert.assertTrue(imports.contains(this.testImportOntologyID1));
+        Assert.assertTrue(imports.contains(this.testImportOntologyID2));
+        Assert.assertTrue(imports.contains(this.testImportOntologyID3));
     }
     
 }
