@@ -348,11 +348,12 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
         
         OntologyUtils.extractOntologyAndVersions(model, schemaOntologyUris, schemaVersionUris);
         
-        OntologyUtils.validateSchemaManifestImports(model, schemaVersionUris);
+        OntologyUtils.validateSchemaManifestImports(model, schemaOntologyUris, schemaVersionUris);
         
         final ConcurrentMap<URI, Set<URI>> importsMap = new ConcurrentHashMap<>(schemaOntologyUris.size());
         
-        final List<URI> importOrder = OntologyUtils.orderImports(model, schemaOntologyUris, schemaVersionUris, importsMap);
+        final List<URI> importOrder =
+                OntologyUtils.orderImports(model, schemaOntologyUris, schemaVersionUris, importsMap);
         
         Map<URI, Set<OWLOntologyID>> allImports =
                 OntologyUtils.getSchemaManifestImports(model, schemaOntologyUris, schemaVersionUris);
@@ -429,8 +430,8 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
                     // transaction can
                     // be rolled back if there are any failures!
                     final InferredOWLOntologyID nextResult =
-                            this.uploadSchemaOntologyInternal(schemaOntologyID, inputStream, fileFormat, managementConnection,
-                                    this.repositoryManager.getSchemaManagementGraph());
+                            this.uploadSchemaOntologyInternal(schemaOntologyID, inputStream, fileFormat,
+                                    managementConnection, this.repositoryManager.getSchemaManagementGraph());
                     
                     result.add(nextResult);
                 }

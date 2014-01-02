@@ -687,9 +687,21 @@ public class OntologyUtils
      * @throws SchemaManifestException
      *             If the imports from the two locations are not consistent
      */
-    public static void validateSchemaManifestImports(final Model manifestModel, final Set<URI> schemaVersionUris)
-        throws IOException, RDFParseException, UnsupportedRDFormatException, SchemaManifestException
+    public static void validateSchemaManifestImports(final Model manifestModel, final Set<URI> schemaOntologyUris,
+            final Set<URI> schemaVersionUris) throws IOException, RDFParseException, UnsupportedRDFormatException,
+        SchemaManifestException
     {
+        for(final URI nextOntologyUri : schemaOntologyUris)
+        {
+            if(manifestModel.contains(nextOntologyUri, OWL.IMPORTS, null))
+            {
+                OntologyUtils.log.error("Schema ontology in manifest has owl:imports coming directly from it: {}",
+                        nextOntologyUri);
+                throw new SchemaManifestException(IRI.create(nextOntologyUri),
+                        "Schema ontology in manifest has owl:imports coming directly from it");
+            }
+        }
+        
         for(final URI nextVersionUri : schemaVersionUris)
         {
             final Set<Value> importsInManifest = manifestModel.filter(nextVersionUri, OWL.IMPORTS, null).objects();

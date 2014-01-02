@@ -877,8 +877,6 @@ public abstract class AbstractPoddSchemaManagerTest
         }
         catch(final SchemaManifestException e)
         {
-            Assert.assertTrue("Not the expected Exception",
-                    e.getMessage().contains("Imports should be associated with version IRI"));
             Assert.assertEquals("Failure not due to expected ontology", "http://example.org/podd/ns/poddB", e
                     .getSchemaOntologyIRI().toString());
         }
