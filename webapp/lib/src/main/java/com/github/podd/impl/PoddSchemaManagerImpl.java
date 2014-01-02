@@ -30,6 +30,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.Model;
@@ -348,7 +350,9 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
         
         OntologyUtils.validateSchemaManifestImports(model, schemaVersionUris);
         
-        final List<URI> importOrder = OntologyUtils.orderImports(model, schemaOntologyUris, schemaVersionUris);
+        final ConcurrentMap<URI, Set<URI>> importsMap = new ConcurrentHashMap<>(schemaOntologyUris.size());
+        
+        final List<URI> importOrder = OntologyUtils.orderImports(model, schemaOntologyUris, schemaVersionUris, importsMap);
         
         Map<URI, Set<OWLOntologyID>> allImports =
                 OntologyUtils.getSchemaManifestImports(model, schemaOntologyUris, schemaVersionUris);

@@ -118,6 +118,7 @@ public class OntologyUtils
             final Set<URI> schemaOntologyUris, final Set<URI> schemaVersionUris) throws SchemaManifestException
     {
         final ConcurrentMap<URI, Set<OWLOntologyID>> result = new ConcurrentHashMap<>();
+        final ConcurrentMap<URI, Set<URI>> importsMap = new ConcurrentHashMap<>(schemaOntologyUris.size());
         
         if(schemaVersionUris.isEmpty())
         {
@@ -175,7 +176,7 @@ public class OntologyUtils
                 nextImports.add(nextImportVersionURI);
             }
             
-            List<URI> orderImports = OntologyUtils.orderImports(model, schemaOntologyUris, schemaVersionUris);
+            List<URI> orderImports = OntologyUtils.orderImports(model, schemaOntologyUris, schemaVersionUris, importsMap);
             
             // Iterate through universally ordered collection to find ordered imports for this
             // ontology
@@ -616,51 +617,7 @@ public class OntologyUtils
      * @throws SchemaManifestException
      */
     public static List<URI> orderImports(final Model model, final Set<URI> schemaOntologyUris,
-            final Set<URI> schemaVersionUris) throws SchemaManifestException
-    {
-        final List<URI> importOrder = new ArrayList<>(schemaOntologyUris.size());
-        
-        final ConcurrentMap<URI, URI> currentVersionsMap = new ConcurrentHashMap<>(schemaOntologyUris.size());
-        final ConcurrentMap<URI, Set<URI>> allVersionsMap = new ConcurrentHashMap<>(schemaOntologyUris.size());
-        final ConcurrentMap<URI, Set<URI>> importsMap = new ConcurrentHashMap<>(schemaOntologyUris.size());
-        
-        // Find current version for each schema ontology
-        for(final URI nextSchemaOntologyUri : schemaOntologyUris)
-        {
-            OntologyUtils.mapCurrentVersion(model, currentVersionsMap, nextSchemaOntologyUri);
-        }
-        
-        // Find all versions for each schema ontology
-        for(final URI nextSchemaOntologyUri : schemaOntologyUris)
-        {
-            OntologyUtils.mapAllVersions(model, currentVersionsMap, allVersionsMap, nextSchemaOntologyUri);
-        }
-        
-        // Map the actual schema ontologies to the correct order, based on
-        // current versions and all versions with the imports taken into account
-        for(final URI nextVersionUri : schemaVersionUris)
-        {
-            OntologyUtils.mapAndSortImports(model, currentVersionsMap, allVersionsMap, importsMap, importOrder,
-                    nextVersionUri);
-        }
-        
-        OntologyUtils.log.debug("importOrder: {}", importOrder);
-        return importOrder;
-    }
-    
-    /**
-     * Orders the schema ontology imports into list that can be uploaded in order to give a good
-     * chance that dependencies will be uploaded first.
-     * 
-     * @param model
-     * @param schemaOntologyUris
-     * @param schemaVersionUris
-     * @return An ordered list of {@link URI}s that determine a useful order for uploading schema
-     *         ontologies to ensure that dependencies are available internally when needed.
-     * @throws SchemaManifestException
-     */
-    public static List<URI> orderImportsForOneOntology(final Model model, final Set<URI> schemaOntologyUris,
-            final Set<URI> schemaVersionUris, final URI nextOntology, final ConcurrentMap<URI, Set<URI>> importsMap)
+            final Set<URI> schemaVersionUris, final ConcurrentMap<URI, Set<URI>> importsMap)
         throws SchemaManifestException
     {
         final List<URI> importOrder = new ArrayList<>(schemaOntologyUris.size());
@@ -680,20 +637,12 @@ public class OntologyUtils
             OntologyUtils.mapAllVersions(model, currentVersionsMap, allVersionsMap, nextSchemaOntologyUri);
         }
         
-        OntologyUtils.mapAndSortImports(model, currentVersionsMap, allVersionsMap, importsMap, importOrder,
-                nextOntology);
-        
-        if(importsMap.containsKey(nextOntology))
+        // Map the actual schema ontologies to the correct order, based on
+        // current versions and all versions with the imports taken into account
+        for(final URI nextVersionUri : schemaVersionUris)
         {
-            // Recurse over transitive imports
-            for(URI nextTransitiveImport : importsMap.get(nextOntology))
-            {
-                if(!importOrder.contains(nextTransitiveImport))
-                {
-                    OntologyUtils.orderImportsForOneOntology(model, schemaOntologyUris, schemaVersionUris,
-                            nextTransitiveImport, importsMap);
-                }
-            }
+            OntologyUtils.mapAndSortImports(model, currentVersionsMap, allVersionsMap, importsMap, importOrder,
+                    nextVersionUri);
         }
         
         OntologyUtils.log.debug("importOrder: {}", importOrder);
@@ -803,9 +752,7 @@ public class OntologyUtils
         
         if(schemaOntologyUris.contains(artifactID.getOntologyIRI().toOpenRDFURI()))
         {
-            List<URI> importsForOneOntology =
-                    orderImportsForOneOntology(model, schemaOntologyUris, schemaVersionUris, artifactID
-                            .getOntologyIRI().toOpenRDFURI(), importsMap);
+            List<URI> importsForOneOntology = orderImports(model, schemaOntologyUris, schemaVersionUris, importsMap);
             
             importsForOneOntology.remove(artifactID.getOntologyIRI().toOpenRDFURI());
             
