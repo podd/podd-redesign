@@ -46,30 +46,30 @@ public interface PoddOWLManager
      * the ontologies are already cached.
      * 
      * @param ontologyIDs
-     * @param conn
-     * @param context
+     * @param managementConnection
+     * @param schemaManagementContext
      * @throws OpenRDFException
      * @throws PoddException
      * @throws IOException
      * @throws OWLException
      */
-    void cacheSchemaOntologies(Set<? extends OWLOntologyID> ontologyIDs, RepositoryConnection conn, URI schemaManagementContext)
-        throws OpenRDFException, OWLException, IOException, PoddException;
+    void cacheSchemaOntologies(Set<? extends OWLOntologyID> ontologyIDs, RepositoryConnection managementConnection,
+            URI schemaManagementContext) throws OpenRDFException, OWLException, IOException, PoddException;
     
     /**
      * Loads and caches the given schema ontology in memory from a Repository. Silently returns if
      * the ontology is already cached.
      * 
      * @param ontologyID
-     * @param conn
-     * @param context
+     * @param managementConnection
+     * @param schemaManagementContext
      * @throws OpenRDFException
      * @throws PoddException
      * @throws IOException
      * @throws OWLException
      */
-    void cacheSchemaOntology(OWLOntologyID ontologyID, RepositoryConnection conn, URI context) throws OpenRDFException,
-        OWLException, IOException, PoddException;
+    void cacheSchemaOntology(OWLOntologyID ontologyID, RepositoryConnection managementConnection,
+            URI schemaManagementContext) throws OpenRDFException, OWLException, IOException, PoddException;
     
     /**
      * Determing if the ontology is cached in memory.
@@ -99,8 +99,9 @@ public interface PoddOWLManager
      * @throws IOException
      */
     InferredOWLOntologyID loadAndInfer(OWLOntologyDocumentSource owlSource,
-            RepositoryConnection permanentRepositoryConnection, OWLOntologyID replacementOntologyID)
-        throws OWLException, PoddException, OpenRDFException, IOException;
+            RepositoryConnection permanentRepositoryConnection, OWLOntologyID replacementOntologyID,
+            Set<? extends OWLOntologyID> ontologyIDs, RepositoryConnection managementConnection,
+            URI schemaManagementContext) throws OWLException, PoddException, OpenRDFException, IOException;
     
     /**
      * Attempts to regain memory in the underlying OWLOntologyManager by removing the ontology from

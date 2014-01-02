@@ -695,10 +695,12 @@ public class PoddOWLManagerImpl implements PoddOWLManager
      */
     @Override
     public InferredOWLOntologyID loadAndInfer(final OWLOntologyDocumentSource owlSource,
-            final RepositoryConnection permanentRepositoryConnection, final OWLOntologyID replacementOntologyID)
-        throws OWLException, PoddException, OpenRDFException, IOException
+            final RepositoryConnection permanentRepositoryConnection, final OWLOntologyID replacementOntologyID,
+            Set<? extends OWLOntologyID> ontologyIDs, RepositoryConnection managementConnection,
+            URI schemaManagementContext) throws OWLException, PoddException, OpenRDFException, IOException
     {
-        return this.loadAndInfer(permanentRepositoryConnection, replacementOntologyID, owlSource, true);
+        return this.loadAndInfer(permanentRepositoryConnection, replacementOntologyID, owlSource, true, ontologyIDs,
+                managementConnection, schemaManagementContext);
     }
     
     /**
@@ -712,7 +714,9 @@ public class PoddOWLManagerImpl implements PoddOWLManager
      */
     public InferredOWLOntologyID loadAndInfer(final RepositoryConnection permanentRepositoryConnection,
             final OWLOntologyID ontologyID, final OWLOntologyDocumentSource owlSource,
-            final boolean removeFromCacheOnException) throws OWLException, PoddException, OpenRDFException, IOException
+            final boolean removeFromCacheOnException, Set<? extends OWLOntologyID> ontologyIDs,
+            RepositoryConnection managementConnection, URI schemaManagementContext) throws OWLException, PoddException,
+        OpenRDFException, IOException
     {
         InferredOWLOntologyID inferredOWLOntologyID = null;
         OWLOntology nextOntology = null;
@@ -796,14 +800,28 @@ public class PoddOWLManagerImpl implements PoddOWLManager
         }
         catch(final Throwable e)
         {
-            if(nextOntology != null && removeFromCacheOnException)
+            try
             {
-                this.removeCache(nextOntology.getOntologyID());
+                try
+                {
+                    if(nextOntology != null && removeFromCacheOnException)
+                    {
+                        this.removeCache(nextOntology.getOntologyID());
+                    }
+                }
+                finally
+                {
+                    if(inferredOWLOntologyID != null && removeFromCacheOnException)
+                    {
+                        this.removeCache(inferredOWLOntologyID.getInferredOWLOntologyID());
+                    }
+                }
             }
-            
-            if(inferredOWLOntologyID != null && removeFromCacheOnException)
+            catch(final Throwable e1)
             {
-                this.removeCache(inferredOWLOntologyID.getInferredOWLOntologyID());
+                // Do not propagate this exception as it will clobber the real exception that we
+                // want to rethrow
+                this.log.error("Found exception while clearing memory cache: ", e1);
             }
             
             throw e;
