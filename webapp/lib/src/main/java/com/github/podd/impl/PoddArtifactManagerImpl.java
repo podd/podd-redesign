@@ -1414,6 +1414,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
                 // set version IRI in temporary repository
                 this.log.info("Setting version IRI to <{}>", newVersionIRI);
             }
+            
             temporaryRepositoryConnection.remove(ontologyIRI.toOpenRDFURI(), PODD.OWL_VERSION_IRI, null, randomContext);
             temporaryRepositoryConnection.add(ontologyIRI.toOpenRDFURI(), PODD.OWL_VERSION_IRI,
                     newVersionIRI.toOpenRDFURI(), randomContext);

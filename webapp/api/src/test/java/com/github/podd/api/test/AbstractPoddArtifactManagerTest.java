@@ -24,6 +24,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -133,7 +134,7 @@ public abstract class AbstractPoddArtifactManagerTest
     private PoddSchemaManager testSchemaManager;
     private PoddSesameManager testSesameManager;
     
-    private RepositoryConnection testRepositoryConnection;
+    private RepositoryConnection testManagementRepositoryConnection;
     
     private URI schemaGraph;
     
@@ -165,7 +166,8 @@ public abstract class AbstractPoddArtifactManagerTest
         writer.startRDF();
         
         final List<Statement> inferredList =
-                Iterations.asList(this.testRepositoryConnection.getStatements(null, null, null, false, context));
+                Iterations.asList(this.testManagementRepositoryConnection.getStatements(null, null, null, false,
+                        context));
         for(final Statement s : inferredList)
         {
             writer.handleStatement(s);
@@ -425,12 +427,14 @@ public abstract class AbstractPoddArtifactManagerTest
      * @param inferredStatementCount
      * @param repositoryConnection
      *            TODO
+     * @param dependentSchemaOntologies
      * @return
      * @throws Exception
      */
-    private InferredOWLOntologyID loadInferStoreOntology(final InputStream inputStream, final RDFFormat format,
+    private InferredOWLOntologyID loadInferStoreSchema(final InputStream inputStream, final RDFFormat format,
             final long assertedStatementCount, final long inferredStatementCount,
-            final RepositoryConnection repositoryConnection) throws Exception
+            final RepositoryConnection repositoryConnection, Set<? extends OWLOntologyID> dependentSchemaOntologies)
+        throws Exception
     {
         // load ontology to OWLManager
         final OWLOntologyDocumentSource owlSource =
@@ -438,7 +442,8 @@ public abstract class AbstractPoddArtifactManagerTest
                         format.getDefaultMIMEType()));
         
         final InferredOWLOntologyID inferredOntologyID =
-                this.testArtifactManager.getOWLManager().loadAndInfer(owlSource, repositoryConnection, null);
+                this.testArtifactManager.getOWLManager().loadAndInfer(owlSource, repositoryConnection, null,
+                        dependentSchemaOntologies, repositoryConnection, this.schemaGraph);
         
         // verify statement counts
         final URI versionURI = inferredOntologyID.getVersionIRI().toOpenRDFURI();
@@ -473,19 +478,21 @@ public abstract class AbstractPoddArtifactManagerTest
      * @param inferredStatementCount
      * @param repositoryConnection
      *            TODO
+     * @param dependentSchemaOntologies
      * @return
      * @throws Exception
      */
-    private InferredOWLOntologyID loadInferStoreOntology(final String resourcePath, final RDFFormat format,
+    private InferredOWLOntologyID loadInferStoreSchema(final String resourcePath, final RDFFormat format,
             final long assertedStatementCount, final long inferredStatementCount,
-            final RepositoryConnection repositoryConnection) throws Exception
+            final RepositoryConnection repositoryConnection, Set<? extends OWLOntologyID> dependentSchemaOntologies)
+        throws Exception
     {
         // load ontology to OWLManager
         final InputStream inputStream = this.getClass().getResourceAsStream(resourcePath);
         Assert.assertNotNull("Could not find resource: " + resourcePath, inputStream);
         
-        return this.loadInferStoreOntology(inputStream, format, assertedStatementCount, inferredStatementCount,
-                repositoryConnection);
+        return this.loadInferStoreSchema(inputStream, format, assertedStatementCount, inferredStatementCount,
+                repositoryConnection, dependentSchemaOntologies);
     }
     
     /**
@@ -499,48 +506,62 @@ public abstract class AbstractPoddArtifactManagerTest
      */
     private List<InferredOWLOntologyID> loadVersion1SchemaOntologies() throws Exception
     {
+        // Keep track of the ontologies that have been loaded to ensure they are in memory when
+        // inferring the next schema
+        Set<InferredOWLOntologyID> loadedOntologies = new LinkedHashSet<>();
         // prepare: load schema ontologies
         final InferredOWLOntologyID inferredDctermsOntologyID =
-                this.loadInferStoreOntology(PODD.PATH_PODD_DCTERMS_V1, RDFFormat.RDFXML,
+                this.loadInferStoreSchema(PODD.PATH_PODD_DCTERMS_V1, RDFFormat.RDFXML,
                         TestConstants.EXPECTED_TRIPLE_COUNT_DC_TERMS_CONCRETE,
-                        TestConstants.EXPECTED_TRIPLE_COUNT_DC_TERMS_INFERRED, this.testRepositoryConnection);
+                        TestConstants.EXPECTED_TRIPLE_COUNT_DC_TERMS_INFERRED, this.testManagementRepositoryConnection,
+                        loadedOntologies);
+        loadedOntologies.add(inferredDctermsOntologyID);
         final InferredOWLOntologyID inferredFoafOntologyID =
-                this.loadInferStoreOntology(PODD.PATH_PODD_FOAF_V1, RDFFormat.RDFXML,
+                this.loadInferStoreSchema(PODD.PATH_PODD_FOAF_V1, RDFFormat.RDFXML,
                         TestConstants.EXPECTED_TRIPLE_COUNT_FOAF_CONCRETE,
-                        TestConstants.EXPECTED_TRIPLE_COUNT_FOAF_INFERRED, this.testRepositoryConnection);
+                        TestConstants.EXPECTED_TRIPLE_COUNT_FOAF_INFERRED, this.testManagementRepositoryConnection,
+                        loadedOntologies);
+        loadedOntologies.add(inferredFoafOntologyID);
         final InferredOWLOntologyID inferredPUserOntologyID =
-                this.loadInferStoreOntology(PODD.PATH_PODD_USER_V1, RDFFormat.RDFXML,
+                this.loadInferStoreSchema(PODD.PATH_PODD_USER_V1, RDFFormat.RDFXML,
                         TestConstants.EXPECTED_TRIPLE_COUNT_PODD_USER_CONCRETE,
-                        TestConstants.EXPECTED_TRIPLE_COUNT_PODD_USER_INFERRED, this.testRepositoryConnection);
+                        TestConstants.EXPECTED_TRIPLE_COUNT_PODD_USER_INFERRED,
+                        this.testManagementRepositoryConnection, loadedOntologies);
+        loadedOntologies.add(inferredPUserOntologyID);
         final InferredOWLOntologyID inferredPBaseOntologyID =
-                this.loadInferStoreOntology(PODD.PATH_PODD_BASE_V1, RDFFormat.RDFXML,
+                this.loadInferStoreSchema(PODD.PATH_PODD_BASE_V1, RDFFormat.RDFXML,
                         TestConstants.EXPECTED_TRIPLE_COUNT_PODD_BASE_CONCRETE,
-                        TestConstants.EXPECTED_TRIPLE_COUNT_PODD_BASE_INFERRED, this.testRepositoryConnection);
+                        TestConstants.EXPECTED_TRIPLE_COUNT_PODD_BASE_INFERRED,
+                        this.testManagementRepositoryConnection, loadedOntologies);
+        loadedOntologies.add(inferredPBaseOntologyID);
         final InferredOWLOntologyID inferredPScienceOntologyID =
-                this.loadInferStoreOntology(PODD.PATH_PODD_SCIENCE_V1, RDFFormat.RDFXML,
+                this.loadInferStoreSchema(PODD.PATH_PODD_SCIENCE_V1, RDFFormat.RDFXML,
                         TestConstants.EXPECTED_TRIPLE_COUNT_PODD_SCIENCE_CONCRETE,
-                        TestConstants.EXPECTED_TRIPLE_COUNT_PODD_SCIENCE_INFERRED, this.testRepositoryConnection);
+                        TestConstants.EXPECTED_TRIPLE_COUNT_PODD_SCIENCE_INFERRED,
+                        this.testManagementRepositoryConnection, loadedOntologies);
+        loadedOntologies.add(inferredPScienceOntologyID);
         final InferredOWLOntologyID inferredPPlantOntologyID =
-                this.loadInferStoreOntology(PODD.PATH_PODD_PLANT_V1, RDFFormat.RDFXML,
+                this.loadInferStoreSchema(PODD.PATH_PODD_PLANT_V1, RDFFormat.RDFXML,
                         TestConstants.EXPECTED_TRIPLE_COUNT_PODD_PLANT_CONCRETE,
-                        TestConstants.EXPECTED_TRIPLE_COUNT_PODD_PLANT_INFERRED, this.testRepositoryConnection);
+                        TestConstants.EXPECTED_TRIPLE_COUNT_PODD_PLANT_INFERRED,
+                        this.testManagementRepositoryConnection, loadedOntologies);
+        loadedOntologies.add(inferredPPlantOntologyID);
         
         // prepare: update schema management graph
         this.testSesameManager.updateCurrentManagedSchemaOntologyVersion(inferredDctermsOntologyID, false,
-                this.testRepositoryConnection, this.schemaGraph);
+                this.testManagementRepositoryConnection, this.schemaGraph);
         this.testSesameManager.updateCurrentManagedSchemaOntologyVersion(inferredFoafOntologyID, false,
-                this.testRepositoryConnection, this.schemaGraph);
+                this.testManagementRepositoryConnection, this.schemaGraph);
         this.testSesameManager.updateCurrentManagedSchemaOntologyVersion(inferredPUserOntologyID, false,
-                this.testRepositoryConnection, this.schemaGraph);
+                this.testManagementRepositoryConnection, this.schemaGraph);
         this.testSesameManager.updateCurrentManagedSchemaOntologyVersion(inferredPBaseOntologyID, false,
-                this.testRepositoryConnection, this.schemaGraph);
+                this.testManagementRepositoryConnection, this.schemaGraph);
         this.testSesameManager.updateCurrentManagedSchemaOntologyVersion(inferredPScienceOntologyID, false,
-                this.testRepositoryConnection, this.schemaGraph);
+                this.testManagementRepositoryConnection, this.schemaGraph);
         this.testSesameManager.updateCurrentManagedSchemaOntologyVersion(inferredPPlantOntologyID, false,
-                this.testRepositoryConnection, this.schemaGraph);
+                this.testManagementRepositoryConnection, this.schemaGraph);
         
-        return Arrays.asList(inferredDctermsOntologyID, inferredFoafOntologyID, inferredPUserOntologyID,
-                inferredPBaseOntologyID, inferredPScienceOntologyID, inferredPPlantOntologyID);
+        return new ArrayList<InferredOWLOntologyID>(loadedOntologies);
     }
     
     /**
@@ -554,48 +575,62 @@ public abstract class AbstractPoddArtifactManagerTest
      */
     private List<InferredOWLOntologyID> loadVersion2SchemaOntologies() throws Exception
     {
+        // Keep track of the ontologies that have been loaded to ensure they are in memory when
+        // inferring the next schema
+        Set<InferredOWLOntologyID> loadedOntologies = new LinkedHashSet<>();
         // prepare: load schema ontologies
         final InferredOWLOntologyID inferredDctermsOntologyID =
-                this.loadInferStoreOntology(PODD.PATH_PODD_DCTERMS_V2, RDFFormat.RDFXML,
+                this.loadInferStoreSchema(PODD.PATH_PODD_DCTERMS_V2, RDFFormat.RDFXML,
                         TestConstants.EXPECTED_TRIPLE_COUNT_DC_TERMS_CONCRETE,
-                        TestConstants.EXPECTED_TRIPLE_COUNT_DC_TERMS_INFERRED, this.testRepositoryConnection);
+                        TestConstants.EXPECTED_TRIPLE_COUNT_DC_TERMS_INFERRED, this.testManagementRepositoryConnection,
+                        loadedOntologies);
+        loadedOntologies.add(inferredDctermsOntologyID);
         final InferredOWLOntologyID inferredFoafOntologyID =
-                this.loadInferStoreOntology(PODD.PATH_PODD_FOAF_V2, RDFFormat.RDFXML,
+                this.loadInferStoreSchema(PODD.PATH_PODD_FOAF_V2, RDFFormat.RDFXML,
                         TestConstants.EXPECTED_TRIPLE_COUNT_FOAF_CONCRETE,
-                        TestConstants.EXPECTED_TRIPLE_COUNT_FOAF_INFERRED, this.testRepositoryConnection);
+                        TestConstants.EXPECTED_TRIPLE_COUNT_FOAF_INFERRED, this.testManagementRepositoryConnection,
+                        loadedOntologies);
+        loadedOntologies.add(inferredFoafOntologyID);
         final InferredOWLOntologyID inferredPUserOntologyID =
-                this.loadInferStoreOntology(PODD.PATH_PODD_USER_V2, RDFFormat.RDFXML,
+                this.loadInferStoreSchema(PODD.PATH_PODD_USER_V2, RDFFormat.RDFXML,
                         TestConstants.EXPECTED_TRIPLE_COUNT_PODD_USER_CONCRETE,
-                        TestConstants.EXPECTED_TRIPLE_COUNT_PODD_USER_INFERRED, this.testRepositoryConnection);
+                        TestConstants.EXPECTED_TRIPLE_COUNT_PODD_USER_INFERRED,
+                        this.testManagementRepositoryConnection, loadedOntologies);
+        loadedOntologies.add(inferredPUserOntologyID);
         final InferredOWLOntologyID inferredPBaseOntologyID =
-                this.loadInferStoreOntology(PODD.PATH_PODD_BASE_V2, RDFFormat.RDFXML,
+                this.loadInferStoreSchema(PODD.PATH_PODD_BASE_V2, RDFFormat.RDFXML,
                         TestConstants.EXPECTED_TRIPLE_COUNT_PODD_BASE_CONCRETE,
-                        TestConstants.EXPECTED_TRIPLE_COUNT_PODD_BASE_INFERRED, this.testRepositoryConnection);
+                        TestConstants.EXPECTED_TRIPLE_COUNT_PODD_BASE_INFERRED,
+                        this.testManagementRepositoryConnection, loadedOntologies);
+        loadedOntologies.add(inferredPBaseOntologyID);
         final InferredOWLOntologyID inferredPScienceOntologyID =
-                this.loadInferStoreOntology(PODD.PATH_PODD_SCIENCE_V2, RDFFormat.RDFXML,
+                this.loadInferStoreSchema(PODD.PATH_PODD_SCIENCE_V2, RDFFormat.RDFXML,
                         TestConstants.EXPECTED_TRIPLE_COUNT_PODD_SCIENCE_CONCRETE,
-                        TestConstants.EXPECTED_TRIPLE_COUNT_PODD_SCIENCE_INFERRED, this.testRepositoryConnection);
+                        TestConstants.EXPECTED_TRIPLE_COUNT_PODD_SCIENCE_INFERRED,
+                        this.testManagementRepositoryConnection, loadedOntologies);
+        loadedOntologies.add(inferredPScienceOntologyID);
         final InferredOWLOntologyID inferredPPlantOntologyID =
-                this.loadInferStoreOntology(PODD.PATH_PODD_PLANT_V2, RDFFormat.RDFXML,
+                this.loadInferStoreSchema(PODD.PATH_PODD_PLANT_V2, RDFFormat.RDFXML,
                         TestConstants.EXPECTED_TRIPLE_COUNT_PODD_PLANT_CONCRETE,
-                        TestConstants.EXPECTED_TRIPLE_COUNT_PODD_PLANT_INFERRED, this.testRepositoryConnection);
+                        TestConstants.EXPECTED_TRIPLE_COUNT_PODD_PLANT_INFERRED,
+                        this.testManagementRepositoryConnection, loadedOntologies);
+        loadedOntologies.add(inferredPPlantOntologyID);
         
         // prepare: update schema management graph
         this.testSesameManager.updateCurrentManagedSchemaOntologyVersion(inferredDctermsOntologyID, false,
-                this.testRepositoryConnection, this.schemaGraph);
+                this.testManagementRepositoryConnection, this.schemaGraph);
         this.testSesameManager.updateCurrentManagedSchemaOntologyVersion(inferredFoafOntologyID, false,
-                this.testRepositoryConnection, this.schemaGraph);
+                this.testManagementRepositoryConnection, this.schemaGraph);
         this.testSesameManager.updateCurrentManagedSchemaOntologyVersion(inferredPUserOntologyID, false,
-                this.testRepositoryConnection, this.schemaGraph);
+                this.testManagementRepositoryConnection, this.schemaGraph);
         this.testSesameManager.updateCurrentManagedSchemaOntologyVersion(inferredPBaseOntologyID, false,
-                this.testRepositoryConnection, this.schemaGraph);
+                this.testManagementRepositoryConnection, this.schemaGraph);
         this.testSesameManager.updateCurrentManagedSchemaOntologyVersion(inferredPScienceOntologyID, false,
-                this.testRepositoryConnection, this.schemaGraph);
+                this.testManagementRepositoryConnection, this.schemaGraph);
         this.testSesameManager.updateCurrentManagedSchemaOntologyVersion(inferredPPlantOntologyID, false,
-                this.testRepositoryConnection, this.schemaGraph);
+                this.testManagementRepositoryConnection, this.schemaGraph);
         
-        return Arrays.asList(inferredDctermsOntologyID, inferredFoafOntologyID, inferredPUserOntologyID,
-                inferredPBaseOntologyID, inferredPScienceOntologyID, inferredPPlantOntologyID);
+        return new ArrayList<InferredOWLOntologyID>(loadedOntologies);
     }
     
     /**
@@ -611,7 +646,7 @@ public abstract class AbstractPoddArtifactManagerTest
         this.testRepositoryManager.setSchemaManagementGraph(this.schemaGraph);
         this.testRepositoryManager.setArtifactManagementGraph(this.artifactGraph);
         
-        this.testRepositoryConnection = this.testRepositoryManager.getManagementRepository().getConnection();
+        this.testManagementRepositoryConnection = this.testRepositoryManager.getManagementRepository().getConnection();
         
         this.setupNonRepositoryManagers();
     }
@@ -686,7 +721,7 @@ public abstract class AbstractPoddArtifactManagerTest
         
         try
         {
-            if(this.testRepositoryConnection.isActive())
+            if(this.testManagementRepositoryConnection.isActive())
             {
                 this.log.warn("Found active transaction after test");
                 // this.testRepositoryConnection.rollback();
@@ -696,16 +731,16 @@ public abstract class AbstractPoddArtifactManagerTest
         {
             try
             {
-                if(this.testRepositoryConnection.isOpen())
+                if(this.testManagementRepositoryConnection.isOpen())
                 {
-                    this.testRepositoryConnection.close();
+                    this.testManagementRepositoryConnection.close();
                 }
             }
             finally
             {
                 this.testRepositoryManager.getManagementRepository().shutDown();
                 this.testRepositoryManager = null;
-                this.testRepositoryConnection = null;
+                this.testManagementRepositoryConnection = null;
             }
         }
     }
@@ -1486,7 +1521,7 @@ public abstract class AbstractPoddArtifactManagerTest
         
         Set<? extends OWLOntologyID> schemaImports = this.testArtifactManager.getSchemaImports(artifactID);
         
-        DebugUtils.printContents(testRepositoryConnection, artifactGraph);
+        DebugUtils.printContents(testManagementRepositoryConnection, artifactGraph);
         
         Assert.assertFalse("No schema imports detected", schemaImports.isEmpty());
     }
@@ -1756,37 +1791,50 @@ public abstract class AbstractPoddArtifactManagerTest
     @Test
     public final void testLoadArtifactWithMissingSchemaOntologiesInRepository() throws Exception
     {
+        // Keep track of the ontologies that have been loaded to ensure they are in memory when
+        // inferring the next schema
+        Set<InferredOWLOntologyID> loadedOntologies = new LinkedHashSet<>();
         // prepare: load schema ontologies
         final InferredOWLOntologyID inferredDctermsOntologyID =
-                this.loadInferStoreOntology(PODD.PATH_PODD_DCTERMS_V1, RDFFormat.RDFXML,
+                this.loadInferStoreSchema(PODD.PATH_PODD_DCTERMS_V1, RDFFormat.RDFXML,
                         TestConstants.EXPECTED_TRIPLE_COUNT_DC_TERMS_CONCRETE,
-                        TestConstants.EXPECTED_TRIPLE_COUNT_DC_TERMS_INFERRED, this.testRepositoryConnection);
+                        TestConstants.EXPECTED_TRIPLE_COUNT_DC_TERMS_INFERRED, this.testManagementRepositoryConnection,
+                        loadedOntologies);
+        loadedOntologies.add(inferredDctermsOntologyID);
         final InferredOWLOntologyID inferredFoafOntologyID =
-                this.loadInferStoreOntology(PODD.PATH_PODD_FOAF_V1, RDFFormat.RDFXML,
+                this.loadInferStoreSchema(PODD.PATH_PODD_FOAF_V1, RDFFormat.RDFXML,
                         TestConstants.EXPECTED_TRIPLE_COUNT_FOAF_CONCRETE,
-                        TestConstants.EXPECTED_TRIPLE_COUNT_FOAF_INFERRED, this.testRepositoryConnection);
+                        TestConstants.EXPECTED_TRIPLE_COUNT_FOAF_INFERRED, this.testManagementRepositoryConnection,
+                        loadedOntologies);
+        loadedOntologies.add(inferredFoafOntologyID);
         final InferredOWLOntologyID inferredPUserOntologyID =
-                this.loadInferStoreOntology(PODD.PATH_PODD_USER_V1, RDFFormat.RDFXML,
+                this.loadInferStoreSchema(PODD.PATH_PODD_USER_V1, RDFFormat.RDFXML,
                         TestConstants.EXPECTED_TRIPLE_COUNT_PODD_USER_CONCRETE,
-                        TestConstants.EXPECTED_TRIPLE_COUNT_PODD_USER_INFERRED, this.testRepositoryConnection);
+                        TestConstants.EXPECTED_TRIPLE_COUNT_PODD_USER_INFERRED,
+                        this.testManagementRepositoryConnection, loadedOntologies);
+        loadedOntologies.add(inferredPUserOntologyID);
         final InferredOWLOntologyID inferredPBaseOntologyID =
-                this.loadInferStoreOntology(PODD.PATH_PODD_BASE_V1, RDFFormat.RDFXML,
+                this.loadInferStoreSchema(PODD.PATH_PODD_BASE_V1, RDFFormat.RDFXML,
                         TestConstants.EXPECTED_TRIPLE_COUNT_PODD_BASE_CONCRETE,
-                        TestConstants.EXPECTED_TRIPLE_COUNT_PODD_BASE_INFERRED, this.testRepositoryConnection);
+                        TestConstants.EXPECTED_TRIPLE_COUNT_PODD_BASE_INFERRED,
+                        this.testManagementRepositoryConnection, loadedOntologies);
+        loadedOntologies.add(inferredPBaseOntologyID);
         final InferredOWLOntologyID inferredPScienceOntologyID =
-                this.loadInferStoreOntology(PODD.PATH_PODD_SCIENCE_V1, RDFFormat.RDFXML,
+                this.loadInferStoreSchema(PODD.PATH_PODD_SCIENCE_V1, RDFFormat.RDFXML,
                         TestConstants.EXPECTED_TRIPLE_COUNT_PODD_SCIENCE_CONCRETE,
-                        TestConstants.EXPECTED_TRIPLE_COUNT_PODD_SCIENCE_INFERRED, this.testRepositoryConnection);
+                        TestConstants.EXPECTED_TRIPLE_COUNT_PODD_SCIENCE_INFERRED,
+                        this.testManagementRepositoryConnection, loadedOntologies);
+        loadedOntologies.add(inferredPScienceOntologyID);
         
         // prepare: update schema management graph
         this.testSesameManager.updateCurrentManagedSchemaOntologyVersion(inferredDctermsOntologyID, false,
-                this.testRepositoryConnection, this.schemaGraph);
+                this.testManagementRepositoryConnection, this.schemaGraph);
         this.testSesameManager.updateCurrentManagedSchemaOntologyVersion(inferredFoafOntologyID, false,
-                this.testRepositoryConnection, this.schemaGraph);
+                this.testManagementRepositoryConnection, this.schemaGraph);
         this.testSesameManager.updateCurrentManagedSchemaOntologyVersion(inferredPUserOntologyID, false,
-                this.testRepositoryConnection, this.schemaGraph);
+                this.testManagementRepositoryConnection, this.schemaGraph);
         this.testSesameManager.updateCurrentManagedSchemaOntologyVersion(inferredPBaseOntologyID, false,
-                this.testRepositoryConnection, this.schemaGraph);
+                this.testManagementRepositoryConnection, this.schemaGraph);
         // PODD-Science ontology is not added to schema management graph
         
         final InputStream inputStream =
@@ -1818,14 +1866,15 @@ public abstract class AbstractPoddArtifactManagerTest
     public final void testLoadArtifactWithNonCurrentSchemaVersionImport() throws Exception
     {
         // prepare:
-        this.loadVersion1SchemaOntologies();
+        List<InferredOWLOntologyID> version1SchemaOntologies = this.loadVersion1SchemaOntologies();
         
         // prepare: load poddScience v2
         final InferredOWLOntologyID inferredPScienceOntologyID =
-                this.loadInferStoreOntology("/test/ontologies/poddScienceVXYZ.owl", RDFFormat.RDFXML, 1265, 220,
-                        this.testRepositoryConnection);
+                this.loadInferStoreSchema("/test/ontologies/poddScienceVXYZ.owl", RDFFormat.RDFXML, 1265, 220,
+                        this.testManagementRepositoryConnection, new LinkedHashSet<InferredOWLOntologyID>(
+                                version1SchemaOntologies));
         this.testSesameManager.updateCurrentManagedSchemaOntologyVersion(inferredPScienceOntologyID, true,
-                this.testRepositoryConnection, this.schemaGraph);
+                this.testManagementRepositoryConnection, this.schemaGraph);
         
         // load test artifact
         final InputStream inputStream4Artifact =
