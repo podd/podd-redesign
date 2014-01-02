@@ -176,7 +176,8 @@ public class OntologyUtils
                 nextImports.add(nextImportVersionURI);
             }
             
-            List<URI> orderImports = OntologyUtils.orderImports(model, schemaOntologyUris, schemaVersionUris, importsMap);
+            List<URI> orderImports =
+                    OntologyUtils.orderImports(model, schemaOntologyUris, schemaVersionUris, importsMap);
             
             // Iterate through universally ordered collection to find ordered imports for this
             // ontology
@@ -755,6 +756,10 @@ public class OntologyUtils
             List<URI> importsForOneOntology = orderImports(model, schemaOntologyUris, schemaVersionUris, importsMap);
             
             importsForOneOntology.remove(artifactID.getOntologyIRI().toOpenRDFURI());
+            if(artifactID.getVersionIRI() != null)
+            {
+                importsForOneOntology.remove(artifactID.getVersionIRI().toOpenRDFURI());
+            }
             
             for(URI nextImport : importsForOneOntology)
             {
