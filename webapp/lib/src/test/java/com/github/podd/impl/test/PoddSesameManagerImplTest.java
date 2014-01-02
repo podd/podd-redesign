@@ -19,13 +19,16 @@ package com.github.podd.impl.test;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.List;
 
 import org.junit.Assert;
+import org.openrdf.model.URI;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.rio.RDFFormat;
 import org.semanticweb.owlapi.io.OWLOntologyDocumentSource;
 import org.semanticweb.owlapi.io.StreamDocumentSource;
+import org.semanticweb.owlapi.model.OWLOntologyID;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.OWLOntologyManagerFactory;
 import org.semanticweb.owlapi.model.OWLOntologyManagerFactoryRegistry;
@@ -59,7 +62,7 @@ public class PoddSesameManagerImplTest extends AbstractPoddSesameManagerTest
     }
     
     @Override
-    public PoddSesameManager getNewPoddSesameManagerInstance()
+    public final PoddSesameManager getNewPoddSesameManagerInstance()
     {
         return new PoddSesameManagerImpl();
     }
@@ -74,7 +77,8 @@ public class PoddSesameManagerImplTest extends AbstractPoddSesameManagerTest
      * generate inferred statements for schema ontologies.
      */
     @Override
-    public List<InferredOWLOntologyID> loadSchemaOntologies(final RepositoryConnection conn) throws Exception
+    public final List<InferredOWLOntologyID> loadSchemaOntologies(final RepositoryConnection conn,
+            final URI schemaManagementGraph) throws Exception
     {
         final List<InferredOWLOntologyID> schemaList = new ArrayList<InferredOWLOntologyID>();
         
@@ -100,7 +104,9 @@ public class PoddSesameManagerImplTest extends AbstractPoddSesameManagerTest
             final InputStream resourceStream = this.getClass().getResourceAsStream(schemaResourcePath);
             final OWLOntologyDocumentSource owlSource =
                     new StreamDocumentSource(resourceStream, RDFFormat.RDFXML.getDefaultMIMEType());
-            final InferredOWLOntologyID nextInferredOntology = testPoddOWLManager.loadAndInfer(owlSource, conn, null);
+            final InferredOWLOntologyID nextInferredOntology =
+                    testPoddOWLManager.loadAndInfer(owlSource, conn, null,
+                            new LinkedHashSet<OWLOntologyID>(schemaList), conn, schemaManagementGraph);
             
             schemaList.add(nextInferredOntology);
         }

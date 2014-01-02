@@ -175,7 +175,7 @@ public abstract class AbstractPoddSesameManagerTest
      */
     private List<InferredOWLOntologyID> loadSchemaOntologies() throws Exception
     {
-        return this.loadSchemaOntologies(this.testRepositoryConnection);
+        return this.loadSchemaOntologies(this.testRepositoryConnection, this.schemaGraph);
     }
     
     /**
@@ -186,7 +186,8 @@ public abstract class AbstractPoddSesameManagerTest
      * @return
      * @throws Exception
      */
-    protected abstract List<InferredOWLOntologyID> loadSchemaOntologies(RepositoryConnection conn) throws Exception;
+    protected abstract List<InferredOWLOntologyID> loadSchemaOntologies(RepositoryConnection conn,
+            URI schemaManagementGraph) throws Exception;
     
     /**
      * Helper method which populates a graph with artifact management triples.
