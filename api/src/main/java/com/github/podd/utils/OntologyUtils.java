@@ -683,6 +683,19 @@ public class OntologyUtils
         OntologyUtils.mapAndSortImports(model, currentVersionsMap, allVersionsMap, importsMap, importOrder,
                 nextOntology);
         
+        if(importsMap.containsKey(nextOntology))
+        {
+            // Recurse over transitive imports
+            for(URI nextTransitiveImport : importsMap.get(nextOntology))
+            {
+                if(!importOrder.contains(nextTransitiveImport))
+                {
+                    OntologyUtils.orderImportsForOneOntology(model, schemaOntologyUris, schemaVersionUris,
+                            nextTransitiveImport, importsMap);
+                }
+            }
+        }
+        
         OntologyUtils.log.debug("importOrder: {}", importOrder);
         return importOrder;
     }
@@ -786,9 +799,36 @@ public class OntologyUtils
         
         OntologyUtils.extractOntologyAndVersions(model, schemaOntologyUris, schemaVersionUris);
         
+        List<InferredOWLOntologyID> ontologyIDs = OntologyUtils.modelToOntologyIDs(model, true, false);
+        
         if(schemaOntologyUris.contains(artifactID.getOntologyIRI().toOpenRDFURI()))
         {
+            List<URI> importsForOneOntology =
+                    orderImportsForOneOntology(model, schemaOntologyUris, schemaVersionUris, artifactID
+                            .getOntologyIRI().toOpenRDFURI(), importsMap);
             
+            importsForOneOntology.remove(artifactID.getOntologyIRI().toOpenRDFURI());
+            
+            for(URI nextImport : importsForOneOntology)
+            {
+                if(importsMap.containsKey(nextImport))
+                {
+                    for(OWLOntologyID nextOntologyID : ontologyIDs)
+                    {
+                        if(nextOntologyID.getOntologyIRI().toOpenRDFURI().equals(nextImport))
+                        {
+                            results.add(nextOntologyID);
+                            break;
+                        }
+                        else if(nextOntologyID.getVersionIRI() != null
+                                && nextOntologyID.getVersionIRI().toOpenRDFURI().equals(nextImport))
+                        {
+                            results.add(nextOntologyID);
+                            break;
+                        }
+                    }
+                }
+            }
         }
         else
         {
