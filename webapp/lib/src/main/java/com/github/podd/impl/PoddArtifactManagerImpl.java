@@ -1095,7 +1095,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
      * Helper method to check schema ontology imports and update use of ontology IRIs to version
      * IRIs.
      */
-    private void handleSchemaImports(final URI ontologyIRI, final RepositoryConnection managementRepositoryConnection,
+    private void useVersionsForSchemaImports(final URI ontologyIRI, final RepositoryConnection managementRepositoryConnection,
             final RepositoryConnection tempRepositoryConnection, final URI tempContext) throws OpenRDFException,
         UnmanagedSchemaIRIException
     {
@@ -1337,7 +1337,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             rawModel = null;
             
             // check and ensure schema ontology imports are for version IRIs
-            this.handleSchemaImports(ontologyIDs.get(0).getOntologyIRI().toOpenRDFURI(),
+            this.useVersionsForSchemaImports(ontologyIDs.get(0).getOntologyIRI().toOpenRDFURI(),
                     managementRepositoryConnection, temporaryRepositoryConnection, randomContext);
             
             Model importsModel = new LinkedHashModel();
@@ -2009,7 +2009,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
                     newVersionIRI, tempContext);
             
             // check and ensure schema ontology imports are for version IRIs
-            this.handleSchemaImports(artifactID.getOntologyIRI().toOpenRDFURI(), managementRepositoryConnection,
+            this.useVersionsForSchemaImports(artifactID.getOntologyIRI().toOpenRDFURI(), managementRepositoryConnection,
                     tempRepositoryConnection, tempContext);
             
             // ensure schema ontologies are cached in memory before loading
