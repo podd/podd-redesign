@@ -194,9 +194,7 @@ public interface PoddSchemaManager
      * 
      * @param owlManager
      *            The PoddOWLManager
-     * @deprecated We should not be passing across references to a shared PoddOWLManager.
      */
-    @Deprecated
     void setOwlManager(PoddOWLManager owlManager);
     
     /**
@@ -251,8 +249,9 @@ public interface PoddSchemaManager
      * @throws PoddException
      *             If an error occurs due to a violation of the PODD constraints.
      */
-    InferredOWLOntologyID uploadSchemaOntology(InputStream inputStream, RDFFormat fileFormat) throws OpenRDFException,
-        IOException, OWLException, PoddException;
+    InferredOWLOntologyID uploadSchemaOntology(InputStream inputStream, RDFFormat fileFormat,
+            Set<? extends OWLOntologyID> dependentSchemaOntologies) throws OpenRDFException, IOException, OWLException,
+        PoddException;
     
     /**
      * Loads a Schema Ontology into the internal repository, computes inferences on the schema
@@ -278,6 +277,7 @@ public interface PoddSchemaManager
      *             If an error occurs due to a violation of the PODD constraints.
      */
     InferredOWLOntologyID uploadSchemaOntology(OWLOntologyID schemaOntologyID, InputStream inputStream,
-            RDFFormat fileFormat) throws OpenRDFException, IOException, OWLException, PoddException;
+            RDFFormat fileFormat, Set<? extends OWLOntologyID> dependentSchemaOntologies) throws OpenRDFException,
+        IOException, OWLException, PoddException;
     
 }

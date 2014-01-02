@@ -431,7 +431,8 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
                     // be rolled back if there are any failures!
                     final InferredOWLOntologyID nextResult =
                             this.uploadSchemaOntologyInternal(schemaOntologyID, inputStream, fileFormat,
-                                    managementConnection, this.repositoryManager.getSchemaManagementGraph());
+                                    managementConnection, this.repositoryManager.getSchemaManagementGraph(),
+                                    new LinkedHashSet<OWLOntologyID>(result));
                     
                     result.add(nextResult);
                 }
@@ -460,10 +461,11 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
     }
     
     @Override
-    public InferredOWLOntologyID uploadSchemaOntology(final InputStream inputStream, final RDFFormat fileFormat)
-        throws OpenRDFException, IOException, OWLException, PoddException
+    public InferredOWLOntologyID uploadSchemaOntology(final InputStream inputStream, final RDFFormat fileFormat,
+            Set<? extends OWLOntologyID> dependentSchemaOntologies) throws OpenRDFException, IOException, OWLException,
+        PoddException
     {
-        return this.uploadSchemaOntology(null, inputStream, fileFormat);
+        return this.uploadSchemaOntology(null, inputStream, fileFormat, dependentSchemaOntologies);
     }
     
     /*
@@ -471,8 +473,9 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
      */
     @Override
     public InferredOWLOntologyID uploadSchemaOntology(final OWLOntologyID schemaOntologyID,
-            final InputStream inputStream, final RDFFormat fileFormat) throws OpenRDFException, IOException,
-        OWLException, PoddException
+            final InputStream inputStream, final RDFFormat fileFormat,
+            Set<? extends OWLOntologyID> dependentSchemaOntologies) throws OpenRDFException, IOException, OWLException,
+        PoddException
     {
         Objects.requireNonNull(inputStream, "Schema Ontology input stream was null");
         
@@ -490,7 +493,7 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
             // be rolled back if there are any failures!
             final InferredOWLOntologyID result =
                     this.uploadSchemaOntologyInternal(schemaOntologyID, inputStream, fileFormat, conn,
-                            this.repositoryManager.getSchemaManagementGraph());
+                            this.repositoryManager.getSchemaManagementGraph(), dependentSchemaOntologies);
             
             conn.commit();
             
@@ -520,6 +523,7 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
      * @param inputStream
      * @param fileFormat
      * @param conn
+     * @param dependentSchemaOntologies
      * @return
      * @throws OWLException
      * @throws IOException
@@ -531,12 +535,15 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
      */
     private InferredOWLOntologyID uploadSchemaOntologyInternal(final OWLOntologyID schemaOntologyID,
             final InputStream inputStream, final RDFFormat fileFormat, final RepositoryConnection conn,
-            final URI schemaManagementGraph) throws OWLException, IOException, PoddException, EmptyOntologyException,
-        RepositoryException, OWLRuntimeException, OpenRDFException
+            final URI schemaManagementGraph, Set<? extends OWLOntologyID> dependentSchemaOntologies)
+        throws OWLException, IOException, PoddException, EmptyOntologyException, RepositoryException,
+        OWLRuntimeException, OpenRDFException
     {
         final OWLOntologyDocumentSource owlSource =
                 new StreamDocumentSource(inputStream, fileFormat.getDefaultMIMEType());
-        InferredOWLOntologyID nextInferredOntology = this.owlManager.loadAndInfer(owlSource, conn, schemaOntologyID);
+        InferredOWLOntologyID nextInferredOntology =
+                this.owlManager.loadAndInfer(owlSource, conn, schemaOntologyID, dependentSchemaOntologies, conn,
+                        schemaManagementGraph);
         
         // update the link in the schema ontology management graph
         // TODO: This may not be the right method for this purpose
