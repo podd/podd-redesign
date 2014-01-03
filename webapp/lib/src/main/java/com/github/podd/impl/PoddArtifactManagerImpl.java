@@ -222,8 +222,8 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             // OWLOntologyManager's cache
             for(final InferredOWLOntologyID deletedOntologyId : requestedArtifactIds)
             {
-                this.getOWLManager().removeCache(deletedOntologyId.getBaseOWLOntologyID());
-                this.getOWLManager().removeCache(deletedOntologyId.getInferredOWLOntologyID());
+                this.getOWLManager().removeCache(deletedOntologyId.getBaseOWLOntologyID(), schemaImports);
+                this.getOWLManager().removeCache(deletedOntologyId.getInferredOWLOntologyID(), schemaImports);
             }
             
             return !requestedArtifactIds.isEmpty();
@@ -1284,6 +1284,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         RepositoryConnection permanentRepositoryConnection = null;
         RepositoryConnection managementRepositoryConnection = null;
         InferredOWLOntologyID inferredOWLOntologyID = null;
+        Set<OWLOntologyID> schemaImports = null;
         try
         {
             final URI randomContext =
@@ -1332,7 +1333,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             
             // Rio.write(model, Rio.createWriter(RDFFormat.NQUADS, System.out));
             
-            Set<OWLOntologyID> schemaImports = OntologyUtils.getArtifactImports(ontologyIDs.get(0), importsModel);
+            schemaImports = OntologyUtils.getArtifactImports(ontologyIDs.get(0), importsModel);
             
             final Repository permanentRepository = this.getRepositoryManager().getPermanentRepository(schemaImports);
             permanentRepositoryConnection = permanentRepository.getConnection();
@@ -1442,15 +1443,16 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             try
             {
                 // release resources
-                if(inferredOWLOntologyID != null)
+                if(inferredOWLOntologyID != null && schemaImports != null)
                 {
                     try
                     {
-                        this.getOWLManager().removeCache(inferredOWLOntologyID.getBaseOWLOntologyID());
+                        this.getOWLManager().removeCache(inferredOWLOntologyID.getBaseOWLOntologyID(), schemaImports);
                     }
                     finally
                     {
-                        this.getOWLManager().removeCache(inferredOWLOntologyID.getInferredOWLOntologyID());
+                        this.getOWLManager().removeCache(inferredOWLOntologyID.getInferredOWLOntologyID(),
+                                schemaImports);
                     }
                 }
             }
@@ -1849,13 +1851,11 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
                             + "]. The current version is [" + artifactID.getVersionIRI().toString() + "]";
             
             this.log.error(message);
-            // TODO: UpdatePolicy.MERGE_WITH_EXISTING and
-            // UpdatePolicy.REPLACE_ALL should be fine to
+            // TODO: UpdatePolicy.MERGE_WITH_EXISTING and UpdatePolicy.REPLACE_ALL should be fine to
             // go on in most cases
             throw new UnmanagedArtifactVersionException(artifactID.getOntologyIRI(), artifactID.getVersionIRI(),
                     IRI.create(versionUri), message, e);
-            // FIXME - handle this conflict intelligently instead of rejecting
-            // the update.
+            // FIXME - handle this conflict intelligently instead of rejecting the update.
         }
         
         final Repository tempRepository = this.getRepositoryManager().getNewTemporaryRepository();
@@ -1863,6 +1863,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         RepositoryConnection permanentRepositoryConnection = null;
         RepositoryConnection managementRepositoryConnection = null;
         InferredOWLOntologyID inferredOWLOntologyID = null;
+        Set<? extends OWLOntologyID> currentSchemaImports = null;
         
         try
         {
@@ -1872,7 +1873,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             
             managementRepositoryConnection = this.getRepositoryManager().getManagementRepository().getConnection();
             
-            final Set<? extends OWLOntologyID> currentSchemaImports = this.getSchemaImports(artifactID);
+            currentSchemaImports = this.getSchemaImports(artifactID);
             
             permanentRepositoryConnection =
                     this.getRepositoryManager().getPermanentRepository(currentSchemaImports).getConnection();
@@ -2070,10 +2071,11 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             }
             
             // release resources
-            if(inferredOWLOntologyID != null)
+            if(inferredOWLOntologyID != null && currentSchemaImports != null)
             {
-                this.getOWLManager().removeCache(inferredOWLOntologyID.getBaseOWLOntologyID());
-                this.getOWLManager().removeCache(inferredOWLOntologyID.getInferredOWLOntologyID());
+                this.getOWLManager().removeCache(inferredOWLOntologyID.getBaseOWLOntologyID(), currentSchemaImports);
+                this.getOWLManager()
+                        .removeCache(inferredOWLOntologyID.getInferredOWLOntologyID(), currentSchemaImports);
             }
             
             if(tempRepositoryConnection != null && tempRepositoryConnection.isOpen())

@@ -267,8 +267,9 @@ public class PoddOWLManagerImpl implements PoddOWLManager
         return cachedManager;
     }
     
-    public void cacheSchemaOntologies(final Set<? extends OWLOntologyID> ontologyIDs, final RepositoryConnection conn,
-            final URI schemaManagementContext) throws OpenRDFException, OWLException, IOException, PoddException
+    public void cacheSchemaOntologies(final Set<? extends OWLOntologyID> ontologyIDs,
+            final RepositoryConnection managementConnection, final URI schemaManagementContext)
+        throws OpenRDFException, OWLException, IOException, PoddException
     {
         // -- validate input
         if(ontologyIDs == null)
@@ -304,16 +305,17 @@ public class PoddOWLManagerImpl implements PoddOWLManager
             // ontologies, as it is identifying the foaf ontology as having no imports, yet it
             // imports the dcterms ontology
             
-            Model schemaManagement = new LinkedHashModel();
-            conn.export(new StatementCollector(schemaManagement), schemaManagementContext);
+            Model schemaManagementTriples = new LinkedHashModel();
+            managementConnection.export(new StatementCollector(schemaManagementTriples), schemaManagementContext);
             
             final Set<URI> schemaOntologyUris = new LinkedHashSet<>();
             final Set<URI> schemaVersionUris = new LinkedHashSet<>();
             
-            OntologyUtils.extractOntologyAndVersions(schemaManagement, schemaOntologyUris, schemaVersionUris);
+            OntologyUtils.extractOntologyAndVersions(schemaManagementTriples, schemaOntologyUris, schemaVersionUris);
             
             Map<URI, Set<OWLOntologyID>> imports2 =
-                    OntologyUtils.getSchemaManifestImports(schemaManagement, schemaOntologyUris, schemaVersionUris);
+                    OntologyUtils.getSchemaManifestImports(schemaManagementTriples, schemaOntologyUris,
+                            schemaVersionUris);
             
             if(imports2.containsKey(ontologyID.getVersionIRI().toOpenRDFURI()))
             {
@@ -329,7 +331,7 @@ public class PoddOWLManagerImpl implements PoddOWLManager
                 for(final OWLOntologyID inferredOntologyID : nextImports)
                 {
                     this.log.info("Checking caching for imported schema: {}", inferredOntologyID);
-                    this.cacheSchemaOntologyInternal(conn, inferredOntologyID, cachedManager);
+                    this.cacheSchemaOntologyInternal(managementConnection, inferredOntologyID, cachedManager);
                 }
             }
             else
@@ -340,7 +342,7 @@ public class PoddOWLManagerImpl implements PoddOWLManager
             // the
             // Manager's cache
             this.log.info("Checking caching for ontology: {}", ontologyID);
-            this.cacheSchemaOntologyInternal(conn, ontologyID, cachedManager);
+            this.cacheSchemaOntologyInternal(managementConnection, ontologyID, cachedManager);
             
             this.log.info("Completed caching for schema ontology: {}", ontologyID);
         }
@@ -363,7 +365,7 @@ public class PoddOWLManagerImpl implements PoddOWLManager
         {
             this.log.info("About to parse schema ontology into managers cache: {}", ontologyID);
             
-            this.parseRDFStatements(conn, ontologyID.getVersionIRI().toOpenRDFURI());
+            this.parseRDFStatements(cachedManager, conn, ontologyID.getVersionIRI().toOpenRDFURI());
         }
         else
         {
@@ -380,8 +382,8 @@ public class PoddOWLManagerImpl implements PoddOWLManager
                 
                 if(((InferredOWLOntologyID)ontologyID).getInferredOntologyIRI() != null)
                 {
-                    this.parseRDFStatements(conn, ((InferredOWLOntologyID)ontologyID).getInferredOntologyIRI()
-                            .toOpenRDFURI());
+                    this.parseRDFStatements(cachedManager, conn, ((InferredOWLOntologyID)ontologyID)
+                            .getInferredOntologyIRI().toOpenRDFURI());
                 }
                 else
                 {
@@ -700,7 +702,7 @@ public class PoddOWLManagerImpl implements PoddOWLManager
         
         synchronized(this.managerFactory)
         {
-            OWLOntologyManager cachedManager = this.getCachedManager(Collections.<OWLOntologyID> emptySet());
+            OWLOntologyManager cachedManager = this.getCachedManager(dependentOntologies);
             return isCachedInternal(ontologyID, cachedManager);
         }
     }
@@ -746,7 +748,7 @@ public class PoddOWLManagerImpl implements PoddOWLManager
      */
     public InferredOWLOntologyID loadAndInfer(final RepositoryConnection permanentRepositoryConnection,
             final OWLOntologyID ontologyID, final OWLOntologyDocumentSource owlSource,
-            final boolean removeFromCacheOnException, Set<? extends OWLOntologyID> ontologyIDs,
+            final boolean removeFromCacheOnException, Set<? extends OWLOntologyID> dependentSchemaOntologies,
             RepositoryConnection managementConnection, URI schemaManagementContext) throws OWLException, PoddException,
         OpenRDFException, IOException
     {
@@ -754,7 +756,7 @@ public class PoddOWLManagerImpl implements PoddOWLManager
         OWLOntology nextOntology = null;
         try
         {
-            nextOntology = this.loadOntologyInternal(ontologyID, owlSource, ontologyIDs);
+            nextOntology = this.loadOntologyInternal(ontologyID, owlSource, dependentSchemaOntologies);
             
             // Check the OWLAPI OWLOntology against an OWLProfile to make sure
             // it is in profile
@@ -838,14 +840,14 @@ public class PoddOWLManagerImpl implements PoddOWLManager
                 {
                     if(nextOntology != null && removeFromCacheOnException)
                     {
-                        this.removeCache(nextOntology.getOntologyID());
+                        this.removeCache(nextOntology.getOntologyID(), dependentSchemaOntologies);
                     }
                 }
                 finally
                 {
                     if(inferredOWLOntologyID != null && removeFromCacheOnException)
                     {
-                        this.removeCache(inferredOWLOntologyID.getInferredOWLOntologyID());
+                        this.removeCache(inferredOWLOntologyID.getInferredOWLOntologyID(), dependentSchemaOntologies);
                     }
                 }
             }
@@ -861,13 +863,25 @@ public class PoddOWLManagerImpl implements PoddOWLManager
     }
     
     public OWLOntology loadOntologyInternal(final OWLOntologyID ontologyID, final OWLOntologyDocumentSource owlSource,
-            final Set<? extends OWLOntologyID> dependentOntologies) throws OWLException, IOException, PoddException
+            final Set<? extends OWLOntologyID> dependentSchemaOntologies) throws OWLException, IOException,
+        PoddException
     {
         synchronized(this.managerFactory)
         {
+            OWLOntologyManager cachedManager = this.getCachedManager(dependentSchemaOntologies);
+            
             try
             {
                 OWLOntology nextOntology;
+                if(ontologyID == null)
+                {
+                    nextOntology = cachedManager.createOntology();
+                }
+                else
+                {
+                    nextOntology = cachedManager.createOntology(ontologyID);
+                }
+                
                 if(owlSource instanceof RioMemoryTripleSource)
                 {
                     final RioRDFOntologyFormatFactory ontologyFormatFactory =
@@ -875,43 +889,21 @@ public class PoddOWLManagerImpl implements PoddOWLManager
                                     "application/rdf+xml");
                     final RioParserImpl owlParser = new RioParserImpl(ontologyFormatFactory);
                     
-                    if(ontologyID == null)
-                    {
-                        nextOntology = this.getCachedManager(dependentOntologies).createOntology();
-                    }
-                    else
-                    {
-                        nextOntology = this.getCachedManager(dependentOntologies).createOntology(ontologyID);
-                    }
-                    
                     owlParser.parse(owlSource, nextOntology);
                 }
                 else
                 {
-                    if(ontologyID == null)
-                    {
-                        nextOntology = this.getCachedManager(Collections.<OWLOntologyID> emptySet()).createOntology();
-                    }
-                    else
-                    {
-                        nextOntology =
-                                this.getCachedManager(Collections.<OWLOntologyID> emptySet())
-                                        .createOntology(ontologyID);
-                    }
-                    
                     if(owlSource.isFormatKnown())
                     {
                         final OWLParser parser =
                                 OWLParserFactoryRegistry.getInstance().getParserFactory(owlSource.getFormatFactory())
-                                        .createParser(nextOntology.getOWLOntologyManager());
+                                        .createParser(cachedManager);
                         parser.parse(owlSource, nextOntology);
                     }
                     else
                     {
                         // FIXME: loadOntologyFromOntologyDocument does not allow for this case
-                        nextOntology =
-                                this.getCachedManager(Collections.<OWLOntologyID> emptySet())
-                                        .loadOntologyFromOntologyDocument(owlSource);
+                        nextOntology = cachedManager.loadOntologyFromOntologyDocument(owlSource);
                     }
                 }
                 
@@ -928,8 +920,8 @@ public class PoddOWLManagerImpl implements PoddOWLManager
         }
     }
     
-    public OWLOntologyID parseRDFStatements(final Model model) throws OpenRDFException, OWLException, IOException,
-        PoddException
+    public OWLOntologyID parseRDFStatements(final Model model, final OWLOntologyManager cachedManager)
+        throws OpenRDFException, OWLException, IOException, PoddException
     {
         this.log.info("About to parse statements");
         synchronized(this.managerFactory)
@@ -938,8 +930,6 @@ public class PoddOWLManagerImpl implements PoddOWLManager
                     new RioMemoryTripleSource(model.iterator(), Namespaces.asMap(model.getNamespaces()));
             
             final RioParserImpl owlParser = new RioParserImpl(new RDFXMLOntologyFormatFactory());
-            
-            OWLOntologyManager cachedManager = this.getCachedManager(Collections.<OWLOntologyID> emptySet());
             
             this.log.info("Creating new ontology");
             final OWLOntology nextOntology = cachedManager.createOntology();
@@ -979,46 +969,53 @@ public class PoddOWLManagerImpl implements PoddOWLManager
         }
     }
     
-    public OWLOntologyID parseRDFStatements(final RepositoryConnection conn, final URI... contexts)
-        throws OpenRDFException, OWLException, IOException, PoddException
+    public OWLOntologyID parseRDFStatements(final Set<? extends OWLOntologyID> dependentSchemaOntologies,
+            final RepositoryConnection conn, final URI... contexts) throws OpenRDFException, OWLException, IOException,
+        PoddException
     {
         OpenRDFUtil.verifyContextNotNull(contexts);
         
+        OWLOntologyManager cachedManager = this.getCachedManager(dependentSchemaOntologies);
+        
+        return parseRDFStatements(cachedManager, conn, contexts);
+    }
+    
+    private OWLOntologyID parseRDFStatements(final OWLOntologyManager cachedManager, final RepositoryConnection conn,
+            final URI... contexts) throws OpenRDFException, OWLException, IOException, PoddException
+    {
         this.log.info("Exporting statements to model for parsing");
         final Model model = new LinkedHashModel();
         conn.export(new StatementCollector(model), contexts);
         
-        return this.parseRDFStatements(model);
+        return this.parseRDFStatements(model, cachedManager);
     }
     
     @Override
-    public boolean removeCache(final OWLOntologyID ontologyID) throws OWLException
+    public boolean removeCache(final OWLOntologyID ontologyID,
+            final Set<? extends OWLOntologyID> dependentSchemaOntologies) throws OWLException
     {
         synchronized(this.managerFactory)
         {
+            OWLOntologyManager cachedManager = this.getCachedManager(dependentSchemaOntologies);
+            
             if(ontologyID instanceof InferredOWLOntologyID)
             {
                 final boolean containsInferredOntology =
-                        this.getCachedManager(Collections.<OWLOntologyID> emptySet()).contains(
-                                ((InferredOWLOntologyID)ontologyID).getInferredOntologyIRI());
+                        cachedManager.contains(((InferredOWLOntologyID)ontologyID).getInferredOntologyIRI());
                 if(containsInferredOntology)
                 {
-                    this.getCachedManager(Collections.<OWLOntologyID> emptySet()).removeOntology(
-                            this.getCachedManager(Collections.<OWLOntologyID> emptySet()).getOntology(
-                                    ((InferredOWLOntologyID)ontologyID).getInferredOntologyIRI()));
+                    cachedManager.removeOntology(cachedManager.getOntology(((InferredOWLOntologyID)ontologyID)
+                            .getInferredOntologyIRI()));
                 }
                 // TODO: Verify that this .contains method matches our desired
                 // semantics
                 final boolean containsOntology =
-                        this.getCachedManager(Collections.<OWLOntologyID> emptySet()).contains(
-                                ((InferredOWLOntologyID)ontologyID).getBaseOWLOntologyID());
+                        cachedManager.contains(((InferredOWLOntologyID)ontologyID).getBaseOWLOntologyID());
                 
                 if(containsOntology)
                 {
-                    this.getCachedManager(Collections.<OWLOntologyID> emptySet()).removeOntology(
-                            ((InferredOWLOntologyID)ontologyID).getBaseOWLOntologyID());
-                    return !this.getCachedManager(Collections.<OWLOntologyID> emptySet()).contains(
-                            ((InferredOWLOntologyID)ontologyID).getBaseOWLOntologyID());
+                    cachedManager.removeOntology(((InferredOWLOntologyID)ontologyID).getBaseOWLOntologyID());
+                    return !cachedManager.contains(((InferredOWLOntologyID)ontologyID).getBaseOWLOntologyID());
                 }
                 
                 return containsInferredOntology || containsOntology;

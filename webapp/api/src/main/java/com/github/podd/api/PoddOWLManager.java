@@ -72,7 +72,7 @@ public interface PoddOWLManager
      */
     InferredOWLOntologyID loadAndInfer(OWLOntologyDocumentSource owlSource,
             RepositoryConnection permanentRepositoryConnection, OWLOntologyID replacementOntologyID,
-            Set<? extends OWLOntologyID> ontologyIDs, RepositoryConnection managementConnection,
+            Set<? extends OWLOntologyID> dependentSchemaOntologies, RepositoryConnection managementConnection,
             URI schemaManagementContext) throws OWLException, PoddException, OpenRDFException, IOException;
     
     /**
@@ -89,7 +89,8 @@ public interface PoddOWLManager
      * @throws OWLException
      *             If there was an error while attempting to retrieve the memory.
      */
-    boolean removeCache(OWLOntologyID ontologyID) throws OWLException;
+    boolean removeCache(OWLOntologyID ontologyID, Set<? extends OWLOntologyID> dependentSchemaOntologies)
+        throws OWLException;
     
     /**
      * Helper method to verify that a given {@link Model} represents an ontology which complies with
