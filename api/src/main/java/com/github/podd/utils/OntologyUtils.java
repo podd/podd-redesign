@@ -799,6 +799,10 @@ public class OntologyUtils
             {
                 importsForOneOntology.remove(artifactID.getVersionIRI().toOpenRDFURI());
             }
+            if(artifactID.getInferredOntologyIRI() != null)
+            {
+                importsForOneOntology.remove(artifactID.getInferredOntologyIRI().toOpenRDFURI());
+            }
             
             for(URI nextImport : importsForOneOntology)
             {

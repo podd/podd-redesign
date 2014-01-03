@@ -120,7 +120,7 @@ public abstract class AbstractPoddOWLManagerTest
         
         final InferredOWLOntologyID inferredOntologyID =
                 this.testOWLManager.loadAndInfer(owlSource, this.testManagementConnection, null,
-                        dependentSchemaOntologies, this.testManagementConnection, null);
+                        dependentSchemaOntologies, this.testManagementConnection, this.schemaGraph);
         
         this.testOWLManager.removeCache(inferredOntologyID, dependentSchemaOntologies);
         

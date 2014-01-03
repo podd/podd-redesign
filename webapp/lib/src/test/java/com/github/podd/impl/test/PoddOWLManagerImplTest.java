@@ -119,20 +119,20 @@ public class PoddOWLManagerImplTest extends AbstractPoddOWLManagerTest
                         TestConstants.EXPECTED_TRIPLE_COUNT_DC_TERMS_INFERRED, loadedOntologies);
         manager.removeCache(null, loadedOntologies);
         loadedOntologies.add(inferredDctermsOntologyID);
+        manager.cacheSchemaOntologies(loadedOntologies, testManagementConnection, schemaGraph);
         final InferredOWLOntologyID inferredFoafOntologyID =
                 this.loadInferStoreOntology(PODD.PATH_PODD_FOAF_V1, RDFFormat.RDFXML,
                         TestConstants.EXPECTED_TRIPLE_COUNT_FOAF_CONCRETE,
                         TestConstants.EXPECTED_TRIPLE_COUNT_FOAF_INFERRED, loadedOntologies);
         manager.removeCache(null, loadedOntologies);
         loadedOntologies.add(inferredFoafOntologyID);
+        manager.cacheSchemaOntologies(loadedOntologies, testManagementConnection, schemaGraph);
         final InferredOWLOntologyID inferredPUserOntologyID =
                 this.loadInferStoreOntology(PODD.PATH_PODD_USER_V1, RDFFormat.RDFXML,
                         TestConstants.EXPECTED_TRIPLE_COUNT_PODD_USER_CONCRETE,
                         TestConstants.EXPECTED_TRIPLE_COUNT_PODD_USER_INFERRED, loadedOntologies);
         manager.removeCache(null, loadedOntologies);
         loadedOntologies.add(inferredPUserOntologyID);
-        
-        // Recache after the entire load has been performed
         manager.cacheSchemaOntologies(loadedOntologies, testManagementConnection, schemaGraph);
         
         return new ArrayList<InferredOWLOntologyID>(loadedOntologies);
@@ -568,7 +568,11 @@ public class PoddOWLManagerImplTest extends AbstractPoddOWLManagerTest
                 this.loadInferStoreOntology(PODD.PATH_PODD_BASE_V1, RDFFormat.RDFXML,
                         TestConstants.EXPECTED_TRIPLE_COUNT_PODD_BASE_CONCRETE,
                         TestConstants.EXPECTED_TRIPLE_COUNT_PODD_BASE_INFERRED, new LinkedHashSet<>(schemaOntologies));
+        this.testOWLManager.removeCache(null, new LinkedHashSet<>(schemaOntologies));
         schemaOntologies.add(inferredOntologyID);
+        
+        ((PoddOWLManagerImpl)this.testOWLManager).cacheSchemaOntologies(new LinkedHashSet<>(schemaOntologies),
+                this.testManagementConnection, null);
         
         // prepare: remove from cache
         this.testOWLManager.removeCache(inferredOntologyID.getBaseOWLOntologyID(),
@@ -809,7 +813,6 @@ public class PoddOWLManagerImplTest extends AbstractPoddOWLManagerTest
                         TestConstants.EXPECTED_TRIPLE_COUNT_PODD_BASE_CONCRETE,
                         TestConstants.EXPECTED_TRIPLE_COUNT_PODD_BASE_INFERRED, new LinkedHashSet<>(schemaOntologies));
         this.testOWLManager.removeCache(inferredOntologyID, new LinkedHashSet<>(schemaOntologies));
-        
         schemaOntologies.add(inferredOntologyID);
         
         Assert.assertFalse("Ontology should not be in memory",

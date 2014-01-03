@@ -110,6 +110,7 @@ import com.github.podd.exception.EmptyOntologyException;
 import com.github.podd.exception.InconsistentOntologyException;
 import com.github.podd.exception.OntologyNotInProfileException;
 import com.github.podd.exception.PoddException;
+import com.github.podd.utils.DebugUtils;
 import com.github.podd.utils.DeduplicatingRDFInserter;
 import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.OntologyUtils;
@@ -280,6 +281,52 @@ public class PoddOWLManagerImpl implements PoddOWLManager
         // NOTE: if InferredOntologyIRI is null, only the base ontology is
         // cached
         
+        Model schemaManagementTriples = new LinkedHashModel();
+        managementConnection.export(new StatementCollector(schemaManagementTriples), schemaManagementContext);
+        
+        final Set<URI> schemaOntologyUris = new LinkedHashSet<>();
+        final Set<URI> schemaVersionUris = new LinkedHashSet<>();
+        
+        OntologyUtils.extractOntologyAndVersions(schemaManagementTriples, schemaOntologyUris, schemaVersionUris);
+        
+        Map<URI, Set<OWLOntologyID>> imports2 =
+                OntologyUtils.getSchemaManifestImports(schemaManagementTriples, schemaOntologyUris, schemaVersionUris);
+        
+        final ConcurrentMap<URI, Set<URI>> importsMap = new ConcurrentHashMap<>(schemaOntologyUris.size());
+        List<URI> orderImports =
+                OntologyUtils.orderImports(schemaManagementTriples, schemaOntologyUris, schemaVersionUris, importsMap);
+        
+        List<OWLOntologyID> orderedOntologies = new ArrayList<>(ontologyIDs.size());
+        
+        for(URI nextOrderedImport : orderImports)
+        {
+            for(OWLOntologyID ontologyID : ontologyIDs)
+            {
+                if(ontologyID == null || ontologyID.getOntologyIRI() == null)
+                {
+                    throw new NullPointerException("OWLOntology is incomplete");
+                }
+                
+                if(ontologyID.getOntologyIRI().toOpenRDFURI().equals(nextOrderedImport))
+                {
+                    orderedOntologies.add(ontologyID);
+                    break;
+                }
+                else if(ontologyID.getVersionIRI() != null
+                        && ontologyID.getVersionIRI().toOpenRDFURI().equals(nextOrderedImport))
+                {
+                    orderedOntologies.add(ontologyID);
+                    break;
+                }
+            }
+        }
+        
+        if(orderedOntologies.size() != ontologyIDs.size())
+        {
+            this.log.error("Ordered ontology list does not match input list: {} {}", orderedOntologies, ontologyIDs);
+            DebugUtils.printContents(schemaManagementTriples);
+        }
+        
         OWLOntologyManager cachedManager = getCachedManager(ontologyIDs);
         
         synchronized(cachedManager)
@@ -292,35 +339,6 @@ public class PoddOWLManagerImpl implements PoddOWLManager
                 }
                 
                 this.log.debug("Checking whether the schema ontology is already cached: {}", ontologyID);
-                
-                // final IRI baseOntologyIRI = ontologyID.getOntologyIRI();
-                // final IRI baseOntologyVersionIRI = ontologyID.getVersionIRI();
-                // final IRI inferredOntologyIRI = ontologyID.getInferredOntologyIRI();
-                
-                // Only direct imports and first-level indirect imports are identified.
-                // This works for the current PODD schema ontologies which have a maximum import
-                // depth
-                // of 3 (PoddPlant -> PoddScience -> PoddBase)
-                // TODO: Fix this using a SPARQL which identifies the complete imports closure and
-                // sorts
-                // them in the proper order for loading.
-                
-                // FIXME: The following doesn't seem to work on the initial load for new schema
-                // ontologies, as it is identifying the foaf ontology as having no imports, yet it
-                // imports the dcterms ontology
-                
-                Model schemaManagementTriples = new LinkedHashModel();
-                managementConnection.export(new StatementCollector(schemaManagementTriples), schemaManagementContext);
-                
-                final Set<URI> schemaOntologyUris = new LinkedHashSet<>();
-                final Set<URI> schemaVersionUris = new LinkedHashSet<>();
-                
-                OntologyUtils
-                        .extractOntologyAndVersions(schemaManagementTriples, schemaOntologyUris, schemaVersionUris);
-                
-                Map<URI, Set<OWLOntologyID>> imports2 =
-                        OntologyUtils.getSchemaManifestImports(schemaManagementTriples, schemaOntologyUris,
-                                schemaVersionUris);
                 
                 if(imports2.containsKey(ontologyID.getVersionIRI().toOpenRDFURI()))
                 {
@@ -345,10 +363,9 @@ public class PoddOWLManagerImpl implements PoddOWLManager
                     this.log.debug("Did not find any imports for schema ontology: {}", ontologyID);
                 }
                 // -- load the requested schema ontology (and inferred statements if they exist)
-                // into
-                // the
-                // Manager's cache
+                // into the Manager's cache
                 this.log.debug("Checking caching for ontology: {}", ontologyID);
+                
                 this.cacheSchemaOntologyInternal(managementConnection, ontologyID, cachedManager);
                 
                 this.log.debug("Completed caching for schema ontology: {}", ontologyID);
