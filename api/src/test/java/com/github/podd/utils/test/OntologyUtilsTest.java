@@ -25,6 +25,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -842,4 +843,23 @@ public class OntologyUtilsTest
         Assert.assertEquals(0, importsRoot.size());
     }
     
+    @Test
+    public void testGetSchemaManifestImports() throws Exception
+    {
+        Model model = new LinkedHashModel();
+        OntologyUtils.ontologyIDsToModel(Arrays.asList(this.testOntologyID), model);
+        
+        Set<URI> schemaOntologyUris = new HashSet<URI>();
+        Set<URI> schemaVersionUris = new HashSet<URI>();
+        
+        schemaOntologyUris.add(this.testOntologyUri1);
+        
+        schemaVersionUris.add(this.testVersionUri1);
+        
+        Map<URI, Set<OWLOntologyID>> schemaManifestImports = OntologyUtils.getSchemaManifestImports(model, schemaOntologyUris, schemaVersionUris);
+        
+        Assert.assertNotNull(schemaManifestImports);
+        Assert.assertEquals(1, schemaManifestImports.size());
+        Assert.assertTrue(schemaManifestImports.containsKey(this.testVersionUri1));
+    }
 }
