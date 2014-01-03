@@ -20,6 +20,7 @@
 package com.github.podd.api;
 
 import java.io.IOException;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 import org.openrdf.OpenRDFException;
@@ -46,9 +47,10 @@ public interface PoddOWLManager
      * 
      * @param ontologyID
      *            The ontology IRI and version IRI to check for caching.
+     * @param dependentSchemaOntologies
      * @return True if the ontology is cached in memory and false otherwise.
      */
-    boolean isCached(OWLOntologyID ontologyID);
+    boolean isCached(OWLOntologyID ontologyID, Set<? extends OWLOntologyID> dependentSchemaOntologies);
     
     /**
      * Loads an ontology from the given {@link OWLOntologyDocumentSource} into the given
