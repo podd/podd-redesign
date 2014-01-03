@@ -692,12 +692,14 @@ public class PoddOWLManagerImpl implements PoddOWLManager
     }
     
     @Override
-    public boolean isCached(final OWLOntologyID ontologyID, final Set<? extends OWLOntologyID> dependentOntologies)
+    public boolean isCached(final OWLOntologyID ontologyID, final Set<? extends OWLOntologyID> dependentSchemaOntologies)
     {
         Objects.requireNonNull(ontologyID, "Ontology ID cannot be null");
         Objects.requireNonNull(ontologyID.getOntologyIRI(), "Ontology IRI cannot be null");
         
-        OWLOntologyManager cachedManager = this.getCachedManager(dependentOntologies);
+        // We do not require a repository connection as we should never validly need to load new
+        // schemas into memory for this method to succeed or fail
+        OWLOntologyManager cachedManager = this.getCachedManager(dependentSchemaOntologies);
         synchronized(cachedManager)
         {
             return isCachedInternal(ontologyID, cachedManager);
@@ -979,6 +981,8 @@ public class PoddOWLManagerImpl implements PoddOWLManager
     public boolean removeCache(final OWLOntologyID ontologyID,
             final Set<? extends OWLOntologyID> dependentSchemaOntologies) throws OWLException
     {
+        // We do not require a repository connection as we should never validly need to load new
+        // schemas into memory for this method to succeed or fail
         OWLOntologyManager cachedManager = this.getCachedManager(dependentSchemaOntologies);
         
         synchronized(cachedManager)
@@ -1009,16 +1013,15 @@ public class PoddOWLManagerImpl implements PoddOWLManager
             {
                 // TODO: Verify that this .contains method matches our desired
                 // semantics
-                final boolean containsOntology =
-                        this.getCachedManager(Collections.<OWLOntologyID> emptySet()).contains(ontologyID);
+                final boolean containsOntology = cachedManager.contains(ontologyID);
                 
                 if(containsOntology)
                 {
-                    this.getCachedManager(Collections.<OWLOntologyID> emptySet()).removeOntology(ontologyID);
+                    cachedManager.removeOntology(ontologyID);
                     
                     // return true if the ontology manager does not contain the
                     // ontology at this point
-                    return !this.getCachedManager(Collections.<OWLOntologyID> emptySet()).contains(ontologyID);
+                    return !cachedManager.contains(ontologyID);
                 }
                 else
                 {
