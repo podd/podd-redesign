@@ -127,16 +127,37 @@ public class OntologyUtils
     public static Map<URI, Set<OWLOntologyID>> getSchemaManifestImports(final Model model,
             final Set<URI> schemaOntologyUris, final Set<URI> schemaVersionUris) throws SchemaManifestException
     {
-        final ConcurrentMap<URI, Set<OWLOntologyID>> result = new ConcurrentHashMap<>();
-        final ConcurrentMap<URI, Set<URI>> importsMap = new ConcurrentHashMap<>(schemaOntologyUris.size());
-        
         if(schemaVersionUris.isEmpty())
         {
             log.debug("No schema version URIs to get imports for");
         }
         
-        for(final URI nextSchemaVersionUri : schemaVersionUris)
+        final ConcurrentMap<URI, Set<OWLOntologyID>> result = new ConcurrentHashMap<>();
+        
+        final ConcurrentMap<URI, Set<URI>> importsMap = new ConcurrentHashMap<>(schemaOntologyUris.size());
+        List<URI> orderImports =
+                OntologyUtils.orderImports(model, schemaOntologyUris, schemaVersionUris, importsMap);
+        
+        for(final URI nextSchemaVersionUri : orderImports)
         {
+            if(!schemaVersionUris.contains(nextSchemaVersionUri))
+            {
+                // Not getting imports for this schema
+                continue;
+            }
+            Set<OWLOntologyID> nextSet = new LinkedHashSet<>();
+            final Set<OWLOntologyID> putIfAbsent = result.putIfAbsent(nextSchemaVersionUri, nextSet);
+            if(putIfAbsent != null)
+            {
+                nextSet = putIfAbsent;
+            }
+            
+            if(!importsMap.containsKey(nextSchemaVersionUri))
+            {
+                // No imports for this 
+                continue;
+            }
+            
             final Set<Resource> ontologies = model.filter(null, OWL.VERSIONIRI, nextSchemaVersionUri).subjects();
             if(ontologies.isEmpty())
             {
@@ -162,13 +183,6 @@ public class OntologyUtils
             
             final Set<Value> imports = model.filter(nextSchemaVersionUri, OWL.IMPORTS, null).objects();
             
-            Set<OWLOntologyID> nextSet = new LinkedHashSet<>();
-            final Set<OWLOntologyID> putIfAbsent = result.putIfAbsent(nextSchemaVersionUri, nextSet);
-            if(putIfAbsent != null)
-            {
-                nextSet = putIfAbsent;
-            }
-            
             Set<URI> nextImports = new LinkedHashSet<>();
             
             for(final Value nextImport : imports)
@@ -183,11 +197,11 @@ public class OntologyUtils
                 
                 final URI nextImportVersionURI = (URI)nextImport;
                 
-                nextImports.add(nextImportVersionURI);
+                if(schemaVersionUris.contains(nextImportVersionURI))
+                {
+                    nextImports.add(nextImportVersionURI);
+                }
             }
-            
-            List<URI> orderImports =
-                    OntologyUtils.orderImports(model, schemaOntologyUris, schemaVersionUris, importsMap);
             
             // Iterate through universally ordered collection to find ordered imports for this
             // ontology
