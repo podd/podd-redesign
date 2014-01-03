@@ -735,6 +735,21 @@ public class OntologyUtilsTest
         Assert.assertEquals(this.testImportVersionUri1, orderImports.get(3));
         Assert.assertEquals(this.testVersionUri1, orderImports.get(4));
         
+        Assert.assertEquals(5, importsMap.size());
+        Assert.assertTrue(importsMap.containsKey(this.testImportVersionUri4));
+        Assert.assertTrue(importsMap.containsKey(this.testImportVersionUri3));
+        Assert.assertTrue(importsMap.containsKey(this.testImportVersionUri2));
+        Assert.assertTrue(importsMap.containsKey(this.testImportVersionUri1));
+        Assert.assertTrue(importsMap.containsKey(this.testVersionUri1));
+        
+        Set<URI> imports4 = importsMap.get(this.testImportVersionUri4);
+        Assert.assertNotNull(imports4);
+        Assert.assertEquals(0, imports4.size());
+        
+        Set<URI> imports3 = importsMap.get(this.testImportVersionUri3);
+        Assert.assertNotNull(imports3);
+        Assert.assertEquals(1, imports3.size());
+        Assert.assertEquals(this.testImportVersionUri4, imports3.iterator().next());
     }
     
 }
