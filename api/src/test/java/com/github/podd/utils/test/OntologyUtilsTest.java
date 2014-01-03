@@ -679,7 +679,7 @@ public class OntologyUtilsTest
     }
     
     @Test
-    public void testImportsOrder() throws Exception
+    public void testImportsOrderFourLevels() throws Exception
     {
         Model model = new LinkedHashModel();
         OntologyUtils.ontologyIDsToModel(Arrays.asList(this.testOntologyID), model);
@@ -719,10 +719,12 @@ public class OntologyUtilsTest
         schemaVersionUris.add(this.testImportVersionUri4);
         
         ConcurrentMap<URI, Set<URI>> importsMap = new ConcurrentHashMap<URI, Set<URI>>();
-        importsMap.put(testImportVersionUri1, Collections.singleton(this.testImportVersionUri2));
-        importsMap.put(testImportVersionUri2, Collections.singleton(this.testImportVersionUri3));
-        importsMap.put(testImportVersionUri3, new HashSet<URI>(Arrays.asList(this.testImportVersionUri4)));
-        importsMap.put(testImportVersionUri4, new HashSet<URI>());
+        // Expected output solution from importsMap after calling orderImports
+        //importsMap.put(testVersionUri1, Collections.singleton(this.testImportVersionUri1));
+        //importsMap.put(testImportVersionUri1, Collections.singleton(this.testImportVersionUri2));
+        //importsMap.put(testImportVersionUri2, Collections.singleton(this.testImportVersionUri3));
+        //importsMap.put(testImportVersionUri3, new HashSet<URI>(Arrays.asList(this.testImportVersionUri4)));
+        //importsMap.put(testImportVersionUri4, new HashSet<URI>());
         
         List<URI> orderImports = OntologyUtils.orderImports(model, schemaOntologyUris, schemaVersionUris, importsMap);
         
@@ -734,4 +736,5 @@ public class OntologyUtilsTest
         Assert.assertEquals(this.testVersionUri1, orderImports.get(4));
         
     }
+    
 }
