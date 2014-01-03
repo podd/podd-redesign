@@ -856,7 +856,8 @@ public class OntologyUtilsTest
         
         schemaVersionUris.add(this.testVersionUri1);
         
-        Map<URI, Set<OWLOntologyID>> schemaManifestImports = OntologyUtils.getSchemaManifestImports(model, schemaOntologyUris, schemaVersionUris);
+        Map<URI, Set<OWLOntologyID>> schemaManifestImports =
+                OntologyUtils.getSchemaManifestImports(model, schemaOntologyUris, schemaVersionUris);
         
         Assert.assertNotNull(schemaManifestImports);
         Assert.assertEquals(1, schemaManifestImports.size());
@@ -866,4 +867,42 @@ public class OntologyUtilsTest
         Assert.assertNotNull(importsRoot);
         Assert.assertEquals(0, importsRoot.size());
     }
+    
+    @Test
+    public void testGetSchemaManifestImportsOneLevel() throws Exception
+    {
+        Model model = new LinkedHashModel();
+        OntologyUtils.ontologyIDsToModel(Arrays.asList(this.testOntologyID), model);
+        model.add(this.testVersionUri1, OWL.IMPORTS, this.testImportOntologyUri1);
+        model.add(this.testImportOntologyUri1, RDF.TYPE, OWL.ONTOLOGY);
+        model.add(this.testImportOntologyUri1, OWL.VERSIONIRI, this.testImportVersionUri1);
+        model.add(this.testImportVersionUri1, RDF.TYPE, OWL.ONTOLOGY);
+        
+        Set<URI> schemaOntologyUris = new HashSet<URI>();
+        Set<URI> schemaVersionUris = new HashSet<URI>();
+        
+        schemaOntologyUris.add(this.testOntologyUri1);
+        schemaOntologyUris.add(this.testImportOntologyUri1);
+        
+        schemaVersionUris.add(this.testVersionUri1);
+        schemaVersionUris.add(this.testImportVersionUri1);
+        
+        Map<URI, Set<OWLOntologyID>> schemaManifestImports =
+                OntologyUtils.getSchemaManifestImports(model, schemaOntologyUris, schemaVersionUris);
+        
+        Assert.assertNotNull(schemaManifestImports);
+        Assert.assertEquals(2, schemaManifestImports.size());
+        Assert.assertTrue(schemaManifestImports.containsKey(this.testVersionUri1));
+        Assert.assertTrue(schemaManifestImports.containsKey(this.testImportVersionUri1));
+        
+        Set<OWLOntologyID> imports1 = schemaManifestImports.get(this.testImportVersionUri1);
+        Assert.assertNotNull(imports1);
+        Assert.assertEquals(0, imports1.size());
+        
+        Set<OWLOntologyID> importsRoot = schemaManifestImports.get(this.testVersionUri1);
+        Assert.assertNotNull(importsRoot);
+        Assert.assertEquals(1, importsRoot.size());
+        Assert.assertEquals(this.testImportOntologyID1, importsRoot.iterator().next());
+    }
+    
 }
