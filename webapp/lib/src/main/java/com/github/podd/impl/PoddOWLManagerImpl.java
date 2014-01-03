@@ -259,7 +259,7 @@ public class PoddOWLManagerImpl implements PoddOWLManager
                         cachedManager = putIfAbsent;
                     }
                     
-                    // FIXME: Load the requisite ontologies into the manager
+                    // FIXME: Should we load the requisite ontologies into the manager
                 }
             }
         }
@@ -267,7 +267,7 @@ public class PoddOWLManagerImpl implements PoddOWLManager
         return cachedManager;
     }
     
-    public void cacheSchemaOntologies(final Set<? extends OWLOntologyID> ontologyIDs,
+    public OWLOntologyManager cacheSchemaOntologies(final Set<? extends OWLOntologyID> ontologyIDs,
             final RepositoryConnection managementConnection, final URI schemaManagementContext)
         throws OpenRDFException, OWLException, IOException, PoddException
     {
@@ -354,6 +354,7 @@ public class PoddOWLManagerImpl implements PoddOWLManager
                 this.log.info("Completed caching for schema ontology: {}", ontologyID);
             }
         }
+        return cachedManager;
     }
     
     /**
@@ -752,8 +753,8 @@ public class PoddOWLManagerImpl implements PoddOWLManager
         OWLOntology nextOntology = null;
         try
         {
-            OWLOntologyManager cachedManager = this.getCachedManager(dependentSchemaOntologies);
-            
+            OWLOntologyManager cachedManager =
+                    this.cacheSchemaOntologies(dependentSchemaOntologies, managementConnection, schemaManagementContext);
             synchronized(cachedManager)
             {
                 nextOntology = this.loadOntologyInternal(ontologyID, owlSource, cachedManager);
@@ -962,20 +963,6 @@ public class PoddOWLManagerImpl implements PoddOWLManager
         }
         
         return nextOntology.getOntologyID();
-    }
-    
-    public OWLOntologyID parseRDFStatements(final Set<? extends OWLOntologyID> dependentSchemaOntologies,
-            final RepositoryConnection conn, final URI... contexts) throws OpenRDFException, OWLException, IOException,
-        PoddException
-    {
-        OpenRDFUtil.verifyContextNotNull(contexts);
-        
-        OWLOntologyManager cachedManager = this.getCachedManager(dependentSchemaOntologies);
-        
-        synchronized(cachedManager)
-        {
-            return parseRDFStatements(cachedManager, conn, contexts);
-        }
     }
     
     private OWLOntologyID parseRDFStatements(final OWLOntologyManager cachedManager, final RepositoryConnection conn,
