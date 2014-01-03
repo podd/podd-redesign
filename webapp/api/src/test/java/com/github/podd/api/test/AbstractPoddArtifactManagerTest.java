@@ -573,7 +573,7 @@ public abstract class AbstractPoddArtifactManagerTest
      * 
      * @throws Exception
      */
-    private List<InferredOWLOntologyID> loadVersion2SchemaOntologies() throws Exception
+    protected List<InferredOWLOntologyID> loadVersion2SchemaOntologies() throws Exception
     {
         // Keep track of the ontologies that have been loaded to ensure they are in memory when
         // inferring the next schema

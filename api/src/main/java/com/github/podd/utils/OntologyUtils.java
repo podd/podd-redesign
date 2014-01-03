@@ -132,7 +132,7 @@ public class OntologyUtils
         
         if(schemaVersionUris.isEmpty())
         {
-            log.info("No schema version URIs to get imports for");
+            log.debug("No schema version URIs to get imports for");
         }
         
         for(final URI nextSchemaVersionUri : schemaVersionUris)

@@ -95,29 +95,7 @@ public abstract class AbstractPoddOWLManagerTest
     /**
      * Helper method which loads podd:dcTerms, podd:foaf and podd:User schema ontologies.
      */
-    protected List<InferredOWLOntologyID> loadDcFoafAndPoddUserSchemaOntologies() throws Exception
-    {
-        // Keep track of the ontologies that have been loaded to ensure they are in memory when
-        // inferring the next schema
-        Set<InferredOWLOntologyID> loadedOntologies = new LinkedHashSet<>();
-        final InferredOWLOntologyID inferredDctermsOntologyID =
-                this.loadInferStoreOntology(PODD.PATH_PODD_DCTERMS_V1, RDFFormat.RDFXML,
-                        TestConstants.EXPECTED_TRIPLE_COUNT_DC_TERMS_CONCRETE,
-                        TestConstants.EXPECTED_TRIPLE_COUNT_DC_TERMS_INFERRED, loadedOntologies);
-        loadedOntologies.add(inferredDctermsOntologyID);
-        final InferredOWLOntologyID inferredFoafOntologyID =
-                this.loadInferStoreOntology(PODD.PATH_PODD_FOAF_V1, RDFFormat.RDFXML,
-                        TestConstants.EXPECTED_TRIPLE_COUNT_FOAF_CONCRETE,
-                        TestConstants.EXPECTED_TRIPLE_COUNT_FOAF_INFERRED, loadedOntologies);
-        loadedOntologies.add(inferredFoafOntologyID);
-        final InferredOWLOntologyID inferredPUserOntologyID =
-                this.loadInferStoreOntology(PODD.PATH_PODD_USER_V1, RDFFormat.RDFXML,
-                        TestConstants.EXPECTED_TRIPLE_COUNT_PODD_USER_CONCRETE,
-                        TestConstants.EXPECTED_TRIPLE_COUNT_PODD_USER_INFERRED, loadedOntologies);
-        loadedOntologies.add(inferredPUserOntologyID);
-        
-        return new ArrayList<InferredOWLOntologyID>(loadedOntologies);
-    }
+    protected abstract List<InferredOWLOntologyID> loadDcFoafAndPoddUserSchemaOntologies() throws Exception;
     
     /**
      * Helper method which loads, infers and stores a given ontology using the PoddOWLManager.
@@ -143,6 +121,8 @@ public abstract class AbstractPoddOWLManagerTest
         final InferredOWLOntologyID inferredOntologyID =
                 this.testOWLManager.loadAndInfer(owlSource, this.testManagementConnection, null,
                         dependentSchemaOntologies, this.testManagementConnection, null);
+        
+        this.testOWLManager.removeCache(inferredOntologyID, dependentSchemaOntologies);
         
         // verify statement counts
         final URI versionURI = inferredOntologyID.getVersionIRI().toOpenRDFURI();
