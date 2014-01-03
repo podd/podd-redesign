@@ -768,4 +768,78 @@ public class OntologyUtilsTest
         Assert.assertEquals(this.testImportVersionUri1, importsRoot.iterator().next());
     }
     
+    @Test
+    public void testImportsOrderOneLevel() throws Exception
+    {
+        Model model = new LinkedHashModel();
+        OntologyUtils.ontologyIDsToModel(Arrays.asList(this.testOntologyID), model);
+        model.add(this.testVersionUri1, OWL.IMPORTS, this.testImportOntologyUri1);
+        model.add(this.testImportOntologyUri1, RDF.TYPE, OWL.ONTOLOGY);
+        model.add(this.testImportOntologyUri1, OWL.VERSIONIRI, this.testImportVersionUri1);
+        model.add(this.testImportVersionUri1, RDF.TYPE, OWL.ONTOLOGY);
+        
+        Set<URI> schemaOntologyUris = new HashSet<URI>();
+        Set<URI> schemaVersionUris = new HashSet<URI>();
+        
+        schemaOntologyUris.add(this.testOntologyUri1);
+        schemaOntologyUris.add(this.testImportOntologyUri1);
+        
+        schemaVersionUris.add(this.testVersionUri1);
+        schemaVersionUris.add(this.testImportVersionUri1);
+        
+        ConcurrentMap<URI, Set<URI>> importsMap = new ConcurrentHashMap<URI, Set<URI>>();
+        // Expected output solution from importsMap after calling orderImports
+        // importsMap.put(testVersionUri1, Collections.singleton(this.testImportVersionUri1));
+        // importsMap.put(testImportVersionUri1, new HashSet<URI>());
+        
+        List<URI> orderImports = OntologyUtils.orderImports(model, schemaOntologyUris, schemaVersionUris, importsMap);
+        
+        Assert.assertEquals(2, orderImports.size());
+        Assert.assertEquals(this.testImportVersionUri1, orderImports.get(0));
+        Assert.assertEquals(this.testVersionUri1, orderImports.get(1));
+        
+        Assert.assertEquals(2, importsMap.size());
+        Assert.assertTrue(importsMap.containsKey(this.testImportVersionUri1));
+        Assert.assertTrue(importsMap.containsKey(this.testVersionUri1));
+        
+        Set<URI> imports1 = importsMap.get(this.testImportVersionUri1);
+        Assert.assertNotNull(imports1);
+        Assert.assertEquals(0, imports1.size());
+        
+        Set<URI> importsRoot = importsMap.get(this.testVersionUri1);
+        Assert.assertNotNull(importsRoot);
+        Assert.assertEquals(1, importsRoot.size());
+        Assert.assertEquals(this.testImportVersionUri1, importsRoot.iterator().next());
+    }
+    
+    @Test
+    public void testImportsOrderZeroLevels() throws Exception
+    {
+        Model model = new LinkedHashModel();
+        OntologyUtils.ontologyIDsToModel(Arrays.asList(this.testOntologyID), model);
+        
+        Set<URI> schemaOntologyUris = new HashSet<URI>();
+        Set<URI> schemaVersionUris = new HashSet<URI>();
+        
+        schemaOntologyUris.add(this.testOntologyUri1);
+        
+        schemaVersionUris.add(this.testVersionUri1);
+        
+        ConcurrentMap<URI, Set<URI>> importsMap = new ConcurrentHashMap<URI, Set<URI>>();
+        // Expected output solution from importsMap after calling orderImports
+        // importsMap.put(testVersionUri1, new HashSet<URI>());
+        
+        List<URI> orderImports = OntologyUtils.orderImports(model, schemaOntologyUris, schemaVersionUris, importsMap);
+        
+        Assert.assertEquals(1, orderImports.size());
+        Assert.assertEquals(this.testVersionUri1, orderImports.get(0));
+        
+        Assert.assertEquals(1, importsMap.size());
+        Assert.assertTrue(importsMap.containsKey(this.testVersionUri1));
+        
+        Set<URI> importsRoot = importsMap.get(this.testVersionUri1);
+        Assert.assertNotNull(importsRoot);
+        Assert.assertEquals(0, importsRoot.size());
+    }
+    
 }
