@@ -720,11 +720,12 @@ public class OntologyUtilsTest
         
         ConcurrentMap<URI, Set<URI>> importsMap = new ConcurrentHashMap<URI, Set<URI>>();
         // Expected output solution from importsMap after calling orderImports
-        //importsMap.put(testVersionUri1, Collections.singleton(this.testImportVersionUri1));
-        //importsMap.put(testImportVersionUri1, Collections.singleton(this.testImportVersionUri2));
-        //importsMap.put(testImportVersionUri2, Collections.singleton(this.testImportVersionUri3));
-        //importsMap.put(testImportVersionUri3, new HashSet<URI>(Arrays.asList(this.testImportVersionUri4)));
-        //importsMap.put(testImportVersionUri4, new HashSet<URI>());
+        // importsMap.put(testVersionUri1, Collections.singleton(this.testImportVersionUri1));
+        // importsMap.put(testImportVersionUri1, Collections.singleton(this.testImportVersionUri2));
+        // importsMap.put(testImportVersionUri2, Collections.singleton(this.testImportVersionUri3));
+        // importsMap.put(testImportVersionUri3, new
+        // HashSet<URI>(Arrays.asList(this.testImportVersionUri4)));
+        // importsMap.put(testImportVersionUri4, new HashSet<URI>());
         
         List<URI> orderImports = OntologyUtils.orderImports(model, schemaOntologyUris, schemaVersionUris, importsMap);
         
@@ -750,6 +751,21 @@ public class OntologyUtilsTest
         Assert.assertNotNull(imports3);
         Assert.assertEquals(1, imports3.size());
         Assert.assertEquals(this.testImportVersionUri4, imports3.iterator().next());
+        
+        Set<URI> imports2 = importsMap.get(this.testImportVersionUri2);
+        Assert.assertNotNull(imports2);
+        Assert.assertEquals(1, imports2.size());
+        Assert.assertEquals(this.testImportVersionUri3, imports2.iterator().next());
+        
+        Set<URI> imports1 = importsMap.get(this.testImportVersionUri1);
+        Assert.assertNotNull(imports1);
+        Assert.assertEquals(1, imports1.size());
+        Assert.assertEquals(this.testImportVersionUri2, imports1.iterator().next());
+        
+        Set<URI> importsRoot = importsMap.get(this.testVersionUri1);
+        Assert.assertNotNull(importsRoot);
+        Assert.assertEquals(1, importsRoot.size());
+        Assert.assertEquals(this.testImportVersionUri1, importsRoot.iterator().next());
     }
     
 }
