@@ -428,8 +428,8 @@ public class PoddOWLManagerImpl implements PoddOWLManager
      * @throws DataRepositoryException
      *             If verification fails
      */
-    private OWLOntology checkForConsistentOwlDlOntology(final Model model) throws EmptyOntologyException,
-        OntologyNotInProfileException, InconsistentOntologyException
+    private OWLOntology checkForConsistentOwlDlOntology(final Model model, final OWLOntologyManager emptyOntologyManager)
+        throws EmptyOntologyException, OntologyNotInProfileException, InconsistentOntologyException
     {
         final RioRDFOntologyFormatFactory ontologyFormatFactory =
                 (RioRDFOntologyFormatFactory)OWLOntologyFormatFactoryRegistry.getInstance().getByMIMEType(
@@ -438,7 +438,6 @@ public class PoddOWLManagerImpl implements PoddOWLManager
         
         OWLOntology nextOntology = null;
         
-        OWLOntologyManager emptyOntologyManager = managerFactory.buildOWLOntologyManager();
         try
         {
             try
@@ -1051,6 +1050,7 @@ public class PoddOWLManagerImpl implements PoddOWLManager
         
         synchronized(this.managerFactory)
         {
+            OWLOntologyManager emptyOntologyManager = this.managerFactory.buildOWLOntologyManager();
             try
             // (final InputStream inputA =
             // this.getClass().getResourceAsStream(PoddRdfConstants.PATH_PODD_DATA_REPOSITORY);)
@@ -1059,9 +1059,9 @@ public class PoddOWLManagerImpl implements PoddOWLManager
                 // final Model schemaModel = Rio.parse(inputA, "", RDFFormat.RDFXML);
                 // Rio.parse(inputA, null, RDFFormat.RDFXML);
                 // verify & load poddDataRepository.owl into OWLAPI
-                dataRepositoryOntology = this.checkForConsistentOwlDlOntology(schemaModel);
+                dataRepositoryOntology = this.checkForConsistentOwlDlOntology(schemaModel, emptyOntologyManager);
                 
-                defaultAliasOntology = this.checkForConsistentOwlDlOntology(model);
+                defaultAliasOntology = this.checkForConsistentOwlDlOntology(model, emptyOntologyManager);
             }
             catch(final PoddException e)// | OpenRDFException | IOException e)
             {
@@ -1074,12 +1074,11 @@ public class PoddOWLManagerImpl implements PoddOWLManager
                 // clear OWLAPI memory
                 if(defaultAliasOntology != null)
                 {
-                    this.getCachedManager(Collections.<OWLOntologyID> emptySet()).removeOntology(defaultAliasOntology);
+                    emptyOntologyManager.removeOntology(defaultAliasOntology);
                 }
                 if(dataRepositoryOntology != null)
                 {
-                    this.getCachedManager(Collections.<OWLOntologyID> emptySet())
-                            .removeOntology(dataRepositoryOntology);
+                    emptyOntologyManager.removeOntology(dataRepositoryOntology);
                 }
             }
         }
