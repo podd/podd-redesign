@@ -420,9 +420,10 @@ public class PoddOWLManagerImplTest extends AbstractPoddOWLManagerTest
                 new StreamDocumentSource(inputStream, OWLOntologyFormatFactoryRegistry.getInstance().getByMIMEType(
                         RDFFormat.RDFXML.getDefaultMIMEType()));
         
+        OWLOntologyManager cachedManager =
+                ((PoddOWLManagerImpl)this.testOWLManager).getCachedManager(Collections.<OWLOntologyID> emptySet());
         final OWLOntology loadedOntology =
-                ((PoddOWLManagerImpl)this.testOWLManager).loadOntologyInternal(null, owlSource,
-                        Collections.<OWLOntologyID> emptySet());
+                ((PoddOWLManagerImpl)this.testOWLManager).loadOntologyInternal(null, owlSource, cachedManager);
         Assert.assertEquals("Nothing should be in the Repository at this stage", 0,
                 this.testManagementConnection.size());
         
@@ -461,10 +462,10 @@ public class PoddOWLManagerImplTest extends AbstractPoddOWLManagerTest
         final OWLOntologyDocumentSource owlSource =
                 new StreamDocumentSource(inputStream, OWLOntologyFormatFactoryRegistry.getInstance().getByMIMEType(
                         RDFFormat.RDFXML.getDefaultMIMEType()));
-        
+        OWLOntologyManager cachedManager =
+                ((PoddOWLManagerImpl)this.testOWLManager).getCachedManager(new LinkedHashSet<>(schemaOntologies));
         final OWLOntology loadedOntology =
-                ((PoddOWLManagerImpl)this.testOWLManager).loadOntologyInternal(null, owlSource, new LinkedHashSet<>(
-                        schemaOntologies));
+                ((PoddOWLManagerImpl)this.testOWLManager).loadOntologyInternal(null, owlSource, cachedManager);
         Assert.assertEquals("Repository should not have changed at this stage", repoSizeAfterPreparation,
                 this.testManagementConnection.size());
         
@@ -532,8 +533,9 @@ public class PoddOWLManagerImplTest extends AbstractPoddOWLManagerTest
         
         try
         {
-            ((PoddOWLManagerImpl)this.testOWLManager).loadOntologyInternal(null, owlSource,
-                    Collections.<OWLOntologyID> emptySet());
+            OWLOntologyManager cachedManager =
+                    ((PoddOWLManagerImpl)this.testOWLManager).getCachedManager(Collections.<OWLOntologyID> emptySet());
+            ((PoddOWLManagerImpl)this.testOWLManager).loadOntologyInternal(null, owlSource, cachedManager);
             Assert.fail("Should have thrown an OWLOntologyCreationException");
         }
         catch(final EmptyOntologyException e)
@@ -561,9 +563,10 @@ public class PoddOWLManagerImplTest extends AbstractPoddOWLManagerTest
                 new StreamDocumentSource(inputStream, OWLOntologyFormatFactoryRegistry.getInstance().getByMIMEType(
                         RDFFormat.RDFXML.getDefaultMIMEType()));
         
+        OWLOntologyManager cachedManager =
+                ((PoddOWLManagerImpl)this.testOWLManager).getCachedManager(new LinkedHashSet<>(schemaOntologies));
         final OWLOntology loadedOntology =
-                ((PoddOWLManagerImpl)this.testOWLManager).loadOntologyInternal(null, owlSource, new LinkedHashSet<>(
-                        schemaOntologies));
+                ((PoddOWLManagerImpl)this.testOWLManager).loadOntologyInternal(null, owlSource, cachedManager);
         
         // verify:
         Assert.assertNotNull(loadedOntology);
@@ -598,9 +601,10 @@ public class PoddOWLManagerImplTest extends AbstractPoddOWLManagerTest
         
         final RioMemoryTripleSource owlSource = new RioMemoryTripleSource(statements.iterator());
         
+        OWLOntologyManager cachedManager =
+                ((PoddOWLManagerImpl)this.testOWLManager).getCachedManager(new LinkedHashSet<>(schemaOntologies));
         final OWLOntology loadedOntology =
-                ((PoddOWLManagerImpl)this.testOWLManager).loadOntologyInternal(null, owlSource, new LinkedHashSet<>(
-                        schemaOntologies));
+                ((PoddOWLManagerImpl)this.testOWLManager).loadOntologyInternal(null, owlSource, cachedManager);
         
         // verify:
         Assert.assertNotNull(loadedOntology);
@@ -628,8 +632,9 @@ public class PoddOWLManagerImplTest extends AbstractPoddOWLManagerTest
         
         try
         {
-            ((PoddOWLManagerImpl)this.testOWLManager).loadOntologyInternal(null, owlSource,
-                    Collections.<OWLOntologyID> emptySet());
+            OWLOntologyManager cachedManager =
+                    ((PoddOWLManagerImpl)this.testOWLManager).getCachedManager(Collections.<OWLOntologyID> emptySet());
+            ((PoddOWLManagerImpl)this.testOWLManager).loadOntologyInternal(null, owlSource, cachedManager);
             Assert.fail("Should have thrown an OWLOntologyCreationException");
         }
         catch(final OWLException e)

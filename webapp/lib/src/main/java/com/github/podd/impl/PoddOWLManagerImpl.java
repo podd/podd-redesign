@@ -241,7 +241,7 @@ public class PoddOWLManagerImpl implements PoddOWLManager
         return new ArrayList<InferredOWLOntologyID>(orderedResultsList);
     }
     
-    private OWLOntologyManager getCachedManager(Set<? extends OWLOntologyID> schemaOntologies)
+    public OWLOntologyManager getCachedManager(Set<? extends OWLOntologyID> schemaOntologies)
     {
         OWLOntologyManager cachedManager = managerCache.get(schemaOntologies);
         
@@ -755,7 +755,9 @@ public class PoddOWLManagerImpl implements PoddOWLManager
         OWLOntology nextOntology = null;
         try
         {
-            nextOntology = this.loadOntologyInternal(ontologyID, owlSource, dependentSchemaOntologies);
+            OWLOntologyManager cachedManager = this.getCachedManager(dependentSchemaOntologies);
+            
+            nextOntology = this.loadOntologyInternal(ontologyID, owlSource, cachedManager);
             
             // Check the OWLAPI OWLOntology against an OWLProfile to make sure
             // it is in profile
@@ -862,13 +864,10 @@ public class PoddOWLManagerImpl implements PoddOWLManager
     }
     
     public OWLOntology loadOntologyInternal(final OWLOntologyID ontologyID, final OWLOntologyDocumentSource owlSource,
-            final Set<? extends OWLOntologyID> dependentSchemaOntologies) throws OWLException, IOException,
-        PoddException
+            final OWLOntologyManager cachedManager) throws OWLException, IOException, PoddException
     {
         synchronized(this.managerFactory)
         {
-            OWLOntologyManager cachedManager = this.getCachedManager(dependentSchemaOntologies);
-            
             try
             {
                 OWLOntology nextOntology;
