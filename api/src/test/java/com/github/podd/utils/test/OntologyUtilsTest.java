@@ -844,7 +844,7 @@ public class OntologyUtilsTest
     }
     
     @Test
-    public void testGetSchemaManifestImports() throws Exception
+    public void testGetSchemaManifestImportsZeroLevels() throws Exception
     {
         Model model = new LinkedHashModel();
         OntologyUtils.ontologyIDsToModel(Arrays.asList(this.testOntologyID), model);
@@ -861,5 +861,9 @@ public class OntologyUtilsTest
         Assert.assertNotNull(schemaManifestImports);
         Assert.assertEquals(1, schemaManifestImports.size());
         Assert.assertTrue(schemaManifestImports.containsKey(this.testVersionUri1));
+        
+        Set<OWLOntologyID> importsRoot = schemaManifestImports.get(this.testVersionUri1);
+        Assert.assertNotNull(importsRoot);
+        Assert.assertEquals(0, importsRoot.size());
     }
 }
