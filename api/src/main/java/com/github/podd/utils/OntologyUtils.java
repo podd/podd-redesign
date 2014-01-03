@@ -251,7 +251,7 @@ public class OntologyUtils
         
         if(nextAllVersions.isEmpty())
         {
-            OntologyUtils.log.error("Could not find any version information for schema ontology: {}",
+            OntologyUtils.log.debug("Could not find any version information for schema ontology: {}",
                     nextSchemaOntologyUri);
         }
     }
