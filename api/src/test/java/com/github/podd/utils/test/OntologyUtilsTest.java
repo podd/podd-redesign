@@ -23,7 +23,11 @@ import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.After;
@@ -672,5 +676,62 @@ public class OntologyUtilsTest
         Set<OWLOntologyID> imports = OntologyUtils.getArtifactImports(this.testOntologyID, model);
         
         Assert.assertEquals(4, imports.size());
+    }
+    
+    @Test
+    public void testImportsOrder() throws Exception
+    {
+        Model model = new LinkedHashModel();
+        OntologyUtils.ontologyIDsToModel(Arrays.asList(this.testOntologyID), model);
+        model.add(this.testVersionUri1, OWL.IMPORTS, this.testImportOntologyUri1);
+        model.add(this.testImportOntologyUri1, RDF.TYPE, OWL.ONTOLOGY);
+        model.add(this.testImportOntologyUri1, OWL.VERSIONIRI, this.testImportVersionUri1);
+        model.add(this.testImportVersionUri1, RDF.TYPE, OWL.ONTOLOGY);
+        
+        model.add(this.testImportOntologyUri2, RDF.TYPE, OWL.ONTOLOGY);
+        model.add(this.testImportOntologyUri2, OWL.VERSIONIRI, this.testImportVersionUri2);
+        model.add(this.testImportVersionUri2, RDF.TYPE, OWL.ONTOLOGY);
+        model.add(this.testImportVersionUri1, OWL.IMPORTS, this.testImportVersionUri2);
+        
+        model.add(this.testImportOntologyUri3, RDF.TYPE, OWL.ONTOLOGY);
+        model.add(this.testImportOntologyUri3, OWL.VERSIONIRI, this.testImportVersionUri3);
+        model.add(this.testImportVersionUri3, RDF.TYPE, OWL.ONTOLOGY);
+        model.add(this.testImportVersionUri2, OWL.IMPORTS, this.testImportVersionUri3);
+        
+        model.add(this.testImportOntologyUri4, RDF.TYPE, OWL.ONTOLOGY);
+        model.add(this.testImportOntologyUri4, OWL.VERSIONIRI, this.testImportVersionUri4);
+        model.add(this.testImportVersionUri4, RDF.TYPE, OWL.ONTOLOGY);
+        model.add(this.testImportVersionUri3, OWL.IMPORTS, this.testImportVersionUri4);
+        
+        Set<URI> schemaOntologyUris = new HashSet<URI>();
+        Set<URI> schemaVersionUris = new HashSet<URI>();
+        
+        schemaOntologyUris.add(this.testOntologyUri1);
+        schemaOntologyUris.add(this.testImportOntologyUri1);
+        schemaOntologyUris.add(this.testImportOntologyUri2);
+        schemaOntologyUris.add(this.testImportOntologyUri3);
+        schemaOntologyUris.add(this.testImportOntologyUri4);
+        
+        schemaVersionUris.add(this.testVersionUri1);
+        schemaVersionUris.add(this.testImportVersionUri1);
+        schemaVersionUris.add(this.testImportVersionUri2);
+        schemaVersionUris.add(this.testImportVersionUri3);
+        schemaVersionUris.add(this.testImportVersionUri4);
+        
+        ConcurrentMap<URI, Set<URI>> importsMap = new ConcurrentHashMap<URI, Set<URI>>();
+        importsMap.put(testImportVersionUri1, Collections.singleton(this.testImportVersionUri2));
+        importsMap.put(testImportVersionUri2, Collections.singleton(this.testImportVersionUri3));
+        importsMap.put(testImportVersionUri3, new HashSet<URI>(Arrays.asList(this.testImportVersionUri4)));
+        importsMap.put(testImportVersionUri4, new HashSet<URI>());
+        
+        List<URI> orderImports = OntologyUtils.orderImports(model, schemaOntologyUris, schemaVersionUris, importsMap);
+        
+        Assert.assertEquals(5, orderImports.size());
+        Assert.assertEquals(this.testImportVersionUri4, orderImports.get(0));
+        Assert.assertEquals(this.testImportVersionUri3, orderImports.get(1));
+        Assert.assertEquals(this.testImportVersionUri2, orderImports.get(2));
+        Assert.assertEquals(this.testImportVersionUri1, orderImports.get(3));
+        Assert.assertEquals(this.testVersionUri1, orderImports.get(4));
+        
     }
 }
