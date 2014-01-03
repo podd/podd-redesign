@@ -330,11 +330,13 @@ public class OntologyUtils
                                     nextImportsSet.add(nextEntry.getValue().iterator().next());
                                 }
                                 foundAllVersion = true;
+                                break;
                             }
                             else if(nextEntry.getValue().contains(nextImport))
                             {
                                 nextImportsSet.add((URI)nextImport);
                                 foundAllVersion = true;
+                                break;
                             }
                         }
                         
@@ -344,7 +346,8 @@ public class OntologyUtils
                         }
                         else
                         {
-                            nextImportsSet.add((URI)nextImport);
+                            // This should not be necessary given the sequence of calls above
+                            //nextImportsSet.add((URI)nextImport);
                         }
                     }
                     final int nextIndex = importOrder.indexOf(nextImport);
