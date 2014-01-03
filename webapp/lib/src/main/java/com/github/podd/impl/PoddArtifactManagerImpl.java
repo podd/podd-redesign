@@ -955,29 +955,6 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
     }
     
     /**
-     * Helper method to cache schema ontologies in memory before loading statements into OWLAPI
-     */
-    private void handleCacheSchemasInMemory(final RepositoryConnection managementRepositoryConnection,
-            final RepositoryConnection tempRepositoryConnection, final URI tempContext) throws OpenRDFException,
-        OWLException, IOException, PoddException
-    {
-        final Set<URI> importedSchemas =
-                this.getSesameManager().getDirectImports(tempRepositoryConnection, tempContext);
-        
-        final Set<InferredOWLOntologyID> importedSchemaOntologies = new HashSet<>();
-        
-        for(final URI importedSchemaIRI : importedSchemas)
-        {
-            importedSchemaOntologies.add(this.getSesameManager().getSchemaVersion(IRI.create(importedSchemaIRI),
-                    managementRepositoryConnection, this.getRepositoryManager().getSchemaManagementGraph()));
-        }
-        
-        this.getOWLManager().cacheSchemaOntologies(importedSchemaOntologies, managementRepositoryConnection,
-                this.getRepositoryManager().getSchemaManagementGraph());
-        
-    }
-    
-    /**
      * Checks for dangling objects that are not linked to the artifact and deletes them if
      * <i>force</i> is true.
      * 
@@ -1428,8 +1405,8 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             
             // ensure schema ontologies are cached in memory before loading
             // statements into OWLAPI
-            this.handleCacheSchemasInMemory(managementRepositoryConnection, temporaryRepositoryConnection,
-                    randomContext);
+            // this.getDirectImports(managementRepositoryConnection, temporaryRepositoryConnection,
+            // randomContext);
             
             inferredOWLOntologyID =
                     this.loadInferStoreArtifact(temporaryRepositoryConnection, permanentRepositoryConnection,
@@ -2015,12 +1992,17 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
                     newVersionIRI, tempContext);
             
             // check and ensure schema ontology imports are for version IRIs
+            // WARNING: This method MUST not be used to update schema imports. If they are updated
+            // silently here without a prior specific call to the updateSchemaImports method, then
+            // they may land in a repository which does not contain their requisite schema
+            // ontologies
             this.useVersionsForSchemaImports(artifactID.getOntologyIRI().toOpenRDFURI(),
                     managementRepositoryConnection, tempRepositoryConnection, tempContext);
             
             // ensure schema ontologies are cached in memory before loading
             // statements into OWLAPI
-            this.handleCacheSchemasInMemory(managementRepositoryConnection, tempRepositoryConnection, tempContext);
+            // this.getDirectImports(managementRepositoryConnection, tempRepositoryConnection,
+            // tempContext);
             
             inferredOWLOntologyID =
                     this.loadInferStoreArtifact(tempRepositoryConnection, permanentRepositoryConnection,
@@ -2186,12 +2168,14 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
                         nextNewSchemaOntologyID.getVersionIRI().toOpenRDFURI(), newVersionIRI.toOpenRDFURI());
             }
             
-            this.log.info("Started caching schema ontologies: {}", newSchemaOntologyIds);
-            this.getOWLManager().cacheSchemaOntologies(newSchemaOntologyIds, managementRepositoryConnection,
-                    this.getRepositoryManager().getSchemaManagementGraph());
-            this.log.info("Finished caching schema ontology: {}", newSchemaOntologyIds);
-            
-            this.log.info("Finished caching schema ontologies for artifact migration: {}", artifactVersion);
+            // this.log.info("Started caching schema ontologies: {}", newSchemaOntologyIds);
+            // this.getOWLManager().cacheSchemaOntologies(newSchemaOntologyIds,
+            // managementRepositoryConnection,
+            // this.getRepositoryManager().getSchemaManagementGraph());
+            // this.log.info("Finished caching schema ontology: {}", newSchemaOntologyIds);
+            //
+            // this.log.info("Finished caching schema ontologies for artifact migration: {}",
+            // artifactVersion);
             
             tempRepositoryConnection.commit();
             

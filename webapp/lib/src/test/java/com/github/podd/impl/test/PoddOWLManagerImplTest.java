@@ -19,6 +19,7 @@ package com.github.podd.impl.test;
 import java.io.InputStream;
 import java.io.StringWriter;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -418,7 +419,8 @@ public class PoddOWLManagerImplTest extends AbstractPoddOWLManagerTest
                         RDFFormat.RDFXML.getDefaultMIMEType()));
         
         final OWLOntology loadedOntology =
-                ((PoddOWLManagerImpl)this.testOWLManager).loadOntologyInternal(null, owlSource);
+                ((PoddOWLManagerImpl)this.testOWLManager).loadOntologyInternal(null, owlSource,
+                        Collections.<OWLOntologyID> emptySet());
         Assert.assertEquals("Nothing should be in the Repository at this stage", 0,
                 this.testManagementConnection.size());
         
@@ -446,7 +448,7 @@ public class PoddOWLManagerImplTest extends AbstractPoddOWLManagerTest
     @Test
     public void testInferStatementsTwiceForSameOntology() throws Exception
     {
-        this.loadDcFoafAndPoddUserSchemaOntologies();
+        List<InferredOWLOntologyID> schemaOntologies = this.loadDcFoafAndPoddUserSchemaOntologies();
         
         final long repoSizeAfterPreparation = this.testManagementConnection.size();
         
@@ -459,7 +461,8 @@ public class PoddOWLManagerImplTest extends AbstractPoddOWLManagerTest
                         RDFFormat.RDFXML.getDefaultMIMEType()));
         
         final OWLOntology loadedOntology =
-                ((PoddOWLManagerImpl)this.testOWLManager).loadOntologyInternal(null, owlSource);
+                ((PoddOWLManagerImpl)this.testOWLManager).loadOntologyInternal(null, owlSource, new LinkedHashSet<>(
+                        schemaOntologies));
         Assert.assertEquals("Repository should not have changed at this stage", repoSizeAfterPreparation,
                 this.testManagementConnection.size());
         
@@ -527,7 +530,8 @@ public class PoddOWLManagerImplTest extends AbstractPoddOWLManagerTest
         
         try
         {
-            ((PoddOWLManagerImpl)this.testOWLManager).loadOntologyInternal(null, owlSource);
+            ((PoddOWLManagerImpl)this.testOWLManager).loadOntologyInternal(null, owlSource,
+                    Collections.<OWLOntologyID> emptySet());
             Assert.fail("Should have thrown an OWLOntologyCreationException");
         }
         catch(final EmptyOntologyException e)
@@ -545,7 +549,7 @@ public class PoddOWLManagerImplTest extends AbstractPoddOWLManagerTest
     @Test
     public void testLoadOntologyFromOWLOntologyDocumentSource() throws Exception
     {
-        this.loadDcFoafAndPoddUserSchemaOntologies();
+        List<InferredOWLOntologyID> schemaOntologies = this.loadDcFoafAndPoddUserSchemaOntologies();
         
         // prepare: load an ontology into a StreamDocumentSource
         final InputStream inputStream = this.getClass().getResourceAsStream(PODD.PATH_PODD_BASE_V1);
@@ -556,7 +560,8 @@ public class PoddOWLManagerImplTest extends AbstractPoddOWLManagerTest
                         RDFFormat.RDFXML.getDefaultMIMEType()));
         
         final OWLOntology loadedOntology =
-                ((PoddOWLManagerImpl)this.testOWLManager).loadOntologyInternal(null, owlSource);
+                ((PoddOWLManagerImpl)this.testOWLManager).loadOntologyInternal(null, owlSource, new LinkedHashSet<>(
+                        schemaOntologies));
         
         // verify:
         Assert.assertNotNull(loadedOntology);
@@ -575,7 +580,7 @@ public class PoddOWLManagerImplTest extends AbstractPoddOWLManagerTest
     @Test
     public void testLoadOntologyFromRioMemoryTripleSource() throws Exception
     {
-        this.loadDcFoafAndPoddUserSchemaOntologies();
+        List<InferredOWLOntologyID> schemaOntologies = this.loadDcFoafAndPoddUserSchemaOntologies();
         
         // prepare: load an ontology into a RioMemoryTripleSource via the test repository
         final URI context = ValueFactoryImpl.getInstance().createURI("urn:context:test");
@@ -592,7 +597,8 @@ public class PoddOWLManagerImplTest extends AbstractPoddOWLManagerTest
         final RioMemoryTripleSource owlSource = new RioMemoryTripleSource(statements.iterator());
         
         final OWLOntology loadedOntology =
-                ((PoddOWLManagerImpl)this.testOWLManager).loadOntologyInternal(null, owlSource);
+                ((PoddOWLManagerImpl)this.testOWLManager).loadOntologyInternal(null, owlSource, new LinkedHashSet<>(
+                        schemaOntologies));
         
         // verify:
         Assert.assertNotNull(loadedOntology);
@@ -620,7 +626,8 @@ public class PoddOWLManagerImplTest extends AbstractPoddOWLManagerTest
         
         try
         {
-            ((PoddOWLManagerImpl)this.testOWLManager).loadOntologyInternal(null, owlSource);
+            ((PoddOWLManagerImpl)this.testOWLManager).loadOntologyInternal(null, owlSource,
+                    Collections.<OWLOntologyID> emptySet());
             Assert.fail("Should have thrown an OWLOntologyCreationException");
         }
         catch(final OWLException e)
@@ -640,7 +647,7 @@ public class PoddOWLManagerImplTest extends AbstractPoddOWLManagerTest
     {
         try
         {
-            ((PoddOWLManagerImpl)this.testOWLManager).loadOntologyInternal(null, null);
+            ((PoddOWLManagerImpl)this.testOWLManager).loadOntologyInternal(null, null, null);
             Assert.fail("Should have thrown a RuntimeException");
         }
         catch(final RuntimeException e)
@@ -923,7 +930,8 @@ public class PoddOWLManagerImplTest extends AbstractPoddOWLManagerTest
         
         Assert.assertFalse("Ontology should not be in memory", this.testOWLManager.isCached(inferredOntologyID));
         
-        this.testOWLManager.cacheSchemaOntology(inferredOntologyID, this.testManagementConnection, null);
+        ((PoddOWLManagerImpl)this.testOWLManager).cacheSchemaOntology(inferredOntologyID,
+                this.testManagementConnection, null);
         
         // verify:
         Assert.assertTrue("Ontology should be in memory",
@@ -953,7 +961,8 @@ public class PoddOWLManagerImplTest extends AbstractPoddOWLManagerTest
         Assert.assertTrue("Ontology should already be in memory", this.testOWLManager.isCached(inferredOntologyID));
         
         // this call will silently return since the ontology is already in cache
-        this.testOWLManager.cacheSchemaOntology(inferredOntologyID, this.testManagementConnection, null);
+        ((PoddOWLManagerImpl)this.testOWLManager).cacheSchemaOntology(inferredOntologyID,
+                this.testManagementConnection, null);
         
         // verify:
         Assert.assertTrue("Ontology should still be in memory", this.testOWLManager.isCached(inferredOntologyID));
@@ -978,7 +987,8 @@ public class PoddOWLManagerImplTest extends AbstractPoddOWLManagerTest
         
         try
         {
-            this.testOWLManager.cacheSchemaOntology(inferredOntologyID, this.testManagementConnection, null);
+            ((PoddOWLManagerImpl)this.testOWLManager).cacheSchemaOntology(inferredOntologyID,
+                    this.testManagementConnection, null);
             Assert.fail("Should have thrown an EmptyOntologyException");
         }
         catch(final EmptyOntologyException e)
@@ -1000,7 +1010,8 @@ public class PoddOWLManagerImplTest extends AbstractPoddOWLManagerTest
         
         try
         {
-            this.testOWLManager.cacheSchemaOntology(inferredOntologyID, this.testManagementConnection, null);
+            ((PoddOWLManagerImpl)this.testOWLManager).cacheSchemaOntology(inferredOntologyID,
+                    this.testManagementConnection, null);
             Assert.fail("Should have thrown a NullPointerException");
         }
         catch(final NullPointerException e)
@@ -1032,7 +1043,7 @@ public class PoddOWLManagerImplTest extends AbstractPoddOWLManagerTest
     {
         try
         {
-            this.testOWLManager.cacheSchemaOntology(null, this.testManagementConnection, null);
+            ((PoddOWLManagerImpl)this.testOWLManager).cacheSchemaOntology(null, this.testManagementConnection, null);
             Assert.fail("Should have thrown a NullPointerException");
         }
         catch(final NullPointerException e)
@@ -1104,7 +1115,8 @@ public class PoddOWLManagerImplTest extends AbstractPoddOWLManagerTest
                 pScienceInferredOntologyID.getInferredOntologyIRI().toOpenRDFURI(), schemaGraph);
         
         // invoke method to test
-        this.testOWLManager.cacheSchemaOntology(pScienceInferredOntologyID, this.testManagementConnection, schemaGraph);
+        ((PoddOWLManagerImpl)this.testOWLManager).cacheSchemaOntology(pScienceInferredOntologyID,
+                this.testManagementConnection, schemaGraph);
         
         // verify:
         Assert.assertTrue("Ontology should be in memory", this.testOWLManager.isCached(pScienceInferredOntologyID));
@@ -1135,7 +1147,8 @@ public class PoddOWLManagerImplTest extends AbstractPoddOWLManagerTest
         Assert.assertFalse("Ontology should not be in memory", this.testOWLManager.isCached(inferredOntologyID));
         
         // invoke method to test
-        this.testOWLManager.cacheSchemaOntology(inferredOntologyID, this.testManagementConnection, null);
+        ((PoddOWLManagerImpl)this.testOWLManager).cacheSchemaOntology(inferredOntologyID,
+                this.testManagementConnection, null);
         
         // verify:
         Assert.assertTrue("Ontology should be in memory", this.testOWLManager.isCached(inferredOntologyID));
@@ -1235,7 +1248,8 @@ public class PoddOWLManagerImplTest extends AbstractPoddOWLManagerTest
                 pPlantInferredOntologyID.getInferredOntologyIRI().toOpenRDFURI(), schemaGraph);
         
         // invoke method to test
-        this.testOWLManager.cacheSchemaOntology(pPlantInferredOntologyID, this.testManagementConnection, schemaGraph);
+        ((PoddOWLManagerImpl)this.testOWLManager).cacheSchemaOntology(pPlantInferredOntologyID,
+                this.testManagementConnection, schemaGraph);
         
         // verify:
         Assert.assertTrue("Ontology should be in memory",

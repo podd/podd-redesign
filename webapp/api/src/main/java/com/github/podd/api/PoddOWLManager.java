@@ -42,36 +42,6 @@ import com.github.podd.utils.InferredOWLOntologyID;
 public interface PoddOWLManager
 {
     /**
-     * Loads and caches the given schema ontologies in memory from a Repository. Silently returns if
-     * the ontologies are already cached.
-     * 
-     * @param ontologyIDs
-     * @param managementConnection
-     * @param schemaManagementContext
-     * @throws OpenRDFException
-     * @throws PoddException
-     * @throws IOException
-     * @throws OWLException
-     */
-    void cacheSchemaOntologies(Set<? extends OWLOntologyID> ontologyIDs, RepositoryConnection managementConnection,
-            URI schemaManagementContext) throws OpenRDFException, OWLException, IOException, PoddException;
-    
-    /**
-     * Loads and caches the given schema ontology in memory from a Repository. Silently returns if
-     * the ontology is already cached.
-     * 
-     * @param ontologyID
-     * @param managementConnection
-     * @param schemaManagementContext
-     * @throws OpenRDFException
-     * @throws PoddException
-     * @throws IOException
-     * @throws OWLException
-     */
-    void cacheSchemaOntology(OWLOntologyID ontologyID, RepositoryConnection managementConnection,
-            URI schemaManagementContext) throws OpenRDFException, OWLException, IOException, PoddException;
-    
-    /**
      * Determing if the ontology is cached in memory.
      * 
      * @param ontologyID
