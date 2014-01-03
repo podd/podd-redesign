@@ -179,6 +179,7 @@ public class PoddArtifactManagerImplTest extends AbstractPoddArtifactManagerTest
     @Override
     protected List<InferredOWLOntologyID> loadVersion1SchemaOntologies() throws Exception
     {
+        PoddOWLManagerImpl manager = (PoddOWLManagerImpl)this.testArtifactManager.getOWLManager();
         // Keep track of the ontologies that have been loaded to ensure they are in memory when
         // inferring the next schema
         Set<InferredOWLOntologyID> loadedOntologies = new LinkedHashSet<>();
@@ -190,6 +191,7 @@ public class PoddArtifactManagerImplTest extends AbstractPoddArtifactManagerTest
                         loadedOntologies);
         this.testArtifactManager.getOWLManager().removeCache(null, loadedOntologies);
         loadedOntologies.add(inferredDctermsOntologyID);
+        manager.cacheSchemaOntologies(loadedOntologies, testManagementRepositoryConnection, schemaGraph);
         final InferredOWLOntologyID inferredFoafOntologyID =
                 this.loadInferStoreSchema(PODD.PATH_PODD_FOAF_V1, RDFFormat.RDFXML,
                         TestConstants.EXPECTED_TRIPLE_COUNT_FOAF_CONCRETE,
