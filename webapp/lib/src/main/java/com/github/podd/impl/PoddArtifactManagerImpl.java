@@ -899,7 +899,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             managementConnection.export(new StatementCollector(model), this.getRepositoryManager()
                     .getSchemaManagementGraph());
             
-            return OntologyUtils.getArtifactImports(inferredOWLOntologyID, model);
+            return OntologyUtils.artifactImports(inferredOWLOntologyID, model);
         }
         finally
         {
@@ -1333,7 +1333,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             
             // Rio.write(model, Rio.createWriter(RDFFormat.NQUADS, System.out));
             
-            schemaImports = OntologyUtils.getArtifactImports(ontologyIDs.get(0), importsModel);
+            schemaImports = OntologyUtils.artifactImports(ontologyIDs.get(0), importsModel);
             
             final Repository permanentRepository = this.getRepositoryManager().getPermanentRepository(schemaImports);
             permanentRepositoryConnection = permanentRepository.getConnection();

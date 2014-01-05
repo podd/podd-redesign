@@ -353,10 +353,10 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
         final ConcurrentMap<URI, Set<URI>> importsMap = new ConcurrentHashMap<>(schemaOntologyUris.size());
         
         final List<URI> importOrder =
-                OntologyUtils.orderImports(model, schemaOntologyUris, schemaVersionUris, importsMap);
+                OntologyUtils.orderImports(model, schemaOntologyUris, schemaVersionUris, importsMap, false);
         
         Map<URI, Set<OWLOntologyID>> allImports =
-                OntologyUtils.getSchemaManifestImports(model, schemaOntologyUris, schemaVersionUris);
+                OntologyUtils.schemaManifestImports(model, schemaOntologyUris, schemaVersionUris);
         
         return this.uploadSchemaOntologiesInOrder(model, importOrder);
     }

@@ -290,11 +290,11 @@ public class PoddOWLManagerImpl implements PoddOWLManager
         OntologyUtils.extractOntologyAndVersions(schemaManagementTriples, schemaOntologyUris, schemaVersionUris);
         
         Map<URI, Set<OWLOntologyID>> imports2 =
-                OntologyUtils.getSchemaManifestImports(schemaManagementTriples, schemaOntologyUris, schemaVersionUris);
+                OntologyUtils.schemaManifestImports(schemaManagementTriples, schemaOntologyUris, schemaVersionUris);
         
         final ConcurrentMap<URI, Set<URI>> importsMap = new ConcurrentHashMap<>(schemaOntologyUris.size());
         List<URI> orderImports =
-                OntologyUtils.orderImports(schemaManagementTriples, schemaOntologyUris, schemaVersionUris, importsMap);
+                OntologyUtils.orderImports(schemaManagementTriples, schemaOntologyUris, schemaVersionUris, importsMap, false);
         
         List<OWLOntologyID> orderedOntologies = new ArrayList<>(ontologyIDs.size());
         
