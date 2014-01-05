@@ -873,10 +873,14 @@ public class OntologyUtilsTest
     {
         Model model = new LinkedHashModel();
         OntologyUtils.ontologyIDsToModel(Arrays.asList(this.testOntologyID), model);
+        model.add(this.testVersionUri1, RDF.TYPE, OWL.ONTOLOGY);
         model.add(this.testVersionUri1, OWL.IMPORTS, this.testImportOntologyUri1);
         model.add(this.testImportOntologyUri1, RDF.TYPE, OWL.ONTOLOGY);
+        model.add(this.testImportOntologyUri1, PODD.OMV_CURRENT_VERSION, this.testImportVersionUri1);
         model.add(this.testImportOntologyUri1, OWL.VERSIONIRI, this.testImportVersionUri1);
         model.add(this.testImportVersionUri1, RDF.TYPE, OWL.ONTOLOGY);
+        
+        DebugUtils.printContents(model);
         
         Set<URI> schemaOntologyUris = new HashSet<URI>();
         Set<URI> schemaVersionUris = new HashSet<URI>();
