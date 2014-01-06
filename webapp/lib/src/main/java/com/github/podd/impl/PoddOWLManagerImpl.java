@@ -284,48 +284,7 @@ public class PoddOWLManagerImpl implements PoddOWLManager
         Model schemaManagementTriples = new LinkedHashModel();
         managementConnection.export(new StatementCollector(schemaManagementTriples), schemaManagementContext);
         
-        final Set<URI> schemaOntologyUris = new LinkedHashSet<>();
-        final Set<URI> schemaVersionUris = new LinkedHashSet<>();
-        
-        OntologyUtils.extractOntologyAndVersions(schemaManagementTriples, schemaOntologyUris, schemaVersionUris);
-        
-        Map<URI, Set<OWLOntologyID>> imports2 =
-                OntologyUtils.schemaManifestImports(schemaManagementTriples, schemaOntologyUris, schemaVersionUris);
-        
-        final ConcurrentMap<URI, Set<URI>> importsMap = new ConcurrentHashMap<>(schemaOntologyUris.size());
-        List<URI> orderImports =
-                OntologyUtils.orderImports(schemaManagementTriples, schemaOntologyUris, schemaVersionUris, importsMap, false);
-        
-        List<OWLOntologyID> orderedOntologies = new ArrayList<>(ontologyIDs.size());
-        
-        for(URI nextOrderedImport : orderImports)
-        {
-            for(OWLOntologyID ontologyID : ontologyIDs)
-            {
-                if(ontologyID == null || ontologyID.getOntologyIRI() == null)
-                {
-                    throw new NullPointerException("OWLOntology is incomplete");
-                }
-                
-                if(ontologyID.getOntologyIRI().toOpenRDFURI().equals(nextOrderedImport))
-                {
-                    orderedOntologies.add(ontologyID);
-                    break;
-                }
-                else if(ontologyID.getVersionIRI() != null
-                        && ontologyID.getVersionIRI().toOpenRDFURI().equals(nextOrderedImport))
-                {
-                    orderedOntologies.add(ontologyID);
-                    break;
-                }
-            }
-        }
-        
-        if(orderedOntologies.size() != ontologyIDs.size())
-        {
-            this.log.error("Ordered ontology list does not match input list: {} {}", orderedOntologies, ontologyIDs);
-            DebugUtils.printContents(schemaManagementTriples);
-        }
+        OntologyUtils.schemaManifestImports(schemaManagementTriples, ontologyIDs);
         
         OWLOntologyManager cachedManager = getCachedManager(ontologyIDs);
         
@@ -333,42 +292,6 @@ public class PoddOWLManagerImpl implements PoddOWLManager
         {
             for(OWLOntologyID ontologyID : ontologyIDs)
             {
-                if(ontologyID == null || ontologyID.getOntologyIRI() == null)
-                {
-                    throw new NullPointerException("OWLOntology is incomplete");
-                }
-                
-                this.log.debug("Checking whether the schema ontology is already cached: {}", ontologyID);
-                
-                if(imports2.containsKey(ontologyID.getVersionIRI().toOpenRDFURI()))
-                {
-                    Set<OWLOntologyID> nextImports = imports2.get(ontologyID.getVersionIRI().toOpenRDFURI());
-                    
-                    // final List<InferredOWLOntologyID> imports =
-                    // this.buildTwoLevelOrderedImportsList(ontologyID, conn,
-                    // schemaManagementContext);
-                    this.log.debug("The schema ontology {} has {} imports.", ontologyID, nextImports.size());
-                    
-                    // -- load the imported ontologies into the Manager's cache. It is expected that
-                    // they
-                    // are already in the Repository
-                    for(final OWLOntologyID inferredOntologyID : nextImports)
-                    {
-                        this.log.debug("Checking caching for imported schema: {}", inferredOntologyID);
-                        this.cacheSchemaOntologyInternal(managementConnection, inferredOntologyID, cachedManager);
-                    }
-                }
-                else
-                {
-                    this.log.debug("Did not find any imports for schema ontology: {}", ontologyID);
-                }
-                // -- load the requested schema ontology (and inferred statements if they exist)
-                // into the Manager's cache
-                this.log.debug("Checking caching for ontology: {}", ontologyID);
-                
-                this.cacheSchemaOntologyInternal(managementConnection, ontologyID, cachedManager);
-                
-                this.log.debug("Completed caching for schema ontology: {}", ontologyID);
             }
         }
         return cachedManager;

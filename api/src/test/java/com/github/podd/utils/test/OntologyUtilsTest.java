@@ -858,23 +858,11 @@ public class OntologyUtilsTest
         Model model = new LinkedHashModel();
         OntologyUtils.ontologyIDsToModel(Arrays.asList(this.testOntologyID), model);
         
-        Set<URI> schemaOntologyUris = new HashSet<URI>();
-        Set<URI> schemaVersionUris = new HashSet<URI>();
-        
-        schemaOntologyUris.add(this.testOntologyUri1);
-        
-        schemaVersionUris.add(this.testVersionUri1);
-        
-        Map<URI, Set<OWLOntologyID>> schemaManifestImports =
-                OntologyUtils.schemaManifestImports(model, schemaOntologyUris, schemaVersionUris);
+        Set<OWLOntologyID> schemaManifestImports =
+                OntologyUtils.schemaManifestImports(model, Collections.singleton(this.testOntologyID));
         
         Assert.assertNotNull(schemaManifestImports);
-        Assert.assertEquals(1, schemaManifestImports.size());
-        Assert.assertTrue(schemaManifestImports.containsKey(this.testVersionUri1));
-        
-        Set<OWLOntologyID> importsRoot = schemaManifestImports.get(this.testVersionUri1);
-        Assert.assertNotNull(importsRoot);
-        Assert.assertEquals(0, importsRoot.size());
+        Assert.assertEquals(0, schemaManifestImports.size());
     }
     
     @Test
