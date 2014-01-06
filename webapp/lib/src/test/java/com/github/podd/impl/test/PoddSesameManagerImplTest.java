@@ -23,9 +23,11 @@ import java.util.LinkedHashSet;
 import java.util.List;
 
 import org.junit.Assert;
+import org.openrdf.model.Model;
 import org.openrdf.model.URI;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.rio.RDFFormat;
+import org.openrdf.rio.Rio;
 import org.semanticweb.owlapi.io.OWLOntologyDocumentSource;
 import org.semanticweb.owlapi.io.StreamDocumentSource;
 import org.semanticweb.owlapi.model.OWLOntologyID;
@@ -40,6 +42,7 @@ import com.github.podd.api.test.AbstractPoddSesameManagerTest;
 import com.github.podd.impl.PoddOWLManagerImpl;
 import com.github.podd.impl.PoddSesameManagerImpl;
 import com.github.podd.utils.InferredOWLOntologyID;
+import com.github.podd.utils.OntologyUtils;
 import com.github.podd.utils.PODD;
 import com.github.podd.utils.PoddWebConstants;
 
@@ -77,17 +80,14 @@ public class PoddSesameManagerImplTest extends AbstractPoddSesameManagerTest
      * generate inferred statements for schema ontologies.
      */
     @Override
-    public final List<InferredOWLOntologyID> loadSchemaOntologies(final RepositoryConnection conn,
+    public final List<InferredOWLOntologyID> loadSchemaOntologies(final RepositoryConnection managementConnection,
             final URI schemaManagementGraph) throws Exception
     {
-        final List<InferredOWLOntologyID> schemaList = new ArrayList<InferredOWLOntologyID>();
+        Model model =
+                Rio.parse(this.getClass().getResourceAsStream("/podd-schema-manifest.ttl"), "", RDFFormat.TURTLE,
+                        schemaManagementGraph);
         
-        // - schema ontologies to be loaded
-        final String[] schemaResourcePaths =
-                { PODD.PATH_PODD_DCTERMS_V1, PODD.PATH_PODD_FOAF_V1, PODD.PATH_PODD_USER_V1, PODD.PATH_PODD_BASE_V1,
-                        PODD.PATH_PODD_SCIENCE_V1, PODD.PATH_PODD_PLANT_V1,
-                // PoddRdfConstants.PATH_PODD_ANIMAL,
-                };
+        managementConnection.add(model, schemaManagementGraph);
         
         // - create a PODD OWLManager instance
         final OWLReasonerFactory reasonerFactory =
@@ -96,22 +96,25 @@ public class PoddSesameManagerImplTest extends AbstractPoddSesameManagerTest
         final PoddOWLManagerImpl testPoddOWLManager =
                 new PoddOWLManagerImpl(getNewOWLOntologyManagerFactory(), reasonerFactory);
         
-        // - load each schema ontology (and its inferred ontology) to the
-        // RepositoryConnection
-        for(final String schemaResourcePath : schemaResourcePaths)
+        List<InferredOWLOntologyID> ontologyIDs = OntologyUtils.modelToOntologyIDs(model, false, false);
+        
+        for(InferredOWLOntologyID nextOntology : ontologyIDs)
         {
-            this.log.debug("Next paths: {} ", schemaResourcePath);
-            final InputStream resourceStream = this.getClass().getResourceAsStream(schemaResourcePath);
-            final OWLOntologyDocumentSource owlSource =
-                    new StreamDocumentSource(resourceStream, RDFFormat.RDFXML.getDefaultMIMEType());
-            final InferredOWLOntologyID nextInferredOntology =
-                    testPoddOWLManager.loadAndInfer(owlSource, conn, null,
-                            new LinkedHashSet<OWLOntologyID>(schemaList), conn, schemaManagementGraph);
+            String classpath =
+                    model.filter(nextOntology.getVersionIRI().toOpenRDFURI(), PODD.PODD_SCHEMA_CLASSPATH, null)
+                            .objectString();
+            Assert.assertNotNull("Ontology was not mapped to a classpath: " + nextOntology, classpath);
+            InputStream nextStream = this.getClass().getResourceAsStream(classpath);
+            Assert.assertNotNull("Ontology classpath mapping was not valid: " + nextOntology + " " + classpath);
             
-            schemaList.add(nextInferredOntology);
+            managementConnection.add(nextStream, "", Rio.getParserFormatForFileName(classpath, RDFFormat.RDFXML),
+                    nextOntology.getVersionIRI().toOpenRDFURI());
         }
         
-        return schemaList;
+        testPoddOWLManager.cacheSchemaOntologies(new LinkedHashSet<>(ontologyIDs), managementConnection,
+                schemaManagementGraph);
+        
+        return ontologyIDs;
     }
     
 }
