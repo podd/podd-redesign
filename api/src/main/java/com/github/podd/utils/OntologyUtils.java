@@ -779,7 +779,6 @@ public class OntologyUtils
                 
                 // Iterate through universally ordered collection to find ordered imports for this
                 // ontology
-                // TODO: This may not be the most efficient way to do this
                 for(final URI nextOrderedVersion : orderImports)
                 {
                     if(nextImports.contains(nextOrderedVersion))
