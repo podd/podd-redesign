@@ -55,7 +55,7 @@ public class SPARQLDataReferenceProcessorImpl implements SPARQLDataReferenceProc
         
         for(final URI fileType : this.getTypes())
         {
-            final Model matchingModels = rdfStatements.filter((Resource)null, null, fileType);
+            final Model matchingModels = rdfStatements.filter((Resource)null, RDF.TYPE, fileType);
             if(!matchingModels.isEmpty())
             {
                 return true;
