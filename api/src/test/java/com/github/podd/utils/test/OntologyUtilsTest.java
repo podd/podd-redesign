@@ -493,7 +493,7 @@ public class OntologyUtilsTest
         Model model = new LinkedHashModel();
         OntologyUtils.ontologyIDsToModel(Arrays.asList(this.testOntologyID), model);
         
-        Set<OWLOntologyID> imports = OntologyUtils.artifactImports(this.testOntologyID, model);
+        List<OWLOntologyID> imports = OntologyUtils.artifactImports(this.testOntologyID, model);
         
         Assert.assertEquals(0, imports.size());
         Assert.assertTrue(imports.isEmpty());
@@ -511,7 +511,7 @@ public class OntologyUtilsTest
         
         DebugUtils.printContents(model);
         
-        Set<OWLOntologyID> imports = OntologyUtils.artifactImports(this.testOntologyID, model);
+        List<OWLOntologyID> imports = OntologyUtils.artifactImports(this.testOntologyID, model);
         
         Assert.assertEquals(1, imports.size());
         Assert.assertTrue(imports.contains(this.testImportOntologyID1));
@@ -527,7 +527,7 @@ public class OntologyUtilsTest
         model.add(this.testImportOntologyUri1, OWL.VERSIONIRI, this.testImportVersionUri1);
         model.add(this.testVersionUri1, OWL.IMPORTS, this.testImportOntologyUri1);
         
-        Set<OWLOntologyID> imports = OntologyUtils.artifactImports(this.testOntologyID, model);
+        List<OWLOntologyID> imports = OntologyUtils.artifactImports(this.testOntologyID, model);
         
         Assert.assertEquals(1, imports.size());
         Assert.assertTrue(imports.contains(this.testImportOntologyID1));
@@ -547,7 +547,7 @@ public class OntologyUtilsTest
         model.add(this.testImportOntologyUri2, OWL.VERSIONIRI, this.testImportVersionUri2);
         model.add(this.testOntologyUri1, OWL.IMPORTS, this.testImportOntologyUri1);
         
-        Set<OWLOntologyID> imports = OntologyUtils.artifactImports(this.testOntologyID, model);
+        List<OWLOntologyID> imports = OntologyUtils.artifactImports(this.testOntologyID, model);
         
         Assert.assertEquals(2, imports.size());
         Assert.assertTrue(imports.contains(this.testImportOntologyID1));
@@ -567,7 +567,7 @@ public class OntologyUtilsTest
         model.add(this.testImportOntologyUri2, OWL.VERSIONIRI, this.testImportVersionUri2);
         model.add(this.testOntologyUri1, OWL.IMPORTS, this.testImportOntologyUri1);
         
-        Set<OWLOntologyID> imports = OntologyUtils.artifactImports(this.testOntologyID, model);
+        List<OWLOntologyID> imports = OntologyUtils.artifactImports(this.testOntologyID, model);
         
         Assert.assertEquals(1, imports.size());
         Assert.assertTrue(imports.contains(this.testImportOntologyID1));
@@ -593,7 +593,7 @@ public class OntologyUtilsTest
         model.add(this.testImportVersionUri3, RDF.TYPE, OWL.ONTOLOGY);
         model.add(this.testImportVersionUri2, OWL.IMPORTS, this.testImportVersionUri3);
         
-        Set<OWLOntologyID> imports = OntologyUtils.artifactImports(this.testOntologyID, model);
+        List<OWLOntologyID> imports = OntologyUtils.artifactImports(this.testOntologyID, model);
         
         Assert.assertEquals(3, imports.size());
         Assert.assertTrue(imports.contains(this.testImportOntologyID1));
@@ -626,7 +626,7 @@ public class OntologyUtilsTest
         model.add(this.testImportVersionUri4, RDF.TYPE, OWL.ONTOLOGY);
         model.add(this.testImportVersionUri2, OWL.IMPORTS, this.testImportVersionUri4);
         
-        Set<OWLOntologyID> imports = OntologyUtils.artifactImports(this.testOntologyID, model);
+        List<OWLOntologyID> imports = OntologyUtils.artifactImports(this.testOntologyID, model);
         
         Assert.assertEquals(4, imports.size());
         Assert.assertTrue(imports.contains(this.testImportOntologyID1));
@@ -660,7 +660,7 @@ public class OntologyUtilsTest
         model.add(this.testImportVersionUri4, RDF.TYPE, OWL.ONTOLOGY);
         model.add(this.testImportVersionUri2, OWL.IMPORTS, this.testImportVersionUri4);
         
-        Set<OWLOntologyID> imports = OntologyUtils.artifactImports(this.testOntologyID, model);
+        List<OWLOntologyID> imports = OntologyUtils.artifactImports(this.testOntologyID, model);
         
         Assert.assertEquals(4, imports.size());
         Assert.assertTrue(imports.contains(this.testImportOntologyID1));
@@ -681,7 +681,7 @@ public class OntologyUtilsTest
         
         DebugUtils.printContents(model);
         
-        Set<OWLOntologyID> imports = OntologyUtils.artifactImports(this.testOntologyID, model);
+        List<OWLOntologyID> imports = OntologyUtils.artifactImports(this.testOntologyID, model);
         
         this.log.info("Imports: {}", imports);
         
@@ -860,7 +860,7 @@ public class OntologyUtilsTest
     {
         Model model = new LinkedHashModel();
         
-        Set<OWLOntologyID> schemaManifestImports =
+        List<OWLOntologyID> schemaManifestImports =
                 OntologyUtils.schemaManifestImports(model, Collections.<OWLOntologyID> emptySet());
         
         Assert.assertNotNull(schemaManifestImports);
@@ -873,7 +873,7 @@ public class OntologyUtilsTest
         Model model = new LinkedHashModel();
         OntologyUtils.ontologyIDsToModel(Arrays.asList(this.testOntologyID), model);
         
-        Set<OWLOntologyID> schemaManifestImports =
+        List<OWLOntologyID> schemaManifestImports =
                 OntologyUtils.schemaManifestImports(model, Collections.singleton(this.testOntologyID));
         
         Assert.assertNotNull(schemaManifestImports);
@@ -895,7 +895,7 @@ public class OntologyUtilsTest
         
         DebugUtils.printContents(model);
         
-        Set<OWLOntologyID> schemaManifestImports =
+        List<OWLOntologyID> schemaManifestImports =
                 OntologyUtils.schemaManifestImports(model,
                         new HashSet<OWLOntologyID>(Arrays.asList(this.testOntologyID, this.testImportOntologyID1)));
         
@@ -918,7 +918,7 @@ public class OntologyUtilsTest
         
         DebugUtils.printContents(model);
         
-        Set<OWLOntologyID> schemaManifestImports =
+        List<OWLOntologyID> schemaManifestImports =
                 OntologyUtils.schemaManifestImports(model,
                         new HashSet<OWLOntologyID>(Arrays.asList(this.testOntologyID, this.testImportOntologyID1)));
         

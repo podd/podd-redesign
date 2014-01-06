@@ -85,7 +85,7 @@ public class OntologyUtils
      * @throws RDFParseException
      * @throws UnsupportedRDFormatException
      */
-    public static Set<OWLOntologyID> artifactImports(final InferredOWLOntologyID artifactID, final Model model)
+    public static List<OWLOntologyID> artifactImports(final InferredOWLOntologyID artifactID, final Model model)
         throws OpenRDFException, SchemaManifestException, IOException, RDFParseException, UnsupportedRDFormatException
     {
         Objects.requireNonNull(artifactID);
@@ -117,9 +117,9 @@ public class OntologyUtils
         
         final List<InferredOWLOntologyID> ontologyIDs = OntologyUtils.modelToOntologyIDs(model, true, false);
         
-        finalOrderImports(results, ontologyIDs, orderImports, artifactImports, importsMap);
+        Set<OWLOntologyID> finalOrderImports = finalOrderImports(results, ontologyIDs, orderImports, artifactImports, importsMap);
         
-        return results;
+        return new ArrayList<>(finalOrderImports);
     }
     
     /**
@@ -171,14 +171,14 @@ public class OntologyUtils
                 {
                     if(nextOntologyID.getOntologyIRI().toOpenRDFURI().equals(nextImport))
                     {
-                        results.add(nextOntologyID);
+                        finalResults.add(nextOntologyID);
                         found = true;
                         break;
                     }
                     else if(nextOntologyID.getVersionIRI() != null
                             && nextOntologyID.getVersionIRI().toOpenRDFURI().equals(nextImport))
                     {
-                        results.add(nextOntologyID);
+                        finalResults.add(nextOntologyID);
                         found = true;
                         break;
                     }
@@ -702,7 +702,7 @@ public class OntologyUtils
      * @return
      * @throws SchemaManifestException
      */
-    public static Set<OWLOntologyID> schemaManifestImports(final Model model,
+    public static List<OWLOntologyID> schemaManifestImports(final Model model,
             final Set<? extends OWLOntologyID> dependentSchemaOntologies) throws SchemaManifestException
     {
         Objects.requireNonNull(dependentSchemaOntologies);
@@ -735,9 +735,9 @@ public class OntologyUtils
         
         final List<InferredOWLOntologyID> ontologyIDs = OntologyUtils.modelToOntologyIDs(model, true, false);
         
-        finalOrderImports(results, ontologyIDs, orderImports, artifactImports, importsMap);
+        Set<OWLOntologyID> finalOrderImports = finalOrderImports(results, ontologyIDs, orderImports, artifactImports, importsMap);
         
-        return results;
+        return new ArrayList<>(finalOrderImports);
     }
     
     /**

@@ -284,7 +284,7 @@ public class PoddOWLManagerImpl implements PoddOWLManager
         Model schemaManagementTriples = new LinkedHashModel();
         managementConnection.export(new StatementCollector(schemaManagementTriples), schemaManagementContext);
         
-        Set<OWLOntologyID> manifestImports = OntologyUtils.schemaManifestImports(schemaManagementTriples, ontologyIDs);
+        List<OWLOntologyID> manifestImports = OntologyUtils.schemaManifestImports(schemaManagementTriples, ontologyIDs);
         
         OWLOntologyManager cachedManager = getCachedManager(ontologyIDs);
         
@@ -324,11 +324,12 @@ public class PoddOWLManagerImpl implements PoddOWLManager
         
         if(ontologyID instanceof InferredOWLOntologyID)
         {
+            OWLOntologyID inferredIRI = ((InferredOWLOntologyID)ontologyID).getInferredOWLOntologyID();
             this.log.debug("Found inferred OWL ontology ID");
-            if(!isCachedInternal(((InferredOWLOntologyID)ontologyID).getInferredOWLOntologyID(), cachedManager))
+            if(inferredIRI.getOntologyIRI() != null && !isCachedInternal(inferredIRI, cachedManager))
             {
                 this.log.debug("About to parse inferred schema ontology into managers cache: {}",
-                        ((InferredOWLOntologyID)ontologyID).getInferredOWLOntologyID());
+                        inferredIRI);
                 
                 if(((InferredOWLOntologyID)ontologyID).getInferredOntologyIRI() != null)
                 {
@@ -653,9 +654,13 @@ public class PoddOWLManagerImpl implements PoddOWLManager
         {
             return cachedManager.contains(ontologyID.getVersionIRI());
         }
-        else
+        else if(ontologyID.getOntologyIRI() != null)
         {
             return cachedManager.contains(ontologyID.getOntologyIRI());
+        }
+        else
+        {
+            return false;
         }
     }
     
