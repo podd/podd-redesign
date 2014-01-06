@@ -31,6 +31,8 @@ import org.openrdf.repository.sail.SailRepository;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.Rio;
 import org.openrdf.sail.memory.MemoryStore;
+import org.semanticweb.owlapi.model.IRI;
+import org.semanticweb.owlapi.model.OWLOntologyID;
 import org.semanticweb.owlapi.model.OWLOntologyManagerFactory;
 import org.semanticweb.owlapi.model.OWLOntologyManagerFactoryRegistry;
 import org.semanticweb.owlapi.model.UnloadableImportException;
@@ -46,6 +48,7 @@ import com.github.podd.impl.PoddOWLManagerImpl;
 import com.github.podd.impl.PoddRepositoryManagerImpl;
 import com.github.podd.impl.PoddSchemaManagerImpl;
 import com.github.podd.impl.PoddSesameManagerImpl;
+import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.PODD;
 import com.github.podd.utils.PoddWebConstants;
 
@@ -117,15 +120,17 @@ public class PoddSchemaManagerImplTest extends AbstractPoddSchemaManagerTest
         }
         
         // prepare: order of imports
-        final String[] testImportOrderArray =
-                { "http://example.org/podd/ns/version/poddA/1", "http://example.org/podd/ns/version/poddB/2",
-                        "http://example.org/podd/ns/version/poddB/1", "http://example.org/podd/ns/version/poddC/3",
-                        "http://example.org/podd/ns/version/poddC/1", };
+        final String[][] testImportOrderArray =
+                { { "http://example.org/podd/ns/A", "http://example.org/podd/ns/version/poddA/1" },
+                        { "http://example.org/podd/ns/B", "http://example.org/podd/ns/version/poddB/2" },
+                        { "http://example.org/podd/ns/B", "http://example.org/podd/ns/version/poddB/1" },
+                        { "http://example.org/podd/ns/C", "http://example.org/podd/ns/version/poddC/3" },
+                        { "http://example.org/podd/ns/C", "http://example.org/podd/ns/version/poddC/1" } };
         
-        final List<URI> testImportOrder = new ArrayList<>();
-        for(final String s : testImportOrderArray)
+        final List<OWLOntologyID> testImportOrder = new ArrayList<>();
+        for(final String[] s : testImportOrderArray)
         {
-            testImportOrder.add(PODD.VF.createURI(s));
+            testImportOrder.add(new OWLOntologyID(IRI.create(s[0]), IRI.create(s[1])));
         }
         
         ((PoddSchemaManagerImpl)this.testSchemaManager).uploadSchemaOntologiesInOrder(model, testImportOrder);
@@ -149,15 +154,17 @@ public class PoddSchemaManagerImplTest extends AbstractPoddSchemaManagerTest
         }
         
         // prepare: order of imports
-        final String[] testImportOrderArray =
-                { "http://example.org/podd/ns/version/poddA/1", "http://example.org/podd/ns/version/poddB/2",
-                        "http://example.org/podd/ns/version/poddB/1", "http://example.org/podd/ns/version/poddC/3",
-                        "http://example.org/podd/ns/version/poddC/1", };
+        final String[][] testImportOrderArray =
+                { { "http://example.org/podd/ns/A", "http://example.org/podd/ns/version/poddA/1" },
+                        { "http://example.org/podd/ns/B", "http://example.org/podd/ns/version/poddB/2" },
+                        { "http://example.org/podd/ns/B", "http://example.org/podd/ns/version/poddB/1" },
+                        { "http://example.org/podd/ns/C", "http://example.org/podd/ns/version/poddC/3" },
+                        { "http://example.org/podd/ns/C", "http://example.org/podd/ns/version/poddC/1" } };
         
-        final List<URI> testImportOrder = new ArrayList<>();
-        for(final String s : testImportOrderArray)
+        final List<OWLOntologyID> testImportOrder = new ArrayList<>();
+        for(final String[] s : testImportOrderArray)
         {
-            testImportOrder.add(PODD.VF.createURI(s));
+            testImportOrder.add(new OWLOntologyID(IRI.create(s[0]), IRI.create(s[1])));
         }
         
         ((PoddSchemaManagerImpl)this.testSchemaManager).uploadSchemaOntologiesInOrder(model, testImportOrder);
@@ -187,26 +194,21 @@ public class PoddSchemaManagerImplTest extends AbstractPoddSchemaManagerTest
             model = Rio.parse(schemaManifestStream, "", format);
         }
         
-        // prepare: order of imports
         // NOTE: C/1 needs B/1 to be loaded!
-        final String[] testImportOrderArray = {
+        // prepare: order of imports
+        final String[][] testImportOrderArray =
+                { { "http://example.org/podd/ns/A", "http://example.org/podd/ns/version/poddA/1" },
+                        { "http://example.org/podd/ns/B", "http://example.org/podd/ns/version/poddB/2" },
+                        { "http://example.org/podd/ns/C", "http://example.org/podd/ns/version/poddC/1" },
+                        { "http://example.org/podd/ns/B", "http://example.org/podd/ns/version/poddB/1" },
+                        { "http://example.org/podd/ns/C", "http://example.org/podd/ns/version/poddC/3" }
+                
+                };
         
-        "http://example.org/podd/ns/version/poddA/1",
-        
-        "http://example.org/podd/ns/version/poddB/2",
-        
-        "http://example.org/podd/ns/version/poddC/1",
-        
-        "http://example.org/podd/ns/version/poddB/1",
-        
-        "http://example.org/podd/ns/version/poddC/3",
-        
-        };
-        
-        final List<URI> testImportOrder = new ArrayList<>(testImportOrderArray.length);
-        for(final String s : testImportOrderArray)
+        final List<OWLOntologyID> testImportOrder = new ArrayList<>();
+        for(final String[] s : testImportOrderArray)
         {
-            testImportOrder.add(PODD.VF.createURI(s));
+            testImportOrder.add(new OWLOntologyID(IRI.create(s[0]), IRI.create(s[1])));
         }
         
         try
@@ -226,5 +228,4 @@ public class PoddSchemaManagerImplTest extends AbstractPoddSchemaManagerTest
         Assert.assertEquals("Expected 0 schema ontology versions", 0, this.testSchemaManager.getSchemaOntologies()
                 .size());
     }
-    
 }
