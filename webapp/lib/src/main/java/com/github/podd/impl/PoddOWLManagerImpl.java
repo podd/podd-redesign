@@ -284,14 +284,15 @@ public class PoddOWLManagerImpl implements PoddOWLManager
         Model schemaManagementTriples = new LinkedHashModel();
         managementConnection.export(new StatementCollector(schemaManagementTriples), schemaManagementContext);
         
-        OntologyUtils.schemaManifestImports(schemaManagementTriples, ontologyIDs);
+        Set<OWLOntologyID> manifestImports = OntologyUtils.schemaManifestImports(schemaManagementTriples, ontologyIDs);
         
         OWLOntologyManager cachedManager = getCachedManager(ontologyIDs);
         
         synchronized(cachedManager)
         {
-            for(OWLOntologyID ontologyID : ontologyIDs)
+            for(OWLOntologyID ontologyID : manifestImports)
             {
+                this.cacheSchemaOntologyInternal(managementConnection, ontologyID, cachedManager);
             }
         }
         return cachedManager;
