@@ -99,52 +99,18 @@ public class OntologyUtils
         
         OntologyUtils.extractOntologyAndVersions(model, schemaOntologyUris, schemaVersionUris);
         
+        final List<URI> orderImports =
+                OntologyUtils.orderImports(model, schemaOntologyUris, schemaVersionUris, importsMap, true);
+        
+        final Set<URI> artifactImports = new HashSet<>();
+        
         if(schemaOntologyUris.contains(artifactID.getOntologyIRI().toOpenRDFURI()))
         {
-            final List<InferredOWLOntologyID> ontologyIDs = OntologyUtils.modelToOntologyIDs(model, true, false);
-            
-            final List<URI> orderImports =
-                    OntologyUtils.orderImports(model, schemaOntologyUris, schemaVersionUris, importsMap, true);
-            
-            final Set<URI> artifactImports = new HashSet<>();
-            
             // Be tolerant for artifacts and add imports for both the ontology and the version
-            if(importsMap.containsKey(artifactID.getOntologyIRI().toOpenRDFURI()))
-            {
-                artifactImports.addAll(importsMap.get(artifactID.getOntologyIRI().toOpenRDFURI()));
-            }
+            recursiveFollowImports(artifactImports, importsMap, artifactID.getOntologyIRI().toOpenRDFURI());
             
-            if(importsMap.containsKey(artifactID.getVersionIRI().toOpenRDFURI()))
-            {
-                artifactImports.addAll(importsMap.get(artifactID.getVersionIRI().toOpenRDFURI()));
-            }
+            recursiveFollowImports(artifactImports, importsMap, artifactID.getVersionIRI().toOpenRDFURI());
             
-            if(!artifactImports.isEmpty())
-            {
-                // Iterate through universally ordered collection to find ordered imports for this
-                // ontology
-                // TODO: This may not be the most efficient way to do this
-                for(final URI nextImport : orderImports)
-                {
-                    if(artifactImports.contains(nextImport))
-                    {
-                        for(final OWLOntologyID nextOntologyID : ontologyIDs)
-                        {
-                            if(nextOntologyID.getOntologyIRI().toOpenRDFURI().equals(nextImport))
-                            {
-                                results.add(nextOntologyID);
-                                break;
-                            }
-                            else if(nextOntologyID.getVersionIRI() != null
-                                    && nextOntologyID.getVersionIRI().toOpenRDFURI().equals(nextImport))
-                            {
-                                results.add(nextOntologyID);
-                                break;
-                            }
-                        }
-                    }
-                }
-            }
         }
         else
         {
@@ -152,7 +118,81 @@ public class OntologyUtils
                     "Did not find the given ontology IRI in the model: " + artifactID.getOntologyIRI());
         }
         
+        final List<InferredOWLOntologyID> ontologyIDs = OntologyUtils.modelToOntologyIDs(model, true, false);
+        
+        finalOrderImports(results, ontologyIDs, orderImports, artifactImports, importsMap);
+        
         return results;
+    }
+    
+    /**
+     * Recursively follow the imports for the given URI, based on those identified in the
+     * importsMap.
+     * 
+     * @param artifactImports
+     * @param importsMap
+     * @param nextURI
+     */
+    public static void recursiveFollowImports(Set<URI> artifactImports, ConcurrentMap<URI, Set<URI>> importsMap,
+            URI nextURI)
+    {
+        if(importsMap.containsKey(nextURI))
+        {
+            Set<URI> nextSet = importsMap.get(nextURI);
+            for(URI nextSetUri : nextSet)
+            {
+                if(!artifactImports.contains(nextSetUri))
+                {
+                    artifactImports.add(nextSetUri);
+                    recursiveFollowImports(artifactImports, importsMap, nextSetUri);
+                }
+            }
+        }
+    }
+    
+    /**
+     * Call this to reorder the results set according to the order specified in orderImports.
+     * 
+     * @param results
+     * @param ontologyIDs
+     * @param orderImports
+     * @param artifactImports
+     * @param importsMap
+     */
+    public static Set<OWLOntologyID> finalOrderImports(final Set<OWLOntologyID> results,
+            final List<? extends OWLOntologyID> ontologyIDs, final List<URI> orderImports,
+            final Set<URI> artifactImports, ConcurrentMap<URI, Set<URI>> importsMap)
+    {
+        Set<OWLOntologyID> finalResults = new LinkedHashSet<OWLOntologyID>();
+        for(URI nextImport : orderImports)
+        {
+            // Iterate through all of the imports and select those which were actually found
+            if(artifactImports.contains(nextImport))
+            {
+                boolean found = false;
+                for(final OWLOntologyID nextOntologyID : ontologyIDs)
+                {
+                    if(nextOntologyID.getOntologyIRI().toOpenRDFURI().equals(nextImport))
+                    {
+                        results.add(nextOntologyID);
+                        found = true;
+                        break;
+                    }
+                    else if(nextOntologyID.getVersionIRI() != null
+                            && nextOntologyID.getVersionIRI().toOpenRDFURI().equals(nextImport))
+                    {
+                        results.add(nextOntologyID);
+                        found = true;
+                        break;
+                    }
+                }
+                if(!found)
+                {
+                    log.error("Could not map import to an ontology ID: ", nextImport);
+                }
+            }
+        }
+        return finalResults;
     }
     
     /**

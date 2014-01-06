@@ -685,7 +685,7 @@ public class OntologyUtilsTest
         
         this.log.info("Imports: {}", imports);
         
-        Assert.assertEquals(4, imports.size());
+        Assert.assertEquals(5, imports.size());
     }
     
     @Test
