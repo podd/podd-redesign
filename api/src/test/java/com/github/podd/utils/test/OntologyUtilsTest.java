@@ -737,7 +737,8 @@ public class OntologyUtilsTest
         // HashSet<URI>(Arrays.asList(this.testImportVersionUri4)));
         // importsMap.put(testImportVersionUri4, new HashSet<URI>());
         
-        List<URI> orderImports = OntologyUtils.orderImports(model, schemaOntologyUris, schemaVersionUris, importsMap, false);
+        List<URI> orderImports =
+                OntologyUtils.orderImports(model, schemaOntologyUris, schemaVersionUris, importsMap, false);
         
         Assert.assertEquals(5, orderImports.size());
         Assert.assertEquals(this.testImportVersionUri4, orderImports.get(0));
@@ -802,7 +803,8 @@ public class OntologyUtilsTest
         // importsMap.put(testVersionUri1, Collections.singleton(this.testImportVersionUri1));
         // importsMap.put(testImportVersionUri1, new HashSet<URI>());
         
-        List<URI> orderImports = OntologyUtils.orderImports(model, schemaOntologyUris, schemaVersionUris, importsMap, false);
+        List<URI> orderImports =
+                OntologyUtils.orderImports(model, schemaOntologyUris, schemaVersionUris, importsMap, false);
         
         Assert.assertEquals(2, orderImports.size());
         Assert.assertEquals(this.testImportVersionUri1, orderImports.get(0));
@@ -839,7 +841,8 @@ public class OntologyUtilsTest
         // Expected output solution from importsMap after calling orderImports
         // importsMap.put(testVersionUri1, new HashSet<URI>());
         
-        List<URI> orderImports = OntologyUtils.orderImports(model, schemaOntologyUris, schemaVersionUris, importsMap, false);
+        List<URI> orderImports =
+                OntologyUtils.orderImports(model, schemaOntologyUris, schemaVersionUris, importsMap, false);
         
         Assert.assertEquals(1, orderImports.size());
         Assert.assertEquals(this.testVersionUri1, orderImports.get(0));
@@ -853,6 +856,18 @@ public class OntologyUtilsTest
     }
     
     @Test
+    public void testGetSchemaManifestImportsEmpty() throws Exception
+    {
+        Model model = new LinkedHashModel();
+        
+        Set<OWLOntologyID> schemaManifestImports =
+                OntologyUtils.schemaManifestImports(model, Collections.<OWLOntologyID> emptySet());
+        
+        Assert.assertNotNull(schemaManifestImports);
+        Assert.assertEquals(0, schemaManifestImports.size());
+    }
+    
+    @Test
     public void testGetSchemaManifestImportsZeroLevels() throws Exception
     {
         Model model = new LinkedHashModel();
@@ -862,7 +877,8 @@ public class OntologyUtilsTest
                 OntologyUtils.schemaManifestImports(model, Collections.singleton(this.testOntologyID));
         
         Assert.assertNotNull(schemaManifestImports);
-        Assert.assertEquals(0, schemaManifestImports.size());
+        Assert.assertEquals(1, schemaManifestImports.size());
+        Assert.assertTrue(schemaManifestImports.contains(this.testOntologyID));
     }
     
     @Test
@@ -879,31 +895,14 @@ public class OntologyUtilsTest
         
         DebugUtils.printContents(model);
         
-        Set<URI> schemaOntologyUris = new HashSet<URI>();
-        Set<URI> schemaVersionUris = new HashSet<URI>();
-        
-        schemaOntologyUris.add(this.testOntologyUri1);
-        schemaOntologyUris.add(this.testImportOntologyUri1);
-        
-        schemaVersionUris.add(this.testVersionUri1);
-        schemaVersionUris.add(this.testImportVersionUri1);
-        
-        Map<URI, Set<OWLOntologyID>> schemaManifestImports =
-                OntologyUtils.schemaManifestImports(model, schemaOntologyUris, schemaVersionUris);
+        Set<OWLOntologyID> schemaManifestImports =
+                OntologyUtils.schemaManifestImports(model,
+                        new HashSet<OWLOntologyID>(Arrays.asList(this.testOntologyID, this.testImportOntologyID1)));
         
         Assert.assertNotNull(schemaManifestImports);
         Assert.assertEquals(2, schemaManifestImports.size());
-        Assert.assertTrue(schemaManifestImports.containsKey(this.testVersionUri1));
-        Assert.assertTrue(schemaManifestImports.containsKey(this.testImportVersionUri1));
-        
-        Set<OWLOntologyID> imports1 = schemaManifestImports.get(this.testImportVersionUri1);
-        Assert.assertNotNull(imports1);
-        Assert.assertEquals(0, imports1.size());
-        
-        Set<OWLOntologyID> importsRoot = schemaManifestImports.get(this.testVersionUri1);
-        Assert.assertNotNull(importsRoot);
-        Assert.assertEquals(1, importsRoot.size());
-        Assert.assertEquals(this.testImportOntologyID1, importsRoot.iterator().next());
+        Assert.assertTrue(schemaManifestImports.contains(this.testOntologyID));
+        Assert.assertTrue(schemaManifestImports.contains(this.testImportOntologyID1));
     }
     
     @Test
@@ -919,31 +918,14 @@ public class OntologyUtilsTest
         
         DebugUtils.printContents(model);
         
-        Set<URI> schemaOntologyUris = new HashSet<URI>();
-        Set<URI> schemaVersionUris = new HashSet<URI>();
-        
-        schemaOntologyUris.add(this.testOntologyUri1);
-        schemaOntologyUris.add(this.testImportOntologyUri1);
-        
-        schemaVersionUris.add(this.testVersionUri1);
-        schemaVersionUris.add(this.testImportVersionUri1);
-        
-        Map<URI, Set<OWLOntologyID>> schemaManifestImports =
-                OntologyUtils.schemaManifestImports(model, schemaOntologyUris, schemaVersionUris);
+        Set<OWLOntologyID> schemaManifestImports =
+                OntologyUtils.schemaManifestImports(model,
+                        new HashSet<OWLOntologyID>(Arrays.asList(this.testOntologyID, this.testImportOntologyID1)));
         
         Assert.assertNotNull(schemaManifestImports);
         Assert.assertEquals(2, schemaManifestImports.size());
-        Assert.assertTrue(schemaManifestImports.containsKey(this.testVersionUri1));
-        Assert.assertTrue(schemaManifestImports.containsKey(this.testImportVersionUri1));
-        
-        Set<OWLOntologyID> imports1 = schemaManifestImports.get(this.testImportVersionUri1);
-        Assert.assertNotNull(imports1);
-        Assert.assertEquals(0, imports1.size());
-        
-        Set<OWLOntologyID> importsRoot = schemaManifestImports.get(this.testVersionUri1);
-        Assert.assertNotNull(importsRoot);
-        Assert.assertEquals(1, importsRoot.size());
-        Assert.assertEquals(this.testImportOntologyID1, importsRoot.iterator().next());
+        Assert.assertTrue(schemaManifestImports.contains(this.testOntologyID));
+        Assert.assertTrue(schemaManifestImports.contains(this.testImportOntologyID1));
     }
     
 }

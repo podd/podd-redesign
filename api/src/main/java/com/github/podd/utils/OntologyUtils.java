@@ -723,6 +723,7 @@ public class OntologyUtils
         
         for(OWLOntologyID nextDependentSchemaOntology : dependentSchemaOntologies)
         {
+            artifactImports.add(nextDependentSchemaOntology.getVersionIRI().toOpenRDFURI());
             // Not tolerant for artifacts... Imports must be directed to version IRIs
             // recursiveFollowImports(artifactImports, importsMap,
             // artifactID.getOntologyIRI().toOpenRDFURI());
