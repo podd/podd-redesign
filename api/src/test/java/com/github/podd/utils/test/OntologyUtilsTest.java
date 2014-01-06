@@ -569,9 +569,8 @@ public class OntologyUtilsTest
         
         Set<OWLOntologyID> imports = OntologyUtils.artifactImports(this.testOntologyID, model);
         
-        Assert.assertEquals(2, imports.size());
+        Assert.assertEquals(1, imports.size());
         Assert.assertTrue(imports.contains(this.testImportOntologyID1));
-        Assert.assertTrue(imports.contains(this.testImportOntologyID2));
     }
     
     @Test
