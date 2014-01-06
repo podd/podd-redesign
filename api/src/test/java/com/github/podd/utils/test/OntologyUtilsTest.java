@@ -1020,4 +1020,25 @@ public class OntologyUtilsTest
         
     }
     
+    @Test
+    public void testGetSchemaManifestImportsC3() throws Exception
+    {
+        Model model =
+                Rio.parse(this.getClass().getResourceAsStream("/test/schema-manifest-a1b2c3.ttl"), "", RDFFormat.TURTLE);
+        
+        DebugUtils.printContents(model);
+        List<OWLOntologyID> schemaManifestImports =
+                OntologyUtils.schemaManifestImports(model, new HashSet<OWLOntologyID>(Arrays.asList(this.testC3)));
+        
+        Assert.assertNotNull(schemaManifestImports);
+        Assert.assertEquals(3, schemaManifestImports.size());
+        Assert.assertTrue(schemaManifestImports.contains(this.testA1));
+        Assert.assertTrue(schemaManifestImports.contains(this.testB2));
+        Assert.assertTrue(schemaManifestImports.contains(this.testC3));
+        Assert.assertEquals(this.testA1, schemaManifestImports.get(0));
+        Assert.assertEquals(this.testB2, schemaManifestImports.get(1));
+        Assert.assertEquals(this.testC3, schemaManifestImports.get(2));
+        
+    }
+    
 }
