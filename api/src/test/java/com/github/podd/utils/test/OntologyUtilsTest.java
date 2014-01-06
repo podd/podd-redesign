@@ -1062,4 +1062,59 @@ public class OntologyUtilsTest
         
     }
     
+    @Test
+    public void testGetSchemaManifestImportsB1() throws Exception
+    {
+        Model model =
+                Rio.parse(this.getClass().getResourceAsStream("/test/schema-manifest-a1b2c3.ttl"), "", RDFFormat.TURTLE);
+        
+        DebugUtils.printContents(model);
+        List<OWLOntologyID> schemaManifestImports =
+                OntologyUtils.schemaManifestImports(model, new HashSet<OWLOntologyID>(Arrays.asList(this.testB1)));
+        
+        Assert.assertNotNull(schemaManifestImports);
+        Assert.assertEquals(2, schemaManifestImports.size());
+        Assert.assertTrue(schemaManifestImports.contains(this.testA1));
+        Assert.assertTrue(schemaManifestImports.contains(this.testB1));
+        Assert.assertEquals(this.testA1, schemaManifestImports.get(0));
+        Assert.assertEquals(this.testB1, schemaManifestImports.get(1));
+        
+    }
+    
+    @Test
+    public void testGetSchemaManifestImportsB2() throws Exception
+    {
+        Model model =
+                Rio.parse(this.getClass().getResourceAsStream("/test/schema-manifest-a1b2c3.ttl"), "", RDFFormat.TURTLE);
+        
+        DebugUtils.printContents(model);
+        List<OWLOntologyID> schemaManifestImports =
+                OntologyUtils.schemaManifestImports(model, new HashSet<OWLOntologyID>(Arrays.asList(this.testB2)));
+        
+        Assert.assertNotNull(schemaManifestImports);
+        Assert.assertEquals(2, schemaManifestImports.size());
+        Assert.assertTrue(schemaManifestImports.contains(this.testA1));
+        Assert.assertTrue(schemaManifestImports.contains(this.testB2));
+        Assert.assertEquals(this.testA1, schemaManifestImports.get(0));
+        Assert.assertEquals(this.testB2, schemaManifestImports.get(1));
+        
+    }
+    
+    @Test
+    public void testGetSchemaManifestImportsA1() throws Exception
+    {
+        Model model =
+                Rio.parse(this.getClass().getResourceAsStream("/test/schema-manifest-a1b2c3.ttl"), "", RDFFormat.TURTLE);
+        
+        DebugUtils.printContents(model);
+        List<OWLOntologyID> schemaManifestImports =
+                OntologyUtils.schemaManifestImports(model, new HashSet<OWLOntologyID>(Arrays.asList(this.testA1)));
+        
+        Assert.assertNotNull(schemaManifestImports);
+        Assert.assertEquals(1, schemaManifestImports.size());
+        Assert.assertTrue(schemaManifestImports.contains(this.testA1));
+        Assert.assertEquals(this.testA1, schemaManifestImports.get(0));
+        
+    }
+    
 }
