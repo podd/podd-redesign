@@ -552,6 +552,8 @@ public class OntologyUtilsTest
         Assert.assertEquals(2, imports.size());
         Assert.assertTrue(imports.contains(this.testImportOntologyID1));
         Assert.assertTrue(imports.contains(this.testImportOntologyID2));
+        Assert.assertEquals(this.testImportOntologyID2, imports.get(0));
+        Assert.assertEquals(this.testImportOntologyID1, imports.get(1));
     }
     
     @Test
@@ -599,6 +601,9 @@ public class OntologyUtilsTest
         Assert.assertTrue(imports.contains(this.testImportOntologyID1));
         Assert.assertTrue(imports.contains(this.testImportOntologyID2));
         Assert.assertTrue(imports.contains(this.testImportOntologyID3));
+        Assert.assertEquals(this.testImportOntologyID3, imports.get(0));
+        Assert.assertEquals(this.testImportOntologyID2, imports.get(1));
+        Assert.assertEquals(this.testImportOntologyID1, imports.get(2));
     }
     
     @Test
@@ -633,6 +638,9 @@ public class OntologyUtilsTest
         Assert.assertTrue(imports.contains(this.testImportOntologyID2));
         Assert.assertTrue(imports.contains(this.testImportOntologyID3));
         Assert.assertTrue(imports.contains(this.testImportOntologyID4));
+        // NOTE: First two positions are not consistent, so only testing the last two
+        Assert.assertEquals(this.testImportOntologyID2, imports.get(2));
+        Assert.assertEquals(this.testImportOntologyID1, imports.get(3));
     }
     
     @Test
@@ -667,6 +675,9 @@ public class OntologyUtilsTest
         Assert.assertTrue(imports.contains(this.testImportOntologyID2));
         Assert.assertTrue(imports.contains(this.testImportOntologyID3));
         Assert.assertTrue(imports.contains(this.testImportOntologyID4));
+        // NOTE: First two positions are not consistent, so only testing the last two
+        Assert.assertEquals(this.testImportOntologyID2, imports.get(2));
+        Assert.assertEquals(this.testImportOntologyID1, imports.get(3));
     }
     
     @Test
@@ -903,6 +914,9 @@ public class OntologyUtilsTest
         Assert.assertEquals(2, schemaManifestImports.size());
         Assert.assertTrue(schemaManifestImports.contains(this.testOntologyID));
         Assert.assertTrue(schemaManifestImports.contains(this.testImportOntologyID1));
+        Assert.assertEquals(this.testImportOntologyID1, schemaManifestImports.get(0));
+        Assert.assertEquals(this.testOntologyID, schemaManifestImports.get(1));
+        
     }
     
     @Test
@@ -926,6 +940,9 @@ public class OntologyUtilsTest
         Assert.assertEquals(2, schemaManifestImports.size());
         Assert.assertTrue(schemaManifestImports.contains(this.testOntologyID));
         Assert.assertTrue(schemaManifestImports.contains(this.testImportOntologyID1));
+        Assert.assertEquals(this.testImportOntologyID1, schemaManifestImports.get(0));
+        Assert.assertEquals(this.testOntologyID, schemaManifestImports.get(1));
+        
     }
     
 }
