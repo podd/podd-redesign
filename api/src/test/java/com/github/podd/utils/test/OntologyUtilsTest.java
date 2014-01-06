@@ -86,6 +86,21 @@ public class OntologyUtilsTest
     private InferredOWLOntologyID testImportOntologyID3;
     private InferredOWLOntologyID testImportOntologyID4;
     
+    private URI testOntologyUriA;
+    private URI testVersionUriA1;
+    private URI testOntologyUriB;
+    private URI testVersionUriB1;
+    private URI testVersionUriB2;
+    private URI testOntologyUriC;
+    private URI testVersionUriC1;
+    private URI testVersionUriC3;
+    
+    private InferredOWLOntologyID testA1;
+    private InferredOWLOntologyID testB1;
+    private InferredOWLOntologyID testB2;
+    private InferredOWLOntologyID testC1;
+    private InferredOWLOntologyID testC3;
+    
     @Before
     public void setUp() throws Exception
     {
@@ -110,6 +125,22 @@ public class OntologyUtilsTest
         this.testImportOntologyUri4 = this.vf.createURI("urn:test:import:ontology:uri:4");
         this.testImportVersionUri4 = this.vf.createURI("urn:test:import:ontology:uri:4:version:1");
         this.testImportOntologyID4 = new InferredOWLOntologyID(testImportOntologyUri4, testImportVersionUri4, null);
+        
+        this.testOntologyUriA = this.vf.createURI("http://example.org/podd/ns/A");
+        this.testVersionUriA1 = this.vf.createURI("http://example.org/podd/ns/version/poddA/1");
+        this.testA1 = new InferredOWLOntologyID(testOntologyUriA, testVersionUriA1, null);
+        
+        this.testOntologyUriB = this.vf.createURI("http://example.org/podd/ns/B");
+        this.testVersionUriB1 = this.vf.createURI("http://example.org/podd/ns/version/poddB/1");
+        this.testB1 = new InferredOWLOntologyID(testOntologyUriB, testVersionUriB1, null);
+        this.testVersionUriB2 = this.vf.createURI("http://example.org/podd/ns/version/poddB/2");
+        this.testB2 = new InferredOWLOntologyID(testOntologyUriB, testVersionUriB2, null);
+        
+        this.testOntologyUriC = this.vf.createURI("http://example.org/podd/ns/C");
+        this.testVersionUriC1 = this.vf.createURI("http://example.org/podd/ns/version/poddC/1");
+        this.testC1 = new InferredOWLOntologyID(testOntologyUriC, testVersionUriC1, null);
+        this.testVersionUriC3 = this.vf.createURI("http://example.org/podd/ns/version/poddC/3");
+        this.testC3 = new InferredOWLOntologyID(testOntologyUriC, testVersionUriC3, null);
     }
     
     @After
@@ -952,17 +983,18 @@ public class OntologyUtilsTest
                 Rio.parse(this.getClass().getResourceAsStream("/test/schema-manifest-a1b2c3.ttl"), "", RDFFormat.TURTLE);
         
         DebugUtils.printContents(model);
-        Assert.fail("TODO: Implement me!");
         List<OWLOntologyID> schemaManifestImports =
                 OntologyUtils.schemaManifestImports(model,
-                        new HashSet<OWLOntologyID>(Arrays.asList(this.testOntologyID)));
+                        new HashSet<OWLOntologyID>(Arrays.asList(this.testA1, this.testB2, this.testC3)));
         
         Assert.assertNotNull(schemaManifestImports);
-        Assert.assertEquals(2, schemaManifestImports.size());
-        Assert.assertTrue(schemaManifestImports.contains(this.testOntologyID));
-        Assert.assertTrue(schemaManifestImports.contains(this.testImportOntologyID1));
-        Assert.assertEquals(this.testImportOntologyID1, schemaManifestImports.get(0));
-        Assert.assertEquals(this.testOntologyID, schemaManifestImports.get(1));
+        Assert.assertEquals(3, schemaManifestImports.size());
+        Assert.assertTrue(schemaManifestImports.contains(this.testA1));
+        Assert.assertTrue(schemaManifestImports.contains(this.testB2));
+        Assert.assertTrue(schemaManifestImports.contains(this.testC3));
+        Assert.assertEquals(this.testA1, schemaManifestImports.get(0));
+        Assert.assertEquals(this.testB2, schemaManifestImports.get(1));
+        Assert.assertEquals(this.testC3, schemaManifestImports.get(2));
         
     }
     
