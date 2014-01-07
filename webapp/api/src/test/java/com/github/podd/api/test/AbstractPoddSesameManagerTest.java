@@ -2270,6 +2270,82 @@ public abstract class AbstractPoddSesameManagerTest
         this.verifyManagementGraphContents(7, this.artifactGraph, pArtifactIRI, pVersionIRIv3, pInferredVersionIRIv3);
     }
     
+    @Test
+    public void testVersionContexts() throws Exception
+    {
+        this.loadSchemaOntologies();
+        final InferredOWLOntologyID ontologyID =
+                this.loadOntologyFromResource(TestConstants.TEST_ARTIFACT_20130206,
+                        TestConstants.TEST_ARTIFACT_20130206_INFERRED, RDFFormat.TURTLE);
+        
+        URI[] versionAndSchemaContexts = this.testPoddSesameManager.versionContexts(ontologyID);
+        
+        Assert.assertNotNull(versionAndSchemaContexts);
+        for(URI nextUri : versionAndSchemaContexts)
+        {
+            Assert.assertNotNull(nextUri);
+        }
+        Assert.assertEquals(1, versionAndSchemaContexts.length);
+    }
+    
+    @Test
+    public void testVersionAndInferredContexts() throws Exception
+    {
+        this.loadSchemaOntologies();
+        final InferredOWLOntologyID ontologyID =
+                this.loadOntologyFromResource(TestConstants.TEST_ARTIFACT_20130206,
+                        TestConstants.TEST_ARTIFACT_20130206_INFERRED, RDFFormat.TURTLE);
+        
+        URI[] versionAndSchemaContexts = this.testPoddSesameManager.versionAndInferredContexts(ontologyID);
+        
+        Assert.assertNotNull(versionAndSchemaContexts);
+        for(URI nextUri : versionAndSchemaContexts)
+        {
+            Assert.assertNotNull(nextUri);
+        }
+        Assert.assertEquals(2, versionAndSchemaContexts.length);
+    }
+    
+    @Test
+    public void testVersionAndSchemaContexts() throws Exception
+    {
+        this.loadSchemaOntologies();
+        final InferredOWLOntologyID ontologyID =
+                this.loadOntologyFromResource(TestConstants.TEST_ARTIFACT_20130206,
+                        TestConstants.TEST_ARTIFACT_20130206_INFERRED, RDFFormat.TURTLE);
+        
+        URI[] versionAndSchemaContexts =
+                this.testPoddSesameManager.versionAndSchemaContexts(ontologyID, this.testRepositoryConnection,
+                        this.schemaGraph);
+        
+        Assert.assertNotNull(versionAndSchemaContexts);
+        for(URI nextUri : versionAndSchemaContexts)
+        {
+            Assert.assertNotNull(nextUri);
+        }
+        Assert.assertEquals(6, versionAndSchemaContexts.length);
+    }
+    
+    @Test
+    public void testVersionAndInferredAndSchemaContexts() throws Exception
+    {
+        this.loadSchemaOntologies();
+        final InferredOWLOntologyID ontologyID =
+                this.loadOntologyFromResource(TestConstants.TEST_ARTIFACT_20130206,
+                        TestConstants.TEST_ARTIFACT_20130206_INFERRED, RDFFormat.TURTLE);
+        
+        URI[] versionAndSchemaContexts =
+                this.testPoddSesameManager.versionAndInferredAndSchemaContexts(ontologyID,
+                        this.testRepositoryConnection, this.schemaGraph);
+        
+        Assert.assertNotNull(versionAndSchemaContexts);
+        for(URI nextUri : versionAndSchemaContexts)
+        {
+            Assert.assertNotNull(nextUri);
+        }
+        Assert.assertEquals(7, versionAndSchemaContexts.length);
+    }
+    
     /**
      * Helper method to verify the contents of a management graph
      * 
