@@ -851,10 +851,11 @@ public class OntologyUtils
      * @throws ModelException
      * @throws IOException
      * @throws RDFParseException
+     * @throws SchemaManifestException
      */
     public static List<InferredOWLOntologyID> loadSchemasFromManifest(final RepositoryConnection managementConnection,
             final URI schemaManagementGraph, Model model) throws RepositoryException, ModelException, IOException,
-        RDFParseException
+        RDFParseException, SchemaManifestException
     {
         managementConnection.add(model, schemaManagementGraph);
         
@@ -865,9 +866,17 @@ public class OntologyUtils
             String classpath =
                     model.filter(nextOntology.getVersionIRI().toOpenRDFURI(), PODD.PODD_SCHEMA_CLASSPATH, null)
                             .objectString();
-            Objects.requireNonNull(classpath, "Ontology was not mapped to a classpath: " + nextOntology.toString());
+            if(classpath == null)
+            {
+                throw new SchemaManifestException(nextOntology.getVersionIRI(),
+                        "Ontology was not mapped to a classpath: " + nextOntology.toString());
+            }
             InputStream nextStream = OntologyUtils.class.getResourceAsStream(classpath);
-            Objects.requireNonNull(nextStream, "Ontology was not found on the classpath: " + classpath);
+            if(nextStream == null)
+            {
+                throw new SchemaManifestException(nextOntology.getVersionIRI(),
+                        "Ontology was not found on the classpath: " + classpath);
+            }
             managementConnection.add(nextStream, "", Rio.getParserFormatForFileName(classpath, RDFFormat.RDFXML),
                     nextOntology.getVersionIRI().toOpenRDFURI());
         }
