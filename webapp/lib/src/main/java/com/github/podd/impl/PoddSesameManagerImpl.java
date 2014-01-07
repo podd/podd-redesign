@@ -306,13 +306,15 @@ public class PoddSesameManagerImpl implements PoddSesameManager
      *         list if the property does not have a pre-defined set of possible members.
      * @throws OpenRDFException
      * @throws SchemaManifestException
+     * @throws UnmanagedSchemaIRIException
      * 
      * @deprecated Unused. Somewhat similar functionality is available in {@link getInstancesOf()}.
      */
     @Deprecated
     private List<URI> getAllValidMembers(final InferredOWLOntologyID artifactID, final URI propertyUri,
             final RepositoryConnection repositoryConnection, final URI schemaManagementGraph,
-            final URI artifactManagementGraph) throws OpenRDFException, SchemaManifestException
+            final URI artifactManagementGraph) throws OpenRDFException, SchemaManifestException,
+        UnmanagedSchemaIRIException
     {
         /*
          * Example: Triples describing PlatformType enumeration consisting of 3 members.
@@ -364,7 +366,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
     public Map<URI, URI> getCardinalityValues(final InferredOWLOntologyID artifactID, final URI objectUri,
             final Collection<URI> propertyUris, final RepositoryConnection repositoryConnection,
             final URI schemaManagementGraph, final URI artifactManagementGraph) throws OpenRDFException,
-        SchemaManifestException
+        SchemaManifestException, UnmanagedSchemaIRIException
     {
         return this.getCardinalityValues(objectUri, propertyUris, false, repositoryConnection, this
                 .versionAndInferredAndSchemaContexts(artifactID, repositoryConnection, schemaManagementGraph,
@@ -827,11 +829,13 @@ public class PoddSesameManagerImpl implements PoddSesameManager
      * @return
      * @throws OpenRDFException
      * @throws SchemaManifestException
+     * @throws UnmanagedSchemaIRIException
      */
     @Override
     public Model getObjectDetailsForDisplay(final InferredOWLOntologyID artifactID, final URI objectUri,
             final RepositoryConnection repositoryConnection, final URI schemaManagementGraph,
-            final URI artifactManagementGraph) throws OpenRDFException, SchemaManifestException
+            final URI artifactManagementGraph) throws OpenRDFException, SchemaManifestException,
+        UnmanagedSchemaIRIException
     {
         final StringBuilder sb = new StringBuilder(1024);
         
@@ -882,11 +886,13 @@ public class PoddSesameManagerImpl implements PoddSesameManager
      * @return
      * @throws OpenRDFException
      * @throws SchemaManifestException
+     * @throws UnmanagedSchemaIRIException
      */
     @Override
     public PoddObjectLabel getObjectLabel(final InferredOWLOntologyID ontologyID, final URI objectUri,
             final RepositoryConnection repositoryConnection, final URI schemaManagementGraph,
-            final URI artifactManagementGraph) throws OpenRDFException, SchemaManifestException
+            final URI artifactManagementGraph) throws OpenRDFException, SchemaManifestException,
+        UnmanagedSchemaIRIException
     {
         final StringBuilder sb = new StringBuilder(1024);
         sb.append("SELECT ?label ?description ");
@@ -1403,11 +1409,13 @@ public class PoddSesameManagerImpl implements PoddSesameManager
      * @return A list of URIs for the identified object Types
      * @throws OpenRDFException
      * @throws SchemaManifestException
+     * @throws UnmanagedSchemaIRIException
      */
     @Override
     public List<URI> getObjectTypes(final InferredOWLOntologyID ontologyID, final URI objectUri,
             final RepositoryConnection repositoryConnection, final URI schemaManagementGraph,
-            final URI artifactManagementGraph) throws OpenRDFException, SchemaManifestException
+            final URI artifactManagementGraph) throws OpenRDFException, SchemaManifestException,
+        UnmanagedSchemaIRIException
     {
         final StringBuilder sb = new StringBuilder(1024);
         sb.append("SELECT DISTINCT ?poddTypeUri ");
@@ -2170,11 +2178,13 @@ public class PoddSesameManagerImpl implements PoddSesameManager
      * @return
      * @throws OpenRDFException
      * @throws SchemaManifestException
+     * @throws UnmanagedSchemaIRIException
      */
     @Override
     public URI[] versionAndInferredAndSchemaContexts(final InferredOWLOntologyID ontologyID,
             final RepositoryConnection managementConnection, final URI schemaManagementGraph,
-            final URI artifactManagementGraph) throws OpenRDFException, SchemaManifestException
+            final URI artifactManagementGraph) throws OpenRDFException, SchemaManifestException,
+        UnmanagedSchemaIRIException
     {
         final Set<URI> contexts = new LinkedHashSet<URI>();
         if(ontologyID != null)
@@ -2233,11 +2243,13 @@ public class PoddSesameManagerImpl implements PoddSesameManager
      *         the default graphs for SPARQL queries.
      * @throws OpenRDFException
      * @throws SchemaManifestException
+     * @throws UnmanagedSchemaIRIException
      */
     @Override
     public URI[] versionAndSchemaContexts(final InferredOWLOntologyID ontologyID,
             final RepositoryConnection managementConnection, final URI schemaManagementGraph,
-            final URI artifactManagementGraph) throws OpenRDFException, SchemaManifestException
+            final URI artifactManagementGraph) throws OpenRDFException, SchemaManifestException,
+        UnmanagedSchemaIRIException
     {
         final Set<URI> contexts = new LinkedHashSet<URI>();
         if(ontologyID != null)
@@ -2252,7 +2264,8 @@ public class PoddSesameManagerImpl implements PoddSesameManager
     @Override
     public URI[] inferredAndSchemaContexts(final InferredOWLOntologyID ontologyID,
             final RepositoryConnection managementConnection, final URI schemaManagementGraph,
-            final URI artifactManagementGraph) throws OpenRDFException, SchemaManifestException
+            final URI artifactManagementGraph) throws OpenRDFException, SchemaManifestException,
+        UnmanagedSchemaIRIException
     {
         final Set<URI> contexts = new LinkedHashSet<URI>();
         if(ontologyID != null && ontologyID.getInferredOntologyIRI() != null)
@@ -2280,7 +2293,8 @@ public class PoddSesameManagerImpl implements PoddSesameManager
     @Override
     public URI[] schemaContexts(final InferredOWLOntologyID artifactID,
             final RepositoryConnection managementConnection, final URI schemaManagementGraph,
-            final URI artifactManagementGraph) throws OpenRDFException, SchemaManifestException
+            final URI artifactManagementGraph) throws OpenRDFException, SchemaManifestException,
+        UnmanagedSchemaIRIException
     {
         final Set<URI> contexts = new LinkedHashSet<URI>();
         Set<OWLOntologyID> dependentSchemaOntologies = new LinkedHashSet<>();
@@ -2291,9 +2305,10 @@ public class PoddSesameManagerImpl implements PoddSesameManager
             
             for(final URI directImport : directImports)
             {
-                contexts.add(directImport);
+                InferredOWLOntologyID schemaVersion =
+                        getSchemaVersion(IRI.create(directImport), managementConnection, schemaManagementGraph);
+                dependentSchemaOntologies.add(schemaVersion);
             }
-            
         }
         else
         {
