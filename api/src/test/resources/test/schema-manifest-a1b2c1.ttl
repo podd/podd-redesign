@@ -5,7 +5,7 @@
 @prefix omv: <http://omv.ontoware.org/ontology#> .
 
 # --- A
-<http://example.org/podd/ns/A> a owl:Ontology ;
+<http://example.org/podd/ns/poddA> a owl:Ontology ;
 	owl:versionIRI <http://example.org/podd/ns/version/poddA/1> ;
 	omv:currentVersion <http://example.org/podd/ns/version/poddA/1> .
 
@@ -14,7 +14,7 @@
 
 
 # --- B
-<http://example.org/podd/ns/B> a owl:Ontology ;
+<http://example.org/podd/ns/poddB> a owl:Ontology ;
 	owl:versionIRI <http://example.org/podd/ns/version/poddB/1> ;
 	owl:versionIRI <http://example.org/podd/ns/version/poddB/2> ;
 	omv:currentVersion <http://example.org/podd/ns/version/poddB/1> .
@@ -29,7 +29,7 @@
 
 
 # --- C
-<http://example.org/podd/ns/C> a owl:Ontology ;
+<http://example.org/podd/ns/poddC> a owl:Ontology ;
 	owl:versionIRI <http://example.org/podd/ns/version/poddC/1> ;
 	omv:currentVersion <http://example.org/podd/ns/version/poddC/1> .
 

@@ -126,17 +126,17 @@ public class OntologyUtilsTest
         this.testImportVersionUri4 = this.vf.createURI("urn:test:import:ontology:uri:4:version:1");
         this.testImportOntologyID4 = new InferredOWLOntologyID(testImportOntologyUri4, testImportVersionUri4, null);
         
-        this.testOntologyUriA = this.vf.createURI("http://example.org/podd/ns/A");
+        this.testOntologyUriA = this.vf.createURI("http://example.org/podd/ns/poddA");
         this.testVersionUriA1 = this.vf.createURI("http://example.org/podd/ns/version/poddA/1");
         this.testA1 = new InferredOWLOntologyID(testOntologyUriA, testVersionUriA1, null);
         
-        this.testOntologyUriB = this.vf.createURI("http://example.org/podd/ns/B");
+        this.testOntologyUriB = this.vf.createURI("http://example.org/podd/ns/poddB");
         this.testVersionUriB1 = this.vf.createURI("http://example.org/podd/ns/version/poddB/1");
         this.testB1 = new InferredOWLOntologyID(testOntologyUriB, testVersionUriB1, null);
         this.testVersionUriB2 = this.vf.createURI("http://example.org/podd/ns/version/poddB/2");
         this.testB2 = new InferredOWLOntologyID(testOntologyUriB, testVersionUriB2, null);
         
-        this.testOntologyUriC = this.vf.createURI("http://example.org/podd/ns/C");
+        this.testOntologyUriC = this.vf.createURI("http://example.org/podd/ns/poddC");
         this.testVersionUriC1 = this.vf.createURI("http://example.org/podd/ns/version/poddC/1");
         this.testC1 = new InferredOWLOntologyID(testOntologyUriC, testVersionUriC1, null);
         this.testVersionUriC3 = this.vf.createURI("http://example.org/podd/ns/version/poddC/3");
