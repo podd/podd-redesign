@@ -2168,13 +2168,13 @@ public class PoddSesameManagerImpl implements PoddSesameManager
      * {@link #getDirectImports(InferredOWLOntologyID, RepositoryConnection)}.
      * 
      * @param ontologyID
-     * @param repositoryConnection
+     * @param managementConnection
      * @return
      * @throws OpenRDFException
      */
     @Override
     public URI[] versionAndInferredAndSchemaContexts(final InferredOWLOntologyID ontologyID,
-            final RepositoryConnection repositoryConnection, final URI schemaManagementGraph) throws OpenRDFException
+            final RepositoryConnection managementConnection, final URI schemaManagementGraph) throws OpenRDFException
     {
         final Set<URI> contexts = new LinkedHashSet<URI>();
         if(ontologyID != null)
@@ -2185,7 +2185,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
                 contexts.add(ontologyID.getInferredOntologyIRI().toOpenRDFURI());
             }
         }
-        contexts.addAll(Arrays.asList(this.schemaContexts(ontologyID, repositoryConnection, schemaManagementGraph)));
+        contexts.addAll(Arrays.asList(this.schemaContexts(ontologyID, managementConnection, schemaManagementGraph)));
         return contexts.toArray(new URI[0]);
     }
     
@@ -2273,12 +2273,12 @@ public class PoddSesameManagerImpl implements PoddSesameManager
     
     @Override
     public URI[] schemaContexts(final InferredOWLOntologyID ontologyID,
-            final RepositoryConnection repositoryConnection, final URI schemaManagementGraph) throws OpenRDFException
+            final RepositoryConnection managementConnection, final URI schemaManagementGraph) throws OpenRDFException
     {
         final Set<URI> contexts = new LinkedHashSet<URI>();
         if(ontologyID != null)
         {
-            final Set<URI> directImports = this.getDirectImports(ontologyID, repositoryConnection);
+            final Set<URI> directImports = this.getDirectImports(ontologyID, managementConnection);
             
             for(final URI directImport : directImports)
             {
@@ -2288,7 +2288,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         else
         {
             final Set<InferredOWLOntologyID> allSchemaOntologyVersions =
-                    this.getAllCurrentSchemaOntologyVersions(repositoryConnection, schemaManagementGraph);
+                    this.getAllCurrentSchemaOntologyVersions(managementConnection, schemaManagementGraph);
             for(final InferredOWLOntologyID schemaOntology : allSchemaOntologyVersions)
             {
                 contexts.add(schemaOntology.getVersionIRI().toOpenRDFURI());
