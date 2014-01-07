@@ -51,11 +51,13 @@ import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.RepositoryResult;
+import org.openrdf.repository.sail.SailRepository;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.RDFParseException;
 import org.openrdf.rio.Rio;
 import org.openrdf.rio.UnsupportedRDFormatException;
 import org.openrdf.rio.helpers.StatementCollector;
+import org.openrdf.sail.federation.Federation;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLException;
 import org.semanticweb.owlapi.model.OWLOntologyID;
@@ -790,18 +792,19 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         UnmanagedSchemaIRIException, SchemaManifestException, UnsupportedRDFormatException, IOException,
         UnmanagedArtifactIRIException, UnmanagedArtifactVersionException
     {
+        Repository federationRepository = null;
         RepositoryConnection permanentConnection = null;
         RepositoryConnection managementConnection = null;
         try
         {
             final Set<? extends OWLOntologyID> schemaImports = this.getSchemaImports(ontologyID);
-            permanentConnection = this.getRepositoryManager().getPermanentRepository(schemaImports).getConnection();
             managementConnection = this.getRepositoryManager().getManagementRepository().getConnection();
             final URI[] contexts =
                     this.getSesameManager().versionAndSchemaContexts(ontologyID, managementConnection,
                             this.getRepositoryManager().getSchemaManagementGraph());
             
-            DebugUtils.printContexts(permanentConnection);
+            federationRepository = this.getRepositoryManager().getReadOnlyFederatedRepository(schemaImports);
+            permanentConnection = federationRepository.getConnection();
             
             return this.getSesameManager().getParentDetails(objectUri, permanentConnection, contexts);
         }
@@ -816,9 +819,19 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             }
             finally
             {
-                if(managementConnection != null && managementConnection.isOpen())
+                try
                 {
-                    managementConnection.close();
+                    if(federationRepository != null)
+                    {
+                        federationRepository.shutDown();
+                    }
+                }
+                finally
+                {
+                    if(managementConnection != null && managementConnection.isOpen())
+                    {
+                        managementConnection.close();
+                    }
                 }
             }
         }

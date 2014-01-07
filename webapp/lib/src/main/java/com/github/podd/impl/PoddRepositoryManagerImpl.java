@@ -49,12 +49,14 @@ import org.openrdf.repository.sail.SailRepository;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.Rio;
 import org.openrdf.rio.UnsupportedRDFormatException;
+import org.openrdf.sail.federation.Federation;
 import org.openrdf.sail.memory.MemoryStore;
 import org.semanticweb.owlapi.model.OWLOntologyID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.github.podd.api.PoddRepositoryManager;
+import com.github.podd.utils.ManualShutdownRepository;
 import com.github.podd.utils.PODD;
 
 /**
@@ -69,7 +71,7 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
     
     private final Logger log = LoggerFactory.getLogger(this.getClass());
     
-    private Repository managementRepository;
+    private ManualShutdownRepository managementRepository;
     
     private ConcurrentMap<Set<? extends OWLOntologyID>, Repository> permanentRepositories = new ConcurrentHashMap<>();
     
@@ -88,7 +90,7 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
     public PoddRepositoryManagerImpl(final Repository managementRepository, final RepositoryManager repositoryManager,
             final RepositoryImplConfig permanentRepositoryConfig) throws RepositoryConfigException
     {
-        this.managementRepository = managementRepository;
+        this.managementRepository = new ManualShutdownRepository(managementRepository);
         this.sesameRepositoryManager = repositoryManager;
         this.permanentRepositoryConfig = permanentRepositoryConfig;
     }
@@ -315,7 +317,7 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
     @Override
     public void setManagementRepository(final Repository repository) throws OpenRDFException
     {
-        this.managementRepository = repository;
+        this.managementRepository = new ManualShutdownRepository(repository);
     }
     
     @Override
@@ -333,7 +335,7 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
             if(this.managementRepository != null)
             {
                 this.log.info("Shutting down management repository");
-                this.managementRepository.shutDown();
+                this.managementRepository.realShutDown();
             }
         }
         catch(RepositoryException e)
@@ -373,6 +375,19 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
         {
             throw foundException;
         }
+    }
+    
+    @Override
+    public Repository getReadOnlyFederatedRepository(Set<? extends OWLOntologyID> schemaImports) throws OpenRDFException
+    {
+        Federation federation = new Federation();
+        federation.setReadOnly(true);
+        federation.addMember(this.getPermanentRepository(schemaImports));
+        federation.addMember(this.getManagementRepository());
+        federation.initialize();
+        Repository federationRepository = new SailRepository(federation);
+        federationRepository.initialize();
+        return federationRepository;
     }
     
 }

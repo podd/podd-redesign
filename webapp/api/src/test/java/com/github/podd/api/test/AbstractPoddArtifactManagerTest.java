@@ -1341,7 +1341,7 @@ public abstract class AbstractPoddArtifactManagerTest
         
         for(final Object[] element : testData)
         {
-            final URI objectUri = ValueFactoryImpl.getInstance().createURI(element[0].toString());
+            final URI objectUri = PODD.VF.createURI(element[0].toString());
             final int expectedStatementCount = (int)element[1];
             
             final Model model = this.testArtifactManager.getParentDetails(artifactIDv1, objectUri);

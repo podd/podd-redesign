@@ -77,6 +77,20 @@ public interface PoddRepositoryManager
     Repository getPermanentRepository(Set<? extends OWLOntologyID> schemaOntologies) throws OpenRDFException;
     
     /**
+     * Gets a federated repository over the permanent repository for the given schema ontologies,
+     * and the management repository.
+     * 
+     * This repository is read-only to prevent changes across the two repositories.
+     * 
+     * NOTE: This repository may be much slower than a typical repository.
+     * 
+     * @param schemaOntologies
+     * @return
+     * @throws OpenRDFException
+     */
+    Repository getReadOnlyFederatedRepository(Set<? extends OWLOntologyID> schemaOntologies) throws OpenRDFException;
+    
+    /**
      * 
      * @return The schema management graph URI for this repository manager.
      */
