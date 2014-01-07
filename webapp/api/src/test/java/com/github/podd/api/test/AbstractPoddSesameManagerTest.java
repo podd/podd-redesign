@@ -421,7 +421,7 @@ public abstract class AbstractPoddSesameManagerTest
         {
             final String objectString =
                     resultModel.filter(PODD.VF.createURI(objectUris[i]), RDFS.LABEL, null).objectString();
-            Assert.assertEquals("Not the expected label", expectedLabels[i], objectString);
+            Assert.assertEquals("Not the expected label: " + objectUris[i], expectedLabels[i], objectString);
         }
     }
     
