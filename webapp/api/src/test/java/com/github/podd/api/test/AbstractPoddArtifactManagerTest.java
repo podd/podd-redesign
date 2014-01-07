@@ -818,9 +818,10 @@ public abstract class AbstractPoddArtifactManagerTest
             this.testArtifactManager.deleteArtifact(resultArtifactId);
             Assert.fail("Did not find expected exception");
         }
-        catch(UnmanagedArtifactIRIException e)
+        catch(DeleteArtifactException e)
         {
-            
+            Assert.assertNotNull(e.getCause());
+            Assert.assertTrue(e.getCause() instanceof UnmanagedArtifactIRIException);
         }
     }
     

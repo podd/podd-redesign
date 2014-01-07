@@ -189,15 +189,17 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         
         try
         {
-            if(this.isPublished(artifactId))
-            {
-                throw new DeleteArtifactException("Published Artifacts cannot be deleted", artifactId);
-            }
-            
             final Set<? extends OWLOntologyID> schemaImports = this.getSchemaImports(artifactId);
             permanentConnection = this.getRepositoryManager().getPermanentRepository(schemaImports).getConnection();
             permanentConnection.begin();
             managementConnection = this.getRepositoryManager().getManagementRepository().getConnection();
+            managementConnection.begin();
+            
+            if(this.getSesameManager().isPublished(artifactId, managementConnection,
+                    this.getRepositoryManager().getArtifactManagementGraph()))
+            {
+                throw new DeleteArtifactException("Published Artifacts cannot be deleted", artifactId);
+            }
             
             List<InferredOWLOntologyID> requestedArtifactIds =
                     this.getSesameManager().getAllOntologyVersions(artifactId.getOntologyIRI(), managementConnection,
@@ -219,6 +221,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             this.getSesameManager().deleteOntologies(requestedArtifactIds, permanentConnection, managementConnection,
                     this.getRepositoryManager().getArtifactManagementGraph());
             permanentConnection.commit();
+            managementConnection.commit();
             
             // - ensure deleted ontologies are removed from the
             // OWLOntologyManager's cache
@@ -230,10 +233,14 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             
             return !requestedArtifactIds.isEmpty();
         }
-        catch(final OpenRDFException | OWLException | UnsupportedRDFormatException | IOException e)
+        catch(final Throwable e)
         {
             try
             {
+                if(managementConnection != null && managementConnection.isActive())
+                {
+                    managementConnection.rollback();
+                }
                 if(permanentConnection != null && permanentConnection.isActive())
                 {
                     permanentConnection.rollback();
@@ -244,12 +251,16 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
                 this.log.error("Found error rolling back repository connection", e1);
             }
             
-            throw new DeleteArtifactException("Repository exception occurred", e, artifactId);
+            throw new DeleteArtifactException("Exception occurred while deleting artifact", e, artifactId);
         }
         finally
         {
             try
             {
+                if(managementConnection != null && managementConnection.isOpen())
+                {
+                    managementConnection.close();
+                }
                 if(permanentConnection != null && permanentConnection.isOpen())
                 {
                     permanentConnection.close();
