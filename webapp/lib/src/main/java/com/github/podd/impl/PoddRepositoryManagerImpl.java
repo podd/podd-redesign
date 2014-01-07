@@ -73,7 +73,8 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
     
     private ManualShutdownRepository managementRepository;
     
-    private ConcurrentMap<Set<? extends OWLOntologyID>, Repository> permanentRepositories = new ConcurrentHashMap<>();
+    private ConcurrentMap<Set<? extends OWLOntologyID>, ManualShutdownRepository> permanentRepositories =
+            new ConcurrentHashMap<>();
     
     private URI schemaGraph = PODD.DEFAULT_SCHEMA_MANAGEMENT_GRAPH;
     
@@ -152,7 +153,9 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
                     Repository nextRepository = this.sesameRepositoryManager.getRepository(newRepositoryID);
                     // If we somehow created a new repository since we entered this section, we need
                     // to remove the new repository to cleanup
-                    Repository putIfAbsent = this.permanentRepositories.putIfAbsent(schemaOntologies, nextRepository);
+                    Repository putIfAbsent =
+                            this.permanentRepositories.putIfAbsent(schemaOntologies, new ManualShutdownRepository(
+                                    nextRepository));
                     if(putIfAbsent != null)
                     {
                         this.log.error("Created a duplicate repository that must now be removed: {}", newRepositoryID);
@@ -241,15 +244,18 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
     
     @Override
     public void mapPermanentRepository(final Set<? extends OWLOntologyID> schemaOntologies, final Repository repository)
+        throws RepositoryException
     {
         synchronized(this.permanentRepositories)
         {
             // Override any previous repositories that were there
-            final Repository putIfAbsent = this.permanentRepositories.putIfAbsent(schemaOntologies, repository);
+            final ManualShutdownRepository putIfAbsent =
+                    this.permanentRepositories.putIfAbsent(schemaOntologies, new ManualShutdownRepository(repository));
             
             // TODO: Shutdown putIfAbsent
             if(putIfAbsent != null)
             {
+                putIfAbsent.shutDown();
                 this.log.warn("Overriding previous repository for a set of schema ontologies: {}", schemaOntologies);
             }
         }
@@ -344,12 +350,13 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
         }
         finally
         {
-            for(Entry<Set<? extends OWLOntologyID>, Repository> nextRepository : this.permanentRepositories.entrySet())
+            for(Entry<Set<? extends OWLOntologyID>, ManualShutdownRepository> nextRepository : this.permanentRepositories
+                    .entrySet())
             {
                 try
                 {
                     this.log.info("Shutting down repository for schema ontologies: {} ", nextRepository.getKey());
-                    nextRepository.getValue().shutDown();
+                    nextRepository.getValue().realShutDown();
                 }
                 catch(RepositoryException e)
                 {
@@ -378,7 +385,8 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
     }
     
     @Override
-    public Repository getReadOnlyFederatedRepository(Set<? extends OWLOntologyID> schemaImports) throws OpenRDFException
+    public Repository getReadOnlyFederatedRepository(Set<? extends OWLOntologyID> schemaImports)
+        throws OpenRDFException
     {
         Federation federation = new Federation();
         federation.setReadOnly(true);

@@ -1346,11 +1346,12 @@ public abstract class AbstractPoddArtifactManagerTest
             
             final Model model = this.testArtifactManager.getParentDetails(artifactIDv1, objectUri);
             
-            Assert.assertEquals("Unexpected no. of statements", expectedStatementCount, model.size());
+            Assert.assertEquals("Unexpected no. of statements: " + objectUri, expectedStatementCount, model.size());
             if(expectedStatementCount == 1)
             {
-                final URI expectedParent = ValueFactoryImpl.getInstance().createURI(element[2].toString());
-                Assert.assertTrue("Not the expected parent", model.subjects().contains(expectedParent));
+                final URI expectedParent = PODD.VF.createURI(element[2].toString());
+                Assert.assertTrue("Not the expected parent: " + objectUri + " " + expectedParent, model.subjects()
+                        .contains(expectedParent));
             }
         }
     }

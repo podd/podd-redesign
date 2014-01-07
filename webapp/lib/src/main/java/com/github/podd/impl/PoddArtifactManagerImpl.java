@@ -792,7 +792,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         UnmanagedSchemaIRIException, SchemaManifestException, UnsupportedRDFormatException, IOException,
         UnmanagedArtifactIRIException, UnmanagedArtifactVersionException
     {
-        Repository federationRepository = null;
+        Repository permanentRepository = null;
         RepositoryConnection permanentConnection = null;
         RepositoryConnection managementConnection = null;
         try
@@ -800,11 +800,11 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             final Set<? extends OWLOntologyID> schemaImports = this.getSchemaImports(ontologyID);
             managementConnection = this.getRepositoryManager().getManagementRepository().getConnection();
             final URI[] contexts =
-                    this.getSesameManager().versionAndSchemaContexts(ontologyID, managementConnection,
+                    this.getSesameManager().versionAndInferredAndSchemaContexts(ontologyID, managementConnection,
                             this.getRepositoryManager().getSchemaManagementGraph());
             
-            federationRepository = this.getRepositoryManager().getReadOnlyFederatedRepository(schemaImports);
-            permanentConnection = federationRepository.getConnection();
+            permanentRepository = this.getRepositoryManager().getPermanentRepository(schemaImports);
+            permanentConnection = permanentRepository.getConnection();
             
             return this.getSesameManager().getParentDetails(objectUri, permanentConnection, contexts);
         }
@@ -819,19 +819,9 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             }
             finally
             {
-                try
+                if(managementConnection != null && managementConnection.isOpen())
                 {
-                    if(federationRepository != null)
-                    {
-                        federationRepository.shutDown();
-                    }
-                }
-                finally
-                {
-                    if(managementConnection != null && managementConnection.isOpen())
-                    {
-                        managementConnection.close();
-                    }
+                    managementConnection.close();
                 }
             }
         }
