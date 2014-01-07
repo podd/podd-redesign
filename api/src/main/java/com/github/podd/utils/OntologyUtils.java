@@ -24,14 +24,12 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-import org.junit.Assert;
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.Model;
 import org.openrdf.model.Resource;
@@ -41,8 +39,6 @@ import org.openrdf.model.Value;
 import org.openrdf.model.ValueFactory;
 import org.openrdf.model.impl.LinkedHashModel;
 import org.openrdf.model.impl.ValueFactoryImpl;
-import org.openrdf.model.util.GraphUtil;
-import org.openrdf.model.util.GraphUtilException;
 import org.openrdf.model.util.ModelException;
 import org.openrdf.model.vocabulary.OWL;
 import org.openrdf.model.vocabulary.RDF;
@@ -120,7 +116,8 @@ public class OntologyUtils
         
         final List<InferredOWLOntologyID> ontologyIDs = OntologyUtils.modelToOntologyIDs(model, true, false);
         
-        Set<OWLOntologyID> finalOrderImports = finalOrderImports(results, ontologyIDs, orderImports, artifactImports, importsMap);
+        Set<OWLOntologyID> finalOrderImports =
+                finalOrderImports(results, ontologyIDs, orderImports, artifactImports, importsMap);
         
         return new ArrayList<>(finalOrderImports);
     }
@@ -738,7 +735,8 @@ public class OntologyUtils
         
         final List<InferredOWLOntologyID> ontologyIDs = OntologyUtils.modelToOntologyIDs(model, true, false);
         
-        Set<OWLOntologyID> finalOrderImports = finalOrderImports(results, ontologyIDs, orderImports, artifactImports, importsMap);
+        Set<OWLOntologyID> finalOrderImports =
+                finalOrderImports(results, ontologyIDs, orderImports, artifactImports, importsMap);
         
         return new ArrayList<>(finalOrderImports);
     }
@@ -843,7 +841,7 @@ public class OntologyUtils
     private OntologyUtils()
     {
     }
-
+    
     /**
      * @param managementConnection
      * @param schemaManagementGraph
@@ -867,10 +865,9 @@ public class OntologyUtils
             String classpath =
                     model.filter(nextOntology.getVersionIRI().toOpenRDFURI(), PODD.PODD_SCHEMA_CLASSPATH, null)
                             .objectString();
-            Assert.assertNotNull("Ontology was not mapped to a classpath: " + nextOntology, classpath);
+            Objects.requireNonNull(classpath, "Ontology was not mapped to a classpath: " + nextOntology.toString());
             InputStream nextStream = OntologyUtils.class.getResourceAsStream(classpath);
-            Assert.assertNotNull("Ontology classpath mapping was not valid: " + nextOntology + " " + classpath);
-            
+            Objects.requireNonNull(nextStream, "Ontology was not found on the classpath: " + classpath);
             managementConnection.add(nextStream, "", Rio.getParserFormatForFileName(classpath, RDFFormat.RDFXML),
                     nextOntology.getVersionIRI().toOpenRDFURI());
         }
