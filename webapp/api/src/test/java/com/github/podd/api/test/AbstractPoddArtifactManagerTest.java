@@ -1683,6 +1683,7 @@ public abstract class AbstractPoddArtifactManagerTest
      * {@link com.github.podd.api.PoddArtifactManager#loadArtifact(java.io.InputStream, org.openrdf.rio.RDFFormat)}
      * .
      */
+    @Ignore("TODO: Enable manual upload tests")
     @Test
     public final void testLoadArtifactWithMissingSchemaOntologiesInRepository() throws Exception
     {
@@ -2803,6 +2804,7 @@ public abstract class AbstractPoddArtifactManagerTest
      * {@link com.github.podd.api.PoddArtifactManager#updateSchemaImports(InferredOWLOntologyID, Set, Set)}
      * .
      */
+    @Ignore("TODO: Enable manual upload tests")
     @Test
     public final void testUpdateSchemaImportsEmptySchemas() throws Exception
     {
