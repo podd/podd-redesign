@@ -26,22 +26,33 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.junit.After;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.openrdf.model.BNode;
 import org.openrdf.model.Model;
+import org.openrdf.model.Resource;
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.openrdf.model.impl.LinkedHashModel;
 import org.openrdf.model.impl.TreeModel;
 import org.openrdf.model.impl.ValueFactoryImpl;
+import org.openrdf.model.util.GraphUtil;
 import org.openrdf.model.vocabulary.OWL;
 import org.openrdf.model.vocabulary.RDF;
+import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
+import org.openrdf.repository.config.RepositoryConfigSchema;
+import org.openrdf.repository.config.RepositoryImplConfig;
+import org.openrdf.repository.config.RepositoryImplConfigBase;
+import org.openrdf.repository.manager.LocalRepositoryManager;
+import org.openrdf.repository.sail.SailRepository;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.Rio;
 import org.openrdf.rio.helpers.StatementCollector;
+import org.openrdf.sail.memory.MemoryStore;
 import org.semanticweb.owlapi.formats.OWLOntologyFormatFactoryRegistry;
 import org.semanticweb.owlapi.io.OWLOntologyDocumentSource;
 import org.semanticweb.owlapi.io.StreamDocumentSource;
@@ -59,10 +70,15 @@ import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactoryRegistry;
 import org.semanticweb.owlapi.rio.RioMemoryTripleSource;
 
+import com.github.podd.api.PoddRepositoryManager;
+import com.github.podd.api.PoddSchemaManager;
 import com.github.podd.api.test.AbstractPoddOWLManagerTest;
 import com.github.podd.api.test.TestConstants;
 import com.github.podd.exception.EmptyOntologyException;
 import com.github.podd.impl.PoddOWLManagerImpl;
+import com.github.podd.impl.PoddRepositoryManagerImpl;
+import com.github.podd.impl.PoddSchemaManagerImpl;
+import com.github.podd.impl.PoddSesameManagerImpl;
 import com.github.podd.utils.DebugUtils;
 import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.PODD;
@@ -75,6 +91,57 @@ import com.github.podd.utils.PoddWebConstants;
 public class PoddOWLManagerImplTest extends AbstractPoddOWLManagerTest
 {
     private String reasonerName = "Pellet";
+    
+    private URI schemaGraph;
+    
+    private PoddRepositoryManager testRepositoryManager;
+    
+    private RepositoryConnection testManagementConnection;
+    
+    private PoddSchemaManager testSchemaManager;
+    
+    @Before
+    @Override
+    public void setUp() throws Exception
+    {
+        super.setUp();
+        
+        this.schemaGraph = PODD.VF.createURI("urn:test:owlmanager:schemagraph");
+        
+        PoddSesameManagerImpl testSesameManager = new PoddSesameManagerImpl();
+        
+        Repository managementRepository = new SailRepository(new MemoryStore());
+        managementRepository.initialize();
+        
+        this.testManagementConnection = managementRepository.getConnection();
+        
+        final Model graph =
+                Rio.parse(this.getClass().getResourceAsStream("/memorystoreconfig.ttl"), "", RDFFormat.TURTLE);
+        final Resource repositoryNode = GraphUtil.getUniqueSubject(graph, RepositoryConfigSchema.REPOSITORYTYPE, null);
+        RepositoryImplConfig repositoryImplConfig = RepositoryImplConfigBase.create(graph, repositoryNode);
+        Assert.assertNotNull(repositoryImplConfig);
+        Assert.assertNotNull(repositoryImplConfig.getType());
+        LocalRepositoryManager repositoryManager = new LocalRepositoryManager(tempDir.newFolder("repositorymanager"));
+        repositoryManager.initialize();
+        testRepositoryManager =
+                new PoddRepositoryManagerImpl(managementRepository, repositoryManager, repositoryImplConfig);
+        
+        testSchemaManager = new PoddSchemaManagerImpl();
+        testSchemaManager.setOwlManager(this.testOWLManager);
+        testSchemaManager.setSesameManager(testSesameManager);
+        testSchemaManager.setRepositoryManager(testRepositoryManager);
+        
+    }
+    
+    /**
+     * @throws java.lang.Exception
+     */
+    @After
+    public void tearDown() throws Exception
+    {
+        this.testManagementConnection.close();
+        this.testRepositoryManager.shutDown();
+    }
     
     @Override
     protected OWLReasonerFactory getNewOWLReasonerFactoryInstance()
@@ -108,35 +175,9 @@ public class PoddOWLManagerImplTest extends AbstractPoddOWLManagerTest
     @Override
     protected List<InferredOWLOntologyID> loadDcFoafAndPoddUserSchemaOntologies() throws Exception
     {
-        PoddOWLManagerImpl manager = (PoddOWLManagerImpl)this.testOWLManager;
-        
-        // Keep track of the ontologies that have been loaded to ensure they are in memory when
-        // inferring the next schema
-        Set<InferredOWLOntologyID> loadedOntologies = new LinkedHashSet<>();
-        final InferredOWLOntologyID inferredDctermsOntologyID =
-                this.loadInferStoreOntology(PODD.PATH_PODD_DCTERMS_V1, RDFFormat.RDFXML,
-                        TestConstants.EXPECTED_TRIPLE_COUNT_DC_TERMS_CONCRETE,
-                        TestConstants.EXPECTED_TRIPLE_COUNT_DC_TERMS_INFERRED, loadedOntologies);
-        manager.removeCache(null, loadedOntologies);
-        loadedOntologies.add(inferredDctermsOntologyID);
-        manager.cacheSchemaOntologies(loadedOntologies, testManagementConnection, schemaGraph);
-        
-        final InferredOWLOntologyID inferredFoafOntologyID =
-                this.loadInferStoreOntology(PODD.PATH_PODD_FOAF_V1, RDFFormat.RDFXML,
-                        TestConstants.EXPECTED_TRIPLE_COUNT_FOAF_CONCRETE,
-                        TestConstants.EXPECTED_TRIPLE_COUNT_FOAF_INFERRED, loadedOntologies);
-        manager.removeCache(null, loadedOntologies);
-        loadedOntologies.add(inferredFoafOntologyID);
-        manager.cacheSchemaOntologies(loadedOntologies, testManagementConnection, schemaGraph);
-        final InferredOWLOntologyID inferredPUserOntologyID =
-                this.loadInferStoreOntology(PODD.PATH_PODD_USER_V1, RDFFormat.RDFXML,
-                        TestConstants.EXPECTED_TRIPLE_COUNT_PODD_USER_CONCRETE,
-                        TestConstants.EXPECTED_TRIPLE_COUNT_PODD_USER_INFERRED, loadedOntologies);
-        manager.removeCache(null, loadedOntologies);
-        loadedOntologies.add(inferredPUserOntologyID);
-        manager.cacheSchemaOntologies(loadedOntologies, testManagementConnection, schemaGraph);
-        
-        return new ArrayList<InferredOWLOntologyID>(loadedOntologies);
+        return testSchemaManager.uploadSchemaOntologies(Rio.parse(
+                this.getClass().getResourceAsStream("/podd-schema-manifest-version1only-dcfoafuser.ttl"), "",
+                RDFFormat.TURTLE));
     }
     
     /**

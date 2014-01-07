@@ -26,7 +26,9 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 import org.openrdf.model.URI;
 import org.openrdf.model.vocabulary.OWL;
 import org.openrdf.model.vocabulary.RDF;
@@ -63,15 +65,12 @@ import com.github.podd.utils.PODD;
  */
 public abstract class AbstractPoddOWLManagerTest
 {
+    @Rule
+    public TemporaryFolder tempDir = new TemporaryFolder();
+    
     protected Logger log = LoggerFactory.getLogger(this.getClass());
     
     protected PoddOWLManager testOWLManager;
-    
-    protected URI schemaGraph;
-    
-    private Repository testRepository;
-    
-    protected RepositoryConnection testManagementConnection;
     
     /**
      * @return A new OWLReasonerFactory instance for use with the PoddOWLManager
@@ -117,11 +116,6 @@ public abstract class AbstractPoddOWLManagerTest
     @Before
     public void setUp() throws Exception
     {
-        this.schemaGraph = PODD.VF.createURI("urn:test:owlmanager:schemagraph");
-        
-        // this.manager = OWLOntologyManagerFactoryRegistry.createOWLOntologyManager();
-        // Assert.assertNotNull("Null implementation of OWLOntologymanager", this.manager);
-        
         final OWLReasonerFactory reasonerFactory = this.getNewOWLReasonerFactoryInstance();
         Assert.assertNotNull("Null implementation of reasoner factory", reasonerFactory);
         
@@ -130,11 +124,6 @@ public abstract class AbstractPoddOWLManagerTest
         this.testOWLManager = this.getNewPoddOWLManagerInstance(managerFactory, reasonerFactory);
         Assert.assertNotNull("Null implementation of test OWLManager", this.testOWLManager);
         
-        // create a memory Repository for tests
-        this.testRepository = new SailRepository(new MemoryStore());
-        this.testRepository.initialize();
-        this.testManagementConnection = this.testRepository.getConnection();
-        // this.testRepositoryConnection.begin();
     }
     
     /**
@@ -143,9 +132,6 @@ public abstract class AbstractPoddOWLManagerTest
     @After
     public void tearDown() throws Exception
     {
-        // this.testRepositoryConnection.rollback();
-        this.testManagementConnection.close();
-        this.testRepository.shutDown();
         
         this.testOWLManager = null;
     }
