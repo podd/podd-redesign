@@ -392,7 +392,7 @@ public abstract class AbstractPoddSesameManagerTest
                         TestConstants.TEST_ARTIFACT_20130206_INFERRED, RDFFormat.TURTLE);
         final URI[] contexts =
                 this.testPoddSesameManager.versionAndSchemaContexts(ontologyID, this.testRepositoryConnection,
-                        this.schemaGraph);
+                        this.schemaGraph, this.artifactGraph);
         
         final String[] objectUris =
                 { "http://purl.org/podd/basic-1-20130206/object:2966",
@@ -576,7 +576,7 @@ public abstract class AbstractPoddSesameManagerTest
             final Collection<URI> nextProperty = Arrays.asList(element[1]);
             final Map<URI, URI> cardinalityValue =
                     this.testPoddSesameManager.getCardinalityValues(ontologyID, element[0], nextProperty,
-                            this.testRepositoryConnection, this.schemaGraph);
+                            this.testRepositoryConnection, this.schemaGraph, this.artifactGraph);
             Assert.assertEquals("Could not find cardinality for: " + nextProperty, 1, cardinalityValue.size());
             Assert.assertTrue("Did not find cardinality for: " + nextProperty, cardinalityValue.containsKey(element[1]));
             Assert.assertEquals("Not the expected cardinality value", element[2], cardinalityValue.get(element[1]));
@@ -929,7 +929,7 @@ public abstract class AbstractPoddSesameManagerTest
             
             final URI[] contexts =
                     this.testPoddSesameManager.versionAndSchemaContexts(ontologyID, this.testRepositoryConnection,
-                            this.schemaGraph);
+                            this.schemaGraph, this.artifactGraph);
             
             final Model model =
                     this.testPoddSesameManager.getObjectData(ontologyID, objectUri, this.testRepositoryConnection,
@@ -983,7 +983,7 @@ public abstract class AbstractPoddSesameManagerTest
         
         final Model displayModel =
                 this.testPoddSesameManager.getObjectDetailsForDisplay(ontologyID, objectUri,
-                        this.testRepositoryConnection, this.schemaGraph);
+                        this.testRepositoryConnection, this.schemaGraph, this.artifactGraph);
         
         // verify:
         Assert.assertNotNull("Display Model is null", displayModel);
@@ -1016,7 +1016,7 @@ public abstract class AbstractPoddSesameManagerTest
         
         final Model displayModel =
                 this.testPoddSesameManager.getObjectDetailsForDisplay(ontologyID, objectUri,
-                        this.testRepositoryConnection, this.schemaGraph);
+                        this.testRepositoryConnection, this.schemaGraph, this.artifactGraph);
         
         // verify:
         Assert.assertNotNull("Display Model is null", displayModel);
@@ -1078,7 +1078,7 @@ public abstract class AbstractPoddSesameManagerTest
             
             final PoddObjectLabel objectLabel =
                     this.testPoddSesameManager.getObjectLabel(ontologyID, objectUri, this.testRepositoryConnection,
-                            this.schemaGraph);
+                            this.schemaGraph, this.artifactGraph);
             
             // verify:
             Assert.assertNotNull("PoddObjectLabel was null", objectLabel);
@@ -1261,7 +1261,7 @@ public abstract class AbstractPoddSesameManagerTest
             
             final List<URI> objectTypes =
                     this.testPoddSesameManager.getObjectTypes(ontologyID1, objectUri, this.testRepositoryConnection,
-                            this.schemaGraph);
+                            this.schemaGraph, this.artifactGraph);
             
             // verify:
             Assert.assertNotNull("Type was null", objectTypes);
@@ -1450,7 +1450,7 @@ public abstract class AbstractPoddSesameManagerTest
         
         final URI[] contexts =
                 this.testPoddSesameManager.versionAndSchemaContexts(ontologyID, this.testRepositoryConnection,
-                        this.schemaGraph);
+                        this.schemaGraph, this.artifactGraph);
         
         // object, expected statement count, expected parent
         final Object[][] testData =
@@ -1717,7 +1717,7 @@ public abstract class AbstractPoddSesameManagerTest
         
         final URI[] contexts =
                 this.testPoddSesameManager.versionAndSchemaContexts(nextOntologyID, this.testRepositoryConnection,
-                        this.schemaGraph);
+                        this.schemaGraph, this.artifactGraph);
         final List<URI> orderedPropertyUris =
                 this.testPoddSesameManager.getWeightedProperties(internalObjectUri, false,
                         this.testRepositoryConnection, contexts);
@@ -1756,7 +1756,7 @@ public abstract class AbstractPoddSesameManagerTest
         
         final URI[] contexts =
                 this.testPoddSesameManager.versionAndSchemaContexts(nextOntologyID, this.testRepositoryConnection,
-                        this.schemaGraph);
+                        this.schemaGraph, this.artifactGraph);
         final List<URI> orderedPropertyUris =
                 this.testPoddSesameManager.getWeightedProperties(topObjectUri, false, this.testRepositoryConnection,
                         contexts);
@@ -1804,7 +1804,7 @@ public abstract class AbstractPoddSesameManagerTest
         
         final URI[] contexts =
                 this.testPoddSesameManager.versionAndSchemaContexts(nextOntologyID, this.testRepositoryConnection,
-                        this.schemaGraph);
+                        this.schemaGraph, this.artifactGraph);
         final List<URI> orderedPropertyUris =
                 this.testPoddSesameManager.getWeightedProperties(topObjectUri, true, this.testRepositoryConnection,
                         contexts);
@@ -1923,7 +1923,7 @@ public abstract class AbstractPoddSesameManagerTest
                 { PODD.VF.createURI(PODD.PODD_SCIENCE, "Platform"), PODD.VF.createURI(OWL.NAMESPACE, "NamedIndividual") };
         final URI[] contexts =
                 this.testPoddSesameManager.versionAndSchemaContexts(ontologyID, this.testRepositoryConnection,
-                        this.schemaGraph);
+                        this.schemaGraph, this.artifactGraph);
         final Model result =
                 this.testPoddSesameManager.searchOntologyLabels(searchTerm, searchTypes, 1000, 0,
                         this.testRepositoryConnection, contexts);
@@ -1960,7 +1960,7 @@ public abstract class AbstractPoddSesameManagerTest
                         PODD.VF.createURI(OWL.NAMESPACE, "NamedIndividual") };
         final URI[] contexts =
                 this.testPoddSesameManager.versionAndSchemaContexts(ontologyID, this.testRepositoryConnection,
-                        this.schemaGraph);
+                        this.schemaGraph, this.artifactGraph);
         final Model result =
                 this.testPoddSesameManager.searchOntologyLabels(searchTerm, searchTypes, 1000, 0,
                         this.testRepositoryConnection, contexts);
@@ -2316,7 +2316,7 @@ public abstract class AbstractPoddSesameManagerTest
         
         URI[] versionAndSchemaContexts =
                 this.testPoddSesameManager.versionAndSchemaContexts(ontologyID, this.testRepositoryConnection,
-                        this.schemaGraph);
+                        this.schemaGraph, this.artifactGraph);
         
         Assert.assertNotNull(versionAndSchemaContexts);
         for(URI nextUri : versionAndSchemaContexts)
@@ -2336,7 +2336,7 @@ public abstract class AbstractPoddSesameManagerTest
         
         URI[] versionAndSchemaContexts =
                 this.testPoddSesameManager.versionAndInferredAndSchemaContexts(ontologyID,
-                        this.testRepositoryConnection, this.schemaGraph);
+                        this.testRepositoryConnection, this.schemaGraph, this.artifactGraph);
         
         Assert.assertNotNull(versionAndSchemaContexts);
         for(URI nextUri : versionAndSchemaContexts)

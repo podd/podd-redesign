@@ -423,7 +423,8 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             managementConnection = this.getRepositoryManager().getManagementRepository().getConnection();
             final URI[] contexts =
                     this.sesameManager.versionAndInferredAndSchemaContexts(artifactID, managementConnection,
-                            this.repositoryManager.getSchemaManagementGraph());
+                            this.repositoryManager.getSchemaManagementGraph(),
+                            this.repositoryManager.getArtifactManagementGraph());
             
             Model model;
             if(containsPropertyPolicy == MetadataPolicy.ONLY_CONTAINS)
@@ -465,7 +466,8 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             managementConnection = this.getRepositoryManager().getManagementRepository().getConnection();
             final URI[] contexts =
                     this.getSesameManager().versionAndInferredAndSchemaContexts(ontologyID, managementConnection,
-                            this.getRepositoryManager().getSchemaManagementGraph());
+                            this.getRepositoryManager().getSchemaManagementGraph(),
+                            this.getRepositoryManager().getArtifactManagementGraph());
             
             return this.getSesameManager().fillMissingLabels(inputModel, permanentConnection, contexts);
         }
@@ -597,7 +599,8 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             
             final URI[] contexts =
                     this.getSesameManager().versionAndInferredAndSchemaContexts(ontologyID, managementConnection,
-                            this.getRepositoryManager().getSchemaManagementGraph());
+                            this.getRepositoryManager().getSchemaManagementGraph(),
+                            this.getRepositoryManager().getArtifactManagementGraph());
             
             return this.getSesameManager().getChildObjects(objectUri, permanentConnection, contexts);
         }
@@ -675,7 +678,8 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             final Set<? extends OWLOntologyID> schemaImports = this.getSchemaImports(ontologyID);
             conn = this.getRepositoryManager().getPermanentRepository(schemaImports).getConnection();
             return this.getSesameManager().getObjectDetailsForDisplay(ontologyID, objectUri, conn,
-                    this.getRepositoryManager().getSchemaManagementGraph());
+                    this.getRepositoryManager().getSchemaManagementGraph(),
+                    this.getRepositoryManager().getArtifactManagementGraph());
         }
         finally
         {
@@ -697,7 +701,8 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             final Set<? extends OWLOntologyID> schemaImports = this.getSchemaImports(ontologyID);
             conn = this.getRepositoryManager().getPermanentRepository(schemaImports).getConnection();
             return this.getSesameManager().getObjectLabel(ontologyID, objectUri, conn,
-                    this.getRepositoryManager().getSchemaManagementGraph());
+                    this.getRepositoryManager().getSchemaManagementGraph(),
+                    this.getRepositoryManager().getArtifactManagementGraph());
         }
         finally
         {
@@ -729,11 +734,13 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             
             final List<URI> typesList =
                     this.getSesameManager().getObjectTypes(artifactId, objectUri, conn,
-                            this.getRepositoryManager().getSchemaManagementGraph());
+                            this.getRepositoryManager().getSchemaManagementGraph(),
+                            this.getRepositoryManager().getArtifactManagementGraph());
             for(final URI objectType : typesList)
             {
                 results.add(this.getSesameManager().getObjectLabel(artifactId, objectType, conn,
-                        this.getRepositoryManager().getSchemaManagementGraph()));
+                        this.getRepositoryManager().getSchemaManagementGraph(),
+                        this.getRepositoryManager().getArtifactManagementGraph()));
             }
         }
         finally
@@ -768,7 +775,8 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             
             final URI[] contexts =
                     this.getSesameManager().versionAndSchemaContexts(ontologyID, conn,
-                            this.getRepositoryManager().getSchemaManagementGraph());
+                            this.getRepositoryManager().getSchemaManagementGraph(),
+                            this.getRepositoryManager().getArtifactManagementGraph());
             
             return this.getSesameManager().getWeightedProperties(objectUri, excludeContainsProperties, conn, contexts);
         }
@@ -812,7 +820,8 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             managementConnection = this.getRepositoryManager().getManagementRepository().getConnection();
             final URI[] contexts =
                     this.getSesameManager().versionAndInferredAndSchemaContexts(ontologyID, managementConnection,
-                            this.getRepositoryManager().getSchemaManagementGraph());
+                            this.getRepositoryManager().getSchemaManagementGraph(),
+                            this.getRepositoryManager().getArtifactManagementGraph());
             
             permanentRepository = this.getRepositoryManager().getPermanentRepository(schemaImports);
             permanentConnection = permanentRepository.getConnection();
@@ -860,7 +869,8 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             conn = this.getRepositoryManager().getPermanentRepository(schemaImports).getConnection();
             final URI[] contexts =
                     this.getSesameManager().versionAndSchemaContexts(ontologyID, conn,
-                            this.getRepositoryManager().getSchemaManagementGraph());
+                            this.getRepositoryManager().getSchemaManagementGraph(),
+                            this.getRepositoryManager().getArtifactManagementGraph());
             
             return this.getSesameManager().getReferringObjectDetails(objectUri, conn, contexts);
         }
@@ -955,7 +965,8 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
                 
                 final URI objectIRI = this.getSesameManager().getTopObjectIRI(artifactId, conn);
                 results.add(this.getSesameManager().getObjectLabel(artifactId, objectIRI, conn,
-                        this.getRepositoryManager().getSchemaManagementGraph()));
+                        this.getRepositoryManager().getSchemaManagementGraph(),
+                        this.getRepositoryManager().getArtifactManagementGraph()));
             }
             finally
             {
@@ -1690,10 +1701,10 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             }
             
             conn = this.getRepositoryManager().getPermanentRepository(schemaImports).getConnection();
-            // FIXME: Cannot use contexts like this for a federated method
             final URI[] contexts =
                     this.getSesameManager().versionAndInferredAndSchemaContexts(ontologyID, conn,
-                            this.getRepositoryManager().getSchemaManagementGraph());
+                            this.getRepositoryManager().getSchemaManagementGraph(),
+                            this.getRepositoryManager().getArtifactManagementGraph());
             return this.getSesameManager().searchOntologyLabels(searchTerm, searchTypes, 1000, 0, conn, contexts);
         }
         catch(final Throwable e)

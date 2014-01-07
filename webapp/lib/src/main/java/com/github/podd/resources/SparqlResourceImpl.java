@@ -317,7 +317,8 @@ public class SparqlResourceImpl extends AbstractPoddResourceImpl
                 if(includeSchema)
                 {
                     contextSet.addAll(Arrays.asList(this.getPoddSesameManager().schemaContexts(ontologyID, conn,
-                            this.getPoddRepositoryManager().getSchemaManagementGraph())));
+                            this.getPoddRepositoryManager().getSchemaManagementGraph(),
+                            this.getPoddRepositoryManager().getArtifactManagementGraph())));
                 }
                 // TODO: Support cross-artifact queries if they all import the
                 // same schemas
