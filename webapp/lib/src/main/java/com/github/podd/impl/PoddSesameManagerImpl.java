@@ -255,11 +255,12 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         final Set<InferredOWLOntologyID> returnList = new HashSet<InferredOWLOntologyID>();
         final StringBuilder sb = new StringBuilder(1024);
         
-        sb.append("SELECT ?ontologyIri ?versionIri ?inferredVersionIri WHERE { ");
+        sb.append("SELECT DISTINCT ?ontologyIri ?versionIri ?inferredVersionIri WHERE { ");
         
         sb.append(" ?ontologyIri <" + RDF.TYPE.stringValue() + "> <" + OWL.ONTOLOGY.stringValue() + "> . ");
         sb.append(" ?ontologyIri <" + OWL.VERSIONIRI.stringValue() + "> ?versionIri . ");
-        sb.append(" ?versionIri <" + PODD.PODD_BASE_INFERRED_VERSION.stringValue() + "> ?inferredVersionIri . ");
+        sb.append(" OPTIONAL { ?versionIri <" + PODD.PODD_BASE_INFERRED_VERSION.stringValue()
+                + "> ?inferredVersionIri . } ");
         
         sb.append(" }");
         
@@ -272,10 +273,14 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         {
             final String nextOntologyIRI = nextResult.getValue("ontologyIri").stringValue();
             final String nextVersionIRI = nextResult.getValue("versionIri").stringValue();
-            final String nextInferredIRI = nextResult.getValue("inferredVersionIri").stringValue();
+            IRI nextInferredIRI = null;
+            if(nextResult.hasBinding("inferredVersionIri"))
+            {
+                nextInferredIRI = IRI.create(nextResult.getValue("inferredVersionIri").stringValue());
+            }
             
-            returnList.add(new InferredOWLOntologyID(IRI.create(nextOntologyIRI), IRI.create(nextVersionIRI), IRI
-                    .create(nextInferredIRI)));
+            returnList.add(new InferredOWLOntologyID(IRI.create(nextOntologyIRI), IRI.create(nextVersionIRI),
+                    nextInferredIRI));
         }
         return returnList;
     }
