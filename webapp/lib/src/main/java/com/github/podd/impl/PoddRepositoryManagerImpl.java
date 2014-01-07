@@ -405,6 +405,9 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
                     }
                 }
             }
+            
+            // NOTE: Exceptions from the following are logged but not thrown for some reason
+            sesameRepositoryManager.shutDown();
         }
         
         if(foundException != null)
