@@ -136,4 +136,23 @@ public abstract class AbstractPoddOWLManagerTest
         this.testOWLManager = null;
     }
     
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddOWLManager#removeCache(org.semanticweb.owlapi.model.OWLOntologyID)}
+     * .
+     * 
+     */
+    @Test
+    public void testRemoveCacheWithNullOntology() throws Exception
+    {
+        try
+        {
+            this.testOWLManager.removeCache(null, null);
+            Assert.fail("Should have thrown a NullPointerException");
+        }
+        catch(final NullPointerException e)
+        {
+        }
+    }
+    
 }
