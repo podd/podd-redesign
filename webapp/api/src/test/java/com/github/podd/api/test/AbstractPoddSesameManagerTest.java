@@ -91,22 +91,22 @@ public abstract class AbstractPoddSesameManagerTest
      * 
      */
     private boolean internalTestIsPublished(final boolean isPublished, final String testResourcePath,
-            final int expectedSize, final URI contextCumVersionURI, final URI managementGraph) throws Exception
+            final int expectedSize, final URI contextVersionURI, final URI managementGraph) throws Exception
     {
         // prepare: load the ontology into the test repository
         final InputStream inputStream = this.getClass().getResourceAsStream(testResourcePath);
-        this.testRepositoryConnection.add(inputStream, "", RDFFormat.RDFXML, contextCumVersionURI);
+        this.testRepositoryConnection.add(inputStream, "", RDFFormat.RDFXML, contextVersionURI);
         Assert.assertEquals("Not the expected number of statements in Repository", expectedSize,
-                this.testRepositoryConnection.size(contextCumVersionURI));
+                this.testRepositoryConnection.size(contextVersionURI));
         
         // prepare: build an OWLOntologyID
         final IRI ontologyIRI =
-                this.testPoddSesameManager.getOntologyIRI(this.testRepositoryConnection, contextCumVersionURI);
+                this.testPoddSesameManager.getOntologyIRI(this.testRepositoryConnection, contextVersionURI);
         final InferredOWLOntologyID ontologyID =
-                new InferredOWLOntologyID(ontologyIRI, IRI.create(contextCumVersionURI),
+                new InferredOWLOntologyID(ontologyIRI, IRI.create(contextVersionURI),
                         IRI.create("urn:not:actually:inferred"));
         this.testRepositoryConnection.add(ontologyIRI.toOpenRDFURI(), RDF.TYPE, OWL.ONTOLOGY, managementGraph);
-        this.testRepositoryConnection.add(ontologyIRI.toOpenRDFURI(), OWL.VERSIONIRI, contextCumVersionURI,
+        this.testRepositoryConnection.add(ontologyIRI.toOpenRDFURI(), OWL.VERSIONIRI, contextVersionURI,
                 managementGraph);
         
         final InferredOWLOntologyID publishedOntologyID =
@@ -1990,7 +1990,7 @@ public abstract class AbstractPoddSesameManagerTest
                 new InferredOWLOntologyID(pOntologyIRI, pVersionIRI, pInferredVersionIRI);
         
         // invoke method under test
-        this.testPoddSesameManager.updateCurrentManagedSchemaOntologyVersion(nextOntologyID, false,
+        this.testPoddSesameManager.updateManagedSchemaOntologyVersion(nextOntologyID, false,
                 this.testRepositoryConnection, this.schemaGraph);
         
         this.verifyManagementGraphContents(6, this.schemaGraph, pOntologyIRI, pVersionIRI, pInferredVersionIRI);
@@ -2011,7 +2011,7 @@ public abstract class AbstractPoddSesameManagerTest
                 new InferredOWLOntologyID(pOntologyIRI, pVersionIRI, pInferredVersionIRI);
         
         // first setting of schema versions in mgt graph
-        this.testPoddSesameManager.updateCurrentManagedSchemaOntologyVersion(nextOntologyID, false,
+        this.testPoddSesameManager.updateManagedSchemaOntologyVersion(nextOntologyID, false,
                 this.testRepositoryConnection, this.schemaGraph);
         this.verifyManagementGraphContents(6, this.schemaGraph, pOntologyIRI, pVersionIRI, pInferredVersionIRI);
         
@@ -2021,14 +2021,14 @@ public abstract class AbstractPoddSesameManagerTest
                 new InferredOWLOntologyID(pOntologyIRI, pVersionIRIUpdated, pInferredVersionIRIUpdated);
         
         // invoke with "updateCurrent" disallowed
-        this.testPoddSesameManager.updateCurrentManagedSchemaOntologyVersion(nextOntologyIDUpdated, false,
+        this.testPoddSesameManager.updateManagedSchemaOntologyVersion(nextOntologyIDUpdated, false,
                 this.testRepositoryConnection, this.schemaGraph);
         
         // verify only inferred ontology version is updated
         this.verifyManagementGraphContents(9, this.schemaGraph, pOntologyIRI, pVersionIRI, pInferredVersionIRIUpdated);
         
         // invoke with "updateCurrent" allowed
-        this.testPoddSesameManager.updateCurrentManagedSchemaOntologyVersion(nextOntologyIDUpdated, true,
+        this.testPoddSesameManager.updateManagedSchemaOntologyVersion(nextOntologyIDUpdated, true,
                 this.testRepositoryConnection, this.schemaGraph);
         
         // verify both ontology current version and inferred ontology version haven been updated

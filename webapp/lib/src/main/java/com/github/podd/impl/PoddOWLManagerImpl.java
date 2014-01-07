@@ -259,8 +259,6 @@ public class PoddOWLManagerImpl implements PoddOWLManager
                     {
                         cachedManager = putIfAbsent;
                     }
-                    
-                    // FIXME: Should we load the requisite ontologies into the manager
                 }
             }
         }
@@ -278,9 +276,6 @@ public class PoddOWLManagerImpl implements PoddOWLManager
             throw new NullPointerException("OWLOntology collection is incomplete");
         }
         
-        // NOTE: if InferredOntologyIRI is null, only the base ontology is
-        // cached
-        
         Model schemaManagementTriples = new LinkedHashModel();
         managementConnection.export(new StatementCollector(schemaManagementTriples), schemaManagementContext);
         
@@ -292,6 +287,8 @@ public class PoddOWLManagerImpl implements PoddOWLManager
         {
             for(OWLOntologyID ontologyID : manifestImports)
             {
+                // NOTE: if InferredOntologyIRI is null, only the base ontology is
+                // cached
                 this.cacheSchemaOntologyInternal(managementConnection, ontologyID, cachedManager);
             }
         }

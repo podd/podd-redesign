@@ -107,35 +107,9 @@ public abstract class AbstractPoddOWLManagerTest
      * @return
      * @throws Exception
      */
-    protected InferredOWLOntologyID loadInferStoreOntology(final String resourcePath, final RDFFormat format,
+    protected abstract InferredOWLOntologyID loadInferStoreOntology(final String resourcePath, final RDFFormat format,
             final long assertedStatements, final long inferredStatements,
-            final Set<? extends OWLOntologyID> dependentSchemaOntologies) throws Exception
-    {
-        // load ontology to OWLManager
-        final InputStream inputStream = this.getClass().getResourceAsStream(resourcePath);
-        Assert.assertNotNull("Could not find resource", inputStream);
-        final OWLOntologyDocumentSource owlSource =
-                new StreamDocumentSource(inputStream, OWLOntologyFormatFactoryRegistry.getInstance().getByMIMEType(
-                        format.getDefaultMIMEType()));
-        
-        final InferredOWLOntologyID inferredOntologyID =
-                this.testOWLManager.loadAndInfer(owlSource, this.testManagementConnection, null,
-                        dependentSchemaOntologies, this.testManagementConnection, this.schemaGraph);
-        
-        this.testOWLManager.removeCache(inferredOntologyID, dependentSchemaOntologies);
-        
-        // verify statement counts
-        final URI versionURI = inferredOntologyID.getVersionIRI().toOpenRDFURI();
-        Assert.assertEquals("Wrong statement count", assertedStatements, this.testManagementConnection.size(versionURI));
-        
-        final URI inferredOntologyURI = inferredOntologyID.getInferredOntologyIRI().toOpenRDFURI();
-        
-        // DebugUtils.printContents(testRepositoryConnection, inferredOntologyURI);
-        Assert.assertEquals("Wrong inferred statement count", inferredStatements,
-                this.testManagementConnection.size(inferredOntologyURI));
-        
-        return inferredOntologyID;
-    }
+            final Set<? extends OWLOntologyID> dependentSchemaOntologies) throws Exception;
     
     /**
      * @throws java.lang.Exception

@@ -444,7 +444,7 @@ public abstract class AbstractPoddArtifactManagerTest
                 this.testArtifactManager.getOWLManager().loadAndInfer(owlSource, repositoryConnection, null,
                         dependentSchemaOntologies, repositoryConnection, this.schemaGraph);
         
-        this.testSesameManager.updateCurrentManagedSchemaOntologyVersion(inferredOntologyID, true,
+        this.testSesameManager.updateManagedSchemaOntologyVersion(inferredOntologyID, true,
                 repositoryConnection, this.schemaGraph);
         
         // verify statement counts
@@ -1713,13 +1713,13 @@ public abstract class AbstractPoddArtifactManagerTest
         loadedOntologies.add(inferredPScienceOntologyID);
         
         // prepare: update schema management graph
-        this.testSesameManager.updateCurrentManagedSchemaOntologyVersion(inferredDctermsOntologyID, false,
+        this.testSesameManager.updateManagedSchemaOntologyVersion(inferredDctermsOntologyID, false,
                 this.testManagementConnection, this.schemaGraph);
-        this.testSesameManager.updateCurrentManagedSchemaOntologyVersion(inferredFoafOntologyID, false,
+        this.testSesameManager.updateManagedSchemaOntologyVersion(inferredFoafOntologyID, false,
                 this.testManagementConnection, this.schemaGraph);
-        this.testSesameManager.updateCurrentManagedSchemaOntologyVersion(inferredPUserOntologyID, false,
+        this.testSesameManager.updateManagedSchemaOntologyVersion(inferredPUserOntologyID, false,
                 this.testManagementConnection, this.schemaGraph);
-        this.testSesameManager.updateCurrentManagedSchemaOntologyVersion(inferredPBaseOntologyID, false,
+        this.testSesameManager.updateManagedSchemaOntologyVersion(inferredPBaseOntologyID, false,
                 this.testManagementConnection, this.schemaGraph);
         // PODD-Science ontology is not added to schema management graph
         
@@ -1759,7 +1759,7 @@ public abstract class AbstractPoddArtifactManagerTest
                 this.loadInferStoreSchema("/test/ontologies/poddScienceVXYZ.owl", RDFFormat.RDFXML, 1265, 220,
                         this.testManagementConnection, new LinkedHashSet<InferredOWLOntologyID>(
                                 version1SchemaOntologies));
-        this.testSesameManager.updateCurrentManagedSchemaOntologyVersion(inferredPScienceOntologyID, true,
+        this.testSesameManager.updateManagedSchemaOntologyVersion(inferredPScienceOntologyID, true,
                 this.testManagementConnection, this.schemaGraph);
         
         // load test artifact

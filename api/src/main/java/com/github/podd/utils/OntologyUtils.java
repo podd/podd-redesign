@@ -425,7 +425,7 @@ public class OntologyUtils
             OntologyUtils.log.error("Could not find a single unique current version for schema ontology: {}",
                     nextSchemaOntologyUri);
             throw new SchemaManifestException(IRI.create(nextSchemaOntologyUri),
-                    "Could not find a single unique current version IRI for schema ontology");
+                    "Could not find a single unique current version IRI for schema ontology", e);
         }
     }
     
@@ -874,6 +874,16 @@ public class OntologyUtils
             managementConnection.add(nextStream, "", Rio.getParserFormatForFileName(classpath, RDFFormat.RDFXML),
                     nextOntology.getVersionIRI().toOpenRDFURI());
         }
+        
+        Model currentVersions = model.filter(null, PODD.OMV_CURRENT_VERSION, null);
+        for(Resource nextOntology : currentVersions.subjects())
+        {
+            // Ensure that there is only one current version
+            URI nextCurrentVersion = model.filter(nextOntology, PODD.OMV_CURRENT_VERSION, null).objectURI();
+            managementConnection.remove(nextOntology, PODD.OMV_CURRENT_VERSION, null, schemaManagementGraph);
+            managementConnection.add(nextOntology, PODD.OMV_CURRENT_VERSION, nextCurrentVersion, schemaManagementGraph);
+        }
+        
         return ontologyIDs;
     }
 }

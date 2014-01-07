@@ -88,15 +88,17 @@ public class PoddSesameManagerImplTest extends AbstractPoddSesameManagerTest
         List<InferredOWLOntologyID> ontologyIDs =
                 OntologyUtils.loadSchemasFromManifest(managementConnection, schemaManagementGraph, model);
         
+        // TODO: If any tests require inferencing, then we may need to recreate the following
         // - create a PODD OWLManager instance
-        final OWLReasonerFactory reasonerFactory =
-                OWLReasonerFactoryRegistry.getInstance().getReasonerFactory("Pellet");
-        Assert.assertNotNull("Null implementation of OWLReasonerFactory", reasonerFactory);
-        final PoddOWLManagerImpl testPoddOWLManager =
-                new PoddOWLManagerImpl(getNewOWLOntologyManagerFactory(), reasonerFactory);
-        
-        testPoddOWLManager.cacheSchemaOntologies(new LinkedHashSet<>(ontologyIDs), managementConnection,
-                schemaManagementGraph);
+        // final OWLReasonerFactory reasonerFactory =
+        // OWLReasonerFactoryRegistry.getInstance().getReasonerFactory("Pellet");
+        // Assert.assertNotNull("Null implementation of OWLReasonerFactory", reasonerFactory);
+        // final PoddOWLManagerImpl testPoddOWLManager =
+        // new PoddOWLManagerImpl(getNewOWLOntologyManagerFactory(), reasonerFactory);
+        //
+        // testPoddOWLManager.cacheSchemaOntologies(new LinkedHashSet<>(ontologyIDs),
+        // managementConnection,
+        // schemaManagementGraph);
         
         return ontologyIDs;
     }

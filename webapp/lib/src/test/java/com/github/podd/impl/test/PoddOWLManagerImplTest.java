@@ -120,6 +120,7 @@ public class PoddOWLManagerImplTest extends AbstractPoddOWLManagerTest
         manager.removeCache(null, loadedOntologies);
         loadedOntologies.add(inferredDctermsOntologyID);
         manager.cacheSchemaOntologies(loadedOntologies, testManagementConnection, schemaGraph);
+        
         final InferredOWLOntologyID inferredFoafOntologyID =
                 this.loadInferStoreOntology(PODD.PATH_PODD_FOAF_V1, RDFFormat.RDFXML,
                         TestConstants.EXPECTED_TRIPLE_COUNT_FOAF_CONCRETE,
@@ -136,6 +137,53 @@ public class PoddOWLManagerImplTest extends AbstractPoddOWLManagerTest
         manager.cacheSchemaOntologies(loadedOntologies, testManagementConnection, schemaGraph);
         
         return new ArrayList<InferredOWLOntologyID>(loadedOntologies);
+    }
+    
+    /**
+     * Helper method which loads, infers and stores a given ontology using the PoddOWLManager.
+     * 
+     * @param resourcePath
+     * @param format
+     * @param assertedStatements
+     * @param inferredStatements
+     * @return
+     * @throws Exception
+     */
+    protected InferredOWLOntologyID loadInferStoreOntology(final String resourcePath, final RDFFormat format,
+            final long assertedStatements, final long inferredStatements,
+            final Set<? extends OWLOntologyID> dependentSchemaOntologies) throws Exception
+    {
+        PoddOWLManagerImpl manager = (PoddOWLManagerImpl)this.testOWLManager;
+        
+        // load ontology to OWLManager
+        final InputStream inputStream = this.getClass().getResourceAsStream(resourcePath);
+        Assert.assertNotNull("Could not find resource", inputStream);
+        final OWLOntologyDocumentSource owlSource =
+                new StreamDocumentSource(inputStream, OWLOntologyFormatFactoryRegistry.getInstance().getByMIMEType(
+                        format.getDefaultMIMEType()));
+        
+        final InferredOWLOntologyID inferredOntologyID =
+                this.testOWLManager.loadAndInfer(owlSource, this.testManagementConnection, null,
+                        dependentSchemaOntologies, this.testManagementConnection, this.schemaGraph);
+        
+        this.testOWLManager.removeCache(null, dependentSchemaOntologies);
+        
+        Set<OWLOntologyID> newDependentSchemaOntologies = new LinkedHashSet<>(dependentSchemaOntologies);
+        newDependentSchemaOntologies.add(inferredOntologyID);
+        
+        manager.cacheSchemaOntologies(newDependentSchemaOntologies, testManagementConnection, schemaGraph);
+        
+        // verify statement counts
+        final URI versionURI = inferredOntologyID.getVersionIRI().toOpenRDFURI();
+        Assert.assertEquals("Wrong statement count", assertedStatements, this.testManagementConnection.size(versionURI));
+        
+        final URI inferredOntologyURI = inferredOntologyID.getInferredOntologyIRI().toOpenRDFURI();
+        
+        // DebugUtils.printContents(testRepositoryConnection, inferredOntologyURI);
+        Assert.assertEquals("Wrong inferred statement count", inferredStatements,
+                this.testManagementConnection.size(inferredOntologyURI));
+        
+        return inferredOntologyID;
     }
     
     /**
@@ -730,6 +778,7 @@ public class PoddOWLManagerImplTest extends AbstractPoddOWLManagerTest
                         TestConstants.EXPECTED_TRIPLE_COUNT_PODD_BASE_INFERRED, new LinkedHashSet<>(schemaOntologies));
         this.testOWLManager.removeCache(pbInferredOntologyID, new LinkedHashSet<>(schemaOntologies));
         schemaOntologies.add(pbInferredOntologyID);
+        manager.cacheSchemaOntologies(new LinkedHashSet<>(schemaOntologies), testManagementConnection, schemaGraph);
         
         final URI pbBaseOntologyURI = pbInferredOntologyID.getOntologyIRI().toOpenRDFURI();
         final URI pbVersionURI = pbInferredOntologyID.getVersionIRI().toOpenRDFURI();
@@ -742,6 +791,7 @@ public class PoddOWLManagerImplTest extends AbstractPoddOWLManagerTest
                         new LinkedHashSet<>(schemaOntologies));
         this.testOWLManager.removeCache(pScienceInferredOntologyID, new LinkedHashSet<>(schemaOntologies));
         schemaOntologies.add(pScienceInferredOntologyID);
+        manager.cacheSchemaOntologies(new LinkedHashSet<>(schemaOntologies), testManagementConnection, schemaGraph);
         
         final URI pScienceBaseOntologyURI = pScienceInferredOntologyID.getOntologyIRI().toOpenRDFURI();
         final URI pScienceVersionURI = pScienceInferredOntologyID.getVersionIRI().toOpenRDFURI();

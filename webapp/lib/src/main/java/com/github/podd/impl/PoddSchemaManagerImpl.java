@@ -374,7 +374,7 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
      * @throws OWLException
      * @throws PoddException
      */
-    public List<InferredOWLOntologyID> uploadSchemaOntologiesInOrder(final Model model,
+    private List<InferredOWLOntologyID> uploadSchemaOntologiesInOrder(final Model model,
             final List<OWLOntologyID> nextImportOrder) throws ModelException, OpenRDFException, IOException,
         OWLException, PoddException
     {
@@ -530,7 +530,7 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
      * @param schemaOntologyID
      * @param inputStream
      * @param fileFormat
-     * @param conn
+     * @param managementConnection
      * @param dependentSchemaOntologies
      * @return
      * @throws OWLException
@@ -542,7 +542,7 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
      * @throws OpenRDFException
      */
     private InferredOWLOntologyID uploadSchemaOntologyInternal(final OWLOntologyID schemaOntologyID,
-            final InputStream inputStream, final RDFFormat fileFormat, final RepositoryConnection conn,
+            final InputStream inputStream, final RDFFormat fileFormat, final RepositoryConnection managementConnection,
             final URI schemaManagementGraph, Set<? extends OWLOntologyID> dependentSchemaOntologies)
         throws OWLException, IOException, PoddException, EmptyOntologyException, RepositoryException,
         OWLRuntimeException, OpenRDFException
@@ -550,18 +550,19 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
         final OWLOntologyDocumentSource owlSource =
                 new StreamDocumentSource(inputStream, fileFormat.getDefaultMIMEType());
         InferredOWLOntologyID nextInferredOntology =
-                this.owlManager.loadAndInfer(owlSource, conn, schemaOntologyID, dependentSchemaOntologies, conn,
-                        schemaManagementGraph);
+                this.owlManager.loadAndInfer(owlSource, managementConnection, schemaOntologyID,
+                        dependentSchemaOntologies, managementConnection, schemaManagementGraph);
         
         // update the link in the schema ontology management graph
         // TODO: This may not be the right method for this purpose
-        this.sesameManager.updateCurrentManagedSchemaOntologyVersion(nextInferredOntology, true, conn,
+        this.sesameManager.updateManagedSchemaOntologyVersion(nextInferredOntology, true, managementConnection,
                 schemaManagementGraph);
         
+        return nextInferredOntology;
         // TODO: Why are we not able to return nextInferredOntology here
-        final InferredOWLOntologyID result =
-                new InferredOWLOntologyID(nextInferredOntology.getOntologyIRI(), nextInferredOntology.getVersionIRI(),
-                        nextInferredOntology.getOntologyIRI());
-        return result;
+//        final InferredOWLOntologyID result =
+//                new InferredOWLOntologyID(nextInferredOntology.getOntologyIRI(), nextInferredOntology.getVersionIRI(),
+//                        nextInferredOntology.getOntologyIRI());
+//        return result;
     }
 }

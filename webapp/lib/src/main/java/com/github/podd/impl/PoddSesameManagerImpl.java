@@ -1968,7 +1968,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
     }
     
     @Override
-    public void updateCurrentManagedSchemaOntologyVersion(final InferredOWLOntologyID nextOntologyID,
+    public void updateManagedSchemaOntologyVersion(final InferredOWLOntologyID nextOntologyID,
             final boolean updateCurrent, final RepositoryConnection repositoryConnection, final URI context)
         throws OpenRDFException
     {

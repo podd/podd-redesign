@@ -522,7 +522,7 @@ public interface PoddSesameManager
      * @param context
      * @throws OpenRDFException
      */
-    void updateCurrentManagedSchemaOntologyVersion(InferredOWLOntologyID nextOntologyID, boolean updateCurrent,
+    void updateManagedSchemaOntologyVersion(InferredOWLOntologyID nextOntologyID, boolean updateCurrent,
             RepositoryConnection repositoryConnection, URI context) throws OpenRDFException;
     
     /**
