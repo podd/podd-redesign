@@ -371,9 +371,45 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
     @Override
     public void shutDown() throws RepositoryException
     {
-        if(this.managementRepository != null)
+        RepositoryException foundException = null;
+        try
         {
-            this.managementRepository.shutDown();
+            if(this.managementRepository != null)
+            {
+                this.log.info("Shutting down management repository");
+                this.managementRepository.shutDown();
+            }
+        }
+        catch(RepositoryException e)
+        {
+            foundException = e;
+        }
+        finally
+        {
+            for(Entry<Set<? extends OWLOntologyID>, Repository> nextRepository : this.permanentRepositories.entrySet())
+            {
+                try
+                {
+                    this.log.info("Shutting down repository for schema ontologies: {} ", nextRepository.getKey());
+                    nextRepository.getValue().shutDown();
+                }
+                catch(RepositoryException e)
+                {
+                    if(foundException == null)
+                    {
+                        foundException = e;
+                    }
+                    else
+                    {
+                        foundException.addSuppressed(e);
+                    }
+                }
+            }
+        }
+        
+        if(foundException != null)
+        {
+            throw foundException;
         }
     }
     
