@@ -26,14 +26,23 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.rules.TemporaryFolder;
+import org.junit.rules.Timeout;
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.Model;
+import org.openrdf.model.Resource;
 import org.openrdf.model.URI;
 import org.openrdf.model.impl.LinkedHashModel;
 import org.openrdf.model.impl.ValueFactoryImpl;
+import org.openrdf.model.util.GraphUtil;
 import org.openrdf.model.vocabulary.RDF;
 import org.openrdf.repository.Repository;
+import org.openrdf.repository.config.RepositoryConfigSchema;
+import org.openrdf.repository.config.RepositoryImplConfig;
+import org.openrdf.repository.config.RepositoryImplConfigBase;
+import org.openrdf.repository.manager.LocalRepositoryManager;
 import org.openrdf.repository.sail.SailRepository;
+import org.openrdf.rio.RDFFormat;
+import org.openrdf.rio.Rio;
 import org.openrdf.sail.memory.MemoryStore;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.OWLOntologyManagerFactory;
@@ -62,9 +71,11 @@ import com.github.podd.utils.PoddWebConstants;
  */
 public class PoddFileRepositoryManagerImplTest extends AbstractPoddFileRepositoryManagerTest
 {
+    @Rule
+    public Timeout timeout = new Timeout(30000);
     
     @Rule
-    public final TemporaryFolder tempDirectory = new TemporaryFolder();
+    public TemporaryFolder tempDir = new TemporaryFolder();
     
     /** SSH File Repository server for tests */
     protected SSHService sshd;
@@ -143,31 +154,36 @@ public class PoddFileRepositoryManagerImplTest extends AbstractPoddFileRepositor
     @Override
     protected DataReference getNewInvalidFileReference() throws Exception
     {
-        return SSHService.getNewInvalidFileReference("invalid-file",
-                this.tempDirectory.newFolder("poddfilerepositoryimpltest-resources-" + UUID.randomUUID().toString())
-                        .toPath());
+        return SSHService
+                .getNewInvalidFileReference("invalid-file",
+                        this.tempDir.newFolder("poddfilerepositoryimpltest-resources-" + UUID.randomUUID().toString())
+                                .toPath());
     }
     
     @Override
-    protected PoddDataRepositoryManager getNewPoddFileRepositoryManager() throws OpenRDFException
+    protected PoddDataRepositoryManager getNewPoddFileRepositoryManager() throws Exception
     {
         // create a Repository Manager with an internal memory Repository
         Repository managementRepository = new SailRepository(new MemoryStore());
         managementRepository.initialize();
-        Repository permanentRepository = new SailRepository(new MemoryStore());
-        permanentRepository.initialize();
         
-        final PoddRepositoryManager repositoryManager =
-                new PoddRepositoryManagerImpl(managementRepository, permanentRepository);
-        repositoryManager.setManagementRepository(permanentRepository);
-        repositoryManager.setFileRepositoryManagementGraph(PODD.DEFAULT_FILE_REPOSITORY_MANAGEMENT_GRAPH);
+        final Model graph =
+                Rio.parse(this.getClass().getResourceAsStream("/memorystoreconfig.ttl"), "", RDFFormat.TURTLE);
+        final Resource repositoryNode = GraphUtil.getUniqueSubject(graph, RepositoryConfigSchema.REPOSITORYTYPE, null);
+        RepositoryImplConfig repositoryImplConfig = RepositoryImplConfigBase.create(graph, repositoryNode);
+        Assert.assertNotNull(repositoryImplConfig);
+        Assert.assertNotNull(repositoryImplConfig.getType());
+        LocalRepositoryManager repositoryManager = new LocalRepositoryManager(tempDir.newFolder("repositorymanager"));
+        repositoryManager.initialize();
+        PoddRepositoryManagerImpl repositoryManagerImpl =
+                new PoddRepositoryManagerImpl(managementRepository, repositoryManager, repositoryImplConfig);
         
         final PoddOWLManager owlManager =
                 new PoddOWLManagerImpl(getNewOWLOntologyManagerFactory(), getNewReasonerFactory());
         
         // create the PoddDataRepositoryManager for testing
         final PoddDataRepositoryManager testFileRepositoryManager = new PoddFileRepositoryManagerImpl();
-        testFileRepositoryManager.setRepositoryManager(repositoryManager);
+        testFileRepositoryManager.setRepositoryManager(repositoryManagerImpl);
         testFileRepositoryManager.setOWLManager(owlManager);
         
         return testFileRepositoryManager;
@@ -193,16 +209,17 @@ public class PoddFileRepositoryManagerImplTest extends AbstractPoddFileRepositor
     @Override
     protected DataReference getNewValidFileReference() throws Exception
     {
-        return SSHService.getNewValidFileReference("valid-file",
-                this.tempDirectory.newFolder("poddfilerepositoryimpltest-resources-" + UUID.randomUUID().toString())
-                        .toPath());
+        return SSHService
+                .getNewValidFileReference("valid-file",
+                        this.tempDir.newFolder("poddfilerepositoryimpltest-resources-" + UUID.randomUUID().toString())
+                                .toPath());
     }
     
     @Before
     @Override
     public void setUp() throws Exception
     {
-        this.sshDir = this.tempDirectory.newFolder("podd-filerepository-manager-impl-test").toPath();
+        this.sshDir = this.tempDir.newFolder("podd-filerepository-manager-impl-test").toPath();
         this.sshd = new SSHService();
         this.sshd.startTestSSHServer(this.sshDir);
         super.setUp();

@@ -28,7 +28,9 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.Model;
 import org.openrdf.model.URI;
@@ -64,6 +66,9 @@ import com.github.podd.utils.PODD;
  */
 public abstract class AbstractPoddSchemaManagerTest
 {
+    @Rule
+    public TemporaryFolder tempDir = new TemporaryFolder();
+    
     protected final Logger log = LoggerFactory.getLogger(this.getClass());
     
     protected PoddSchemaManager testSchemaManager;
@@ -89,9 +94,9 @@ public abstract class AbstractPoddSchemaManagerTest
     /**
      * 
      * @return A new instance of {@link PoddRepositoryManager}, for each call to this method.
-     * @throws RepositoryException
+     * @throws Exception
      */
-    protected abstract PoddRepositoryManager getNewPoddRepositoryManagerInstance() throws RepositoryException;
+    protected abstract PoddRepositoryManager getNewPoddRepositoryManagerInstance() throws Exception;
     
     /**
      * 

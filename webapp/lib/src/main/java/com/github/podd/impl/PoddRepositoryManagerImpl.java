@@ -79,50 +79,6 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
     
     private RepositoryManager sesameRepositoryManager;
     
-    // /**
-    // * Default constructor, which sets up an in-memory MemoryStore repository.
-    // */
-    // public PoddRepositoryManagerImpl()
-    // {
-    // this.managementRepository = new SailRepository(new MemoryStore());
-    // try
-    // {
-    // this.managementRepository.initialize();
-    // // TODO: Use a non-stub mapping here
-    // this.permanentRepositories.put(Collections.<OWLOntologyID> emptySet(),
-    // this.managementRepository);
-    // }
-    // catch(final RepositoryException e)
-    // {
-    // try
-    // {
-    // this.managementRepository.shutDown();
-    // }
-    // catch(final RepositoryException e1)
-    // {
-    // // TODO Auto-generated catch block
-    // e1.printStackTrace();
-    // }
-    //
-    // throw new
-    // RuntimeException("Could not initialise PoddRepositoryManager with an in-memory repository",
-    // e);
-    // }
-    // }
-    //
-    
-    /**
-     * 
-     * @param managementRepository
-     * @param permanentRepository
-     */
-    public PoddRepositoryManagerImpl(final Repository managementRepository, final Repository permanentRepository)
-    {
-        this.managementRepository = managementRepository;
-        // FIXME: This method should be removed
-        this.permanentRepositories.put(Collections.<OWLOntologyID> emptySet(), permanentRepository);
-    }
-    
     /**
      * 
      * @param managementRepository
@@ -406,8 +362,11 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
                 }
             }
             
-            // NOTE: Exceptions from the following are logged but not thrown for some reason
-            sesameRepositoryManager.shutDown();
+            if(sesameRepositoryManager != null)
+            {
+                // NOTE: Exceptions from the following are logged but not thrown for some reason
+                sesameRepositoryManager.shutDown();
+            }
         }
         
         if(foundException != null)
