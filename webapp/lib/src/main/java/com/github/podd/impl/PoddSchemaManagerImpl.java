@@ -381,8 +381,6 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
         Objects.requireNonNull(model, "Schema Ontology model was null");
         Objects.requireNonNull(nextImportOrder, "Schema Ontology import order was null");
         
-        Set<OWLOntologyID> dependentSchemaOntologies = new LinkedHashSet<>(nextImportOrder.size());
-        
         final Set<InferredOWLOntologyID> currentSchemaOntologies = this.getSchemaOntologies();
         
         Map<OWLOntologyID, Boolean> loadingOrder = new LinkedHashMap<>();
@@ -391,10 +389,6 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
         
         try
         {
-            // TODO: Should we store these copies in a separate repository again, to reduce bloat in
-            // the management repository??
-            managementConnection = this.repositoryManager.getManagementRepository().getConnection();
-            managementConnection.begin();
             
             for(final OWLOntologyID nextImport : nextImportOrder)
             {
@@ -410,12 +404,24 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
                 loadingOrder.put(nextImport, alreadyLoaded);
             }
             
+            managementConnection = this.repositoryManager.getManagementRepository().getConnection();
+            managementConnection.begin();
+            
+            List<InferredOWLOntologyID> ontologyIDs =
+                    OntologyUtils.loadSchemasFromManifest(managementConnection,
+                            this.repositoryManager.getSchemaManagementGraph(), model);
+            // managementConnection.add(model, this.repositoryManager.getSchemaManagementGraph());
+            
             List<InferredOWLOntologyID> results = new ArrayList<>();
             
             for(Entry<OWLOntologyID, Boolean> loadEntry : loadingOrder.entrySet())
             {
                 if(!loadEntry.getValue())
                 {
+                    // TODO: Should we store these copies in a separate repository again, to reduce
+                    // bloat in
+                    // the management repository??
+                    
                     OWLOntologyID loadEntryID = loadEntry.getKey();
                     final String classpathLocation =
                             model.filter(loadEntryID.getVersionIRI().toOpenRDFURI(), PODD.PODD_SCHEMA_CLASSPATH, null)
@@ -433,16 +439,15 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
                         final InferredOWLOntologyID nextResult =
                                 this.uploadSchemaOntologyInternal(schemaOntologyID, inputStream, fileFormat,
                                         managementConnection, this.repositoryManager.getSchemaManagementGraph(),
-                                        new LinkedHashSet<OWLOntologyID>(dependentSchemaOntologies));
+                                        new LinkedHashSet<OWLOntologyID>(results));
                         
                         results.add(nextResult);
                     }
+                    
                 }
-                dependentSchemaOntologies.add(loadEntry.getKey());
             }
             
             managementConnection.commit();
-            
             return results;
         }
         catch(final Throwable e)

@@ -31,6 +31,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+import org.junit.Assert;
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.Model;
 import org.openrdf.model.Resource;
@@ -45,6 +46,8 @@ import org.openrdf.model.util.GraphUtilException;
 import org.openrdf.model.util.ModelException;
 import org.openrdf.model.vocabulary.OWL;
 import org.openrdf.model.vocabulary.RDF;
+import org.openrdf.repository.RepositoryConnection;
+import org.openrdf.repository.RepositoryException;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.RDFHandler;
 import org.openrdf.rio.RDFHandlerException;
@@ -839,5 +842,38 @@ public class OntologyUtils
     
     private OntologyUtils()
     {
+    }
+
+    /**
+     * @param managementConnection
+     * @param schemaManagementGraph
+     * @param model
+     * @return
+     * @throws RepositoryException
+     * @throws ModelException
+     * @throws IOException
+     * @throws RDFParseException
+     */
+    public static List<InferredOWLOntologyID> loadSchemasFromManifest(final RepositoryConnection managementConnection,
+            final URI schemaManagementGraph, Model model) throws RepositoryException, ModelException, IOException,
+        RDFParseException
+    {
+        managementConnection.add(model, schemaManagementGraph);
+        
+        List<InferredOWLOntologyID> ontologyIDs = modelToOntologyIDs(model, false, false);
+        
+        for(InferredOWLOntologyID nextOntology : ontologyIDs)
+        {
+            String classpath =
+                    model.filter(nextOntology.getVersionIRI().toOpenRDFURI(), PODD.PODD_SCHEMA_CLASSPATH, null)
+                            .objectString();
+            Assert.assertNotNull("Ontology was not mapped to a classpath: " + nextOntology, classpath);
+            InputStream nextStream = OntologyUtils.class.getResourceAsStream(classpath);
+            Assert.assertNotNull("Ontology classpath mapping was not valid: " + nextOntology + " " + classpath);
+            
+            managementConnection.add(nextStream, "", Rio.getParserFormatForFileName(classpath, RDFFormat.RDFXML),
+                    nextOntology.getVersionIRI().toOpenRDFURI());
+        }
+        return ontologyIDs;
     }
 }

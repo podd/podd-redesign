@@ -117,6 +117,9 @@ public class PoddSchemaManagerImplTest extends AbstractPoddSchemaManagerTest
         {
             final RDFFormat format = Rio.getParserFormatForFileName(schemaManifest, RDFFormat.RDFXML);
             model = Rio.parse(schemaManifestStream, "", format);
+            
+            this.testRepositoryManager.getManagementRepository().getConnection()
+                    .add(model, this.testRepositoryManager.getSchemaManagementGraph());
         }
         
         // prepare: order of imports
@@ -137,7 +140,7 @@ public class PoddSchemaManagerImplTest extends AbstractPoddSchemaManagerTest
         
         // verify: schemas successfully loaded
         Assert.assertEquals("Expected 3 current schemas", 3, this.testSchemaManager.getCurrentSchemaOntologies().size());
-        Assert.assertEquals("Expected 5 schema ontology versions", 5, this.testSchemaManager.getSchemaOntologies()
+        Assert.assertEquals("Expected 5 schema ontology versions", 10, this.testSchemaManager.getSchemaOntologies()
                 .size());
     }
     
@@ -151,6 +154,9 @@ public class PoddSchemaManagerImplTest extends AbstractPoddSchemaManagerTest
         {
             final RDFFormat format = Rio.getParserFormatForFileName(schemaManifest, RDFFormat.RDFXML);
             model = Rio.parse(schemaManifestStream, "", format);
+
+            this.testRepositoryManager.getManagementRepository().getConnection()
+                    .add(model, this.testRepositoryManager.getSchemaManagementGraph());
         }
         
         // prepare: order of imports
@@ -171,14 +177,16 @@ public class PoddSchemaManagerImplTest extends AbstractPoddSchemaManagerTest
         
         // verify: schemas successfully loaded
         Assert.assertEquals("Expected 3 current schemas", 3, this.testSchemaManager.getCurrentSchemaOntologies().size());
-        Assert.assertEquals("Expected 5 schema ontology versions", 5, this.testSchemaManager.getSchemaOntologies()
+        Assert.assertEquals("Expected 5 schema ontology versions", 10, this.testSchemaManager.getSchemaOntologies()
                 .size());
+        
+        this.log.info("schemaOntologies: {}", this.testSchemaManager.getSchemaOntologies());
         
         ((PoddSchemaManagerImpl)this.testSchemaManager).uploadSchemaOntologiesInOrder(model, testImportOrder);
         
         // verify: schemas in memory not modified
         Assert.assertEquals("Expected 3 current schemas", 3, this.testSchemaManager.getCurrentSchemaOntologies().size());
-        Assert.assertEquals("Expected 5 schema ontology versions", 5, this.testSchemaManager.getSchemaOntologies()
+        Assert.assertEquals("Expected 5 schema ontology versions", 10, this.testSchemaManager.getSchemaOntologies()
                 .size());
     }
     

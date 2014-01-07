@@ -16,7 +16,6 @@
  */
 package com.github.podd.impl.test;
 
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashSet;
@@ -43,7 +42,6 @@ import com.github.podd.impl.PoddOWLManagerImpl;
 import com.github.podd.impl.PoddSesameManagerImpl;
 import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.OntologyUtils;
-import com.github.podd.utils.PODD;
 import com.github.podd.utils.PoddWebConstants;
 
 /**
@@ -87,7 +85,8 @@ public class PoddSesameManagerImplTest extends AbstractPoddSesameManagerTest
                 Rio.parse(this.getClass().getResourceAsStream("/podd-schema-manifest.ttl"), "", RDFFormat.TURTLE,
                         schemaManagementGraph);
         
-        managementConnection.add(model, schemaManagementGraph);
+        List<InferredOWLOntologyID> ontologyIDs =
+                OntologyUtils.loadSchemasFromManifest(managementConnection, schemaManagementGraph, model);
         
         // - create a PODD OWLManager instance
         final OWLReasonerFactory reasonerFactory =
@@ -95,21 +94,6 @@ public class PoddSesameManagerImplTest extends AbstractPoddSesameManagerTest
         Assert.assertNotNull("Null implementation of OWLReasonerFactory", reasonerFactory);
         final PoddOWLManagerImpl testPoddOWLManager =
                 new PoddOWLManagerImpl(getNewOWLOntologyManagerFactory(), reasonerFactory);
-        
-        List<InferredOWLOntologyID> ontologyIDs = OntologyUtils.modelToOntologyIDs(model, false, false);
-        
-        for(InferredOWLOntologyID nextOntology : ontologyIDs)
-        {
-            String classpath =
-                    model.filter(nextOntology.getVersionIRI().toOpenRDFURI(), PODD.PODD_SCHEMA_CLASSPATH, null)
-                            .objectString();
-            Assert.assertNotNull("Ontology was not mapped to a classpath: " + nextOntology, classpath);
-            InputStream nextStream = this.getClass().getResourceAsStream(classpath);
-            Assert.assertNotNull("Ontology classpath mapping was not valid: " + nextOntology + " " + classpath);
-            
-            managementConnection.add(nextStream, "", Rio.getParserFormatForFileName(classpath, RDFFormat.RDFXML),
-                    nextOntology.getVersionIRI().toOpenRDFURI());
-        }
         
         testPoddOWLManager.cacheSchemaOntologies(new LinkedHashSet<>(ontologyIDs), managementConnection,
                 schemaManagementGraph);

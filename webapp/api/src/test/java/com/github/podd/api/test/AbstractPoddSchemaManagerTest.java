@@ -68,7 +68,7 @@ public abstract class AbstractPoddSchemaManagerTest
     
     protected PoddSchemaManager testSchemaManager;
     private PoddOWLManager testOwlManager;
-    private PoddRepositoryManager testRepositoryManager;
+    protected PoddRepositoryManager testRepositoryManager;
     private PoddSesameManager testSesameManager;
     
     /**
