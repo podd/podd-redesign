@@ -197,6 +197,7 @@ public abstract class AbstractPoddSchemaManagerTest
     @After
     public void tearDown() throws Exception
     {
+        this.testRepositoryManager.shutDown();
         this.testSchemaManager = null;
     }
     

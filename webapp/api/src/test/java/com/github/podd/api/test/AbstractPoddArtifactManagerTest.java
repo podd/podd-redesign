@@ -624,7 +624,7 @@ public abstract class AbstractPoddArtifactManagerTest
             }
             finally
             {
-                this.testRepositoryManager.getManagementRepository().shutDown();
+                this.testRepositoryManager.shutDown();
                 this.testRepositoryManager = null;
                 this.testManagementConnection = null;
             }

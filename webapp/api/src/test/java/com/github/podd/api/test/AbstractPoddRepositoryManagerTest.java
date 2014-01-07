@@ -76,7 +76,7 @@ public abstract class AbstractPoddRepositoryManagerTest
     @After
     public void tearDown() throws Exception
     {
-        this.testRepositoryManager.getManagementRepository().shutDown();
+        this.testRepositoryManager.shutDown();
         this.testRepositoryManager = null;
     }
     
