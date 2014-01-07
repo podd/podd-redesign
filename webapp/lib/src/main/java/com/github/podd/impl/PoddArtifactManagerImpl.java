@@ -453,7 +453,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             permanentConnection = this.getRepositoryManager().getPermanentRepository(schemaImports).getConnection();
             managementConnection = this.getRepositoryManager().getManagementRepository().getConnection();
             final URI[] contexts =
-                    this.getSesameManager().versionAndSchemaContexts(ontologyID, managementConnection,
+                    this.getSesameManager().versionAndInferredAndSchemaContexts(ontologyID, managementConnection,
                             this.getRepositoryManager().getSchemaManagementGraph());
             
             return this.getSesameManager().fillMissingLabels(inputModel, permanentConnection, contexts);

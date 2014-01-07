@@ -164,12 +164,15 @@ public class PoddSesameManagerImpl implements PoddSesameManager
             final URI... contexts) throws OpenRDFException
     {
         final Set<URI> missingLabelUris = new LinkedHashSet<>();
-        for(final Statement statement : inputModel)
+        for(final Resource subject : inputModel.subjects())
         {
-            if(statement.getSubject() instanceof URI
-                    && !inputModel.contains(statement.getSubject(), RDFS.LABEL, null, contexts))
+            if(subject instanceof URI)
             {
-                missingLabelUris.add((URI)statement.getSubject());
+                Set<Value> objects = inputModel.filter(subject, RDFS.LABEL, null, contexts).objects();
+                if(objects.isEmpty() || objects.size() == 1 && objects.iterator().next().stringValue().equals("?blank"))
+                {
+                    missingLabelUris.add((URI)subject);
+                }
             }
         }
         
