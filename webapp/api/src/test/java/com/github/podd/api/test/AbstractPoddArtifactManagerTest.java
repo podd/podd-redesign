@@ -444,8 +444,8 @@ public abstract class AbstractPoddArtifactManagerTest
                 this.testArtifactManager.getOWLManager().loadAndInfer(owlSource, repositoryConnection, null,
                         dependentSchemaOntologies, repositoryConnection, this.schemaGraph);
         
-        this.testSesameManager.updateManagedSchemaOntologyVersion(inferredOntologyID, true,
-                repositoryConnection, this.schemaGraph);
+        this.testSesameManager.updateManagedSchemaOntologyVersion(inferredOntologyID, true, repositoryConnection,
+                this.schemaGraph);
         
         // verify statement counts
         final URI versionURI = inferredOntologyID.getVersionIRI().toOpenRDFURI();
@@ -658,20 +658,23 @@ public abstract class AbstractPoddArtifactManagerTest
                             DataReferenceVerificationPolicy.DO_NOT_VERIFY);
         }
         // verify:
-        RepositoryConnection nextRepositoryConnection = null;
+        RepositoryConnection managementConnection = null;
+        RepositoryConnection permanentConnection = null;
         try
         {
-            nextRepositoryConnection = this.testRepositoryManager.getManagementRepository().getConnection();
-            nextRepositoryConnection.begin();
+            managementConnection = this.testRepositoryManager.getManagementRepository().getConnection();
+            managementConnection.begin();
+            
+            Set<? extends OWLOntologyID> schemaImports = this.testArtifactManager.getSchemaImports(updatedArtifact);
+            permanentConnection = this.testRepositoryManager.getPermanentRepository(schemaImports).getConnection();
             
             this.verifyUpdatedArtifact(updatedArtifact, "http://purl.org/podd/basic-2-20130206/artifact:1:version:2",
-                    TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES + 8, nextRepositoryConnection);
+                    TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES + 8, managementConnection);
             
             // verify: file reference object
             final List<Statement> fileRefList =
-                    Iterations.asList(nextRepositoryConnection.getStatements(null, ValueFactoryImpl.getInstance()
-                            .createURI(PODD.PODD_BASE, "hasDataReference"), null, false, updatedArtifact
-                            .getVersionIRI().toOpenRDFURI()));
+                    Iterations.asList(permanentConnection.getStatements(null, PODD.PODD_BASE_HAS_DATA_REFERENCE, null,
+                            false, updatedArtifact.getVersionIRI().toOpenRDFURI()));
             Assert.assertEquals("Graph should have 1 file reference", 1, fileRefList.size());
             
             Assert.assertTrue("File reference value incorrect",
@@ -679,15 +682,21 @@ public abstract class AbstractPoddArtifactManagerTest
         }
         finally
         {
-            if(nextRepositoryConnection != null && nextRepositoryConnection.isActive())
+            if(permanentConnection != null && permanentConnection.isOpen())
             {
-                nextRepositoryConnection.rollback();
+                permanentConnection.close();
             }
-            if(nextRepositoryConnection != null && nextRepositoryConnection.isOpen())
+            permanentConnection = null;
+            
+            if(managementConnection != null && managementConnection.isActive())
             {
-                nextRepositoryConnection.close();
+                managementConnection.rollback();
             }
-            nextRepositoryConnection = null;
+            if(managementConnection != null && managementConnection.isOpen())
+            {
+                managementConnection.close();
+            }
+            managementConnection = null;
         }
     }
     
@@ -1918,7 +1927,7 @@ public abstract class AbstractPoddArtifactManagerTest
         this.verifyLoadedArtifact(firstArtifactId, 22,
                 TestConstants.TEST_ARTIFACT_BASIC_1_INTERNAL_OBJECT_CONCRETE_TRIPLES,
                 TestConstants.TEST_ARTIFACT_BASIC_1_INTERNAL_OBJECT_INFERRED_TRIPLES, false);
-        this.verifyLoadedArtifact(secondArtifactId, 14, TestConstants.TEST_ARTIFACT_BASIC_PROJECT_2_CONCRETE_TRIPLES,
+        this.verifyLoadedArtifact(secondArtifactId, 22, TestConstants.TEST_ARTIFACT_BASIC_PROJECT_2_CONCRETE_TRIPLES,
                 TestConstants.TEST_ARTIFACT_BASIC_PROJECT_2_INFERRED_TRIPLES, true);
     }
     

@@ -1556,12 +1556,9 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         this.getSesameManager().updateManagedPoddArtifactVersion(inferredOWLOntologyID, true,
                 managementRepositoryConnection, this.getRepositoryManager().getArtifactManagementGraph());
         
-        Model importsModel = new LinkedHashModel();
-        permanentRepositoryConnection.exportStatements(inferredOWLOntologyID.getOntologyIRI().toOpenRDFURI(),
-                OWL.IMPORTS, null, true, new StatementCollector(importsModel), inferredOWLOntologyID.getVersionIRI()
-                        .toOpenRDFURI());
-        
-        for(Statement nextImport : importsModel)
+        for(Statement nextImport : Iterations.asList(permanentRepositoryConnection.getStatements(inferredOWLOntologyID
+                .getOntologyIRI().toOpenRDFURI(), OWL.IMPORTS, null, true, inferredOWLOntologyID.getVersionIRI()
+                .toOpenRDFURI())))
         {
             managementRepositoryConnection.add(inferredOWLOntologyID.getVersionIRI().toOpenRDFURI(), OWL.IMPORTS,
                     nextImport.getObject(), this.getRepositoryManager().getArtifactManagementGraph());
