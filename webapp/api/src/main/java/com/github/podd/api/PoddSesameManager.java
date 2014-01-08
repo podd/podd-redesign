@@ -323,8 +323,9 @@ public interface PoddSesameManager
         throws OpenRDFException;
     
     List<URI> getObjectTypes(InferredOWLOntologyID ontologyID, URI objectUri,
-            RepositoryConnection repositoryConnection, URI schemaManagementGraph, URI artifactManagementGraph)
-        throws OpenRDFException, SchemaManifestException, UnmanagedSchemaIRIException;
+            RepositoryConnection managementConnection, RepositoryConnection permanentConnection,
+            URI schemaManagementGraph, URI artifactManagementGraph) throws OpenRDFException, SchemaManifestException,
+        UnmanagedSchemaIRIException;
     
     /**
      * Returns a collection of ontologies managed in the given graph, optionally only returning the

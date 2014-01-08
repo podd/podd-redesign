@@ -1275,7 +1275,7 @@ public abstract class AbstractPoddSesameManagerTest
             
             final List<URI> objectTypes =
                     this.testPoddSesameManager.getObjectTypes(ontologyID1, objectUri, this.testRepositoryConnection,
-                            this.schemaGraph, this.artifactGraph);
+                            this.testRepositoryConnection, this.schemaGraph, this.artifactGraph);
             
             // verify:
             Assert.assertNotNull("Type was null", objectTypes);

@@ -728,14 +728,16 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
     {
         final List<PoddObjectLabel> results = new ArrayList<PoddObjectLabel>();
         RepositoryConnection permanentConnection = null;
+        RepositoryConnection managementConnection = null;
         
         try
         {
             final Set<? extends OWLOntologyID> schemaImports = this.getSchemaImports(artifactId);
+            managementConnection = this.getRepositoryManager().getManagementRepository().getConnection();
             permanentConnection = this.getRepositoryManager().getPermanentRepository(schemaImports).getConnection();
             
             final List<URI> typesList =
-                    this.getSesameManager().getObjectTypes(artifactId, objectUri, permanentConnection,
+                    this.getSesameManager().getObjectTypes(artifactId, objectUri, managementConnection, permanentConnection,
                             this.getRepositoryManager().getSchemaManagementGraph(),
                             this.getRepositoryManager().getArtifactManagementGraph());
             for(final URI objectType : typesList)
@@ -747,9 +749,19 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         }
         finally
         {
-            if(permanentConnection != null)
+            try
             {
-                permanentConnection.close();
+                if(permanentConnection != null && permanentConnection.isOpen())
+                {
+                    permanentConnection.close();
+                }
+            }
+            finally
+            {
+                if(managementConnection != null && managementConnection.isOpen())
+                {
+                    managementConnection.close();
+                }
             }
         }
         

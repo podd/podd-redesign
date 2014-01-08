@@ -1418,7 +1418,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
      *            The artifact to which the object belongs
      * @param objectUri
      *            The object whose type is to be determined
-     * @param repositoryConnection
+     * @param permanentConnection
      * @param artifactManagementGraph
      * @return A list of URIs for the identified object Types
      * @throws OpenRDFException
@@ -1427,9 +1427,9 @@ public class PoddSesameManagerImpl implements PoddSesameManager
      */
     @Override
     public List<URI> getObjectTypes(final InferredOWLOntologyID ontologyID, final URI objectUri,
-            final RepositoryConnection repositoryConnection, final URI schemaManagementGraph,
-            final URI artifactManagementGraph) throws OpenRDFException, SchemaManifestException,
-        UnmanagedSchemaIRIException
+            final RepositoryConnection managementConnection, final RepositoryConnection permanentConnection,
+            final URI schemaManagementGraph, final URI artifactManagementGraph) throws OpenRDFException,
+        SchemaManifestException, UnmanagedSchemaIRIException
     {
         final StringBuilder sb = new StringBuilder(1024);
         sb.append("SELECT DISTINCT ?poddTypeUri ");
@@ -1450,11 +1450,11 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         
         this.log.debug("Created SPARQL {} with objectUri bound to {}", sb, objectUri);
         
-        final TupleQuery tupleQuery = repositoryConnection.prepareTupleQuery(QueryLanguage.SPARQL, sb.toString());
+        final TupleQuery tupleQuery = permanentConnection.prepareTupleQuery(QueryLanguage.SPARQL, sb.toString());
         tupleQuery.setBinding("objectUri", objectUri);
         final QueryResultCollector queryResults =
                 RdfUtility.executeTupleQuery(tupleQuery, this.versionAndSchemaContexts(ontologyID,
-                        repositoryConnection, schemaManagementGraph, artifactManagementGraph));
+                        managementConnection, schemaManagementGraph, artifactManagementGraph));
         
         final List<URI> results = new ArrayList<URI>(queryResults.getBindingSets().size());
         
