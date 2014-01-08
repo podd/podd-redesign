@@ -16,12 +16,14 @@
  */
 package com.github.podd.resources;
 
+import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
 
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.URI;
 import org.openrdf.repository.RepositoryConnection;
+import org.openrdf.rio.UnsupportedRDFormatException;
 import org.restlet.data.MediaType;
 import org.restlet.data.Status;
 import org.restlet.representation.Representation;
@@ -30,7 +32,9 @@ import org.restlet.resource.Get;
 import org.restlet.resource.Post;
 import org.restlet.resource.ResourceException;
 import org.semanticweb.owlapi.model.IRI;
+import org.semanticweb.owlapi.model.OWLOntologyID;
 
+import com.github.podd.exception.SchemaManifestException;
 import com.github.podd.exception.UnmanagedArtifactIRIException;
 import com.github.podd.exception.UnmanagedArtifactVersionException;
 import com.github.podd.exception.UnmanagedSchemaIRIException;
@@ -63,10 +67,12 @@ public class AddObjectResourceImpl extends AbstractPoddResourceImpl
      * Serve the "Add new object" HTML page
      * 
      * @throws UnmanagedSchemaIRIException
+     * @throws IOException
+     * @throws UnsupportedRDFormatException
      */
     @Get("html")
     public Representation getCreateObjectHtml(final Representation entity) throws ResourceException,
-        UnmanagedSchemaIRIException
+        UnmanagedSchemaIRIException, UnsupportedRDFormatException, IOException
     {
         this.log.info("@Get addObjectHtml Page");
         
@@ -89,6 +95,9 @@ public class AddObjectResourceImpl extends AbstractPoddResourceImpl
         }
         else
         {
+            // Only allow access if they have edit access to the artifact in question,
+            // otherwise will be leaking information about objectType that may be sensitive
+            // if it is defined inside of the artifact.
             this.checkAuthentication(PoddAction.ARTIFACT_EDIT, PODD.VF.createURI(artifactUri));
         }
         
@@ -146,43 +155,65 @@ public class AddObjectResourceImpl extends AbstractPoddResourceImpl
      * API.
      */
     private PoddObjectLabel getObjectTypeLabel(final String artifactUri, final String objectType)
+        throws UnsupportedRDFormatException, IOException
     {
         PoddObjectLabel objectLabel;
+        RepositoryConnection managementConnection = null;
         try
         {
-            InferredOWLOntologyID ontologyID;
-            if(artifactUri == null)
-            {
-                // FIXME: Why is there a hack here???
-                ontologyID =
-                        this.getPoddSchemaManager().getCurrentSchemaOntologyVersion(
-                                IRI.create(PODD.PODD_SCIENCE.replace("#", "")));
-            }
-            else
-            {
-                ontologyID = this.getPoddArtifactManager().getArtifact(IRI.create(artifactUri));
-            }
-            
-            final Set<InferredOWLOntologyID> schemaImports = this.getPoddArtifactManager().getSchemaImports(ontologyID);
-            RepositoryConnection conn = null;
+            RepositoryConnection permanentConnection = null;
             try
             {
-                conn = this.getPoddRepositoryManager().getPermanentRepository(schemaImports).getConnection();
-                objectLabel =
-                        this.getPoddSesameManager().getObjectLabel(ontologyID, PODD.VF.createURI(objectType), conn,
-                                this.getPoddRepositoryManager().getSchemaManagementGraph());
+                managementConnection = this.getPoddRepositoryManager().getManagementRepository().getConnection();
+                managementConnection.begin();
+                
+                InferredOWLOntologyID ontologyID = null;
+                if(artifactUri != null)
+                {
+                    ontologyID = this.getPoddArtifactManager().getArtifact(IRI.create(artifactUri));
+                    final Set<? extends OWLOntologyID> schemaImports =
+                            this.getPoddArtifactManager().getSchemaImports(ontologyID);
+                    permanentConnection =
+                            this.getPoddRepositoryManager().getPermanentRepository(schemaImports).getConnection();
+                    
+                    objectLabel =
+                            this.getPoddSesameManager().getObjectLabel(ontologyID, PODD.VF.createURI(objectType),
+                                    managementConnection, permanentConnection,
+                                    this.getPoddRepositoryManager().getSchemaManagementGraph(),
+                                    this.getPoddRepositoryManager().getArtifactManagementGraph());
+                }
+                else
+                {
+                    objectLabel =
+                            this.getPoddSesameManager().getObjectLabel(ontologyID, PODD.VF.createURI(objectType),
+                                    managementConnection, managementConnection,
+                                    this.getPoddRepositoryManager().getSchemaManagementGraph(),
+                                    this.getPoddRepositoryManager().getArtifactManagementGraph());
+                    
+                }
             }
             finally
             {
-                if(conn != null)
+                try
                 {
-                    conn.rollback(); // read only, nothing to commit
-                    conn.close();
+                    if(managementConnection != null && managementConnection.isOpen())
+                    {
+                        managementConnection.rollback(); // read only, nothing to commit
+                        managementConnection.close();
+                    }
+                }
+                finally
+                {
+                    if(permanentConnection != null && permanentConnection.isOpen())
+                    {
+                        permanentConnection.rollback(); // read only, nothing to commit
+                        permanentConnection.close();
+                    }
                 }
             }
         }
         catch(UnmanagedArtifactIRIException | UnmanagedSchemaIRIException | OpenRDFException
-                | UnmanagedArtifactVersionException e)
+                | UnmanagedArtifactVersionException | SchemaManifestException e)
         {
             e.printStackTrace();
             // failed to find Label

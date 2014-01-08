@@ -51,6 +51,7 @@ import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.RDFHandlerException;
 import org.openrdf.rio.RDFWriter;
 import org.openrdf.rio.Rio;
+import org.openrdf.rio.UnsupportedRDFormatException;
 import org.restlet.data.MediaType;
 import org.restlet.data.Status;
 import org.restlet.ext.fileupload.RestletFileUpload;
@@ -63,12 +64,14 @@ import org.restlet.resource.Post;
 import org.restlet.resource.ResourceException;
 import org.restlet.security.User;
 import org.semanticweb.owlapi.model.OWLException;
+import org.semanticweb.owlapi.model.OWLOntologyID;
 
 import com.github.podd.api.DanglingObjectPolicy;
 import com.github.podd.api.DataReferenceVerificationPolicy;
 import com.github.podd.api.PoddArtifactManager;
 import com.github.podd.exception.DuplicateArtifactIRIException;
 import com.github.podd.exception.PoddException;
+import com.github.podd.exception.SchemaManifestException;
 import com.github.podd.exception.UnmanagedArtifactIRIException;
 import com.github.podd.exception.UnmanagedArtifactVersionException;
 import com.github.podd.exception.UnmanagedSchemaIRIException;
@@ -291,7 +294,7 @@ public class UploadArtifactResourceImpl extends AbstractPoddResourceImpl
             {
                 // FIXME: This should be a method inside of
                 // PoddArtifactManagerImpl
-                final Set<InferredOWLOntologyID> schemaImports =
+                final Set<? extends OWLOntologyID> schemaImports =
                         this.getPoddArtifactManager().getSchemaImports(artifactId);
                 conn = this.getPoddRepositoryManager().getPermanentRepository(schemaImports).getConnection();
                 final URI topObjectIRI =
@@ -310,7 +313,8 @@ public class UploadArtifactResourceImpl extends AbstractPoddResourceImpl
                 }
             }
             catch(final OpenRDFException | UnmanagedArtifactIRIException | UnmanagedArtifactVersionException
-                    | UnmanagedSchemaIRIException e)
+                    | UnmanagedSchemaIRIException | SchemaManifestException | UnsupportedRDFormatException
+                    | IOException e)
             {
                 this.log.error("Failed to get top object URI", e);
             }

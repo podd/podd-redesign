@@ -23,6 +23,7 @@ import info.aduna.iteration.Iterations;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -35,13 +36,26 @@ import java.util.concurrent.ConcurrentMap;
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.Model;
 import org.openrdf.model.Namespace;
+import org.openrdf.model.Resource;
 import org.openrdf.model.URI;
 import org.openrdf.model.impl.LinkedHashModel;
+import org.openrdf.model.util.GraphUtil;
+import org.openrdf.model.vocabulary.RDF;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
+import org.openrdf.repository.config.RepositoryConfig;
+import org.openrdf.repository.config.RepositoryConfigSchema;
+import org.openrdf.repository.config.RepositoryFactory;
+import org.openrdf.repository.config.RepositoryImplConfig;
+import org.openrdf.repository.config.RepositoryImplConfigBase;
+import org.openrdf.repository.config.RepositoryRegistry;
 import org.openrdf.repository.http.HTTPRepository;
+import org.openrdf.repository.manager.LocalRepositoryManager;
+import org.openrdf.repository.manager.RemoteRepositoryManager;
+import org.openrdf.repository.manager.RepositoryManager;
 import org.openrdf.repository.sail.SailRepository;
+import org.openrdf.repository.sail.config.SailRepositoryFactory;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.RDFHandlerException;
 import org.openrdf.rio.Rio;
@@ -224,14 +238,19 @@ public class ApplicationUtils
         return result;
     }
     
-    public static Repository getNewRepository(final PropertyUtil props) throws RepositoryException
+    public static Repository getNewManagementRepository(final PropertyUtil props) throws RepositoryException
     {
         final String repositoryUrl =
-                props.get(PoddWebConstants.PROPERTY_SESAME_URL, PoddWebConstants.DEFAULT_SESAME_URL);
+                props.get(PoddWebConstants.PROPERTY_MANAGEMENT_SESAME_URL,
+                        PoddWebConstants.DEFAULT_MANAGEMENT_SESAME_URL);
         
+        return getNewRepositoryInternal(repositoryUrl);
+    }
+    
+    private static Repository getNewRepositoryInternal(final String repositoryUrl) throws RepositoryException
+    {
         // if we weren't able to find a repository URL in the configuration, we
-        // setup an
-        // in-memory store
+        // setup an in-memory store
         if(repositoryUrl == null || repositoryUrl.trim().isEmpty())
         {
             final Repository repository = new SailRepository(new MemoryStore());
@@ -287,7 +306,7 @@ public class ApplicationUtils
     }
     
     public static void setupApplication(final PoddWebServiceApplication application, final Context applicationContext)
-        throws OpenRDFException
+        throws OpenRDFException, UnsupportedRDFormatException, IOException
     {
         final PropertyUtil props = application.getPropertyUtil();
         
@@ -299,9 +318,34 @@ public class ApplicationUtils
         roles.clear();
         roles.addAll(PoddRoles.getRoles());
         
-        final Repository nextRepository = ApplicationUtils.getNewRepository(props);
+        final Repository nextManagementRepository = ApplicationUtils.getNewManagementRepository(props);
         
-        application.setPoddRepositoryManager(new PoddRepositoryManagerImpl(nextRepository));
+        String permanentRepositoryConfigPath =
+                props.get(PoddWebConstants.PROPERTY_PERMANENT_SESAME_REPOSITORY_CONFIG,
+                        PoddWebConstants.DEFAULT_PERMANENT_SESAME_REPOSITORY_CONFIG);
+        final Model graph =
+                Rio.parse(ApplicationUtils.class.getResourceAsStream(permanentRepositoryConfigPath), "",
+                        RDFFormat.TURTLE);
+        final Resource repositoryNode = GraphUtil.getUniqueSubject(graph, RepositoryConfigSchema.REPOSITORYTYPE, null);
+        RepositoryImplConfig repositoryImplConfig = RepositoryImplConfigBase.create(graph, repositoryNode);
+        RepositoryManager repositoryManager;
+        String repositoryManagerUrl =
+                props.get(PoddWebConstants.PROPERTY_PERMANENT_SESAME_REPOSITORY_LOCATION,
+                        PoddWebConstants.DEFAULT_PERMANENT_SESAME_REPOSITORY_LOCATION);
+        if(repositoryManagerUrl == null || repositoryManagerUrl.trim().isEmpty())
+        {
+            repositoryManager =
+                    new LocalRepositoryManager(Files.createTempDirectory("podd-temp-repositories-").toFile());
+        }
+        else
+        {
+            repositoryManager = new RemoteRepositoryManager(repositoryManagerUrl);
+        }
+        repositoryManager.initialize();
+        
+        application.setPoddRepositoryManager(new PoddRepositoryManagerImpl(nextManagementRepository, repositoryManager,
+                repositoryImplConfig));
+        
         application.getPoddRepositoryManager().setSchemaManagementGraph(
                 PODD.VF.createURI(props.get(PoddWebConstants.PROPERTY_SCHEMA_GRAPH,
                         PoddWebConstants.DEFAULT_SCHEMA_GRAPH)));
@@ -389,7 +433,8 @@ public class ApplicationUtils
         
         ApplicationUtils.setupSchemas(application);
         
-        final PoddSesameRealm nextRealm = new PoddSesameRealm(nextRepository, PODD.DEFAULT_USER_MANAGEMENT_GRAPH);
+        final PoddSesameRealm nextRealm =
+                new PoddSesameRealm(nextManagementRepository, PODD.DEFAULT_USER_MANAGEMENT_GRAPH);
         
         // FIXME: Make this configurable
         nextRealm.setName("PODDRealm");
@@ -526,7 +571,7 @@ public class ApplicationUtils
             // Once the upgrade process is well developed, may want to streamline application
             // startup to avoid attempting to do this every time
             
-            final ConcurrentMap<InferredOWLOntologyID, Set<InferredOWLOntologyID>> currentArtifactImports =
+            final ConcurrentMap<InferredOWLOntologyID, Set<? extends OWLOntologyID>> currentArtifactImports =
                     new ConcurrentHashMap<>();
             
             final ConcurrentMap<InferredOWLOntologyID, Set<InferredOWLOntologyID>> artifactsToUpdate =
@@ -549,7 +594,7 @@ public class ApplicationUtils
                 ApplicationUtils.log.info("Fetching schema imports for unpublished artifact: {}",
                         nextArtifact.getOntologyIRI());
                 
-                final Set<InferredOWLOntologyID> schemaImports = poddArtifactManager.getSchemaImports(nextArtifact);
+                final Set<? extends OWLOntologyID> schemaImports = poddArtifactManager.getSchemaImports(nextArtifact);
                 
                 // Cache the current artifact imports so they are easily accessible without calling
                 // the above method again if they need to be updated

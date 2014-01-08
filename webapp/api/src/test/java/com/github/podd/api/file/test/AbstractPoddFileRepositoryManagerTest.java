@@ -98,9 +98,9 @@ public abstract class AbstractPoddFileRepositoryManagerTest
      * {@link PoddDataRepositoryManager} is the object under test in this class.
      * 
      * @return A new {@link PoddDataRepositoryManager} instance for use by the test
-     * @throws OpenRDFException
+     * @throws Exception 
      */
-    protected abstract PoddDataRepositoryManager getNewPoddFileRepositoryManager() throws OpenRDFException;
+    protected abstract PoddDataRepositoryManager getNewPoddFileRepositoryManager() throws Exception;
     
     protected abstract DataReference getNewValidFileReference() throws Exception;
     

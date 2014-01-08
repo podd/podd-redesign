@@ -24,9 +24,21 @@ import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
 import org.openrdf.model.Model;
+import org.openrdf.model.Resource;
 import org.openrdf.model.URI;
+import org.openrdf.model.util.GraphUtil;
+import org.openrdf.repository.Repository;
+import org.openrdf.repository.RepositoryException;
+import org.openrdf.repository.config.RepositoryConfigSchema;
+import org.openrdf.repository.config.RepositoryImplConfig;
+import org.openrdf.repository.config.RepositoryImplConfigBase;
+import org.openrdf.repository.manager.LocalRepositoryManager;
+import org.openrdf.repository.sail.SailRepository;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.Rio;
+import org.openrdf.sail.memory.MemoryStore;
+import org.semanticweb.owlapi.model.IRI;
+import org.semanticweb.owlapi.model.OWLOntologyID;
 import org.semanticweb.owlapi.model.OWLOntologyManagerFactory;
 import org.semanticweb.owlapi.model.OWLOntologyManagerFactoryRegistry;
 import org.semanticweb.owlapi.model.UnloadableImportException;
@@ -42,6 +54,7 @@ import com.github.podd.impl.PoddOWLManagerImpl;
 import com.github.podd.impl.PoddRepositoryManagerImpl;
 import com.github.podd.impl.PoddSchemaManagerImpl;
 import com.github.podd.impl.PoddSesameManagerImpl;
+import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.PODD;
 import com.github.podd.utils.PoddWebConstants;
 
@@ -72,9 +85,20 @@ public class PoddSchemaManagerImplTest extends AbstractPoddSchemaManagerTest
     }
     
     @Override
-    protected PoddRepositoryManager getNewPoddRepositoryManagerInstance()
+    protected PoddRepositoryManager getNewPoddRepositoryManagerInstance() throws Exception
     {
-        return new PoddRepositoryManagerImpl();
+        Repository managementRepository = new SailRepository(new MemoryStore());
+        managementRepository.initialize();
+        
+        final Model graph =
+                Rio.parse(this.getClass().getResourceAsStream("/memorystoreconfig.ttl"), "", RDFFormat.TURTLE);
+        final Resource repositoryNode = GraphUtil.getUniqueSubject(graph, RepositoryConfigSchema.REPOSITORYTYPE, null);
+        RepositoryImplConfig repositoryImplConfig = RepositoryImplConfigBase.create(graph, repositoryNode);
+        Assert.assertNotNull(repositoryImplConfig);
+        Assert.assertNotNull(repositoryImplConfig.getType());
+        LocalRepositoryManager repositoryManager = new LocalRepositoryManager(tempDir.newFolder("repositorymanager"));
+        repositoryManager.initialize();
+        return new PoddRepositoryManagerImpl(managementRepository, repositoryManager, repositoryImplConfig);
     }
     
     @Override
@@ -94,128 +118,4 @@ public class PoddSchemaManagerImplTest extends AbstractPoddSchemaManagerTest
     {
         return OWLReasonerFactoryRegistry.getInstance().getReasonerFactory("Pellet");
     }
-    
-    @Test
-    public void testUploadSchemaOntologiesInOrder() throws Exception
-    {
-        // prepare: Model containing schema-manifest
-        final String schemaManifest = "/test/schema-manifest-a1b2c3.ttl";
-        Model model = null;
-        try (final InputStream schemaManifestStream = this.getClass().getResourceAsStream(schemaManifest);)
-        {
-            final RDFFormat format = Rio.getParserFormatForFileName(schemaManifest, RDFFormat.RDFXML);
-            model = Rio.parse(schemaManifestStream, "", format);
-        }
-        
-        // prepare: order of imports
-        final String[] testImportOrderArray =
-                { "http://example.org/podd/ns/version/poddA/1", "http://example.org/podd/ns/version/poddB/2",
-                        "http://example.org/podd/ns/version/poddB/1", "http://example.org/podd/ns/version/poddC/3",
-                        "http://example.org/podd/ns/version/poddC/1", };
-        
-        final List<URI> testImportOrder = new ArrayList<>();
-        for(final String s : testImportOrderArray)
-        {
-            testImportOrder.add(PODD.VF.createURI(s));
-        }
-        
-        ((PoddSchemaManagerImpl)this.testSchemaManager).uploadSchemaOntologiesInOrder(model, testImportOrder);
-        
-        // verify: schemas successfully loaded
-        Assert.assertEquals("Expected 3 current schemas", 3, this.testSchemaManager.getCurrentSchemaOntologies().size());
-        Assert.assertEquals("Expected 5 schema ontology versions", 5, this.testSchemaManager.getSchemaOntologies()
-                .size());
-    }
-    
-    @Test
-    public void testUploadSchemaOntologiesInOrderRepeat() throws Exception
-    {
-        // prepare: Model containing schema-manifest
-        final String schemaManifest = "/test/schema-manifest-a1b2c3.ttl";
-        Model model = null;
-        try (final InputStream schemaManifestStream = this.getClass().getResourceAsStream(schemaManifest);)
-        {
-            final RDFFormat format = Rio.getParserFormatForFileName(schemaManifest, RDFFormat.RDFXML);
-            model = Rio.parse(schemaManifestStream, "", format);
-        }
-        
-        // prepare: order of imports
-        final String[] testImportOrderArray =
-                { "http://example.org/podd/ns/version/poddA/1", "http://example.org/podd/ns/version/poddB/2",
-                        "http://example.org/podd/ns/version/poddB/1", "http://example.org/podd/ns/version/poddC/3",
-                        "http://example.org/podd/ns/version/poddC/1", };
-        
-        final List<URI> testImportOrder = new ArrayList<>();
-        for(final String s : testImportOrderArray)
-        {
-            testImportOrder.add(PODD.VF.createURI(s));
-        }
-        
-        ((PoddSchemaManagerImpl)this.testSchemaManager).uploadSchemaOntologiesInOrder(model, testImportOrder);
-        
-        // verify: schemas successfully loaded
-        Assert.assertEquals("Expected 3 current schemas", 3, this.testSchemaManager.getCurrentSchemaOntologies().size());
-        Assert.assertEquals("Expected 5 schema ontology versions", 5, this.testSchemaManager.getSchemaOntologies()
-                .size());
-        
-        ((PoddSchemaManagerImpl)this.testSchemaManager).uploadSchemaOntologiesInOrder(model, testImportOrder);
-        
-        // verify: schemas in memory not modified
-        Assert.assertEquals("Expected 3 current schemas", 3, this.testSchemaManager.getCurrentSchemaOntologies().size());
-        Assert.assertEquals("Expected 5 schema ontology versions", 5, this.testSchemaManager.getSchemaOntologies()
-                .size());
-    }
-    
-    @Test
-    public void testUploadSchemaOntologiesInOrderInvalid() throws Exception
-    {
-        // prepare: Model containing schema-manifest
-        final String schemaManifest = "/test/schema-manifest-a1b2c3.ttl";
-        Model model = null;
-        try (final InputStream schemaManifestStream = this.getClass().getResourceAsStream(schemaManifest);)
-        {
-            final RDFFormat format = Rio.getParserFormatForFileName(schemaManifest, RDFFormat.RDFXML);
-            model = Rio.parse(schemaManifestStream, "", format);
-        }
-        
-        // prepare: order of imports
-        // NOTE: C/1 needs B/1 to be loaded!
-        final String[] testImportOrderArray = {
-        
-        "http://example.org/podd/ns/version/poddA/1",
-        
-        "http://example.org/podd/ns/version/poddB/2",
-        
-        "http://example.org/podd/ns/version/poddC/1",
-        
-        "http://example.org/podd/ns/version/poddB/1",
-        
-        "http://example.org/podd/ns/version/poddC/3",
-        
-        };
-        
-        final List<URI> testImportOrder = new ArrayList<>(testImportOrderArray.length);
-        for(final String s : testImportOrderArray)
-        {
-            testImportOrder.add(PODD.VF.createURI(s));
-        }
-        
-        try
-        {
-            ((PoddSchemaManagerImpl)this.testSchemaManager).uploadSchemaOntologiesInOrder(model, testImportOrder);
-            Assert.fail("Should have failed loading due to incorrect import order");
-        }
-        catch(final UnloadableImportException e)
-        {
-            Assert.assertTrue("Not the expected error message",
-                    e.getMessage().contains("http://example.org/podd/ns/version/poddB/1"));
-        }
-        
-        // verify: no schemas loaded at all if any of the bulk upload failed, to ensure that we
-        // don't have partial schema updates
-        Assert.assertEquals("Expected 0 current schemas", 0, this.testSchemaManager.getCurrentSchemaOntologies().size());
-        Assert.assertEquals("Expected 0 schema ontology versions", 0, this.testSchemaManager.getSchemaOntologies()
-                .size());
-    }
-    
 }

@@ -16,15 +16,22 @@
  */
 package com.github.podd.api.test;
 
+import java.util.Collections;
+
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
+import org.junit.rules.Timeout;
 import org.openrdf.model.URI;
 import org.openrdf.model.impl.ValueFactoryImpl;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
+import org.openrdf.repository.RepositoryException;
+import org.semanticweb.owlapi.model.OWLOntologyID;
 
 import com.github.podd.api.PoddRepositoryManager;
 
@@ -32,16 +39,22 @@ import com.github.podd.api.PoddRepositoryManager;
  * @author kutila
  * 
  */
-@Ignore
 public abstract class AbstractPoddRepositoryManagerTest
 {
+    @Rule
+    public Timeout timeout = new Timeout(30000);
+    
+    @Rule
+    public TemporaryFolder tempDir = new TemporaryFolder();
     
     private PoddRepositoryManager testRepositoryManager;
     
     /**
      * @return A new instance of PoddOWLManager, for each call to this method
+     * @throws Exception
      */
-    protected abstract PoddRepositoryManager getNewPoddRepositoryManagerInstance();
+    protected abstract PoddRepositoryManager getNewPoddRepositoryManagerInstance() throws RepositoryException,
+        Exception;
     
     /**
      * @throws java.lang.Exception
@@ -63,7 +76,7 @@ public abstract class AbstractPoddRepositoryManagerTest
     @After
     public void tearDown() throws Exception
     {
-        this.testRepositoryManager.getManagementRepository().shutDown();
+        this.testRepositoryManager.shutDown();
         this.testRepositoryManager = null;
     }
     
@@ -93,7 +106,6 @@ public abstract class AbstractPoddRepositoryManagerTest
      * Test method for
      * {@link com.github.podd.impl.PoddRepositoryManagerImpl#getNewTemporaryRepository()}.
      */
-    @Ignore("TODO: Migrate to new methodology")
     @Test
     public final void testGetNewTemporaryRepository() throws Exception
     {
@@ -101,7 +113,7 @@ public abstract class AbstractPoddRepositoryManagerTest
         RepositoryConnection tempRepositoryConnection = null;
         try
         {
-            newTempRepository = this.testRepositoryManager.getNewTemporaryRepository(null);
+            newTempRepository = this.testRepositoryManager.getNewTemporaryRepository();
             Assert.assertNotNull("New temporary repository was null", newTempRepository);
             Assert.assertTrue("New temporary repository was not initialized", newTempRepository.isInitialized());
             tempRepositoryConnection = newTempRepository.getConnection();
@@ -113,6 +125,9 @@ public abstract class AbstractPoddRepositoryManagerTest
             if(tempRepositoryConnection != null && tempRepositoryConnection.isActive())
             {
                 tempRepositoryConnection.rollback();
+            }
+            if(tempRepositoryConnection != null && tempRepositoryConnection.isOpen())
+            {
                 tempRepositoryConnection.close();
             }
             if(newTempRepository != null)
@@ -129,7 +144,36 @@ public abstract class AbstractPoddRepositoryManagerTest
     @Test
     public final void testGetManagementRepository() throws Exception
     {
-        Assert.assertNotNull("Repository was null", this.testRepositoryManager.getManagementRepository());
+        Assert.assertNotNull("Management repository was null", this.testRepositoryManager.getManagementRepository());
+    }
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.impl.PoddRepositoryManagerImpl#getManagementRepository()}.
+     */
+    @Test
+    public final void testGetPermanentRepositoryEmptySchemaSet() throws Exception
+    {
+        Assert.assertNotNull("Permanent repository was null",
+                this.testRepositoryManager.getPermanentRepository(Collections.<OWLOntologyID> emptySet()));
+    }
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.impl.PoddRepositoryManagerImpl#getManagementRepository()}.
+     */
+    @Test
+    public final void testGetPermanentRepositoryNull() throws Exception
+    {
+        try
+        {
+            this.testRepositoryManager.getPermanentRepository(null);
+            Assert.fail("Did not receive the expected exception");
+        }
+        catch(NullPointerException e)
+        {
+            
+        }
     }
     
     /**

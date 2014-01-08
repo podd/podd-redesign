@@ -20,6 +20,7 @@ import info.aduna.iteration.Iterations;
 
 import java.util.List;
 
+import org.openrdf.OpenRDFUtil;
 import org.openrdf.model.Model;
 import org.openrdf.model.Resource;
 import org.openrdf.model.Statement;
@@ -62,18 +63,22 @@ public class DebugUtils
     /**
      * Helper method prints the contents of the given context of a Repository
      */
-    public static void printContents(final RepositoryConnection conn, final URI context) throws RepositoryException
+    public static void printContents(final RepositoryConnection conn, final URI... contexts) throws RepositoryException
     {
-        System.out.println("==================================================");
-        System.out.println("Graph = " + context);
-        System.out.println();
-        final List<Statement> repoResults = Iterations.asList(conn.getStatements(null, null, null, false, context));
-        for(final Statement stmt : repoResults)
+        OpenRDFUtil.verifyContextNotNull(contexts);
+        for(URI context : contexts)
         {
-            System.out.println("   {" + stmt.getSubject() + "}   <" + stmt.getPredicate() + ">  {" + stmt.getObject()
-                    + "}");
+            System.out.println("==================================================");
+            System.out.println("Graph = " + context);
+            System.out.println();
+            final List<Statement> repoResults = Iterations.asList(conn.getStatements(null, null, null, false, context));
+            for(final Statement stmt : repoResults)
+            {
+                System.out.println("   {" + stmt.getSubject() + "}   <" + stmt.getPredicate() + ">  {"
+                        + stmt.getObject() + "}");
+            }
+            System.out.println("==================================================");
         }
-        System.out.println("==================================================");
     }
     
     /**

@@ -30,6 +30,7 @@ import java.util.Set;
 
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.Model;
+import org.openrdf.model.Resource;
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.openrdf.model.Value;
@@ -151,8 +152,10 @@ public class RdfUtility
             final URI... context) throws RepositoryException
     {
         final List<URI> exclusions =
-                Arrays.asList(new URI[] { root, OWL.THING, OWL.ONTOLOGY, OWL.INDIVIDUAL,
-                        ValueFactoryImpl.getInstance().createURI("http://www.w3.org/2002/07/owl#NamedIndividual"), });
+                Arrays.asList(root, OWL.THING, OWL.ONTOLOGY, OWL.INDIVIDUAL,
+                        ValueFactoryImpl.getInstance().createURI("http://www.w3.org/2002/07/owl#NamedIndividual"));
+        
+        final List<URI> propertyExclusions = Arrays.asList(OWL.IMPORTS, OWL.VERSIONIRI);
         
         // - identify nodes that should be connected to the root
         final Set<URI> nodesToCheck = new HashSet<URI>();
@@ -161,17 +164,24 @@ public class RdfUtility
                 Iterations.asList(connection.getStatements(null, null, null, false, context));
         for(final Statement s : allStatements)
         {
+            final URI predicateValue = s.getPredicate();
+            if(propertyExclusions.contains(predicateValue))
+            {
+                continue;
+            }
+            
             final Value objectValue = s.getObject();
             if(objectValue instanceof URI && !exclusions.contains(objectValue))
             {
                 nodesToCheck.add((URI)objectValue);
             }
             
-            final Value subjectValue = s.getSubject();
+            final Resource subjectValue = s.getSubject();
             if(subjectValue instanceof URI && !exclusions.contains(subjectValue))
             {
                 nodesToCheck.add((URI)subjectValue);
             }
+            
         }
         
         // RdfUtility.log.info("{} nodes to check for connectivity.", nodesToCheck.size());

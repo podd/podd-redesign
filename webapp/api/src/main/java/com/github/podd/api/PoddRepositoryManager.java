@@ -57,15 +57,13 @@ public interface PoddRepositoryManager
     Repository getManagementRepository() throws OpenRDFException;
     
     /**
-     * 
-     * @param schemaOntologies
-     *            A list of schema ontologies that must be supported by the temporary repository.
+     * Get a new temporary repository.
      * 
      * @return A new, initialized in-memory repository that can be used to store statements
      *         temporarily while validating them before uploading them to a permanent repository.
      * @throws OpenRDFException
      */
-    Repository getNewTemporaryRepository(Set<? extends OWLOntologyID> schemaOntologies) throws OpenRDFException;
+    Repository getNewTemporaryRepository() throws OpenRDFException;
     
     /**
      * 
@@ -77,6 +75,20 @@ public interface PoddRepositoryManager
      *             If there are any errors with the repository at this stage.
      */
     Repository getPermanentRepository(Set<? extends OWLOntologyID> schemaOntologies) throws OpenRDFException;
+    
+    /**
+     * Gets a federated repository over the permanent repository for the given schema ontologies,
+     * and the management repository.
+     * 
+     * This repository is read-only to prevent changes across the two repositories.
+     * 
+     * NOTE: This repository may be much slower than a typical repository.
+     * 
+     * @param schemaOntologies
+     * @return
+     * @throws OpenRDFException
+     */
+    Repository getReadOnlyFederatedRepository(Set<? extends OWLOntologyID> schemaOntologies) throws OpenRDFException;
     
     /**
      * 

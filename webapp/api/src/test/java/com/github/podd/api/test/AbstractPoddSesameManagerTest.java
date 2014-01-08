@@ -46,6 +46,7 @@ import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.sail.SailRepository;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.Rio;
+import org.openrdf.rio.helpers.StatementCollector;
 import org.openrdf.sail.memory.MemoryStore;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLOntologyID;
@@ -91,22 +92,22 @@ public abstract class AbstractPoddSesameManagerTest
      * 
      */
     private boolean internalTestIsPublished(final boolean isPublished, final String testResourcePath,
-            final int expectedSize, final URI contextCumVersionURI, final URI managementGraph) throws Exception
+            final int expectedSize, final URI contextVersionURI, final URI managementGraph) throws Exception
     {
         // prepare: load the ontology into the test repository
         final InputStream inputStream = this.getClass().getResourceAsStream(testResourcePath);
-        this.testRepositoryConnection.add(inputStream, "", RDFFormat.RDFXML, contextCumVersionURI);
+        this.testRepositoryConnection.add(inputStream, "", RDFFormat.RDFXML, contextVersionURI);
         Assert.assertEquals("Not the expected number of statements in Repository", expectedSize,
-                this.testRepositoryConnection.size(contextCumVersionURI));
+                this.testRepositoryConnection.size(contextVersionURI));
         
         // prepare: build an OWLOntologyID
         final IRI ontologyIRI =
-                this.testPoddSesameManager.getOntologyIRI(this.testRepositoryConnection, contextCumVersionURI);
+                this.testPoddSesameManager.getOntologyIRI(this.testRepositoryConnection, contextVersionURI);
         final InferredOWLOntologyID ontologyID =
-                new InferredOWLOntologyID(ontologyIRI, IRI.create(contextCumVersionURI),
+                new InferredOWLOntologyID(ontologyIRI, IRI.create(contextVersionURI),
                         IRI.create("urn:not:actually:inferred"));
         this.testRepositoryConnection.add(ontologyIRI.toOpenRDFURI(), RDF.TYPE, OWL.ONTOLOGY, managementGraph);
-        this.testRepositoryConnection.add(ontologyIRI.toOpenRDFURI(), OWL.VERSIONIRI, contextCumVersionURI,
+        this.testRepositoryConnection.add(ontologyIRI.toOpenRDFURI(), OWL.VERSIONIRI, contextVersionURI,
                 managementGraph);
         
         final InferredOWLOntologyID publishedOntologyID =
@@ -167,7 +168,20 @@ public abstract class AbstractPoddSesameManagerTest
         final Collection<InferredOWLOntologyID> results = OntologyUtils.modelToOntologyIDs(totalModel);
         Assert.assertEquals(1, results.size());
         
-        return results.iterator().next();
+        InferredOWLOntologyID owlOntologyID = results.iterator().next();
+        
+        this.testPoddSesameManager.updateManagedPoddArtifactVersion(owlOntologyID, true, this.testRepositoryConnection,
+                this.artifactGraph);
+        
+        this.testRepositoryConnection.export(new StatementCollector(totalModel), this.schemaGraph);
+        
+        for(OWLOntologyID nextImport : OntologyUtils.artifactImports(owlOntologyID, totalModel))
+        {
+            this.testRepositoryConnection.add(owlOntologyID.getOntologyIRI().toOpenRDFURI(), OWL.IMPORTS, nextImport
+                    .getVersionIRI().toOpenRDFURI(), this.artifactGraph);
+        }
+        
+        return owlOntologyID;
     }
     
     /**
@@ -175,7 +189,7 @@ public abstract class AbstractPoddSesameManagerTest
      */
     private List<InferredOWLOntologyID> loadSchemaOntologies() throws Exception
     {
-        return this.loadSchemaOntologies(this.testRepositoryConnection);
+        return this.loadSchemaOntologies(this.testRepositoryConnection, this.schemaGraph);
     }
     
     /**
@@ -186,7 +200,8 @@ public abstract class AbstractPoddSesameManagerTest
      * @return
      * @throws Exception
      */
-    protected abstract List<InferredOWLOntologyID> loadSchemaOntologies(RepositoryConnection conn) throws Exception;
+    protected abstract List<InferredOWLOntologyID> loadSchemaOntologies(RepositoryConnection conn,
+            URI schemaManagementGraph) throws Exception;
     
     /**
      * Helper method which populates a graph with artifact management triples.
@@ -364,7 +379,7 @@ public abstract class AbstractPoddSesameManagerTest
                 inferredOntologyID.getInferredOntologyIRI());
         
         this.testPoddSesameManager.deleteOntologies(Arrays.asList(inferredOntologyID), this.testRepositoryConnection,
-                artifactGraph);
+                this.testRepositoryConnection, artifactGraph);
         
         try
         {
@@ -391,7 +406,7 @@ public abstract class AbstractPoddSesameManagerTest
                         TestConstants.TEST_ARTIFACT_20130206_INFERRED, RDFFormat.TURTLE);
         final URI[] contexts =
                 this.testPoddSesameManager.versionAndSchemaContexts(ontologyID, this.testRepositoryConnection,
-                        this.schemaGraph);
+                        this.schemaGraph, this.artifactGraph);
         
         final String[] objectUris =
                 { "http://purl.org/podd/basic-1-20130206/object:2966",
@@ -420,7 +435,7 @@ public abstract class AbstractPoddSesameManagerTest
         {
             final String objectString =
                     resultModel.filter(PODD.VF.createURI(objectUris[i]), RDFS.LABEL, null).objectString();
-            Assert.assertEquals("Not the expected label", expectedLabels[i], objectString);
+            Assert.assertEquals("Not the expected label: " + objectUris[i], expectedLabels[i], objectString);
         }
     }
     
@@ -575,7 +590,8 @@ public abstract class AbstractPoddSesameManagerTest
             final Collection<URI> nextProperty = Arrays.asList(element[1]);
             final Map<URI, URI> cardinalityValue =
                     this.testPoddSesameManager.getCardinalityValues(ontologyID, element[0], nextProperty,
-                            this.testRepositoryConnection, this.schemaGraph);
+                            this.testRepositoryConnection, this.testRepositoryConnection, this.schemaGraph,
+                            this.artifactGraph);
             Assert.assertEquals("Could not find cardinality for: " + nextProperty, 1, cardinalityValue.size());
             Assert.assertTrue("Did not find cardinality for: " + nextProperty, cardinalityValue.containsKey(element[1]));
             Assert.assertEquals("Not the expected cardinality value", element[2], cardinalityValue.get(element[1]));
@@ -801,8 +817,8 @@ public abstract class AbstractPoddSesameManagerTest
         }
         catch(final UnmanagedSchemaIRIException e)
         {
-            Assert.assertEquals("Not the expected exception", "This IRI does not refer to a managed ontology",
-                    e.getMessage());
+            Assert.assertTrue("Not the expected exception",
+                    e.getMessage().contains("This IRI does not refer to a managed ontology"));
             Assert.assertEquals(ontologyIRI, e.getOntologyID());
         }
     }
@@ -928,7 +944,7 @@ public abstract class AbstractPoddSesameManagerTest
             
             final URI[] contexts =
                     this.testPoddSesameManager.versionAndSchemaContexts(ontologyID, this.testRepositoryConnection,
-                            this.schemaGraph);
+                            this.schemaGraph, this.artifactGraph);
             
             final Model model =
                     this.testPoddSesameManager.getObjectData(ontologyID, objectUri, this.testRepositoryConnection,
@@ -982,7 +998,8 @@ public abstract class AbstractPoddSesameManagerTest
         
         final Model displayModel =
                 this.testPoddSesameManager.getObjectDetailsForDisplay(ontologyID, objectUri,
-                        this.testRepositoryConnection, this.schemaGraph);
+                        this.testRepositoryConnection, this.testRepositoryConnection, this.schemaGraph,
+                        this.artifactGraph);
         
         // verify:
         Assert.assertNotNull("Display Model is null", displayModel);
@@ -1015,7 +1032,8 @@ public abstract class AbstractPoddSesameManagerTest
         
         final Model displayModel =
                 this.testPoddSesameManager.getObjectDetailsForDisplay(ontologyID, objectUri,
-                        this.testRepositoryConnection, this.schemaGraph);
+                        this.testRepositoryConnection, this.testRepositoryConnection, this.schemaGraph,
+                        this.artifactGraph);
         
         // verify:
         Assert.assertNotNull("Display Model is null", displayModel);
@@ -1077,7 +1095,7 @@ public abstract class AbstractPoddSesameManagerTest
             
             final PoddObjectLabel objectLabel =
                     this.testPoddSesameManager.getObjectLabel(ontologyID, objectUri, this.testRepositoryConnection,
-                            this.schemaGraph);
+                            this.testRepositoryConnection, this.schemaGraph, this.artifactGraph);
             
             // verify:
             Assert.assertNotNull("PoddObjectLabel was null", objectLabel);
@@ -1260,7 +1278,7 @@ public abstract class AbstractPoddSesameManagerTest
             
             final List<URI> objectTypes =
                     this.testPoddSesameManager.getObjectTypes(ontologyID1, objectUri, this.testRepositoryConnection,
-                            this.schemaGraph);
+                            this.testRepositoryConnection, this.schemaGraph, this.artifactGraph);
             
             // verify:
             Assert.assertNotNull("Type was null", objectTypes);
@@ -1449,7 +1467,7 @@ public abstract class AbstractPoddSesameManagerTest
         
         final URI[] contexts =
                 this.testPoddSesameManager.versionAndSchemaContexts(ontologyID, this.testRepositoryConnection,
-                        this.schemaGraph);
+                        this.schemaGraph, this.artifactGraph);
         
         // object, expected statement count, expected parent
         final Object[][] testData =
@@ -1553,8 +1571,8 @@ public abstract class AbstractPoddSesameManagerTest
         }
         catch(final UnmanagedSchemaIRIException e)
         {
-            Assert.assertEquals("Not the expected exception", "This IRI does not refer to a managed ontology",
-                    e.getMessage());
+            Assert.assertTrue("Not the expected exception",
+                    e.getMessage().contains("This IRI does not refer to a managed ontology"));
             Assert.assertEquals(unmanagedSchemaVersionIri, e.getOntologyID());
         }
     }
@@ -1664,6 +1682,7 @@ public abstract class AbstractPoddSesameManagerTest
      * . Test retrieving Top Objects from an artifact which has more than one top object. A PODD
      * artifact should currently have only 1 top object.
      */
+    @Ignore("TODO: Decide if this case is supported")
     @Test
     public void testGetTopObjectsFromArtifactWithSeveralTopObjects() throws Exception
     {
@@ -1716,7 +1735,7 @@ public abstract class AbstractPoddSesameManagerTest
         
         final URI[] contexts =
                 this.testPoddSesameManager.versionAndSchemaContexts(nextOntologyID, this.testRepositoryConnection,
-                        this.schemaGraph);
+                        this.schemaGraph, this.artifactGraph);
         final List<URI> orderedPropertyUris =
                 this.testPoddSesameManager.getWeightedProperties(internalObjectUri, false,
                         this.testRepositoryConnection, contexts);
@@ -1755,7 +1774,7 @@ public abstract class AbstractPoddSesameManagerTest
         
         final URI[] contexts =
                 this.testPoddSesameManager.versionAndSchemaContexts(nextOntologyID, this.testRepositoryConnection,
-                        this.schemaGraph);
+                        this.schemaGraph, this.artifactGraph);
         final List<URI> orderedPropertyUris =
                 this.testPoddSesameManager.getWeightedProperties(topObjectUri, false, this.testRepositoryConnection,
                         contexts);
@@ -1803,7 +1822,7 @@ public abstract class AbstractPoddSesameManagerTest
         
         final URI[] contexts =
                 this.testPoddSesameManager.versionAndSchemaContexts(nextOntologyID, this.testRepositoryConnection,
-                        this.schemaGraph);
+                        this.schemaGraph, this.artifactGraph);
         final List<URI> orderedPropertyUris =
                 this.testPoddSesameManager.getWeightedProperties(topObjectUri, true, this.testRepositoryConnection,
                         contexts);
@@ -1922,7 +1941,7 @@ public abstract class AbstractPoddSesameManagerTest
                 { PODD.VF.createURI(PODD.PODD_SCIENCE, "Platform"), PODD.VF.createURI(OWL.NAMESPACE, "NamedIndividual") };
         final URI[] contexts =
                 this.testPoddSesameManager.versionAndSchemaContexts(ontologyID, this.testRepositoryConnection,
-                        this.schemaGraph);
+                        this.schemaGraph, this.artifactGraph);
         final Model result =
                 this.testPoddSesameManager.searchOntologyLabels(searchTerm, searchTypes, 1000, 0,
                         this.testRepositoryConnection, contexts);
@@ -1959,7 +1978,7 @@ public abstract class AbstractPoddSesameManagerTest
                         PODD.VF.createURI(OWL.NAMESPACE, "NamedIndividual") };
         final URI[] contexts =
                 this.testPoddSesameManager.versionAndSchemaContexts(ontologyID, this.testRepositoryConnection,
-                        this.schemaGraph);
+                        this.schemaGraph, this.artifactGraph);
         final Model result =
                 this.testPoddSesameManager.searchOntologyLabels(searchTerm, searchTypes, 1000, 0,
                         this.testRepositoryConnection, contexts);
@@ -1989,7 +2008,7 @@ public abstract class AbstractPoddSesameManagerTest
                 new InferredOWLOntologyID(pOntologyIRI, pVersionIRI, pInferredVersionIRI);
         
         // invoke method under test
-        this.testPoddSesameManager.updateCurrentManagedSchemaOntologyVersion(nextOntologyID, false,
+        this.testPoddSesameManager.updateManagedSchemaOntologyVersion(nextOntologyID, false,
                 this.testRepositoryConnection, this.schemaGraph);
         
         this.verifyManagementGraphContents(6, this.schemaGraph, pOntologyIRI, pVersionIRI, pInferredVersionIRI);
@@ -2010,7 +2029,7 @@ public abstract class AbstractPoddSesameManagerTest
                 new InferredOWLOntologyID(pOntologyIRI, pVersionIRI, pInferredVersionIRI);
         
         // first setting of schema versions in mgt graph
-        this.testPoddSesameManager.updateCurrentManagedSchemaOntologyVersion(nextOntologyID, false,
+        this.testPoddSesameManager.updateManagedSchemaOntologyVersion(nextOntologyID, false,
                 this.testRepositoryConnection, this.schemaGraph);
         this.verifyManagementGraphContents(6, this.schemaGraph, pOntologyIRI, pVersionIRI, pInferredVersionIRI);
         
@@ -2020,14 +2039,14 @@ public abstract class AbstractPoddSesameManagerTest
                 new InferredOWLOntologyID(pOntologyIRI, pVersionIRIUpdated, pInferredVersionIRIUpdated);
         
         // invoke with "updateCurrent" disallowed
-        this.testPoddSesameManager.updateCurrentManagedSchemaOntologyVersion(nextOntologyIDUpdated, false,
+        this.testPoddSesameManager.updateManagedSchemaOntologyVersion(nextOntologyIDUpdated, false,
                 this.testRepositoryConnection, this.schemaGraph);
         
         // verify only inferred ontology version is updated
         this.verifyManagementGraphContents(9, this.schemaGraph, pOntologyIRI, pVersionIRI, pInferredVersionIRIUpdated);
         
         // invoke with "updateCurrent" allowed
-        this.testPoddSesameManager.updateCurrentManagedSchemaOntologyVersion(nextOntologyIDUpdated, true,
+        this.testPoddSesameManager.updateManagedSchemaOntologyVersion(nextOntologyIDUpdated, true,
                 this.testRepositoryConnection, this.schemaGraph);
         
         // verify both ontology current version and inferred ontology version haven been updated
@@ -2267,6 +2286,82 @@ public abstract class AbstractPoddSesameManagerTest
                 this.testRepositoryConnection, this.artifactGraph);
         
         this.verifyManagementGraphContents(7, this.artifactGraph, pArtifactIRI, pVersionIRIv3, pInferredVersionIRIv3);
+    }
+    
+    @Test
+    public void testVersionContexts() throws Exception
+    {
+        this.loadSchemaOntologies();
+        final InferredOWLOntologyID ontologyID =
+                this.loadOntologyFromResource(TestConstants.TEST_ARTIFACT_20130206,
+                        TestConstants.TEST_ARTIFACT_20130206_INFERRED, RDFFormat.TURTLE);
+        
+        URI[] versionAndSchemaContexts = this.testPoddSesameManager.versionContexts(ontologyID);
+        
+        Assert.assertNotNull(versionAndSchemaContexts);
+        for(URI nextUri : versionAndSchemaContexts)
+        {
+            Assert.assertNotNull(nextUri);
+        }
+        Assert.assertEquals(1, versionAndSchemaContexts.length);
+    }
+    
+    @Test
+    public void testVersionAndInferredContexts() throws Exception
+    {
+        this.loadSchemaOntologies();
+        final InferredOWLOntologyID ontologyID =
+                this.loadOntologyFromResource(TestConstants.TEST_ARTIFACT_20130206,
+                        TestConstants.TEST_ARTIFACT_20130206_INFERRED, RDFFormat.TURTLE);
+        
+        URI[] versionAndSchemaContexts = this.testPoddSesameManager.versionAndInferredContexts(ontologyID);
+        
+        Assert.assertNotNull(versionAndSchemaContexts);
+        for(URI nextUri : versionAndSchemaContexts)
+        {
+            Assert.assertNotNull(nextUri);
+        }
+        Assert.assertEquals(2, versionAndSchemaContexts.length);
+    }
+    
+    @Test
+    public void testVersionAndSchemaContexts() throws Exception
+    {
+        this.loadSchemaOntologies();
+        final InferredOWLOntologyID ontologyID =
+                this.loadOntologyFromResource(TestConstants.TEST_ARTIFACT_20130206,
+                        TestConstants.TEST_ARTIFACT_20130206_INFERRED, RDFFormat.TURTLE);
+        
+        URI[] versionAndSchemaContexts =
+                this.testPoddSesameManager.versionAndSchemaContexts(ontologyID, this.testRepositoryConnection,
+                        this.schemaGraph, this.artifactGraph);
+        
+        Assert.assertNotNull(versionAndSchemaContexts);
+        for(URI nextUri : versionAndSchemaContexts)
+        {
+            Assert.assertNotNull(nextUri);
+        }
+        Assert.assertEquals(7, versionAndSchemaContexts.length);
+    }
+    
+    @Test
+    public void testVersionAndInferredAndSchemaContexts() throws Exception
+    {
+        this.loadSchemaOntologies();
+        final InferredOWLOntologyID ontologyID =
+                this.loadOntologyFromResource(TestConstants.TEST_ARTIFACT_20130206,
+                        TestConstants.TEST_ARTIFACT_20130206_INFERRED, RDFFormat.TURTLE);
+        
+        URI[] versionAndSchemaContexts =
+                this.testPoddSesameManager.versionAndInferredAndSchemaContexts(ontologyID,
+                        this.testRepositoryConnection, this.schemaGraph, this.artifactGraph);
+        
+        Assert.assertNotNull(versionAndSchemaContexts);
+        for(URI nextUri : versionAndSchemaContexts)
+        {
+            Assert.assertNotNull(nextUri);
+        }
+        Assert.assertEquals(8, versionAndSchemaContexts.length);
     }
     
     /**

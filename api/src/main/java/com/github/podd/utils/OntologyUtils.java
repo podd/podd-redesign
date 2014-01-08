@@ -24,8 +24,8 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -39,11 +39,11 @@ import org.openrdf.model.Value;
 import org.openrdf.model.ValueFactory;
 import org.openrdf.model.impl.LinkedHashModel;
 import org.openrdf.model.impl.ValueFactoryImpl;
-import org.openrdf.model.util.GraphUtil;
-import org.openrdf.model.util.GraphUtilException;
 import org.openrdf.model.util.ModelException;
 import org.openrdf.model.vocabulary.OWL;
 import org.openrdf.model.vocabulary.RDF;
+import org.openrdf.repository.RepositoryConnection;
+import org.openrdf.repository.RepositoryException;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.RDFHandler;
 import org.openrdf.rio.RDFHandlerException;
@@ -56,6 +56,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.github.podd.exception.SchemaManifestException;
+import com.github.podd.exception.UnmanagedArtifactIRIException;
+import com.github.podd.exception.UnmanagedArtifactVersionException;
 
 /**
  * Utilities for working with {@link InferredOWLOntologyID}
@@ -67,14 +69,157 @@ public class OntologyUtils
     private static final Logger log = LoggerFactory.getLogger(OntologyUtils.class);
     
     /**
+     * Finds the schema imports for the given artifact.
+     * 
+     * Must not throw an {@link UnmanagedArtifactIRIException} or
+     * {@link UnmanagedArtifactVersionException} if the artifact does not exist globally, as long as
+     * it is managed correctly in the given model.
+     * 
+     * @param artifactID
+     * @param results
      * @param model
-     * @param schemaOntologyUris
-     * @param schemaVersionUris
+     * @throws OpenRDFException
      * @throws SchemaManifestException
+     * @throws IOException
+     * @throws RDFParseException
+     * @throws UnsupportedRDFormatException
+     */
+    public static List<OWLOntologyID> artifactImports(final InferredOWLOntologyID artifactID, final Model model)
+        throws OpenRDFException, SchemaManifestException, IOException, RDFParseException, UnsupportedRDFormatException
+    {
+        Objects.requireNonNull(artifactID);
+        Objects.requireNonNull(model);
+        
+        final Set<OWLOntologyID> results = new LinkedHashSet<OWLOntologyID>();
+        
+        final Set<URI> schemaOntologyUris = new HashSet<>();
+        final Set<URI> schemaVersionUris = new HashSet<>();
+        final ConcurrentMap<URI, Set<URI>> importsMap = new ConcurrentHashMap<>(schemaOntologyUris.size());
+        
+        OntologyUtils.extractOntologyAndVersions(model, schemaOntologyUris, schemaVersionUris);
+        
+        if(!schemaOntologyUris.contains(artifactID.getOntologyIRI().toOpenRDFURI()))
+        {
+            throw new SchemaManifestException(artifactID.getOntologyIRI(),
+                    "Did not find the given ontology IRI in the model: " + artifactID.getOntologyIRI());
+        }
+        
+        final List<URI> orderImports =
+                OntologyUtils.orderImports(model, schemaOntologyUris, schemaVersionUris, importsMap, true);
+        
+        final Set<URI> artifactImports = new HashSet<>();
+        
+        // Be tolerant for artifacts and add imports for both the ontology and the version
+        recursiveFollowImports(artifactImports, importsMap, artifactID.getOntologyIRI().toOpenRDFURI());
+        
+        recursiveFollowImports(artifactImports, importsMap, artifactID.getVersionIRI().toOpenRDFURI());
+        
+        final List<InferredOWLOntologyID> ontologyIDs = OntologyUtils.modelToOntologyIDs(model, true, false);
+        
+        Set<OWLOntologyID> finalOrderImports =
+                finalOrderImports(results, ontologyIDs, orderImports, artifactImports, importsMap);
+        
+        return new ArrayList<>(finalOrderImports);
+    }
+    
+    /**
+     * Recursively follow the imports for the given URI, based on those identified in the
+     * importsMap.
+     * 
+     * @param artifactImports
+     * @param importsMap
+     * @param nextURI
+     */
+    public static void recursiveFollowImports(Set<URI> artifactImports, ConcurrentMap<URI, Set<URI>> importsMap,
+            URI nextURI)
+    {
+        if(importsMap.containsKey(nextURI))
+        {
+            Set<URI> nextSet = importsMap.get(nextURI);
+            for(URI nextSetUri : nextSet)
+            {
+                if(!artifactImports.contains(nextSetUri))
+                {
+                    artifactImports.add(nextSetUri);
+                    recursiveFollowImports(artifactImports, importsMap, nextSetUri);
+                }
+            }
+        }
+    }
+    
+    /**
+     * Call this to reorder the results set according to the order specified in orderImports.
+     * 
+     * @param results
+     * @param ontologyIDs
+     * @param orderImports
+     * @param artifactImports
+     * @param importsMap
+     */
+    public static Set<OWLOntologyID> finalOrderImports(final Set<OWLOntologyID> results,
+            final List<? extends OWLOntologyID> ontologyIDs, final List<URI> orderImports,
+            final Set<URI> artifactImports, ConcurrentMap<URI, Set<URI>> importsMap)
+    {
+        Set<OWLOntologyID> finalResults = new LinkedHashSet<OWLOntologyID>();
+        for(URI nextImport : orderImports)
+        {
+            // Iterate through all of the imports and select those which were actually found
+            if(artifactImports.contains(nextImport))
+            {
+                boolean found = false;
+                for(final OWLOntologyID nextOntologyID : ontologyIDs)
+                {
+                    if(nextOntologyID.getOntologyIRI().toOpenRDFURI().equals(nextImport))
+                    {
+                        finalResults.add(nextOntologyID);
+                        found = true;
+                        break;
+                    }
+                    else if(nextOntologyID.getVersionIRI() != null
+                            && nextOntologyID.getVersionIRI().toOpenRDFURI().equals(nextImport))
+                    {
+                        finalResults.add(nextOntologyID);
+                        found = true;
+                        break;
+                    }
+                }
+                if(!found)
+                {
+                    log.error("Could not map import to an ontology ID: ", nextImport);
+                }
+            }
+        }
+        return finalResults;
+    }
+    
+    /**
+     * Extracts ontology and version IRIs to separate sets, which are both given as parameters.
+     * 
+     * Only recognises ontology IRIs which have an "ontologyIRI, rdf:type, owl:Ontology" triple.
+     * 
+     * Only recognises version IRIs which have both "versionIRI, rdf:type, owl:Ontology" and
+     * "ontologyIRI, owl:versionIRI, versionIRI"
+     * 
+     * @param model
+     *            The input statements.
+     * @param schemaOntologyUris
+     *            An output container for all of the ontology IRIs which are not also version IRIs.
+     * @param schemaVersionUris
+     *            An output container for all of the ontology IRIs which are also versionIRIs.
      */
     public static void extractOntologyAndVersions(final Model model, final Set<URI> schemaOntologyUris,
-            final Set<URI> schemaVersionUris) throws SchemaManifestException
+            final Set<URI> schemaVersionUris)
     {
+        for(final Statement nextImport : model.filter(null, OWL.VERSIONIRI, null))
+        {
+            if(nextImport.getObject() instanceof URI)
+            {
+                if(!model.contains((URI)nextImport.getObject(), RDF.TYPE, OWL.ONTOLOGY))
+                {
+                    model.add((URI)nextImport.getObject(), RDF.TYPE, OWL.ONTOLOGY);
+                }
+            }
+        }
         for(final Resource nextOntology : model.filter(null, RDF.TYPE, OWL.ONTOLOGY).subjects())
         {
             if(nextOntology instanceof URI)
@@ -86,117 +231,9 @@ public class OntologyUtils
                 else
                 {
                     schemaOntologyUris.add((URI)nextOntology);
-                    // check ontology IRI does not have any associated
-                    // owl:imports
-                    if(model.filter(nextOntology, OWL.IMPORTS, null).size() > 0)
-                    {
-                        throw new SchemaManifestException(IRI.create((URI)nextOntology),
-                                "Imports should be associated with version IRI");
-                    }
                 }
             }
         }
-    }
-    
-    /**
-     * Retrieves imports specified using {@link OWL#IMPORTS}, based on the given version IRIs. Also
-     * checks to verify that there is an {@link OWL#VERSIONIRI} statement for each of the version
-     * IRIs. <br>
-     * This works with the format used by both the schema manifests and the schema management graph.
-     * 
-     * @param model
-     * @param schemaVersionUris
-     * @return
-     * @throws SchemaManifestException
-     */
-    public static Map<URI, Set<OWLOntologyID>> getImports(final Model model, final Set<URI> schemaOntologyUris,
-            final Set<URI> schemaVersionUris) throws SchemaManifestException
-    {
-        final ConcurrentMap<URI, Set<OWLOntologyID>> result = new ConcurrentHashMap<>();
-        
-        if(schemaVersionUris.isEmpty())
-        {
-            log.info("No schema version URIs to get imports for");
-        }
-        
-        for(final URI nextSchemaVersionUri : schemaVersionUris)
-        {
-            final Set<Resource> ontologies = model.filter(null, OWL.VERSIONIRI, nextSchemaVersionUri).subjects();
-            if(ontologies.isEmpty())
-            {
-                throw new SchemaManifestException(IRI.create(nextSchemaVersionUri),
-                        "No mapping from version IRI to an ontology IRI");
-            }
-            if(ontologies.size() > 1)
-            {
-                OntologyUtils.log.error("Found multiple mappings from version IRI to ontology IRI: {} {}",
-                        nextSchemaVersionUri, ontologies);
-                throw new SchemaManifestException(IRI.create(nextSchemaVersionUri),
-                        "Non-unique mapping from version IRI to an ontology IRI");
-            }
-            final Resource uniqueOntology = ontologies.iterator().next();
-            
-            if(!(uniqueOntology instanceof URI))
-            {
-                OntologyUtils.log.error("Found non-URI mapping from version IRI to ontology IRI: {} {}",
-                        nextSchemaVersionUri, ontologies);
-                throw new SchemaManifestException(IRI.create(nextSchemaVersionUri),
-                        "Non-URI mapping from version IRI to an ontology IRI");
-            }
-            
-            final Set<Value> imports = model.filter(nextSchemaVersionUri, OWL.IMPORTS, null).objects();
-            
-            Set<OWLOntologyID> nextSet = new LinkedHashSet<>();
-            final Set<OWLOntologyID> putIfAbsent = result.putIfAbsent(nextSchemaVersionUri, nextSet);
-            if(putIfAbsent != null)
-            {
-                nextSet = putIfAbsent;
-            }
-            
-            Set<URI> nextImports = new LinkedHashSet<>();
-            
-            for(final Value nextImport : imports)
-            {
-                if(!(nextImport instanceof URI))
-                {
-                    OntologyUtils.log.error("Found non-URI import for version IRI: {} {}", nextSchemaVersionUri,
-                            nextImport);
-                    throw new SchemaManifestException(IRI.create(nextSchemaVersionUri),
-                            "Non-URI import for version IRI");
-                }
-                
-                final URI nextImportVersionURI = (URI)nextImport;
-                
-                nextImports.add(nextImportVersionURI);
-            }
-            
-            List<URI> orderImports = OntologyUtils.orderImports(model, schemaOntologyUris, schemaVersionUris);
-            
-            // Iterate through universally ordered collection to find ordered imports for this
-            // ontology
-            // TODO: This may not be the most efficient way to do this
-            for(URI nextOrderedVersion : orderImports)
-            {
-                if(nextImports.contains(nextOrderedVersion))
-                {
-                    try
-                    {
-                        final URI nextImportOntologyURI =
-                                GraphUtil.getUniqueSubjectURI(model, OWL.VERSIONIRI, nextOrderedVersion);
-                        
-                        nextSet.add(new OWLOntologyID(nextImportOntologyURI, nextOrderedVersion));
-                    }
-                    catch(final GraphUtilException e)
-                    {
-                        OntologyUtils.log.error("Found non-unique ontology IRI for imported version IRI: {}",
-                                nextOrderedVersion);
-                        throw new SchemaManifestException(IRI.create(nextOrderedVersion),
-                                "Non-URI import for version IRI");
-                    }
-                }
-            }
-        }
-        return result;
     }
     
     /**
@@ -234,7 +271,7 @@ public class OntologyUtils
         
         if(nextAllVersions.isEmpty())
         {
-            OntologyUtils.log.error("Could not find any version information for schema ontology: {}",
+            OntologyUtils.log.debug("Could not find any version information for schema ontology: {}",
                     nextSchemaOntologyUri);
         }
     }
@@ -245,15 +282,15 @@ public class OntologyUtils
      * @param allVersionsMap
      * @param importsMap
      * @param importOrder
-     * @param nextVersionUri
+     * @param nextOntologyUri
      */
     public static void mapAndSortImports(final Model model, final ConcurrentMap<URI, URI> currentVersionsMap,
             final ConcurrentMap<URI, Set<URI>> allVersionsMap, final ConcurrentMap<URI, Set<URI>> importsMap,
-            final List<URI> importOrder, final URI nextVersionUri)
+            final List<URI> importOrder, final URI nextOntologyUri)
     {
-        final Set<Value> imports = model.filter(nextVersionUri, OWL.IMPORTS, null).objects();
+        final Set<Value> imports = model.filter(nextOntologyUri, OWL.IMPORTS, null).objects();
         Set<URI> nextImportsSet = new LinkedHashSet<>();
-        final Set<URI> putIfAbsent = importsMap.putIfAbsent(nextVersionUri, nextImportsSet);
+        final Set<URI> putIfAbsent = importsMap.putIfAbsent(nextOntologyUri, nextImportsSet);
         if(putIfAbsent != null)
         {
             nextImportsSet = putIfAbsent;
@@ -263,12 +300,12 @@ public class OntologyUtils
         {
             if(!nextImportsSet.isEmpty())
             {
-                OntologyUtils.log.error("Found inconsistent imports set: {} {}", nextVersionUri, nextImportsSet);
+                OntologyUtils.log.error("Found inconsistent imports set: {} {}", nextOntologyUri, nextImportsSet);
             }
         }
         else
         {
-            for(Value nextImport : imports)
+            for(final Value nextImport : imports)
             {
                 if(nextImport instanceof URI)
                 {
@@ -298,26 +335,35 @@ public class OntologyUtils
                             
                             if(nextAllVersions.equals(nextImport))
                             {
-                                // this should not normally occur, as the current versions map
-                                // should also contain this key
-                                nextImport = currentVersionsMap.get(nextAllVersions);
-                                nextImportsSet.add((URI)nextImport);
+                                if(nextEntry.getValue().isEmpty())
+                                {
+                                    nextImportsSet.add((URI)nextImport);
+                                }
+                                else
+                                {
+                                    // Randomly choose one, as the ontology does not have a current
+                                    // version, but it does have some version information
+                                    nextImportsSet.add(nextEntry.getValue().iterator().next());
+                                }
                                 foundAllVersion = true;
+                                break;
                             }
                             else if(nextEntry.getValue().contains(nextImport))
                             {
                                 nextImportsSet.add((URI)nextImport);
                                 foundAllVersion = true;
+                                break;
                             }
                         }
                         
                         if(!foundAllVersion)
                         {
-                            OntologyUtils.log.warn("Could not find import: {} imports {}", nextVersionUri, nextImport);
+                            OntologyUtils.log.warn("Could not find import: {} imports {}", nextOntologyUri, nextImport);
                         }
                         else
                         {
-                            nextImportsSet.add((URI)nextImport);
+                            // This should not be necessary given the sequence of calls above
+                            // nextImportsSet.add((URI)nextImport);
                         }
                     }
                     final int nextIndex = importOrder.indexOf(nextImport);
@@ -328,10 +374,10 @@ public class OntologyUtils
                 }
             }
         }
-        OntologyUtils.log.debug("adding import for {} at {}", nextVersionUri, maxIndex);
+        OntologyUtils.log.debug("adding import for {} at {}", nextOntologyUri, maxIndex);
         // TODO: FIXME: This will not allow for multiple versions of a single schema ontology at the
         // same time if they have any shared import versions
-        importOrder.add(maxIndex, nextVersionUri);
+        importOrder.add(maxIndex, nextOntologyUri);
     }
     
     /**
@@ -340,7 +386,7 @@ public class OntologyUtils
      * @param nextSchemaOntologyUri
      * @throws SchemaManifestException
      */
-    public static void mapCurrentVersion(final Model model, final ConcurrentMap<URI, URI> currentVersionsMap,
+    public static URI mapCurrentVersion(final Model model, final ConcurrentMap<URI, URI> currentVersionsMap,
             final URI nextSchemaOntologyUri) throws SchemaManifestException
     {
         try
@@ -350,29 +396,33 @@ public class OntologyUtils
             
             if(nextCurrentVersionURI == null)
             {
-                OntologyUtils.log
-                        .error("Did not find a current version for schema ontology: {}", nextSchemaOntologyUri);
-                throw new SchemaManifestException(IRI.create(nextSchemaOntologyUri),
-                        "Did not find a current version for schema ontology");
+                // OntologyUtils.log
+                // .error("Did not find a current version for schema ontology: {}",
+                // nextSchemaOntologyUri);
+                // throw new SchemaManifestException(IRI.create(nextSchemaOntologyUri),
+                // "Did not find a current version for schema ontology: " +
+                // nextSchemaOntologyUri.stringValue());
             }
             else
             {
                 final URI putIfAbsent = currentVersionsMap.putIfAbsent(nextSchemaOntologyUri, nextCurrentVersionURI);
                 if(putIfAbsent != null)
                 {
-                    OntologyUtils.log.error("Found multiple version URIs for schema ontology: {} old={} new={}",
+                    OntologyUtils.log.error("Found multiple version URIs for ontology: {} old={} new={}",
                             nextSchemaOntologyUri, putIfAbsent, nextCurrentVersionURI);
                     throw new SchemaManifestException(IRI.create(nextSchemaOntologyUri),
-                            "Found multiple version IRIs for schema ontology");
+                            "Found multiple version IRIs for ontology");
                 }
             }
+            
+            return nextCurrentVersionURI;
         }
         catch(final ModelException e)
         {
             OntologyUtils.log.error("Could not find a single unique current version for schema ontology: {}",
                     nextSchemaOntologyUri);
             throw new SchemaManifestException(IRI.create(nextSchemaOntologyUri),
-                    "Could not find a single unique current version IRI for schema ontology");
+                    "Could not find a single unique current version IRI for schema ontology", e);
         }
     }
     
@@ -517,6 +567,11 @@ public class OntologyUtils
         }
     }
     
+    public static Model ontologyIDsToModel(final Collection<InferredOWLOntologyID> input, final Model result)
+    {
+        return OntologyUtils.ontologyIDsToModel(input, result, true);
+    }
+    
     /**
      * Serialises the given collection of {@link InferredOWLOntologyID} objects to RDF, adding the
      * {@link Statement}s to the given {@link Model}, or creating a new Model if the given model is
@@ -550,11 +605,6 @@ public class OntologyUtils
         }
         
         return results;
-    }
-    
-    public static Model ontologyIDsToModel(final List<InferredOWLOntologyID> input, final Model result)
-    {
-        return OntologyUtils.ontologyIDsToModel(input, result, true);
     }
     
     public static Model ontologyIDToRDF(final OWLOntologyID ontology, final Model result,
@@ -600,13 +650,13 @@ public class OntologyUtils
      * @throws SchemaManifestException
      */
     public static List<URI> orderImports(final Model model, final Set<URI> schemaOntologyUris,
-            final Set<URI> schemaVersionUris) throws SchemaManifestException
+            final Set<URI> schemaVersionUris, final ConcurrentMap<URI, Set<URI>> importsMap,
+            boolean allowOntologyUriImports) throws SchemaManifestException
     {
         final List<URI> importOrder = new ArrayList<>(schemaOntologyUris.size());
         
         final ConcurrentMap<URI, URI> currentVersionsMap = new ConcurrentHashMap<>(schemaOntologyUris.size());
         final ConcurrentMap<URI, Set<URI>> allVersionsMap = new ConcurrentHashMap<>(schemaOntologyUris.size());
-        final ConcurrentMap<URI, Set<URI>> importsMap = new ConcurrentHashMap<>(schemaOntologyUris.size());
         
         // Find current version for each schema ontology
         for(final URI nextSchemaOntologyUri : schemaOntologyUris)
@@ -628,8 +678,67 @@ public class OntologyUtils
                     nextVersionUri);
         }
         
+        if(allowOntologyUriImports)
+        {
+            for(final URI nextOntologyUri : schemaOntologyUris)
+            {
+                OntologyUtils.mapAndSortImports(model, currentVersionsMap, allVersionsMap, importsMap, importOrder,
+                        nextOntologyUri);
+            }
+        }
+        
         OntologyUtils.log.debug("importOrder: {}", importOrder);
         return importOrder;
+    }
+    
+    /**
+     * Retrieves imports specified using {@link OWL#IMPORTS}, based on the given version IRIs. Also
+     * checks to verify that there is an {@link OWL#VERSIONIRI} statement for each of the version
+     * IRIs. <br>
+     * This works with the format used by both the schema manifests and the schema management graph.
+     * 
+     * @param model
+     * @param schemaVersionUris
+     * @return
+     * @throws SchemaManifestException
+     */
+    public static List<OWLOntologyID> schemaManifestImports(final Model model,
+            final Set<? extends OWLOntologyID> dependentSchemaOntologies) throws SchemaManifestException
+    {
+        Objects.requireNonNull(dependentSchemaOntologies);
+        Objects.requireNonNull(model);
+        
+        final Set<OWLOntologyID> results = new LinkedHashSet<OWLOntologyID>();
+        
+        final Set<URI> schemaOntologyUris = new HashSet<>();
+        final Set<URI> schemaVersionUris = new HashSet<>();
+        final ConcurrentMap<URI, Set<URI>> importsMap = new ConcurrentHashMap<>(schemaOntologyUris.size());
+        
+        OntologyUtils.extractOntologyAndVersions(model, schemaOntologyUris, schemaVersionUris);
+        
+        final List<URI> orderImports =
+                OntologyUtils.orderImports(model, schemaOntologyUris, schemaVersionUris, importsMap, true);
+        
+        final Set<URI> artifactImports = new HashSet<>();
+        
+        for(OWLOntologyID nextDependentSchemaOntology : dependentSchemaOntologies)
+        {
+            artifactImports.add(nextDependentSchemaOntology.getVersionIRI().toOpenRDFURI());
+            // Not tolerant for artifacts... Imports must be directed to version IRIs
+            // recursiveFollowImports(artifactImports, importsMap,
+            // artifactID.getOntologyIRI().toOpenRDFURI());
+            
+            recursiveFollowImports(artifactImports, importsMap, nextDependentSchemaOntology.getVersionIRI()
+                    .toOpenRDFURI());
+            
+        }
+        
+        final List<InferredOWLOntologyID> ontologyIDs = OntologyUtils.modelToOntologyIDs(model, true, false);
+        
+        Set<OWLOntologyID> finalOrderImports =
+                finalOrderImports(results, ontologyIDs, orderImports, artifactImports, importsMap);
+        
+        return new ArrayList<>(finalOrderImports);
     }
     
     /**
@@ -669,9 +778,37 @@ public class OntologyUtils
      * @throws SchemaManifestException
      *             If the imports from the two locations are not consistent
      */
-    public static void validateSchemaManifestImports(final Model manifestModel, final Set<URI> schemaVersionUris)
-        throws IOException, RDFParseException, UnsupportedRDFormatException, SchemaManifestException
+    public static void validateSchemaManifestImports(final Model manifestModel, final Set<URI> schemaOntologyUris,
+            final Set<URI> schemaVersionUris) throws IOException, RDFParseException, UnsupportedRDFormatException,
+        SchemaManifestException
     {
+        for(final URI nextOntologyUri : schemaOntologyUris)
+        {
+            if(manifestModel.contains(nextOntologyUri, OWL.IMPORTS, null))
+            {
+                OntologyUtils.log.error("Schema ontology in manifest has owl:imports coming directly from it: {}",
+                        nextOntologyUri);
+                throw new SchemaManifestException(IRI.create(nextOntologyUri),
+                        "Schema ontology in manifest has owl:imports coming directly from it");
+            }
+            
+            final Model currentVersion = manifestModel.filter(nextOntologyUri, PODD.OMV_CURRENT_VERSION, null);
+            
+            if(currentVersion.isEmpty())
+            {
+                OntologyUtils.log.error("Missing OMV current version for schema ontology: {}", nextOntologyUri);
+                throw new SchemaManifestException(IRI.create(nextOntologyUri),
+                        "Missing OMV current version for schema ontology");
+            }
+            
+            if(currentVersion.size() > 1)
+            {
+                OntologyUtils.log.error("Multiple OMV current versions for schema ontology: {}", nextOntologyUri);
+                throw new SchemaManifestException(IRI.create(nextOntologyUri),
+                        "Multiple OMV current versions for schema ontology");
+            }
+        }
+        
         for(final URI nextVersionUri : schemaVersionUris)
         {
             final Set<Value> importsInManifest = manifestModel.filter(nextVersionUri, OWL.IMPORTS, null).objects();
@@ -703,5 +840,56 @@ public class OntologyUtils
     
     private OntologyUtils()
     {
+    }
+    
+    /**
+     * @param managementConnection
+     * @param schemaManagementGraph
+     * @param model
+     * @return
+     * @throws RepositoryException
+     * @throws ModelException
+     * @throws IOException
+     * @throws RDFParseException
+     * @throws SchemaManifestException
+     */
+    public static List<InferredOWLOntologyID> loadSchemasFromManifest(final RepositoryConnection managementConnection,
+            final URI schemaManagementGraph, Model model) throws RepositoryException, ModelException, IOException,
+        RDFParseException, SchemaManifestException
+    {
+        managementConnection.add(model, schemaManagementGraph);
+        
+        List<InferredOWLOntologyID> ontologyIDs = modelToOntologyIDs(model, false, false);
+        
+        for(InferredOWLOntologyID nextOntology : ontologyIDs)
+        {
+            String classpath =
+                    model.filter(nextOntology.getVersionIRI().toOpenRDFURI(), PODD.PODD_SCHEMA_CLASSPATH, null)
+                            .objectString();
+            if(classpath == null)
+            {
+                throw new SchemaManifestException(nextOntology.getVersionIRI(),
+                        "Ontology was not mapped to a classpath: " + nextOntology.toString());
+            }
+            InputStream nextStream = OntologyUtils.class.getResourceAsStream(classpath);
+            if(nextStream == null)
+            {
+                throw new SchemaManifestException(nextOntology.getVersionIRI(),
+                        "Ontology was not found on the classpath: " + classpath);
+            }
+            managementConnection.add(nextStream, "", Rio.getParserFormatForFileName(classpath, RDFFormat.RDFXML),
+                    nextOntology.getVersionIRI().toOpenRDFURI());
+        }
+        
+        Model currentVersions = model.filter(null, PODD.OMV_CURRENT_VERSION, null);
+        for(Resource nextOntology : currentVersions.subjects())
+        {
+            // Ensure that there is only one current version
+            URI nextCurrentVersion = model.filter(nextOntology, PODD.OMV_CURRENT_VERSION, null).objectURI();
+            managementConnection.remove(nextOntology, PODD.OMV_CURRENT_VERSION, null, schemaManagementGraph);
+            managementConnection.add(nextOntology, PODD.OMV_CURRENT_VERSION, nextCurrentVersion, schemaManagementGraph);
+        }
+        
+        return ontologyIDs;
     }
 }

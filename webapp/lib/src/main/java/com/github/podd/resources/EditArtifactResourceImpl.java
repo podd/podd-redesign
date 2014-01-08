@@ -31,6 +31,7 @@ import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.Rio;
+import org.openrdf.rio.UnsupportedRDFormatException;
 import org.restlet.data.MediaType;
 import org.restlet.data.Status;
 import org.restlet.representation.ByteArrayRepresentation;
@@ -47,6 +48,7 @@ import com.github.podd.api.DanglingObjectPolicy;
 import com.github.podd.api.DataReferenceVerificationPolicy;
 import com.github.podd.api.UpdatePolicy;
 import com.github.podd.exception.PoddException;
+import com.github.podd.exception.SchemaManifestException;
 import com.github.podd.exception.UnmanagedArtifactIRIException;
 import com.github.podd.exception.UnmanagedArtifactVersionException;
 import com.github.podd.exception.UnmanagedSchemaIRIException;
@@ -276,7 +278,9 @@ public class EditArtifactResourceImpl extends AbstractPoddResourceImpl
                 dataModel.put("parentPredicateUri", statement.getPredicate().stringValue());
             }
         }
-        catch(final OpenRDFException | UnmanagedSchemaIRIException e)
+        catch(final OpenRDFException | UnmanagedSchemaIRIException | SchemaManifestException
+                | UnsupportedRDFormatException | IOException | UnmanagedArtifactIRIException
+                | UnmanagedArtifactVersionException e)
         {
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Failed to populate data model");
         }

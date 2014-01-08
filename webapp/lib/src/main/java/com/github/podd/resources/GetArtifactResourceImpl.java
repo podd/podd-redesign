@@ -26,6 +26,7 @@ import org.openrdf.OpenRDFException;
 import org.openrdf.model.Model;
 import org.openrdf.model.URI;
 import org.openrdf.rio.RDFFormat;
+import org.openrdf.rio.UnsupportedRDFormatException;
 import org.restlet.data.MediaType;
 import org.restlet.data.Status;
 import org.restlet.representation.ByteArrayRepresentation;
@@ -37,6 +38,7 @@ import org.restlet.security.User;
 import org.semanticweb.owlapi.model.IRI;
 
 import com.github.podd.exception.PoddException;
+import com.github.podd.exception.SchemaManifestException;
 import com.github.podd.exception.UnmanagedArtifactIRIException;
 import com.github.podd.exception.UnmanagedArtifactVersionException;
 import com.github.podd.exception.UnmanagedSchemaIRIException;
@@ -156,7 +158,9 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
         {
             this.populateDataModelWithArtifactData(ontologyID, objectToView, dataModel, isPublished);
         }
-        catch(final OpenRDFException | UnmanagedSchemaIRIException e)
+        catch(final OpenRDFException | UnmanagedSchemaIRIException | SchemaManifestException
+                | UnsupportedRDFormatException | IOException | UnmanagedArtifactIRIException
+                | UnmanagedArtifactVersionException e)
         {
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Failed to populate data model", e);
         }
@@ -251,10 +255,17 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
      *            True if the Project is Published
      * @throws OpenRDFException
      * @throws UnmanagedSchemaIRIException
+     * @throws IOException
+     * @throws UnsupportedRDFormatException
+     * @throws SchemaManifestException
+     * @throws ResourceException
+     * @throws UnmanagedArtifactVersionException
+     * @throws UnmanagedArtifactIRIException
      */
     private void populateDataModelWithArtifactData(final InferredOWLOntologyID ontologyID, final String objectToView,
             final Map<String, Object> dataModel, final boolean isPublished) throws OpenRDFException,
-        UnmanagedSchemaIRIException
+        UnmanagedSchemaIRIException, SchemaManifestException, UnsupportedRDFormatException, IOException,
+        UnmanagedArtifactIRIException, UnmanagedArtifactVersionException, ResourceException
     {
         
         final PoddObjectLabel theObject =

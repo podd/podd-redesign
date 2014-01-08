@@ -31,6 +31,16 @@ public class SchemaManifestException extends PoddException
     
     private final IRI schemaOntologyIRI;
     
+    public SchemaManifestException(final String msg)
+    {
+        this(null, msg);
+    }
+    
+    public SchemaManifestException(final String msg, final Throwable throwable)
+    {
+        this(null, msg, throwable);
+    }
+    
     public SchemaManifestException(final IRI schemaOntologyIRI, final String msg)
     {
         super(msg);

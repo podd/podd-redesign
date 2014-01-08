@@ -14,51 +14,70 @@
  * You should have received a copy of the GNU Affero General Public License along with this program.
  * If not, see <http://www.gnu.org/licenses/>.
  */
-package com.github.podd.impl.test;
+package com.github.podd.utils.test;
 
+import org.junit.After;
 import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+import org.openrdf.model.Literal;
 import org.openrdf.model.Model;
 import org.openrdf.model.Resource;
+import org.openrdf.model.URI;
 import org.openrdf.model.util.GraphUtil;
 import org.openrdf.model.vocabulary.RDF;
 import org.openrdf.repository.Repository;
+import org.openrdf.repository.config.RepositoryConfig;
 import org.openrdf.repository.config.RepositoryConfigSchema;
 import org.openrdf.repository.config.RepositoryFactory;
 import org.openrdf.repository.config.RepositoryImplConfig;
 import org.openrdf.repository.config.RepositoryImplConfigBase;
 import org.openrdf.repository.config.RepositoryRegistry;
-import org.openrdf.repository.manager.LocalRepositoryManager;
-import org.openrdf.repository.sail.SailRepository;
-import org.openrdf.repository.sail.config.SailRepositoryFactory;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.Rio;
-import org.openrdf.sail.memory.MemoryStore;
-
-import com.github.podd.api.PoddRepositoryManager;
-import com.github.podd.api.test.AbstractPoddRepositoryManagerTest;
-import com.github.podd.impl.PoddRepositoryManagerImpl;
 
 /**
- * @author kutila
+ * 
  * @author Peter Ansell p_ansell@yahoo.com
+ * 
  */
-public class PoddRepositoryManagerImplTest extends AbstractPoddRepositoryManagerTest
+public class RepositoryConfigTest
 {
     
-    @Override
-    protected PoddRepositoryManager getNewPoddRepositoryManagerInstance() throws Exception
+    /**
+     * @throws java.lang.Exception
+     */
+    @Before
+    public void setUp() throws Exception
     {
-        Repository managementRepository = new SailRepository(new MemoryStore());
-        managementRepository.initialize();
-        
+    }
+    
+    /**
+     * @throws java.lang.Exception
+     */
+    @After
+    public void tearDown() throws Exception
+    {
+    }
+    
+    @Test
+    public final void testParsing() throws Exception
+    {
         final Model graph =
                 Rio.parse(this.getClass().getResourceAsStream("/memorystoreconfig.ttl"), "", RDFFormat.TURTLE);
         final Resource repositoryNode = GraphUtil.getUniqueSubject(graph, RepositoryConfigSchema.REPOSITORYTYPE, null);
+        // RepositoryConfig repositoryConfig = RepositoryConfig.create(graph, repositoryNode);
+        // RepositoryImplConfig repositoryImplConfig = repositoryConfig.getRepositoryImplConfig();
         RepositoryImplConfig repositoryImplConfig = RepositoryImplConfigBase.create(graph, repositoryNode);
         Assert.assertNotNull(repositoryImplConfig);
         Assert.assertNotNull(repositoryImplConfig.getType());
-        LocalRepositoryManager repositoryManager = new LocalRepositoryManager(tempDir.newFolder("repositorymanager"));
-        repositoryManager.initialize();
-        return new PoddRepositoryManagerImpl(managementRepository, repositoryManager, repositoryImplConfig);
+        RepositoryFactory repositoryFactory = RepositoryRegistry.getInstance().get(repositoryImplConfig.getType());
+        
+        Repository repository = repositoryFactory.getRepository(repositoryImplConfig);
+        Assert.assertNotNull(repository);
+        repository.initialize();
+        // Assert.assertTrue("Did not create a SailRepositoryConfig object",
+        // repositoryConfig instanceof SailRepositoryConfig);
     }
+    
 }

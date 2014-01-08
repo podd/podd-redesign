@@ -20,6 +20,7 @@
 package com.github.podd.api;
 
 import java.io.IOException;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 import org.openrdf.OpenRDFException;
@@ -42,43 +43,14 @@ import com.github.podd.utils.InferredOWLOntologyID;
 public interface PoddOWLManager
 {
     /**
-     * Loads and caches the given schema ontologies in memory from a Repository. Silently returns if
-     * the ontologies are already cached.
-     * 
-     * @param ontologyIDs
-     * @param conn
-     * @param context
-     * @throws OpenRDFException
-     * @throws PoddException
-     * @throws IOException
-     * @throws OWLException
-     */
-    void cacheSchemaOntologies(Set<? extends OWLOntologyID> ontologyIDs, RepositoryConnection conn, URI schemaManagementContext)
-        throws OpenRDFException, OWLException, IOException, PoddException;
-    
-    /**
-     * Loads and caches the given schema ontology in memory from a Repository. Silently returns if
-     * the ontology is already cached.
-     * 
-     * @param ontologyID
-     * @param conn
-     * @param context
-     * @throws OpenRDFException
-     * @throws PoddException
-     * @throws IOException
-     * @throws OWLException
-     */
-    void cacheSchemaOntology(OWLOntologyID ontologyID, RepositoryConnection conn, URI context) throws OpenRDFException,
-        OWLException, IOException, PoddException;
-    
-    /**
      * Determing if the ontology is cached in memory.
      * 
      * @param ontologyID
      *            The ontology IRI and version IRI to check for caching.
+     * @param dependentSchemaOntologies
      * @return True if the ontology is cached in memory and false otherwise.
      */
-    boolean isCached(OWLOntologyID ontologyID);
+    boolean isCached(OWLOntologyID ontologyID, Set<? extends OWLOntologyID> dependentSchemaOntologies);
     
     /**
      * Loads an ontology from the given {@link OWLOntologyDocumentSource} into the given
@@ -99,8 +71,9 @@ public interface PoddOWLManager
      * @throws IOException
      */
     InferredOWLOntologyID loadAndInfer(OWLOntologyDocumentSource owlSource,
-            RepositoryConnection permanentRepositoryConnection, OWLOntologyID replacementOntologyID)
-        throws OWLException, PoddException, OpenRDFException, IOException;
+            RepositoryConnection permanentRepositoryConnection, OWLOntologyID replacementOntologyID,
+            Set<? extends OWLOntologyID> dependentSchemaOntologies, RepositoryConnection managementConnection,
+            URI schemaManagementContext) throws OWLException, PoddException, OpenRDFException, IOException;
     
     /**
      * Attempts to regain memory in the underlying OWLOntologyManager by removing the ontology from
@@ -116,7 +89,8 @@ public interface PoddOWLManager
      * @throws OWLException
      *             If there was an error while attempting to retrieve the memory.
      */
-    boolean removeCache(OWLOntologyID ontologyID) throws OWLException;
+    boolean removeCache(OWLOntologyID ontologyID, Set<? extends OWLOntologyID> dependentSchemaOntologies)
+        throws OWLException;
     
     /**
      * Helper method to verify that a given {@link Model} represents an ontology which complies with

@@ -30,6 +30,7 @@ import org.openrdf.model.URI;
 import org.openrdf.repository.RepositoryConnection;
 import org.semanticweb.owlapi.model.IRI;
 
+import com.github.podd.exception.SchemaManifestException;
 import com.github.podd.exception.UnmanagedArtifactIRIException;
 import com.github.podd.exception.UnmanagedSchemaIRIException;
 import com.github.podd.utils.InferredOWLOntologyID;
@@ -52,15 +53,18 @@ public interface PoddSesameManager
      * @param requestedArtifactIds
      *            A collection of InferredOWLOntologyID objects containing the ontologies to be
      *            deleted, including the inferred ontology IRIs.
-     * @param repositoryConnection
-     *            The connection to the repository to use.
+     * @param permanentConnection
+     *            The connection to the permanent storage repository.
+     * @param managementConnection
+     *            The connection to the management repository.
      * @param ontologyManagementGraph
      *            The URI of the context in the repository containing the management information for
      *            the ontologies.
      * @throws OpenRDFException
      */
     void deleteOntologies(Collection<InferredOWLOntologyID> requestedArtifactIds,
-            RepositoryConnection repositoryConnection, URI ontologyManagementGraph) throws OpenRDFException;
+            RepositoryConnection permanentConnection, RepositoryConnection managementConnection,
+            URI ontologyManagementGraph) throws OpenRDFException;
     
     /**
      * This method attempts to find the labels for a given collection of URIs. If a label could not
@@ -153,17 +157,19 @@ public interface PoddSesameManager
      *            The object under consideration
      * @param propertyUris
      *            The property under consideration
-     * @param repositoryConnection
+     * @param permanentConnection
      * @param schemaManagementGraph
      *            TODO
      * @return a URI representing the cardinality value or NULL if no cardinality statements were
      *         found
      * @throws OpenRDFException
-     * 
-     * @since 03/05/2013
+     * @throws SchemaManifestException
+     * @throws UnmanagedSchemaIRIException
      */
     Map<URI, URI> getCardinalityValues(InferredOWLOntologyID artifactID, URI objectUri, Collection<URI> propertyUris,
-            RepositoryConnection repositoryConnection, URI schemaManagementGraph) throws OpenRDFException;
+            RepositoryConnection managementConnection, RepositoryConnection permanentConnection,
+            URI schemaManagementGraph, URI artifactManagementGraph) throws OpenRDFException, SchemaManifestException,
+        UnmanagedSchemaIRIException;
     
     Map<URI, URI> getCardinalityValues(URI objectUri, Collection<URI> propertyUris, boolean findFromType,
             RepositoryConnection repositoryConnection, URI... contexts) throws OpenRDFException;
@@ -266,10 +272,14 @@ public interface PoddSesameManager
             URI... contexts) throws OpenRDFException;
     
     Model getObjectDetailsForDisplay(InferredOWLOntologyID artifactID, URI objectUri,
-            RepositoryConnection repositoryConnection, URI schemaManagementGraph) throws OpenRDFException;
+            RepositoryConnection managementConnection, RepositoryConnection permanentConnection,
+            URI schemaManagementGraph, URI artifactManagementGraph) throws OpenRDFException, SchemaManifestException,
+        UnmanagedSchemaIRIException;
     
     PoddObjectLabel getObjectLabel(InferredOWLOntologyID ontologyID, URI objectUri,
-            RepositoryConnection repositoryConnection, URI schemaManagementGraph) throws OpenRDFException;
+            RepositoryConnection managementConnection, RepositoryConnection permanentConnection,
+            URI schemaManagementGraph, URI artifactManagementGraph) throws OpenRDFException, SchemaManifestException,
+        UnmanagedSchemaIRIException;
     
     /**
      * For a given PODD Object Type, this method retrieves metadata about possible objects that it
@@ -316,7 +326,9 @@ public interface PoddSesameManager
         throws OpenRDFException;
     
     List<URI> getObjectTypes(InferredOWLOntologyID ontologyID, URI objectUri,
-            RepositoryConnection repositoryConnection, URI schemaManagementGraph) throws OpenRDFException;
+            RepositoryConnection managementConnection, RepositoryConnection permanentConnection,
+            URI schemaManagementGraph, URI artifactManagementGraph) throws OpenRDFException, SchemaManifestException,
+        UnmanagedSchemaIRIException;
     
     /**
      * Returns a collection of ontologies managed in the given graph, optionally only returning the
@@ -415,10 +427,10 @@ public interface PoddSesameManager
     InferredOWLOntologyID getSchemaVersion(IRI schemaVersionIRI, RepositoryConnection conn, URI schemaManagementGraph)
         throws OpenRDFException, UnmanagedSchemaIRIException;
     
-    URI getTopObjectIRI(InferredOWLOntologyID ontologyIRI, RepositoryConnection repositoryConnection)
+    URI getTopObjectIRI(InferredOWLOntologyID ontologyIRI, RepositoryConnection permanentConnection)
         throws OpenRDFException;
     
-    List<URI> getTopObjects(InferredOWLOntologyID ontologyID, RepositoryConnection repositoryConnection)
+    List<URI> getTopObjects(InferredOWLOntologyID ontologyID, RepositoryConnection permanentConnection)
         throws OpenRDFException;
     
     /**
@@ -445,7 +457,8 @@ public interface PoddSesameManager
             final RepositoryConnection repositoryConnection, final URI... contexts) throws OpenRDFException;
     
     URI[] inferredAndSchemaContexts(InferredOWLOntologyID ontologyID, RepositoryConnection repositoryConnection,
-            URI schemaManagementGraph) throws OpenRDFException;
+            URI schemaManagementGraph, URI artifactManagementGraph) throws OpenRDFException, SchemaManifestException,
+        UnmanagedSchemaIRIException;
     
     URI[] inferredContexts(InferredOWLOntologyID ontologyID) throws OpenRDFException;
     
@@ -462,7 +475,8 @@ public interface PoddSesameManager
         throws OpenRDFException;
     
     URI[] schemaContexts(InferredOWLOntologyID ontologyID, RepositoryConnection repositoryConnection,
-            URI schemaManagementGraph) throws OpenRDFException;
+            URI schemaManagementGraph, URI artifactManagementGraph) throws OpenRDFException, SchemaManifestException,
+        UnmanagedSchemaIRIException;
     
     /**
      * Carries out a case-insensitive search for objects whose labels match a given term. The search
@@ -519,7 +533,7 @@ public interface PoddSesameManager
      * @param context
      * @throws OpenRDFException
      */
-    void updateCurrentManagedSchemaOntologyVersion(InferredOWLOntologyID nextOntologyID, boolean updateCurrent,
+    void updateManagedSchemaOntologyVersion(InferredOWLOntologyID nextOntologyID, boolean updateCurrent,
             RepositoryConnection repositoryConnection, URI context) throws OpenRDFException;
     
     /**
@@ -533,20 +547,22 @@ public interface PoddSesameManager
      *            If true, will update the current version if it exists, and remove all statements
      *            relating to previous versions. If false it will only add the current version if it
      *            does not exist.
-     * @param repositoryConnection
+     * @param managementConnection
      * @param context
      * @throws OpenRDFException
      */
     void updateManagedPoddArtifactVersion(InferredOWLOntologyID nextOntologyID, boolean updateCurrentAndRemovePrevious,
-            RepositoryConnection repositoryConnection, URI context) throws OpenRDFException;
+            RepositoryConnection managementConnection, URI context) throws OpenRDFException;
     
     URI[] versionAndInferredAndSchemaContexts(InferredOWLOntologyID ontologyID,
-            RepositoryConnection repositoryConnection, URI schemaManagementGraph) throws OpenRDFException;
+            RepositoryConnection managementConnection, URI schemaManagementGraph, URI artifactManagementGraph)
+        throws OpenRDFException, SchemaManifestException, UnmanagedSchemaIRIException;
     
     URI[] versionAndInferredContexts(InferredOWLOntologyID ontologyID);
     
-    URI[] versionAndSchemaContexts(InferredOWLOntologyID ontologyID, RepositoryConnection repositoryConnection,
-            URI schemaManagementGraph) throws OpenRDFException;
+    URI[] versionAndSchemaContexts(InferredOWLOntologyID ontologyID, RepositoryConnection managementConnection,
+            URI schemaManagementGraph, URI artifactManagementGraph) throws OpenRDFException, SchemaManifestException,
+        UnmanagedSchemaIRIException;
     
     URI[] versionContexts(InferredOWLOntologyID ontologyID);
     
