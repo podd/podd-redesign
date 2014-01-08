@@ -64,6 +64,7 @@ import com.github.podd.api.PoddSesameManager;
 import com.github.podd.exception.SchemaManifestException;
 import com.github.podd.exception.UnmanagedArtifactIRIException;
 import com.github.podd.exception.UnmanagedSchemaIRIException;
+import com.github.podd.utils.DebugUtils;
 import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.OntologyUtils;
 import com.github.podd.utils.PODD;
@@ -582,7 +583,8 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         }
         else
         {
-            throw new UnmanagedSchemaIRIException(ontologyIRI, "This IRI does not refer to a managed ontology");
+            throw new UnmanagedSchemaIRIException(ontologyIRI, "This IRI does not refer to a managed ontology: "
+                    + ontologyIRI);
         }
     }
     
@@ -723,8 +725,20 @@ public class PoddSesameManagerImpl implements PoddSesameManager
             final URI... contexts) throws OpenRDFException
     {
         Set<URI> results = new HashSet<>();
-        for(Statement nextImport : Iterations.asList(permanentConnection.getStatements(ontologyIRI.toOpenRDFURI(),
-                OWL.IMPORTS, null, true, contexts)))
+        
+        RepositoryResult<Statement> statements;
+        
+        if(ontologyIRI != null)
+        {
+            statements =
+                    permanentConnection.getStatements(ontologyIRI.toOpenRDFURI(), OWL.IMPORTS, null, true, contexts);
+        }
+        else
+        {
+            statements = permanentConnection.getStatements(null, OWL.IMPORTS, null, true, contexts);
+        }
+        DebugUtils.printContents(permanentConnection, contexts);
+        for(Statement nextImport : Iterations.asList(statements))
         {
             if(nextImport.getObject() instanceof URI)
             {
@@ -1580,7 +1594,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         sb2.append("SELECT ?ontologyIri ?inferredIri WHERE { ");
         sb2.append(" ?ontologyIri <" + RDF.TYPE.stringValue() + "> <" + OWL.ONTOLOGY.stringValue() + "> . ");
         sb2.append(" ?ontologyIri <" + OWL.VERSIONIRI.stringValue() + "> ?versionIri . ");
-        sb2.append(" ?versionIri <" + PODD.PODD_BASE_INFERRED_VERSION.stringValue() + "> ?inferredIri . ");
+        sb2.append(" OPTIONAL { ?versionIri <" + PODD.PODD_BASE_INFERRED_VERSION.stringValue() + "> ?inferredIri . } ");
         sb2.append(" }");
         
         this.log.debug("Generated SPARQL {} with versionIri bound to <{}>", sb2, versionIRI);
@@ -1597,11 +1611,14 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         for(final BindingSet nextResult : resultsCollector.getBindingSets())
         {
             final URI nextOntologyIRI = (URI)nextResult.getValue("ontologyIri");
-            final URI nextInferredIRI = (URI)nextResult.getValue("inferredIri");
-            
+            IRI nextInferredIRI = null;
+            if(nextResult.hasBinding("inferredIri"))
+            {
+                nextInferredIRI = IRI.create((URI)nextResult.getValue("inferredIri"));
+            }
             // return the first solution since there should only be only one
             // result
-            return new InferredOWLOntologyID(IRI.create(nextOntologyIRI), versionIRI, IRI.create(nextInferredIRI));
+            return new InferredOWLOntologyID(IRI.create(nextOntologyIRI), versionIRI, nextInferredIRI);
         }
         
         // could not find given IRI as a version IRI
