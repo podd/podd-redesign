@@ -737,8 +737,8 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             permanentConnection = this.getRepositoryManager().getPermanentRepository(schemaImports).getConnection();
             
             final List<URI> typesList =
-                    this.getSesameManager().getObjectTypes(artifactId, objectUri, managementConnection, permanentConnection,
-                            this.getRepositoryManager().getSchemaManagementGraph(),
+                    this.getSesameManager().getObjectTypes(artifactId, objectUri, managementConnection,
+                            permanentConnection, this.getRepositoryManager().getSchemaManagementGraph(),
                             this.getRepositoryManager().getArtifactManagementGraph());
             for(final URI objectType : typesList)
             {
@@ -876,30 +876,35 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         throws OpenRDFException, UnmanagedSchemaIRIException, SchemaManifestException, UnsupportedRDFormatException,
         IOException, UnmanagedArtifactIRIException, UnmanagedArtifactVersionException
     {
-        RepositoryConnection conn = null;
+        RepositoryConnection permanentConnection = null;
+        RepositoryConnection managementConnection = null;
         try
         {
             final Set<? extends OWLOntologyID> schemaImports = this.getSchemaImports(ontologyID);
-            conn = this.getRepositoryManager().getPermanentRepository(schemaImports).getConnection();
+            managementConnection = this.getRepositoryManager().getManagementRepository().getConnection();
+            permanentConnection = this.getRepositoryManager().getPermanentRepository(schemaImports).getConnection();
             final URI[] contexts =
-                    this.getSesameManager().versionAndSchemaContexts(ontologyID, conn,
+                    this.getSesameManager().versionAndSchemaContexts(ontologyID, managementConnection,
                             this.getRepositoryManager().getSchemaManagementGraph(),
                             this.getRepositoryManager().getArtifactManagementGraph());
             
-            return this.getSesameManager().getReferringObjectDetails(objectUri, conn, contexts);
+            return this.getSesameManager().getReferringObjectDetails(objectUri, permanentConnection, contexts);
         }
         finally
         {
             try
             {
-                if(conn != null && conn.isOpen())
+                if(permanentConnection != null && permanentConnection.isOpen())
                 {
-                    conn.close();
+                    permanentConnection.close();
                 }
             }
-            catch(final RepositoryException e)
+            finally
             {
-                throw e;
+                if(managementConnection != null && managementConnection.isOpen())
+                {
+                    managementConnection.close();
+                }
             }
         }
     }
