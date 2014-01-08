@@ -1401,7 +1401,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             final URI randomContext = PODD.VF.createURI("urn:uuid:" + UUID.randomUUID().toString());
             Model rawModel = Rio.parse(inputStream, "", format, randomContext);
             
-            final List<InferredOWLOntologyID> ontologyIDs = OntologyUtils.modelToOntologyIDs(rawModel);
+            final List<InferredOWLOntologyID> ontologyIDs = OntologyUtils.modelToOntologyIDs(rawModel, true, false);
             if(ontologyIDs.isEmpty())
             {
                 throw new EmptyOntologyException(null, "Loaded ontology is empty");
