@@ -171,6 +171,10 @@ public class UploadArtifactResourceImpl extends AbstractPoddResourceImpl
             
             try (final InputStream inputStream = entity.getStream();)
             {
+                if(inputStream == null)
+                {
+                    throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Did not send an artifact");
+                }
                 artifactMap =
                         this.uploadFileAndLoadArtifactIntoPodd(inputStream, format, danglingObjectPolicy,
                                 fileRefVerificationPolicy);
