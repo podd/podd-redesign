@@ -95,6 +95,9 @@ public class AddObjectResourceImpl extends AbstractPoddResourceImpl
         }
         else
         {
+            // Only allow access if they have edit access to the artifact in question,
+            // otherwise will be leaking information about objectType that may be sensitive
+            // if it is defined inside of the artifact.
             this.checkAuthentication(PoddAction.ARTIFACT_EDIT, PODD.VF.createURI(artifactUri));
         }
         
