@@ -155,54 +155,56 @@ public class AddObjectResourceImpl extends AbstractPoddResourceImpl
         throws UnsupportedRDFormatException, IOException
     {
         PoddObjectLabel objectLabel;
+        RepositoryConnection managementConnection = null;
         try
         {
-            InferredOWLOntologyID ontologyID;
-            if(artifactUri == null)
-            {
-                // FIXME: Why is there a hack here???
-                ontologyID =
-                        this.getPoddSchemaManager().getCurrentSchemaOntologyVersion(
-                                IRI.create(PODD.PODD_SCIENCE.replace("#", "")));
-            }
-            else
-            {
-                ontologyID = this.getPoddArtifactManager().getArtifact(IRI.create(artifactUri));
-            }
-            
-            final Set<? extends OWLOntologyID> schemaImports =
-                    this.getPoddArtifactManager().getSchemaImports(ontologyID);
             RepositoryConnection permanentConnection = null;
-            RepositoryConnection managementConnection = null;
             try
             {
-                permanentConnection =
-                        this.getPoddRepositoryManager().getPermanentRepository(schemaImports).getConnection();
-                permanentConnection.begin();
                 managementConnection = this.getPoddRepositoryManager().getManagementRepository().getConnection();
                 managementConnection.begin();
-                objectLabel =
-                        this.getPoddSesameManager().getObjectLabel(ontologyID, PODD.VF.createURI(objectType),
-                                managementConnection, permanentConnection,
-                                this.getPoddRepositoryManager().getSchemaManagementGraph(),
-                                this.getPoddRepositoryManager().getArtifactManagementGraph());
+                
+                InferredOWLOntologyID ontologyID = null;
+                if(artifactUri != null)
+                {
+                    ontologyID = this.getPoddArtifactManager().getArtifact(IRI.create(artifactUri));
+                    final Set<? extends OWLOntologyID> schemaImports =
+                            this.getPoddArtifactManager().getSchemaImports(ontologyID);
+                    permanentConnection =
+                            this.getPoddRepositoryManager().getPermanentRepository(schemaImports).getConnection();
+                    
+                    objectLabel =
+                            this.getPoddSesameManager().getObjectLabel(ontologyID, PODD.VF.createURI(objectType),
+                                    managementConnection, permanentConnection,
+                                    this.getPoddRepositoryManager().getSchemaManagementGraph(),
+                                    this.getPoddRepositoryManager().getArtifactManagementGraph());
+                }
+                else
+                {
+                    objectLabel =
+                            this.getPoddSesameManager().getObjectLabel(ontologyID, PODD.VF.createURI(objectType),
+                                    managementConnection, managementConnection,
+                                    this.getPoddRepositoryManager().getSchemaManagementGraph(),
+                                    this.getPoddRepositoryManager().getArtifactManagementGraph());
+                    
+                }
             }
             finally
             {
                 try
                 {
-                    if(permanentConnection != null && permanentConnection.isOpen())
-                    {
-                        permanentConnection.rollback(); // read only, nothing to commit
-                        permanentConnection.close();
-                    }
-                }
-                finally
-                {
                     if(managementConnection != null && managementConnection.isOpen())
                     {
                         managementConnection.rollback(); // read only, nothing to commit
                         managementConnection.close();
+                    }
+                }
+                finally
+                {
+                    if(permanentConnection != null && permanentConnection.isOpen())
+                    {
+                        permanentConnection.rollback(); // read only, nothing to commit
+                        permanentConnection.close();
                     }
                 }
             }

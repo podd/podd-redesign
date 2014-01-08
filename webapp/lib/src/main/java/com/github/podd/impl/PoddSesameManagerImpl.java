@@ -851,9 +851,20 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         
         final TupleQuery tupleQuery = permanentConnection.prepareTupleQuery(QueryLanguage.SPARQL, sb.toString());
         tupleQuery.setBinding("objectUri", objectUri);
+        URI[] contexts;
+        
+        if(ontologyID != null)
+        {
+            contexts = this.versionAndSchemaContexts(ontologyID,
+                    managementConnection, schemaManagementGraph, artifactManagementGraph);
+        }
+        else
+        {
+            contexts = this.schemaContexts(ontologyID,
+                    managementConnection, schemaManagementGraph, artifactManagementGraph);
+        }
         final QueryResultCollector queryResults =
-                RdfUtility.executeTupleQuery(tupleQuery, this.versionAndSchemaContexts(ontologyID,
-                        managementConnection, schemaManagementGraph, artifactManagementGraph));
+                RdfUtility.executeTupleQuery(tupleQuery, contexts);
         
         String label = null;
         String description = null;
