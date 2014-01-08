@@ -21,7 +21,6 @@ import info.aduna.iteration.Iterations;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -64,7 +63,6 @@ import com.github.podd.api.PoddSesameManager;
 import com.github.podd.exception.SchemaManifestException;
 import com.github.podd.exception.UnmanagedArtifactIRIException;
 import com.github.podd.exception.UnmanagedSchemaIRIException;
-import com.github.podd.utils.DebugUtils;
 import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.OntologyUtils;
 import com.github.podd.utils.PODD;
@@ -174,7 +172,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         {
             if(subject instanceof URI)
             {
-                Set<Value> objects = inputModel.filter(subject, RDFS.LABEL, null, contexts).objects();
+                final Set<Value> objects = inputModel.filter(subject, RDFS.LABEL, null, contexts).objects();
                 if(objects.isEmpty() || objects.size() == 1 && objects.iterator().next().stringValue().equals("?blank"))
                 {
                     missingLabelUris.add((URI)subject);
@@ -656,7 +654,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
     public Set<URI> getDirectImports(final IRI ontologyIRI, final RepositoryConnection permanentConnection,
             final URI... contexts) throws OpenRDFException
     {
-        Set<URI> results = new HashSet<>();
+        final Set<URI> results = new HashSet<>();
         
         RepositoryResult<Statement> statements;
         
@@ -669,8 +667,8 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         {
             statements = permanentConnection.getStatements(null, OWL.IMPORTS, null, true, contexts);
         }
-        //DebugUtils.printContents(permanentConnection, contexts);
-        for(Statement nextImport : Iterations.asList(statements))
+        // DebugUtils.printContents(permanentConnection, contexts);
+        for(final Statement nextImport : Iterations.asList(statements))
         {
             if(nextImport.getObject() instanceof URI)
             {
@@ -855,16 +853,17 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         
         if(ontologyID != null)
         {
-            contexts = this.versionAndSchemaContexts(ontologyID,
-                    managementConnection, schemaManagementGraph, artifactManagementGraph);
+            contexts =
+                    this.versionAndSchemaContexts(ontologyID, managementConnection, schemaManagementGraph,
+                            artifactManagementGraph);
         }
         else
         {
-            contexts = this.schemaContexts(ontologyID,
-                    managementConnection, schemaManagementGraph, artifactManagementGraph);
+            contexts =
+                    this.schemaContexts(ontologyID, managementConnection, schemaManagementGraph,
+                            artifactManagementGraph);
         }
-        final QueryResultCollector queryResults =
-                RdfUtility.executeTupleQuery(tupleQuery, contexts);
+        final QueryResultCollector queryResults = RdfUtility.executeTupleQuery(tupleQuery, contexts);
         
         String label = null;
         String description = null;
@@ -2257,7 +2256,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         UnmanagedSchemaIRIException
     {
         final Set<URI> contexts = new LinkedHashSet<URI>();
-        Set<OWLOntologyID> dependentSchemaOntologies = new LinkedHashSet<>();
+        final Set<OWLOntologyID> dependentSchemaOntologies = new LinkedHashSet<>();
         if(artifactID != null)
         {
             final Set<URI> directImports =
@@ -2265,8 +2264,8 @@ public class PoddSesameManagerImpl implements PoddSesameManager
             
             for(final URI directImport : directImports)
             {
-                InferredOWLOntologyID schemaVersion =
-                        getSchemaVersion(IRI.create(directImport), managementConnection, schemaManagementGraph);
+                final InferredOWLOntologyID schemaVersion =
+                        this.getSchemaVersion(IRI.create(directImport), managementConnection, schemaManagementGraph);
                 dependentSchemaOntologies.add(schemaVersion);
             }
         }
@@ -2276,10 +2275,10 @@ public class PoddSesameManagerImpl implements PoddSesameManager
                     schemaManagementGraph));
         }
         
-        Model model = new LinkedHashModel();
+        final Model model = new LinkedHashModel();
         managementConnection.export(new StatementCollector(model), schemaManagementGraph);
         
-        List<OWLOntologyID> schemaManifestImports =
+        final List<OWLOntologyID> schemaManifestImports =
                 OntologyUtils.schemaManifestImports(model, dependentSchemaOntologies);
         
         for(final OWLOntologyID schemaOntology : schemaManifestImports)

@@ -24,7 +24,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -56,7 +55,6 @@ import org.openrdf.model.vocabulary.RDFS;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
-import org.openrdf.repository.sail.SailRepository;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.RDFParseException;
 import org.openrdf.rio.RDFParser;
@@ -64,16 +62,13 @@ import org.openrdf.rio.RDFWriter;
 import org.openrdf.rio.Rio;
 import org.openrdf.rio.UnsupportedRDFormatException;
 import org.openrdf.rio.helpers.StatementCollector;
-import org.openrdf.sail.memory.MemoryStore;
 import org.semanticweb.owlapi.formats.OWLOntologyFormatFactoryRegistry;
 import org.semanticweb.owlapi.io.OWLOntologyDocumentSource;
 import org.semanticweb.owlapi.io.StreamDocumentSource;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLException;
 import org.semanticweb.owlapi.model.OWLOntologyID;
-import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.OWLOntologyManagerFactory;
-import org.semanticweb.owlapi.model.OWLOntologyManagerFactoryRegistry;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -432,8 +427,8 @@ public abstract class AbstractPoddArtifactManagerTest
      */
     private InferredOWLOntologyID loadInferStoreSchema(final InputStream inputStream, final RDFFormat format,
             final long assertedStatementCount, final long inferredStatementCount,
-            final RepositoryConnection repositoryConnection, Set<? extends OWLOntologyID> dependentSchemaOntologies)
-        throws Exception
+            final RepositoryConnection repositoryConnection,
+            final Set<? extends OWLOntologyID> dependentSchemaOntologies) throws Exception
     {
         // load ontology to OWLManager
         final OWLOntologyDocumentSource owlSource =
@@ -486,8 +481,8 @@ public abstract class AbstractPoddArtifactManagerTest
      */
     protected InferredOWLOntologyID loadInferStoreSchema(final String resourcePath, final RDFFormat format,
             final long assertedStatementCount, final long inferredStatementCount,
-            final RepositoryConnection repositoryConnection, Set<? extends OWLOntologyID> dependentSchemaOntologies)
-        throws Exception
+            final RepositoryConnection repositoryConnection,
+            final Set<? extends OWLOntologyID> dependentSchemaOntologies) throws Exception
     {
         // load ontology to OWLManager
         final InputStream inputStream = this.getClass().getResourceAsStream(resourcePath);
@@ -560,7 +555,7 @@ public abstract class AbstractPoddArtifactManagerTest
         final PoddPurlManager testPurlManager = this.getNewPurlManager();
         testPurlManager.setPurlProcessorFactoryRegistry(testPurlRegistry);
         
-        OWLOntologyManagerFactory manager = getNewOWLOntologyManagerFactory();
+        final OWLOntologyManagerFactory manager = this.getNewOWLOntologyManagerFactory();
         Assert.assertNotNull("Null implementation of OWLOntologyManagerFactory", manager);
         final PoddOWLManager testOWLManager = this.getNewOWLManager(manager, this.getNewReasonerFactory());
         
@@ -665,7 +660,8 @@ public abstract class AbstractPoddArtifactManagerTest
             managementConnection = this.testRepositoryManager.getManagementRepository().getConnection();
             managementConnection.begin();
             
-            Set<? extends OWLOntologyID> schemaImports = this.testArtifactManager.getSchemaImports(updatedArtifact);
+            final Set<? extends OWLOntologyID> schemaImports =
+                    this.testArtifactManager.getSchemaImports(updatedArtifact);
             permanentConnection = this.testRepositoryManager.getPermanentRepository(schemaImports).getConnection();
             
             this.verifyUpdatedArtifact(updatedArtifact, "http://purl.org/podd/basic-2-20130206/artifact:1:version:2",
@@ -810,7 +806,7 @@ public abstract class AbstractPoddArtifactManagerTest
                 TestConstants.TEST_ARTIFACT_BASIC_1_INTERNAL_OBJECT_CONCRETE_TRIPLES,
                 TestConstants.TEST_ARTIFACT_BASIC_1_INTERNAL_OBJECT_INFERRED_TRIPLES, false);
         
-        boolean deleted = this.testArtifactManager.deleteArtifact(resultArtifactId);
+        final boolean deleted = this.testArtifactManager.deleteArtifact(resultArtifactId);
         Assert.assertTrue("Should have deleted artifact successfully", deleted);
         
         try
@@ -818,7 +814,7 @@ public abstract class AbstractPoddArtifactManagerTest
             this.testArtifactManager.deleteArtifact(resultArtifactId);
             Assert.fail("Did not find expected exception");
         }
-        catch(DeleteArtifactException e)
+        catch(final DeleteArtifactException e)
         {
             Assert.assertNotNull(e.getCause());
             Assert.assertTrue(e.getCause() instanceof UnmanagedArtifactIRIException);
@@ -1279,7 +1275,7 @@ public abstract class AbstractPoddArtifactManagerTest
     @Test
     public final void testSchemaContexts() throws Exception
     {
-        List<InferredOWLOntologyID> schemaOntologies = this.loadVersion1SchemaOntologies();
+        final List<InferredOWLOntologyID> schemaOntologies = this.loadVersion1SchemaOntologies();
         
         // prepare: upload a test artifact
         final InputStream inputStream1 = this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_20130206);
@@ -1288,15 +1284,15 @@ public abstract class AbstractPoddArtifactManagerTest
         this.verifyLoadedArtifact(artifactIDv1, 12, TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES,
                 TestConstants.TEST_ARTIFACT_BASIC_1_20130206_INFERRED_TRIPLES, false);
         
-        URI[] schemaContexts =
-                this.testArtifactManager.getSesameManager().schemaContexts(artifactIDv1, testManagementConnection,
-                        schemaGraph, artifactGraph);
+        final URI[] schemaContexts =
+                this.testArtifactManager.getSesameManager().schemaContexts(artifactIDv1, this.testManagementConnection,
+                        this.schemaGraph, this.artifactGraph);
         
         Assert.assertEquals(6, schemaContexts.length);
         
-        Set<URI> schemaUris = new HashSet<>(Arrays.asList(schemaContexts));
+        final Set<URI> schemaUris = new HashSet<>(Arrays.asList(schemaContexts));
         
-        for(InferredOWLOntologyID nextSchemaOntology : schemaOntologies)
+        for(final InferredOWLOntologyID nextSchemaOntology : schemaOntologies)
         {
             Assert.assertTrue(schemaUris.contains(nextSchemaOntology.getVersionIRI().toOpenRDFURI()));
         }
@@ -1311,7 +1307,7 @@ public abstract class AbstractPoddArtifactManagerTest
     @Test
     public final void testVersionSchemaContexts() throws Exception
     {
-        List<InferredOWLOntologyID> schemaOntologies = this.loadVersion1SchemaOntologies();
+        final List<InferredOWLOntologyID> schemaOntologies = this.loadVersion1SchemaOntologies();
         
         // prepare: upload a test artifact
         final InputStream inputStream1 = this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_20130206);
@@ -1320,17 +1316,17 @@ public abstract class AbstractPoddArtifactManagerTest
         this.verifyLoadedArtifact(artifactIDv1, 12, TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES,
                 TestConstants.TEST_ARTIFACT_BASIC_1_20130206_INFERRED_TRIPLES, false);
         
-        URI[] schemaContexts =
+        final URI[] schemaContexts =
                 this.testArtifactManager.getSesameManager().versionAndSchemaContexts(artifactIDv1,
-                        testManagementConnection, schemaGraph, artifactGraph);
+                        this.testManagementConnection, this.schemaGraph, this.artifactGraph);
         
         Assert.assertEquals(7, schemaContexts.length);
         
-        Set<URI> schemaUris = new HashSet<>(Arrays.asList(schemaContexts));
+        final Set<URI> schemaUris = new HashSet<>(Arrays.asList(schemaContexts));
         
         Assert.assertTrue(schemaUris.contains(artifactIDv1.getVersionIRI().toOpenRDFURI()));
         
-        for(InferredOWLOntologyID nextSchemaOntology : schemaOntologies)
+        for(final InferredOWLOntologyID nextSchemaOntology : schemaOntologies)
         {
             Assert.assertTrue(schemaUris.contains(nextSchemaOntology.getVersionIRI().toOpenRDFURI()));
         }
@@ -1345,7 +1341,7 @@ public abstract class AbstractPoddArtifactManagerTest
     @Test
     public final void testVersionInferredSchemaContexts() throws Exception
     {
-        List<InferredOWLOntologyID> schemaOntologies = this.loadVersion1SchemaOntologies();
+        final List<InferredOWLOntologyID> schemaOntologies = this.loadVersion1SchemaOntologies();
         
         // prepare: upload a test artifact
         final InputStream inputStream1 = this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_20130206);
@@ -1354,18 +1350,18 @@ public abstract class AbstractPoddArtifactManagerTest
         this.verifyLoadedArtifact(artifactIDv1, 12, TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES,
                 TestConstants.TEST_ARTIFACT_BASIC_1_20130206_INFERRED_TRIPLES, false);
         
-        URI[] schemaContexts =
+        final URI[] schemaContexts =
                 this.testArtifactManager.getSesameManager().versionAndInferredAndSchemaContexts(artifactIDv1,
-                        testManagementConnection, schemaGraph, artifactGraph);
+                        this.testManagementConnection, this.schemaGraph, this.artifactGraph);
         
         Assert.assertEquals(8, schemaContexts.length);
         
-        Set<URI> schemaUris = new HashSet<>(Arrays.asList(schemaContexts));
+        final Set<URI> schemaUris = new HashSet<>(Arrays.asList(schemaContexts));
         
         Assert.assertTrue(schemaUris.contains(artifactIDv1.getVersionIRI().toOpenRDFURI()));
         Assert.assertTrue(schemaUris.contains(artifactIDv1.getInferredOntologyIRI().toOpenRDFURI()));
         
-        for(InferredOWLOntologyID nextSchemaOntology : schemaOntologies)
+        for(final InferredOWLOntologyID nextSchemaOntology : schemaOntologies)
         {
             Assert.assertTrue(schemaUris.contains(nextSchemaOntology.getVersionIRI().toOpenRDFURI()));
         }
@@ -1486,7 +1482,7 @@ public abstract class AbstractPoddArtifactManagerTest
             this.testArtifactManager.getSchemaImports(null);
             Assert.fail("Did not receive expected exception");
         }
-        catch(NullPointerException e)
+        catch(final NullPointerException e)
         {
             
         }
@@ -1502,7 +1498,7 @@ public abstract class AbstractPoddArtifactManagerTest
                     .create("urn:inferred:artifact:does:not:exist")));
             Assert.fail("Did not receive expected exception");
         }
-        catch(UnmanagedArtifactIRIException e)
+        catch(final UnmanagedArtifactIRIException e)
         {
             
         }
@@ -1519,7 +1515,7 @@ public abstract class AbstractPoddArtifactManagerTest
         this.verifyLoadedArtifact(artifactID, 11, TestConstants.TEST_ARTIFACT_BASIC_1_INTERNAL_OBJECT_CONCRETE_TRIPLES,
                 TestConstants.TEST_ARTIFACT_BASIC_1_INTERNAL_OBJECT_INFERRED_TRIPLES, false);
         
-        Set<? extends OWLOntologyID> schemaImports = this.testArtifactManager.getSchemaImports(artifactID);
+        final Set<? extends OWLOntologyID> schemaImports = this.testArtifactManager.getSchemaImports(artifactID);
         
         // DebugUtils.printContents(testManagementConnection, artifactGraph);
         
@@ -1794,7 +1790,7 @@ public abstract class AbstractPoddArtifactManagerTest
     {
         // Keep track of the ontologies that have been loaded to ensure they are in memory when
         // inferring the next schema
-        Set<InferredOWLOntologyID> loadedOntologies = new LinkedHashSet<>();
+        final Set<InferredOWLOntologyID> loadedOntologies = new LinkedHashSet<>();
         // prepare: load schema ontologies
         final InferredOWLOntologyID inferredDctermsOntologyID =
                 this.loadInferStoreSchema(PODD.PATH_PODD_DCTERMS_V1, RDFFormat.RDFXML,
@@ -1867,7 +1863,7 @@ public abstract class AbstractPoddArtifactManagerTest
     public final void testLoadArtifactWithNonCurrentSchemaVersionImport() throws Exception
     {
         // prepare:
-        List<InferredOWLOntologyID> version1SchemaOntologies = this.loadVersion1SchemaOntologies();
+        final List<InferredOWLOntologyID> version1SchemaOntologies = this.loadVersion1SchemaOntologies();
         
         // prepare: load poddScience v2
         final InferredOWLOntologyID inferredPScienceOntologyID =
@@ -1893,7 +1889,7 @@ public abstract class AbstractPoddArtifactManagerTest
         {
             managementConnection = this.testRepositoryManager.getManagementRepository().getConnection();
             
-            Set<? extends OWLOntologyID> schemaImports = this.testArtifactManager.getSchemaImports(artifactId);
+            final Set<? extends OWLOntologyID> schemaImports = this.testArtifactManager.getSchemaImports(artifactId);
             permanentConnection = this.testRepositoryManager.getPermanentRepository(schemaImports).getConnection();
             
             final String[] expectedImports =
@@ -2212,7 +2208,8 @@ public abstract class AbstractPoddArtifactManagerTest
         {
             managementConnection = this.testRepositoryManager.getManagementRepository().getConnection();
             
-            Set<? extends OWLOntologyID> schemaImports = this.testArtifactManager.getSchemaImports(updatedArtifact);
+            final Set<? extends OWLOntologyID> schemaImports =
+                    this.testArtifactManager.getSchemaImports(updatedArtifact);
             permanentConnection = this.testRepositoryManager.getPermanentRepository(schemaImports).getConnection();
             
             this.verifyUpdatedArtifact(updatedArtifact, "http://purl.org/podd/basic-2-20130206/artifact:1:version:2",
@@ -2277,7 +2274,8 @@ public abstract class AbstractPoddArtifactManagerTest
         try
         {
             managementConnection = this.testRepositoryManager.getManagementRepository().getConnection();
-            Set<? extends OWLOntologyID> schemaImports = this.testArtifactManager.getSchemaImports(updatedArtifact);
+            final Set<? extends OWLOntologyID> schemaImports =
+                    this.testArtifactManager.getSchemaImports(updatedArtifact);
             permanentConnection = this.testRepositoryManager.getPermanentRepository(schemaImports).getConnection();
             
             this.verifyUpdatedArtifact(updatedArtifact, "http://purl.org/podd/basic-2-20130206/artifact:1:version:2",
@@ -2347,7 +2345,8 @@ public abstract class AbstractPoddArtifactManagerTest
         try
         {
             managementConnection = this.testRepositoryManager.getManagementRepository().getConnection();
-            Set<? extends OWLOntologyID> schemaImports = this.testArtifactManager.getSchemaImports(updatedArtifact);
+            final Set<? extends OWLOntologyID> schemaImports =
+                    this.testArtifactManager.getSchemaImports(updatedArtifact);
             permanentConnection = this.testRepositoryManager.getPermanentRepository(schemaImports).getConnection();
             
             this.verifyUpdatedArtifact(updatedArtifact, "http://purl.org/podd/basic-2-20130206/artifact:1:version:2",
@@ -2402,7 +2401,8 @@ public abstract class AbstractPoddArtifactManagerTest
         try
         {
             managementConnection = this.testRepositoryManager.getManagementRepository().getConnection();
-            Set<? extends OWLOntologyID> schemaImports = this.testArtifactManager.getSchemaImports(updatedArtifact);
+            final Set<? extends OWLOntologyID> schemaImports =
+                    this.testArtifactManager.getSchemaImports(updatedArtifact);
             permanentConnection = this.testRepositoryManager.getPermanentRepository(schemaImports).getConnection();
             
             this.verifyUpdatedArtifact(updatedArtifact, "http://purl.org/podd/basic-2-20130206/artifact:1:version:2",
@@ -2488,7 +2488,8 @@ public abstract class AbstractPoddArtifactManagerTest
         try
         {
             managementConnection = this.testRepositoryManager.getManagementRepository().getConnection();
-            Set<? extends OWLOntologyID> schemaImports = this.testArtifactManager.getSchemaImports(updatedArtifact);
+            final Set<? extends OWLOntologyID> schemaImports =
+                    this.testArtifactManager.getSchemaImports(updatedArtifact);
             permanentConnection = this.testRepositoryManager.getPermanentRepository(schemaImports).getConnection();
             
             this.verifyUpdatedArtifact(updatedArtifact, "http://purl.org/podd/basic-2-20130206/artifact:1:version:2",
@@ -2549,7 +2550,8 @@ public abstract class AbstractPoddArtifactManagerTest
         try
         {
             managementConnection = this.testRepositoryManager.getManagementRepository().getConnection();
-            Set<? extends OWLOntologyID> schemaImports = this.testArtifactManager.getSchemaImports(updatedArtifact);
+            final Set<? extends OWLOntologyID> schemaImports =
+                    this.testArtifactManager.getSchemaImports(updatedArtifact);
             permanentConnection = this.testRepositoryManager.getPermanentRepository(schemaImports).getConnection();
             
             this.verifyUpdatedArtifact(updatedArtifact, "http://purl.org/podd/basic-2-20130206/artifact:1:version:2",
@@ -2611,7 +2613,8 @@ public abstract class AbstractPoddArtifactManagerTest
         try
         {
             managementConnection = this.testRepositoryManager.getManagementRepository().getConnection();
-            Set<? extends OWLOntologyID> schemaImports = this.testArtifactManager.getSchemaImports(updatedArtifact);
+            final Set<? extends OWLOntologyID> schemaImports =
+                    this.testArtifactManager.getSchemaImports(updatedArtifact);
             permanentConnection = this.testRepositoryManager.getPermanentRepository(schemaImports).getConnection();
             
             this.verifyUpdatedArtifact(updatedArtifact, "http://purl.org/podd/basic-2-20130206/artifact:1:version:2",
@@ -3153,7 +3156,7 @@ public abstract class AbstractPoddArtifactManagerTest
         RepositoryConnection permanentConnection = null;
         try
         {
-            Set<? extends OWLOntologyID> schemaOntologies =
+            final Set<? extends OWLOntologyID> schemaOntologies =
                     this.testArtifactManager.getSchemaImports(inferredOntologyId);
             
             Assert.assertFalse("Could not find schema imports, so cannot find permanent repository!",
@@ -3208,9 +3211,9 @@ public abstract class AbstractPoddArtifactManagerTest
             final long expectedConcreteStatementCount, final RepositoryConnection managementConnection)
         throws Exception
     {
-        Set<? extends OWLOntologyID> schemaImports = this.testArtifactManager.getSchemaImports(updatedArtifact);
+        final Set<? extends OWLOntologyID> schemaImports = this.testArtifactManager.getSchemaImports(updatedArtifact);
         
-        RepositoryConnection permanentConnection =
+        final RepositoryConnection permanentConnection =
                 this.testRepositoryManager.getPermanentRepository(schemaImports).getConnection();
         
         try

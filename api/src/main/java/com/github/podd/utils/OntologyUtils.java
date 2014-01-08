@@ -110,14 +110,14 @@ public class OntologyUtils
         final Set<URI> artifactImports = new HashSet<>();
         
         // Be tolerant for artifacts and add imports for both the ontology and the version
-        recursiveFollowImports(artifactImports, importsMap, artifactID.getOntologyIRI().toOpenRDFURI());
+        OntologyUtils.recursiveFollowImports(artifactImports, importsMap, artifactID.getOntologyIRI().toOpenRDFURI());
         
-        recursiveFollowImports(artifactImports, importsMap, artifactID.getVersionIRI().toOpenRDFURI());
+        OntologyUtils.recursiveFollowImports(artifactImports, importsMap, artifactID.getVersionIRI().toOpenRDFURI());
         
         final List<InferredOWLOntologyID> ontologyIDs = OntologyUtils.modelToOntologyIDs(model, true, false);
         
-        Set<OWLOntologyID> finalOrderImports =
-                finalOrderImports(results, ontologyIDs, orderImports, artifactImports, importsMap);
+        final Set<OWLOntologyID> finalOrderImports =
+                OntologyUtils.finalOrderImports(results, ontologyIDs, orderImports, artifactImports, importsMap);
         
         return new ArrayList<>(finalOrderImports);
     }
@@ -130,18 +130,18 @@ public class OntologyUtils
      * @param importsMap
      * @param nextURI
      */
-    public static void recursiveFollowImports(Set<URI> artifactImports, ConcurrentMap<URI, Set<URI>> importsMap,
-            URI nextURI)
+    public static void recursiveFollowImports(final Set<URI> artifactImports,
+            final ConcurrentMap<URI, Set<URI>> importsMap, final URI nextURI)
     {
         if(importsMap.containsKey(nextURI))
         {
-            Set<URI> nextSet = importsMap.get(nextURI);
-            for(URI nextSetUri : nextSet)
+            final Set<URI> nextSet = importsMap.get(nextURI);
+            for(final URI nextSetUri : nextSet)
             {
                 if(!artifactImports.contains(nextSetUri))
                 {
                     artifactImports.add(nextSetUri);
-                    recursiveFollowImports(artifactImports, importsMap, nextSetUri);
+                    OntologyUtils.recursiveFollowImports(artifactImports, importsMap, nextSetUri);
                 }
             }
         }
@@ -158,10 +158,10 @@ public class OntologyUtils
      */
     public static Set<OWLOntologyID> finalOrderImports(final Set<OWLOntologyID> results,
             final List<? extends OWLOntologyID> ontologyIDs, final List<URI> orderImports,
-            final Set<URI> artifactImports, ConcurrentMap<URI, Set<URI>> importsMap)
+            final Set<URI> artifactImports, final ConcurrentMap<URI, Set<URI>> importsMap)
     {
-        Set<OWLOntologyID> finalResults = new LinkedHashSet<OWLOntologyID>();
-        for(URI nextImport : orderImports)
+        final Set<OWLOntologyID> finalResults = new LinkedHashSet<OWLOntologyID>();
+        for(final URI nextImport : orderImports)
         {
             // Iterate through all of the imports and select those which were actually found
             if(artifactImports.contains(nextImport))
@@ -185,7 +185,7 @@ public class OntologyUtils
                 }
                 if(!found)
                 {
-                    log.error("Could not map import to an ontology ID: ", nextImport);
+                    OntologyUtils.log.error("Could not map import to an ontology ID: ", nextImport);
                 }
             }
         }
@@ -651,7 +651,7 @@ public class OntologyUtils
      */
     public static List<URI> orderImports(final Model model, final Set<URI> schemaOntologyUris,
             final Set<URI> schemaVersionUris, final ConcurrentMap<URI, Set<URI>> importsMap,
-            boolean allowOntologyUriImports) throws SchemaManifestException
+            final boolean allowOntologyUriImports) throws SchemaManifestException
     {
         final List<URI> importOrder = new ArrayList<>(schemaOntologyUris.size());
         
@@ -721,22 +721,22 @@ public class OntologyUtils
         
         final Set<URI> artifactImports = new HashSet<>();
         
-        for(OWLOntologyID nextDependentSchemaOntology : dependentSchemaOntologies)
+        for(final OWLOntologyID nextDependentSchemaOntology : dependentSchemaOntologies)
         {
             artifactImports.add(nextDependentSchemaOntology.getVersionIRI().toOpenRDFURI());
             // Not tolerant for artifacts... Imports must be directed to version IRIs
             // recursiveFollowImports(artifactImports, importsMap,
             // artifactID.getOntologyIRI().toOpenRDFURI());
             
-            recursiveFollowImports(artifactImports, importsMap, nextDependentSchemaOntology.getVersionIRI()
-                    .toOpenRDFURI());
+            OntologyUtils.recursiveFollowImports(artifactImports, importsMap, nextDependentSchemaOntology
+                    .getVersionIRI().toOpenRDFURI());
             
         }
         
         final List<InferredOWLOntologyID> ontologyIDs = OntologyUtils.modelToOntologyIDs(model, true, false);
         
-        Set<OWLOntologyID> finalOrderImports =
-                finalOrderImports(results, ontologyIDs, orderImports, artifactImports, importsMap);
+        final Set<OWLOntologyID> finalOrderImports =
+                OntologyUtils.finalOrderImports(results, ontologyIDs, orderImports, artifactImports, importsMap);
         
         return new ArrayList<>(finalOrderImports);
     }
@@ -854,16 +854,16 @@ public class OntologyUtils
      * @throws SchemaManifestException
      */
     public static List<InferredOWLOntologyID> loadSchemasFromManifest(final RepositoryConnection managementConnection,
-            final URI schemaManagementGraph, Model model) throws RepositoryException, ModelException, IOException,
-        RDFParseException, SchemaManifestException
+            final URI schemaManagementGraph, final Model model) throws RepositoryException, ModelException,
+        IOException, RDFParseException, SchemaManifestException
     {
         managementConnection.add(model, schemaManagementGraph);
         
-        List<InferredOWLOntologyID> ontologyIDs = modelToOntologyIDs(model, false, false);
+        final List<InferredOWLOntologyID> ontologyIDs = OntologyUtils.modelToOntologyIDs(model, false, false);
         
-        for(InferredOWLOntologyID nextOntology : ontologyIDs)
+        for(final InferredOWLOntologyID nextOntology : ontologyIDs)
         {
-            String classpath =
+            final String classpath =
                     model.filter(nextOntology.getVersionIRI().toOpenRDFURI(), PODD.PODD_SCHEMA_CLASSPATH, null)
                             .objectString();
             if(classpath == null)
@@ -871,7 +871,7 @@ public class OntologyUtils
                 throw new SchemaManifestException(nextOntology.getVersionIRI(),
                         "Ontology was not mapped to a classpath: " + nextOntology.toString());
             }
-            InputStream nextStream = OntologyUtils.class.getResourceAsStream(classpath);
+            final InputStream nextStream = OntologyUtils.class.getResourceAsStream(classpath);
             if(nextStream == null)
             {
                 throw new SchemaManifestException(nextOntology.getVersionIRI(),
@@ -881,11 +881,11 @@ public class OntologyUtils
                     nextOntology.getVersionIRI().toOpenRDFURI());
         }
         
-        Model currentVersions = model.filter(null, PODD.OMV_CURRENT_VERSION, null);
-        for(Resource nextOntology : currentVersions.subjects())
+        final Model currentVersions = model.filter(null, PODD.OMV_CURRENT_VERSION, null);
+        for(final Resource nextOntology : currentVersions.subjects())
         {
             // Ensure that there is only one current version
-            URI nextCurrentVersion = model.filter(nextOntology, PODD.OMV_CURRENT_VERSION, null).objectURI();
+            final URI nextCurrentVersion = model.filter(nextOntology, PODD.OMV_CURRENT_VERSION, null).objectURI();
             managementConnection.remove(nextOntology, PODD.OMV_CURRENT_VERSION, null, schemaManagementGraph);
             managementConnection.add(nextOntology, PODD.OMV_CURRENT_VERSION, nextCurrentVersion, schemaManagementGraph);
         }

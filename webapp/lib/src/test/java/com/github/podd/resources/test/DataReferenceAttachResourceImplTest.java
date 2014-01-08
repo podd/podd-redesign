@@ -48,7 +48,6 @@ import org.restlet.resource.ResourceException;
 import com.github.ansell.restletutils.test.RestletTestUtils;
 import com.github.podd.api.test.TestConstants;
 import com.github.podd.impl.file.test.SSHService;
-import com.github.podd.utils.DebugUtils;
 import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.OntologyUtils;
 import com.github.podd.utils.PODD;
@@ -185,7 +184,7 @@ public class DataReferenceAttachResourceImplTest extends AbstractResourceImplTes
             
             final Model artifactModel = this.getArtifactAsModel(artifactID.getOntologyIRI().toString());
             
-            //DebugUtils.printContents(artifactModel);
+            // DebugUtils.printContents(artifactModel);
             
             Assert.assertEquals(98, artifactModel.size());
             Assert.assertEquals(20, artifactModel.subjects().size());

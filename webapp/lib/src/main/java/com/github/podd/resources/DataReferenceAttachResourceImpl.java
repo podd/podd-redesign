@@ -161,7 +161,7 @@ public class DataReferenceAttachResourceImpl extends AbstractPoddResourceImpl
             this.log.error("Object IRI not submitted");
             throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Object IRI not submitted");
         }
-        URI artifactUri = PODD.VF.createURI(artifactUriString);
+        final URI artifactUri = PODD.VF.createURI(artifactUriString);
         this.checkAuthentication(PoddAction.ARTIFACT_EDIT, artifactUri);
         
         InferredOWLOntologyID artifact;

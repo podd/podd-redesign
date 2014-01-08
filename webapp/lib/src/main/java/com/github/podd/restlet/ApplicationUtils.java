@@ -40,22 +40,17 @@ import org.openrdf.model.Resource;
 import org.openrdf.model.URI;
 import org.openrdf.model.impl.LinkedHashModel;
 import org.openrdf.model.util.GraphUtil;
-import org.openrdf.model.vocabulary.RDF;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
-import org.openrdf.repository.config.RepositoryConfig;
 import org.openrdf.repository.config.RepositoryConfigSchema;
-import org.openrdf.repository.config.RepositoryFactory;
 import org.openrdf.repository.config.RepositoryImplConfig;
 import org.openrdf.repository.config.RepositoryImplConfigBase;
-import org.openrdf.repository.config.RepositoryRegistry;
 import org.openrdf.repository.http.HTTPRepository;
 import org.openrdf.repository.manager.LocalRepositoryManager;
 import org.openrdf.repository.manager.RemoteRepositoryManager;
 import org.openrdf.repository.manager.RepositoryManager;
 import org.openrdf.repository.sail.SailRepository;
-import org.openrdf.repository.sail.config.SailRepositoryFactory;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.RDFHandlerException;
 import org.openrdf.rio.Rio;
@@ -71,7 +66,6 @@ import org.restlet.security.Realm;
 import org.restlet.security.Role;
 import org.semanticweb.owlapi.model.OWLException;
 import org.semanticweb.owlapi.model.OWLOntologyID;
-import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.OWLOntologyManagerFactory;
 import org.semanticweb.owlapi.model.OWLOntologyManagerFactoryRegistry;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
@@ -106,7 +100,6 @@ import com.github.podd.impl.purl.PoddPurlManagerImpl;
 import com.github.podd.impl.purl.UUIDPurlProcessorFactoryImpl;
 import com.github.podd.utils.DebugUtils;
 import com.github.podd.utils.InferredOWLOntologyID;
-import com.github.podd.utils.OntologyUtils;
 import com.github.podd.utils.PODD;
 import com.github.podd.utils.PoddRoles;
 import com.github.podd.utils.PoddUser;
@@ -244,7 +237,7 @@ public class ApplicationUtils
                 props.get(PoddWebConstants.PROPERTY_MANAGEMENT_SESAME_URL,
                         PoddWebConstants.DEFAULT_MANAGEMENT_SESAME_URL);
         
-        return getNewRepositoryInternal(repositoryUrl);
+        return ApplicationUtils.getNewRepositoryInternal(repositoryUrl);
     }
     
     private static Repository getNewRepositoryInternal(final String repositoryUrl) throws RepositoryException
@@ -320,20 +313,20 @@ public class ApplicationUtils
         
         final Repository nextManagementRepository = ApplicationUtils.getNewManagementRepository(props);
         
-        String permanentRepositoryConfigPath =
+        final String permanentRepositoryConfigPath =
                 props.get(PoddWebConstants.PROPERTY_PERMANENT_SESAME_REPOSITORY_CONFIG,
                         PoddWebConstants.DEFAULT_PERMANENT_SESAME_REPOSITORY_CONFIG);
-        InputStream repositoryImplConfigStream =
+        final InputStream repositoryImplConfigStream =
                 ApplicationUtils.class.getResourceAsStream(permanentRepositoryConfigPath);
         if(repositoryImplConfigStream == null)
         {
-            log.error("Could not find repository config");
+            ApplicationUtils.log.error("Could not find repository config");
         }
         final Model graph = Rio.parse(repositoryImplConfigStream, "", RDFFormat.TURTLE);
         final Resource repositoryNode = GraphUtil.getUniqueSubject(graph, RepositoryConfigSchema.REPOSITORYTYPE, null);
-        RepositoryImplConfig repositoryImplConfig = RepositoryImplConfigBase.create(graph, repositoryNode);
+        final RepositoryImplConfig repositoryImplConfig = RepositoryImplConfigBase.create(graph, repositoryNode);
         RepositoryManager repositoryManager;
-        String repositoryManagerUrl =
+        final String repositoryManagerUrl =
                 props.get(PoddWebConstants.PROPERTY_PERMANENT_SESAME_REPOSITORY_LOCATION,
                         PoddWebConstants.DEFAULT_PERMANENT_SESAME_REPOSITORY_LOCATION);
         if(repositoryManagerUrl == null || repositoryManagerUrl.trim().isEmpty())
@@ -383,7 +376,7 @@ public class ApplicationUtils
         final PoddPurlManager nextPurlManager = new PoddPurlManagerImpl();
         nextPurlManager.setPurlProcessorFactoryRegistry(nextPurlRegistry);
         
-        Collection<OWLOntologyManagerFactory> ontologyManagers =
+        final Collection<OWLOntologyManagerFactory> ontologyManagers =
                 OWLOntologyManagerFactoryRegistry.getInstance().get(
                         props.get(PoddWebConstants.PROPERTY_OWLAPI_MANAGER, PoddWebConstants.DEFAULT_OWLAPI_MANAGER));
         
@@ -525,7 +518,7 @@ public class ApplicationUtils
                 model = Rio.parse(schemaManifestStream, "", format);
             }
             
-            if(log.isDebugEnabled())
+            if(ApplicationUtils.log.isDebugEnabled())
             {
                 ApplicationUtils.log.debug("Schema manifest contents");
                 DebugUtils.printContents(model);

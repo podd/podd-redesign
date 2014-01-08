@@ -26,10 +26,8 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
@@ -39,13 +37,11 @@ import java.util.concurrent.ConcurrentMap;
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.Literal;
 import org.openrdf.model.Model;
-import org.openrdf.model.Namespace;
 import org.openrdf.model.Resource;
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.openrdf.model.Value;
 import org.openrdf.model.impl.LinkedHashModel;
-import org.openrdf.model.impl.ValueFactoryImpl;
 import org.openrdf.model.util.Namespaces;
 import org.openrdf.model.vocabulary.OWL;
 import org.openrdf.model.vocabulary.RDF;
@@ -53,13 +49,10 @@ import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.RepositoryResult;
-import org.openrdf.repository.sail.SailRepository;
 import org.openrdf.rio.RDFFormat;
-import org.openrdf.rio.RDFParseException;
 import org.openrdf.rio.Rio;
 import org.openrdf.rio.UnsupportedRDFormatException;
 import org.openrdf.rio.helpers.StatementCollector;
-import org.openrdf.sail.federation.Federation;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLException;
 import org.semanticweb.owlapi.model.OWLOntologyID;
@@ -99,7 +92,6 @@ import com.github.podd.exception.SchemaManifestException;
 import com.github.podd.exception.UnmanagedArtifactIRIException;
 import com.github.podd.exception.UnmanagedArtifactVersionException;
 import com.github.podd.exception.UnmanagedSchemaIRIException;
-import com.github.podd.utils.DebugUtils;
 import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.OntologyUtils;
 import com.github.podd.utils.PODD;
@@ -515,7 +507,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         try
         {
             managementConnection = this.getRepositoryManager().getManagementRepository().getConnection();
-            return getArtifactInternal(artifactIRI, versionIRI, managementConnection);
+            return this.getArtifactInternal(artifactIRI, versionIRI, managementConnection);
         }
         catch(final OpenRDFException e)
         {
@@ -974,7 +966,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         {
             managementConnection = this.getRepositoryManager().getManagementRepository().getConnection();
             
-            InferredOWLOntologyID inferredOWLOntologyID =
+            final InferredOWLOntologyID inferredOWLOntologyID =
                     this.getArtifactInternal(artifactID.getOntologyIRI(), artifactID.getVersionIRI(),
                             managementConnection);
             
@@ -1015,7 +1007,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         IOException, UnmanagedArtifactIRIException, UnmanagedArtifactVersionException
     {
         final List<PoddObjectLabel> results = new ArrayList<PoddObjectLabel>();
-        ConcurrentMap<Set<? extends OWLOntologyID>, RepositoryConnection> cache =
+        final ConcurrentMap<Set<? extends OWLOntologyID>, RepositoryConnection> cache =
                 new ConcurrentHashMap<Set<? extends OWLOntologyID>, RepositoryConnection>();
         
         RepositoryConnection managementConnection = null;
@@ -1031,7 +1023,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
                 {
                     RepositoryConnection nextConnection =
                             this.getRepositoryManager().getPermanentRepository(schemaImports).getConnection();
-                    RepositoryConnection putIfAbsent = cache.putIfAbsent(schemaImports, nextConnection);
+                    final RepositoryConnection putIfAbsent = cache.putIfAbsent(schemaImports, nextConnection);
                     if(putIfAbsent != null)
                     {
                         nextConnection = putIfAbsent;
@@ -1048,7 +1040,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         {
             try
             {
-                for(RepositoryConnection nextPermanentConnection : cache.values())
+                for(final RepositoryConnection nextPermanentConnection : cache.values())
                 {
                     try
                     {
@@ -1057,7 +1049,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
                             nextPermanentConnection.close();
                         }
                     }
-                    catch(Throwable e)
+                    catch(final Throwable e)
                     {
                         this.log.error("Found exception closing connection", e);
                     }
@@ -1192,8 +1184,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
      * Helper method to check schema ontology imports and update use of ontology IRIs to version
      * IRIs.
      */
-    private void useVersionsForSchemaImports(final URI ontologyIRI,
-            final RepositoryConnection managementRepositoryConnection,
+    private void useVersionsForSchemaImports(final URI ontologyIRI, final RepositoryConnection managementConnection,
             final RepositoryConnection tempRepositoryConnection, final URI tempContext) throws OpenRDFException,
         UnmanagedSchemaIRIException
     {
@@ -1202,8 +1193,8 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         for(final URI importedSchemaIRI : importedSchemas)
         {
             final InferredOWLOntologyID schemaOntologyID =
-                    this.getSesameManager().getSchemaVersion(IRI.create(importedSchemaIRI),
-                            managementRepositoryConnection, this.getRepositoryManager().getSchemaManagementGraph());
+                    this.getSesameManager().getSchemaVersion(IRI.create(importedSchemaIRI), managementConnection,
+                            this.getRepositoryManager().getSchemaManagementGraph());
             
             // Always replace with the version IRI
             if(!importedSchemaIRI.equals(schemaOntologyID.getVersionIRI().toOpenRDFURI()))
@@ -1400,15 +1391,14 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         // connection to the temporary repository that the artifact RDF triples
         // will be stored while they are initially parsed by OWLAPI.
         Repository tempRepository = null;
-        RepositoryConnection temporaryRepositoryConnection = null;
-        RepositoryConnection permanentRepositoryConnection = null;
-        RepositoryConnection managementRepositoryConnection = null;
+        RepositoryConnection temporaryConnection = null;
+        RepositoryConnection permanentConnection = null;
+        RepositoryConnection managementConnection = null;
         InferredOWLOntologyID inferredOWLOntologyID = null;
         Set<OWLOntologyID> schemaImports = null;
         try
         {
-            final URI randomContext =
-                    ValueFactoryImpl.getInstance().createURI("urn:uuid:" + UUID.randomUUID().toString());
+            final URI randomContext = PODD.VF.createURI("urn:uuid:" + UUID.randomUUID().toString());
             Model rawModel = Rio.parse(inputStream, "", format, randomContext);
             
             final List<InferredOWLOntologyID> ontologyIDs = OntologyUtils.modelToOntologyIDs(rawModel);
@@ -1422,33 +1412,33 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
                         ontologyIDs);
             }
             
-            managementRepositoryConnection = this.getRepositoryManager().getManagementRepository().getConnection();
-            managementRepositoryConnection.begin();
+            managementConnection = this.getRepositoryManager().getManagementRepository().getConnection();
+            managementConnection.begin();
             
             tempRepository = this.repositoryManager.getNewTemporaryRepository();
-            temporaryRepositoryConnection = tempRepository.getConnection();
+            temporaryConnection = tempRepository.getConnection();
             
             // Load the artifact RDF triples into a random context in the temp
             // repository, which may be shared between different uploads
-            temporaryRepositoryConnection.add(rawModel, randomContext);
+            temporaryConnection.add(rawModel, randomContext);
             
             rawModel.clear();
             rawModel = null;
             
             // check and ensure schema ontology imports are for version IRIs
-            this.useVersionsForSchemaImports(ontologyIDs.get(0).getOntologyIRI().toOpenRDFURI(),
-                    managementRepositoryConnection, temporaryRepositoryConnection, randomContext);
+            this.useVersionsForSchemaImports(ontologyIDs.get(0).getOntologyIRI().toOpenRDFURI(), managementConnection,
+                    temporaryConnection, randomContext);
             
-            Model importsModel = new LinkedHashModel();
+            final Model importsModel = new LinkedHashModel();
             
             // Repopulate model so it can be used by OntologyUtils in getSchemaImportsInternal
-            temporaryRepositoryConnection.exportStatements(null, OWL.IMPORTS, null, true, new StatementCollector(
+            temporaryConnection.exportStatements(null, OWL.IMPORTS, null, true, new StatementCollector(importsModel),
+                    randomContext);
+            temporaryConnection.exportStatements(null, RDF.TYPE, OWL.ONTOLOGY, true, new StatementCollector(
                     importsModel), randomContext);
-            temporaryRepositoryConnection.exportStatements(null, RDF.TYPE, OWL.ONTOLOGY, true, new StatementCollector(
-                    importsModel), randomContext);
-            temporaryRepositoryConnection.exportStatements(null, OWL.VERSIONIRI, null, true, new StatementCollector(
-                    importsModel), randomContext);
-            managementRepositoryConnection.export(new StatementCollector(importsModel), this.getRepositoryManager()
+            temporaryConnection.exportStatements(null, OWL.VERSIONIRI, null, true,
+                    new StatementCollector(importsModel), randomContext);
+            managementConnection.export(new StatementCollector(importsModel), this.getRepositoryManager()
                     .getSchemaManagementGraph());
             
             // Rio.write(model, Rio.createWriter(RDFFormat.NQUADS, System.out));
@@ -1456,16 +1446,16 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             schemaImports = new LinkedHashSet<>(OntologyUtils.artifactImports(ontologyIDs.get(0), importsModel));
             
             final Repository permanentRepository = this.getRepositoryManager().getPermanentRepository(schemaImports);
-            permanentRepositoryConnection = permanentRepository.getConnection();
-            permanentRepositoryConnection.begin();
+            permanentConnection = permanentRepository.getConnection();
+            permanentConnection.begin();
             
             // Remove any assertions that the user has made about publication status, as this
             // information is a privileged operation that must be done through the designated API
             // method
-            cleanPrivilegedAssertions(randomContext, temporaryRepositoryConnection);
+            this.cleanPrivilegedAssertions(randomContext, temporaryConnection);
             
             // Replace temporary URIs with PURLs
-            this.handlePurls(temporaryRepositoryConnection, randomContext);
+            this.handlePurls(temporaryConnection, randomContext);
             
             // Set a Version IRI for this artifact based on the PURL
             /*
@@ -1475,8 +1465,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
              * For a new artifact, a Version IRI is created based on the Ontology IRI while for a
              * new version of a managed artifact, the most recent version is incremented.
              */
-            final IRI ontologyIRI =
-                    this.getSesameManager().getOntologyIRI(temporaryRepositoryConnection, randomContext);
+            final IRI ontologyIRI = this.getSesameManager().getOntologyIRI(temporaryConnection, randomContext);
             if(ontologyIRI == null)
             {
                 throw new EmptyOntologyException(null, "Loaded ontology is empty");
@@ -1488,7 +1477,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             try
             {
                 currentManagedArtifactID =
-                        this.getSesameManager().getCurrentArtifactVersion(ontologyIRI, managementRepositoryConnection,
+                        this.getSesameManager().getCurrentArtifactVersion(ontologyIRI, managementConnection,
                                 this.getRepositoryManager().getArtifactManagementGraph());
                 if(currentManagedArtifactID != null)
                 {
@@ -1513,47 +1502,46 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
                 this.log.info("Setting version IRI to <{}>", newVersionIRI);
             }
             
-            temporaryRepositoryConnection.remove(ontologyIRI.toOpenRDFURI(), PODD.OWL_VERSION_IRI, null, randomContext);
-            temporaryRepositoryConnection.add(ontologyIRI.toOpenRDFURI(), PODD.OWL_VERSION_IRI,
-                    newVersionIRI.toOpenRDFURI(), randomContext);
+            temporaryConnection.remove(ontologyIRI.toOpenRDFURI(), PODD.OWL_VERSION_IRI, null, randomContext);
+            temporaryConnection.add(ontologyIRI.toOpenRDFURI(), PODD.OWL_VERSION_IRI, newVersionIRI.toOpenRDFURI(),
+                    randomContext);
             
             // check and update statements with default timestamp values
             final Value now = PODD.VF.createLiteral(new Date());
-            this.handleTimestamps(temporaryRepositoryConnection, PODD.PODD_BASE_CREATED_AT, now, randomContext);
-            this.handleTimestamps(temporaryRepositoryConnection, PODD.PODD_BASE_LAST_MODIFIED, now, randomContext);
+            this.handleTimestamps(temporaryConnection, PODD.PODD_BASE_CREATED_AT, now, randomContext);
+            this.handleTimestamps(temporaryConnection, PODD.PODD_BASE_LAST_MODIFIED, now, randomContext);
             
-            this.handleDanglingObjects(ontologyIRI, temporaryRepositoryConnection, randomContext, danglingObjectPolicy);
+            this.handleDanglingObjects(ontologyIRI, temporaryConnection, randomContext, danglingObjectPolicy);
             
             // ensure schema ontologies are cached in memory before loading
             // statements into OWLAPI
-            // this.getDirectImports(managementRepositoryConnection, temporaryRepositoryConnection,
+            // this.getDirectImports(managementConnection, temporaryRepositoryConnection,
             // randomContext);
             
             inferredOWLOntologyID =
-                    this.loadInferStoreArtifact(temporaryRepositoryConnection, permanentRepositoryConnection,
-                            managementRepositoryConnection, randomContext, dataReferenceVerificationPolicy, false,
-                            schemaImports);
+                    this.loadInferStoreArtifact(temporaryConnection, permanentConnection, managementConnection,
+                            randomContext, dataReferenceVerificationPolicy, false, schemaImports);
             
-            permanentRepositoryConnection.commit();
-            managementRepositoryConnection.commit();
+            permanentConnection.commit();
+            managementConnection.commit();
             
             return inferredOWLOntologyID;
         }
         catch(final Throwable e)
         {
-            if(temporaryRepositoryConnection != null && temporaryRepositoryConnection.isActive())
+            if(temporaryConnection != null && temporaryConnection.isActive())
             {
-                temporaryRepositoryConnection.rollback();
+                temporaryConnection.rollback();
             }
             
-            if(permanentRepositoryConnection != null && permanentRepositoryConnection.isActive())
+            if(permanentConnection != null && permanentConnection.isActive())
             {
-                permanentRepositoryConnection.rollback();
+                permanentConnection.rollback();
             }
             
-            if(managementRepositoryConnection != null && managementRepositoryConnection.isActive())
+            if(managementConnection != null && managementConnection.isActive())
             {
-                managementRepositoryConnection.rollback();
+                managementConnection.rollback();
             }
             
             throw e;
@@ -1580,9 +1568,9 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             {
                 try
                 {
-                    if(managementRepositoryConnection != null && managementRepositoryConnection.isOpen())
+                    if(managementConnection != null && managementConnection.isOpen())
                     {
-                        managementRepositoryConnection.close();
+                        managementConnection.close();
                     }
                 }
                 catch(final RepositoryException e)
@@ -1593,9 +1581,9 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
                 {
                     try
                     {
-                        if(permanentRepositoryConnection != null && permanentRepositoryConnection.isOpen())
+                        if(permanentConnection != null && permanentConnection.isOpen())
                         {
-                            permanentRepositoryConnection.close();
+                            permanentConnection.close();
                         }
                     }
                     catch(final RepositoryException e)
@@ -1606,9 +1594,9 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
                     {
                         try
                         {
-                            if(temporaryRepositoryConnection != null && temporaryRepositoryConnection.isOpen())
+                            if(temporaryConnection != null && temporaryConnection.isOpen())
                             {
-                                temporaryRepositoryConnection.close();
+                                temporaryConnection.close();
                             }
                         }
                         catch(final RepositoryException e)
@@ -1633,8 +1621,8 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
      * @param temporaryRepositoryConnection
      * @throws RepositoryException
      */
-    public void cleanPrivilegedAssertions(final URI randomContext, RepositoryConnection temporaryRepositoryConnection)
-        throws RepositoryException
+    public void cleanPrivilegedAssertions(final URI randomContext,
+            final RepositoryConnection temporaryRepositoryConnection) throws RepositoryException
     {
         temporaryRepositoryConnection.remove((Resource)null, PODD.PODD_BASE_HAS_PUBLICATION_STATUS, (Resource)null,
                 randomContext);
@@ -1648,11 +1636,11 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
      * @param dependentSchemaOntologies
      */
     private InferredOWLOntologyID loadInferStoreArtifact(final RepositoryConnection tempRepositoryConnection,
-            final RepositoryConnection permanentRepositoryConnection,
-            final RepositoryConnection managementRepositoryConnection, final URI tempContext,
-            final DataReferenceVerificationPolicy fileReferencePolicy, final boolean asynchronousInferences,
-            Set<? extends OWLOntologyID> dependentSchemaOntologies) throws OpenRDFException, OWLException, IOException,
-        PoddException, OntologyNotInProfileException, InconsistentOntologyException
+            final RepositoryConnection permanentConnection, final RepositoryConnection managementConnection,
+            final URI tempContext, final DataReferenceVerificationPolicy fileReferencePolicy,
+            final boolean asynchronousInferences, final Set<? extends OWLOntologyID> dependentSchemaOntologies)
+        throws OpenRDFException, OWLException, IOException, PoddException, OntologyNotInProfileException,
+        InconsistentOntologyException
     {
         // load into OWLAPI
         this.log.debug("Loading podd artifact from temp repository: {}", tempContext);
@@ -1664,26 +1652,25 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
                         .asSet(tempRepositoryConnection.getNamespaces())));
         
         final InferredOWLOntologyID inferredOWLOntologyID =
-                this.getOWLManager().loadAndInfer(owlSource, permanentRepositoryConnection, null,
-                        dependentSchemaOntologies, managementRepositoryConnection,
-                        this.getRepositoryManager().getSchemaManagementGraph());
+                this.getOWLManager().loadAndInfer(owlSource, permanentConnection, null, dependentSchemaOntologies,
+                        managementConnection, this.getRepositoryManager().getSchemaManagementGraph());
         
         // Check file references after inferencing to accurately identify
         // the parent object
-        this.handleFileReferences(permanentRepositoryConnection, fileReferencePolicy, inferredOWLOntologyID
-                .getVersionIRI().toOpenRDFURI(), inferredOWLOntologyID.getInferredOntologyIRI().toOpenRDFURI());
+        this.handleFileReferences(permanentConnection, fileReferencePolicy, inferredOWLOntologyID.getVersionIRI()
+                .toOpenRDFURI(), inferredOWLOntologyID.getInferredOntologyIRI().toOpenRDFURI());
         
-        this.getSesameManager().updateManagedPoddArtifactVersion(inferredOWLOntologyID, true,
-                managementRepositoryConnection, this.getRepositoryManager().getArtifactManagementGraph());
-        
-        managementRepositoryConnection.remove(inferredOWLOntologyID.getOntologyIRI().toOpenRDFURI(), OWL.IMPORTS, null,
+        this.getSesameManager().updateManagedPoddArtifactVersion(inferredOWLOntologyID, true, managementConnection,
                 this.getRepositoryManager().getArtifactManagementGraph());
         
-        for(Statement nextImport : Iterations.asList(permanentRepositoryConnection.getStatements(inferredOWLOntologyID
+        managementConnection.remove(inferredOWLOntologyID.getOntologyIRI().toOpenRDFURI(), OWL.IMPORTS, null, this
+                .getRepositoryManager().getArtifactManagementGraph());
+        
+        for(final Statement nextImport : Iterations.asList(permanentConnection.getStatements(inferredOWLOntologyID
                 .getOntologyIRI().toOpenRDFURI(), OWL.IMPORTS, null, true, inferredOWLOntologyID.getVersionIRI()
                 .toOpenRDFURI())))
         {
-            managementRepositoryConnection.add(inferredOWLOntologyID.getOntologyIRI().toOpenRDFURI(), OWL.IMPORTS,
+            managementConnection.add(inferredOWLOntologyID.getOntologyIRI().toOpenRDFURI(), OWL.IMPORTS,
                     nextImport.getObject(), this.getRepositoryManager().getArtifactManagementGraph());
         }
         
@@ -1983,8 +1970,8 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         
         final Repository tempRepository = this.getRepositoryManager().getNewTemporaryRepository();
         RepositoryConnection tempRepositoryConnection = null;
-        RepositoryConnection permanentRepositoryConnection = null;
-        RepositoryConnection managementRepositoryConnection = null;
+        RepositoryConnection permanentConnection = null;
+        RepositoryConnection managementConnection = null;
         InferredOWLOntologyID inferredOWLOntologyID = null;
         Set<? extends OWLOntologyID> currentSchemaImports = null;
         
@@ -1994,18 +1981,18 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             tempRepositoryConnection = tempRepository.getConnection();
             tempRepositoryConnection.begin();
             
-            managementRepositoryConnection = this.getRepositoryManager().getManagementRepository().getConnection();
+            managementConnection = this.getRepositoryManager().getManagementRepository().getConnection();
             
             currentSchemaImports = this.getSchemaImports(artifactID);
             
-            permanentRepositoryConnection =
+            permanentConnection =
                     this.getRepositoryManager().getPermanentRepository(currentSchemaImports).getConnection();
-            permanentRepositoryConnection.begin();
+            permanentConnection.begin();
             
             // load and copy the artifact's concrete statements to the temporary
             // store
             final RepositoryResult<Statement> repoResult =
-                    permanentRepositoryConnection.getStatements(null, null, null, false, artifactID.getVersionIRI()
+                    permanentConnection.getStatements(null, null, null, false, artifactID.getVersionIRI()
                             .toOpenRDFURI());
             final URI tempContext = artifactID.getVersionIRI().toOpenRDFURI();
             tempRepositoryConnection.add(repoResult, tempContext);
@@ -2079,7 +2066,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             this.handleDanglingObjects(artifactID.getOntologyIRI(), tempRepositoryConnection, tempContext,
                     danglingObjectAction);
             
-            cleanPrivilegedAssertions(tempContext, tempRepositoryConnection);
+            this.cleanPrivilegedAssertions(tempContext, tempRepositoryConnection);
             
             final Set<PoddPurlReference> purls = this.handlePurls(tempRepositoryConnection, tempContext);
             
@@ -2103,8 +2090,8 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             
             // increment the version
             final OWLOntologyID currentManagedArtifactID =
-                    this.getSesameManager().getCurrentArtifactVersion(IRI.create(artifactUri),
-                            managementRepositoryConnection, this.getRepositoryManager().getArtifactManagementGraph());
+                    this.getSesameManager().getCurrentArtifactVersion(IRI.create(artifactUri), managementConnection,
+                            this.getRepositoryManager().getArtifactManagementGraph());
             final URI newVersionIRI =
                     PODD.VF.createURI(this.incrementVersion(currentManagedArtifactID.getVersionIRI().toString()));
             
@@ -2120,21 +2107,20 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             // silently here without a prior specific call to the updateSchemaImports method, then
             // they may land in a repository which does not contain their requisite schema
             // ontologies
-            this.useVersionsForSchemaImports(artifactID.getOntologyIRI().toOpenRDFURI(),
-                    managementRepositoryConnection, tempRepositoryConnection, tempContext);
+            this.useVersionsForSchemaImports(artifactID.getOntologyIRI().toOpenRDFURI(), managementConnection,
+                    tempRepositoryConnection, tempContext);
             
             // ensure schema ontologies are cached in memory before loading
             // statements into OWLAPI
-            // this.getDirectImports(managementRepositoryConnection, tempRepositoryConnection,
+            // this.getDirectImports(managementConnection, tempRepositoryConnection,
             // tempContext);
             
             inferredOWLOntologyID =
-                    this.loadInferStoreArtifact(tempRepositoryConnection, permanentRepositoryConnection,
-                            managementRepositoryConnection, tempContext, fileReferenceAction, false,
-                            currentSchemaImports);
+                    this.loadInferStoreArtifact(tempRepositoryConnection, permanentConnection, managementConnection,
+                            tempContext, fileReferenceAction, false, currentSchemaImports);
             
-            permanentRepositoryConnection.commit();
-            managementRepositoryConnection.commit();
+            permanentConnection.commit();
+            managementConnection.commit();
             tempRepositoryConnection.rollback();
             
             return OntologyUtils.ontologyIDsToModel(Arrays.asList(inferredOWLOntologyID), resultsModel);
@@ -2143,18 +2129,18 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         {
             try
             {
-                if(managementRepositoryConnection != null && managementRepositoryConnection.isActive())
+                if(managementConnection != null && managementConnection.isActive())
                 {
-                    managementRepositoryConnection.rollback();
+                    managementConnection.rollback();
                 }
             }
             finally
             {
                 try
                 {
-                    if(permanentRepositoryConnection != null && permanentRepositoryConnection.isActive())
+                    if(permanentConnection != null && permanentConnection.isActive())
                     {
-                        permanentRepositoryConnection.rollback();
+                        permanentConnection.rollback();
                     }
                 }
                 finally
@@ -2169,11 +2155,11 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         }
         finally
         {
-            if(managementRepositoryConnection != null && managementRepositoryConnection.isOpen())
+            if(managementConnection != null && managementConnection.isOpen())
             {
                 try
                 {
-                    managementRepositoryConnection.close();
+                    managementConnection.close();
                 }
                 catch(final RepositoryException e)
                 {
@@ -2181,11 +2167,11 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
                 }
             }
             
-            if(permanentRepositoryConnection != null && permanentRepositoryConnection.isOpen())
+            if(permanentConnection != null && permanentConnection.isOpen())
             {
                 try
                 {
-                    permanentRepositoryConnection.close();
+                    permanentConnection.close();
                 }
                 catch(final RepositoryException e)
                 {
@@ -2228,21 +2214,20 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             throw new IllegalArgumentException("Artifact was null");
         }
         
-        RepositoryConnection managementRepositoryConnection = null;
-        RepositoryConnection permanentRepositoryConnection = null;
+        RepositoryConnection managementConnection = null;
+        RepositoryConnection permanentConnection = null;
         RepositoryConnection tempRepositoryConnection = null;
         Repository tempRepository = null;
         try
         {
-            managementRepositoryConnection = this.repositoryManager.getManagementRepository().getConnection();
-            managementRepositoryConnection.begin();
+            managementConnection = this.repositoryManager.getManagementRepository().getConnection();
+            managementConnection.begin();
             
-            permanentRepositoryConnection =
-                    this.repositoryManager.getPermanentRepository(newSchemaOntologyIds).getConnection();
-            permanentRepositoryConnection.begin();
+            permanentConnection = this.repositoryManager.getPermanentRepository(newSchemaOntologyIds).getConnection();
+            permanentConnection.begin();
             final InferredOWLOntologyID artifactVersion =
-                    this.sesameManager.getCurrentArtifactVersion(artifactId.getOntologyIRI(),
-                            managementRepositoryConnection, this.repositoryManager.getArtifactManagementGraph());
+                    this.sesameManager.getCurrentArtifactVersion(artifactId.getOntologyIRI(), managementConnection,
+                            this.repositoryManager.getArtifactManagementGraph());
             if(!artifactVersion.getVersionIRI().equals(artifactId.getVersionIRI()))
             {
                 throw new UnmanagedArtifactVersionException(artifactId.getOntologyIRI(),
@@ -2295,7 +2280,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             
             // this.log.info("Started caching schema ontologies: {}", newSchemaOntologyIds);
             // this.getOWLManager().cacheSchemaOntologies(newSchemaOntologyIds,
-            // managementRepositoryConnection,
+            // managementConnection,
             // this.getRepositoryManager().getSchemaManagementGraph());
             // this.log.info("Finished caching schema ontology: {}", newSchemaOntologyIds);
             //
@@ -2307,27 +2292,27 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             this.log.info("Starting reload of artifact to Repository: {}", artifactVersion);
             
             // If the following does not succeed, then it throws an exception and we rollback
-            // permanentRepositoryConnection
+            // permanentConnection
             final InferredOWLOntologyID result =
-                    this.loadInferStoreArtifact(tempRepositoryConnection, permanentRepositoryConnection,
-                            managementRepositoryConnection, newVersionIRI.toOpenRDFURI(),
-                            DataReferenceVerificationPolicy.DO_NOT_VERIFY, false, newSchemaOntologyIds);
+                    this.loadInferStoreArtifact(tempRepositoryConnection, permanentConnection, managementConnection,
+                            newVersionIRI.toOpenRDFURI(), DataReferenceVerificationPolicy.DO_NOT_VERIFY, false,
+                            newSchemaOntologyIds);
             
             this.log.info("Completed reload of artifact to Repository: {}", artifactVersion);
             
-            permanentRepositoryConnection.commit();
-            managementRepositoryConnection.commit();
+            permanentConnection.commit();
+            managementConnection.commit();
             return result;
         }
         catch(final Throwable e)
         {
-            if(managementRepositoryConnection != null)
+            if(managementConnection != null)
             {
-                managementRepositoryConnection.rollback();
+                managementConnection.rollback();
             }
-            if(permanentRepositoryConnection != null)
+            if(permanentConnection != null)
             {
-                permanentRepositoryConnection.rollback();
+                permanentConnection.rollback();
             }
             if(tempRepositoryConnection != null)
             {
@@ -2337,13 +2322,13 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         }
         finally
         {
-            if(managementRepositoryConnection != null)
+            if(managementConnection != null)
             {
-                managementRepositoryConnection.close();
+                managementConnection.close();
             }
-            if(permanentRepositoryConnection != null)
+            if(permanentConnection != null)
             {
-                permanentRepositoryConnection.close();
+                permanentConnection.close();
             }
             if(tempRepositoryConnection != null)
             {

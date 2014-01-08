@@ -20,14 +20,10 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.openrdf.model.Literal;
 import org.openrdf.model.Model;
 import org.openrdf.model.Resource;
-import org.openrdf.model.URI;
 import org.openrdf.model.util.GraphUtil;
-import org.openrdf.model.vocabulary.RDF;
 import org.openrdf.repository.Repository;
-import org.openrdf.repository.config.RepositoryConfig;
 import org.openrdf.repository.config.RepositoryConfigSchema;
 import org.openrdf.repository.config.RepositoryFactory;
 import org.openrdf.repository.config.RepositoryImplConfig;
@@ -68,12 +64,13 @@ public class RepositoryConfigTest
         final Resource repositoryNode = GraphUtil.getUniqueSubject(graph, RepositoryConfigSchema.REPOSITORYTYPE, null);
         // RepositoryConfig repositoryConfig = RepositoryConfig.create(graph, repositoryNode);
         // RepositoryImplConfig repositoryImplConfig = repositoryConfig.getRepositoryImplConfig();
-        RepositoryImplConfig repositoryImplConfig = RepositoryImplConfigBase.create(graph, repositoryNode);
+        final RepositoryImplConfig repositoryImplConfig = RepositoryImplConfigBase.create(graph, repositoryNode);
         Assert.assertNotNull(repositoryImplConfig);
         Assert.assertNotNull(repositoryImplConfig.getType());
-        RepositoryFactory repositoryFactory = RepositoryRegistry.getInstance().get(repositoryImplConfig.getType());
+        final RepositoryFactory repositoryFactory =
+                RepositoryRegistry.getInstance().get(repositoryImplConfig.getType());
         
-        Repository repository = repositoryFactory.getRepository(repositoryImplConfig);
+        final Repository repository = repositoryFactory.getRepository(repositoryImplConfig);
         Assert.assertNotNull(repository);
         repository.initialize();
         // Assert.assertTrue("Did not create a SailRepositoryConfig object",

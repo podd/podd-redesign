@@ -16,19 +16,13 @@
  */
 package com.github.podd.impl.test;
 
-import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 import org.junit.Assert;
-import org.junit.Test;
 import org.openrdf.model.Model;
 import org.openrdf.model.Resource;
-import org.openrdf.model.URI;
 import org.openrdf.model.util.GraphUtil;
 import org.openrdf.repository.Repository;
-import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.config.RepositoryConfigSchema;
 import org.openrdf.repository.config.RepositoryImplConfig;
 import org.openrdf.repository.config.RepositoryImplConfigBase;
@@ -37,11 +31,8 @@ import org.openrdf.repository.sail.SailRepository;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.Rio;
 import org.openrdf.sail.memory.MemoryStore;
-import org.semanticweb.owlapi.model.IRI;
-import org.semanticweb.owlapi.model.OWLOntologyID;
 import org.semanticweb.owlapi.model.OWLOntologyManagerFactory;
 import org.semanticweb.owlapi.model.OWLOntologyManagerFactoryRegistry;
-import org.semanticweb.owlapi.model.UnloadableImportException;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactoryRegistry;
 
@@ -54,8 +45,6 @@ import com.github.podd.impl.PoddOWLManagerImpl;
 import com.github.podd.impl.PoddRepositoryManagerImpl;
 import com.github.podd.impl.PoddSchemaManagerImpl;
 import com.github.podd.impl.PoddSesameManagerImpl;
-import com.github.podd.utils.InferredOWLOntologyID;
-import com.github.podd.utils.PODD;
 import com.github.podd.utils.PoddWebConstants;
 
 /**
@@ -67,7 +56,7 @@ public class PoddSchemaManagerImplTest extends AbstractPoddSchemaManagerTest
     @Override
     protected OWLOntologyManagerFactory getNewOWLOntologyManagerFactory()
     {
-        Collection<OWLOntologyManagerFactory> ontologyManagers =
+        final Collection<OWLOntologyManagerFactory> ontologyManagers =
                 OWLOntologyManagerFactoryRegistry.getInstance().get(PoddWebConstants.DEFAULT_OWLAPI_MANAGER);
         
         if(ontologyManagers == null || ontologyManagers.isEmpty())
@@ -87,16 +76,17 @@ public class PoddSchemaManagerImplTest extends AbstractPoddSchemaManagerTest
     @Override
     protected PoddRepositoryManager getNewPoddRepositoryManagerInstance() throws Exception
     {
-        Repository managementRepository = new SailRepository(new MemoryStore());
+        final Repository managementRepository = new SailRepository(new MemoryStore());
         managementRepository.initialize();
         
         final Model graph =
                 Rio.parse(this.getClass().getResourceAsStream("/memorystoreconfig.ttl"), "", RDFFormat.TURTLE);
         final Resource repositoryNode = GraphUtil.getUniqueSubject(graph, RepositoryConfigSchema.REPOSITORYTYPE, null);
-        RepositoryImplConfig repositoryImplConfig = RepositoryImplConfigBase.create(graph, repositoryNode);
+        final RepositoryImplConfig repositoryImplConfig = RepositoryImplConfigBase.create(graph, repositoryNode);
         Assert.assertNotNull(repositoryImplConfig);
         Assert.assertNotNull(repositoryImplConfig.getType());
-        LocalRepositoryManager repositoryManager = new LocalRepositoryManager(tempDir.newFolder("repositorymanager"));
+        final LocalRepositoryManager repositoryManager =
+                new LocalRepositoryManager(this.tempDir.newFolder("repositorymanager"));
         repositoryManager.initialize();
         return new PoddRepositoryManagerImpl(managementRepository, repositoryManager, repositoryImplConfig);
     }

@@ -34,20 +34,16 @@ import org.junit.rules.TemporaryFolder;
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.Model;
 import org.openrdf.model.URI;
-import org.openrdf.repository.RepositoryConnection;
-import org.openrdf.repository.RepositoryException;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.Rio;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLException;
 import org.semanticweb.owlapi.model.OWLOntologyID;
-import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.OWLOntologyManagerFactory;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.github.ansell.propertyutil.PropertyUtil;
 import com.github.podd.api.PoddOWLManager;
 import com.github.podd.api.PoddRepositoryManager;
 import com.github.podd.api.PoddSchemaManager;
@@ -56,7 +52,6 @@ import com.github.podd.exception.EmptyOntologyException;
 import com.github.podd.exception.PoddException;
 import com.github.podd.exception.SchemaManifestException;
 import com.github.podd.exception.UnmanagedSchemaIRIException;
-import com.github.podd.utils.DebugUtils;
 import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.PODD;
 
@@ -134,7 +129,7 @@ public abstract class AbstractPoddSchemaManagerTest
             final String expectedOntologyIri, final String expectedVersionIri) throws Exception
     {
         // prepare: load schema ontologies into PODD
-        List<InferredOWLOntologyID> schemaOntologies = this.loadDefaultSchemaOntologies();
+        final List<InferredOWLOntologyID> schemaOntologies = this.loadDefaultSchemaOntologies();
         final InputStream in = this.getClass().getResourceAsStream("/test/ontologies/poddPlantVXYZ.owl");
         this.testSchemaManager.uploadSchemaOntology(in, RDFFormat.RDFXML, new LinkedHashSet<>(schemaOntologies));
         
@@ -170,7 +165,7 @@ public abstract class AbstractPoddSchemaManagerTest
         Assert.assertNotNull("Manifest was not loaded", model);
         Assert.assertFalse("Manifest was not loaded correctly", model.isEmpty());
         
-        List<InferredOWLOntologyID> schemaOntologies = this.testSchemaManager.uploadSchemaOntologies(model);
+        final List<InferredOWLOntologyID> schemaOntologies = this.testSchemaManager.uploadSchemaOntologies(model);
         
         Assert.assertEquals("Unexpected number of schema ontologies loaded", expectedSchemaOntologies,
                 schemaOntologies.size());
@@ -350,7 +345,7 @@ public abstract class AbstractPoddSchemaManagerTest
     public final void testGetCurrentSchemaOntologyVersionMatchesOntologyIRI() throws Exception
     {
         // prepare: load schema ontologies into PODD
-        List<InferredOWLOntologyID> schemaOntologies = this.loadDefaultSchemaOntologies();
+        final List<InferredOWLOntologyID> schemaOntologies = this.loadDefaultSchemaOntologies();
         final InputStream in = this.getClass().getResourceAsStream("/test/ontologies/poddPlantVXYZ.owl");
         this.testSchemaManager.uploadSchemaOntology(in, RDFFormat.RDFXML, new LinkedHashSet<>(schemaOntologies));
         
@@ -385,7 +380,7 @@ public abstract class AbstractPoddSchemaManagerTest
     public final void testGetCurrentSchemaOntologyVersionMatchesOntologyVersionIRICurrent() throws Exception
     {
         // prepare: load schema ontologies into PODD
-        List<InferredOWLOntologyID> schemaOntologies = this.loadDefaultSchemaOntologies();
+        final List<InferredOWLOntologyID> schemaOntologies = this.loadDefaultSchemaOntologies();
         final InputStream in = this.getClass().getResourceAsStream("/test/ontologies/poddPlantVXYZ.owl");
         this.testSchemaManager.uploadSchemaOntology(in, RDFFormat.RDFXML, new LinkedHashSet<>(schemaOntologies));
         
@@ -414,7 +409,7 @@ public abstract class AbstractPoddSchemaManagerTest
     public final void testGetCurrentSchemaOntologyVersionMatchesOntologyVersionIRINotCurrent() throws Exception
     {
         // prepare: load schema ontologies into PODD
-        List<InferredOWLOntologyID> schemaOntologies = this.loadDefaultSchemaOntologies();
+        final List<InferredOWLOntologyID> schemaOntologies = this.loadDefaultSchemaOntologies();
         final InputStream in = this.getClass().getResourceAsStream("/test/ontologies/poddPlantVXYZ.owl");
         this.testSchemaManager.uploadSchemaOntology(in, RDFFormat.RDFXML, new LinkedHashSet<>(schemaOntologies));
         
@@ -652,7 +647,7 @@ public abstract class AbstractPoddSchemaManagerTest
         final IRI inputVersionIri = IRI.create("http://purl.org/podd/ns/version/poddPlant/999");
         
         // prepare: load schema ontologies into PODD
-        List<InferredOWLOntologyID> schemaOntologies = this.loadDefaultSchemaOntologies();
+        final List<InferredOWLOntologyID> schemaOntologies = this.loadDefaultSchemaOntologies();
         final InputStream in = this.getClass().getResourceAsStream("/test/ontologies/poddPlantVXYZ.owl");
         Assert.assertNotNull("Could not find test resource", in);
         this.testSchemaManager.uploadSchemaOntology(in, RDFFormat.RDFXML, new LinkedHashSet<>(schemaOntologies));
@@ -1302,13 +1297,13 @@ public abstract class AbstractPoddSchemaManagerTest
         final String[] resourcePaths =
                 { PODD.PATH_PODD_DCTERMS_V1, PODD.PATH_PODD_FOAF_V1, PODD.PATH_PODD_USER_V1, PODD.PATH_PODD_BASE_V1, };
         
-        List<InferredOWLOntologyID> schemaOntologies = new ArrayList<>();
+        final List<InferredOWLOntologyID> schemaOntologies = new ArrayList<>();
         
         for(final String path : resourcePaths)
         {
             final InputStream testInputStream = this.getClass().getResourceAsStream(path);
             Assert.assertNotNull("Missing test resource: " + path, testInputStream);
-            InferredOWLOntologyID nextSchemaOntology =
+            final InferredOWLOntologyID nextSchemaOntology =
                     this.testSchemaManager.uploadSchemaOntology(testInputStream, RDFFormat.RDFXML, new LinkedHashSet<>(
                             schemaOntologies));
             schemaOntologies.add(nextSchemaOntology);

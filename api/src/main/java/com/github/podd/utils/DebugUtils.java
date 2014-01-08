@@ -66,7 +66,7 @@ public class DebugUtils
     public static void printContents(final RepositoryConnection conn, final URI... contexts) throws RepositoryException
     {
         OpenRDFUtil.verifyContextNotNull(contexts);
-        for(URI context : contexts)
+        for(final URI context : contexts)
         {
             System.out.println("==================================================");
             System.out.println("Graph = " + context);

@@ -20,7 +20,6 @@
 package com.github.podd.api;
 
 import java.io.IOException;
-import java.util.LinkedHashSet;
 import java.util.Set;
 
 import org.openrdf.OpenRDFException;

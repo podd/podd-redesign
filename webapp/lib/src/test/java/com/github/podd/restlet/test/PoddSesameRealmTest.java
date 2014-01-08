@@ -39,7 +39,6 @@ import org.restlet.security.Role;
 
 import com.github.ansell.restletutils.SesameRealmConstants;
 import com.github.podd.restlet.PoddSesameRealm;
-import com.github.podd.utils.DebugUtils;
 import com.github.podd.utils.PODD;
 import com.github.podd.utils.PoddRoles;
 import com.github.podd.utils.PoddUser;
@@ -132,7 +131,7 @@ public class PoddSesameRealmTest
         final PoddUser testUser = this.addTestUser(testUserId1);
         Assert.assertNotNull("Test user was null", testUser);
         
-        //DebugUtils.printContents(this.getStatementList(null, null, null));
+        // DebugUtils.printContents(this.getStatementList(null, null, null));
         
         final PoddUser retrievedUser = this.testRealm.findUser(testUserId1);
         Assert.assertNotNull("Retrieved user was null", retrievedUser);

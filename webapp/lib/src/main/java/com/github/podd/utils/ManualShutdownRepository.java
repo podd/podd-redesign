@@ -29,7 +29,7 @@ import org.openrdf.repository.base.RepositoryWrapper;
  */
 public class ManualShutdownRepository extends RepositoryWrapper
 {
-    public ManualShutdownRepository(Repository delegate)
+    public ManualShutdownRepository(final Repository delegate)
     {
         super(delegate);
     }
@@ -42,6 +42,6 @@ public class ManualShutdownRepository extends RepositoryWrapper
     
     public void realShutDown() throws RepositoryException
     {
-        getDelegate().shutDown();
+        this.getDelegate().shutDown();
     }
 }

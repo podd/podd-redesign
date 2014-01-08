@@ -16,29 +16,19 @@
  */
 package com.github.podd.impl.test;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedHashSet;
 import java.util.List;
 
-import org.junit.Assert;
 import org.openrdf.model.Model;
 import org.openrdf.model.URI;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.Rio;
-import org.semanticweb.owlapi.io.OWLOntologyDocumentSource;
-import org.semanticweb.owlapi.io.StreamDocumentSource;
-import org.semanticweb.owlapi.model.OWLOntologyID;
-import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.OWLOntologyManagerFactory;
 import org.semanticweb.owlapi.model.OWLOntologyManagerFactoryRegistry;
-import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
-import org.semanticweb.owlapi.reasoner.OWLReasonerFactoryRegistry;
 
 import com.github.podd.api.PoddSesameManager;
 import com.github.podd.api.test.AbstractPoddSesameManagerTest;
-import com.github.podd.impl.PoddOWLManagerImpl;
 import com.github.podd.impl.PoddSesameManagerImpl;
 import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.OntologyUtils;
@@ -52,7 +42,7 @@ public class PoddSesameManagerImplTest extends AbstractPoddSesameManagerTest
 {
     protected OWLOntologyManagerFactory getNewOWLOntologyManagerFactory()
     {
-        Collection<OWLOntologyManagerFactory> ontologyManagers =
+        final Collection<OWLOntologyManagerFactory> ontologyManagers =
                 OWLOntologyManagerFactoryRegistry.getInstance().get(PoddWebConstants.DEFAULT_OWLAPI_MANAGER);
         
         if(ontologyManagers == null || ontologyManagers.isEmpty())
@@ -81,11 +71,11 @@ public class PoddSesameManagerImplTest extends AbstractPoddSesameManagerTest
     public final List<InferredOWLOntologyID> loadSchemaOntologies(final RepositoryConnection managementConnection,
             final URI schemaManagementGraph) throws Exception
     {
-        Model model =
+        final Model model =
                 Rio.parse(this.getClass().getResourceAsStream("/podd-schema-manifest.ttl"), "", RDFFormat.TURTLE,
                         schemaManagementGraph);
         
-        List<InferredOWLOntologyID> ontologyIDs =
+        final List<InferredOWLOntologyID> ontologyIDs =
                 OntologyUtils.loadSchemasFromManifest(managementConnection, schemaManagementGraph, model);
         
         // TODO: If any tests require inferencing, then we may need to recreate the following

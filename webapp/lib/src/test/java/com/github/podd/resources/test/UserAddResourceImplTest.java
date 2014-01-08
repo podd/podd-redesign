@@ -44,7 +44,6 @@ import org.restlet.resource.ResourceException;
 
 import com.github.ansell.restletutils.SesameRealmConstants;
 import com.github.ansell.restletutils.test.RestletTestUtils;
-import com.github.podd.utils.DebugUtils;
 import com.github.podd.utils.PODD;
 import com.github.podd.utils.PoddRoles;
 import com.github.podd.utils.PoddUserStatus;
@@ -183,7 +182,7 @@ public class UserAddResourceImplTest extends AbstractResourceImplTest
             
             final Model resultsModel = this.assertRdf(new StringReader(this.getText(results)), format, 19);
             
-            //DebugUtils.printContents(resultsModel);
+            // DebugUtils.printContents(resultsModel);
             Assert.assertEquals("Unexpected user identifier", testIdentifier,
                     resultsModel.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).objectString());
             Assert.assertEquals("Unexpected user URI", testUserUri,
@@ -228,7 +227,7 @@ public class UserAddResourceImplTest extends AbstractResourceImplTest
             
             final Model resultsModel = this.assertRdf(results, format, 8);
             
-            //DebugUtils.printContents(resultsModel);
+            // DebugUtils.printContents(resultsModel);
             Assert.assertEquals("Unexpected user identifier", testIdentifier,
                     resultsModel.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).objectString());
             Assert.assertEquals("Unexpected user URI", testUserUri,
@@ -280,7 +279,7 @@ public class UserAddResourceImplTest extends AbstractResourceImplTest
             
             final Model resultsModel = this.assertRdf(results, format, 12);
             
-            //DebugUtils.printContents(resultsModel);
+            // DebugUtils.printContents(resultsModel);
             Assert.assertEquals("Unexpected user identifier", testIdentifier,
                     resultsModel.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).objectString());
             Assert.assertEquals("Unexpected user URI", testUserUri,

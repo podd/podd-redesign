@@ -216,15 +216,15 @@ public class SearchOntologyResourceImpl extends AbstractPoddResourceImpl
         {
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Could not find necessary schema ontology", e);
         }
-        catch(SchemaManifestException e)
+        catch(final SchemaManifestException e)
         {
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Could not find necessary schema ontology", e);
         }
-        catch(UnmanagedArtifactIRIException e)
+        catch(final UnmanagedArtifactIRIException e)
         {
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Could not find artifact IRI", e);
         }
-        catch(UnmanagedArtifactVersionException e)
+        catch(final UnmanagedArtifactVersionException e)
         {
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Could not find artifact version", e);
         }

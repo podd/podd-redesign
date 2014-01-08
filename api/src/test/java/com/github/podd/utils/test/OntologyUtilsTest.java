@@ -25,7 +25,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -34,14 +33,11 @@ import org.apache.commons.io.IOUtils;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.openrdf.model.Model;
-import org.openrdf.model.Resource;
 import org.openrdf.model.URI;
 import org.openrdf.model.ValueFactory;
 import org.openrdf.model.impl.LinkedHashModel;
-import org.openrdf.model.impl.ValueFactoryImpl;
 import org.openrdf.model.vocabulary.OWL;
 import org.openrdf.model.vocabulary.RDF;
 import org.openrdf.rio.RDFFormat;
@@ -54,7 +50,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.github.podd.exception.SchemaManifestException;
-import com.github.podd.utils.DebugUtils;
 import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.OntologyUtils;
 import com.github.podd.utils.PODD;
@@ -108,39 +103,44 @@ public class OntologyUtilsTest
         this.testOntologyUri1 = this.vf.createURI("urn:test:ontology:uri:1");
         this.testVersionUri1 = this.vf.createURI("urn:test:ontology:uri:1:version:1");
         this.testInferredUri1 = this.vf.createURI("urn:inferred:test:ontology:uri:1:version:1");
-        this.testOntologyID = new InferredOWLOntologyID(testOntologyUri1, testVersionUri1, testInferredUri1);
+        this.testOntologyID =
+                new InferredOWLOntologyID(this.testOntologyUri1, this.testVersionUri1, this.testInferredUri1);
         
         this.testImportOntologyUri1 = this.vf.createURI("urn:test:import:ontology:uri:1");
         this.testImportVersionUri1 = this.vf.createURI("urn:test:import:ontology:uri:1:version:1");
-        this.testImportOntologyID1 = new InferredOWLOntologyID(testImportOntologyUri1, testImportVersionUri1, null);
+        this.testImportOntologyID1 =
+                new InferredOWLOntologyID(this.testImportOntologyUri1, this.testImportVersionUri1, null);
         
         this.testImportOntologyUri2 = this.vf.createURI("urn:test:import:ontology:uri:2");
         this.testImportVersionUri2 = this.vf.createURI("urn:test:import:ontology:uri:2:version:1");
-        this.testImportOntologyID2 = new InferredOWLOntologyID(testImportOntologyUri2, testImportVersionUri2, null);
+        this.testImportOntologyID2 =
+                new InferredOWLOntologyID(this.testImportOntologyUri2, this.testImportVersionUri2, null);
         
         this.testImportOntologyUri3 = this.vf.createURI("urn:test:import:ontology:uri:3");
         this.testImportVersionUri3 = this.vf.createURI("urn:test:import:ontology:uri:3:version:1");
-        this.testImportOntologyID3 = new InferredOWLOntologyID(testImportOntologyUri3, testImportVersionUri3, null);
+        this.testImportOntologyID3 =
+                new InferredOWLOntologyID(this.testImportOntologyUri3, this.testImportVersionUri3, null);
         
         this.testImportOntologyUri4 = this.vf.createURI("urn:test:import:ontology:uri:4");
         this.testImportVersionUri4 = this.vf.createURI("urn:test:import:ontology:uri:4:version:1");
-        this.testImportOntologyID4 = new InferredOWLOntologyID(testImportOntologyUri4, testImportVersionUri4, null);
+        this.testImportOntologyID4 =
+                new InferredOWLOntologyID(this.testImportOntologyUri4, this.testImportVersionUri4, null);
         
         this.testOntologyUriA = this.vf.createURI("http://example.org/podd/ns/poddA");
         this.testVersionUriA1 = this.vf.createURI("http://example.org/podd/ns/version/poddA/1");
-        this.testA1 = new InferredOWLOntologyID(testOntologyUriA, testVersionUriA1, null);
+        this.testA1 = new InferredOWLOntologyID(this.testOntologyUriA, this.testVersionUriA1, null);
         
         this.testOntologyUriB = this.vf.createURI("http://example.org/podd/ns/poddB");
         this.testVersionUriB1 = this.vf.createURI("http://example.org/podd/ns/version/poddB/1");
-        this.testB1 = new InferredOWLOntologyID(testOntologyUriB, testVersionUriB1, null);
+        this.testB1 = new InferredOWLOntologyID(this.testOntologyUriB, this.testVersionUriB1, null);
         this.testVersionUriB2 = this.vf.createURI("http://example.org/podd/ns/version/poddB/2");
-        this.testB2 = new InferredOWLOntologyID(testOntologyUriB, testVersionUriB2, null);
+        this.testB2 = new InferredOWLOntologyID(this.testOntologyUriB, this.testVersionUriB2, null);
         
         this.testOntologyUriC = this.vf.createURI("http://example.org/podd/ns/poddC");
         this.testVersionUriC1 = this.vf.createURI("http://example.org/podd/ns/version/poddC/1");
-        this.testC1 = new InferredOWLOntologyID(testOntologyUriC, testVersionUriC1, null);
+        this.testC1 = new InferredOWLOntologyID(this.testOntologyUriC, this.testVersionUriC1, null);
         this.testVersionUriC3 = this.vf.createURI("http://example.org/podd/ns/version/poddC/3");
-        this.testC3 = new InferredOWLOntologyID(testOntologyUriC, testVersionUriC3, null);
+        this.testC3 = new InferredOWLOntologyID(this.testOntologyUriC, this.testVersionUriC3, null);
     }
     
     @After
@@ -477,13 +477,13 @@ public class OntologyUtilsTest
     @Test
     public final void testGetArtifactImportsNonExistent() throws Exception
     {
-        Model model = new LinkedHashModel();
+        final Model model = new LinkedHashModel();
         try
         {
             OntologyUtils.artifactImports(this.testOntologyID, model);
             Assert.fail("Did not find expected exception");
         }
-        catch(SchemaManifestException e)
+        catch(final SchemaManifestException e)
         {
             
         }
@@ -492,13 +492,13 @@ public class OntologyUtilsTest
     @Test
     public final void testGetArtifactImportsNullArtifact() throws Exception
     {
-        Model model = new LinkedHashModel();
+        final Model model = new LinkedHashModel();
         try
         {
             OntologyUtils.artifactImports(null, model);
             Assert.fail("Did not find expected exception");
         }
-        catch(NullPointerException e)
+        catch(final NullPointerException e)
         {
             
         }
@@ -512,7 +512,7 @@ public class OntologyUtilsTest
             OntologyUtils.artifactImports(this.testOntologyID, null);
             Assert.fail("Did not find expected exception");
         }
-        catch(NullPointerException e)
+        catch(final NullPointerException e)
         {
             
         }
@@ -521,10 +521,10 @@ public class OntologyUtilsTest
     @Test
     public final void testGetArtifactImportsNoImports() throws Exception
     {
-        Model model = new LinkedHashModel();
+        final Model model = new LinkedHashModel();
         OntologyUtils.ontologyIDsToModel(Arrays.asList(this.testOntologyID), model);
         
-        List<OWLOntologyID> imports = OntologyUtils.artifactImports(this.testOntologyID, model);
+        final List<OWLOntologyID> imports = OntologyUtils.artifactImports(this.testOntologyID, model);
         
         Assert.assertEquals(0, imports.size());
         Assert.assertTrue(imports.isEmpty());
@@ -533,7 +533,7 @@ public class OntologyUtilsTest
     @Test
     public final void testGetArtifactImportsOneImport() throws Exception
     {
-        Model model = new LinkedHashModel();
+        final Model model = new LinkedHashModel();
         OntologyUtils.ontologyIDsToModel(Arrays.asList(this.testOntologyID), model);
         model.add(this.testImportOntologyUri1, RDF.TYPE, OWL.ONTOLOGY);
         model.add(this.testImportVersionUri1, RDF.TYPE, OWL.ONTOLOGY);
@@ -542,7 +542,7 @@ public class OntologyUtilsTest
         
         // DebugUtils.printContents(model);
         
-        List<OWLOntologyID> imports = OntologyUtils.artifactImports(this.testOntologyID, model);
+        final List<OWLOntologyID> imports = OntologyUtils.artifactImports(this.testOntologyID, model);
         
         Assert.assertEquals(1, imports.size());
         Assert.assertTrue(imports.contains(this.testImportOntologyID1));
@@ -551,14 +551,14 @@ public class OntologyUtilsTest
     @Test
     public final void testGetArtifactImportsOneImportVersion() throws Exception
     {
-        Model model = new LinkedHashModel();
+        final Model model = new LinkedHashModel();
         OntologyUtils.ontologyIDsToModel(Arrays.asList(this.testOntologyID), model);
         model.add(this.testImportOntologyUri1, RDF.TYPE, OWL.ONTOLOGY);
         model.add(this.testImportVersionUri1, RDF.TYPE, OWL.ONTOLOGY);
         model.add(this.testImportOntologyUri1, OWL.VERSIONIRI, this.testImportVersionUri1);
         model.add(this.testVersionUri1, OWL.IMPORTS, this.testImportOntologyUri1);
         
-        List<OWLOntologyID> imports = OntologyUtils.artifactImports(this.testOntologyID, model);
+        final List<OWLOntologyID> imports = OntologyUtils.artifactImports(this.testOntologyID, model);
         
         Assert.assertEquals(1, imports.size());
         Assert.assertTrue(imports.contains(this.testImportOntologyID1));
@@ -567,7 +567,7 @@ public class OntologyUtilsTest
     @Test
     public final void testGetArtifactImportsOneImportTransitiveSingle() throws Exception
     {
-        Model model = new LinkedHashModel();
+        final Model model = new LinkedHashModel();
         OntologyUtils.ontologyIDsToModel(Arrays.asList(this.testOntologyID), model);
         model.add(this.testImportOntologyUri1, RDF.TYPE, OWL.ONTOLOGY);
         model.add(this.testImportOntologyUri1, OWL.VERSIONIRI, this.testImportVersionUri1);
@@ -578,7 +578,7 @@ public class OntologyUtilsTest
         model.add(this.testImportOntologyUri2, OWL.VERSIONIRI, this.testImportVersionUri2);
         model.add(this.testOntologyUri1, OWL.IMPORTS, this.testImportOntologyUri1);
         
-        List<OWLOntologyID> imports = OntologyUtils.artifactImports(this.testOntologyID, model);
+        final List<OWLOntologyID> imports = OntologyUtils.artifactImports(this.testOntologyID, model);
         
         Assert.assertEquals(2, imports.size());
         Assert.assertTrue(imports.contains(this.testImportOntologyID1));
@@ -590,7 +590,7 @@ public class OntologyUtilsTest
     @Test
     public final void testGetArtifactImportsOneImportNonTransitiveSingle() throws Exception
     {
-        Model model = new LinkedHashModel();
+        final Model model = new LinkedHashModel();
         OntologyUtils.ontologyIDsToModel(Arrays.asList(this.testOntologyID), model);
         model.add(this.testImportOntologyUri1, RDF.TYPE, OWL.ONTOLOGY);
         model.add(this.testImportOntologyUri1, OWL.VERSIONIRI, this.testImportVersionUri1);
@@ -600,7 +600,7 @@ public class OntologyUtilsTest
         model.add(this.testImportOntologyUri2, OWL.VERSIONIRI, this.testImportVersionUri2);
         model.add(this.testOntologyUri1, OWL.IMPORTS, this.testImportOntologyUri1);
         
-        List<OWLOntologyID> imports = OntologyUtils.artifactImports(this.testOntologyID, model);
+        final List<OWLOntologyID> imports = OntologyUtils.artifactImports(this.testOntologyID, model);
         
         Assert.assertEquals(1, imports.size());
         Assert.assertTrue(imports.contains(this.testImportOntologyID1));
@@ -609,7 +609,7 @@ public class OntologyUtilsTest
     @Test
     public final void testGetArtifactImportsOneImportTransitiveDouble() throws Exception
     {
-        Model model = new LinkedHashModel();
+        final Model model = new LinkedHashModel();
         OntologyUtils.ontologyIDsToModel(Arrays.asList(this.testOntologyID), model);
         model.add(this.testOntologyUri1, OWL.IMPORTS, this.testImportOntologyUri1);
         model.add(this.testImportOntologyUri1, RDF.TYPE, OWL.ONTOLOGY);
@@ -626,7 +626,7 @@ public class OntologyUtilsTest
         model.add(this.testImportVersionUri3, RDF.TYPE, OWL.ONTOLOGY);
         model.add(this.testImportVersionUri2, OWL.IMPORTS, this.testImportVersionUri3);
         
-        List<OWLOntologyID> imports = OntologyUtils.artifactImports(this.testOntologyID, model);
+        final List<OWLOntologyID> imports = OntologyUtils.artifactImports(this.testOntologyID, model);
         
         Assert.assertEquals(3, imports.size());
         Assert.assertTrue(imports.contains(this.testImportOntologyID1));
@@ -640,7 +640,7 @@ public class OntologyUtilsTest
     @Test
     public final void testGetArtifactImportsOneImportTransitiveDoubleDouble() throws Exception
     {
-        Model model = new LinkedHashModel();
+        final Model model = new LinkedHashModel();
         OntologyUtils.ontologyIDsToModel(Arrays.asList(this.testOntologyID), model);
         model.add(this.testOntologyUri1, OWL.IMPORTS, this.testImportOntologyUri1);
         model.add(this.testImportOntologyUri1, RDF.TYPE, OWL.ONTOLOGY);
@@ -662,7 +662,7 @@ public class OntologyUtilsTest
         model.add(this.testImportVersionUri4, RDF.TYPE, OWL.ONTOLOGY);
         model.add(this.testImportVersionUri2, OWL.IMPORTS, this.testImportVersionUri4);
         
-        List<OWLOntologyID> imports = OntologyUtils.artifactImports(this.testOntologyID, model);
+        final List<OWLOntologyID> imports = OntologyUtils.artifactImports(this.testOntologyID, model);
         
         Assert.assertEquals(4, imports.size());
         Assert.assertTrue(imports.contains(this.testImportOntologyID1));
@@ -677,7 +677,7 @@ public class OntologyUtilsTest
     @Test
     public final void testGetArtifactImportsOneImportVersionTransitiveDoubleDouble() throws Exception
     {
-        Model model = new LinkedHashModel();
+        final Model model = new LinkedHashModel();
         OntologyUtils.ontologyIDsToModel(Arrays.asList(this.testOntologyID), model);
         model.add(this.testVersionUri1, OWL.IMPORTS, this.testImportOntologyUri1);
         model.add(this.testImportOntologyUri1, RDF.TYPE, OWL.ONTOLOGY);
@@ -699,7 +699,7 @@ public class OntologyUtilsTest
         model.add(this.testImportVersionUri4, RDF.TYPE, OWL.ONTOLOGY);
         model.add(this.testImportVersionUri2, OWL.IMPORTS, this.testImportVersionUri4);
         
-        List<OWLOntologyID> imports = OntologyUtils.artifactImports(this.testOntologyID, model);
+        final List<OWLOntologyID> imports = OntologyUtils.artifactImports(this.testOntologyID, model);
         
         Assert.assertEquals(4, imports.size());
         Assert.assertTrue(imports.contains(this.testImportOntologyID1));
@@ -714,7 +714,7 @@ public class OntologyUtilsTest
     @Test
     public void testGetArtifactImportsRealistic() throws Exception
     {
-        Model model =
+        final Model model =
                 Rio.parse(this.getClass().getResourceAsStream("/test/artifacts/artifact-imports-test.nq"), "",
                         RDFFormat.NQUADS);
         
@@ -723,7 +723,7 @@ public class OntologyUtilsTest
         
         // DebugUtils.printContents(model);
         
-        List<OWLOntologyID> imports = OntologyUtils.artifactImports(this.testOntologyID, model);
+        final List<OWLOntologyID> imports = OntologyUtils.artifactImports(this.testOntologyID, model);
         
         this.log.info("Imports: {}", imports);
         
@@ -733,7 +733,7 @@ public class OntologyUtilsTest
     @Test
     public void testImportsOrderFourLevels() throws Exception
     {
-        Model model = new LinkedHashModel();
+        final Model model = new LinkedHashModel();
         OntologyUtils.ontologyIDsToModel(Arrays.asList(this.testOntologyID), model);
         model.add(this.testVersionUri1, OWL.IMPORTS, this.testImportOntologyUri1);
         model.add(this.testImportOntologyUri1, RDF.TYPE, OWL.ONTOLOGY);
@@ -755,8 +755,8 @@ public class OntologyUtilsTest
         model.add(this.testImportVersionUri4, RDF.TYPE, OWL.ONTOLOGY);
         model.add(this.testImportVersionUri3, OWL.IMPORTS, this.testImportVersionUri4);
         
-        Set<URI> schemaOntologyUris = new HashSet<URI>();
-        Set<URI> schemaVersionUris = new HashSet<URI>();
+        final Set<URI> schemaOntologyUris = new HashSet<URI>();
+        final Set<URI> schemaVersionUris = new HashSet<URI>();
         
         schemaOntologyUris.add(this.testOntologyUri1);
         schemaOntologyUris.add(this.testImportOntologyUri1);
@@ -770,7 +770,7 @@ public class OntologyUtilsTest
         schemaVersionUris.add(this.testImportVersionUri3);
         schemaVersionUris.add(this.testImportVersionUri4);
         
-        ConcurrentMap<URI, Set<URI>> importsMap = new ConcurrentHashMap<URI, Set<URI>>();
+        final ConcurrentMap<URI, Set<URI>> importsMap = new ConcurrentHashMap<URI, Set<URI>>();
         // Expected output solution from importsMap after calling orderImports
         // importsMap.put(testVersionUri1, Collections.singleton(this.testImportVersionUri1));
         // importsMap.put(testImportVersionUri1, Collections.singleton(this.testImportVersionUri2));
@@ -779,7 +779,7 @@ public class OntologyUtilsTest
         // HashSet<URI>(Arrays.asList(this.testImportVersionUri4)));
         // importsMap.put(testImportVersionUri4, new HashSet<URI>());
         
-        List<URI> orderImports =
+        final List<URI> orderImports =
                 OntologyUtils.orderImports(model, schemaOntologyUris, schemaVersionUris, importsMap, false);
         
         Assert.assertEquals(5, orderImports.size());
@@ -796,26 +796,26 @@ public class OntologyUtilsTest
         Assert.assertTrue(importsMap.containsKey(this.testImportVersionUri1));
         Assert.assertTrue(importsMap.containsKey(this.testVersionUri1));
         
-        Set<URI> imports4 = importsMap.get(this.testImportVersionUri4);
+        final Set<URI> imports4 = importsMap.get(this.testImportVersionUri4);
         Assert.assertNotNull(imports4);
         Assert.assertEquals(0, imports4.size());
         
-        Set<URI> imports3 = importsMap.get(this.testImportVersionUri3);
+        final Set<URI> imports3 = importsMap.get(this.testImportVersionUri3);
         Assert.assertNotNull(imports3);
         Assert.assertEquals(1, imports3.size());
         Assert.assertEquals(this.testImportVersionUri4, imports3.iterator().next());
         
-        Set<URI> imports2 = importsMap.get(this.testImportVersionUri2);
+        final Set<URI> imports2 = importsMap.get(this.testImportVersionUri2);
         Assert.assertNotNull(imports2);
         Assert.assertEquals(1, imports2.size());
         Assert.assertEquals(this.testImportVersionUri3, imports2.iterator().next());
         
-        Set<URI> imports1 = importsMap.get(this.testImportVersionUri1);
+        final Set<URI> imports1 = importsMap.get(this.testImportVersionUri1);
         Assert.assertNotNull(imports1);
         Assert.assertEquals(1, imports1.size());
         Assert.assertEquals(this.testImportVersionUri2, imports1.iterator().next());
         
-        Set<URI> importsRoot = importsMap.get(this.testVersionUri1);
+        final Set<URI> importsRoot = importsMap.get(this.testVersionUri1);
         Assert.assertNotNull(importsRoot);
         Assert.assertEquals(1, importsRoot.size());
         Assert.assertEquals(this.testImportVersionUri1, importsRoot.iterator().next());
@@ -824,15 +824,15 @@ public class OntologyUtilsTest
     @Test
     public void testImportsOrderOneLevel() throws Exception
     {
-        Model model = new LinkedHashModel();
+        final Model model = new LinkedHashModel();
         OntologyUtils.ontologyIDsToModel(Arrays.asList(this.testOntologyID), model);
         model.add(this.testVersionUri1, OWL.IMPORTS, this.testImportOntologyUri1);
         model.add(this.testImportOntologyUri1, RDF.TYPE, OWL.ONTOLOGY);
         model.add(this.testImportOntologyUri1, OWL.VERSIONIRI, this.testImportVersionUri1);
         model.add(this.testImportVersionUri1, RDF.TYPE, OWL.ONTOLOGY);
         
-        Set<URI> schemaOntologyUris = new HashSet<URI>();
-        Set<URI> schemaVersionUris = new HashSet<URI>();
+        final Set<URI> schemaOntologyUris = new HashSet<URI>();
+        final Set<URI> schemaVersionUris = new HashSet<URI>();
         
         schemaOntologyUris.add(this.testOntologyUri1);
         schemaOntologyUris.add(this.testImportOntologyUri1);
@@ -840,12 +840,12 @@ public class OntologyUtilsTest
         schemaVersionUris.add(this.testVersionUri1);
         schemaVersionUris.add(this.testImportVersionUri1);
         
-        ConcurrentMap<URI, Set<URI>> importsMap = new ConcurrentHashMap<URI, Set<URI>>();
+        final ConcurrentMap<URI, Set<URI>> importsMap = new ConcurrentHashMap<URI, Set<URI>>();
         // Expected output solution from importsMap after calling orderImports
         // importsMap.put(testVersionUri1, Collections.singleton(this.testImportVersionUri1));
         // importsMap.put(testImportVersionUri1, new HashSet<URI>());
         
-        List<URI> orderImports =
+        final List<URI> orderImports =
                 OntologyUtils.orderImports(model, schemaOntologyUris, schemaVersionUris, importsMap, false);
         
         Assert.assertEquals(2, orderImports.size());
@@ -856,11 +856,11 @@ public class OntologyUtilsTest
         Assert.assertTrue(importsMap.containsKey(this.testImportVersionUri1));
         Assert.assertTrue(importsMap.containsKey(this.testVersionUri1));
         
-        Set<URI> imports1 = importsMap.get(this.testImportVersionUri1);
+        final Set<URI> imports1 = importsMap.get(this.testImportVersionUri1);
         Assert.assertNotNull(imports1);
         Assert.assertEquals(0, imports1.size());
         
-        Set<URI> importsRoot = importsMap.get(this.testVersionUri1);
+        final Set<URI> importsRoot = importsMap.get(this.testVersionUri1);
         Assert.assertNotNull(importsRoot);
         Assert.assertEquals(1, importsRoot.size());
         Assert.assertEquals(this.testImportVersionUri1, importsRoot.iterator().next());
@@ -869,21 +869,21 @@ public class OntologyUtilsTest
     @Test
     public void testImportsOrderZeroLevels() throws Exception
     {
-        Model model = new LinkedHashModel();
+        final Model model = new LinkedHashModel();
         OntologyUtils.ontologyIDsToModel(Arrays.asList(this.testOntologyID), model);
         
-        Set<URI> schemaOntologyUris = new HashSet<URI>();
-        Set<URI> schemaVersionUris = new HashSet<URI>();
+        final Set<URI> schemaOntologyUris = new HashSet<URI>();
+        final Set<URI> schemaVersionUris = new HashSet<URI>();
         
         schemaOntologyUris.add(this.testOntologyUri1);
         
         schemaVersionUris.add(this.testVersionUri1);
         
-        ConcurrentMap<URI, Set<URI>> importsMap = new ConcurrentHashMap<URI, Set<URI>>();
+        final ConcurrentMap<URI, Set<URI>> importsMap = new ConcurrentHashMap<URI, Set<URI>>();
         // Expected output solution from importsMap after calling orderImports
         // importsMap.put(testVersionUri1, new HashSet<URI>());
         
-        List<URI> orderImports =
+        final List<URI> orderImports =
                 OntologyUtils.orderImports(model, schemaOntologyUris, schemaVersionUris, importsMap, false);
         
         Assert.assertEquals(1, orderImports.size());
@@ -892,7 +892,7 @@ public class OntologyUtilsTest
         Assert.assertEquals(1, importsMap.size());
         Assert.assertTrue(importsMap.containsKey(this.testVersionUri1));
         
-        Set<URI> importsRoot = importsMap.get(this.testVersionUri1);
+        final Set<URI> importsRoot = importsMap.get(this.testVersionUri1);
         Assert.assertNotNull(importsRoot);
         Assert.assertEquals(0, importsRoot.size());
     }
@@ -900,9 +900,9 @@ public class OntologyUtilsTest
     @Test
     public void testGetSchemaManifestImportsEmpty() throws Exception
     {
-        Model model = new LinkedHashModel();
+        final Model model = new LinkedHashModel();
         
-        List<OWLOntologyID> schemaManifestImports =
+        final List<OWLOntologyID> schemaManifestImports =
                 OntologyUtils.schemaManifestImports(model, Collections.<OWLOntologyID> emptySet());
         
         Assert.assertNotNull(schemaManifestImports);
@@ -912,10 +912,10 @@ public class OntologyUtilsTest
     @Test
     public void testGetSchemaManifestImportsZeroLevels() throws Exception
     {
-        Model model = new LinkedHashModel();
+        final Model model = new LinkedHashModel();
         OntologyUtils.ontologyIDsToModel(Arrays.asList(this.testOntologyID), model);
         
-        List<OWLOntologyID> schemaManifestImports =
+        final List<OWLOntologyID> schemaManifestImports =
                 OntologyUtils.schemaManifestImports(model, Collections.singleton(this.testOntologyID));
         
         Assert.assertNotNull(schemaManifestImports);
@@ -926,7 +926,7 @@ public class OntologyUtilsTest
     @Test
     public void testGetSchemaManifestImportsOneLevelCurrentVersion() throws Exception
     {
-        Model model = new LinkedHashModel();
+        final Model model = new LinkedHashModel();
         OntologyUtils.ontologyIDsToModel(Arrays.asList(this.testOntologyID), model);
         model.add(this.testVersionUri1, RDF.TYPE, OWL.ONTOLOGY);
         model.add(this.testVersionUri1, OWL.IMPORTS, this.testImportOntologyUri1);
@@ -937,7 +937,7 @@ public class OntologyUtilsTest
         
         // DebugUtils.printContents(model);
         
-        List<OWLOntologyID> schemaManifestImports =
+        final List<OWLOntologyID> schemaManifestImports =
                 OntologyUtils.schemaManifestImports(model,
                         new HashSet<OWLOntologyID>(Arrays.asList(this.testOntologyID, this.testImportOntologyID1)));
         
@@ -953,7 +953,7 @@ public class OntologyUtilsTest
     @Test
     public void testGetSchemaManifestImportsOneLevel() throws Exception
     {
-        Model model = new LinkedHashModel();
+        final Model model = new LinkedHashModel();
         OntologyUtils.ontologyIDsToModel(Arrays.asList(this.testOntologyID), model);
         model.add(this.testVersionUri1, RDF.TYPE, OWL.ONTOLOGY);
         model.add(this.testVersionUri1, OWL.IMPORTS, this.testImportVersionUri1);
@@ -963,7 +963,7 @@ public class OntologyUtilsTest
         
         // DebugUtils.printContents(model);
         
-        List<OWLOntologyID> schemaManifestImports =
+        final List<OWLOntologyID> schemaManifestImports =
                 OntologyUtils.schemaManifestImports(model,
                         new HashSet<OWLOntologyID>(Arrays.asList(this.testOntologyID, this.testImportOntologyID1)));
         
@@ -979,11 +979,11 @@ public class OntologyUtilsTest
     @Test
     public void testGetSchemaManifestImportsA1B2C3() throws Exception
     {
-        Model model =
+        final Model model =
                 Rio.parse(this.getClass().getResourceAsStream("/test/schema-manifest-a1b2c3.ttl"), "", RDFFormat.TURTLE);
         
         // DebugUtils.printContents(model);
-        List<OWLOntologyID> schemaManifestImports =
+        final List<OWLOntologyID> schemaManifestImports =
                 OntologyUtils.schemaManifestImports(model,
                         new HashSet<OWLOntologyID>(Arrays.asList(this.testA1, this.testB2, this.testC3)));
         
@@ -1001,11 +1001,11 @@ public class OntologyUtilsTest
     @Test
     public void testGetSchemaManifestImportsA1B1C1() throws Exception
     {
-        Model model =
+        final Model model =
                 Rio.parse(this.getClass().getResourceAsStream("/test/schema-manifest-a1b2c3.ttl"), "", RDFFormat.TURTLE);
         
         // DebugUtils.printContents(model);
-        List<OWLOntologyID> schemaManifestImports =
+        final List<OWLOntologyID> schemaManifestImports =
                 OntologyUtils.schemaManifestImports(model,
                         new HashSet<OWLOntologyID>(Arrays.asList(this.testA1, this.testB1, this.testC1)));
         
@@ -1023,11 +1023,11 @@ public class OntologyUtilsTest
     @Test
     public void testGetSchemaManifestImportsC3() throws Exception
     {
-        Model model =
+        final Model model =
                 Rio.parse(this.getClass().getResourceAsStream("/test/schema-manifest-a1b2c3.ttl"), "", RDFFormat.TURTLE);
         
         // DebugUtils.printContents(model);
-        List<OWLOntologyID> schemaManifestImports =
+        final List<OWLOntologyID> schemaManifestImports =
                 OntologyUtils.schemaManifestImports(model, new HashSet<OWLOntologyID>(Arrays.asList(this.testC3)));
         
         Assert.assertNotNull(schemaManifestImports);
@@ -1044,11 +1044,11 @@ public class OntologyUtilsTest
     @Test
     public void testGetSchemaManifestImportsC1() throws Exception
     {
-        Model model =
+        final Model model =
                 Rio.parse(this.getClass().getResourceAsStream("/test/schema-manifest-a1b2c3.ttl"), "", RDFFormat.TURTLE);
         
         // DebugUtils.printContents(model);
-        List<OWLOntologyID> schemaManifestImports =
+        final List<OWLOntologyID> schemaManifestImports =
                 OntologyUtils.schemaManifestImports(model, new HashSet<OWLOntologyID>(Arrays.asList(this.testC1)));
         
         Assert.assertNotNull(schemaManifestImports);
@@ -1065,11 +1065,11 @@ public class OntologyUtilsTest
     @Test
     public void testGetSchemaManifestImportsB1() throws Exception
     {
-        Model model =
+        final Model model =
                 Rio.parse(this.getClass().getResourceAsStream("/test/schema-manifest-a1b2c3.ttl"), "", RDFFormat.TURTLE);
         
         // DebugUtils.printContents(model);
-        List<OWLOntologyID> schemaManifestImports =
+        final List<OWLOntologyID> schemaManifestImports =
                 OntologyUtils.schemaManifestImports(model, new HashSet<OWLOntologyID>(Arrays.asList(this.testB1)));
         
         Assert.assertNotNull(schemaManifestImports);
@@ -1084,11 +1084,11 @@ public class OntologyUtilsTest
     @Test
     public void testGetSchemaManifestImportsB2() throws Exception
     {
-        Model model =
+        final Model model =
                 Rio.parse(this.getClass().getResourceAsStream("/test/schema-manifest-a1b2c3.ttl"), "", RDFFormat.TURTLE);
         
         // DebugUtils.printContents(model);
-        List<OWLOntologyID> schemaManifestImports =
+        final List<OWLOntologyID> schemaManifestImports =
                 OntologyUtils.schemaManifestImports(model, new HashSet<OWLOntologyID>(Arrays.asList(this.testB2)));
         
         Assert.assertNotNull(schemaManifestImports);
@@ -1103,11 +1103,11 @@ public class OntologyUtilsTest
     @Test
     public void testGetSchemaManifestImportsA1() throws Exception
     {
-        Model model =
+        final Model model =
                 Rio.parse(this.getClass().getResourceAsStream("/test/schema-manifest-a1b2c3.ttl"), "", RDFFormat.TURTLE);
         
         // DebugUtils.printContents(model);
-        List<OWLOntologyID> schemaManifestImports =
+        final List<OWLOntologyID> schemaManifestImports =
                 OntologyUtils.schemaManifestImports(model, new HashSet<OWLOntologyID>(Arrays.asList(this.testA1)));
         
         Assert.assertNotNull(schemaManifestImports);
@@ -1120,11 +1120,11 @@ public class OntologyUtilsTest
     @Test
     public void testGetSchemaManifestImportsA1B1C3() throws Exception
     {
-        Model model =
+        final Model model =
                 Rio.parse(this.getClass().getResourceAsStream("/test/schema-manifest-a1b2c3.ttl"), "", RDFFormat.TURTLE);
         
         // DebugUtils.printContents(model);
-        List<OWLOntologyID> schemaManifestImports =
+        final List<OWLOntologyID> schemaManifestImports =
                 OntologyUtils.schemaManifestImports(model,
                         new HashSet<OWLOntologyID>(Arrays.asList(this.testA1, this.testB1, this.testC3)));
         

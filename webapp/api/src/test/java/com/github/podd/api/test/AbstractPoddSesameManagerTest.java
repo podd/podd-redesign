@@ -50,12 +50,10 @@ import org.openrdf.rio.helpers.StatementCollector;
 import org.openrdf.sail.memory.MemoryStore;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLOntologyID;
-import org.semanticweb.owlapi.model.OWLOntologyManagerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.github.podd.api.MetadataPolicy;
-import com.github.podd.api.PoddOWLManager;
 import com.github.podd.api.PoddSesameManager;
 import com.github.podd.exception.UnmanagedArtifactIRIException;
 import com.github.podd.exception.UnmanagedSchemaIRIException;
@@ -168,14 +166,14 @@ public abstract class AbstractPoddSesameManagerTest
         final Collection<InferredOWLOntologyID> results = OntologyUtils.modelToOntologyIDs(totalModel);
         Assert.assertEquals(1, results.size());
         
-        InferredOWLOntologyID owlOntologyID = results.iterator().next();
+        final InferredOWLOntologyID owlOntologyID = results.iterator().next();
         
         this.testPoddSesameManager.updateManagedPoddArtifactVersion(owlOntologyID, true, this.testRepositoryConnection,
                 this.artifactGraph);
         
         this.testRepositoryConnection.export(new StatementCollector(totalModel), this.schemaGraph);
         
-        for(OWLOntologyID nextImport : OntologyUtils.artifactImports(owlOntologyID, totalModel))
+        for(final OWLOntologyID nextImport : OntologyUtils.artifactImports(owlOntologyID, totalModel))
         {
             this.testRepositoryConnection.add(owlOntologyID.getOntologyIRI().toOpenRDFURI(), OWL.IMPORTS, nextImport
                     .getVersionIRI().toOpenRDFURI(), this.artifactGraph);
@@ -2296,10 +2294,10 @@ public abstract class AbstractPoddSesameManagerTest
                 this.loadOntologyFromResource(TestConstants.TEST_ARTIFACT_20130206,
                         TestConstants.TEST_ARTIFACT_20130206_INFERRED, RDFFormat.TURTLE);
         
-        URI[] versionAndSchemaContexts = this.testPoddSesameManager.versionContexts(ontologyID);
+        final URI[] versionAndSchemaContexts = this.testPoddSesameManager.versionContexts(ontologyID);
         
         Assert.assertNotNull(versionAndSchemaContexts);
-        for(URI nextUri : versionAndSchemaContexts)
+        for(final URI nextUri : versionAndSchemaContexts)
         {
             Assert.assertNotNull(nextUri);
         }
@@ -2314,10 +2312,10 @@ public abstract class AbstractPoddSesameManagerTest
                 this.loadOntologyFromResource(TestConstants.TEST_ARTIFACT_20130206,
                         TestConstants.TEST_ARTIFACT_20130206_INFERRED, RDFFormat.TURTLE);
         
-        URI[] versionAndSchemaContexts = this.testPoddSesameManager.versionAndInferredContexts(ontologyID);
+        final URI[] versionAndSchemaContexts = this.testPoddSesameManager.versionAndInferredContexts(ontologyID);
         
         Assert.assertNotNull(versionAndSchemaContexts);
-        for(URI nextUri : versionAndSchemaContexts)
+        for(final URI nextUri : versionAndSchemaContexts)
         {
             Assert.assertNotNull(nextUri);
         }
@@ -2332,12 +2330,12 @@ public abstract class AbstractPoddSesameManagerTest
                 this.loadOntologyFromResource(TestConstants.TEST_ARTIFACT_20130206,
                         TestConstants.TEST_ARTIFACT_20130206_INFERRED, RDFFormat.TURTLE);
         
-        URI[] versionAndSchemaContexts =
+        final URI[] versionAndSchemaContexts =
                 this.testPoddSesameManager.versionAndSchemaContexts(ontologyID, this.testRepositoryConnection,
                         this.schemaGraph, this.artifactGraph);
         
         Assert.assertNotNull(versionAndSchemaContexts);
-        for(URI nextUri : versionAndSchemaContexts)
+        for(final URI nextUri : versionAndSchemaContexts)
         {
             Assert.assertNotNull(nextUri);
         }
@@ -2352,12 +2350,12 @@ public abstract class AbstractPoddSesameManagerTest
                 this.loadOntologyFromResource(TestConstants.TEST_ARTIFACT_20130206,
                         TestConstants.TEST_ARTIFACT_20130206_INFERRED, RDFFormat.TURTLE);
         
-        URI[] versionAndSchemaContexts =
+        final URI[] versionAndSchemaContexts =
                 this.testPoddSesameManager.versionAndInferredAndSchemaContexts(ontologyID,
                         this.testRepositoryConnection, this.schemaGraph, this.artifactGraph);
         
         Assert.assertNotNull(versionAndSchemaContexts);
-        for(URI nextUri : versionAndSchemaContexts)
+        for(final URI nextUri : versionAndSchemaContexts)
         {
             Assert.assertNotNull(nextUri);
         }

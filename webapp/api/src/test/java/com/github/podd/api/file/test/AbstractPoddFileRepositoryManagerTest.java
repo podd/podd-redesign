@@ -26,7 +26,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.openrdf.OpenRDFException;
 import org.openrdf.model.Model;
 import org.openrdf.model.URI;
 import org.openrdf.model.impl.ValueFactoryImpl;
@@ -98,7 +97,7 @@ public abstract class AbstractPoddFileRepositoryManagerTest
      * {@link PoddDataRepositoryManager} is the object under test in this class.
      * 
      * @return A new {@link PoddDataRepositoryManager} instance for use by the test
-     * @throws Exception 
+     * @throws Exception
      */
     protected abstract PoddDataRepositoryManager getNewPoddFileRepositoryManager() throws Exception;
     

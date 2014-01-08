@@ -58,7 +58,6 @@ import com.github.podd.exception.UnmanagedArtifactVersionException;
 import com.github.podd.exception.UnmanagedSchemaIRIException;
 import com.github.podd.restlet.PoddAction;
 import com.github.podd.utils.InferredOWLOntologyID;
-import com.github.podd.utils.PODD;
 import com.github.podd.utils.PoddWebConstants;
 
 /**
@@ -124,7 +123,7 @@ public class SparqlResourceImpl extends AbstractPoddResourceImpl
             return this.doSparqlInternal(sparqlQuery, includeConcrete, includeInferred, includeSchema, artifactUris,
                     variant);
         }
-        catch(OpenRDFException e)
+        catch(final OpenRDFException e)
         {
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL, e);
         }
@@ -209,7 +208,7 @@ public class SparqlResourceImpl extends AbstractPoddResourceImpl
             return this.doSparqlInternal(sparqlQuery, includeConcrete, includeInferred, includeSchema, artifactUris,
                     variant);
         }
-        catch(OpenRDFException e)
+        catch(final OpenRDFException e)
         {
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL, e);
         }
@@ -225,11 +224,12 @@ public class SparqlResourceImpl extends AbstractPoddResourceImpl
         // have access to
         if(artifactUris == null || artifactUris.length == 0)
         {
-            List<InferredOWLOntologyID> unpublishedArtifacts = this.getPoddArtifactManager().listUnpublishedArtifacts();
+            final List<InferredOWLOntologyID> unpublishedArtifacts =
+                    this.getPoddArtifactManager().listUnpublishedArtifacts();
             
-            for(InferredOWLOntologyID unpublishedArtifact : unpublishedArtifacts)
+            for(final InferredOWLOntologyID unpublishedArtifact : unpublishedArtifacts)
             {
-                boolean checkAuthentication =
+                final boolean checkAuthentication =
                         this.checkAuthentication(PoddAction.UNPUBLISHED_ARTIFACT_READ, unpublishedArtifact
                                 .getOntologyIRI().toOpenRDFURI(), false);
                 
@@ -239,11 +239,12 @@ public class SparqlResourceImpl extends AbstractPoddResourceImpl
                 }
             }
             
-            List<InferredOWLOntologyID> publishedArtifacts = this.getPoddArtifactManager().listPublishedArtifacts();
+            final List<InferredOWLOntologyID> publishedArtifacts =
+                    this.getPoddArtifactManager().listPublishedArtifacts();
             
-            for(InferredOWLOntologyID publishedArtifact : publishedArtifacts)
+            for(final InferredOWLOntologyID publishedArtifact : publishedArtifacts)
             {
-                boolean checkAuthentication =
+                final boolean checkAuthentication =
                         this.checkAuthentication(PoddAction.PUBLISHED_ARTIFACT_READ, publishedArtifact.getOntologyIRI()
                                 .toOpenRDFURI(), false);
                 
@@ -302,7 +303,7 @@ public class SparqlResourceImpl extends AbstractPoddResourceImpl
         RepositoryConnection managementConnection = null;
         try
         {
-            ConcurrentMap<Set<? extends OWLOntologyID>, RepositoryConnection> cache =
+            final ConcurrentMap<Set<? extends OWLOntologyID>, RepositoryConnection> cache =
                     new ConcurrentHashMap<Set<? extends OWLOntologyID>, RepositoryConnection>();
             
             managementConnection = this.getPoddRepositoryManager().getManagementRepository().getConnection();
@@ -317,7 +318,7 @@ public class SparqlResourceImpl extends AbstractPoddResourceImpl
                     {
                         RepositoryConnection nextConnection =
                                 this.getPoddRepositoryManager().getPermanentRepository(schemaImports).getConnection();
-                        RepositoryConnection putIfAbsent = cache.putIfAbsent(schemaImports, nextConnection);
+                        final RepositoryConnection putIfAbsent = cache.putIfAbsent(schemaImports, nextConnection);
                         if(putIfAbsent != null)
                         {
                             nextConnection = putIfAbsent;
@@ -370,7 +371,7 @@ public class SparqlResourceImpl extends AbstractPoddResourceImpl
             }
             finally
             {
-                for(RepositoryConnection nextPermanentConnection : cache.values())
+                for(final RepositoryConnection nextPermanentConnection : cache.values())
                 {
                     try
                     {
@@ -379,7 +380,7 @@ public class SparqlResourceImpl extends AbstractPoddResourceImpl
                             nextPermanentConnection.close();
                         }
                     }
-                    catch(Throwable e)
+                    catch(final Throwable e)
                     {
                         this.log.error("Found exception closing connection", e);
                     }
@@ -405,15 +406,15 @@ public class SparqlResourceImpl extends AbstractPoddResourceImpl
             // long term
             throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Repository exception occurred", e);
         }
-        catch(SchemaManifestException e)
+        catch(final SchemaManifestException e)
         {
             throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Could not find a requested artifact", e);
         }
-        catch(UnsupportedRDFormatException e)
+        catch(final UnsupportedRDFormatException e)
         {
             throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Could not find a requested artifact", e);
         }
-        catch(IOException e)
+        catch(final IOException e)
         {
             throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Could not find a requested artifact", e);
         }

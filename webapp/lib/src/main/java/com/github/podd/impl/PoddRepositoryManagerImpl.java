@@ -18,10 +18,7 @@ package com.github.podd.impl;
 
 import info.aduna.iteration.Iterations;
 
-import java.io.IOException;
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Set;
@@ -29,9 +26,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 import org.openrdf.OpenRDFException;
-import org.openrdf.model.Graph;
-import org.openrdf.model.Model;
-import org.openrdf.model.Resource;
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.openrdf.model.vocabulary.SESAME;
@@ -41,14 +35,9 @@ import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.RepositoryResult;
 import org.openrdf.repository.config.RepositoryConfig;
 import org.openrdf.repository.config.RepositoryConfigException;
-import org.openrdf.repository.config.RepositoryFactory;
 import org.openrdf.repository.config.RepositoryImplConfig;
-import org.openrdf.repository.config.RepositoryRegistry;
 import org.openrdf.repository.manager.RepositoryManager;
 import org.openrdf.repository.sail.SailRepository;
-import org.openrdf.rio.RDFFormat;
-import org.openrdf.rio.Rio;
-import org.openrdf.rio.UnsupportedRDFormatException;
 import org.openrdf.sail.federation.Federation;
 import org.openrdf.sail.memory.MemoryStore;
 import org.semanticweb.owlapi.model.OWLOntologyID;
@@ -144,22 +133,23 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
                 {
                     // Create a new one
                     // Get a new repository ID using our base name as the starting point
-                    String newRepositoryID = this.sesameRepositoryManager.getNewRepositoryID("poddredesignrepository");
-                    RepositoryConfig config =
+                    final String newRepositoryID =
+                            this.sesameRepositoryManager.getNewRepositoryID("poddredesignrepository");
+                    final RepositoryConfig config =
                             new RepositoryConfig(newRepositoryID, "PODD Redesign Repository (Automatically created)",
-                                    permanentRepositoryConfig);
+                                    this.permanentRepositoryConfig);
                     this.sesameRepositoryManager.addRepositoryConfig(config);
                     
-                    Repository nextRepository = this.sesameRepositoryManager.getRepository(newRepositoryID);
+                    final Repository nextRepository = this.sesameRepositoryManager.getRepository(newRepositoryID);
                     // If we somehow created a new repository since we entered this section, we need
                     // to remove the new repository to cleanup
-                    Repository putIfAbsent =
+                    final Repository putIfAbsent =
                             this.permanentRepositories.putIfAbsent(schemaOntologies, new ManualShutdownRepository(
                                     nextRepository));
                     if(putIfAbsent != null)
                     {
                         this.log.error("Created a duplicate repository that must now be removed: {}", newRepositoryID);
-                        boolean removeRepository = this.sesameRepositoryManager.removeRepository(newRepositoryID);
+                        final boolean removeRepository = this.sesameRepositoryManager.removeRepository(newRepositoryID);
                         if(!removeRepository)
                         {
                             this.log.warn("Could not remove repository");
@@ -178,8 +168,8 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
                         {
                             permanentConnection = permanentRepository.getConnection();
                             permanentConnection.begin();
-                            managementConnection = getManagementRepository().getConnection();
-                            for(OWLOntologyID nextSchemaOntology : schemaOntologies)
+                            managementConnection = this.getManagementRepository().getConnection();
+                            for(final OWLOntologyID nextSchemaOntology : schemaOntologies)
                             {
                                 if(!permanentConnection.hasStatement(null, null, null, false, nextSchemaOntology
                                         .getVersionIRI().toOpenRDFURI()))
@@ -189,12 +179,12 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
                                             .getVersionIRI().toOpenRDFURI());
                                 }
                                 
-                                RepositoryResult<Statement> statements =
+                                final RepositoryResult<Statement> statements =
                                         managementConnection.getStatements(nextSchemaOntology.getVersionIRI()
                                                 .toOpenRDFURI(), PODD.PODD_BASE_INFERRED_VERSION, null, false, this
                                                 .getSchemaManagementGraph());
                                 
-                                for(Statement nextInferredStatement : Iterations.asList(statements))
+                                for(final Statement nextInferredStatement : Iterations.asList(statements))
                                 {
                                     if(nextInferredStatement.getObject() instanceof URI)
                                     {
@@ -210,7 +200,7 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
                             }
                             permanentConnection.commit();
                         }
-                        catch(Throwable e)
+                        catch(final Throwable e)
                         {
                             if(permanentConnection != null)
                             {
@@ -344,13 +334,13 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
                 this.managementRepository.realShutDown();
             }
         }
-        catch(RepositoryException e)
+        catch(final RepositoryException e)
         {
             foundException = e;
         }
         finally
         {
-            for(Entry<Set<? extends OWLOntologyID>, ManualShutdownRepository> nextRepository : this.permanentRepositories
+            for(final Entry<Set<? extends OWLOntologyID>, ManualShutdownRepository> nextRepository : this.permanentRepositories
                     .entrySet())
             {
                 try
@@ -358,7 +348,7 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
                     this.log.info("Shutting down repository for schema ontologies: {} ", nextRepository.getKey());
                     nextRepository.getValue().realShutDown();
                 }
-                catch(RepositoryException e)
+                catch(final RepositoryException e)
                 {
                     if(foundException == null)
                     {
@@ -371,10 +361,10 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
                 }
             }
             
-            if(sesameRepositoryManager != null)
+            if(this.sesameRepositoryManager != null)
             {
                 // NOTE: Exceptions from the following are logged but not thrown for some reason
-                sesameRepositoryManager.shutDown();
+                this.sesameRepositoryManager.shutDown();
             }
         }
         
@@ -385,15 +375,15 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
     }
     
     @Override
-    public Repository getReadOnlyFederatedRepository(Set<? extends OWLOntologyID> schemaImports)
+    public Repository getReadOnlyFederatedRepository(final Set<? extends OWLOntologyID> schemaImports)
         throws OpenRDFException
     {
-        Federation federation = new Federation();
+        final Federation federation = new Federation();
         federation.setReadOnly(true);
         federation.addMember(this.getPermanentRepository(schemaImports));
         federation.addMember(this.getManagementRepository());
         federation.initialize();
-        Repository federationRepository = new SailRepository(federation);
+        final Repository federationRepository = new SailRepository(federation);
         federationRepository.initialize();
         return federationRepository;
     }

@@ -21,7 +21,6 @@ import java.util.Collections;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -170,7 +169,7 @@ public abstract class AbstractPoddRepositoryManagerTest
             this.testRepositoryManager.getPermanentRepository(null);
             Assert.fail("Did not receive the expected exception");
         }
-        catch(NullPointerException e)
+        catch(final NullPointerException e)
         {
             
         }

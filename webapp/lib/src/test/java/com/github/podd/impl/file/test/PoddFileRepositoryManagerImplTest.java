@@ -27,7 +27,6 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.rules.TemporaryFolder;
 import org.junit.rules.Timeout;
-import org.openrdf.OpenRDFException;
 import org.openrdf.model.Model;
 import org.openrdf.model.Resource;
 import org.openrdf.model.URI;
@@ -44,14 +43,12 @@ import org.openrdf.repository.sail.SailRepository;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.Rio;
 import org.openrdf.sail.memory.MemoryStore;
-import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.OWLOntologyManagerFactory;
 import org.semanticweb.owlapi.model.OWLOntologyManagerFactoryRegistry;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactoryRegistry;
 
 import com.github.podd.api.PoddOWLManager;
-import com.github.podd.api.PoddRepositoryManager;
 import com.github.podd.api.file.DataReference;
 import com.github.podd.api.file.PoddDataRepository;
 import com.github.podd.api.file.PoddDataRepositoryManager;
@@ -164,22 +161,23 @@ public class PoddFileRepositoryManagerImplTest extends AbstractPoddFileRepositor
     protected PoddDataRepositoryManager getNewPoddFileRepositoryManager() throws Exception
     {
         // create a Repository Manager with an internal memory Repository
-        Repository managementRepository = new SailRepository(new MemoryStore());
+        final Repository managementRepository = new SailRepository(new MemoryStore());
         managementRepository.initialize();
         
         final Model graph =
                 Rio.parse(this.getClass().getResourceAsStream("/memorystoreconfig.ttl"), "", RDFFormat.TURTLE);
         final Resource repositoryNode = GraphUtil.getUniqueSubject(graph, RepositoryConfigSchema.REPOSITORYTYPE, null);
-        RepositoryImplConfig repositoryImplConfig = RepositoryImplConfigBase.create(graph, repositoryNode);
+        final RepositoryImplConfig repositoryImplConfig = RepositoryImplConfigBase.create(graph, repositoryNode);
         Assert.assertNotNull(repositoryImplConfig);
         Assert.assertNotNull(repositoryImplConfig.getType());
-        LocalRepositoryManager repositoryManager = new LocalRepositoryManager(tempDir.newFolder("repositorymanager"));
+        final LocalRepositoryManager repositoryManager =
+                new LocalRepositoryManager(this.tempDir.newFolder("repositorymanager"));
         repositoryManager.initialize();
-        PoddRepositoryManagerImpl repositoryManagerImpl =
+        final PoddRepositoryManagerImpl repositoryManagerImpl =
                 new PoddRepositoryManagerImpl(managementRepository, repositoryManager, repositoryImplConfig);
         
         final PoddOWLManager owlManager =
-                new PoddOWLManagerImpl(getNewOWLOntologyManagerFactory(), getNewReasonerFactory());
+                new PoddOWLManagerImpl(this.getNewOWLOntologyManagerFactory(), this.getNewReasonerFactory());
         
         // create the PoddDataRepositoryManager for testing
         final PoddDataRepositoryManager testFileRepositoryManager = new PoddFileRepositoryManagerImpl();
@@ -191,7 +189,7 @@ public class PoddFileRepositoryManagerImplTest extends AbstractPoddFileRepositor
     
     protected OWLOntologyManagerFactory getNewOWLOntologyManagerFactory()
     {
-        Collection<OWLOntologyManagerFactory> ontologyManagers =
+        final Collection<OWLOntologyManagerFactory> ontologyManagers =
                 OWLOntologyManagerFactoryRegistry.getInstance().get(PoddWebConstants.DEFAULT_OWLAPI_MANAGER);
         
         if(ontologyManagers == null || ontologyManagers.isEmpty())
