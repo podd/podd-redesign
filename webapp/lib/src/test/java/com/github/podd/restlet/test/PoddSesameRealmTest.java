@@ -132,7 +132,7 @@ public class PoddSesameRealmTest
         final PoddUser testUser = this.addTestUser(testUserId1);
         Assert.assertNotNull("Test user was null", testUser);
         
-        DebugUtils.printContents(this.getStatementList(null, null, null));
+        //DebugUtils.printContents(this.getStatementList(null, null, null));
         
         final PoddUser retrievedUser = this.testRealm.findUser(testUserId1);
         Assert.assertNotNull("Retrieved user was null", retrievedUser);

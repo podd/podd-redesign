@@ -1521,7 +1521,7 @@ public abstract class AbstractPoddArtifactManagerTest
         
         Set<? extends OWLOntologyID> schemaImports = this.testArtifactManager.getSchemaImports(artifactID);
         
-        DebugUtils.printContents(testManagementConnection, artifactGraph);
+        // DebugUtils.printContents(testManagementConnection, artifactGraph);
         
         Assert.assertFalse("No schema imports detected", schemaImports.isEmpty());
     }

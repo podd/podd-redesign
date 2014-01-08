@@ -953,7 +953,7 @@ public abstract class AbstractPoddSesameManagerTest
             // verify: statement count
             Assert.assertNotNull("NULL model as result", model);
             
-            DebugUtils.printContents(model);
+            // DebugUtils.printContents(model);
             
             Assert.assertEquals("Not the expected no. of statements in model", expectedResults[i][0], model.size());
             
@@ -1949,7 +1949,7 @@ public abstract class AbstractPoddSesameManagerTest
         // verify:
         Assert.assertNotNull("NULL result", result);
         
-        DebugUtils.printContents(result);
+        // DebugUtils.printContents(result);
         
         Assert.assertEquals("Not the expected number of search results", 9, result.size());
         

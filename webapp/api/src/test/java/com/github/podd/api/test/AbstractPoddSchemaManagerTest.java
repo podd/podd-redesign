@@ -777,16 +777,6 @@ public abstract class AbstractPoddSchemaManagerTest
     {
         this.loadSchemaOntologies("/test/schema-manifest-a1b1c2.ttl", 4);
         
-        RepositoryConnection repositoryConnection =
-                this.testRepositoryManager.getManagementRepository().getConnection();
-        try
-        {
-            DebugUtils.printContents(repositoryConnection, this.testRepositoryManager.getSchemaManagementGraph());
-        }
-        finally
-        {
-            repositoryConnection.close();
-        }
         Assert.assertEquals("Incorrect no. of current schema ontologies", 3, this.testSchemaManager
                 .getCurrentSchemaOntologies().size());
         Assert.assertEquals("Incorrect no. of total schema ontologies", 4, this.testSchemaManager.getSchemaOntologies()

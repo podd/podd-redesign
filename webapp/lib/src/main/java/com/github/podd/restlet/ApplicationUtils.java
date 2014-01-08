@@ -525,8 +525,11 @@ public class ApplicationUtils
                 model = Rio.parse(schemaManifestStream, "", format);
             }
             
-            ApplicationUtils.log.info("Schema manifest contents");
-            DebugUtils.printContents(model);
+            if(log.isDebugEnabled())
+            {
+                ApplicationUtils.log.debug("Schema manifest contents");
+                DebugUtils.printContents(model);
+            }
             ApplicationUtils.log.info("About to upload schema ontologies");
             
             // Returns an ordered list of the schema ontologies that were uploaded

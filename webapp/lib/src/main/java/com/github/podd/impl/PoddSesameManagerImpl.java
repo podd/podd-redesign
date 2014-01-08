@@ -669,7 +669,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         {
             statements = permanentConnection.getStatements(null, OWL.IMPORTS, null, true, contexts);
         }
-        DebugUtils.printContents(permanentConnection, contexts);
+        //DebugUtils.printContents(permanentConnection, contexts);
         for(Statement nextImport : Iterations.asList(statements))
         {
             if(nextImport.getObject() instanceof URI)

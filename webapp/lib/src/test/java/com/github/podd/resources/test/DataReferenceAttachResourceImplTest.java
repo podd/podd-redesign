@@ -185,7 +185,7 @@ public class DataReferenceAttachResourceImplTest extends AbstractResourceImplTes
             
             final Model artifactModel = this.getArtifactAsModel(artifactID.getOntologyIRI().toString());
             
-            DebugUtils.printContents(artifactModel);
+            //DebugUtils.printContents(artifactModel);
             
             Assert.assertEquals(98, artifactModel.size());
             Assert.assertEquals(20, artifactModel.subjects().size());

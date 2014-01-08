@@ -183,7 +183,7 @@ public class UserAddResourceImplTest extends AbstractResourceImplTest
             
             final Model resultsModel = this.assertRdf(new StringReader(this.getText(results)), format, 19);
             
-            com.github.podd.utils.DebugUtils.printContents(resultsModel);
+            //DebugUtils.printContents(resultsModel);
             Assert.assertEquals("Unexpected user identifier", testIdentifier,
                     resultsModel.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).objectString());
             Assert.assertEquals("Unexpected user URI", testUserUri,
@@ -228,7 +228,7 @@ public class UserAddResourceImplTest extends AbstractResourceImplTest
             
             final Model resultsModel = this.assertRdf(results, format, 8);
             
-            DebugUtils.printContents(resultsModel);
+            //DebugUtils.printContents(resultsModel);
             Assert.assertEquals("Unexpected user identifier", testIdentifier,
                     resultsModel.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).objectString());
             Assert.assertEquals("Unexpected user URI", testUserUri,
@@ -280,7 +280,7 @@ public class UserAddResourceImplTest extends AbstractResourceImplTest
             
             final Model resultsModel = this.assertRdf(results, format, 12);
             
-            com.github.podd.utils.DebugUtils.printContents(resultsModel);
+            //DebugUtils.printContents(resultsModel);
             Assert.assertEquals("Unexpected user identifier", testIdentifier,
                     resultsModel.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).objectString());
             Assert.assertEquals("Unexpected user URI", testUserUri,

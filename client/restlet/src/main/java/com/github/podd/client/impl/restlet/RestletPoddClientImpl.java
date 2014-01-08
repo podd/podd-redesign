@@ -565,7 +565,7 @@ public class RestletPoddClientImpl implements PoddClient
             
             final Model model = Rio.parse(stream, "", format);
             
-            DebugUtils.printContents(model);
+            //DebugUtils.printContents(model);
             
             final Set<Value> aliases = model.filter(null, PODD.PODD_BASE_HAS_ALIAS, null).objects();
             

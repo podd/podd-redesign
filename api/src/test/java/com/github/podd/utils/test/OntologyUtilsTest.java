@@ -540,7 +540,7 @@ public class OntologyUtilsTest
         model.add(this.testImportOntologyUri1, OWL.VERSIONIRI, this.testImportVersionUri1);
         model.add(this.testOntologyUri1, OWL.IMPORTS, this.testImportOntologyUri1);
         
-        DebugUtils.printContents(model);
+        // DebugUtils.printContents(model);
         
         List<OWLOntologyID> imports = OntologyUtils.artifactImports(this.testOntologyID, model);
         
@@ -721,7 +721,7 @@ public class OntologyUtilsTest
         model.addAll(Rio.parse(this.getClass().getResourceAsStream("/test/test-podd-schema-manifest.ttl"), "",
                 RDFFormat.TURTLE));
         
-        DebugUtils.printContents(model);
+        // DebugUtils.printContents(model);
         
         List<OWLOntologyID> imports = OntologyUtils.artifactImports(this.testOntologyID, model);
         
@@ -935,7 +935,7 @@ public class OntologyUtilsTest
         model.add(this.testImportOntologyUri1, OWL.VERSIONIRI, this.testImportVersionUri1);
         model.add(this.testImportVersionUri1, RDF.TYPE, OWL.ONTOLOGY);
         
-        DebugUtils.printContents(model);
+        // DebugUtils.printContents(model);
         
         List<OWLOntologyID> schemaManifestImports =
                 OntologyUtils.schemaManifestImports(model,
@@ -961,7 +961,7 @@ public class OntologyUtilsTest
         model.add(this.testImportOntologyUri1, OWL.VERSIONIRI, this.testImportVersionUri1);
         model.add(this.testImportVersionUri1, RDF.TYPE, OWL.ONTOLOGY);
         
-        DebugUtils.printContents(model);
+        // DebugUtils.printContents(model);
         
         List<OWLOntologyID> schemaManifestImports =
                 OntologyUtils.schemaManifestImports(model,
@@ -982,7 +982,7 @@ public class OntologyUtilsTest
         Model model =
                 Rio.parse(this.getClass().getResourceAsStream("/test/schema-manifest-a1b2c3.ttl"), "", RDFFormat.TURTLE);
         
-        DebugUtils.printContents(model);
+        // DebugUtils.printContents(model);
         List<OWLOntologyID> schemaManifestImports =
                 OntologyUtils.schemaManifestImports(model,
                         new HashSet<OWLOntologyID>(Arrays.asList(this.testA1, this.testB2, this.testC3)));
@@ -1004,7 +1004,7 @@ public class OntologyUtilsTest
         Model model =
                 Rio.parse(this.getClass().getResourceAsStream("/test/schema-manifest-a1b2c3.ttl"), "", RDFFormat.TURTLE);
         
-        DebugUtils.printContents(model);
+        // DebugUtils.printContents(model);
         List<OWLOntologyID> schemaManifestImports =
                 OntologyUtils.schemaManifestImports(model,
                         new HashSet<OWLOntologyID>(Arrays.asList(this.testA1, this.testB1, this.testC1)));
@@ -1026,7 +1026,7 @@ public class OntologyUtilsTest
         Model model =
                 Rio.parse(this.getClass().getResourceAsStream("/test/schema-manifest-a1b2c3.ttl"), "", RDFFormat.TURTLE);
         
-        DebugUtils.printContents(model);
+        // DebugUtils.printContents(model);
         List<OWLOntologyID> schemaManifestImports =
                 OntologyUtils.schemaManifestImports(model, new HashSet<OWLOntologyID>(Arrays.asList(this.testC3)));
         
@@ -1047,7 +1047,7 @@ public class OntologyUtilsTest
         Model model =
                 Rio.parse(this.getClass().getResourceAsStream("/test/schema-manifest-a1b2c3.ttl"), "", RDFFormat.TURTLE);
         
-        DebugUtils.printContents(model);
+        // DebugUtils.printContents(model);
         List<OWLOntologyID> schemaManifestImports =
                 OntologyUtils.schemaManifestImports(model, new HashSet<OWLOntologyID>(Arrays.asList(this.testC1)));
         
@@ -1068,7 +1068,7 @@ public class OntologyUtilsTest
         Model model =
                 Rio.parse(this.getClass().getResourceAsStream("/test/schema-manifest-a1b2c3.ttl"), "", RDFFormat.TURTLE);
         
-        DebugUtils.printContents(model);
+        // DebugUtils.printContents(model);
         List<OWLOntologyID> schemaManifestImports =
                 OntologyUtils.schemaManifestImports(model, new HashSet<OWLOntologyID>(Arrays.asList(this.testB1)));
         
@@ -1087,7 +1087,7 @@ public class OntologyUtilsTest
         Model model =
                 Rio.parse(this.getClass().getResourceAsStream("/test/schema-manifest-a1b2c3.ttl"), "", RDFFormat.TURTLE);
         
-        DebugUtils.printContents(model);
+        // DebugUtils.printContents(model);
         List<OWLOntologyID> schemaManifestImports =
                 OntologyUtils.schemaManifestImports(model, new HashSet<OWLOntologyID>(Arrays.asList(this.testB2)));
         
@@ -1106,7 +1106,7 @@ public class OntologyUtilsTest
         Model model =
                 Rio.parse(this.getClass().getResourceAsStream("/test/schema-manifest-a1b2c3.ttl"), "", RDFFormat.TURTLE);
         
-        DebugUtils.printContents(model);
+        // DebugUtils.printContents(model);
         List<OWLOntologyID> schemaManifestImports =
                 OntologyUtils.schemaManifestImports(model, new HashSet<OWLOntologyID>(Arrays.asList(this.testA1)));
         
@@ -1123,7 +1123,7 @@ public class OntologyUtilsTest
         Model model =
                 Rio.parse(this.getClass().getResourceAsStream("/test/schema-manifest-a1b2c3.ttl"), "", RDFFormat.TURTLE);
         
-        DebugUtils.printContents(model);
+        // DebugUtils.printContents(model);
         List<OWLOntologyID> schemaManifestImports =
                 OntologyUtils.schemaManifestImports(model,
                         new HashSet<OWLOntologyID>(Arrays.asList(this.testA1, this.testB1, this.testC3)));
