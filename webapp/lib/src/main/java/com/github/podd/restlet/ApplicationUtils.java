@@ -323,9 +323,13 @@ public class ApplicationUtils
         String permanentRepositoryConfigPath =
                 props.get(PoddWebConstants.PROPERTY_PERMANENT_SESAME_REPOSITORY_CONFIG,
                         PoddWebConstants.DEFAULT_PERMANENT_SESAME_REPOSITORY_CONFIG);
-        final Model graph =
-                Rio.parse(ApplicationUtils.class.getResourceAsStream(permanentRepositoryConfigPath), "",
-                        RDFFormat.TURTLE);
+        InputStream repositoryImplConfigStream =
+                ApplicationUtils.class.getResourceAsStream(permanentRepositoryConfigPath);
+        if(repositoryImplConfigStream == null)
+        {
+            log.error("Could not find repository config");
+        }
+        final Model graph = Rio.parse(repositoryImplConfigStream, "", RDFFormat.TURTLE);
         final Resource repositoryNode = GraphUtil.getUniqueSubject(graph, RepositoryConfigSchema.REPOSITORYTYPE, null);
         RepositoryImplConfig repositoryImplConfig = RepositoryImplConfigBase.create(graph, repositoryNode);
         RepositoryManager repositoryManager;
