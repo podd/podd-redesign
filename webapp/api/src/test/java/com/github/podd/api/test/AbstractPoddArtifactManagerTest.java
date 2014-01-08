@@ -1301,7 +1301,7 @@ public abstract class AbstractPoddArtifactManagerTest
             
             final List<PoddObjectLabel> list = this.testArtifactManager.getObjectTypes(artifactIDv1, objectUri);
             
-            this.log.info("Results for object <{}> are {}", objectUri, list.get(0).toString());
+            this.log.info("Results for object <{}> are {}", objectUri, list);
             
             Assert.assertEquals("Unexpected no. of statements", expectedStatementCount, list.size());
             if(expectedStatementCount == 1)
