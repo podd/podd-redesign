@@ -1228,7 +1228,7 @@ public abstract class AbstractPoddArtifactManagerTest
         {
             final String objectString =
                     resultModel.filter(PODD.VF.createURI(objectUris[i]), RDFS.LABEL, null).objectString();
-            Assert.assertNotNull("No label for: " + objectUris[i], objectString);
+            //Assert.assertNotNull("No label for: " + objectUris[i], objectString);
             Assert.assertEquals("Not the expected label for: " + objectUris[i], expectedLabels[i], objectString);
         }
     }
