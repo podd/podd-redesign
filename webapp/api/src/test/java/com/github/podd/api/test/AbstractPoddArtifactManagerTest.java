@@ -310,43 +310,43 @@ public abstract class AbstractPoddArtifactManagerTest
                         { PODD.VF.createURI(PODD.PODD_BASE, "NoSuchObjectType"), false, MetadataPolicy.INCLUDE_ALL, 0,
                                 0, 0 },
                         
-                        { PODD.VF.createURI(PODD.PODD_SCIENCE, "Project"), false, MetadataPolicy.INCLUDE_ALL, 156, 19,
+                        { PODD.VF.createURI(PODD.PODD_SCIENCE, "Project"), false, MetadataPolicy.INCLUDE_ALL, 220, 33,
                                 0 },
-                        { PODD.VF.createURI(PODD.PODD_SCIENCE, "Project"), false, MetadataPolicy.EXCLUDE_CONTAINS, 88,
-                                10, 0 },
-                        { PODD.VF.createURI(PODD.PODD_SCIENCE, "Project"), true, MetadataPolicy.INCLUDE_ALL, 293, 35,
+                        { PODD.VF.createURI(PODD.PODD_SCIENCE, "Project"), false, MetadataPolicy.EXCLUDE_CONTAINS, 113,
+                                16, 0 },
+                        { PODD.VF.createURI(PODD.PODD_SCIENCE, "Project"), true, MetadataPolicy.INCLUDE_ALL, 397, 59,
                                 13 },
-                        { PODD.VF.createURI(PODD.PODD_SCIENCE, "Project"), false, MetadataPolicy.ONLY_CONTAINS, 63, 11,
+                        { PODD.VF.createURI(PODD.PODD_SCIENCE, "Project"), false, MetadataPolicy.ONLY_CONTAINS, 107, 22,
                                 0 },
                         
-                        { PODD.VF.createURI(PODD.PODD_SCIENCE, "Publication"), false, MetadataPolicy.INCLUDE_ALL, 93,
-                                12, 0 },
-                        { PODD.VF.createURI(PODD.PODD_SCIENCE, "Publication"), true, MetadataPolicy.INCLUDE_ALL, 119,
-                                16, 3 },
-                        { PODD.VF.createURI(PODD.PODD_SCIENCE, "Publication"), false, MetadataPolicy.ONLY_CONTAINS, 21,
-                                4, 0 },
+                        { PODD.VF.createURI(PODD.PODD_SCIENCE, "Publication"), false, MetadataPolicy.INCLUDE_ALL, 125,
+                                20, 0 },
+                        { PODD.VF.createURI(PODD.PODD_SCIENCE, "Publication"), true, MetadataPolicy.INCLUDE_ALL, 155,
+                                25, 3 },
+                        { PODD.VF.createURI(PODD.PODD_SCIENCE, "Publication"), false, MetadataPolicy.ONLY_CONTAINS, 37,
+                                8, 0 },
                         
-                        { PODD.VF.createURI(PODD.PODD_SCIENCE, "Environment"), false, MetadataPolicy.INCLUDE_ALL, 73,
-                                10, 0 },
-                        { PODD.VF.createURI(PODD.PODD_SCIENCE, "Environment"), true, MetadataPolicy.INCLUDE_ALL, 99,
-                                14, 3 },
-                        { PODD.VF.createURI(PODD.PODD_SCIENCE, "Environment"), false, MetadataPolicy.ONLY_CONTAINS, 33,
-                                6, 0 },
+                        { PODD.VF.createURI(PODD.PODD_SCIENCE, "Environment"), false, MetadataPolicy.INCLUDE_ALL, 99,
+                                16, 0 },
+                        { PODD.VF.createURI(PODD.PODD_SCIENCE, "Environment"), true, MetadataPolicy.INCLUDE_ALL, 129,
+                                21, 3 },
+                        { PODD.VF.createURI(PODD.PODD_SCIENCE, "Environment"), false, MetadataPolicy.ONLY_CONTAINS, 57,
+                                12, 0 },
                         
                         // to expose issue #96 - add child Process has no fields
-                        { PODD.VF.createURI(PODD.PODD_SCIENCE, "Process"), false, MetadataPolicy.INCLUDE_ALL, 38, 6, 0 },
-                        { PODD.VF.createURI(PODD.PODD_SCIENCE, "Process"), true, MetadataPolicy.INCLUDE_ALL, 64, 10, 3 },
-                        { PODD.VF.createURI(PODD.PODD_SCIENCE, "Process"), false, MetadataPolicy.ONLY_CONTAINS, 27, 5,
+                        { PODD.VF.createURI(PODD.PODD_SCIENCE, "Process"), false, MetadataPolicy.INCLUDE_ALL, 47, 8, 0 },
+                        { PODD.VF.createURI(PODD.PODD_SCIENCE, "Process"), true, MetadataPolicy.INCLUDE_ALL, 77, 13, 3 },
+                        { PODD.VF.createURI(PODD.PODD_SCIENCE, "Process"), false, MetadataPolicy.ONLY_CONTAINS, 47, 10,
                                 0 },
                         { PODD.VF.createURI(PODD.PODD_SCIENCE, "Process"), false, MetadataPolicy.EXCLUDE_CONTAINS, 18,
                                 3, 0 },
                         
-                        { PODD.VF.createURI(PODD.PODD_PLANT, "FieldConditions"), false, MetadataPolicy.INCLUDE_ALL, 89,
-                                12, 0 },
-                        { PODD.VF.createURI(PODD.PODD_PLANT, "FieldConditions"), true, MetadataPolicy.INCLUDE_ALL, 115,
-                                16, 3 },
+                        { PODD.VF.createURI(PODD.PODD_PLANT, "FieldConditions"), false, MetadataPolicy.INCLUDE_ALL, 123,
+                                20, 0 },
+                        { PODD.VF.createURI(PODD.PODD_PLANT, "FieldConditions"), true, MetadataPolicy.INCLUDE_ALL, 153,
+                                25, 3 },
                         { PODD.VF.createURI(PODD.PODD_PLANT, "FieldConditions"), false, MetadataPolicy.ONLY_CONTAINS,
-                                33, 6, 0 }, };
+                                57, 12, 0 }, };
         
         for(final Object[] element : testData)
         {
@@ -1169,7 +1169,7 @@ public abstract class AbstractPoddArtifactManagerTest
                 this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_BASIC_1_INTERNAL_OBJECT);
         final InferredOWLOntologyID unpublishedArtifactId =
                 this.testArtifactManager.loadArtifact(inputStream, RDFFormat.RDFXML);
-        this.verifyLoadedArtifact(unpublishedArtifactId, 22,
+        this.verifyLoadedArtifact(unpublishedArtifactId, 23,
                 TestConstants.TEST_ARTIFACT_BASIC_1_INTERNAL_OBJECT_CONCRETE_TRIPLES,
                 TestConstants.TEST_ARTIFACT_BASIC_1_INTERNAL_OBJECT_INFERRED_TRIPLES, false);
         
