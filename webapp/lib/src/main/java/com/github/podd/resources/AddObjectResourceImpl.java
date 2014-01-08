@@ -172,21 +172,38 @@ public class AddObjectResourceImpl extends AbstractPoddResourceImpl
             
             final Set<? extends OWLOntologyID> schemaImports =
                     this.getPoddArtifactManager().getSchemaImports(ontologyID);
-            RepositoryConnection conn = null;
+            RepositoryConnection permanentConnection = null;
+            RepositoryConnection managementConnection = null;
             try
             {
-                conn = this.getPoddRepositoryManager().getPermanentRepository(schemaImports).getConnection();
+                permanentConnection =
+                        this.getPoddRepositoryManager().getPermanentRepository(schemaImports).getConnection();
+                permanentConnection.begin();
+                managementConnection = this.getPoddRepositoryManager().getManagementRepository().getConnection();
+                managementConnection.begin();
                 objectLabel =
-                        this.getPoddSesameManager().getObjectLabel(ontologyID, PODD.VF.createURI(objectType), conn,
+                        this.getPoddSesameManager().getObjectLabel(ontologyID, PODD.VF.createURI(objectType),
+                                managementConnection, permanentConnection,
                                 this.getPoddRepositoryManager().getSchemaManagementGraph(),
                                 this.getPoddRepositoryManager().getArtifactManagementGraph());
             }
             finally
             {
-                if(conn != null)
+                try
                 {
-                    conn.rollback(); // read only, nothing to commit
-                    conn.close();
+                    if(permanentConnection != null && permanentConnection.isOpen())
+                    {
+                        permanentConnection.rollback(); // read only, nothing to commit
+                        permanentConnection.close();
+                    }
+                }
+                finally
+                {
+                    if(managementConnection != null && managementConnection.isOpen())
+                    {
+                        managementConnection.rollback(); // read only, nothing to commit
+                        managementConnection.close();
+                    }
                 }
             }
         }

@@ -294,83 +294,15 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         return returnList;
     }
     
-    /**
-     * Given a property URI, this method attempts to return all the valid members in the Range of
-     * that property.
-     * 
-     * @param artifactID
-     *            The Collection should either belong to this artifact or be imported by it.
-     * @param propertyUri
-     *            The property whose members are sought.
-     * @param repositoryConnection
-     * @return A List of URIs representing all valid members of the given Collection, or an empty
-     *         list if the property does not have a pre-defined set of possible members.
-     * @throws OpenRDFException
-     * @throws SchemaManifestException
-     * @throws UnmanagedSchemaIRIException
-     * 
-     * @deprecated Unused. Somewhat similar functionality is available in {@link getInstancesOf()}.
-     */
-    @Deprecated
-    private List<URI> getAllValidMembers(final InferredOWLOntologyID artifactID, final URI propertyUri,
-            final RepositoryConnection repositoryConnection, final URI schemaManagementGraph,
+    @Override
+    public Map<URI, URI> getCardinalityValues(final InferredOWLOntologyID artifactID, final URI objectUri,
+            final Collection<URI> propertyUris, final RepositoryConnection managementConnection,
+            final RepositoryConnection permanentConnection, final URI schemaManagementGraph,
             final URI artifactManagementGraph) throws OpenRDFException, SchemaManifestException,
         UnmanagedSchemaIRIException
     {
-        /*
-         * Example: Triples describing PlatformType enumeration consisting of 3 members.
-         * 
-         * {poddScience:PlatformType} <owl:equivalentClass> {_:genid1636663090}
-         * 
-         * {_:genid1636663090} <owl:oneOf> {_:genid72508669}
-         * 
-         * {_:genid72508669} <rdf:first> {poddScience:Software}
-         * 
-         * {_:genid72508669} <rdf:rest> {_:genid953844943}
-         * 
-         * {_:genid953844943} <rdf:first> {poddScience:HardwareSoftware}
-         * 
-         * {_:genid953844943} <rdf:rest> {_:genid278519207}
-         * 
-         * {_:genid278519207} <rdf:first> {poddScience:Hardware}
-         * 
-         * {_:genid278519207} <rdf:rest> {rdf:nil}
-         */
-        
-        final List<URI> results = new ArrayList<URI>();
-        
-        final StringBuilder sb = new StringBuilder(1024);
-        sb.append("SELECT ?member WHERE { ");
-        sb.append(" ?poddProperty <" + RDFS.RANGE.stringValue() + "> ?poddConcept . ");
-        sb.append(" ?poddConcept <" + OWL.EQUIVALENTCLASS.stringValue() + "> ?x . ");
-        sb.append(" ?x <" + OWL.ONEOF.stringValue() + "> ?list . ");
-        sb.append(" ?list <" + RDF.REST.stringValue() + ">*/<" + RDF.FIRST.stringValue() + "> ?member . ");
-        sb.append(" } ");
-        
-        this.log.debug("Created SPARQL {} with poddProperty bound to {}", sb, propertyUri);
-        
-        final TupleQuery tupleQuery = repositoryConnection.prepareTupleQuery(QueryLanguage.SPARQL, sb.toString());
-        tupleQuery.setBinding("poddProperty", propertyUri);
-        final QueryResultCollector queryResults =
-                RdfUtility.executeTupleQuery(tupleQuery, this.versionAndInferredAndSchemaContexts(artifactID,
-                        repositoryConnection, schemaManagementGraph, artifactManagementGraph));
-        
-        for(final BindingSet binding : queryResults.getBindingSets())
-        {
-            final Value member = binding.getValue("member");
-            results.add((URI)member);
-        }
-        return results;
-    }
-    
-    @Override
-    public Map<URI, URI> getCardinalityValues(final InferredOWLOntologyID artifactID, final URI objectUri,
-            final Collection<URI> propertyUris, final RepositoryConnection repositoryConnection,
-            final URI schemaManagementGraph, final URI artifactManagementGraph) throws OpenRDFException,
-        SchemaManifestException, UnmanagedSchemaIRIException
-    {
-        return this.getCardinalityValues(objectUri, propertyUris, false, repositoryConnection, this
-                .versionAndInferredAndSchemaContexts(artifactID, repositoryConnection, schemaManagementGraph,
+        return this.getCardinalityValues(objectUri, propertyUris, false, permanentConnection, this
+                .versionAndInferredAndSchemaContexts(artifactID, managementConnection, schemaManagementGraph,
                         artifactManagementGraph));
     }
     
@@ -836,7 +768,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
      * value RDFS:Label "value label"
      * 
      * @param objectUri
-     * @param repositoryConnection
+     * @param permanentConnection
      * @param artifactManagementGraph
      * @param contexts
      * 
@@ -847,9 +779,9 @@ public class PoddSesameManagerImpl implements PoddSesameManager
      */
     @Override
     public Model getObjectDetailsForDisplay(final InferredOWLOntologyID artifactID, final URI objectUri,
-            final RepositoryConnection repositoryConnection, final URI schemaManagementGraph,
-            final URI artifactManagementGraph) throws OpenRDFException, SchemaManifestException,
-        UnmanagedSchemaIRIException
+            final RepositoryConnection managementConnection, final RepositoryConnection permanentConnection,
+            final URI schemaManagementGraph, final URI artifactManagementGraph) throws OpenRDFException,
+        SchemaManifestException, UnmanagedSchemaIRIException
     {
         final StringBuilder sb = new StringBuilder(1024);
         
@@ -874,12 +806,12 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         
         sb.append("}");
         
-        final GraphQuery graphQuery = repositoryConnection.prepareGraphQuery(QueryLanguage.SPARQL, sb.toString());
+        final GraphQuery graphQuery = permanentConnection.prepareGraphQuery(QueryLanguage.SPARQL, sb.toString());
         graphQuery.setBinding("poddObject", objectUri);
         
         final Model queryResults =
                 RdfUtility.executeGraphQuery(graphQuery, this.versionAndInferredAndSchemaContexts(artifactID,
-                        repositoryConnection, schemaManagementGraph, artifactManagementGraph));
+                        managementConnection, schemaManagementGraph, artifactManagementGraph));
         
         return queryResults;
     }
@@ -895,7 +827,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
      *            given ontology as well as its imports.
      * @param objectUri
      *            The object whose label and description are sought.
-     * @param repositoryConnection
+     * @param permanentConnection
      * @param artifactManagementGraph
      * @return
      * @throws OpenRDFException
@@ -904,9 +836,9 @@ public class PoddSesameManagerImpl implements PoddSesameManager
      */
     @Override
     public PoddObjectLabel getObjectLabel(final InferredOWLOntologyID ontologyID, final URI objectUri,
-            final RepositoryConnection repositoryConnection, final URI schemaManagementGraph,
-            final URI artifactManagementGraph) throws OpenRDFException, SchemaManifestException,
-        UnmanagedSchemaIRIException
+            final RepositoryConnection managementConnection, final RepositoryConnection permanentConnection,
+            final URI schemaManagementGraph, final URI artifactManagementGraph) throws OpenRDFException,
+        SchemaManifestException, UnmanagedSchemaIRIException
     {
         final StringBuilder sb = new StringBuilder(1024);
         sb.append("SELECT ?label ?description ");
@@ -917,11 +849,11 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         
         this.log.debug("Created SPARQL {} with objectUri bound to {}", sb, objectUri);
         
-        final TupleQuery tupleQuery = repositoryConnection.prepareTupleQuery(QueryLanguage.SPARQL, sb.toString());
+        final TupleQuery tupleQuery = permanentConnection.prepareTupleQuery(QueryLanguage.SPARQL, sb.toString());
         tupleQuery.setBinding("objectUri", objectUri);
         final QueryResultCollector queryResults =
                 RdfUtility.executeTupleQuery(tupleQuery, this.versionAndSchemaContexts(ontologyID,
-                        repositoryConnection, schemaManagementGraph, artifactManagementGraph));
+                        managementConnection, schemaManagementGraph, artifactManagementGraph));
         
         String label = null;
         String description = null;

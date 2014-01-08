@@ -108,6 +108,8 @@ public class AddObjectResourceImplTest extends AbstractResourceImplTest
             
             final String body = this.getText(results);
             
+            this.log.info(body);
+            
             // verify:
             // System.out.println(body);
             Assert.assertTrue("Page title not as expected", body.contains("Add new Project"));

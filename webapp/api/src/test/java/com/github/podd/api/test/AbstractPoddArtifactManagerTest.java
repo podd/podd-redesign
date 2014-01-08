@@ -372,10 +372,10 @@ public abstract class AbstractPoddArtifactManagerTest
             }
             
             // verify:
-            Assert.assertEquals("Not the expected statement count in Model", expectedTripleCount, model.size());
-            Assert.assertEquals("Not the expected no. of properties", expectedPropertyCount,
+            Assert.assertEquals("Different statement count", expectedTripleCount, model.size());
+            Assert.assertEquals("Different property count", expectedPropertyCount,
                     model.filter(objectType, null, null).size());
-            Assert.assertEquals("Not the expected no. of non-displayable properties",
+            Assert.assertEquals("Different non-displayable property count",
                     expectedNonDisplayablePropertyCount, model.filter(null, PODD.PODD_BASE_DO_NOT_DISPLAY, null).size());
         }
     }

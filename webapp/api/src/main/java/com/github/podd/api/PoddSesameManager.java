@@ -157,7 +157,7 @@ public interface PoddSesameManager
      *            The object under consideration
      * @param propertyUris
      *            The property under consideration
-     * @param repositoryConnection
+     * @param permanentConnection
      * @param schemaManagementGraph
      *            TODO
      * @return a URI representing the cardinality value or NULL if no cardinality statements were
@@ -167,8 +167,9 @@ public interface PoddSesameManager
      * @throws UnmanagedSchemaIRIException
      */
     Map<URI, URI> getCardinalityValues(InferredOWLOntologyID artifactID, URI objectUri, Collection<URI> propertyUris,
-            RepositoryConnection repositoryConnection, URI schemaManagementGraph, URI artifactManagementGraph)
-        throws OpenRDFException, SchemaManifestException, UnmanagedSchemaIRIException;
+            RepositoryConnection managementConnection, RepositoryConnection permanentConnection,
+            URI schemaManagementGraph, URI artifactManagementGraph) throws OpenRDFException, SchemaManifestException,
+        UnmanagedSchemaIRIException;
     
     Map<URI, URI> getCardinalityValues(URI objectUri, Collection<URI> propertyUris, boolean findFromType,
             RepositoryConnection repositoryConnection, URI... contexts) throws OpenRDFException;
@@ -271,12 +272,14 @@ public interface PoddSesameManager
             URI... contexts) throws OpenRDFException;
     
     Model getObjectDetailsForDisplay(InferredOWLOntologyID artifactID, URI objectUri,
-            RepositoryConnection repositoryConnection, URI schemaManagementGraph, URI artifactManagementGraph)
-        throws OpenRDFException, SchemaManifestException, UnmanagedSchemaIRIException;
+            RepositoryConnection managementConnection, RepositoryConnection permanentConnection,
+            URI schemaManagementGraph, URI artifactManagementGraph) throws OpenRDFException, SchemaManifestException,
+        UnmanagedSchemaIRIException;
     
     PoddObjectLabel getObjectLabel(InferredOWLOntologyID ontologyID, URI objectUri,
-            RepositoryConnection repositoryConnection, URI schemaManagementGraph, URI artifactManagementGraph)
-        throws OpenRDFException, SchemaManifestException, UnmanagedSchemaIRIException;
+            RepositoryConnection managementConnection, RepositoryConnection permanentConnection,
+            URI schemaManagementGraph, URI artifactManagementGraph) throws OpenRDFException, SchemaManifestException,
+        UnmanagedSchemaIRIException;
     
     /**
      * For a given PODD Object Type, this method retrieves metadata about possible objects that it
@@ -424,10 +427,10 @@ public interface PoddSesameManager
     InferredOWLOntologyID getSchemaVersion(IRI schemaVersionIRI, RepositoryConnection conn, URI schemaManagementGraph)
         throws OpenRDFException, UnmanagedSchemaIRIException;
     
-    URI getTopObjectIRI(InferredOWLOntologyID ontologyIRI, RepositoryConnection repositoryConnection)
+    URI getTopObjectIRI(InferredOWLOntologyID ontologyIRI, RepositoryConnection permanentConnection)
         throws OpenRDFException;
     
-    List<URI> getTopObjects(InferredOWLOntologyID ontologyID, RepositoryConnection repositoryConnection)
+    List<URI> getTopObjects(InferredOWLOntologyID ontologyID, RepositoryConnection permanentConnection)
         throws OpenRDFException;
     
     /**

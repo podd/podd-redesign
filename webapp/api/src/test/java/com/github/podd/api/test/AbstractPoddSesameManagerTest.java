@@ -590,7 +590,8 @@ public abstract class AbstractPoddSesameManagerTest
             final Collection<URI> nextProperty = Arrays.asList(element[1]);
             final Map<URI, URI> cardinalityValue =
                     this.testPoddSesameManager.getCardinalityValues(ontologyID, element[0], nextProperty,
-                            this.testRepositoryConnection, this.schemaGraph, this.artifactGraph);
+                            this.testRepositoryConnection, this.testRepositoryConnection, this.schemaGraph,
+                            this.artifactGraph);
             Assert.assertEquals("Could not find cardinality for: " + nextProperty, 1, cardinalityValue.size());
             Assert.assertTrue("Did not find cardinality for: " + nextProperty, cardinalityValue.containsKey(element[1]));
             Assert.assertEquals("Not the expected cardinality value", element[2], cardinalityValue.get(element[1]));
@@ -997,7 +998,8 @@ public abstract class AbstractPoddSesameManagerTest
         
         final Model displayModel =
                 this.testPoddSesameManager.getObjectDetailsForDisplay(ontologyID, objectUri,
-                        this.testRepositoryConnection, this.schemaGraph, this.artifactGraph);
+                        this.testRepositoryConnection, this.testRepositoryConnection, this.schemaGraph,
+                        this.artifactGraph);
         
         // verify:
         Assert.assertNotNull("Display Model is null", displayModel);
@@ -1030,7 +1032,8 @@ public abstract class AbstractPoddSesameManagerTest
         
         final Model displayModel =
                 this.testPoddSesameManager.getObjectDetailsForDisplay(ontologyID, objectUri,
-                        this.testRepositoryConnection, this.schemaGraph, this.artifactGraph);
+                        this.testRepositoryConnection, this.testRepositoryConnection, this.schemaGraph,
+                        this.artifactGraph);
         
         // verify:
         Assert.assertNotNull("Display Model is null", displayModel);
@@ -1092,7 +1095,7 @@ public abstract class AbstractPoddSesameManagerTest
             
             final PoddObjectLabel objectLabel =
                     this.testPoddSesameManager.getObjectLabel(ontologyID, objectUri, this.testRepositoryConnection,
-                            this.schemaGraph, this.artifactGraph);
+                            this.testRepositoryConnection, this.schemaGraph, this.artifactGraph);
             
             // verify:
             Assert.assertNotNull("PoddObjectLabel was null", objectLabel);

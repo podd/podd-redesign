@@ -608,13 +608,19 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         }
         finally
         {
-            if(managementConnection != null)
+            try
             {
-                managementConnection.close();
+                if(managementConnection != null)
+                {
+                    managementConnection.close();
+                }
             }
-            if(permanentConnection != null)
+            finally
             {
-                permanentConnection.close();
+                if(permanentConnection != null)
+                {
+                    permanentConnection.close();
+                }
             }
         }
     }
@@ -674,20 +680,32 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         throws OpenRDFException, UnmanagedSchemaIRIException, SchemaManifestException, UnsupportedRDFormatException,
         IOException, UnmanagedArtifactIRIException, UnmanagedArtifactVersionException
     {
-        RepositoryConnection conn = null;
+        RepositoryConnection permanentConnection = null;
+        RepositoryConnection managementConnection = null;
         try
         {
             final Set<? extends OWLOntologyID> schemaImports = this.getSchemaImports(ontologyID);
-            conn = this.getRepositoryManager().getPermanentRepository(schemaImports).getConnection();
-            return this.getSesameManager().getObjectDetailsForDisplay(ontologyID, objectUri, conn,
-                    this.getRepositoryManager().getSchemaManagementGraph(),
+            permanentConnection = this.getRepositoryManager().getPermanentRepository(schemaImports).getConnection();
+            managementConnection = this.getRepositoryManager().getManagementRepository().getConnection();
+            return this.getSesameManager().getObjectDetailsForDisplay(ontologyID, objectUri, managementConnection,
+                    permanentConnection, this.getRepositoryManager().getSchemaManagementGraph(),
                     this.getRepositoryManager().getArtifactManagementGraph());
         }
         finally
         {
-            if(conn != null)
+            try
             {
-                conn.close();
+                if(managementConnection != null)
+                {
+                    managementConnection.close();
+                }
+            }
+            finally
+            {
+                if(permanentConnection != null)
+                {
+                    permanentConnection.close();
+                }
             }
         }
     }
@@ -697,20 +715,33 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         throws OpenRDFException, UnmanagedSchemaIRIException, SchemaManifestException, UnsupportedRDFormatException,
         IOException, UnmanagedArtifactIRIException, UnmanagedArtifactVersionException
     {
-        RepositoryConnection conn = null;
+        RepositoryConnection permanentConnection = null;
+        RepositoryConnection managementConnection = null;
         try
         {
             final Set<? extends OWLOntologyID> schemaImports = this.getSchemaImports(ontologyID);
-            conn = this.getRepositoryManager().getPermanentRepository(schemaImports).getConnection();
-            return this.getSesameManager().getObjectLabel(ontologyID, objectUri, conn,
-                    this.getRepositoryManager().getSchemaManagementGraph(),
+            managementConnection = this.getRepositoryManager().getManagementRepository().getConnection();
+            permanentConnection = this.getRepositoryManager().getPermanentRepository(schemaImports).getConnection();
+            
+            return this.getSesameManager().getObjectLabel(ontologyID, objectUri, managementConnection,
+                    permanentConnection, this.getRepositoryManager().getSchemaManagementGraph(),
                     this.getRepositoryManager().getArtifactManagementGraph());
         }
         finally
         {
-            if(conn != null)
+            try
             {
-                conn.close();
+                if(permanentConnection != null && permanentConnection.isOpen())
+                {
+                    permanentConnection.close();
+                }
+            }
+            finally
+            {
+                if(managementConnection != null && managementConnection.isOpen())
+                {
+                    managementConnection.close();
+                }
             }
         }
     }
@@ -742,8 +773,8 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
                             this.getRepositoryManager().getArtifactManagementGraph());
             for(final URI objectType : typesList)
             {
-                results.add(this.getSesameManager().getObjectLabel(artifactId, objectType, permanentConnection,
-                        this.getRepositoryManager().getSchemaManagementGraph(),
+                results.add(this.getSesameManager().getObjectLabel(artifactId, objectType, managementConnection,
+                        permanentConnection, this.getRepositoryManager().getSchemaManagementGraph(),
                         this.getRepositoryManager().getArtifactManagementGraph()));
             }
         }
@@ -781,24 +812,37 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         SchemaManifestException, UnsupportedRDFormatException, IOException, UnmanagedArtifactIRIException,
         UnmanagedArtifactVersionException
     {
-        RepositoryConnection conn = null;
+        RepositoryConnection permanentConnection = null;
+        RepositoryConnection managementConnection = null;
         try
         {
             final Set<? extends OWLOntologyID> schemaImports = this.getSchemaImports(ontologyID);
-            conn = this.getRepositoryManager().getPermanentRepository(schemaImports).getConnection();
+            managementConnection = this.getRepositoryManager().getManagementRepository().getConnection();
+            permanentConnection = this.getRepositoryManager().getPermanentRepository(schemaImports).getConnection();
             
             final URI[] contexts =
-                    this.getSesameManager().versionAndSchemaContexts(ontologyID, conn,
+                    this.getSesameManager().versionAndSchemaContexts(ontologyID, managementConnection,
                             this.getRepositoryManager().getSchemaManagementGraph(),
                             this.getRepositoryManager().getArtifactManagementGraph());
             
-            return this.getSesameManager().getWeightedProperties(objectUri, excludeContainsProperties, conn, contexts);
+            return this.getSesameManager().getWeightedProperties(objectUri, excludeContainsProperties,
+                    permanentConnection, contexts);
         }
         finally
         {
-            if(conn != null)
+            try
             {
-                conn.close();
+                if(permanentConnection != null && permanentConnection.isOpen())
+                {
+                    permanentConnection.close();
+                }
+            }
+            finally
+            {
+                if(managementConnection != null && managementConnection.isOpen())
+                {
+                    managementConnection.close();
+                }
             }
         }
     }
@@ -974,8 +1018,11 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         ConcurrentMap<Set<? extends OWLOntologyID>, RepositoryConnection> cache =
                 new ConcurrentHashMap<Set<? extends OWLOntologyID>, RepositoryConnection>();
         
+        RepositoryConnection managementConnection = null;
+        
         try
         {
+            managementConnection = this.getRepositoryManager().getManagementRepository().getConnection();
             for(final InferredOWLOntologyID artifactId : artifacts)
             {
                 final Set<? extends OWLOntologyID> schemaImports = this.getSchemaImports(artifactId);
@@ -992,25 +1039,35 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
                     permanentConnection = nextConnection;
                 }
                 final URI objectIRI = this.getSesameManager().getTopObjectIRI(artifactId, permanentConnection);
-                results.add(this.getSesameManager().getObjectLabel(artifactId, objectIRI, permanentConnection,
-                        this.getRepositoryManager().getSchemaManagementGraph(),
+                results.add(this.getSesameManager().getObjectLabel(artifactId, objectIRI, managementConnection,
+                        permanentConnection, this.getRepositoryManager().getSchemaManagementGraph(),
                         this.getRepositoryManager().getArtifactManagementGraph()));
             }
         }
         finally
         {
-            for(RepositoryConnection nextPermanentConnection : cache.values())
+            try
             {
-                try
+                for(RepositoryConnection nextPermanentConnection : cache.values())
                 {
-                    if(nextPermanentConnection != null)
+                    try
                     {
-                        nextPermanentConnection.close();
+                        if(nextPermanentConnection != null)
+                        {
+                            nextPermanentConnection.close();
+                        }
+                    }
+                    catch(Throwable e)
+                    {
+                        this.log.error("Found exception closing connection", e);
                     }
                 }
-                catch(Throwable e)
+            }
+            finally
+            {
+                if(managementConnection != null && managementConnection.isOpen())
                 {
-                    this.log.error("Found exception closing connection", e);
+                    managementConnection.close();
                 }
             }
         }
@@ -1726,7 +1783,8 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             final URI[] searchTypes) throws OpenRDFException, UnmanagedSchemaIRIException, SchemaManifestException,
         UnsupportedRDFormatException, IOException, UnmanagedArtifactIRIException, UnmanagedArtifactVersionException
     {
-        RepositoryConnection conn = null;
+        RepositoryConnection permanentConnection = null;
+        RepositoryConnection managementConnection = null;
         
         try
         {
@@ -1741,20 +1799,22 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
                 schemaImports = this.getSchemaManager().getCurrentSchemaOntologies();
             }
             
-            conn = this.getRepositoryManager().getPermanentRepository(schemaImports).getConnection();
+            permanentConnection = this.getRepositoryManager().getPermanentRepository(schemaImports).getConnection();
+            managementConnection = this.getRepositoryManager().getManagementRepository().getConnection();
             final URI[] contexts =
-                    this.getSesameManager().versionAndInferredAndSchemaContexts(ontologyID, conn,
+                    this.getSesameManager().versionAndInferredAndSchemaContexts(ontologyID, managementConnection,
                             this.getRepositoryManager().getSchemaManagementGraph(),
                             this.getRepositoryManager().getArtifactManagementGraph());
-            return this.getSesameManager().searchOntologyLabels(searchTerm, searchTypes, 1000, 0, conn, contexts);
+            return this.getSesameManager().searchOntologyLabels(searchTerm, searchTypes, 1000, 0, permanentConnection,
+                    contexts);
         }
         catch(final Throwable e)
         {
             try
             {
-                if(conn != null && conn.isActive())
+                if(permanentConnection != null && permanentConnection.isActive())
                 {
-                    conn.rollback();
+                    permanentConnection.rollback();
                 }
             }
             catch(final RepositoryException e1)
@@ -1768,9 +1828,9 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         {
             try
             {
-                if(conn != null && conn.isOpen())
+                if(permanentConnection != null && permanentConnection.isOpen())
                 {
-                    conn.close();
+                    permanentConnection.close();
                 }
             }
             catch(final RepositoryException e)
