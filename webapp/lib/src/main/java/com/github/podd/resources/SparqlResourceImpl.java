@@ -23,6 +23,8 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.Model;
@@ -300,16 +302,28 @@ public class SparqlResourceImpl extends AbstractPoddResourceImpl
         RepositoryConnection managementConnection = null;
         try
         {
+            ConcurrentMap<Set<? extends OWLOntologyID>, RepositoryConnection> cache =
+                    new ConcurrentHashMap<Set<? extends OWLOntologyID>, RepositoryConnection>();
+            
             managementConnection = this.getPoddRepositoryManager().getManagementRepository().getConnection();
-            for(final InferredOWLOntologyID ontologyID : artifactIds)
+            try
             {
-                RepositoryConnection permanentConnection = null;
-                try
+                for(final InferredOWLOntologyID ontologyID : artifactIds)
                 {
                     final Set<? extends OWLOntologyID> schemaImports =
                             this.getPoddArtifactManager().getSchemaImports(ontologyID);
-                    permanentConnection =
-                            this.getPoddRepositoryManager().getPermanentRepository(schemaImports).getConnection();
+                    RepositoryConnection permanentConnection = cache.get(schemaImports);
+                    if(permanentConnection == null)
+                    {
+                        RepositoryConnection nextConnection =
+                                this.getPoddRepositoryManager().getPermanentRepository(schemaImports).getConnection();
+                        RepositoryConnection putIfAbsent = cache.putIfAbsent(schemaImports, nextConnection);
+                        if(putIfAbsent != null)
+                        {
+                            nextConnection = putIfAbsent;
+                        }
+                        permanentConnection = nextConnection;
+                    }
                     final Set<URI> contextSet = new HashSet<>();
                     if(includeConcrete)
                     {
@@ -353,20 +367,21 @@ public class SparqlResourceImpl extends AbstractPoddResourceImpl
                                 ontologyID, contextSet);
                     }
                 }
-                finally
+            }
+            finally
+            {
+                for(RepositoryConnection nextPermanentConnection : cache.values())
                 {
-                    if(permanentConnection != null)
+                    try
                     {
-                        try
+                        if(nextPermanentConnection != null)
                         {
-                            permanentConnection.close();
+                            nextPermanentConnection.close();
                         }
-                        catch(final RepositoryException e)
-                        {
-                            // TODO Auto-generated catch block
-                            e.printStackTrace();
-                            this.log.error("Could not close repository connection: ", e);
-                        }
+                    }
+                    catch(Throwable e)
+                    {
+                        this.log.error("Found exception closing connection", e);
                     }
                 }
             }
