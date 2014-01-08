@@ -108,7 +108,7 @@ public class AddObjectResourceImplTest extends AbstractResourceImplTest
             
             final String body = this.getText(results);
             
-            this.log.info(body);
+            // this.log.trace(body);
             
             // verify:
             // System.out.println(body);
