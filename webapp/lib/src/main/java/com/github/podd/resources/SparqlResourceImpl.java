@@ -300,6 +300,7 @@ public class SparqlResourceImpl extends AbstractPoddResourceImpl
         RepositoryConnection managementConnection = null;
         try
         {
+            managementConnection = this.getPoddRepositoryManager().getManagementRepository().getConnection();
             for(final InferredOWLOntologyID ontologyID : artifactIds)
             {
                 RepositoryConnection permanentConnection = null;
