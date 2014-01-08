@@ -323,10 +323,7 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
     @Override
     public void setOwlManager(final PoddOWLManager owlManager)
     {
-        synchronized(this)
-        {
-            this.owlManager = owlManager;
-        }
+        this.owlManager = owlManager;
     }
     
     @Override
