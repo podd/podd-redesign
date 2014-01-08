@@ -465,7 +465,7 @@ public abstract class AbstractPoddSchemaManagerTest
         }
         catch(final UnmanagedSchemaIRIException e)
         {
-            Assert.assertEquals("This IRI does not refer to a managed ontology", e.getMessage());
+            Assert.assertTrue(e.getMessage().contains("This IRI does not refer to a managed ontology"));
             Assert.assertEquals(testInputIri, e.getOntologyID());
         }
     }
@@ -664,7 +664,7 @@ public abstract class AbstractPoddSchemaManagerTest
         }
         catch(final UnmanagedSchemaIRIException e)
         {
-            Assert.assertEquals("This IRI does not refer to a managed ontology", e.getMessage());
+            Assert.assertTrue(e.getMessage().contains("This IRI does not refer to a managed ontology"));
             Assert.assertEquals(inputVersionIri, e.getOntologyID());
         }
     }
