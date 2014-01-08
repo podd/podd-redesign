@@ -33,6 +33,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.Literal;
@@ -725,29 +727,29 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         IOException, UnmanagedArtifactIRIException, UnmanagedArtifactVersionException
     {
         final List<PoddObjectLabel> results = new ArrayList<PoddObjectLabel>();
-        RepositoryConnection conn = null;
+        RepositoryConnection permanentConnection = null;
         
         try
         {
             final Set<? extends OWLOntologyID> schemaImports = this.getSchemaImports(artifactId);
-            conn = this.getRepositoryManager().getPermanentRepository(schemaImports).getConnection();
+            permanentConnection = this.getRepositoryManager().getPermanentRepository(schemaImports).getConnection();
             
             final List<URI> typesList =
-                    this.getSesameManager().getObjectTypes(artifactId, objectUri, conn,
+                    this.getSesameManager().getObjectTypes(artifactId, objectUri, permanentConnection,
                             this.getRepositoryManager().getSchemaManagementGraph(),
                             this.getRepositoryManager().getArtifactManagementGraph());
             for(final URI objectType : typesList)
             {
-                results.add(this.getSesameManager().getObjectLabel(artifactId, objectType, conn,
+                results.add(this.getSesameManager().getObjectLabel(artifactId, objectType, permanentConnection,
                         this.getRepositoryManager().getSchemaManagementGraph(),
                         this.getRepositoryManager().getArtifactManagementGraph()));
             }
         }
         finally
         {
-            if(conn != null)
+            if(permanentConnection != null)
             {
-                conn.close();
+                permanentConnection.close();
             }
         }
         
@@ -952,27 +954,46 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         IOException, UnmanagedArtifactIRIException, UnmanagedArtifactVersionException
     {
         final List<PoddObjectLabel> results = new ArrayList<PoddObjectLabel>();
-        RepositoryConnection conn = null;
+        ConcurrentMap<Set<? extends OWLOntologyID>, RepositoryConnection> cache =
+                new ConcurrentHashMap<Set<? extends OWLOntologyID>, RepositoryConnection>();
         
-        for(final InferredOWLOntologyID artifactId : artifacts)
+        try
         {
-            try
+            for(final InferredOWLOntologyID artifactId : artifacts)
             {
                 final Set<? extends OWLOntologyID> schemaImports = this.getSchemaImports(artifactId);
-                // TODO: Should be a simple way to avoid creating multiple
-                // connections here
-                conn = this.getRepositoryManager().getPermanentRepository(schemaImports).getConnection();
-                
-                final URI objectIRI = this.getSesameManager().getTopObjectIRI(artifactId, conn);
-                results.add(this.getSesameManager().getObjectLabel(artifactId, objectIRI, conn,
+                RepositoryConnection permanentConnection = cache.get(schemaImports);
+                if(permanentConnection == null)
+                {
+                    RepositoryConnection nextConnection =
+                            this.getRepositoryManager().getPermanentRepository(schemaImports).getConnection();
+                    RepositoryConnection putIfAbsent = cache.putIfAbsent(schemaImports, nextConnection);
+                    if(putIfAbsent != null)
+                    {
+                        nextConnection = putIfAbsent;
+                    }
+                    permanentConnection = nextConnection;
+                }
+                final URI objectIRI = this.getSesameManager().getTopObjectIRI(artifactId, permanentConnection);
+                results.add(this.getSesameManager().getObjectLabel(artifactId, objectIRI, permanentConnection,
                         this.getRepositoryManager().getSchemaManagementGraph(),
                         this.getRepositoryManager().getArtifactManagementGraph()));
             }
-            finally
+        }
+        finally
+        {
+            for(RepositoryConnection nextPermanentConnection : cache.values())
             {
-                if(conn != null)
+                try
                 {
-                    conn.close();
+                    if(nextPermanentConnection != null)
+                    {
+                        nextPermanentConnection.close();
+                    }
+                }
+                catch(Throwable e)
+                {
+                    this.log.error("Found exception closing connection", e);
                 }
             }
         }

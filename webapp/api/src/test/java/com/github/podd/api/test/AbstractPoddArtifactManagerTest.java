@@ -1269,6 +1269,107 @@ public abstract class AbstractPoddArtifactManagerTest
         Assert.assertNotNull("File Reference Manager was null", this.testArtifactManager.getDataReferenceManager());
     }
     
+    /**
+     * Test that the schema contexts work after using
+     * {@link PoddArtifactManager#loadArtifact(InputStream, RDFFormat)}
+     * 
+     * @throws Exception
+     */
+    @Test
+    public final void testSchemaContexts() throws Exception
+    {
+        List<InferredOWLOntologyID> schemaOntologies = this.loadVersion1SchemaOntologies();
+        
+        // prepare: upload a test artifact
+        final InputStream inputStream1 = this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_20130206);
+        final InferredOWLOntologyID artifactIDv1 =
+                this.testArtifactManager.loadArtifact(inputStream1, RDFFormat.TURTLE);
+        this.verifyLoadedArtifact(artifactIDv1, 12, TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES,
+                TestConstants.TEST_ARTIFACT_BASIC_1_20130206_INFERRED_TRIPLES, false);
+        
+        URI[] schemaContexts =
+                this.testArtifactManager.getSesameManager().schemaContexts(artifactIDv1, testManagementConnection,
+                        schemaGraph, artifactGraph);
+        
+        Assert.assertEquals(6, schemaContexts.length);
+        
+        Set<URI> schemaUris = new HashSet<>(Arrays.asList(schemaContexts));
+        
+        for(InferredOWLOntologyID nextSchemaOntology : schemaOntologies)
+        {
+            Assert.assertTrue(schemaUris.contains(nextSchemaOntology.getVersionIRI().toOpenRDFURI()));
+        }
+    }
+    
+    /**
+     * Test that the schema contexts work after using
+     * {@link PoddArtifactManager#loadArtifact(InputStream, RDFFormat)}
+     * 
+     * @throws Exception
+     */
+    @Test
+    public final void testVersionSchemaContexts() throws Exception
+    {
+        List<InferredOWLOntologyID> schemaOntologies = this.loadVersion1SchemaOntologies();
+        
+        // prepare: upload a test artifact
+        final InputStream inputStream1 = this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_20130206);
+        final InferredOWLOntologyID artifactIDv1 =
+                this.testArtifactManager.loadArtifact(inputStream1, RDFFormat.TURTLE);
+        this.verifyLoadedArtifact(artifactIDv1, 12, TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES,
+                TestConstants.TEST_ARTIFACT_BASIC_1_20130206_INFERRED_TRIPLES, false);
+        
+        URI[] schemaContexts =
+                this.testArtifactManager.getSesameManager().versionAndSchemaContexts(artifactIDv1,
+                        testManagementConnection, schemaGraph, artifactGraph);
+        
+        Assert.assertEquals(7, schemaContexts.length);
+        
+        Set<URI> schemaUris = new HashSet<>(Arrays.asList(schemaContexts));
+        
+        Assert.assertTrue(schemaUris.contains(artifactIDv1.getVersionIRI().toOpenRDFURI()));
+        
+        for(InferredOWLOntologyID nextSchemaOntology : schemaOntologies)
+        {
+            Assert.assertTrue(schemaUris.contains(nextSchemaOntology.getVersionIRI().toOpenRDFURI()));
+        }
+    }
+    
+    /**
+     * Test that the schema contexts work after using
+     * {@link PoddArtifactManager#loadArtifact(InputStream, RDFFormat)}
+     * 
+     * @throws Exception
+     */
+    @Test
+    public final void testVersionInferredSchemaContexts() throws Exception
+    {
+        List<InferredOWLOntologyID> schemaOntologies = this.loadVersion1SchemaOntologies();
+        
+        // prepare: upload a test artifact
+        final InputStream inputStream1 = this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_20130206);
+        final InferredOWLOntologyID artifactIDv1 =
+                this.testArtifactManager.loadArtifact(inputStream1, RDFFormat.TURTLE);
+        this.verifyLoadedArtifact(artifactIDv1, 12, TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES,
+                TestConstants.TEST_ARTIFACT_BASIC_1_20130206_INFERRED_TRIPLES, false);
+        
+        URI[] schemaContexts =
+                this.testArtifactManager.getSesameManager().versionAndInferredAndSchemaContexts(artifactIDv1,
+                        testManagementConnection, schemaGraph, artifactGraph);
+        
+        Assert.assertEquals(8, schemaContexts.length);
+        
+        Set<URI> schemaUris = new HashSet<>(Arrays.asList(schemaContexts));
+        
+        Assert.assertTrue(schemaUris.contains(artifactIDv1.getVersionIRI().toOpenRDFURI()));
+        Assert.assertTrue(schemaUris.contains(artifactIDv1.getInferredOntologyIRI().toOpenRDFURI()));
+        
+        for(InferredOWLOntologyID nextSchemaOntology : schemaOntologies)
+        {
+            Assert.assertTrue(schemaUris.contains(nextSchemaOntology.getVersionIRI().toOpenRDFURI()));
+        }
+    }
+    
     @Test
     public final void testGetObjectTypes() throws Exception
     {
@@ -1296,7 +1397,7 @@ public abstract class AbstractPoddArtifactManagerTest
         
         for(final Object[] element : testData)
         {
-            final URI objectUri = ValueFactoryImpl.getInstance().createURI(element[0].toString());
+            final URI objectUri = PODD.VF.createURI(element[0].toString());
             final int expectedStatementCount = (int)element[1];
             
             final List<PoddObjectLabel> list = this.testArtifactManager.getObjectTypes(artifactIDv1, objectUri);
@@ -1306,7 +1407,7 @@ public abstract class AbstractPoddArtifactManagerTest
             Assert.assertEquals("Unexpected no. of statements", expectedStatementCount, list.size());
             if(expectedStatementCount == 1)
             {
-                final URI expectedType = ValueFactoryImpl.getInstance().createURI(element[2].toString());
+                final URI expectedType = PODD.VF.createURI(element[2].toString());
                 Assert.assertEquals("Not the expected type", expectedType, list.get(0).getObjectURI());
             }
         }
