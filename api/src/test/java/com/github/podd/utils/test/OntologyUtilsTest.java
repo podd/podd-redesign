@@ -584,7 +584,7 @@ public class OntologyUtilsTest
     }
     
     @Test
-    public void testGetSchemaManifestImportsActualManifestPoddV1And2() throws Exception
+    public void testGetSchemaManifestImportsRealisticPoddV1() throws Exception
     {
         final Model model =
                 Rio.parse(this.getClass().getResourceAsStream("/test/test-podd-schema-manifest.ttl"), "",
@@ -609,6 +609,35 @@ public class OntologyUtilsTest
         Assert.assertEquals(this.testPoddBaseV1, schemaManifestImports.get(3));
         Assert.assertEquals(this.testPoddScienceV1, schemaManifestImports.get(4));
         Assert.assertEquals(this.testPoddPlantV1, schemaManifestImports.get(5));
+        
+    }
+    
+    @Test
+    public void testGetSchemaManifestImportsRealisticPoddV2() throws Exception
+    {
+        final Model model =
+                Rio.parse(this.getClass().getResourceAsStream("/test/test-podd-schema-manifest.ttl"), "",
+                        RDFFormat.TURTLE);
+        
+        // DebugUtils.printContents(model);
+        final List<OWLOntologyID> schemaManifestImports =
+                OntologyUtils.schemaManifestImports(model,
+                        new HashSet<OWLOntologyID>(Arrays.asList(this.testPoddPlantV2)));
+        
+        Assert.assertNotNull(schemaManifestImports);
+        Assert.assertEquals(6, schemaManifestImports.size());
+        Assert.assertTrue(schemaManifestImports.contains(this.testPoddDcV2));
+        Assert.assertTrue(schemaManifestImports.contains(this.testPoddFoafV2));
+        Assert.assertTrue(schemaManifestImports.contains(this.testPoddUserV2));
+        Assert.assertTrue(schemaManifestImports.contains(this.testPoddBaseV2));
+        Assert.assertTrue(schemaManifestImports.contains(this.testPoddScienceV2));
+        Assert.assertTrue(schemaManifestImports.contains(this.testPoddPlantV2));
+        Assert.assertEquals(this.testPoddDcV2, schemaManifestImports.get(0));
+        Assert.assertEquals(this.testPoddFoafV2, schemaManifestImports.get(1));
+        Assert.assertEquals(this.testPoddUserV2, schemaManifestImports.get(2));
+        Assert.assertEquals(this.testPoddBaseV2, schemaManifestImports.get(3));
+        Assert.assertEquals(this.testPoddScienceV2, schemaManifestImports.get(4));
+        Assert.assertEquals(this.testPoddPlantV2, schemaManifestImports.get(5));
         
     }
     
