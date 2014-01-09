@@ -309,7 +309,7 @@ public class OntologyUtils
         }
         else
         {
-            for(final Value nextImport : imports)
+            for(Value nextImport : imports)
             {
                 if(nextImport instanceof URI)
                 {
@@ -321,9 +321,11 @@ public class OntologyUtils
                     
                     if(currentVersionsMap.containsKey(nextImport))
                     {
+                        // Replace next import with the version
+                        nextImport = currentVersionsMap.get(nextImport);
                         // Map down to the current version to ensure that we can load multiple
                         // versions simultaneously (if possible with the rest of the system)
-                        nextImportsSet.add(currentVersionsMap.get(nextImport));
+                        nextImportsSet.add((URI)nextImport);
                     }
                     else if(currentVersionsMap.containsValue(nextImport))
                     {
@@ -347,7 +349,8 @@ public class OntologyUtils
                                 {
                                     // Randomly choose one, as the ontology does not have a current
                                     // version, but it does have some version information
-                                    nextImportsSet.add(nextEntry.getValue().iterator().next());
+                                    nextImport = nextEntry.getValue().iterator().next();
+                                    nextImportsSet.add((URI)nextImport);
                                 }
                                 foundAllVersion = true;
                                 break;
