@@ -21,7 +21,6 @@ import java.io.InputStream;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map.Entry;
@@ -92,8 +91,8 @@ public class OntologyUtils
         
         final Set<OWLOntologyID> results = new LinkedHashSet<OWLOntologyID>();
         
-        final Set<URI> schemaOntologyUris = new HashSet<>();
-        final Set<URI> schemaVersionUris = new HashSet<>();
+        final Set<URI> schemaOntologyUris = new LinkedHashSet<>();
+        final Set<URI> schemaVersionUris = new LinkedHashSet<>();
         final ConcurrentMap<URI, Set<URI>> importsMap = new ConcurrentHashMap<>(schemaOntologyUris.size());
         
         OntologyUtils.extractOntologyAndVersions(model, schemaOntologyUris, schemaVersionUris);
@@ -107,7 +106,7 @@ public class OntologyUtils
         final List<URI> orderImports =
                 OntologyUtils.orderImports(model, schemaOntologyUris, schemaVersionUris, importsMap, true);
         
-        final Set<URI> artifactImports = new HashSet<>();
+        final Set<URI> artifactImports = new LinkedHashSet<>();
         
         // Be tolerant for artifacts and add imports for both the ontology and the version
         OntologyUtils.recursiveFollowImports(artifactImports, importsMap, artifactID.getOntologyIRI().toOpenRDFURI());
@@ -250,7 +249,7 @@ public class OntologyUtils
             final ConcurrentMap<URI, Set<URI>> allVersionsMap, final URI nextSchemaOntologyUri)
     {
         final Set<Value> allVersions = model.filter(nextSchemaOntologyUri, OWL.VERSIONIRI, null).objects();
-        Set<URI> nextAllVersions = new HashSet<>();
+        Set<URI> nextAllVersions = new LinkedHashSet<>();
         final Set<URI> putIfAbsent = allVersionsMap.putIfAbsent(nextSchemaOntologyUri, nextAllVersions);
         if(putIfAbsent != null)
         {
@@ -717,8 +716,8 @@ public class OntologyUtils
         
         final Set<OWLOntologyID> results = new LinkedHashSet<OWLOntologyID>();
         
-        final Set<URI> schemaOntologyUris = new HashSet<>();
-        final Set<URI> schemaVersionUris = new HashSet<>();
+        final Set<URI> schemaOntologyUris = new LinkedHashSet<>();
+        final Set<URI> schemaVersionUris = new LinkedHashSet<>();
         final ConcurrentMap<URI, Set<URI>> importsMap = new ConcurrentHashMap<>(schemaOntologyUris.size());
         
         OntologyUtils.extractOntologyAndVersions(model, schemaOntologyUris, schemaVersionUris);
@@ -726,7 +725,7 @@ public class OntologyUtils
         final List<URI> orderImports =
                 OntologyUtils.orderImports(model, schemaOntologyUris, schemaVersionUris, importsMap, true);
         
-        final Set<URI> artifactImports = new HashSet<>();
+        final Set<URI> artifactImports = new LinkedHashSet<>();
         
         for(final OWLOntologyID nextDependentSchemaOntology : dependentSchemaOntologies)
         {
