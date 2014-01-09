@@ -24,6 +24,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -755,8 +756,8 @@ public class OntologyUtilsTest
         model.add(this.testImportVersionUri4, RDF.TYPE, OWL.ONTOLOGY);
         model.add(this.testImportVersionUri3, OWL.IMPORTS, this.testImportVersionUri4);
         
-        final Set<URI> schemaOntologyUris = new HashSet<URI>();
-        final Set<URI> schemaVersionUris = new HashSet<URI>();
+        final Set<URI> schemaOntologyUris = new LinkedHashSet<URI>();
+        final Set<URI> schemaVersionUris = new LinkedHashSet<URI>();
         
         schemaOntologyUris.add(this.testOntologyUri1);
         schemaOntologyUris.add(this.testImportOntologyUri1);
