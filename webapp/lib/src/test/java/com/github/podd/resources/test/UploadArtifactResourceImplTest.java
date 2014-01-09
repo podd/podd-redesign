@@ -17,6 +17,7 @@
 package com.github.podd.resources.test;
 
 import java.io.InputStream;
+import java.io.StringReader;
 import java.util.Collection;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
@@ -32,6 +33,7 @@ import org.openrdf.model.Resource;
 import org.openrdf.model.vocabulary.RDF;
 import org.openrdf.model.vocabulary.RDFS;
 import org.openrdf.rio.RDFFormat;
+import org.openrdf.rio.Rio;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Status;
@@ -41,6 +43,7 @@ import org.restlet.representation.Representation;
 import org.restlet.resource.ClientResource;
 import org.restlet.resource.ResourceException;
 
+import com.github.ansell.restletutils.RestletUtilMediaType;
 import com.github.ansell.restletutils.test.RestletTestUtils;
 import com.github.podd.api.test.TestConstants;
 import com.github.podd.exception.OntologyNotInProfileException;
@@ -55,6 +58,36 @@ import com.github.podd.utils.PoddWebConstants;
  */
 public class UploadArtifactResourceImplTest extends AbstractResourceImplTest
 {
+    @Test
+    public void testUploadNewProjectTemplate() throws Exception
+    {
+        // Rio.write(Rio.parse(this.getClass().getResourceAsStream("/test/artifacts/new-project-template.rj"),
+        // "", RDFFormat.RDFJSON), System.out, RDFFormat.RDFJSON);
+        
+        final ClientResource uploadArtifactClientResource =
+                new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_UPLOAD));
+        try
+        {
+            final Representation input =
+                    this.buildRepresentationFromResource("/test/artifacts/new-project-template.rj",
+                            RestletUtilMediaType.APPLICATION_RDF_JSON);
+            
+            final Representation results =
+                    RestletTestUtils.doTestAuthenticatedRequest(uploadArtifactClientResource, Method.POST, input,
+                            RestletUtilMediaType.APPLICATION_RDF_JSON, Status.SUCCESS_OK,
+                            AbstractResourceImplTest.WITH_ADMIN);
+            
+            // verify: results (expecting the added artifact's ontology IRI)
+            final String body = this.getText(results);
+            
+            this.assertRdf(new StringReader(body), RDFFormat.RDFJSON, 6);
+        }
+        finally
+        {
+            this.releaseClient(uploadArtifactClientResource);
+        }
+    }
+    
     /**
      * Test Upload attempt with an artifact that is inconsistent. Results in an HTTP 500 Internal
      * Server Error with detailed error causes in the RDF body.
@@ -267,7 +300,7 @@ public class UploadArtifactResourceImplTest extends AbstractResourceImplTest
         }
     }
     
-    @Ignore("When this test is active, it seems to slow down other tests so far that they don't complete normally")
+    // @Ignore("When this test is active, it seems to slow down other tests so far that they don't complete normally")
     @Test
     public final void testLoadArtifactConcurrency() throws Exception
     {

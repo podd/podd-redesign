@@ -1,0 +1,81 @@
+{
+  "mailto:initial.admin.user@example.com" : {
+    "http://www.w3.org/1999/02/22-rdf-syntax-ns#type" : [ {
+      "value" : "http://purl.org/podd/ns/poddUser#User",
+      "type" : "uri"
+    } ]
+  },
+  "urn:temp:uuid:artifact" : {
+    "http://purl.org/podd/ns/poddBase#artifactHasTopObject" : [ {
+      "value" : "urn:temp:uuid:object",
+      "type" : "uri"
+    } ],
+    "http://www.w3.org/1999/02/22-rdf-syntax-ns#type" : [ {
+      "value" : "http://www.w3.org/2002/07/owl#Ontology",
+      "type" : "uri"
+    } ],
+    "http://www.w3.org/2002/07/owl#imports" : [ {
+      "value" : "http://purl.org/podd/ns/version/dcTerms/1",
+      "type" : "uri"
+    }, {
+      "value" : "http://purl.org/podd/ns/version/foaf/1",
+      "type" : "uri"
+    }, {
+      "value" : "http://purl.org/podd/ns/version/poddBase/1",
+      "type" : "uri"
+    }, {
+      "value" : "http://purl.org/podd/ns/version/poddPlant/1",
+      "type" : "uri"
+    }, {
+      "value" : "http://purl.org/podd/ns/version/poddScience/1",
+      "type" : "uri"
+    }, {
+      "value" : "http://purl.org/podd/ns/version/poddUser/1",
+      "type" : "uri"
+    } ]
+  },
+  "urn:temp:uuid:object" : {
+    "http://purl.org/dc/terms/creator" : [ {
+      "value" : "mailto:initial.admin.user@example.com",
+      "type" : "uri"
+    } ],
+    "http://purl.org/podd/ns/poddBase#createdAt" : [ {
+      "value" : "1970-01-01T00:00:00",
+      "type" : "literal",
+      "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime"
+    } ],
+    "http://purl.org/podd/ns/poddBase#hasCompletionDate" : [ {
+      "value" : "2014-01-18",
+      "type" : "literal",
+      "datatype" : "http://www.w3.org/2001/XMLSchema#date"
+    } ],
+    "http://purl.org/podd/ns/poddBase#hasLeadInstitution" : [ {
+      "value" : "CSIRO",
+      "type" : "literal",
+      "datatype" : "http://www.w3.org/2001/XMLSchema#string"
+    } ],
+    "http://purl.org/podd/ns/poddBase#hasStartDate" : [ {
+      "value" : "2014-01-17",
+      "type" : "literal",
+      "datatype" : "http://www.w3.org/2001/XMLSchema#date"
+    } ],
+    "http://purl.org/podd/ns/poddBase#lastModified" : [ {
+      "value" : "1970-01-01T00:00:00",
+      "type" : "literal",
+      "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime"
+    } ],
+    "http://purl.org/podd/ns/poddScience#hasANZSRC" : [ {
+      "value" : "http://purl.org/podd/ns/poddScience#ANZSRC10-Technology",
+      "type" : "uri"
+    } ],
+    "http://www.w3.org/1999/02/22-rdf-syntax-ns#type" : [ {
+      "value" : "http://purl.org/podd/ns/poddScience#Project",
+      "type" : "uri"
+    } ],
+    "http://www.w3.org/2000/01/rdf-schema#label" : [ {
+      "value" : "Test project",
+      "type" : "literal",
+      "datatype" : "http://www.w3.org/2001/XMLSchema#string"
+    } ]
+  }
+}

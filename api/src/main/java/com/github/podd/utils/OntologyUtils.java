@@ -112,7 +112,11 @@ public class OntologyUtils
         // Be tolerant for artifacts and add imports for both the ontology and the version
         OntologyUtils.recursiveFollowImports(artifactImports, importsMap, artifactID.getOntologyIRI().toOpenRDFURI());
         
-        OntologyUtils.recursiveFollowImports(artifactImports, importsMap, artifactID.getVersionIRI().toOpenRDFURI());
+        if(artifactID.getVersionIRI() != null)
+        {
+            OntologyUtils
+                    .recursiveFollowImports(artifactImports, importsMap, artifactID.getVersionIRI().toOpenRDFURI());
+        }
         
         final List<InferredOWLOntologyID> ontologyIDs = OntologyUtils.modelToOntologyIDs(model, true, false);
         
