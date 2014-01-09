@@ -383,6 +383,8 @@ public class OntologyUtils
         OntologyUtils.log.debug("adding import for {} at {}", nextOntologyUri, maxIndex);
         // TODO: FIXME: This will not allow for multiple versions of a single schema ontology at the
         // same time if they have any shared import versions
+        // FIXME: This has an iteration order bug if ontologies are processed before any of their
+        // close precedents
         importOrder.add(maxIndex, nextOntologyUri);
     }
     
