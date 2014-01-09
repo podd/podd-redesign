@@ -26,14 +26,12 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.openrdf.model.Model;
 import org.openrdf.model.Resource;
 import org.openrdf.model.vocabulary.RDF;
 import org.openrdf.model.vocabulary.RDFS;
 import org.openrdf.rio.RDFFormat;
-import org.openrdf.rio.Rio;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Status;
@@ -58,36 +56,6 @@ import com.github.podd.utils.PoddWebConstants;
  */
 public class UploadArtifactResourceImplTest extends AbstractResourceImplTest
 {
-    @Test
-    public void testUploadNewProjectTemplate() throws Exception
-    {
-        // Rio.write(Rio.parse(this.getClass().getResourceAsStream("/test/artifacts/new-project-template.rj"),
-        // "", RDFFormat.RDFJSON), System.out, RDFFormat.RDFJSON);
-        
-        final ClientResource uploadArtifactClientResource =
-                new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_UPLOAD));
-        try
-        {
-            final Representation input =
-                    this.buildRepresentationFromResource("/test/artifacts/new-project-template.rj",
-                            RestletUtilMediaType.APPLICATION_RDF_JSON);
-            
-            final Representation results =
-                    RestletTestUtils.doTestAuthenticatedRequest(uploadArtifactClientResource, Method.POST, input,
-                            RestletUtilMediaType.APPLICATION_RDF_JSON, Status.SUCCESS_OK,
-                            AbstractResourceImplTest.WITH_ADMIN);
-            
-            // verify: results (expecting the added artifact's ontology IRI)
-            final String body = this.getText(results);
-            
-            this.assertRdf(new StringReader(body), RDFFormat.RDFJSON, 6);
-        }
-        finally
-        {
-            this.releaseClient(uploadArtifactClientResource);
-        }
-    }
-    
     /**
      * Test Upload attempt with an artifact that is inconsistent. Results in an HTTP 500 Internal
      * Server Error with detailed error causes in the RDF body.
@@ -540,6 +508,40 @@ public class UploadArtifactResourceImplTest extends AbstractResourceImplTest
             Assert.assertEquals("More than 1 ontology ID in response", 1, ontologyIDs.size());
             Assert.assertTrue("Ontology ID not of expected format",
                     ontologyIDs.iterator().next().toString().contains("artifact:1:version:1"));
+        }
+        finally
+        {
+            this.releaseClient(uploadArtifactClientResource);
+        }
+    }
+    
+    @Test
+    public void testUploadNewProjectTemplate() throws Exception
+    {
+        // Rio.write(Rio.parse(this.getClass().getResourceAsStream("/test/artifacts/new-project-template.rj"),
+        // "", RDFFormat.RDFJSON), System.out, RDFFormat.RDFJSON);
+        
+        final ClientResource uploadArtifactClientResource =
+                new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_UPLOAD));
+        try
+        {
+            final Representation input =
+                    this.buildRepresentationFromResource("/test/artifacts/new-project-template.rj",
+                            RestletUtilMediaType.APPLICATION_RDF_JSON);
+            
+            final Representation results =
+                    RestletTestUtils.doTestAuthenticatedRequest(uploadArtifactClientResource, Method.POST, input,
+                            RestletUtilMediaType.APPLICATION_RDF_JSON, Status.SUCCESS_OK,
+                            AbstractResourceImplTest.WITH_ADMIN);
+            
+            // verify: results (expecting the added artifact's ontology IRI)
+            final String body = this.getText(results);
+            
+            final Model model = this.assertRdf(new StringReader(body), RDFFormat.RDFJSON, 6);
+            
+            Assert.assertEquals(3, model.subjects().size());
+            Assert.assertEquals(3, model.predicates().size());
+            Assert.assertEquals(5, model.objects().size());
         }
         finally
         {
