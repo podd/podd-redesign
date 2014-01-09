@@ -823,6 +823,97 @@ public class OntologyUtilsTest
     }
     
     @Test
+    public void testImportsOrderFourLevelsOutOfOrder() throws Exception
+    {
+        final Model model = new LinkedHashModel();
+        OntologyUtils.ontologyIDsToModel(Arrays.asList(this.testOntologyID), model);
+        model.add(this.testVersionUri1, OWL.IMPORTS, this.testImportOntologyUri1);
+        model.add(this.testImportOntologyUri1, RDF.TYPE, OWL.ONTOLOGY);
+        model.add(this.testImportOntologyUri1, OWL.VERSIONIRI, this.testImportVersionUri1);
+        model.add(this.testImportVersionUri1, RDF.TYPE, OWL.ONTOLOGY);
+        
+        model.add(this.testImportOntologyUri2, RDF.TYPE, OWL.ONTOLOGY);
+        model.add(this.testImportOntologyUri2, OWL.VERSIONIRI, this.testImportVersionUri2);
+        model.add(this.testImportVersionUri2, RDF.TYPE, OWL.ONTOLOGY);
+        model.add(this.testImportVersionUri1, OWL.IMPORTS, this.testImportVersionUri2);
+        
+        model.add(this.testImportOntologyUri3, RDF.TYPE, OWL.ONTOLOGY);
+        model.add(this.testImportOntologyUri3, OWL.VERSIONIRI, this.testImportVersionUri3);
+        model.add(this.testImportVersionUri3, RDF.TYPE, OWL.ONTOLOGY);
+        model.add(this.testImportVersionUri2, OWL.IMPORTS, this.testImportVersionUri3);
+        
+        model.add(this.testImportOntologyUri4, RDF.TYPE, OWL.ONTOLOGY);
+        model.add(this.testImportOntologyUri4, OWL.VERSIONIRI, this.testImportVersionUri4);
+        model.add(this.testImportVersionUri4, RDF.TYPE, OWL.ONTOLOGY);
+        model.add(this.testImportVersionUri3, OWL.IMPORTS, this.testImportVersionUri4);
+        
+        final Set<URI> schemaOntologyUris = new LinkedHashSet<URI>();
+        final Set<URI> schemaVersionUris = new LinkedHashSet<URI>();
+        
+        schemaOntologyUris.add(this.testImportOntologyUri2);
+        schemaOntologyUris.add(this.testImportOntologyUri4);
+        schemaOntologyUris.add(this.testOntologyUri1);
+        schemaOntologyUris.add(this.testImportOntologyUri3);
+        schemaOntologyUris.add(this.testImportOntologyUri1);
+        
+        schemaVersionUris.add(this.testImportVersionUri2);
+        schemaVersionUris.add(this.testImportVersionUri4);
+        schemaVersionUris.add(this.testVersionUri1);
+        schemaVersionUris.add(this.testImportVersionUri3);
+        schemaVersionUris.add(this.testImportVersionUri1);
+        
+        final ConcurrentMap<URI, Set<URI>> importsMap = new ConcurrentHashMap<URI, Set<URI>>();
+        // Expected output solution from importsMap after calling orderImports
+        // importsMap.put(testVersionUri1, Collections.singleton(this.testImportVersionUri1));
+        // importsMap.put(testImportVersionUri1, Collections.singleton(this.testImportVersionUri2));
+        // importsMap.put(testImportVersionUri2, Collections.singleton(this.testImportVersionUri3));
+        // importsMap.put(testImportVersionUri3, new
+        // HashSet<URI>(Arrays.asList(this.testImportVersionUri4)));
+        // importsMap.put(testImportVersionUri4, new HashSet<URI>());
+        
+        final List<URI> orderImports =
+                OntologyUtils.orderImports(model, schemaOntologyUris, schemaVersionUris, importsMap, false);
+        
+        Assert.assertEquals(5, orderImports.size());
+        Assert.assertEquals(this.testImportVersionUri4, orderImports.get(0));
+        Assert.assertEquals(this.testImportVersionUri3, orderImports.get(1));
+        Assert.assertEquals(this.testImportVersionUri2, orderImports.get(2));
+        Assert.assertEquals(this.testImportVersionUri1, orderImports.get(3));
+        Assert.assertEquals(this.testVersionUri1, orderImports.get(4));
+        
+        Assert.assertEquals(5, importsMap.size());
+        Assert.assertTrue(importsMap.containsKey(this.testImportVersionUri4));
+        Assert.assertTrue(importsMap.containsKey(this.testImportVersionUri3));
+        Assert.assertTrue(importsMap.containsKey(this.testImportVersionUri2));
+        Assert.assertTrue(importsMap.containsKey(this.testImportVersionUri1));
+        Assert.assertTrue(importsMap.containsKey(this.testVersionUri1));
+        
+        final Set<URI> imports4 = importsMap.get(this.testImportVersionUri4);
+        Assert.assertNotNull(imports4);
+        Assert.assertEquals(0, imports4.size());
+        
+        final Set<URI> imports3 = importsMap.get(this.testImportVersionUri3);
+        Assert.assertNotNull(imports3);
+        Assert.assertEquals(1, imports3.size());
+        Assert.assertEquals(this.testImportVersionUri4, imports3.iterator().next());
+        
+        final Set<URI> imports2 = importsMap.get(this.testImportVersionUri2);
+        Assert.assertNotNull(imports2);
+        Assert.assertEquals(1, imports2.size());
+        Assert.assertEquals(this.testImportVersionUri3, imports2.iterator().next());
+        
+        final Set<URI> imports1 = importsMap.get(this.testImportVersionUri1);
+        Assert.assertNotNull(imports1);
+        Assert.assertEquals(1, imports1.size());
+        Assert.assertEquals(this.testImportVersionUri2, imports1.iterator().next());
+        
+        final Set<URI> importsRoot = importsMap.get(this.testVersionUri1);
+        Assert.assertNotNull(importsRoot);
+        Assert.assertEquals(1, importsRoot.size());
+        Assert.assertEquals(this.testImportVersionUri1, importsRoot.iterator().next());
+    }
+    
+    @Test
     public void testImportsOrderOneLevel() throws Exception
     {
         final Model model = new LinkedHashModel();
