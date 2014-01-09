@@ -868,6 +868,51 @@ public class OntologyUtilsTest
     }
     
     @Test
+    public void testImportsOrderOneLevelOutOfOrder() throws Exception
+    {
+        final Model model = new LinkedHashModel();
+        OntologyUtils.ontologyIDsToModel(Arrays.asList(this.testOntologyID), model);
+        model.add(this.testImportOntologyUri1, RDF.TYPE, OWL.ONTOLOGY);
+        model.add(this.testImportOntologyUri1, OWL.VERSIONIRI, this.testImportVersionUri1);
+        model.add(this.testImportVersionUri1, RDF.TYPE, OWL.ONTOLOGY);
+        model.add(this.testVersionUri1, OWL.IMPORTS, this.testImportOntologyUri1);
+        
+        final Set<URI> schemaOntologyUris = new LinkedHashSet<URI>();
+        final Set<URI> schemaVersionUris = new LinkedHashSet<URI>();
+        
+        schemaOntologyUris.add(this.testImportOntologyUri1);
+        schemaOntologyUris.add(this.testOntologyUri1);
+        
+        schemaVersionUris.add(this.testImportVersionUri1);
+        schemaVersionUris.add(this.testVersionUri1);
+        
+        final ConcurrentMap<URI, Set<URI>> importsMap = new ConcurrentHashMap<URI, Set<URI>>();
+        // Expected output solution from importsMap after calling orderImports
+        // importsMap.put(testVersionUri1, Collections.singleton(this.testImportVersionUri1));
+        // importsMap.put(testImportVersionUri1, new HashSet<URI>());
+        
+        final List<URI> orderImports =
+                OntologyUtils.orderImports(model, schemaOntologyUris, schemaVersionUris, importsMap, false);
+        
+        Assert.assertEquals(2, orderImports.size());
+        Assert.assertEquals(this.testImportVersionUri1, orderImports.get(0));
+        Assert.assertEquals(this.testVersionUri1, orderImports.get(1));
+        
+        Assert.assertEquals(2, importsMap.size());
+        Assert.assertTrue(importsMap.containsKey(this.testImportVersionUri1));
+        Assert.assertTrue(importsMap.containsKey(this.testVersionUri1));
+        
+        final Set<URI> imports1 = importsMap.get(this.testImportVersionUri1);
+        Assert.assertNotNull(imports1);
+        Assert.assertEquals(0, imports1.size());
+        
+        final Set<URI> importsRoot = importsMap.get(this.testVersionUri1);
+        Assert.assertNotNull(importsRoot);
+        Assert.assertEquals(1, importsRoot.size());
+        Assert.assertEquals(this.testImportVersionUri1, importsRoot.iterator().next());
+    }
+    
+    @Test
     public void testImportsOrderZeroLevels() throws Exception
     {
         final Model model = new LinkedHashModel();
