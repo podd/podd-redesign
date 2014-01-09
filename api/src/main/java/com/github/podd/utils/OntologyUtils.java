@@ -739,43 +739,41 @@ public class OntologyUtils
                     {
                         return 0;
                     }
-                    if(importsMap.containsKey(o1))
+                    
+                    Set<URI> set1 = importsMap.get(o1);
+                    Set<URI> set2 = importsMap.get(o2);
+                    
+                    if(set1 == null)
                     {
-                        final Set<URI> set = importsMap.get(o1);
-                        if(set.contains(o2))
-                        {
-                            return 1;
-                        }
-                        else
-                        {
-                            final Set<URI> otherSet = importsMap.get(o2);
-                            if(otherSet.contains(o1))
-                            {
-                                return -1;
-                            }
-                            else
-                            {
-                                return 1;
-                            }
-                        }
+                        set1 = Collections.emptySet();
                     }
-                    else if(importsMap.containsKey(o2))
+                    
+                    if(set2 == null)
                     {
-                        final Set<URI> set = importsMap.get(o2);
-                        if(set.contains(o1))
-                        {
-                            return -1;
-                        }
-                        else
-                        {
-                            return 1;
-                        }
+                        set2 = Collections.emptySet();
+                    }
+                    
+                    if(set1.contains(o2) && set2.contains(o1))
+                    {
+                        OntologyUtils.log.error("Ontologies have mutual imports: {} {}", o1, o2);
+                        throw new RuntimeException("Ontologies have mutual imports: " + o1.stringValue() + " "
+                                + o2.stringValue());
+                    }
+                    else if(set1.contains(o2))
+                    {
+                        return 1;
+                    }
+                    else if(set2.contains(o1))
+                    {
+                        return -1;
                     }
                     else
                     {
-                        // Default to lexical mapping, as there is no direct semantic link between them
+                        // Default to lexical mapping, as there is no direct semantic link between
+                        // them
                         // at this point
-                        // FIXME: This should not be part of the comparison as the imports map should always contain one of the URIs
+                        // FIXME: This should not be part of the comparison as the imports map
+                        // should always contain one of the URIs
                         return o1.stringValue().compareTo(o2.stringValue());
                     }
                 }
