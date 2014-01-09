@@ -1272,12 +1272,14 @@ public class OntologyUtilsTest
         Assert.assertTrue(schemaManifestImports.contains(this.testB2));
         Assert.assertTrue(schemaManifestImports.contains(this.testC3));
         Assert.assertEquals(this.testA1, schemaManifestImports.get(0));
-        // NOTE: The following two entries do not have a deterministic order in this case
+        // NOTE: The following three entries do not have a deterministic order in this case
         // If they start to break on another JVM, then comment them out
-        Assert.assertEquals(this.testB2, schemaManifestImports.get(1));
-        Assert.assertEquals(this.testC3, schemaManifestImports.get(2));
-        Assert.assertEquals(this.testB1, schemaManifestImports.get(3));
-        
+        // Assert.assertEquals(this.testB2, schemaManifestImports.get(1));
+        // Assert.assertEquals(this.testC3, schemaManifestImports.get(2));
+        // Assert.assertEquals(this.testB1, schemaManifestImports.get(3));
+        // Check the general ordering of B2 and C3 are correct. B1 only depends on A1 so it can be
+        // anywhere except the first position
+        Assert.assertTrue(schemaManifestImports.indexOf(this.testB2) < schemaManifestImports.indexOf(this.testC3));
     }
     
 }
