@@ -63,6 +63,7 @@ import com.github.podd.utils.PODD;
 public class OntologyUtilsTest
 {
     private final Logger log = LoggerFactory.getLogger(this.getClass());
+    private final ValueFactory vf = PODD.VF;
     
     private URI testOntologyUri1;
     private URI testVersionUri1;
@@ -75,7 +76,43 @@ public class OntologyUtilsTest
     private URI testImportVersionUri3;
     private URI testImportOntologyUri4;
     private URI testImportVersionUri4;
-    private ValueFactory vf;
+    
+    private InferredOWLOntologyID testPoddDcV1;
+    private InferredOWLOntologyID testPoddDcV2;
+    private URI testPoddDcUri;
+    private URI testPoddDcUriV1;
+    private URI testPoddDcUriV2;
+    
+    private InferredOWLOntologyID testPoddFoafV1;
+    private InferredOWLOntologyID testPoddFoafV2;
+    private URI testPoddFoafUri;
+    private URI testPoddFoafUriV1;
+    private URI testPoddFoafUriV2;
+    
+    private InferredOWLOntologyID testPoddUserV1;
+    private InferredOWLOntologyID testPoddUserV2;
+    private URI testPoddUserUri;
+    private URI testPoddUserUriV1;
+    private URI testPoddUserUriV2;
+    
+    private InferredOWLOntologyID testPoddBaseV1;
+    private InferredOWLOntologyID testPoddBaseV2;
+    private URI testPoddBaseUri;
+    private URI testPoddBaseUriV1;
+    private URI testPoddBaseUriV2;
+    
+    private InferredOWLOntologyID testPoddScienceV1;
+    private InferredOWLOntologyID testPoddScienceV2;
+    private URI testPoddScienceUri;
+    private URI testPoddScienceUriV1;
+    private URI testPoddScienceUriV2;
+    
+    private InferredOWLOntologyID testPoddPlantV1;
+    private InferredOWLOntologyID testPoddPlantV2;
+    private URI testPoddPlantUri;
+    private URI testPoddPlantUriV1;
+    private URI testPoddPlantUriV2;
+    
     private InferredOWLOntologyID testOntologyID;
     private InferredOWLOntologyID testImportOntologyID1;
     private InferredOWLOntologyID testImportOntologyID2;
@@ -97,57 +134,106 @@ public class OntologyUtilsTest
     private InferredOWLOntologyID testC1;
     private InferredOWLOntologyID testC3;
     
+    private final URI uri(String uri)
+    {
+        return PODD.VF.createURI(uri);
+    }
+    
+    private final InferredOWLOntologyID owlid(URI ontologyUri, URI versionUri)
+    {
+        return owlid(ontologyUri, versionUri, null);
+    }
+    
+    private final InferredOWLOntologyID owlid(URI ontologyUri, URI versionUri, URI inferredUri)
+    {
+        return owlid(ontologyUri, versionUri, inferredUri);
+    }
+    
+    private final InferredOWLOntologyID owlid(IRI ontologyUri, IRI versionUri, IRI inferredUri)
+    {
+        return owlid(ontologyUri, versionUri, inferredUri);
+    }
+    
     @Before
     public void setUp() throws Exception
     {
-        this.vf = PODD.VF;
-        this.testOntologyUri1 = this.vf.createURI("urn:test:ontology:uri:1");
-        this.testVersionUri1 = this.vf.createURI("urn:test:ontology:uri:1:version:1");
-        this.testInferredUri1 = this.vf.createURI("urn:inferred:test:ontology:uri:1:version:1");
-        this.testOntologyID =
-                new InferredOWLOntologyID(this.testOntologyUri1, this.testVersionUri1, this.testInferredUri1);
+        this.testPoddDcUri = uri("http://purl.org/podd/ns/dcTerms");
+        this.testPoddDcUriV1 = uri("http://purl.org/podd/ns/version/dcTerms/1");
+        this.testPoddDcUriV2 = uri("http://purl.org/podd/ns/version/dcTerms/2");
+        this.testPoddDcV1 = owlid(this.testPoddDcUri, this.testPoddDcUriV1);
+        this.testPoddDcV2 = owlid(this.testPoddDcUri, this.testPoddDcUriV2);
         
-        this.testImportOntologyUri1 = this.vf.createURI("urn:test:import:ontology:uri:1");
-        this.testImportVersionUri1 = this.vf.createURI("urn:test:import:ontology:uri:1:version:1");
-        this.testImportOntologyID1 =
-                new InferredOWLOntologyID(this.testImportOntologyUri1, this.testImportVersionUri1, null);
+        this.testPoddFoafUri = uri("http://purl.org/podd/ns/foaf");
+        this.testPoddFoafUriV1 = uri("http://purl.org/podd/ns/version/foaf/1");
+        this.testPoddFoafUriV2 = uri("http://purl.org/podd/ns/version/foaf/2");
+        this.testPoddFoafV1 = owlid(this.testPoddFoafUri, this.testPoddFoafUriV1);
+        this.testPoddFoafV2 = owlid(this.testPoddFoafUri, this.testPoddFoafUriV2);
         
-        this.testImportOntologyUri2 = this.vf.createURI("urn:test:import:ontology:uri:2");
-        this.testImportVersionUri2 = this.vf.createURI("urn:test:import:ontology:uri:2:version:1");
-        this.testImportOntologyID2 =
-                new InferredOWLOntologyID(this.testImportOntologyUri2, this.testImportVersionUri2, null);
+        this.testPoddUserUri = uri("http://purl.org/podd/ns/poddUser");
+        this.testPoddUserUriV1 = uri("http://purl.org/podd/ns/version/poddUser/1");
+        this.testPoddUserUriV2 = uri("http://purl.org/podd/ns/version/poddUser/2");
+        this.testPoddUserV1 = owlid(this.testPoddUserUri, this.testPoddUserUriV1);
+        this.testPoddUserV2 = owlid(this.testPoddUserUri, this.testPoddUserUriV2);
         
-        this.testImportOntologyUri3 = this.vf.createURI("urn:test:import:ontology:uri:3");
-        this.testImportVersionUri3 = this.vf.createURI("urn:test:import:ontology:uri:3:version:1");
-        this.testImportOntologyID3 =
-                new InferredOWLOntologyID(this.testImportOntologyUri3, this.testImportVersionUri3, null);
+        this.testPoddBaseUri = uri("http://purl.org/podd/ns/poddBase");
+        this.testPoddBaseUriV1 = uri("http://purl.org/podd/ns/version/poddBase/1");
+        this.testPoddBaseUriV2 = uri("http://purl.org/podd/ns/version/poddBase/2");
+        this.testPoddBaseV1 = owlid(this.testPoddBaseUri, this.testPoddBaseUriV1);
+        this.testPoddBaseV2 = owlid(this.testPoddBaseUri, this.testPoddBaseUriV2);
         
-        this.testImportOntologyUri4 = this.vf.createURI("urn:test:import:ontology:uri:4");
-        this.testImportVersionUri4 = this.vf.createURI("urn:test:import:ontology:uri:4:version:1");
-        this.testImportOntologyID4 =
-                new InferredOWLOntologyID(this.testImportOntologyUri4, this.testImportVersionUri4, null);
+        this.testPoddScienceUri = uri("http://purl.org/podd/ns/poddScience");
+        this.testPoddScienceUriV1 = uri("http://purl.org/podd/ns/version/poddScience/1");
+        this.testPoddScienceUriV2 = uri("http://purl.org/podd/ns/version/poddScience/2");
+        this.testPoddScienceV1 = owlid(this.testPoddScienceUri, this.testPoddScienceUriV1);
+        this.testPoddScienceV2 = owlid(this.testPoddScienceUri, this.testPoddScienceUriV2);
         
-        this.testOntologyUriA = this.vf.createURI("http://example.org/podd/ns/poddA");
-        this.testVersionUriA1 = this.vf.createURI("http://example.org/podd/ns/version/poddA/1");
-        this.testA1 = new InferredOWLOntologyID(this.testOntologyUriA, this.testVersionUriA1, null);
+        this.testPoddPlantUri = uri("http://purl.org/podd/ns/poddPlant");
+        this.testPoddPlantUriV1 = uri("http://purl.org/podd/ns/version/poddPlant/1");
+        this.testPoddPlantUriV2 = uri("http://purl.org/podd/ns/version/poddPlant/2");
+        this.testPoddPlantV1 = owlid(this.testPoddPlantUri, this.testPoddPlantUriV1);
+        this.testPoddPlantV2 = owlid(this.testPoddPlantUri, this.testPoddPlantUriV2);
         
-        this.testOntologyUriB = this.vf.createURI("http://example.org/podd/ns/poddB");
-        this.testVersionUriB1 = this.vf.createURI("http://example.org/podd/ns/version/poddB/1");
-        this.testB1 = new InferredOWLOntologyID(this.testOntologyUriB, this.testVersionUriB1, null);
-        this.testVersionUriB2 = this.vf.createURI("http://example.org/podd/ns/version/poddB/2");
-        this.testB2 = new InferredOWLOntologyID(this.testOntologyUriB, this.testVersionUriB2, null);
+        this.testOntologyUri1 = uri("urn:test:ontology:uri:1");
+        this.testVersionUri1 = uri("urn:test:ontology:uri:1:version:1");
+        this.testInferredUri1 = uri("urn:inferred:test:ontology:uri:1:version:1");
+        this.testOntologyID = owlid(this.testOntologyUri1, this.testVersionUri1, this.testInferredUri1);
         
-        this.testOntologyUriC = this.vf.createURI("http://example.org/podd/ns/poddC");
-        this.testVersionUriC1 = this.vf.createURI("http://example.org/podd/ns/version/poddC/1");
-        this.testC1 = new InferredOWLOntologyID(this.testOntologyUriC, this.testVersionUriC1, null);
-        this.testVersionUriC3 = this.vf.createURI("http://example.org/podd/ns/version/poddC/3");
-        this.testC3 = new InferredOWLOntologyID(this.testOntologyUriC, this.testVersionUriC3, null);
+        this.testImportOntologyUri1 = uri("urn:test:import:ontology:uri:1");
+        this.testImportVersionUri1 = uri("urn:test:import:ontology:uri:1:version:1");
+        this.testImportOntologyID1 = owlid(this.testImportOntologyUri1, this.testImportVersionUri1);
+        
+        this.testImportOntologyUri2 = uri("urn:test:import:ontology:uri:2");
+        this.testImportVersionUri2 = uri("urn:test:import:ontology:uri:2:version:1");
+        this.testImportOntologyID2 = owlid(this.testImportOntologyUri2, this.testImportVersionUri2);
+        
+        this.testImportOntologyUri3 = uri("urn:test:import:ontology:uri:3");
+        this.testImportVersionUri3 = uri("urn:test:import:ontology:uri:3:version:1");
+        this.testImportOntologyID3 = owlid(this.testImportOntologyUri3, this.testImportVersionUri3);
+        
+        this.testImportOntologyUri4 = uri("urn:test:import:ontology:uri:4");
+        this.testImportVersionUri4 = uri("urn:test:import:ontology:uri:4:version:1");
+        this.testImportOntologyID4 = owlid(this.testImportOntologyUri4, this.testImportVersionUri4);
+        
+        this.testOntologyUriA = uri("http://example.org/podd/ns/poddA");
+        this.testVersionUriA1 = uri("http://example.org/podd/ns/version/poddA/1");
+        this.testA1 = owlid(this.testOntologyUriA, this.testVersionUriA1);
+        
+        this.testOntologyUriB = uri("http://example.org/podd/ns/poddB");
+        this.testVersionUriB1 = uri("http://example.org/podd/ns/version/poddB/1");
+        this.testB1 = owlid(this.testOntologyUriB, this.testVersionUriB1);
+        this.testVersionUriB2 = uri("http://example.org/podd/ns/version/poddB/2");
+        this.testB2 = owlid(this.testOntologyUriB, this.testVersionUriB2);
+        
+        this.testOntologyUriC = uri("http://example.org/podd/ns/poddC");
+        this.testVersionUriC1 = uri("http://example.org/podd/ns/version/poddC/1");
+        this.testC1 = owlid(this.testOntologyUriC, this.testVersionUriC1);
+        this.testVersionUriC3 = uri("http://example.org/podd/ns/version/poddC/3");
+        this.testC3 = owlid(this.testOntologyUriC, this.testVersionUriC3);
     }
     
     @After
     public void tearDown() throws Exception
     {
-        this.vf = null;
         this.testOntologyUri1 = null;
         this.testVersionUri1 = null;
         this.testInferredUri1 = null;
@@ -215,8 +301,7 @@ public class OntologyUtilsTest
     {
         final Model input = new LinkedHashModel();
         
-        OntologyUtils.ontologyIDsToHandler(Arrays.asList(new InferredOWLOntologyID((IRI)null, null, null)),
-                new StatementCollector(input));
+        OntologyUtils.ontologyIDsToHandler(Arrays.asList(owlid((IRI)null, null, null)), new StatementCollector(input));
         
         Assert.assertTrue(input.isEmpty());
     }
@@ -264,9 +349,9 @@ public class OntologyUtilsTest
     {
         final Model input = new LinkedHashModel();
         
-        OntologyUtils.ontologyIDsToHandler(Arrays.asList(new InferredOWLOntologyID(IRI
-                .create("urn:test:ontology:iri:abc"), IRI.create("urn:test:ontology:iri:abc:version:1"), null)),
-                new StatementCollector(input));
+        OntologyUtils.ontologyIDsToHandler(
+                Arrays.asList(owlid(IRI.create("urn:test:ontology:iri:abc"),
+                        IRI.create("urn:test:ontology:iri:abc:version:1"), null)), new StatementCollector(input));
         
         Assert.assertEquals(3, input.size());
         Assert.assertTrue(input.contains(null, RDF.TYPE, OWL.ONTOLOGY));
@@ -286,8 +371,7 @@ public class OntologyUtilsTest
     {
         final Model input = new LinkedHashModel();
         
-        OntologyUtils.ontologyIDsToHandler(
-                Arrays.asList(new InferredOWLOntologyID(IRI.create("urn:test:ontology:iri:abc"), null, null)),
+        OntologyUtils.ontologyIDsToHandler(Arrays.asList(owlid(IRI.create("urn:test:ontology:iri:abc"), null, null)),
                 new StatementCollector(input));
         
         Assert.assertEquals(1, input.size());
@@ -306,9 +390,10 @@ public class OntologyUtilsTest
     {
         final Model input = new LinkedHashModel();
         
-        OntologyUtils.ontologyIDsToHandler(Arrays.asList(new InferredOWLOntologyID(IRI
-                .create("urn:test:ontology:iri:abc"), IRI.create("urn:test:ontology:iri:abc:version:1"), IRI
-                .create("urn:inferred:test:ontology:iri:abc:version:1:1"))), new StatementCollector(input));
+        OntologyUtils.ontologyIDsToHandler(
+                Arrays.asList(owlid(IRI.create("urn:test:ontology:iri:abc"),
+                        IRI.create("urn:test:ontology:iri:abc:version:1"),
+                        IRI.create("urn:inferred:test:ontology:iri:abc:version:1:1"))), new StatementCollector(input));
         
         Assert.assertEquals(5, input.size());
         Assert.assertTrue(input.contains(null, RDF.TYPE, OWL.ONTOLOGY));
@@ -328,8 +413,7 @@ public class OntologyUtilsTest
         final Model input = new LinkedHashModel();
         
         final Model ontologyIDsToModel =
-                OntologyUtils
-                        .ontologyIDsToModel(Arrays.asList(new InferredOWLOntologyID((IRI)null, null, null)), input);
+                OntologyUtils.ontologyIDsToModel(Arrays.asList(owlid((IRI)null, null, null)), input);
         
         Assert.assertNotNull(ontologyIDsToModel);
         Assert.assertEquals(input, ontologyIDsToModel);
@@ -381,8 +465,8 @@ public class OntologyUtilsTest
         
         final Model ontologyIDsToModel =
                 OntologyUtils.ontologyIDsToModel(
-                        Arrays.asList(new InferredOWLOntologyID(IRI.create("urn:test:ontology:iri:abc"), IRI
-                                .create("urn:test:ontology:iri:abc:version:1"), null)), input);
+                        Arrays.asList(owlid(IRI.create("urn:test:ontology:iri:abc"),
+                                IRI.create("urn:test:ontology:iri:abc:version:1"), null)), input);
         
         Assert.assertNotNull(ontologyIDsToModel);
         Assert.assertEquals(input, ontologyIDsToModel);
@@ -404,8 +488,7 @@ public class OntologyUtilsTest
         
         final Model ontologyIDsToModel =
                 OntologyUtils.ontologyIDsToModel(
-                        Arrays.asList(new InferredOWLOntologyID(IRI.create("urn:test:ontology:iri:abc"), null, null)),
-                        input);
+                        Arrays.asList(owlid(IRI.create("urn:test:ontology:iri:abc"), null, null)), input);
         
         Assert.assertNotNull(ontologyIDsToModel);
         Assert.assertEquals(input, ontologyIDsToModel);
@@ -424,9 +507,10 @@ public class OntologyUtilsTest
         final Model input = new LinkedHashModel();
         
         final Model ontologyIDsToModel =
-                OntologyUtils.ontologyIDsToModel(Arrays.asList(new InferredOWLOntologyID(IRI
-                        .create("urn:test:ontology:iri:abc"), IRI.create("urn:test:ontology:iri:abc:version:1"), IRI
-                        .create("urn:inferred:test:ontology:iri:abc:version:1:1"))), input);
+                OntologyUtils.ontologyIDsToModel(
+                        Arrays.asList(owlid(IRI.create("urn:test:ontology:iri:abc"),
+                                IRI.create("urn:test:ontology:iri:abc:version:1"),
+                                IRI.create("urn:inferred:test:ontology:iri:abc:version:1:1"))), input);
         
         Assert.assertNotNull(ontologyIDsToModel);
         Assert.assertEquals(input, ontologyIDsToModel);
