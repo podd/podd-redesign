@@ -812,20 +812,27 @@ public class OntologyUtils
         OntologyUtils.extractOntologyAndVersions(model, schemaOntologyUris, schemaVersionUris);
         
         final List<URI> orderImports =
-                OntologyUtils.orderImports(model, schemaOntologyUris, schemaVersionUris, importsMap, true);
+                OntologyUtils.orderImports(model, schemaOntologyUris, schemaVersionUris, importsMap, false);
         
         final Set<URI> artifactImports = new LinkedHashSet<>();
         
-        for(final OWLOntologyID nextDependentSchemaOntology : dependentSchemaOntologies)
+        for(URI nextOrderedImport : orderImports)
         {
-            artifactImports.add(nextDependentSchemaOntology.getVersionIRI().toOpenRDFURI());
-            // Not tolerant for artifacts... Imports must be directed to version IRIs
-            // recursiveFollowImports(artifactImports, importsMap,
-            // artifactID.getOntologyIRI().toOpenRDFURI());
-            
-            OntologyUtils.recursiveFollowImports(artifactImports, importsMap, nextDependentSchemaOntology
-                    .getVersionIRI().toOpenRDFURI());
-            
+            for(final OWLOntologyID nextDependentSchemaOntology : dependentSchemaOntologies)
+            {
+                if(nextDependentSchemaOntology.getOntologyIRI().toOpenRDFURI().equals(nextOrderedImport)
+                        || (nextDependentSchemaOntology.getVersionIRI() != null && nextDependentSchemaOntology
+                                .getVersionIRI().toOpenRDFURI().equals(nextOrderedImport)))
+                {
+                    artifactImports.add(nextDependentSchemaOntology.getVersionIRI().toOpenRDFURI());
+                    // Not tolerant for artifacts... Imports must be directed to version IRIs
+                    // recursiveFollowImports(artifactImports, importsMap,
+                    // artifactID.getOntologyIRI().toOpenRDFURI());
+                    
+                    OntologyUtils.recursiveFollowImports(artifactImports, importsMap, nextDependentSchemaOntology
+                            .getVersionIRI().toOpenRDFURI());
+                }
+            }
         }
         
         final List<InferredOWLOntologyID> ontologyIDs = OntologyUtils.modelToOntologyIDs(model, true, false);
