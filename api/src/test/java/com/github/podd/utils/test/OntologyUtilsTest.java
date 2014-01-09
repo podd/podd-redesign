@@ -593,16 +593,22 @@ public class OntologyUtilsTest
         // DebugUtils.printContents(model);
         final List<OWLOntologyID> schemaManifestImports =
                 OntologyUtils.schemaManifestImports(model,
-                        new HashSet<OWLOntologyID>(Arrays.asList(this.testA1, this.testB2, this.testC3)));
+                        new HashSet<OWLOntologyID>(Arrays.asList(this.testPoddPlantV1)));
         
         Assert.assertNotNull(schemaManifestImports);
-        Assert.assertEquals(3, schemaManifestImports.size());
-        Assert.assertTrue(schemaManifestImports.contains(this.testA1));
-        Assert.assertTrue(schemaManifestImports.contains(this.testB2));
-        Assert.assertTrue(schemaManifestImports.contains(this.testC3));
-        Assert.assertEquals(this.testA1, schemaManifestImports.get(0));
-        Assert.assertEquals(this.testB2, schemaManifestImports.get(1));
-        Assert.assertEquals(this.testC3, schemaManifestImports.get(2));
+        Assert.assertEquals(6, schemaManifestImports.size());
+        Assert.assertTrue(schemaManifestImports.contains(this.testPoddDcV1));
+        Assert.assertTrue(schemaManifestImports.contains(this.testPoddFoafV1));
+        Assert.assertTrue(schemaManifestImports.contains(this.testPoddUserV1));
+        Assert.assertTrue(schemaManifestImports.contains(this.testPoddBaseV1));
+        Assert.assertTrue(schemaManifestImports.contains(this.testPoddScienceV1));
+        Assert.assertTrue(schemaManifestImports.contains(this.testPoddPlantV1));
+        Assert.assertEquals(this.testPoddDcV1, schemaManifestImports.get(0));
+        Assert.assertEquals(this.testPoddFoafV1, schemaManifestImports.get(1));
+        Assert.assertEquals(this.testPoddUserV1, schemaManifestImports.get(2));
+        Assert.assertEquals(this.testPoddBaseV1, schemaManifestImports.get(3));
+        Assert.assertEquals(this.testPoddScienceV1, schemaManifestImports.get(4));
+        Assert.assertEquals(this.testPoddPlantV1, schemaManifestImports.get(5));
         
     }
     
