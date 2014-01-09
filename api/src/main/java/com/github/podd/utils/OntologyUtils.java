@@ -748,15 +748,36 @@ public class OntologyUtils
                         }
                         else
                         {
-                            return -1;
+                            final Set<URI> otherSet = importsMap.get(o2);
+                            if(otherSet.contains(o1))
+                            {
+                                return -1;
+                            }
+                            else
+                            {
+                                return 1;
+                            }
                         }
                     }
-                    // Default to lexical mapping, as there is no direct semantic link between them
-                    // at this point
-                    // TODO: If this starts to fail at any point with a comparator-related
-                    // exception, then try to do more levels of comparison with the importsMap to
-                    // determine the real order.
-                    return o1.stringValue().compareTo(o2.stringValue());
+                    else if(importsMap.containsKey(o2))
+                    {
+                        final Set<URI> set = importsMap.get(o2);
+                        if(set.contains(o1))
+                        {
+                            return -1;
+                        }
+                        else
+                        {
+                            return 1;
+                        }
+                    }
+                    else
+                    {
+                        // Default to lexical mapping, as there is no direct semantic link between them
+                        // at this point
+                        // FIXME: This should not be part of the comparison as the imports map should always contain one of the URIs
+                        return o1.stringValue().compareTo(o2.stringValue());
+                    }
                 }
             });
     }
@@ -765,11 +786,11 @@ public class OntologyUtils
      * Recursively follow the imports for the given URI, based on those identified in the
      * importsMap.
      * 
-     * @param artifactImports
+     * @param ontologyImports
      * @param importsMap
      * @param nextURI
      */
-    public static void recursiveFollowImports(final Set<URI> artifactImports,
+    public static void recursiveFollowImports(final Set<URI> ontologyImports,
             final ConcurrentMap<URI, Set<URI>> importsMap, final URI nextURI)
     {
         if(importsMap.containsKey(nextURI))
@@ -777,10 +798,10 @@ public class OntologyUtils
             final Set<URI> nextSet = importsMap.get(nextURI);
             for(final URI nextSetUri : nextSet)
             {
-                if(!artifactImports.contains(nextSetUri))
+                if(!ontologyImports.contains(nextSetUri))
                 {
-                    artifactImports.add(nextSetUri);
-                    OntologyUtils.recursiveFollowImports(artifactImports, importsMap, nextSetUri);
+                    ontologyImports.add(nextSetUri);
+                    OntologyUtils.recursiveFollowImports(ontologyImports, importsMap, nextSetUri);
                 }
             }
         }
@@ -834,6 +855,8 @@ public class OntologyUtils
                 }
             }
         }
+        
+        OntologyUtils.postSort(orderImports, importsMap);
         
         final List<InferredOWLOntologyID> ontologyIDs = OntologyUtils.modelToOntologyIDs(model, true, false);
         
