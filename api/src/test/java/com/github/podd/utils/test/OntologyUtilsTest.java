@@ -136,7 +136,7 @@ public class OntologyUtilsTest
     
     private final InferredOWLOntologyID owlid(final IRI ontologyUri, final IRI versionUri, final IRI inferredUri)
     {
-        return this.owlid(ontologyUri, versionUri, inferredUri);
+        return new InferredOWLOntologyID(ontologyUri, versionUri, inferredUri);
     }
     
     private final InferredOWLOntologyID owlid(final URI ontologyUri, final URI versionUri)
@@ -146,7 +146,7 @@ public class OntologyUtilsTest
     
     private final InferredOWLOntologyID owlid(final URI ontologyUri, final URI versionUri, final URI inferredUri)
     {
-        return this.owlid(ontologyUri, versionUri, inferredUri);
+        return new InferredOWLOntologyID(ontologyUri, versionUri, inferredUri);
     }
     
     @Before
