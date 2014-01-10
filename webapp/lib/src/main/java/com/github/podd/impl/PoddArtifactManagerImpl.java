@@ -1808,6 +1808,20 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             {
                 this.log.error("Found error rolling back repository connection", e1);
             }
+            finally
+            {
+                try
+                {
+                    if(managementConnection != null && managementConnection.isActive())
+                    {
+                        managementConnection.rollback();
+                    }
+                }
+                catch(final RepositoryException e2)
+                {
+                    this.log.error("Found error rolling back repository connection", e2);
+                }
+            }
             
             throw e;
         }
@@ -1823,6 +1837,20 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             catch(final RepositoryException e)
             {
                 throw e;
+            }
+            finally
+            {
+                try
+                {
+                    if(managementConnection != null && managementConnection.isOpen())
+                    {
+                        managementConnection.close();
+                    }
+                }
+                catch(final RepositoryException e)
+                {
+                    this.log.error("Found exception closing repository connection", e);
+                }
             }
         }
         
