@@ -780,20 +780,42 @@ public class OntologyUtils
                     }
                     else
                     {
-                        Set<URI> tempSet1 = new HashSet<>(set1);
-                        Set<URI> tempSet2 = new HashSet<>(set2);
-                        for(URI nextImport1 : set1)
+                        Set<URI> tempSet1;
+                        if(set1.isEmpty())
                         {
-                            if(set2.contains(nextImport1))
+                            tempSet1 = Collections.emptySet();
+                        }
+                        else
+                        {
+                            tempSet1 = new HashSet<>(set1);
+                        }
+                        Set<URI> tempSet2;
+                        if(set2.isEmpty())
+                        {
+                            tempSet2 = Collections.emptySet();
+                        }
+                        else
+                        {
+                            tempSet2 = new HashSet<>(set2);
+                        }
+                        if(!set2.isEmpty())
+                        {
+                            for(URI nextImport1 : set1)
                             {
-                                tempSet1.remove(nextImport1);
+                                if(set2.contains(nextImport1))
+                                {
+                                    tempSet1.remove(nextImport1);
+                                }
                             }
                         }
-                        for(URI nextImport2 : set2)
+                        if(!set1.isEmpty())
                         {
-                            if(set1.contains(nextImport2))
+                            for(URI nextImport2 : set2)
                             {
-                                tempSet2.remove(nextImport2);
+                                if(set1.contains(nextImport2))
+                                {
+                                    tempSet2.remove(nextImport2);
+                                }
                             }
                         }
                         
