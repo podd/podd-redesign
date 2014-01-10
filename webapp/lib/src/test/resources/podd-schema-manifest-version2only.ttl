@@ -7,12 +7,11 @@
 
 
 <http://purl.org/podd/ns/dcTerms> a owl:Ontology ;
-	owl:versionIRI <http://purl.org/podd/ns/version/dcTerms/2> ; 
+	owl:versionIRI <http://purl.org/podd/ns/version/dcTerms/2> ;
 	omv:currentVersion <http://purl.org/podd/ns/version/dcTerms/2> .
 
 <http://purl.org/podd/ns/version/dcTerms/2> a owl:Ontology ;
     <http://purl.org/podd/ns/schema#classpath> "/ontologies/version/2/dcTerms.owl" .
-
 
 
 
@@ -24,7 +23,6 @@
 <http://purl.org/podd/ns/version/foaf/2> a owl:Ontology ;
     <http://purl.org/podd/ns/schema#classpath> "/ontologies/version/2/foaf.owl" ;
 	owl:imports <http://purl.org/podd/ns/version/dcTerms/2> .
-
 
 
 
@@ -53,27 +51,28 @@
 
 
 
-
 <http://purl.org/podd/ns/poddScience> a owl:Ontology ;
 	owl:versionIRI <http://purl.org/podd/ns/version/poddScience/2> ;
 	omv:currentVersion <http://purl.org/podd/ns/version/poddScience/2> .
 
 <http://purl.org/podd/ns/version/poddScience/2> a owl:Ontology ;
     <http://purl.org/podd/ns/schema#classpath> "/ontologies/version/2/poddScience.owl" ;
-	owl:imports <http://purl.org/podd/ns/version/poddUser/2> ,
+	owl:imports <http://purl.org/podd/ns/version/dcTerms/2> ,
+	    <http://purl.org/podd/ns/version/foaf/2> ,
+	    <http://purl.org/podd/ns/version/poddUser/2> ,
         <http://purl.org/podd/ns/version/poddBase/2> .
 
 
 
 
 <http://purl.org/podd/ns/poddPlant> a owl:Ontology ;
-	owl:versionIRI <http://purl.org/podd/ns/version/poddPlant/2> ; 
+	owl:versionIRI <http://purl.org/podd/ns/version/poddPlant/2> ;
 	omv:currentVersion <http://purl.org/podd/ns/version/poddPlant/2> .
 
 <http://purl.org/podd/ns/version/poddPlant/2> a owl:Ontology ;
     <http://purl.org/podd/ns/schema#classpath> "/ontologies/version/2/poddPlant.owl" ;
-	owl:imports <http://purl.org/podd/ns/version/poddBase/2> ,
+	owl:imports <http://purl.org/podd/ns/version/dcTerms/2> ,
+	    <http://purl.org/podd/ns/version/foaf/2> ,
+	    <http://purl.org/podd/ns/version/poddUser/2> ,
+	    <http://purl.org/podd/ns/version/poddBase/2> ,
         <http://purl.org/podd/ns/version/poddScience/2> .
-
-
-
