@@ -354,8 +354,8 @@ public abstract class AbstractPoddSchemaManagerTest
                         "http://purl.org/podd/ns/poddScience", "http://purl.org/podd/ns/poddPlant", };
         
         final String[] expectedVersionIRIs =
-                { "http://purl.org/podd/ns/version/poddUser/1", "http://purl.org/podd/ns/version/poddBase/1",
-                        "http://purl.org/podd/ns/version/poddScience/1",
+                { "http://purl.org/podd/ns/version/poddUser/2", "http://purl.org/podd/ns/version/poddBase/2",
+                        "http://purl.org/podd/ns/version/poddScience/2",
                         "http://purl.org/podd/ns/version/poddPlant/XYZ", };
         
         for(int i = 0; i < testIRIs.length; i++)
@@ -385,8 +385,8 @@ public abstract class AbstractPoddSchemaManagerTest
         this.testSchemaManager.uploadSchemaOntology(in, RDFFormat.RDFXML, new LinkedHashSet<>(schemaOntologies));
         
         final String[] testIRIs =
-                { "http://purl.org/podd/ns/version/poddUser/1", "http://purl.org/podd/ns/version/poddBase/1",
-                        "http://purl.org/podd/ns/version/poddScience/1",
+                { "http://purl.org/podd/ns/version/poddUser/2", "http://purl.org/podd/ns/version/poddBase/2",
+                        "http://purl.org/podd/ns/version/poddScience/2",
                         "http://purl.org/podd/ns/version/poddPlant/XYZ", };
         
         for(final String testIRI2 : testIRIs)
@@ -424,8 +424,8 @@ public abstract class AbstractPoddSchemaManagerTest
                 };
         
         final String[] expectedVersionIRIs =
-                { "http://purl.org/podd/ns/version/poddUser/1", "http://purl.org/podd/ns/version/poddBase/1",
-                        "http://purl.org/podd/ns/version/poddScience/1",
+                { "http://purl.org/podd/ns/version/poddUser/2", "http://purl.org/podd/ns/version/poddBase/2",
+                        "http://purl.org/podd/ns/version/poddScience/2",
                         "http://purl.org/podd/ns/version/poddPlant/XYZ", // expected
                                                                          // current
                                                                          // Version

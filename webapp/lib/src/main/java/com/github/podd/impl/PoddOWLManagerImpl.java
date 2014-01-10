@@ -271,6 +271,14 @@ public class PoddOWLManagerImpl implements PoddOWLManager
             throw new NullPointerException("OWLOntology collection is incomplete");
         }
         
+        for(OWLOntologyID nextOntologyID : ontologyIDs)
+        {
+            if(nextOntologyID.getOntologyIRI() == null)
+            {
+                throw new NullPointerException("OWLOntology collection contained a null ontology IRI");
+            }
+        }
+        
         final Model schemaManagementTriples = new LinkedHashModel();
         managementConnection.export(new StatementCollector(schemaManagementTriples), schemaManagementContext);
         
