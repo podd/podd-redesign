@@ -234,8 +234,8 @@ public class ApplicationUtils
     public static Repository getNewManagementRepository(final PropertyUtil props) throws RepositoryException
     {
         final String repositoryUrl =
-                props.get(PoddWebConstants.PROPERTY_MANAGEMENT_SESAME_URL,
-                        PoddWebConstants.DEFAULT_MANAGEMENT_SESAME_URL);
+                props.get(PoddWebConstants.PROPERTY_MANAGEMENT_SESAME_LOCATION,
+                        PoddWebConstants.DEFAULT_MANAGEMENT_SESAME_LOCATION);
         
         return ApplicationUtils.getNewRepositoryInternal(repositoryUrl);
     }
@@ -327,8 +327,8 @@ public class ApplicationUtils
         final RepositoryImplConfig repositoryImplConfig = RepositoryImplConfigBase.create(graph, repositoryNode);
         RepositoryManager repositoryManager;
         final String repositoryManagerUrl =
-                props.get(PoddWebConstants.PROPERTY_PERMANENT_SESAME_REPOSITORY_LOCATION,
-                        PoddWebConstants.DEFAULT_PERMANENT_SESAME_REPOSITORY_LOCATION);
+                props.get(PoddWebConstants.PROPERTY_PERMANENT_SESAME_REPOSITORY_SERVER,
+                        PoddWebConstants.DEFAULT_PERMANENT_SESAME_REPOSITORY_SERVER);
         if(repositoryManagerUrl == null || repositoryManagerUrl.trim().isEmpty())
         {
             repositoryManager =

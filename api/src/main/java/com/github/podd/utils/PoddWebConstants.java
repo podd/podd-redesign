@@ -246,22 +246,25 @@ public interface PoddWebConstants
     public static final String PROPERTY_PERMANENT_SESAME_REPOSITORY_CONFIG = "podd.repository.permanent.config";
     public static final String DEFAULT_PERMANENT_SESAME_REPOSITORY_CONFIG = "/memorystoreconfig.ttl";
     
-    public static final String PROPERTY_PERMANENT_SESAME_REPOSITORY_LOCATION = "podd.repository.permanent.location";
-    public static final String DEFAULT_PERMANENT_SESAME_REPOSITORY_LOCATION = "";
+    /**
+     * Graph in the management repository containing permanent repository details
+     */
+    public static final String PROPERTY_PERMANENT_SESAME_REPOSITORY_SERVER = "podd.repositorygraph";
+    public static final String DEFAULT_PERMANENT_SESAME_REPOSITORY_SERVER = "urn:podd:default:graph:repositories";
     // public static final String DEFAULT_PERMANENT_SESAME_REPOSITORY_LOCATION =
     // "http://localhost:8080/openrdf-sesame/";
     
     /**
      * Link to a single management repository.
      */
-    public static final String PROPERTY_MANAGEMENT_SESAME_URL = "podd.managementsesamehttpurl";
-    public static final String DEFAULT_MANAGEMENT_SESAME_URL = "";
+    public static final String PROPERTY_MANAGEMENT_SESAME_LOCATION = "podd.repository.management.location";
+    public static final String DEFAULT_MANAGEMENT_SESAME_LOCATION = "";
     
     public static final String PROPERTY_SCHEMA_GRAPH = "podd.schemagraph";
-    public static final String DEFAULT_SCHEMA_GRAPH = "urn:podd:default:schemamanagementgraph";
+    public static final String DEFAULT_SCHEMA_GRAPH = "urn:podd:default:graph:schemamanagement";
     
     public static final String PROPERTY_ARTIFACT_GRAPH = "podd.artifactgraph";
-    public static final String DEFAULT_ARTIFACT_GRAPH = "urn:podd:default:artifactmanagementgraph";
+    public static final String DEFAULT_ARTIFACT_GRAPH = "urn:podd:default:graph:artifactmanagement";
     
     /**
      * Key used to select published artifacts. Defaults to true.
