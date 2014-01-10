@@ -371,21 +371,21 @@ public class OntologyUtilsTest
         model.add(this.testImportOntologyUri1, RDF.TYPE, OWL.ONTOLOGY);
         model.add(this.testImportOntologyUri1, OWL.VERSIONIRI, this.testImportVersionUri1);
         model.add(this.testImportVersionUri1, RDF.TYPE, OWL.ONTOLOGY);
+        model.add(this.testImportVersionUri1, OWL.IMPORTS, this.testImportVersionUri2);
         
         model.add(this.testImportOntologyUri2, RDF.TYPE, OWL.ONTOLOGY);
         model.add(this.testImportOntologyUri2, OWL.VERSIONIRI, this.testImportVersionUri2);
         model.add(this.testImportVersionUri2, RDF.TYPE, OWL.ONTOLOGY);
-        model.add(this.testImportVersionUri1, OWL.IMPORTS, this.testImportVersionUri2);
+        model.add(this.testImportVersionUri2, OWL.IMPORTS, this.testImportVersionUri3);
+        model.add(this.testImportVersionUri2, OWL.IMPORTS, this.testImportVersionUri4);
         
         model.add(this.testImportOntologyUri3, RDF.TYPE, OWL.ONTOLOGY);
         model.add(this.testImportOntologyUri3, OWL.VERSIONIRI, this.testImportVersionUri3);
         model.add(this.testImportVersionUri3, RDF.TYPE, OWL.ONTOLOGY);
-        model.add(this.testImportVersionUri2, OWL.IMPORTS, this.testImportVersionUri3);
         
         model.add(this.testImportOntologyUri4, RDF.TYPE, OWL.ONTOLOGY);
         model.add(this.testImportOntologyUri4, OWL.VERSIONIRI, this.testImportVersionUri4);
         model.add(this.testImportVersionUri4, RDF.TYPE, OWL.ONTOLOGY);
-        model.add(this.testImportVersionUri2, OWL.IMPORTS, this.testImportVersionUri4);
         
         final List<OWLOntologyID> imports = OntologyUtils.artifactImports(this.testOntologyID, model);
         
@@ -394,6 +394,9 @@ public class OntologyUtilsTest
         Assert.assertTrue(imports.contains(this.testImportOntologyID2));
         Assert.assertTrue(imports.contains(this.testImportOntologyID3));
         Assert.assertTrue(imports.contains(this.testImportOntologyID4));
+        Assert.assertTrue(imports.indexOf(this.testImportOntologyID2) > imports.indexOf(this.testImportOntologyID4));
+        Assert.assertTrue(imports.indexOf(this.testImportOntologyID1) > imports.indexOf(this.testImportOntologyID2));
+        Assert.assertTrue(imports.indexOf(this.testImportOntologyID2) > imports.indexOf(this.testImportOntologyID3));
         // NOTE: First two positions are not consistent, so only testing the last two
         Assert.assertEquals(this.testImportOntologyID2, imports.get(2));
         Assert.assertEquals(this.testImportOntologyID1, imports.get(3));
@@ -489,7 +492,7 @@ public class OntologyUtilsTest
         
         final List<OWLOntologyID> imports = OntologyUtils.artifactImports(this.testOntologyID, model);
         
-        this.log.info("Imports: {}", imports);
+        // this.log.info("Imports: {}", imports);
         
         Assert.assertEquals(5, imports.size());
     }

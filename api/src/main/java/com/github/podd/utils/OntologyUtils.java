@@ -121,8 +121,11 @@ public class OntologyUtils
         
         final List<InferredOWLOntologyID> ontologyIDs = OntologyUtils.modelToOntologyIDs(model, true, false);
         
+        OntologyUtils.postSort(orderImports, importsMap);
+        
         final Set<OWLOntologyID> finalOrderImports =
                 OntologyUtils.finalOrderImports(results, ontologyIDs, orderImports, artifactImports, importsMap);
+        
         
         return new ArrayList<>(finalOrderImports);
     }
@@ -764,6 +767,14 @@ public class OntologyUtils
                         return 1;
                     }
                     else if(set2.contains(o1))
+                    {
+                        return -1;
+                    }
+                    else if(set1.size() > set2.size())
+                    {
+                        return 1;
+                    }
+                    else if(set2.size() > set1.size())
                     {
                         return -1;
                     }
