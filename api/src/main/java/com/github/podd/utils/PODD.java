@@ -34,18 +34,21 @@ public interface PODD
     public static final String DATA_REPOSITORY = "http://purl.org/podd/ns/dataRepository#";
     
     /** Default value is urn:podd:default:usermanagementgraph: */
-    public static final URI DEFAULT_USER_MANAGEMENT_GRAPH = PODD.VF.createURI("urn:podd:default:usermanagementgraph:");
+    public static final URI DEFAULT_USER_MANAGEMENT_GRAPH = PODD.VF.createURI("urn:podd:default:graph:usermanagement");
     
     /** Default value is urn:podd:default:artifactmanagementgraph: */
     public static final URI DEFAULT_ARTIFACT_MANAGEMENT_GRAPH = PODD.VF
-            .createURI("urn:podd:default:artifactmanagementgraph:");
+            .createURI("urn:podd:default:graph:artifactmanagement");
     
     public static final URI DEFAULT_FILE_REPOSITORY_MANAGEMENT_GRAPH = PODD.VF
-            .createURI("urn:podd:default:filerepositorymanagementgraph:");
+            .createURI("urn:podd:default:graph:filerepositorymanagement");
     
-    /** Default value is urn:podd:default:schemamanagementgraph */
+    public static final URI DEFAULT_REPOSITORY_MANAGEMENT_GRAPH = PODD.VF
+            .createURI("urn:podd:default:graph:repositorymanagement");
+    
+    /** Default value is urn:podd:default:graph:schemamanagement */
     public static final URI DEFAULT_SCHEMA_MANAGEMENT_GRAPH = PODD.VF
-            .createURI("urn:podd:default:schemamanagementgraph");
+            .createURI("urn:podd:default:graph:schemamanagement");
     
     /** http://purl.org/podd/ns/err#contains */
     public static final URI ERR_CONTAINS = PODD.VF.createURI(PODD.PODD_ERROR, "contains");
@@ -550,4 +553,27 @@ public interface PODD
     
     public static final URI PODD_SCHEMA_CLASSPATH = PODD.VF.createURI("http://purl.org/podd/ns/schema#classpath");
     
+    public static final URI PODD_REPOSITORY_MANAGER = PODD.VF
+            .createURI("http://purl.org/podd/ns/repository#RepositoryManager");
+    
+    public static final URI PODD_REPOSITORY_MANAGER_CONTAINS_REPOSITORY = PODD.VF
+            .createURI("http://purl.org/podd/ns/repository#repositoryManagerContainsRepository");
+    
+    public static final URI PODD_REPOSITORY_MANAGER_TYPE = PODD.VF
+            .createURI("http://purl.org/podd/ns/repository#repositoryManagerType");
+    
+    public static final URI PODD_REPOSITORY_MANAGER_TYPE_LOCAL = PODD.VF
+            .createURI("http://purl.org/podd/ns/repository#RepositoryManagerTypeLocal");
+    
+    public static final URI PODD_REPOSITORY_MANAGER_LOCAL_DIRECTORY = PODD.VF
+            .createURI("http://purl.org/podd/ns/repository#repositoryManagerLocalDirectory");
+    
+    public static final URI PODD_REPOSITORY_MANAGER_REMOTE_SERVER_URL = PODD.VF
+            .createURI("http://purl.org/podd/ns/repository#repositoryManagerRemoteServerUrl");
+    
+    public static final URI PODD_REPOSITORY_MANAGER_TYPE_REMOTE = PODD.VF
+            .createURI("http://purl.org/podd/ns/repository#RepositoryManagerTypeRemote");
+    
+    public static final URI PODD_REPOSITORY_CONTAINS_SCHEMA = PODD.VF
+            .createURI("http://purl.org/podd/ns/repository#containsSchema");
 }

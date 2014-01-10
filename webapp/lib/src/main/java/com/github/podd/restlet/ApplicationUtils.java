@@ -325,30 +325,32 @@ public class ApplicationUtils
         final Model graph = Rio.parse(repositoryImplConfigStream, "", RDFFormat.TURTLE);
         final Resource repositoryNode = GraphUtil.getUniqueSubject(graph, RepositoryConfigSchema.REPOSITORYTYPE, null);
         final RepositoryImplConfig repositoryImplConfig = RepositoryImplConfigBase.create(graph, repositoryNode);
-        RepositoryManager repositoryManager;
-        final String repositoryManagerUrl =
-                props.get(PoddWebConstants.PROPERTY_PERMANENT_SESAME_REPOSITORY_SERVER,
-                        PoddWebConstants.DEFAULT_PERMANENT_SESAME_REPOSITORY_SERVER);
-        if(repositoryManagerUrl == null || repositoryManagerUrl.trim().isEmpty())
-        {
-            repositoryManager =
-                    new LocalRepositoryManager(Files.createTempDirectory("podd-temp-repositories-").toFile());
-        }
-        else
-        {
-            repositoryManager = new RemoteRepositoryManager(repositoryManagerUrl);
-        }
-        repositoryManager.initialize();
+        // RepositoryManager repositoryManager;
+        // final String repositoryManagerUrl =
+        // props.get(PoddWebConstants.PROPERTY_PERMANENT_SESAME_REPOSITORY_SERVER,
+        // PoddWebConstants.DEFAULT_PERMANENT_SESAME_REPOSITORY_SERVER);
+        // if(repositoryManagerUrl == null || repositoryManagerUrl.trim().isEmpty())
+        // {
+        // repositoryManager =
+        // new
+        // LocalRepositoryManager(Files.createTempDirectory("podd-temp-repositories-").toFile());
+        // }
+        // else
+        // {
+        // repositoryManager = new RemoteRepositoryManager(repositoryManagerUrl);
+        // }
+        // repositoryManager.initialize();
         
-        application.setPoddRepositoryManager(new PoddRepositoryManagerImpl(nextManagementRepository, repositoryManager,
-                repositoryImplConfig));
+        application.setPoddRepositoryManager(new PoddRepositoryManagerImpl(nextManagementRepository,
+                repositoryImplConfig, props.get(PoddWebConstants.PROPERTY_PERMANENT_SESAME_REPOSITORY_SERVER,
+                        PoddWebConstants.DEFAULT_PERMANENT_SESAME_REPOSITORY_SERVER)));
         
         application.getPoddRepositoryManager().setSchemaManagementGraph(
                 PODD.VF.createURI(props.get(PoddWebConstants.PROPERTY_SCHEMA_GRAPH,
-                        PoddWebConstants.DEFAULT_SCHEMA_GRAPH)));
+                        PODD.DEFAULT_SCHEMA_MANAGEMENT_GRAPH.stringValue())));
         application.getPoddRepositoryManager().setArtifactManagementGraph(
                 PODD.VF.createURI(props.get(PoddWebConstants.PROPERTY_ARTIFACT_GRAPH,
-                        PoddWebConstants.DEFAULT_ARTIFACT_GRAPH)));
+                        PODD.DEFAULT_ARTIFACT_MANAGEMENT_GRAPH.stringValue())));
         
         // File Reference manager
         final DataReferenceProcessorRegistry nextFileRegistry = new DataReferenceProcessorRegistry();

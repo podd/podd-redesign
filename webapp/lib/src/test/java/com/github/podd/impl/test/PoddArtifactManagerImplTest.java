@@ -130,10 +130,7 @@ public class PoddArtifactManagerImplTest extends AbstractPoddArtifactManagerTest
         final RepositoryImplConfig repositoryImplConfig = RepositoryImplConfigBase.create(graph, repositoryNode);
         Assert.assertNotNull(repositoryImplConfig);
         Assert.assertNotNull(repositoryImplConfig.getType());
-        final LocalRepositoryManager repositoryManager =
-                new LocalRepositoryManager(this.tempDir.newFolder("repositorymanager"));
-        repositoryManager.initialize();
-        return new PoddRepositoryManagerImpl(managementRepository, repositoryManager, repositoryImplConfig);
+        return new PoddRepositoryManagerImpl(managementRepository, repositoryImplConfig, "");
     }
     
     @Override

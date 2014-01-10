@@ -170,11 +170,8 @@ public class PoddFileRepositoryManagerImplTest extends AbstractPoddFileRepositor
         final RepositoryImplConfig repositoryImplConfig = RepositoryImplConfigBase.create(graph, repositoryNode);
         Assert.assertNotNull(repositoryImplConfig);
         Assert.assertNotNull(repositoryImplConfig.getType());
-        final LocalRepositoryManager repositoryManager =
-                new LocalRepositoryManager(this.tempDir.newFolder("repositorymanager"));
-        repositoryManager.initialize();
         final PoddRepositoryManagerImpl repositoryManagerImpl =
-                new PoddRepositoryManagerImpl(managementRepository, repositoryManager, repositoryImplConfig);
+                new PoddRepositoryManagerImpl(managementRepository, repositoryImplConfig, "");
         
         final PoddOWLManager owlManager =
                 new PoddOWLManagerImpl(this.getNewOWLOntologyManagerFactory(), this.getNewReasonerFactory());

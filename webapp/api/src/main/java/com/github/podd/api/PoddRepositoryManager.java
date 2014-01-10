@@ -19,6 +19,7 @@
  */
 package com.github.podd.api;
 
+import java.io.IOException;
 import java.util.Set;
 
 import org.openrdf.OpenRDFException;
@@ -73,8 +74,11 @@ public interface PoddRepositoryManager
      * @return A link to the initialised repository managed by this manager.
      * @throws OpenRDFException
      *             If there are any errors with the repository at this stage.
+     * @throws IOException
+     *             If there are errors finding the repository.
      */
-    Repository getPermanentRepository(Set<? extends OWLOntologyID> schemaOntologies) throws OpenRDFException;
+    Repository getPermanentRepository(Set<? extends OWLOntologyID> schemaOntologies) throws OpenRDFException,
+        IOException;
     
     /**
      * Gets a federated repository over the permanent repository for the given schema ontologies,
@@ -87,8 +91,9 @@ public interface PoddRepositoryManager
      * @param schemaOntologies
      * @return
      * @throws OpenRDFException
+     * @throws IOException 
      */
-    Repository getReadOnlyFederatedRepository(Set<? extends OWLOntologyID> schemaOntologies) throws OpenRDFException;
+    Repository getReadOnlyFederatedRepository(Set<? extends OWLOntologyID> schemaOntologies) throws OpenRDFException, IOException;
     
     /**
      * 

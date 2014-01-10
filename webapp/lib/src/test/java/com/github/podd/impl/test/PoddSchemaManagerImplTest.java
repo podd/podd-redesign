@@ -88,7 +88,7 @@ public class PoddSchemaManagerImplTest extends AbstractPoddSchemaManagerTest
         final LocalRepositoryManager repositoryManager =
                 new LocalRepositoryManager(this.tempDir.newFolder("repositorymanager"));
         repositoryManager.initialize();
-        return new PoddRepositoryManagerImpl(managementRepository, repositoryManager, repositoryImplConfig);
+        return new PoddRepositoryManagerImpl(managementRepository, repositoryImplConfig, "");
     }
     
     @Override

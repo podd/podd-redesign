@@ -261,10 +261,8 @@ public interface PoddWebConstants
     public static final String DEFAULT_MANAGEMENT_SESAME_LOCATION = "";
     
     public static final String PROPERTY_SCHEMA_GRAPH = "podd.schemagraph";
-    public static final String DEFAULT_SCHEMA_GRAPH = "urn:podd:default:graph:schemamanagement";
     
     public static final String PROPERTY_ARTIFACT_GRAPH = "podd.artifactgraph";
-    public static final String DEFAULT_ARTIFACT_GRAPH = "urn:podd:default:graph:artifactmanagement";
     
     /**
      * Key used to select published artifacts. Defaults to true.
