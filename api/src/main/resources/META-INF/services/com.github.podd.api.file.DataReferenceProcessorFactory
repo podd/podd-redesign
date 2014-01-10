@@ -1,0 +1,2 @@
+com.github.podd.impl.file.SPARQLDataReferenceProcessorFactoryImpl
+com.github.podd.impl.file.SSHFileReferenceProcessorFactoryImpl

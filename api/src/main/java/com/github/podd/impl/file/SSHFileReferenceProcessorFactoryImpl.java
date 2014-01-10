@@ -19,7 +19,6 @@ package com.github.podd.impl.file;
 import java.util.Collections;
 import java.util.Set;
 
-import org.kohsuke.MetaInfServices;
 import org.openrdf.model.vocabulary.RDF;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,7 +35,6 @@ import com.github.podd.utils.PODD;
  * 
  * @author kutila
  */
-@MetaInfServices(DataReferenceProcessorFactory.class)
 public class SSHFileReferenceProcessorFactoryImpl implements SSHFileReferenceProcessorFactory
 {
     
