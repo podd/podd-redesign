@@ -1,0 +1,13 @@
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>.
+@prefix rep: <http://www.openrdf.org/config/repository#>.
+@prefix sr: <http://www.openrdf.org/config/repository/sail#>.
+@prefix sail: <http://www.openrdf.org/config/sail#>.
+@prefix native: <http://www.openrdf.org/config/sail/native#>.
+
+# SailRepository on top of NativeStore, for testing
+[] rep:repositoryType "openrdf:SailRepository" ;
+      sr:sailImpl [
+         sail:sailType "openrdf:NativeStore";
+         sail:tripleIndexes "spoc,cspo,posc,cpos,cpso,psoc"
+      ]
+.
