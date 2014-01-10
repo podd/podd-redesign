@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map.Entry;
@@ -125,7 +126,6 @@ public class OntologyUtils
         
         final Set<OWLOntologyID> finalOrderImports =
                 OntologyUtils.finalOrderImports(results, ontologyIDs, orderImports, artifactImports, importsMap);
-        
         
         return new ArrayList<>(finalOrderImports);
     }
@@ -780,6 +780,32 @@ public class OntologyUtils
                     }
                     else
                     {
+                        Set<URI> tempSet1 = new HashSet<>(set1);
+                        Set<URI> tempSet2 = new HashSet<>(set2);
+                        for(URI nextImport1 : set1)
+                        {
+                            if(set2.contains(nextImport1))
+                            {
+                                tempSet1.remove(nextImport1);
+                            }
+                        }
+                        for(URI nextImport2 : set2)
+                        {
+                            if(set1.contains(nextImport2))
+                            {
+                                tempSet2.remove(nextImport2);
+                            }
+                        }
+                        
+                        if(tempSet1.size() > tempSet2.size())
+                        {
+                            return 1;
+                        }
+                        else if(tempSet2.size() > tempSet1.size())
+                        {
+                            return -1;
+                        }
+                        
                         // Default to lexical mapping, as there is no direct semantic link between
                         // them
                         // at this point
