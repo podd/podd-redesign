@@ -409,11 +409,6 @@
 				<version>1.48</version>
 			</dependency>
 			<dependency>
-				<groupId>org.kohsuke.metainf-services</groupId>
-				<artifactId>metainf-services</artifactId>
-				<version>1.4</version>
-			</dependency>
-			<dependency>
 				<groupId>com.github.ansell.property-util</groupId>
 				<artifactId>property-util</artifactId>
 				<version>0.2</version>
