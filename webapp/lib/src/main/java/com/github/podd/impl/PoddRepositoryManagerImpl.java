@@ -271,25 +271,6 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
     }
     
     @Override
-    public void mapPermanentRepository(final Set<? extends OWLOntologyID> schemaOntologies, final Repository repository)
-        throws RepositoryException
-    {
-        synchronized(this.permanentRepositories)
-        {
-            // Override any previous repositories that were there
-            final ManualShutdownRepository putIfAbsent =
-                    this.permanentRepositories.putIfAbsent(schemaOntologies, new ManualShutdownRepository(repository));
-            
-            // TODO: Shutdown putIfAbsent
-            if(putIfAbsent != null)
-            {
-                putIfAbsent.shutDown();
-                this.log.warn("Overriding previous repository for a set of schema ontologies: {}", schemaOntologies);
-            }
-        }
-    }
-    
-    @Override
     public boolean safeContexts(final URI... contexts)
     {
         boolean returnValue = true;

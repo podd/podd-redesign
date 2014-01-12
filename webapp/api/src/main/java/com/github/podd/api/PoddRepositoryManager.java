@@ -102,18 +102,6 @@ public interface PoddRepositoryManager
     URI getSchemaManagementGraph();
     
     /**
-     * Identfies the given repository as being a suitable target for artifacts importing the given
-     * schema ontologies.
-     * 
-     * @param schemaOntologies
-     *            A set of schema ontologies that match the given repository.
-     * @param repository
-     *            The repository target.
-     */
-    void mapPermanentRepository(Set<? extends OWLOntologyID> schemaOntologies, Repository repository)
-        throws OpenRDFException;
-    
-    /**
      * Verifies that the context is not null, not the default graph (sesame:nil), and is not one of
      * the management graphs.
      * 
