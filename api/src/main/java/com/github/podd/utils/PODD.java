@@ -556,8 +556,13 @@ public interface PODD
     public static final URI PODD_REPOSITORY_MANAGER = PODD.VF
             .createURI("http://purl.org/podd/ns/repository#RepositoryManager");
     
+    public static final URI PODD_REPOSITORY = PODD.VF.createURI("http://purl.org/podd/ns/repository#Repository");
+    
     public static final URI PODD_REPOSITORY_MANAGER_CONTAINS_REPOSITORY = PODD.VF
             .createURI("http://purl.org/podd/ns/repository#repositoryManagerContainsRepository");
+    
+    public static final URI PODD_REPOSITORY_ID_IN_MANAGER = PODD.VF
+            .createURI("http://purl.org/podd/ns/repository#repositoryIdInManager");
     
     public static final URI PODD_REPOSITORY_MANAGER_TYPE = PODD.VF
             .createURI("http://purl.org/podd/ns/repository#repositoryManagerType");
@@ -574,6 +579,8 @@ public interface PODD
     public static final URI PODD_REPOSITORY_MANAGER_TYPE_REMOTE = PODD.VF
             .createURI("http://purl.org/podd/ns/repository#RepositoryManagerTypeRemote");
     
-    public static final URI PODD_REPOSITORY_CONTAINS_SCHEMA = PODD.VF
-            .createURI("http://purl.org/podd/ns/repository#containsSchema");
+    public static final URI PODD_REPOSITORY_CONTAINS_SCHEMA_IRI = PODD.VF
+            .createURI("http://purl.org/podd/ns/repository#containsSchemaIRI");
+    public static final URI PODD_REPOSITORY_CONTAINS_SCHEMA_VERSION = PODD.VF
+            .createURI("http://purl.org/podd/ns/repository#containsSchemaVersion");
 }
