@@ -256,12 +256,12 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
                                             this.permanentRepositoryConfigForNew);
                             sesameRepositoryManager.addRepositoryConfig(config);
                             
-                            final Repository nextRepository = sesameRepositoryManager.getRepository(newRepositoryID);
+                            final ManualShutdownRepository nextRepository =
+                                    new ManualShutdownRepository(sesameRepositoryManager.getRepository(newRepositoryID));
                             // If we somehow created a new repository since we entered this section,
                             // we need to remove the new repository to cleanup
-                            final Repository putIfAbsent =
-                                    this.permanentRepositories.putIfAbsent(schemaOntologies,
-                                            new ManualShutdownRepository(nextRepository));
+                            final ManualShutdownRepository putIfAbsent =
+                                    this.permanentRepositories.putIfAbsent(schemaOntologies, nextRepository);
                             if(putIfAbsent != null)
                             {
                                 this.log.error("Created a new duplicate repository that must now be removed: {}",
@@ -276,7 +276,7 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
                             }
                             else
                             {
-                                permanentRepository = new ManualShutdownRepository(nextRepository);
+                                permanentRepository = nextRepository;
                                 
                                 // In this case, we need to copy the relevant schema ontologies over
                                 // to

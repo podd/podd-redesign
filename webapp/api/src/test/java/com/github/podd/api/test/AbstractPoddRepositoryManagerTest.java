@@ -50,7 +50,7 @@ public abstract class AbstractPoddRepositoryManagerTest
     protected final ValueFactory vf = PODD.VF;
     
     @Rule
-    public Timeout timeout = new Timeout(30000);
+    public Timeout timeout = new Timeout(300000);
     
     @Rule
     public TemporaryFolder tempDir = new TemporaryFolder();
@@ -337,8 +337,7 @@ public abstract class AbstractPoddRepositoryManagerTest
                         .<OWLOntologyID> singleton(this.testOntologyID));
         Assert.assertNotNull("Permanent repository was null", permanentRepository2);
         
-        // TODO: Cannot check for object equality due to our wrapping technique with
-        // ManualShutdownRepository??
+        // Must be exactly the same object
         Assert.assertEquals(permanentRepository1, permanentRepository2);
     }
     
