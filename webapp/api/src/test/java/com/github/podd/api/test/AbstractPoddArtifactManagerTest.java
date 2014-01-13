@@ -56,6 +56,7 @@ import org.openrdf.model.vocabulary.RDFS;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
+import org.openrdf.repository.sail.SailRepository;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.RDFParseException;
 import org.openrdf.rio.RDFParser;
@@ -63,6 +64,7 @@ import org.openrdf.rio.RDFWriter;
 import org.openrdf.rio.Rio;
 import org.openrdf.rio.UnsupportedRDFormatException;
 import org.openrdf.rio.helpers.StatementCollector;
+import org.openrdf.sail.memory.MemoryStore;
 import org.semanticweb.owlapi.formats.OWLOntologyFormatFactoryRegistry;
 import org.semanticweb.owlapi.io.OWLOntologyDocumentSource;
 import org.semanticweb.owlapi.io.StreamDocumentSource;
@@ -137,6 +139,8 @@ public abstract class AbstractPoddArtifactManagerTest
     private URI artifactGraph;
     
     private Path testPath;
+    
+    private Repository managementRepository;
     
     /**
      * Write contents of specified context to a file
@@ -261,7 +265,8 @@ public abstract class AbstractPoddArtifactManagerTest
      * @throws Exception
      *             If there were problems creating or initialising the Repository.
      */
-    protected abstract PoddRepositoryManager getNewRepositoryManager(Path testPath) throws Exception;
+    protected abstract PoddRepositoryManager getNewRepositoryManager(Repository managementRepository, Path testPath)
+        throws Exception;
     
     /**
      * Concrete tests must override this to provide a new, empty, instance of
@@ -527,6 +532,9 @@ public abstract class AbstractPoddArtifactManagerTest
         this.artifactGraph = PODD.VF.createURI("urn:test:artifact-graph");
         
         testPath = tempDir.newFolder("test-podd-repository-manager").toPath();
+        managementRepository = new SailRepository(new MemoryStore());
+        managementRepository.initialize();
+        
         this.setupManagers();
     }
     
@@ -535,7 +543,7 @@ public abstract class AbstractPoddArtifactManagerTest
      */
     private final void setupManagers() throws Exception
     {
-        this.testRepositoryManager = this.getNewRepositoryManager(testPath);
+        this.testRepositoryManager = this.getNewRepositoryManager(managementRepository, testPath);
         this.testRepositoryManager.setSchemaManagementGraph(this.schemaGraph);
         this.testRepositoryManager.setArtifactManagementGraph(this.artifactGraph);
         

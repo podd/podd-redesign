@@ -121,10 +121,8 @@ public class PoddArtifactManagerImplTest extends AbstractPoddArtifactManagerTest
     }
     
     @Override
-    protected PoddRepositoryManager getNewRepositoryManager(Path testPath) throws Exception
+    protected PoddRepositoryManager getNewRepositoryManager(Repository managementRepository, Path testPath) throws Exception
     {
-        final Repository managementRepository = new SailRepository(new MemoryStore());
-        managementRepository.initialize();
         
         final Model graph =
                 Rio.parse(this.getClass().getResourceAsStream("/memorystoreconfig.ttl"), "", RDFFormat.TURTLE);
