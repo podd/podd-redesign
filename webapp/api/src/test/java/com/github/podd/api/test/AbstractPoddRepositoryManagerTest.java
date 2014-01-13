@@ -378,6 +378,8 @@ public abstract class AbstractPoddRepositoryManagerTest
         // shutdown the repository manager
         this.testRepositoryManager.shutDown();
         
+        managementRepository.initialize();
+        
         // Reload a repository manager on this path
         PoddRepositoryManager reloadedRepositoryManager =
                 getNewPoddRepositoryManagerInstance(managementRepository, testTempRepositoryManagerPath);
