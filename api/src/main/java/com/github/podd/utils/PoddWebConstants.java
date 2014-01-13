@@ -31,6 +31,8 @@ public interface PoddWebConstants
      */
     public static final String PROPERTY_TEMPLATE_BASE = "poddBase.html.ftl";
     
+    public static final String PROPERTY_PODD_HOME = "";
+    
     /**
      * Path to locate resources
      */

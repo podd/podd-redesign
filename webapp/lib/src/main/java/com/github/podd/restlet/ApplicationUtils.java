@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -327,9 +328,12 @@ public class ApplicationUtils
         final Resource repositoryNode = GraphUtil.getUniqueSubject(graph, RepositoryConfigSchema.REPOSITORYTYPE, null);
         final RepositoryImplConfig repositoryImplConfig = RepositoryImplConfigBase.create(graph, repositoryNode);
         
+        String poddHome = props.get(PoddWebConstants.PROPERTY_PODD_HOME, "");
+        Path poddHomePath = Paths.get(poddHome);
+        
         application.setPoddRepositoryManager(new PoddRepositoryManagerImpl(nextManagementRepository,
                 repositoryImplConfig, props.get(PoddWebConstants.PROPERTY_PERMANENT_SESAME_REPOSITORY_SERVER,
-                        PoddWebConstants.DEFAULT_PERMANENT_SESAME_REPOSITORY_SERVER)));
+                        PoddWebConstants.DEFAULT_PERMANENT_SESAME_REPOSITORY_SERVER), poddHomePath));
         
         application.getPoddRepositoryManager().setSchemaManagementGraph(
                 PODD.VF.createURI(props.get(PoddWebConstants.PROPERTY_SCHEMA_GRAPH,
