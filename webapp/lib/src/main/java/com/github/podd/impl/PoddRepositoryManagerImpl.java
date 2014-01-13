@@ -201,51 +201,55 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
                                         this.repositoryGraph));
                         for(Statement nextRepositoryStatement : repositoriesInManager)
                         {
-                            Model model = new LinkedHashModel();
-                            managementConnection.exportStatements(nextRepositoryStatement.getSubject(),
-                                    PODD.PODD_REPOSITORY_CONTAINS_SCHEMA_VERSION, null, true, new StatementCollector(
-                                            model), this.repositoryGraph);
-                            
-                            boolean missingSchema = false;
-                            for(OWLOntologyID nextSchemaOntology : schemaOntologies)
+                            if(nextRepositoryStatement.getObject() instanceof URI)
                             {
-                                if(!model.contains(nextRepositoryStatement.getSubject(),
-                                        PODD.PODD_REPOSITORY_CONTAINS_SCHEMA_VERSION, nextSchemaOntology
-                                                .getVersionIRI().toOpenRDFURI()))
+                                Model model = new LinkedHashModel();
+                                managementConnection.exportStatements((URI)nextRepositoryStatement.getObject(),
+                                        PODD.PODD_REPOSITORY_CONTAINS_SCHEMA_VERSION, null, true,
+                                        new StatementCollector(model), this.repositoryGraph);
+                                
+                                boolean missingSchema = false;
+                                for(OWLOntologyID nextSchemaOntology : schemaOntologies)
                                 {
-                                    missingSchema = true;
-                                    break;
-                                }
-                            }
-                            
-                            if(!missingSchema)
-                            {
-                                for(Value nextSchema : model.filter(nextRepositoryStatement.getSubject(),
-                                        PODD.PODD_REPOSITORY_CONTAINS_SCHEMA_VERSION, null).objects())
-                                {
-                                    if(nextSchema instanceof URI)
+                                    if(!model.contains((URI)nextRepositoryStatement.getObject(),
+                                            PODD.PODD_REPOSITORY_CONTAINS_SCHEMA_VERSION, nextSchemaOntology
+                                                    .getVersionIRI().toOpenRDFURI()))
                                     {
-                                        boolean foundNextSchema = false;
-                                        for(OWLOntologyID nextSchemaOntology : schemaOntologies)
+                                        missingSchema = true;
+                                        break;
+                                    }
+                                }
+                                
+                                if(!missingSchema)
+                                {
+                                    for(Value nextSchema : model.filter((URI)nextRepositoryStatement.getObject(),
+                                            PODD.PODD_REPOSITORY_CONTAINS_SCHEMA_VERSION, null).objects())
+                                    {
+                                        if(nextSchema instanceof URI)
                                         {
-                                            if(nextSchemaOntology.getVersionIRI().toOpenRDFURI().equals(nextSchema))
+                                            boolean foundNextSchema = false;
+                                            for(OWLOntologyID nextSchemaOntology : schemaOntologies)
                                             {
-                                                foundNextSchema = true;
+                                                if(nextSchemaOntology.getVersionIRI().toOpenRDFURI().equals(nextSchema))
+                                                {
+                                                    foundNextSchema = true;
+                                                    break;
+                                                }
+                                            }
+                                            if(!foundNextSchema)
+                                            {
+                                                missingSchema = true;
                                                 break;
                                             }
                                         }
-                                        if(!foundNextSchema)
-                                        {
-                                            missingSchema = true;
-                                            break;
-                                        }
                                     }
                                 }
-                            }
-                            
-                            if(!missingSchema)
-                            {
-                                repositoryUri = (URI)nextRepositoryStatement.getSubject();
+                                
+                                if(!missingSchema)
+                                {
+                                    repositoryUri = (URI)nextRepositoryStatement.getObject();
+                                    break;
+                                }
                             }
                         }
                         

@@ -1671,7 +1671,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         }
         else
         {
-            this.log.warn("More than one top object found");
+            this.log.warn("More than one top object found: {}", ontologyIRI.getOntologyIRI());
             return results.get(0);
         }
     }

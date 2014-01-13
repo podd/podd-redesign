@@ -1031,6 +1031,11 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
                     permanentConnection = nextConnection;
                 }
                 final URI objectIRI = this.getSesameManager().getTopObjectIRI(artifactId, permanentConnection);
+                if(objectIRI == null)
+                {
+                    throw new UnmanagedArtifactIRIException(artifactId.getOntologyIRI(),
+                            "Could not find the top object for an artifact");
+                }
                 results.add(this.getSesameManager().getObjectLabel(artifactId, objectIRI, managementConnection,
                         permanentConnection, this.getRepositoryManager().getSchemaManagementGraph(),
                         this.getRepositoryManager().getArtifactManagementGraph()));
