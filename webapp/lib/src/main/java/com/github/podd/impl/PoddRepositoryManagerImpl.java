@@ -93,7 +93,7 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
     
     private RepositoryImplConfig permanentRepositoryConfigForNew;
     
-    private ConcurrentMap<String, RepositoryManager> sesameRepositoryManagers;
+    private ConcurrentMap<String, RepositoryManager> sesameRepositoryManagers = new ConcurrentHashMap<>();
     
     private URI repositoryGraph = PODD.DEFAULT_REPOSITORY_MANAGEMENT_GRAPH;
     
