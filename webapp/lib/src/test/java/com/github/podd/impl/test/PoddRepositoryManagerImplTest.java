@@ -32,6 +32,7 @@ import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.Rio;
 import org.openrdf.sail.memory.MemoryStore;
 
+import com.github.ansell.propertyutil.PropertyUtil;
 import com.github.podd.api.PoddRepositoryManager;
 import com.github.podd.api.test.AbstractPoddRepositoryManagerTest;
 import com.github.podd.impl.PoddRepositoryManagerImpl;
@@ -55,6 +56,6 @@ public class PoddRepositoryManagerImplTest extends AbstractPoddRepositoryManager
         final RepositoryImplConfig repositoryImplConfig = RepositoryImplConfigBase.create(graph, repositoryNode);
         Assert.assertNotNull(repositoryImplConfig);
         Assert.assertNotNull(repositoryImplConfig.getType());
-        return new PoddRepositoryManagerImpl(managementRepository, repositoryImplConfig, "", tempDirPath);
+        return new PoddRepositoryManagerImpl(managementRepository, repositoryImplConfig, "", tempDirPath, new PropertyUtil("podd"));
     }
 }

@@ -38,6 +38,7 @@ import org.semanticweb.owlapi.model.OWLOntologyManagerFactoryRegistry;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactoryRegistry;
 
+import com.github.ansell.propertyutil.PropertyUtil;
 import com.github.podd.api.PoddArtifactManager;
 import com.github.podd.api.PoddOWLManager;
 import com.github.podd.api.PoddRepositoryManager;
@@ -131,7 +132,7 @@ public class PoddArtifactManagerImplTest extends AbstractPoddArtifactManagerTest
         Assert.assertNotNull(repositoryImplConfig);
         Assert.assertNotNull(repositoryImplConfig.getType());
         return new PoddRepositoryManagerImpl(managementRepository, repositoryImplConfig, "", tempDir.newFolder(
-                "test-podd-repository-manager").toPath());
+                "test-podd-repository-manager").toPath(), new PropertyUtil("podd"));
     }
     
     @Override

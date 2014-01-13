@@ -256,8 +256,8 @@ public interface PoddWebConstants
     /**
      * Graph in the management repository containing permanent repository details
      */
-    public static final String PROPERTY_PERMANENT_SESAME_REPOSITORY_SERVER = "podd.repositorygraph";
-    public static final String DEFAULT_PERMANENT_SESAME_REPOSITORY_SERVER = "urn:podd:default:graph:repositories";
+    public static final String PROPERTY_PERMANENT_SESAME_REPOSITORY_SERVER = "podd.repository.defaultpermanentserver";
+    public static final String DEFAULT_PERMANENT_SESAME_REPOSITORY_SERVER = "";
     // public static final String DEFAULT_PERMANENT_SESAME_REPOSITORY_LOCATION =
     // "http://localhost:8080/openrdf-sesame/";
     
@@ -266,10 +266,6 @@ public interface PoddWebConstants
      */
     public static final String PROPERTY_MANAGEMENT_SESAME_LOCATION = "podd.repository.management.location";
     public static final String DEFAULT_MANAGEMENT_SESAME_LOCATION = "";
-    
-    public static final String PROPERTY_SCHEMA_GRAPH = "podd.schemagraph";
-    
-    public static final String PROPERTY_ARTIFACT_GRAPH = "podd.artifactgraph";
     
     /**
      * Key used to select published artifacts. Defaults to true.

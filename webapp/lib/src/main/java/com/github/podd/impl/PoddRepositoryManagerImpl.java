@@ -67,10 +67,10 @@ import org.semanticweb.owlapi.model.OWLOntologyID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.github.ansell.propertyutil.PropertyUtil;
 import com.github.podd.api.PoddRepositoryManager;
 import com.github.podd.utils.ManualShutdownRepository;
 import com.github.podd.utils.PODD;
-import com.github.podd.utils.PoddWebConstants;
 
 /**
  * @author Peter Ansell p_ansell@yahoo.com
@@ -78,28 +78,28 @@ import com.github.podd.utils.PoddWebConstants;
  */
 public class PoddRepositoryManagerImpl implements PoddRepositoryManager
 {
-    private URI artifactGraph = PODD.DEFAULT_ARTIFACT_MANAGEMENT_GRAPH;
-    
-    private URI dataRepositoryGraph = PODD.DEFAULT_FILE_REPOSITORY_MANAGEMENT_GRAPH;
-    
     private final Logger log = LoggerFactory.getLogger(this.getClass());
+    
+    private URI artifactGraph;
+    
+    private URI dataRepositoryGraph;
+    
+    private URI schemaGraph;
+    
+    private URI repositoryGraph;
+    
+    private String defaultPermanentRepositoryServerUrl;
+    
+    private Path poddHomeDirectory;
     
     private ManualShutdownRepository managementRepository;
     
     private ConcurrentMap<Set<? extends OWLOntologyID>, ManualShutdownRepository> permanentRepositories =
             new ConcurrentHashMap<>();
     
-    private URI schemaGraph = PODD.DEFAULT_SCHEMA_MANAGEMENT_GRAPH;
-    
     private RepositoryImplConfig permanentRepositoryConfigForNew;
     
     private ConcurrentMap<String, RepositoryManager> sesameRepositoryManagers = new ConcurrentHashMap<>();
-    
-    private URI repositoryGraph = PODD.DEFAULT_REPOSITORY_MANAGEMENT_GRAPH;
-    
-    private String defaultPermanentRepositoryServerUrl;
-    
-    private Path poddHomeDirectory;
     
     /**
      * 
@@ -109,7 +109,7 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
      */
     public PoddRepositoryManagerImpl(final Repository managementRepository,
             final RepositoryImplConfig permanentRepositoryConfigForNew,
-            final String defaultPermanentRepositoryServerUrl, final Path poddHomeDirectory)
+            final String defaultPermanentRepositoryServerUrl, final Path poddHomeDirectory, final PropertyUtil props)
         throws RepositoryConfigException
     {
         this.managementRepository = new ManualShutdownRepository(managementRepository);
@@ -117,6 +117,18 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
         this.permanentRepositoryConfigForNew = permanentRepositoryConfigForNew;
         this.defaultPermanentRepositoryServerUrl = defaultPermanentRepositoryServerUrl;
         this.poddHomeDirectory = poddHomeDirectory;
+        this.artifactGraph =
+                PODD.VF.createURI(props.get(PODD.PROPERTY_ARTIFACT_MANAGEMENT_GRAPH,
+                        PODD.DEFAULT_ARTIFACT_MANAGEMENT_GRAPH.stringValue()));
+        this.dataRepositoryGraph =
+                PODD.VF.createURI(props.get(PODD.PROPERTY_DATA_REPOSITORY_MANAGEMENT_GRAPH,
+                        PODD.DEFAULT_DATA_REPOSITORY_MANAGEMENT_GRAPH.stringValue()));
+        this.schemaGraph =
+                PODD.VF.createURI(props.get(PODD.PROPERTY_SCHEMA_MANAGEMENT_GRAPH,
+                        PODD.DEFAULT_SCHEMA_MANAGEMENT_GRAPH.stringValue()));
+        this.repositoryGraph =
+                PODD.VF.createURI(props.get(PODD.PROPERTY_REPOSITORY_MANAGEMENT_GRAPH,
+                        PODD.DEFAULT_REPOSITORY_MANAGEMENT_GRAPH.stringValue()));
     }
     
     @Override

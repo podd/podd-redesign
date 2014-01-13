@@ -333,14 +333,7 @@ public class ApplicationUtils
         
         application.setPoddRepositoryManager(new PoddRepositoryManagerImpl(nextManagementRepository,
                 repositoryImplConfig, props.get(PoddWebConstants.PROPERTY_PERMANENT_SESAME_REPOSITORY_SERVER,
-                        PoddWebConstants.DEFAULT_PERMANENT_SESAME_REPOSITORY_SERVER), poddHomePath));
-        
-        application.getPoddRepositoryManager().setSchemaManagementGraph(
-                PODD.VF.createURI(props.get(PoddWebConstants.PROPERTY_SCHEMA_GRAPH,
-                        PODD.DEFAULT_SCHEMA_MANAGEMENT_GRAPH.stringValue())));
-        application.getPoddRepositoryManager().setArtifactManagementGraph(
-                PODD.VF.createURI(props.get(PoddWebConstants.PROPERTY_ARTIFACT_GRAPH,
-                        PODD.DEFAULT_ARTIFACT_MANAGEMENT_GRAPH.stringValue())));
+                        PoddWebConstants.DEFAULT_PERMANENT_SESAME_REPOSITORY_SERVER), poddHomePath, props));
         
         // File Reference manager
         final DataReferenceProcessorRegistry nextFileRegistry = new DataReferenceProcessorRegistry();
@@ -423,7 +416,8 @@ public class ApplicationUtils
         ApplicationUtils.setupSchemas(application);
         
         final PoddSesameRealm nextRealm =
-                new PoddSesameRealm(nextManagementRepository, PODD.DEFAULT_USER_MANAGEMENT_GRAPH);
+                new PoddSesameRealm(nextManagementRepository, PODD.VF.createURI(props.get(
+                        PODD.PROPERTY_USER_MANAGEMENT_GRAPH, PODD.DEFAULT_USER_MANAGEMENT_GRAPH.stringValue())));
         
         // FIXME: Make this configurable
         nextRealm.setName("PODDRealm");

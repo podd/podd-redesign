@@ -36,6 +36,7 @@ import org.semanticweb.owlapi.model.OWLOntologyManagerFactoryRegistry;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactoryRegistry;
 
+import com.github.ansell.propertyutil.PropertyUtil;
 import com.github.podd.api.PoddOWLManager;
 import com.github.podd.api.PoddRepositoryManager;
 import com.github.podd.api.PoddSchemaManager;
@@ -89,7 +90,7 @@ public class PoddSchemaManagerImplTest extends AbstractPoddSchemaManagerTest
                 new LocalRepositoryManager(this.tempDir.newFolder("repositorymanager"));
         repositoryManager.initialize();
         return new PoddRepositoryManagerImpl(managementRepository, repositoryImplConfig, "", tempDir.newFolder(
-                "test-podd-repository-manager").toPath());
+                "test-podd-repository-manager").toPath(), new PropertyUtil("podd"));
     }
     
     @Override
