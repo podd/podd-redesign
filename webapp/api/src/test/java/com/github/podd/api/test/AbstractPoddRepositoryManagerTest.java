@@ -383,6 +383,8 @@ public abstract class AbstractPoddRepositoryManagerTest
         // Reload a repository manager on this path
         PoddRepositoryManager reloadedRepositoryManager =
                 getNewPoddRepositoryManagerInstance(managementRepository, testTempRepositoryManagerPath);
+        reloadedRepositoryManager.setSchemaManagementGraph(schemaGraph);
+        reloadedRepositoryManager.setArtifactManagementGraph(artifactGraph);
         
         Assert.assertNotNull(reloadedRepositoryManager);
         
