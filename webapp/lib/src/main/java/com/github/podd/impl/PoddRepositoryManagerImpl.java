@@ -289,6 +289,8 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
                                     permanentConnection.begin();
                                     for(final OWLOntologyID nextSchemaOntology : schemaOntologies)
                                     {
+                                        // TODO: Check if the ontology version exists in the
+                                        // management connection
                                         if(!permanentConnection.hasStatement(null, null, null, false,
                                                 nextSchemaOntology.getVersionIRI().toOpenRDFURI()))
                                         {
