@@ -27,11 +27,16 @@ public interface PoddWebConstants
     public static final String COOKIE_NAME = "PODDAuthentication";
     
     /**
-     * Freemarker template used as the base for rendering all HTML pages
+     * Property for freemarker template used as the base for rendering all HTML pages
      */
-    public static final String PROPERTY_TEMPLATE_BASE = "poddBase.html.ftl";
+    public static final String PROPERTY_TEMPLATE_BASE = "podd.web.basetemplate";
     
-    public static final String PROPERTY_PODD_HOME = "";
+    /**
+     * Default freemarker template used as the base for rendering all HTML pages
+     */
+    public static final String DEFAULT_TEMPLATE_BASE = "poddBase.html.ftl";
+    
+    public static final String PROPERTY_PODD_HOME = "podd.home";
     
     /**
      * Path to locate resources
