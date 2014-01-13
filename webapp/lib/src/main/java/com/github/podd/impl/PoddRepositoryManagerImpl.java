@@ -357,7 +357,7 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
                                 managementConnection.add(repositoryManagerURI,
                                         PODD.PODD_REPOSITORY_MANAGER_CONTAINS_REPOSITORY, repositoryUri,
                                         this.repositoryGraph);
-                                managementConnection.add(repositoryUri, RDF.TYPE, PODD.PODD_REPOSITORY);
+                                managementConnection.add(repositoryUri, RDF.TYPE, PODD.PODD_REPOSITORY, this.repositoryGraph);
                                 managementConnection.add(repositoryUri, PODD.PODD_REPOSITORY_ID_IN_MANAGER,
                                         repositoryIdInManager, this.repositoryGraph);
                                 for(OWLOntologyID nextSchemaOntologyID : schemaOntologies)
