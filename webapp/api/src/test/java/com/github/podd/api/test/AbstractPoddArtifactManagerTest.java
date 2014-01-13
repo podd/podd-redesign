@@ -1092,6 +1092,33 @@ public abstract class AbstractPoddArtifactManagerTest
                 TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES, model.size());
     }
     
+    @Test
+    public final void testExportArtifactAfterReload() throws Exception
+    {
+        this.loadVersion1SchemaOntologies();
+        
+        // prepare: upload a test artifact
+        final InputStream inputStream1 = this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_20130206);
+        final InferredOWLOntologyID artifactIDv1 =
+                this.testArtifactManager.loadArtifact(inputStream1, RDFFormat.TURTLE);
+        this.verifyLoadedArtifact(artifactIDv1, 12, TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES,
+                TestConstants.TEST_ARTIFACT_BASIC_1_20130206_INFERRED_TRIPLES, false);
+        
+        final Model model = this.testArtifactManager.exportArtifact(artifactIDv1, false);
+        
+        Assert.assertFalse("Exported artifact was empty", model.isEmpty());
+        Assert.assertEquals("Incorrect statement count in exported artifact",
+                TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES, model.size());
+        
+        this.setupManagers();
+        
+        final Model modelAfterReload = this.testArtifactManager.exportArtifact(artifactIDv1, false);
+        
+        Assert.assertFalse("Exported artifact was empty", modelAfterReload.isEmpty());
+        Assert.assertEquals("Incorrect statement count in exported artifact",
+                TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES, modelAfterReload.size());
+    }
+    
     /**
      * Test method for
      * {@link com.github.podd.api.PoddArtifactManager#exportObjectMetadata(URI, java.io.OutputStream, RDFFormat, boolean, MetadataPolicy, InferredOWLOntologyID)}
