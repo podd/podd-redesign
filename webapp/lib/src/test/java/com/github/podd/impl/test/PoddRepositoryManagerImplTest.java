@@ -45,11 +45,8 @@ public class PoddRepositoryManagerImplTest extends AbstractPoddRepositoryManager
 {
     
     @Override
-    protected PoddRepositoryManager getNewPoddRepositoryManagerInstance(Path tempDirPath) throws Exception
+    protected PoddRepositoryManager getNewPoddRepositoryManagerInstance(Repository managementRepository, Path tempDirPath) throws Exception
     {
-        final Repository managementRepository = new SailRepository(new MemoryStore());
-        managementRepository.initialize();
-        
         final Model graph =
                 Rio.parse(this.getClass().getResourceAsStream("/memorystoreconfig.ttl"), "", RDFFormat.TURTLE);
         final Resource repositoryNode = GraphUtil.getUniqueSubject(graph, RepositoryConfigSchema.REPOSITORYTYPE, null);

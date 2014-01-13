@@ -32,6 +32,8 @@ import org.openrdf.model.impl.ValueFactoryImpl;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
+import org.openrdf.repository.sail.SailRepository;
+import org.openrdf.sail.memory.MemoryStore;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLOntologyID;
 import org.slf4j.Logger;
@@ -131,6 +133,7 @@ public abstract class AbstractPoddRepositoryManagerTest
     private URI testVersionUriC1;
     private URI testVersionUriC3;
     private Path testTempRepositoryManagerPath;
+    private Repository managementRepository;
     
     private final InferredOWLOntologyID owlid(final IRI ontologyUri, final IRI versionUri, final IRI inferredUri)
     {
@@ -156,8 +159,8 @@ public abstract class AbstractPoddRepositoryManagerTest
      * @return A new instance of PoddOWLManager, for each call to this method
      * @throws Exception
      */
-    protected abstract PoddRepositoryManager getNewPoddRepositoryManagerInstance(Path tempDirPath)
-        throws RepositoryException, Exception;
+    protected abstract PoddRepositoryManager getNewPoddRepositoryManagerInstance(Repository managementRepository,
+            Path tempDirPath) throws RepositoryException, Exception;
     
     @Before
     public void setUp() throws Exception
@@ -235,11 +238,19 @@ public abstract class AbstractPoddRepositoryManagerTest
         this.testVersionUriC3 = this.uri("http://example.org/podd/ns/version/poddC/3");
         this.testC3 = this.owlid(this.testOntologyUriC, this.testVersionUriC3);
         testTempRepositoryManagerPath = tempDir.newFolder("test-podd-base-directory").toPath();
-        this.testRepositoryManager = this.getNewPoddRepositoryManagerInstance(testTempRepositoryManagerPath);
-        
         this.schemaGraph = PODD.VF.createURI("urn:test:schema-graph");
         this.artifactGraph = PODD.VF.createURI("urn:test:artifact-graph");
         
+        managementRepository = new SailRepository(new MemoryStore());
+        managementRepository.initialize();
+        
+        setupManager();
+    }
+    
+    private void setupManager() throws Exception
+    {
+        this.testRepositoryManager =
+                this.getNewPoddRepositoryManagerInstance(managementRepository, testTempRepositoryManagerPath);
         this.testRepositoryManager.setSchemaManagementGraph(schemaGraph);
         this.testRepositoryManager.setArtifactManagementGraph(artifactGraph);
         
@@ -369,19 +380,18 @@ public abstract class AbstractPoddRepositoryManagerTest
         
         // Reload a repository manager on this path
         PoddRepositoryManager reloadedRepositoryManager =
-                getNewPoddRepositoryManagerInstance(testTempRepositoryManagerPath);
+                getNewPoddRepositoryManagerInstance(managementRepository, testTempRepositoryManagerPath);
         
         Assert.assertNotNull(reloadedRepositoryManager);
         
         // Repeat the double load process on the existing repository to test the other possible code
         // paths
         Repository permanentRepository3 =
-                this.testRepositoryManager
-                        .getPermanentRepository(Collections.<OWLOntologyID> singleton(testOntologyID));
+                reloadedRepositoryManager.getPermanentRepository(Collections.<OWLOntologyID> singleton(testOntologyID));
         Assert.assertNotNull("Permanent repository was null", permanentRepository3);
         
         Repository permanentRepository4 =
-                this.testRepositoryManager.getPermanentRepository(Collections
+                reloadedRepositoryManager.getPermanentRepository(Collections
                         .<OWLOntologyID> singleton(this.testOntologyID));
         Assert.assertNotNull("Permanent repository was null", permanentRepository4);
         

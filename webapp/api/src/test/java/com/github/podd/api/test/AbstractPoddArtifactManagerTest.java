@@ -1114,8 +1114,8 @@ public abstract class AbstractPoddArtifactManagerTest
         
         final Model modelAfterReload = this.testArtifactManager.exportArtifact(artifactIDv1, false);
         
-        Assert.assertFalse("Exported artifact was empty", modelAfterReload.isEmpty());
-        Assert.assertEquals("Incorrect statement count in exported artifact",
+        Assert.assertFalse("Exported artifact was empty after reload", modelAfterReload.isEmpty());
+        Assert.assertEquals("Incorrect statement count in exported artifact after reload",
                 TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES, modelAfterReload.size());
     }
     
