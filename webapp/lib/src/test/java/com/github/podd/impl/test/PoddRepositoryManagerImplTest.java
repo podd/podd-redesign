@@ -16,6 +16,8 @@
  */
 package com.github.podd.impl.test;
 
+import java.nio.file.Path;
+
 import org.junit.Assert;
 import org.openrdf.model.Model;
 import org.openrdf.model.Resource;
@@ -42,7 +44,7 @@ public class PoddRepositoryManagerImplTest extends AbstractPoddRepositoryManager
 {
     
     @Override
-    protected PoddRepositoryManager getNewPoddRepositoryManagerInstance() throws Exception
+    protected PoddRepositoryManager getNewPoddRepositoryManagerInstance(Path tempDirPath) throws Exception
     {
         final Repository managementRepository = new SailRepository(new MemoryStore());
         managementRepository.initialize();
@@ -53,7 +55,6 @@ public class PoddRepositoryManagerImplTest extends AbstractPoddRepositoryManager
         final RepositoryImplConfig repositoryImplConfig = RepositoryImplConfigBase.create(graph, repositoryNode);
         Assert.assertNotNull(repositoryImplConfig);
         Assert.assertNotNull(repositoryImplConfig.getType());
-        return new PoddRepositoryManagerImpl(managementRepository, repositoryImplConfig, "", tempDir.newFolder(
-                "test-podd-base-directory").toPath());
+        return new PoddRepositoryManagerImpl(managementRepository, repositoryImplConfig, "", tempDirPath);
     }
 }

@@ -16,6 +16,7 @@
  */
 package com.github.podd.api.test;
 
+import java.nio.file.Path;
 import java.util.Collections;
 
 import org.junit.After;
@@ -129,6 +130,7 @@ public abstract class AbstractPoddRepositoryManagerTest
     private URI testVersionUriB2;
     private URI testVersionUriC1;
     private URI testVersionUriC3;
+    private Path testTempRepositoryManagerPath;
     
     private final InferredOWLOntologyID owlid(final IRI ontologyUri, final IRI versionUri, final IRI inferredUri)
     {
@@ -154,8 +156,8 @@ public abstract class AbstractPoddRepositoryManagerTest
      * @return A new instance of PoddOWLManager, for each call to this method
      * @throws Exception
      */
-    protected abstract PoddRepositoryManager getNewPoddRepositoryManagerInstance() throws RepositoryException,
-        Exception;
+    protected abstract PoddRepositoryManager getNewPoddRepositoryManagerInstance(Path tempDirPath)
+        throws RepositoryException, Exception;
     
     @Before
     public void setUp() throws Exception
@@ -232,8 +234,8 @@ public abstract class AbstractPoddRepositoryManagerTest
         this.testC1 = this.owlid(this.testOntologyUriC, this.testVersionUriC1);
         this.testVersionUriC3 = this.uri("http://example.org/podd/ns/version/poddC/3");
         this.testC3 = this.owlid(this.testOntologyUriC, this.testVersionUriC3);
-        
-        this.testRepositoryManager = this.getNewPoddRepositoryManagerInstance();
+        testTempRepositoryManagerPath = tempDir.newFolder("test-podd-base-directory").toPath();
+        this.testRepositoryManager = this.getNewPoddRepositoryManagerInstance(testTempRepositoryManagerPath);
         
         this.schemaGraph = PODD.VF.createURI("urn:test:schema-graph");
         this.artifactGraph = PODD.VF.createURI("urn:test:artifact-graph");
@@ -339,6 +341,53 @@ public abstract class AbstractPoddRepositoryManagerTest
         
         // Must be exactly the same object
         Assert.assertEquals(permanentRepository1, permanentRepository2);
+    }
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.impl.PoddRepositoryManagerImpl#getManagementRepository()}.
+     */
+    @Test
+    public final void testGetPermanentRepositorySingleSchemaReload() throws Exception
+    {
+        // Verify sanity first
+        Repository permanentRepository1 =
+                this.testRepositoryManager
+                        .getPermanentRepository(Collections.<OWLOntologyID> singleton(testOntologyID));
+        Assert.assertNotNull("Permanent repository was null", permanentRepository1);
+        
+        Repository permanentRepository2 =
+                this.testRepositoryManager.getPermanentRepository(Collections
+                        .<OWLOntologyID> singleton(this.testOntologyID));
+        Assert.assertNotNull("Permanent repository was null", permanentRepository2);
+        
+        // Must be exactly the same object
+        Assert.assertEquals(permanentRepository1, permanentRepository2);
+        
+        // shutdown the repository manager
+        this.testRepositoryManager.shutDown();
+        
+        // Reload a repository manager on this path
+        PoddRepositoryManager reloadedRepositoryManager =
+                getNewPoddRepositoryManagerInstance(testTempRepositoryManagerPath);
+        
+        Assert.assertNotNull(reloadedRepositoryManager);
+        
+        // Repeat the double load process on the existing repository to test the other possible code
+        // paths
+        Repository permanentRepository3 =
+                this.testRepositoryManager
+                        .getPermanentRepository(Collections.<OWLOntologyID> singleton(testOntologyID));
+        Assert.assertNotNull("Permanent repository was null", permanentRepository3);
+        
+        Repository permanentRepository4 =
+                this.testRepositoryManager.getPermanentRepository(Collections
+                        .<OWLOntologyID> singleton(this.testOntologyID));
+        Assert.assertNotNull("Permanent repository was null", permanentRepository4);
+        
+        // Must be exactly the same object
+        Assert.assertEquals(permanentRepository3, permanentRepository4);
+        
     }
     
     /**
