@@ -24,6 +24,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -134,6 +135,8 @@ public abstract class AbstractPoddArtifactManagerTest
     protected URI schemaGraph;
     
     private URI artifactGraph;
+    
+    private Path testPath;
     
     /**
      * Write contents of specified context to a file
@@ -258,7 +261,7 @@ public abstract class AbstractPoddArtifactManagerTest
      * @throws Exception
      *             If there were problems creating or initialising the Repository.
      */
-    protected abstract PoddRepositoryManager getNewRepositoryManager() throws Exception;
+    protected abstract PoddRepositoryManager getNewRepositoryManager(Path testPath) throws Exception;
     
     /**
      * Concrete tests must override this to provide a new, empty, instance of
@@ -523,20 +526,21 @@ public abstract class AbstractPoddArtifactManagerTest
         this.schemaGraph = PODD.VF.createURI("urn:test:schema-graph");
         this.artifactGraph = PODD.VF.createURI("urn:test:artifact-graph");
         
-        this.testRepositoryManager = this.getNewRepositoryManager();
-        this.testRepositoryManager.setSchemaManagementGraph(this.schemaGraph);
-        this.testRepositoryManager.setArtifactManagementGraph(this.artifactGraph);
-        
-        this.testManagementConnection = this.testRepositoryManager.getManagementRepository().getConnection();
-        
-        this.setupNonRepositoryManagers();
+        testPath = tempDir.newFolder("test-podd-repository-manager").toPath();
+        this.setupManagers();
     }
     
     /**
      * @param testFileRegistry
      */
-    private final void setupNonRepositoryManagers()
+    private final void setupManagers() throws Exception
     {
+        this.testRepositoryManager = this.getNewRepositoryManager(testPath);
+        this.testRepositoryManager.setSchemaManagementGraph(this.schemaGraph);
+        this.testRepositoryManager.setArtifactManagementGraph(this.artifactGraph);
+        
+        this.testManagementConnection = this.testRepositoryManager.getManagementRepository().getConnection();
+        
         final DataReferenceProcessorRegistry testFileRegistry = new DataReferenceProcessorRegistry();
         // FIXME: Why are we clearing here
         testFileRegistry.clear();
@@ -2820,9 +2824,8 @@ public abstract class AbstractPoddArtifactManagerTest
         this.verifyLoadedArtifact(artifactIDv1, 12, TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES,
                 TestConstants.TEST_ARTIFACT_BASIC_1_20130206_INFERRED_TRIPLES, false);
         
-        // Simulate reloading all of the application except for the repository, which is independent
-        // and should be long lived in practice
-        this.setupNonRepositoryManagers();
+        // Simulate reloading all of the application
+        this.setupManagers();
         
         // Upload version 2 schemas
         final List<InferredOWLOntologyID> version2SchemaOntologies = this.loadVersion2SchemaOntologies();
@@ -2857,16 +2860,14 @@ public abstract class AbstractPoddArtifactManagerTest
         this.verifyLoadedArtifact(artifactIDv1, 12, TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES,
                 TestConstants.TEST_ARTIFACT_BASIC_1_20130206_INFERRED_TRIPLES, false);
         
-        // Simulate reloading all of the application except for the repository, which is independent
-        // and should be long lived in practice
-        this.setupNonRepositoryManagers();
+        // Simulate reloading all of the application
+        this.setupManagers();
         
         // Upload version 2 schemas
         final List<InferredOWLOntologyID> version2SchemaOntologies = this.loadVersion2SchemaOntologies();
         
-        // Simulate reloading all of the application except for the repository, which is independent
-        // and should be long lived in practice
-        this.setupNonRepositoryManagers();
+        // Simulate reloading all of the application
+        this.setupManagers();
         
         // Update from version 1 to version 2
         this.testArtifactManager.updateSchemaImports(new InferredOWLOntologyID(artifactIDv1.getOntologyIRI(),

@@ -16,6 +16,7 @@
  */
 package com.github.podd.impl.test;
 
+import java.nio.file.Path;
 import java.util.Collection;
 import java.util.List;
 
@@ -120,7 +121,7 @@ public class PoddArtifactManagerImplTest extends AbstractPoddArtifactManagerTest
     }
     
     @Override
-    protected PoddRepositoryManager getNewRepositoryManager() throws Exception
+    protected PoddRepositoryManager getNewRepositoryManager(Path testPath) throws Exception
     {
         final Repository managementRepository = new SailRepository(new MemoryStore());
         managementRepository.initialize();
@@ -131,8 +132,7 @@ public class PoddArtifactManagerImplTest extends AbstractPoddArtifactManagerTest
         final RepositoryImplConfig repositoryImplConfig = RepositoryImplConfigBase.create(graph, repositoryNode);
         Assert.assertNotNull(repositoryImplConfig);
         Assert.assertNotNull(repositoryImplConfig.getType());
-        return new PoddRepositoryManagerImpl(managementRepository, repositoryImplConfig, "", tempDir.newFolder(
-                "test-podd-repository-manager").toPath(), new PropertyUtil("podd"));
+        return new PoddRepositoryManagerImpl(managementRepository, repositoryImplConfig, "", testPath, new PropertyUtil("podd"));
     }
     
     @Override
