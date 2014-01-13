@@ -181,7 +181,7 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
                             throw new RuntimeException("Found duplicate repository managers. Failing fast");
                         }
                         Resource repositoryManagerURI = sesameRepositoryManagerMap.keySet().iterator().next();
-                        Resource repositoryUri = null;
+                        URI repositoryUri = null;
                         
                         List<Statement> repositoriesInManager =
                                 Iterations.asList(managementConnection.getStatements(repositoryManagerURI,
@@ -233,7 +233,7 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
                             
                             if(!missingSchema)
                             {
-                                repositoryUri = nextRepositoryStatement.getSubject();
+                                repositoryUri = (URI)nextRepositoryStatement.getSubject();
                             }
                         }
                         
@@ -244,9 +244,12 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
                         if(repositoryUri == null)
                         {
                             // Create a new one
+                            repositoryUri =
+                                    managementConnection.getValueFactory().createURI("urn:podd:repository:",
+                                            UUID.randomUUID().toString());
                             // Get a new repository ID using our base name as the starting point
                             final String newRepositoryID =
-                                    sesameRepositoryManager.getNewRepositoryID("poddredesignrepository");
+                                    sesameRepositoryManager.getNewRepositoryID(repositoryUri.stringValue());
                             final RepositoryConfig config =
                                     new RepositoryConfig(newRepositoryID,
                                             "PODD Redesign Repository (Automatically created)",
@@ -273,7 +276,7 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
                             }
                             else
                             {
-                                permanentRepository = nextRepository;
+                                permanentRepository = new ManualShutdownRepository(nextRepository);
                                 
                                 // In this case, we need to copy the relevant schema ontologies over
                                 // to
@@ -331,22 +334,19 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
                                     }
                                 }
                                 
-                                URI repositoryURI =
-                                        managementConnection.getValueFactory().createURI("urn:podd:repository:",
-                                                UUID.randomUUID().toString());
                                 Literal repositoryIdInManager =
                                         managementConnection.getValueFactory().createLiteral(newRepositoryID);
                                 managementConnection.add(repositoryManagerURI,
-                                        PODD.PODD_REPOSITORY_MANAGER_CONTAINS_REPOSITORY, repositoryURI,
+                                        PODD.PODD_REPOSITORY_MANAGER_CONTAINS_REPOSITORY, repositoryUri,
                                         this.repositoryGraph);
-                                managementConnection.add(repositoryURI, RDF.TYPE, PODD.PODD_REPOSITORY);
-                                managementConnection.add(repositoryURI, PODD.PODD_REPOSITORY_ID_IN_MANAGER,
+                                managementConnection.add(repositoryUri, RDF.TYPE, PODD.PODD_REPOSITORY);
+                                managementConnection.add(repositoryUri, PODD.PODD_REPOSITORY_ID_IN_MANAGER,
                                         repositoryIdInManager, this.repositoryGraph);
                                 for(OWLOntologyID nextSchemaOntologyID : schemaOntologies)
                                 {
-                                    managementConnection.add(repositoryURI, PODD.PODD_REPOSITORY_CONTAINS_SCHEMA_IRI,
+                                    managementConnection.add(repositoryUri, PODD.PODD_REPOSITORY_CONTAINS_SCHEMA_IRI,
                                             nextSchemaOntologyID.getOntologyIRI().toOpenRDFURI(), this.repositoryGraph);
-                                    managementConnection.add(repositoryURI,
+                                    managementConnection.add(repositoryUri,
                                             PODD.PODD_REPOSITORY_CONTAINS_SCHEMA_VERSION, nextSchemaOntologyID
                                                     .getVersionIRI().toOpenRDFURI(), this.repositoryGraph);
                                 }
