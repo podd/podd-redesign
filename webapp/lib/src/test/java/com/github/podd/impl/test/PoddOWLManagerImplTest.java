@@ -110,7 +110,8 @@ public class PoddOWLManagerImplTest extends AbstractPoddOWLManagerTest
         Assert.assertNotNull(repositoryImplConfig);
         Assert.assertNotNull(repositoryImplConfig.getType());
         this.testRepositoryManager =
-                new PoddRepositoryManagerImpl(managementRepository, repositoryImplConfig, "");
+                new PoddRepositoryManagerImpl(managementRepository, repositoryImplConfig, "", tempDir.newFolder(
+                        "test-podd-repository-manager").toPath());
         
         this.testSchemaManager = new PoddSchemaManagerImpl();
         this.testSchemaManager.setOwlManager(this.testOWLManager);
