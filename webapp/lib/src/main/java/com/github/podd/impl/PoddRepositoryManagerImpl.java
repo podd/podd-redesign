@@ -523,6 +523,7 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
         }
         catch(final RepositoryException e)
         {
+            this.log.error("Found exception shutting down management repository", e);
             foundException = e;
         }
         finally
@@ -537,6 +538,8 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
                 }
                 catch(final RepositoryException e)
                 {
+                    this.log.error("Found exception shutting down permanent repository for schema ontologies: "
+                            + nextRepository.getKey(), e);
                     if(foundException == null)
                     {
                         foundException = e;
@@ -548,15 +551,16 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
                 }
             }
             
-            for(final Entry<String, RepositoryManager> nextRepository : this.sesameRepositoryManagers.entrySet())
+            for(final Entry<String, RepositoryManager> nextManager : this.sesameRepositoryManagers.entrySet())
             {
                 try
                 {
-                    this.log.info("Shutting down repository manager: {} ", nextRepository.getKey());
-                    nextRepository.getValue().shutDown();
+                    this.log.info("Shutting down repository manager: {} ", nextManager.getKey());
+                    nextManager.getValue().shutDown();
                 }
                 catch(final RuntimeException e)
                 {
+                    this.log.error("Found exception shutting down repository manager: " + nextManager.getKey(), e);
                     if(foundException == null)
                     {
                         foundException = new RepositoryException("Could not shutdown a repository manager", e);
