@@ -152,7 +152,7 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
     {
         Objects.requireNonNull(schemaOntologies, "Schema ontologies must not be null");
         
-        Repository permanentRepository = this.permanentRepositories.get(schemaOntologies);
+        ManualShutdownRepository permanentRepository = this.permanentRepositories.get(schemaOntologies);
         // This synchronisation should not inhibit most operations, but is necessary to prevent
         // multiple repositories with the same schema ontologies, given that there is a relatively
         // large latency in the new repository create process
@@ -378,9 +378,11 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
                                         + existingRepositoryId);
                             }
                             
-                            Repository putIfAbsent =
-                                    permanentRepositories.putIfAbsent(schemaOntologies, new ManualShutdownRepository(
-                                            nextRepository));
+                            nextRepository = new ManualShutdownRepository(nextRepository);
+                            
+                            ManualShutdownRepository putIfAbsent =
+                                    permanentRepositories.putIfAbsent(schemaOntologies,
+                                            (ManualShutdownRepository)nextRepository);
                             if(putIfAbsent != null)
                             {
                                 // TODO: Should we shutdown the repository that is being replaced?
@@ -390,7 +392,7 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
                                 
                                 nextRepository = putIfAbsent;
                             }
-                            permanentRepository = nextRepository;
+                            permanentRepository = (ManualShutdownRepository)nextRepository;
                         }
                         managementConnection.commit();
                     }
