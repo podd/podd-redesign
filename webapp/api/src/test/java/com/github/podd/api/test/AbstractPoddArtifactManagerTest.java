@@ -531,9 +531,10 @@ public abstract class AbstractPoddArtifactManagerTest
         this.schemaGraph = PODD.VF.createURI("urn:test:schema-graph");
         this.artifactGraph = PODD.VF.createURI("urn:test:artifact-graph");
         
-        testPath = tempDir.newFolder("test-podd-repository-manager").toPath();
-        managementRepository = new SailRepository(new MemoryStore());
-        managementRepository.initialize();
+        this.testPath = tempDir.newFolder("test-podd-repository-manager").toPath();
+        this.managementRepository = new SailRepository(new MemoryStore());
+        this.managementRepository.initialize();
+        this.testManagementConnection = managementRepository.getConnection();
         
         this.setupManagers();
     }
@@ -546,8 +547,6 @@ public abstract class AbstractPoddArtifactManagerTest
         this.testRepositoryManager = this.getNewRepositoryManager(managementRepository, testPath);
         this.testRepositoryManager.setSchemaManagementGraph(this.schemaGraph);
         this.testRepositoryManager.setArtifactManagementGraph(this.artifactGraph);
-        
-        this.testManagementConnection = this.testRepositoryManager.getManagementRepository().getConnection();
         
         final DataReferenceProcessorRegistry testFileRegistry = new DataReferenceProcessorRegistry();
         // FIXME: Why are we clearing here
