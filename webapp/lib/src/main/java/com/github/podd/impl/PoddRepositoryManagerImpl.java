@@ -552,7 +552,7 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
             {
                 try
                 {
-                    this.log.info("Shutting down repository for schema ontologies: {} ", nextRepository.getKey());
+                    this.log.info("Shutting down repository manager: {} ", nextRepository.getKey());
                     nextRepository.getValue().shutDown();
                 }
                 catch(final RuntimeException e)
