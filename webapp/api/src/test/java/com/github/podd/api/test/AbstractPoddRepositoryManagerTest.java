@@ -26,6 +26,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.junit.rules.Timeout;
+import org.openrdf.model.Model;
 import org.openrdf.model.URI;
 import org.openrdf.model.ValueFactory;
 import org.openrdf.model.impl.ValueFactoryImpl;
@@ -33,6 +34,8 @@ import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.sail.SailRepository;
+import org.openrdf.rio.RDFFormat;
+import org.openrdf.rio.Rio;
 import org.openrdf.sail.memory.MemoryStore;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLOntologyID;
@@ -41,6 +44,7 @@ import org.slf4j.LoggerFactory;
 
 import com.github.podd.api.PoddRepositoryManager;
 import com.github.podd.utils.InferredOWLOntologyID;
+import com.github.podd.utils.OntologyUtils;
 import com.github.podd.utils.PODD;
 
 /**
@@ -402,6 +406,82 @@ public abstract class AbstractPoddRepositoryManagerTest
         // Must be exactly the same object
         Assert.assertEquals(permanentRepository3, permanentRepository4);
         
+    }
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.impl.PoddRepositoryManagerImpl#getManagementRepository()}.
+     */
+    @Test
+    public final void testGetPermanentRepositorySingleSchemaReloadWithStatements() throws Exception
+    {
+        // Verify sanity first
+        Repository permanentRepository1 =
+                this.testRepositoryManager
+                        .getPermanentRepository(Collections.<OWLOntologyID> singleton(testOntologyID));
+        Assert.assertNotNull("Permanent repository was null", permanentRepository1);
+        
+        Repository permanentRepository2 =
+                this.testRepositoryManager.getPermanentRepository(Collections
+                        .<OWLOntologyID> singleton(this.testOntologyID));
+        Assert.assertNotNull("Permanent repository was null", permanentRepository2);
+        
+        RepositoryConnection firstConnection = permanentRepository1.getConnection();
+        try
+        {
+            Model model =
+                    Rio.parse(this.getClass().getResourceAsStream("/test/test-podd-schema-manifest.ttl"), "",
+                            RDFFormat.TURTLE);
+            OntologyUtils.loadSchemasFromManifest(firstConnection, this.schemaGraph, model);
+            
+            Assert.assertEquals(78, firstConnection.size(this.schemaGraph));
+            Assert.assertEquals(4618, firstConnection.size());
+        }
+        finally
+        {
+            firstConnection.close();
+        }
+        
+        // Must be exactly the same object
+        Assert.assertEquals(permanentRepository1, permanentRepository2);
+        
+        // shutdown the repository manager
+        this.testRepositoryManager.shutDown();
+        
+        managementRepository.initialize();
+        
+        // Reload a repository manager on this path
+        PoddRepositoryManager reloadedRepositoryManager =
+                getNewPoddRepositoryManagerInstance(managementRepository, testTempRepositoryManagerPath);
+        reloadedRepositoryManager.setSchemaManagementGraph(schemaGraph);
+        reloadedRepositoryManager.setArtifactManagementGraph(artifactGraph);
+        
+        Assert.assertNotNull(reloadedRepositoryManager);
+        
+        // Repeat the double load process on the existing repository to test the other possible code
+        // paths
+        Repository permanentRepository3 =
+                reloadedRepositoryManager.getPermanentRepository(Collections.<OWLOntologyID> singleton(testOntologyID));
+        Assert.assertNotNull("Permanent repository was null", permanentRepository3);
+        
+        Repository permanentRepository4 =
+                reloadedRepositoryManager.getPermanentRepository(Collections
+                        .<OWLOntologyID> singleton(this.testOntologyID));
+        Assert.assertNotNull("Permanent repository was null", permanentRepository4);
+        
+        // Must be exactly the same object
+        Assert.assertEquals(permanentRepository3, permanentRepository4);
+        
+        RepositoryConnection secondConnection = permanentRepository3.getConnection();
+        try
+        {
+            Assert.assertEquals(78, secondConnection.size(this.schemaGraph));
+            Assert.assertEquals(4618, secondConnection.size());
+        }
+        finally
+        {
+            secondConnection.close();
+        }
     }
     
     /**
