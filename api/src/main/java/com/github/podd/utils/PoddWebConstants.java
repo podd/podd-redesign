@@ -254,7 +254,8 @@ public interface PoddWebConstants
     public static final String DEFAULT_PERMANENT_SESAME_REPOSITORY_CONFIG = "/memorystoreconfig.ttl";
     
     /**
-     * Graph in the management repository containing permanent repository details
+     * The default instance of openrdf-sesame to store permanent repositories in. This may be
+     * different to the server used to store the management information.
      */
     public static final String PROPERTY_PERMANENT_SESAME_REPOSITORY_SERVER = "podd.repository.defaultpermanentserver";
     public static final String DEFAULT_PERMANENT_SESAME_REPOSITORY_SERVER = "";
