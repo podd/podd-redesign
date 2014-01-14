@@ -825,10 +825,8 @@ public abstract class AbstractPoddArtifactManagerTest
             this.testArtifactManager.deleteArtifact(resultArtifactId);
             Assert.fail("Did not find expected exception");
         }
-        catch(final DeleteArtifactException e)
+        catch(final UnmanagedArtifactIRIException e)
         {
-            Assert.assertNotNull(e.getCause());
-            Assert.assertTrue(e.getCause() instanceof UnmanagedArtifactIRIException);
         }
     }
     
@@ -2967,6 +2965,35 @@ public abstract class AbstractPoddArtifactManagerTest
                 this.testArtifactManager.updateSchemaImports(new InferredOWLOntologyID(artifactIDv1.getOntologyIRI(),
                         artifactIDv1.getVersionIRI(), artifactIDv1.getInferredOntologyIRI()),
                         new HashSet<OWLOntologyID>(), new LinkedHashSet<OWLOntologyID>(schemaOntologies));
+        
+        Assert.assertEquals(updateSchemaImports.getOntologyIRI(), artifactIDv1.getOntologyIRI());
+        Assert.assertNotEquals(updateSchemaImports.getVersionIRI(), artifactIDv1.getVersionIRI());
+    }
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddArtifactManager#updateSchemaImports(InferredOWLOntologyID, Set, Set)}
+     * .
+     */
+    @Test
+    public final void testUpdateSchemaImportsRealOldSchemas() throws Exception
+    {
+        final List<InferredOWLOntologyID> schemaOntologies = this.loadVersion1SchemaOntologies();
+        
+        // upload artifact
+        final InputStream inputStream1 = this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_20130206);
+        final InferredOWLOntologyID artifactIDv1 =
+                this.testArtifactManager.loadArtifact(inputStream1, RDFFormat.TURTLE);
+        this.verifyLoadedArtifact(artifactIDv1, 12, TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES,
+                TestConstants.TEST_ARTIFACT_BASIC_1_20130206_INFERRED_TRIPLES, false);
+        
+        Set<? extends OWLOntologyID> realSchemaImports = this.testArtifactManager.getSchemaImports(artifactIDv1);
+        Assert.assertFalse(realSchemaImports.isEmpty());
+        
+        final InferredOWLOntologyID updateSchemaImports =
+                this.testArtifactManager.updateSchemaImports(new InferredOWLOntologyID(artifactIDv1.getOntologyIRI(),
+                        artifactIDv1.getVersionIRI(), artifactIDv1.getInferredOntologyIRI()), realSchemaImports,
+                        new LinkedHashSet<OWLOntologyID>(schemaOntologies));
         
         Assert.assertEquals(updateSchemaImports.getOntologyIRI(), artifactIDv1.getOntologyIRI());
         Assert.assertNotEquals(updateSchemaImports.getVersionIRI(), artifactIDv1.getVersionIRI());
