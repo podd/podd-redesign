@@ -16,6 +16,7 @@
  */
 package com.github.podd.impl.test;
 
+import java.io.File;
 import java.util.Collection;
 
 import org.junit.Assert;
@@ -77,7 +78,10 @@ public class PoddSchemaManagerImplTest extends AbstractPoddSchemaManagerTest
     @Override
     protected PoddRepositoryManager getNewPoddRepositoryManagerInstance() throws Exception
     {
-        final Repository managementRepository = new SailRepository(new MemoryStore());
+        File repositoryManagerDirectory = this.tempDir.newFolder("repositorymanager");
+        File managementRepositoryDirectory = this.tempDir.newFolder("managementrepository");
+        
+        final Repository managementRepository = new SailRepository(new MemoryStore(managementRepositoryDirectory));
         managementRepository.initialize();
         
         final Model graph =
@@ -86,11 +90,10 @@ public class PoddSchemaManagerImplTest extends AbstractPoddSchemaManagerTest
         final RepositoryImplConfig repositoryImplConfig = RepositoryImplConfigBase.create(graph, repositoryNode);
         Assert.assertNotNull(repositoryImplConfig);
         Assert.assertNotNull(repositoryImplConfig.getType());
-        final LocalRepositoryManager repositoryManager =
-                new LocalRepositoryManager(this.tempDir.newFolder("repositorymanager"));
+        final LocalRepositoryManager repositoryManager = new LocalRepositoryManager(repositoryManagerDirectory);
         repositoryManager.initialize();
-        return new PoddRepositoryManagerImpl(managementRepository, repositoryImplConfig, "", tempDir.newFolder(
-                "test-podd-repository-manager").toPath(), new PropertyUtil("podd"));
+        return new PoddRepositoryManagerImpl(managementRepository, repositoryImplConfig, "",
+                repositoryManagerDirectory.toPath(), new PropertyUtil("podd"));
     }
     
     @Override

@@ -20,8 +20,10 @@ import info.aduna.iteration.Iterations;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.attribute.FileAttribute;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -357,7 +359,8 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
                                 managementConnection.add(repositoryManagerURI,
                                         PODD.PODD_REPOSITORY_MANAGER_CONTAINS_REPOSITORY, repositoryUri,
                                         this.repositoryGraph);
-                                managementConnection.add(repositoryUri, RDF.TYPE, PODD.PODD_REPOSITORY, this.repositoryGraph);
+                                managementConnection.add(repositoryUri, RDF.TYPE, PODD.PODD_REPOSITORY,
+                                        this.repositoryGraph);
                                 managementConnection.add(repositoryUri, PODD.PODD_REPOSITORY_ID_IN_MANAGER,
                                         repositoryIdInManager, this.repositoryGraph);
                                 for(OWLOntologyID nextSchemaOntologyID : schemaOntologies)
@@ -554,6 +557,7 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
                     }
                 }
             }
+            this.permanentRepositories.clear();
             
             for(final Entry<String, RepositoryManager> nextManager : this.sesameRepositoryManagers.entrySet())
             {
@@ -575,7 +579,10 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
                     }
                 }
             }
+            this.sesameRepositoryManagers.clear();
         }
+        
+        this.managementRepository = null;
         
         if(foundException != null)
         {
@@ -678,16 +685,22 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
                                             null).objectLiteral();
                             if(directory != null)
                             {
+                                LocalRepositoryManager localRepositoryManager =
+                                        new LocalRepositoryManager(Paths.get(directory.stringValue()).toFile());
+                                localRepositoryManager.initialize();
                                 return Collections.<Resource, RepositoryManager> singletonMap(nextRepositoryManager,
-                                        new LocalRepositoryManager(Paths.get(directory.stringValue()).toFile()));
+                                        localRepositoryManager);
                             }
                             else
                             {
                                 Path path = Files.createTempDirectory("podd-temp-repositories-");
                                 this.log.warn("Temporary local repositories in use!!!: {} {}", path.toString(),
                                         schemaImports);
+                                LocalRepositoryManager localRepositoryManager =
+                                        new LocalRepositoryManager(path.toFile());
+                                localRepositoryManager.initialize();
                                 return Collections.<Resource, RepositoryManager> singletonMap(nextRepositoryManager,
-                                        new LocalRepositoryManager(path.toFile()));
+                                        localRepositoryManager);
                             }
                         }
                         else if(repositoryManagerType.equals(PODD.PODD_REPOSITORY_MANAGER_TYPE_REMOTE))
@@ -695,8 +708,11 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
                             Literal serverURL =
                                     model.filter(nextRepositoryManager, PODD.PODD_REPOSITORY_MANAGER_REMOTE_SERVER_URL,
                                             null).objectLiteral();
+                            RemoteRepositoryManager remoteRepositoryManager =
+                                    new RemoteRepositoryManager(serverURL.stringValue());
+                            remoteRepositoryManager.initialize();
                             return Collections.<Resource, RepositoryManager> singletonMap(nextRepositoryManager,
-                                    new RemoteRepositoryManager(serverURL.stringValue()));
+                                    remoteRepositoryManager);
                         }
                         else
                         {
@@ -726,7 +742,12 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
         if(repositoryManagerUrl == null || repositoryManagerUrl.trim().isEmpty())
         {
             Path nextPath = poddHomeDirectory.resolve(newRepositoryManagerURI.stringValue());
-            repositoryManager = new LocalRepositoryManager(Files.createDirectory(nextPath).toFile());
+            if(!Files.exists(nextPath, LinkOption.NOFOLLOW_LINKS))
+            {
+                Files.createDirectories(nextPath);
+            }
+            repositoryManager = new LocalRepositoryManager(nextPath.toFile());
+            repositoryManager.initialize();
             
             Literal nextLiteral = managementConnection.getValueFactory().createLiteral(nextPath.toString());
             
@@ -738,14 +759,14 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
         else
         {
             repositoryManager = new RemoteRepositoryManager(repositoryManagerUrl);
+            repositoryManager.initialize();
+            
             Literal nextUrl = managementConnection.getValueFactory().createLiteral(repositoryManagerUrl);
             managementConnection.add(newRepositoryManagerURI, PODD.PODD_REPOSITORY_MANAGER_TYPE,
                     PODD.PODD_REPOSITORY_MANAGER_TYPE_REMOTE, repositoryManagementContext);
             managementConnection.add(newRepositoryManagerURI, PODD.PODD_REPOSITORY_MANAGER_REMOTE_SERVER_URL, nextUrl,
                     repositoryManagementContext);
         }
-        
-        repositoryManager.initialize();
         
         return Collections.<Resource, RepositoryManager> singletonMap(newRepositoryManagerURI, repositoryManager);
     }

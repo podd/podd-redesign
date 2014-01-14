@@ -245,7 +245,9 @@ public abstract class AbstractPoddRepositoryManagerTest
         this.schemaGraph = PODD.VF.createURI("urn:test:schema-graph");
         this.artifactGraph = PODD.VF.createURI("urn:test:artifact-graph");
         
-        managementRepository = new SailRepository(new MemoryStore());
+        Path testTempManagementRepositoryPath = testTempRepositoryManagerPath.resolve("managementrepository");
+        
+        managementRepository = new SailRepository(new MemoryStore(testTempManagementRepositoryPath.toFile()));
         managementRepository.initialize();
         
         setupManager();
@@ -416,6 +418,17 @@ public abstract class AbstractPoddRepositoryManagerTest
     public final void testGetPermanentRepositorySingleSchemaReloadWithStatements() throws Exception
     {
         // Verify sanity first
+        RepositoryConnection managementConnection =
+                this.testRepositoryManager.getManagementRepository().getConnection();
+        try
+        {
+            Assert.assertEquals(0, managementConnection.size());
+        }
+        finally
+        {
+            managementConnection.close();
+        }
+        
         Repository permanentRepository1 =
                 this.testRepositoryManager
                         .getPermanentRepository(Collections.<OWLOntologyID> singleton(testOntologyID));
@@ -426,16 +439,25 @@ public abstract class AbstractPoddRepositoryManagerTest
                         .<OWLOntologyID> singleton(this.testOntologyID));
         Assert.assertNotNull("Permanent repository was null", permanentRepository2);
         
+        RepositoryConnection managementConnection2 =
+                this.testRepositoryManager.getManagementRepository().getConnection();
+        try
+        {
+            Assert.assertEquals(8, managementConnection2.size());
+        }
+        finally
+        {
+            managementConnection2.close();
+        }
+        
         RepositoryConnection firstConnection = permanentRepository1.getConnection();
         try
         {
             Model model =
-                    Rio.parse(this.getClass().getResourceAsStream("/test/test-podd-schema-manifest.ttl"), "",
-                            RDFFormat.TURTLE);
-            OntologyUtils.loadSchemasFromManifest(firstConnection, this.schemaGraph, model);
-            
-            Assert.assertEquals(78, firstConnection.size(this.schemaGraph));
-            Assert.assertEquals(4618, firstConnection.size());
+                    Rio.parse(this.getClass().getResourceAsStream("/test/artifacts/basic-1.ttl"), "", RDFFormat.TURTLE);
+            firstConnection.add(model, testVersionUriA1);
+            Assert.assertEquals(32, firstConnection.size(this.testVersionUriA1));
+            Assert.assertEquals(32, firstConnection.size());
         }
         finally
         {
@@ -475,8 +497,8 @@ public abstract class AbstractPoddRepositoryManagerTest
         RepositoryConnection secondConnection = permanentRepository3.getConnection();
         try
         {
-            Assert.assertEquals(78, secondConnection.size(this.schemaGraph));
-            Assert.assertEquals(4618, secondConnection.size());
+            Assert.assertEquals(32, secondConnection.size(this.testVersionUriA1));
+            Assert.assertEquals(32, secondConnection.size());
         }
         finally
         {
