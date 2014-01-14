@@ -166,6 +166,11 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
     {
         Objects.requireNonNull(schemaOntologies, "Schema ontologies must not be null");
         
+        if(schemaOntologies.isEmpty())
+        {
+            throw new IllegalArgumentException("Schema ontologies cannot be empty");
+        }
+        
         ManualShutdownRepository permanentRepository = this.permanentRepositories.get(schemaOntologies);
         // This synchronisation should not inhibit most operations, but is necessary to prevent
         // multiple repositories with the same schema ontologies, given that there is a relatively
