@@ -2337,8 +2337,6 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             managementConnection = this.repositoryManager.getManagementRepository().getConnection();
             managementConnection.begin();
             
-            permanentConnection = this.repositoryManager.getPermanentRepository(newSchemaOntologyIds).getConnection();
-            permanentConnection.begin();
             final InferredOWLOntologyID artifactVersion =
                     this.sesameManager.getCurrentArtifactVersion(artifactId.getOntologyIRI(), managementConnection,
                             this.repositoryManager.getArtifactManagementGraph());
@@ -2404,6 +2402,9 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             tempRepositoryConnection.commit();
             
             this.log.info("Starting reload of artifact to Repository: {}", artifactVersion);
+            
+            permanentConnection = this.repositoryManager.getPermanentRepository(newSchemaOntologyIds).getConnection();
+            permanentConnection.begin();
             
             // If the following does not succeed, then it throws an exception and we rollback
             // permanentConnection

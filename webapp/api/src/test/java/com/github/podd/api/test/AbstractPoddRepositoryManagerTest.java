@@ -22,6 +22,7 @@ import java.util.Collections;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -510,6 +511,7 @@ public abstract class AbstractPoddRepositoryManagerTest
      * Test method for
      * {@link com.github.podd.impl.PoddRepositoryManagerImpl#getManagementRepository()}.
      */
+    @Ignore("We do not support this case anymore")
     @Test
     public final void testGetPermanentRepositoryEmptySchemaSet() throws Exception
     {

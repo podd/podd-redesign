@@ -2809,6 +2809,7 @@ public abstract class AbstractPoddArtifactManagerTest
      * {@link com.github.podd.api.PoddArtifactManager#updateSchemaImports(InferredOWLOntologyID, Set, Set)}
      * .
      */
+    @Ignore("Test is not relevant anymore as we don't support this case")
     @Test
     public final void testUpdateSchemaImportsEmptyNewSchemas() throws Exception
     {
@@ -2949,6 +2950,7 @@ public abstract class AbstractPoddArtifactManagerTest
      * {@link com.github.podd.api.PoddArtifactManager#updateSchemaImports(InferredOWLOntologyID, Set, Set)}
      * .
      */
+    @Ignore("Test is not relevant anymore as we don't support this case")
     @Test
     public final void testUpdateSchemaImportsEmptyOldSchemas() throws Exception
     {
@@ -2979,6 +2981,7 @@ public abstract class AbstractPoddArtifactManagerTest
     public final void testUpdateSchemaImportsRealOldSchemas() throws Exception
     {
         final List<InferredOWLOntologyID> schemaOntologies = this.loadVersion1SchemaOntologies();
+        Assert.assertFalse(schemaOntologies.isEmpty());
         
         // upload artifact
         final InputStream inputStream1 = this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_20130206);
@@ -3075,6 +3078,7 @@ public abstract class AbstractPoddArtifactManagerTest
      * {@link com.github.podd.api.PoddArtifactManager#updateSchemaImports(InferredOWLOntologyID, Set, Set)}
      * .
      */
+    @Ignore("Test is not relevant anymore as we don't support this case")
     @Test
     public final void testUpdateSchemaImportsUnmanagedVersion() throws Exception
     {
