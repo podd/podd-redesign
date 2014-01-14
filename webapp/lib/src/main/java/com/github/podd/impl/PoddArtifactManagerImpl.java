@@ -2339,37 +2339,82 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         }
         catch(final Throwable e)
         {
-            if(managementConnection != null)
+            try
             {
-                managementConnection.rollback();
+                if(managementConnection != null)
+                {
+                    managementConnection.rollback();
+                }
             }
-            if(permanentConnection != null)
+            catch(final Throwable e1)
             {
-                permanentConnection.rollback();
+                log.error("Found exception while rolling back management connection", e);
             }
-            if(tempRepositoryConnection != null)
+            finally
             {
-                tempRepositoryConnection.rollback();
+                try
+                {
+                    if(permanentConnection != null)
+                    {
+                        permanentConnection.rollback();
+                    }
+                }
+                catch(final Throwable e1)
+                {
+                    log.error("Found exception while rolling back permanent connection", e);
+                }
+                finally
+                {
+                    try
+                    {
+                        if(tempRepositoryConnection != null)
+                        {
+                            tempRepositoryConnection.rollback();
+                        }
+                    }
+                    catch(final Throwable e1)
+                    {
+                        log.error("Found exception while rolling back temporary connection", e);
+                    }
+                }
             }
             throw e;
         }
         finally
         {
-            if(managementConnection != null)
+            try
             {
-                managementConnection.close();
+                if(managementConnection != null)
+                {
+                    managementConnection.close();
+                }
             }
-            if(permanentConnection != null)
+            finally
             {
-                permanentConnection.close();
-            }
-            if(tempRepositoryConnection != null)
-            {
-                tempRepositoryConnection.close();
-            }
-            if(tempRepository != null)
-            {
-                tempRepository.shutDown();
+                try
+                {
+                    if(permanentConnection != null)
+                    {
+                        permanentConnection.close();
+                    }
+                }
+                finally
+                {
+                    try
+                    {
+                        if(tempRepositoryConnection != null)
+                        {
+                            tempRepositoryConnection.close();
+                        }
+                    }
+                    finally
+                    {
+                        if(tempRepository != null)
+                        {
+                            tempRepository.shutDown();
+                        }
+                    }
+                }
             }
         }
     }
