@@ -1503,10 +1503,6 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             
             schemaImports = new LinkedHashSet<>(OntologyUtils.artifactImports(ontologyIDs.get(0), importsModel));
             
-            final Repository permanentRepository = this.getRepositoryManager().getPermanentRepository(schemaImports);
-            permanentConnection = permanentRepository.getConnection();
-            permanentConnection.begin();
-            
             // Remove any assertions that the user has made about publication status, as this
             // information is a privileged operation that must be done through the designated API
             // method
@@ -1575,6 +1571,9 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             // statements into OWLAPI
             // this.getDirectImports(managementConnection, temporaryRepositoryConnection,
             // randomContext);
+            
+            permanentConnection = this.getRepositoryManager().getPermanentRepository(schemaImports).getConnection();
+            permanentConnection.begin();
             
             inferredOWLOntologyID =
                     this.loadInferStoreArtifact(temporaryConnection, permanentConnection, managementConnection,
