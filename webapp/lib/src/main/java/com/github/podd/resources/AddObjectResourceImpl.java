@@ -166,7 +166,7 @@ public class AddObjectResourceImpl extends AbstractPoddResourceImpl
             RepositoryConnection permanentConnection = null;
             try
             {
-                managementConnection = this.getPoddRepositoryManager().getManagementRepository().getConnection();
+                managementConnection = this.getPoddRepositoryManager().getManagementRepositoryConnection();
                 managementConnection.begin();
                 
                 InferredOWLOntologyID ontologyID = null;
@@ -176,7 +176,7 @@ public class AddObjectResourceImpl extends AbstractPoddResourceImpl
                     final Set<? extends OWLOntologyID> schemaImports =
                             this.getPoddArtifactManager().getSchemaImports(ontologyID);
                     permanentConnection =
-                            this.getPoddRepositoryManager().getPermanentRepository(schemaImports).getConnection();
+                            this.getPoddRepositoryManager().getPermanentRepositoryConnection(schemaImports);
                     
                     objectLabel =
                             this.getPoddSesameManager().getObjectLabel(ontologyID, PODD.VF.createURI(objectType),

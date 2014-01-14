@@ -300,7 +300,7 @@ public class UploadArtifactResourceImpl extends AbstractPoddResourceImpl
                 // PoddArtifactManagerImpl
                 final Set<? extends OWLOntologyID> schemaImports =
                         this.getPoddArtifactManager().getSchemaImports(artifactId);
-                permanentConnection = this.getPoddRepositoryManager().getPermanentRepository(schemaImports).getConnection();
+                permanentConnection = this.getPoddRepositoryManager().getPermanentRepositoryConnection(schemaImports);
                 final URI topObjectIRI =
                         this.getPoddArtifactManager().getSesameManager().getTopObjectIRI(artifactId, permanentConnection);
                 

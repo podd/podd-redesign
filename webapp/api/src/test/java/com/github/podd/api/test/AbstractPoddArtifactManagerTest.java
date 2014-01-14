@@ -668,12 +668,12 @@ public abstract class AbstractPoddArtifactManagerTest
         RepositoryConnection permanentConnection = null;
         try
         {
-            managementConnection = this.testRepositoryManager.getManagementRepository().getConnection();
+            managementConnection = this.testRepositoryManager.getManagementRepositoryConnection();
             managementConnection.begin();
             
             final Set<? extends OWLOntologyID> schemaImports =
                     this.testArtifactManager.getSchemaImports(updatedArtifact);
-            permanentConnection = this.testRepositoryManager.getPermanentRepository(schemaImports).getConnection();
+            permanentConnection = this.testRepositoryManager.getPermanentRepositoryConnection(schemaImports);
             
             this.verifyUpdatedArtifact(updatedArtifact, "http://purl.org/podd/basic-2-20130206/artifact:1:version:2",
                     TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES + 8, managementConnection);
@@ -1925,10 +1925,10 @@ public abstract class AbstractPoddArtifactManagerTest
         RepositoryConnection permanentConnection = null;
         try
         {
-            managementConnection = this.testRepositoryManager.getManagementRepository().getConnection();
+            managementConnection = this.testRepositoryManager.getManagementRepositoryConnection();
             
             final Set<? extends OWLOntologyID> schemaImports = this.testArtifactManager.getSchemaImports(artifactId);
-            permanentConnection = this.testRepositoryManager.getPermanentRepository(schemaImports).getConnection();
+            permanentConnection = this.testRepositoryManager.getPermanentRepositoryConnection(schemaImports);
             
             final String[] expectedImports =
                     { "http://purl.org/podd/ns/version/dcTerms/1", "http://purl.org/podd/ns/version/poddUser/1",
@@ -2133,7 +2133,7 @@ public abstract class AbstractPoddArtifactManagerTest
         RepositoryConnection nextRepositoryConnection = null;
         try
         {
-            nextRepositoryConnection = this.testRepositoryManager.getManagementRepository().getConnection();
+            nextRepositoryConnection = this.testRepositoryManager.getManagementRepositoryConnection();
             nextRepositoryConnection.begin();
             
             // verify: a single PUBLICATION_STATUS in asserted ontology
@@ -2248,11 +2248,11 @@ public abstract class AbstractPoddArtifactManagerTest
         RepositoryConnection permanentConnection = null;
         try
         {
-            managementConnection = this.testRepositoryManager.getManagementRepository().getConnection();
+            managementConnection = this.testRepositoryManager.getManagementRepositoryConnection();
             
             final Set<? extends OWLOntologyID> schemaImports =
                     this.testArtifactManager.getSchemaImports(updatedArtifact);
-            permanentConnection = this.testRepositoryManager.getPermanentRepository(schemaImports).getConnection();
+            permanentConnection = this.testRepositoryManager.getPermanentRepositoryConnection(schemaImports);
             
             this.verifyUpdatedArtifact(updatedArtifact, "http://purl.org/podd/basic-2-20130206/artifact:1:version:2",
                     TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES + 28, managementConnection);
@@ -2319,10 +2319,10 @@ public abstract class AbstractPoddArtifactManagerTest
         RepositoryConnection permanentConnection = null;
         try
         {
-            managementConnection = this.testRepositoryManager.getManagementRepository().getConnection();
+            managementConnection = this.testRepositoryManager.getManagementRepositoryConnection();
             final Set<? extends OWLOntologyID> schemaImports =
                     this.testArtifactManager.getSchemaImports(updatedArtifact);
-            permanentConnection = this.testRepositoryManager.getPermanentRepository(schemaImports).getConnection();
+            permanentConnection = this.testRepositoryManager.getPermanentRepositoryConnection(schemaImports);
             
             this.verifyUpdatedArtifact(updatedArtifact, "http://purl.org/podd/basic-2-20130206/artifact:1:version:2",
                     TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES + 8, managementConnection);
@@ -2393,10 +2393,10 @@ public abstract class AbstractPoddArtifactManagerTest
         RepositoryConnection permanentConnection = null;
         try
         {
-            managementConnection = this.testRepositoryManager.getManagementRepository().getConnection();
+            managementConnection = this.testRepositoryManager.getManagementRepositoryConnection();
             final Set<? extends OWLOntologyID> schemaImports =
                     this.testArtifactManager.getSchemaImports(updatedArtifact);
-            permanentConnection = this.testRepositoryManager.getPermanentRepository(schemaImports).getConnection();
+            permanentConnection = this.testRepositoryManager.getPermanentRepositoryConnection(schemaImports);
             
             this.verifyUpdatedArtifact(updatedArtifact, "http://purl.org/podd/basic-2-20130206/artifact:1:version:2",
                     TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES + 8, managementConnection);
@@ -2452,10 +2452,10 @@ public abstract class AbstractPoddArtifactManagerTest
         RepositoryConnection permanentConnection = null;
         try
         {
-            managementConnection = this.testRepositoryManager.getManagementRepository().getConnection();
+            managementConnection = this.testRepositoryManager.getManagementRepositoryConnection();
             final Set<? extends OWLOntologyID> schemaImports =
                     this.testArtifactManager.getSchemaImports(updatedArtifact);
-            permanentConnection = this.testRepositoryManager.getPermanentRepository(schemaImports).getConnection();
+            permanentConnection = this.testRepositoryManager.getPermanentRepositoryConnection(schemaImports);
             
             this.verifyUpdatedArtifact(updatedArtifact, "http://purl.org/podd/basic-2-20130206/artifact:1:version:2",
                     TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES + 10, managementConnection);
@@ -2542,10 +2542,10 @@ public abstract class AbstractPoddArtifactManagerTest
         RepositoryConnection permanentConnection = null;
         try
         {
-            managementConnection = this.testRepositoryManager.getManagementRepository().getConnection();
+            managementConnection = this.testRepositoryManager.getManagementRepositoryConnection();
             final Set<? extends OWLOntologyID> schemaImports =
                     this.testArtifactManager.getSchemaImports(updatedArtifact);
-            permanentConnection = this.testRepositoryManager.getPermanentRepository(schemaImports).getConnection();
+            permanentConnection = this.testRepositoryManager.getPermanentRepositoryConnection(schemaImports);
             
             this.verifyUpdatedArtifact(updatedArtifact, "http://purl.org/podd/basic-2-20130206/artifact:1:version:2",
                     TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES, managementConnection);
@@ -2607,10 +2607,10 @@ public abstract class AbstractPoddArtifactManagerTest
         RepositoryConnection permanentConnection = null;
         try
         {
-            managementConnection = this.testRepositoryManager.getManagementRepository().getConnection();
+            managementConnection = this.testRepositoryManager.getManagementRepositoryConnection();
             final Set<? extends OWLOntologyID> schemaImports =
                     this.testArtifactManager.getSchemaImports(updatedArtifact);
-            permanentConnection = this.testRepositoryManager.getPermanentRepository(schemaImports).getConnection();
+            permanentConnection = this.testRepositoryManager.getPermanentRepositoryConnection(schemaImports);
             
             this.verifyUpdatedArtifact(updatedArtifact, "http://purl.org/podd/basic-2-20130206/artifact:1:version:2",
                     TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES, managementConnection);
@@ -2673,10 +2673,10 @@ public abstract class AbstractPoddArtifactManagerTest
         RepositoryConnection permanentConnection = null;
         try
         {
-            managementConnection = this.testRepositoryManager.getManagementRepository().getConnection();
+            managementConnection = this.testRepositoryManager.getManagementRepositoryConnection();
             final Set<? extends OWLOntologyID> schemaImports =
                     this.testArtifactManager.getSchemaImports(updatedArtifact);
-            permanentConnection = this.testRepositoryManager.getPermanentRepository(schemaImports).getConnection();
+            permanentConnection = this.testRepositoryManager.getPermanentRepositoryConnection(schemaImports);
             
             this.verifyUpdatedArtifact(updatedArtifact, "http://purl.org/podd/basic-2-20130206/artifact:1:version:2",
                     TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES - 12, managementConnection);
@@ -2993,6 +2993,12 @@ public abstract class AbstractPoddArtifactManagerTest
         Set<? extends OWLOntologyID> realSchemaImports = this.testArtifactManager.getSchemaImports(artifactIDv1);
         Assert.assertFalse(realSchemaImports.isEmpty());
         
+        this.testManagementConnection.close();
+        this.testRepositoryManager.shutDown();
+        this.managementRepository.initialize();
+        
+        this.setupManagers();
+        
         final InferredOWLOntologyID updateSchemaImports =
                 this.testArtifactManager.updateSchemaImports(new InferredOWLOntologyID(artifactIDv1.getOntologyIRI(),
                         artifactIDv1.getVersionIRI(), artifactIDv1.getInferredOntologyIRI()), realSchemaImports,
@@ -3258,9 +3264,9 @@ public abstract class AbstractPoddArtifactManagerTest
             Assert.assertFalse("Could not find schema imports, so cannot find permanent repository!",
                     schemaOntologies.isEmpty());
             
-            managementConnection = this.testRepositoryManager.getManagementRepository().getConnection();
+            managementConnection = this.testRepositoryManager.getManagementRepositoryConnection();
             
-            permanentConnection = this.testRepositoryManager.getPermanentRepository(schemaOntologies).getConnection();
+            permanentConnection = this.testRepositoryManager.getPermanentRepositoryConnection(schemaOntologies);
             
             if(permanentConnection.size(inferredOntologyId.getVersionIRI().toOpenRDFURI()) != assertedStatementCount)
             {
@@ -3317,7 +3323,7 @@ public abstract class AbstractPoddArtifactManagerTest
         {
             final Set<? extends OWLOntologyID> schemaImports =
                     this.testArtifactManager.getSchemaImports(updatedArtifact);
-            permanentConnection = this.testRepositoryManager.getPermanentRepository(schemaImports).getConnection();
+            permanentConnection = this.testRepositoryManager.getPermanentRepositoryConnection(schemaImports);
             
             Assert.assertEquals("Unexpected concrete statement count", expectedConcreteStatementCount,
                     permanentConnection.size(updatedArtifact.getVersionIRI().toOpenRDFURI()));

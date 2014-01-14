@@ -144,7 +144,7 @@ public class PoddFileRepositoryManagerImpl implements PoddDataRepositoryManager
         RepositoryConnection conn = null;
         try
         {
-            conn = this.repositoryManager.getManagementRepository().getConnection();
+            conn = this.repositoryManager.getManagementRepositoryConnection();
             conn.begin();
             
             if(repositoryConfigurationExistsInGraph)
@@ -230,7 +230,7 @@ public class PoddFileRepositoryManagerImpl implements PoddDataRepositoryManager
         RepositoryConnection conn = null;
         try
         {
-            conn = this.repositoryManager.getManagementRepository().getConnection();
+            conn = this.repositoryManager.getManagementRepositoryConnection();
             conn.begin();
             
             final URI context = this.repositoryManager.getFileRepositoryManagementGraph();
@@ -276,7 +276,7 @@ public class PoddFileRepositoryManagerImpl implements PoddDataRepositoryManager
         RepositoryConnection conn = null;
         try
         {
-            conn = this.repositoryManager.getManagementRepository().getConnection();
+            conn = this.repositoryManager.getManagementRepositoryConnection();
             conn.begin();
             
             final URI context = this.repositoryManager.getFileRepositoryManagementGraph();
@@ -333,7 +333,7 @@ public class PoddFileRepositoryManagerImpl implements PoddDataRepositoryManager
         RepositoryConnection conn = null;
         try
         {
-            conn = this.repositoryManager.getManagementRepository().getConnection();
+            conn = this.repositoryManager.getManagementRepositoryConnection();
             
             final URI context = this.repositoryManager.getFileRepositoryManagementGraph();
             final Model repositories = new LinkedHashModel();
@@ -460,7 +460,7 @@ public class PoddFileRepositoryManagerImpl implements PoddDataRepositoryManager
         RepositoryConnection conn = null;
         try
         {
-            conn = this.repositoryManager.getManagementRepository().getConnection();
+            conn = this.repositoryManager.getManagementRepositoryConnection();
             conn.begin();
             
             final URI context = this.repositoryManager.getFileRepositoryManagementGraph();

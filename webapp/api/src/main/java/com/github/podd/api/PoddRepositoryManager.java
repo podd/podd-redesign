@@ -25,6 +25,7 @@ import java.util.Set;
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.URI;
 import org.openrdf.repository.Repository;
+import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
 import org.semanticweb.owlapi.model.OWLOntologyID;
 
@@ -55,7 +56,7 @@ public interface PoddRepositoryManager
      * @throws OpenRDFException
      *             If there are any errors with the repository at this stage.
      */
-    Repository getManagementRepository() throws OpenRDFException;
+    RepositoryConnection getManagementRepositoryConnection() throws OpenRDFException;
     
     /**
      * Get a new temporary repository.
@@ -77,7 +78,7 @@ public interface PoddRepositoryManager
      * @throws IOException
      *             If there are errors finding the repository.
      */
-    Repository getPermanentRepository(Set<? extends OWLOntologyID> schemaOntologies) throws OpenRDFException,
+    RepositoryConnection getPermanentRepositoryConnection(Set<? extends OWLOntologyID> schemaOntologies) throws OpenRDFException,
         IOException;
     
     /**

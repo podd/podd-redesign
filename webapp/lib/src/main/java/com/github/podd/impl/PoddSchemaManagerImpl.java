@@ -120,16 +120,17 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
             contexts = Arrays.asList(schemaOntologyID.getVersionIRI().toOpenRDFURI());
         }
         
-        RepositoryConnection connection = null;
+        RepositoryConnection managementConnection = null;
         
         try
         {
-            connection = this.repositoryManager.getManagementRepository().getConnection();
+            managementConnection = this.repositoryManager.getManagementRepositoryConnection();
             
             final RepositoryResult<Statement> statements =
-                    connection.getStatements(null, null, null, includeInferred, contexts.toArray(new Resource[] {}));
+                    managementConnection.getStatements(null, null, null, includeInferred,
+                            contexts.toArray(new Resource[] {}));
             final Model model = new LinkedHashModel(Iterations.asList(statements));
-            final RepositoryResult<Namespace> namespaces = connection.getNamespaces();
+            final RepositoryResult<Namespace> namespaces = managementConnection.getNamespaces();
             for(final Namespace nextNs : Iterations.asSet(namespaces))
             {
                 model.setNamespace(nextNs);
@@ -138,9 +139,9 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
         }
         finally
         {
-            if(connection != null)
+            if(managementConnection != null)
             {
-                connection.close();
+                managementConnection.close();
             }
         }
     }
@@ -148,20 +149,20 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
     @Override
     public Set<InferredOWLOntologyID> getCurrentSchemaOntologies() throws OpenRDFException
     {
-        RepositoryConnection conn = null;
+        RepositoryConnection managementConnection = null;
         
         try
         {
-            conn = this.repositoryManager.getManagementRepository().getConnection();
+            managementConnection = this.repositoryManager.getManagementRepositoryConnection();
             
-            return this.sesameManager.getAllCurrentSchemaOntologyVersions(conn,
+            return this.sesameManager.getAllCurrentSchemaOntologyVersions(managementConnection,
                     this.repositoryManager.getSchemaManagementGraph());
         }
         finally
         {
-            if(conn != null && conn.isOpen())
+            if(managementConnection != null && managementConnection.isOpen())
             {
-                conn.close();
+                managementConnection.close();
             }
         }
     }
@@ -175,24 +176,24 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
             throw new UnmanagedSchemaIRIException(null, "NULL is not a managed schema ontology");
         }
         
-        RepositoryConnection conn = null;
+        RepositoryConnection managementConnection = null;
         try
         {
-            conn = this.repositoryManager.getManagementRepository().getConnection();
-            conn.begin();
+            managementConnection = this.repositoryManager.getManagementRepositoryConnection();
+            managementConnection.begin();
             
-            return this.sesameManager.getCurrentSchemaVersion(schemaOntologyIRI, conn,
+            return this.sesameManager.getCurrentSchemaVersion(schemaOntologyIRI, managementConnection,
                     this.repositoryManager.getSchemaManagementGraph());
         }
         finally
         {
-            if(conn != null && conn.isActive())
+            if(managementConnection != null && managementConnection.isActive())
             {
-                conn.rollback();
+                managementConnection.rollback();
             }
-            if(conn != null && conn.isOpen())
+            if(managementConnection != null && managementConnection.isOpen())
             {
-                conn.close();
+                managementConnection.close();
             }
         }
     }
@@ -200,20 +201,20 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
     @Override
     public Set<InferredOWLOntologyID> getSchemaOntologies() throws OpenRDFException
     {
-        RepositoryConnection conn = null;
+        RepositoryConnection managementConnection = null;
         
         try
         {
-            conn = this.repositoryManager.getManagementRepository().getConnection();
+            managementConnection = this.repositoryManager.getManagementRepositoryConnection();
             
-            return this.sesameManager.getAllSchemaOntologyVersions(conn,
+            return this.sesameManager.getAllSchemaOntologyVersions(managementConnection,
                     this.repositoryManager.getSchemaManagementGraph());
         }
         finally
         {
-            if(conn != null && conn.isOpen())
+            if(managementConnection != null)
             {
-                conn.close();
+                managementConnection.close();
             }
         }
     }
@@ -240,14 +241,14 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
             throw new UnmanagedSchemaOntologyIDException(owlOntologyID, "NULL is not a managed schema ontology");
         }
         
-        RepositoryConnection conn = null;
+        RepositoryConnection managementConnection = null;
         try
         {
-            conn = this.repositoryManager.getManagementRepository().getConnection();
-            conn.begin();
+            managementConnection = this.repositoryManager.getManagementRepositoryConnection();
+            managementConnection.begin();
             
             final InferredOWLOntologyID version =
-                    this.sesameManager.getSchemaVersion(owlOntologyID.getVersionIRI(), conn,
+                    this.sesameManager.getSchemaVersion(owlOntologyID.getVersionIRI(), managementConnection,
                             this.repositoryManager.getSchemaManagementGraph());
             
             // Check that the ontology IRI matches or return an error
@@ -268,13 +269,13 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
         }
         finally
         {
-            if(conn != null && conn.isActive())
+            if(managementConnection != null && managementConnection.isActive())
             {
-                conn.rollback();
+                managementConnection.rollback();
             }
-            if(conn != null && conn.isOpen())
+            if(managementConnection != null && managementConnection.isOpen())
             {
-                conn.close();
+                managementConnection.close();
             }
         }
     }
@@ -288,24 +289,24 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
             throw new UnmanagedSchemaIRIException(null, "NULL is not a managed schema ontology");
         }
         
-        RepositoryConnection conn = null;
+        RepositoryConnection managementConnection = null;
         try
         {
-            conn = this.repositoryManager.getManagementRepository().getConnection();
-            conn.begin();
+            managementConnection = this.repositoryManager.getManagementRepositoryConnection();
+            managementConnection.begin();
             
-            return this.sesameManager.getSchemaVersion(schemaVersionIRI, conn,
+            return this.sesameManager.getSchemaVersion(schemaVersionIRI, managementConnection,
                     this.repositoryManager.getSchemaManagementGraph());
         }
         finally
         {
-            if(conn != null && conn.isActive())
+            if(managementConnection != null && managementConnection.isActive())
             {
-                conn.rollback();
+                managementConnection.rollback();
             }
-            if(conn != null && conn.isOpen())
+            if(managementConnection != null && managementConnection.isOpen())
             {
-                conn.close();
+                managementConnection.close();
             }
         }
     }
@@ -399,7 +400,7 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
                 loadingOrder.put(nextImport, alreadyLoaded);
             }
             
-            managementConnection = this.repositoryManager.getManagementRepository().getConnection();
+            managementConnection = this.repositoryManager.getManagementRepositoryConnection();
             managementConnection.begin();
             
             final List<InferredOWLOntologyID> ontologyIDs =
@@ -482,40 +483,40 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
     {
         Objects.requireNonNull(inputStream, "Schema Ontology input stream was null");
         
-        RepositoryConnection conn = null;
+        RepositoryConnection managementConnection = null;
         
         try
         {
             // TODO: Should we store these copies in a separate repository
             // again, to reduce bloat in
             // the management repository??
-            conn = this.repositoryManager.getManagementRepository().getConnection();
-            conn.begin();
+            managementConnection = this.repositoryManager.getManagementRepositoryConnection();
+            managementConnection.begin();
             
             // TODO: Call this method directly from other methods so that the whole transaction can
             // be rolled back if there are any failures!
             final InferredOWLOntologyID result =
-                    this.uploadSchemaOntologyInternal(schemaOntologyID, inputStream, fileFormat, conn,
+                    this.uploadSchemaOntologyInternal(schemaOntologyID, inputStream, fileFormat, managementConnection,
                             this.repositoryManager.getSchemaManagementGraph(), dependentSchemaOntologies);
             
-            conn.commit();
+            managementConnection.commit();
             
             return result;
         }
         catch(final Throwable e)
         {
-            if(conn != null && conn.isActive())
+            if(managementConnection != null)
             {
-                conn.rollback();
+                managementConnection.rollback();
             }
             
             throw e;
         }
         finally
         {
-            if(conn != null && conn.isOpen())
+            if(managementConnection != null)
             {
-                conn.close();
+                managementConnection.close();
             }
         }
         

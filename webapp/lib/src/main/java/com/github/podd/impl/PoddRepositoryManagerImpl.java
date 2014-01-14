@@ -146,24 +146,29 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
     }
     
     @Override
-    public Repository getManagementRepository() throws OpenRDFException
+    public RepositoryConnection getManagementRepositoryConnection() throws OpenRDFException
     {
-        return this.managementRepository;
+        this.log.info("Get management repository");
+        return this.managementRepository.getConnection();
     }
     
     @Override
     public Repository getNewTemporaryRepository() throws OpenRDFException
     {
+        this.log.info("Started creating temporary MemoryStore repository");
         final Repository result = new SailRepository(new MemoryStore());
         result.initialize();
+        this.log.info("Finished creating temporary MemoryStore repository");
         
         return result;
     }
     
     @Override
-    public Repository getPermanentRepository(final Set<? extends OWLOntologyID> schemaOntologies)
+    public RepositoryConnection getPermanentRepositoryConnection(final Set<? extends OWLOntologyID> schemaOntologies)
         throws OpenRDFException, IOException
     {
+        this.log.info("Entering get permanent repository");
+        this.log.debug("Get permanent repository schemas: {}", schemaOntologies);
         Objects.requireNonNull(schemaOntologies, "Schema ontologies must not be null");
         
         if(schemaOntologies.isEmpty())
@@ -184,10 +189,12 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
                 permanentRepository = this.permanentRepositories.get(schemaOntologies);
                 if(permanentRepository == null)
                 {
+                    this.log.info("Permanent repository not cached, but may exist");
+                    
                     RepositoryConnection managementConnection = null;
                     try
                     {
-                        managementConnection = this.getManagementRepository().getConnection();
+                        managementConnection = this.getManagementRepositoryConnection();
                         managementConnection.begin();
                         Map<Resource, RepositoryManager> sesameRepositoryManagerMap =
                                 getRepositoryManager(schemaOntologies, managementConnection, this.repositoryGraph);
@@ -266,6 +273,7 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
                         // reference to the existing repository
                         if(repositoryUri == null)
                         {
+                            this.log.info("Permanent repository not created yet");
                             // Create a new one
                             repositoryUri =
                                     managementConnection.getValueFactory().createURI("urn:podd:repository:",
@@ -299,6 +307,7 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
                             }
                             else
                             {
+                                this.log.info("Permanent repository created: {}", newRepositoryID);
                                 permanentRepository = nextRepository;
                                 
                                 // In this case, we need to copy the relevant schema ontologies over
@@ -380,6 +389,8 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
                         }
                         else
                         {
+                            this.log.info("Permanent repository created but not cached: {}", repositoryUri);
+                            new RuntimeException().printStackTrace();
                             // create reference to existing repositoryUri
                             Model model = new LinkedHashModel();
                             managementConnection.exportStatements(repositoryUri, null, null, false,
@@ -441,7 +452,8 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
                 }
             }
         }
-        return permanentRepository;
+        this.log.info("Returning from get permanent repository");
+        return permanentRepository.getConnection();
     }
     
     @Override
@@ -601,8 +613,9 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
     {
         final Federation federation = new Federation();
         federation.setReadOnly(true);
-        federation.addMember(this.getPermanentRepository(schemaImports));
-        federation.addMember(this.getManagementRepository());
+        // FIXME: Need an internal method that returns a repository to support this
+        // federation.addMember(this.getPermanentRepositoryConnection(schemaImports));
+        // federation.addMember(this.getManagementRepositoryConnection());
         federation.initialize();
         final Repository federationRepository = new SailRepository(federation);
         federationRepository.initialize();

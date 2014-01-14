@@ -306,7 +306,7 @@ public class SparqlResourceImpl extends AbstractPoddResourceImpl
             final ConcurrentMap<Set<? extends OWLOntologyID>, RepositoryConnection> cache =
                     new ConcurrentHashMap<Set<? extends OWLOntologyID>, RepositoryConnection>();
             
-            managementConnection = this.getPoddRepositoryManager().getManagementRepository().getConnection();
+            managementConnection = this.getPoddRepositoryManager().getManagementRepositoryConnection();
             try
             {
                 for(final InferredOWLOntologyID ontologyID : artifactIds)
@@ -317,7 +317,7 @@ public class SparqlResourceImpl extends AbstractPoddResourceImpl
                     if(permanentConnection == null)
                     {
                         RepositoryConnection nextConnection =
-                                this.getPoddRepositoryManager().getPermanentRepository(schemaImports).getConnection();
+                                this.getPoddRepositoryManager().getPermanentRepositoryConnection(schemaImports);
                         final RepositoryConnection putIfAbsent = cache.putIfAbsent(schemaImports, nextConnection);
                         if(putIfAbsent != null)
                         {
