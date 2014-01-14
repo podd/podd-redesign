@@ -160,7 +160,7 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
         }
         finally
         {
-            if(managementConnection != null && managementConnection.isOpen())
+            if(managementConnection != null)
             {
                 managementConnection.close();
             }
@@ -180,18 +180,13 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
         try
         {
             managementConnection = this.repositoryManager.getManagementRepositoryConnection();
-            managementConnection.begin();
             
             return this.sesameManager.getCurrentSchemaVersion(schemaOntologyIRI, managementConnection,
                     this.repositoryManager.getSchemaManagementGraph());
         }
         finally
         {
-            if(managementConnection != null && managementConnection.isActive())
-            {
-                managementConnection.rollback();
-            }
-            if(managementConnection != null && managementConnection.isOpen())
+            if(managementConnection != null)
             {
                 managementConnection.close();
             }
@@ -245,7 +240,6 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
         try
         {
             managementConnection = this.repositoryManager.getManagementRepositoryConnection();
-            managementConnection.begin();
             
             final InferredOWLOntologyID version =
                     this.sesameManager.getSchemaVersion(owlOntologyID.getVersionIRI(), managementConnection,
@@ -269,11 +263,7 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
         }
         finally
         {
-            if(managementConnection != null && managementConnection.isActive())
-            {
-                managementConnection.rollback();
-            }
-            if(managementConnection != null && managementConnection.isOpen())
+            if(managementConnection != null)
             {
                 managementConnection.close();
             }
@@ -293,18 +283,13 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
         try
         {
             managementConnection = this.repositoryManager.getManagementRepositoryConnection();
-            managementConnection.begin();
             
             return this.sesameManager.getSchemaVersion(schemaVersionIRI, managementConnection,
                     this.repositoryManager.getSchemaManagementGraph());
         }
         finally
         {
-            if(managementConnection != null && managementConnection.isActive())
-            {
-                managementConnection.rollback();
-            }
-            if(managementConnection != null && managementConnection.isOpen())
+            if(managementConnection != null)
             {
                 managementConnection.close();
             }
