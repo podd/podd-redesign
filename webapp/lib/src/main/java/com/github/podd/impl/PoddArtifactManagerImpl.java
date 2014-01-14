@@ -235,14 +235,24 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
                 {
                     managementConnection.rollback();
                 }
-                if(permanentConnection != null && permanentConnection.isActive())
-                {
-                    permanentConnection.rollback();
-                }
             }
             catch(final RepositoryException e1)
             {
                 this.log.error("Found error rolling back repository connection", e1);
+            }
+            finally
+            {
+                try
+                {
+                    if(permanentConnection != null && permanentConnection.isActive())
+                    {
+                        permanentConnection.rollback();
+                    }
+                }
+                catch(final RepositoryException e1)
+                {
+                    this.log.error("Found error rolling back repository connection", e1);
+                }
             }
             
             throw new DeleteArtifactException("Exception occurred while deleting artifact", e, artifactId);
@@ -251,18 +261,28 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         {
             try
             {
-                if(managementConnection != null && managementConnection.isOpen())
+                if(managementConnection != null)
                 {
                     managementConnection.close();
-                }
-                if(permanentConnection != null && permanentConnection.isOpen())
-                {
-                    permanentConnection.close();
                 }
             }
             catch(final RepositoryException e)
             {
                 throw new DeleteArtifactException("Repository exception occurred", e, artifactId);
+            }
+            finally
+            {
+                try
+                {
+                    if(permanentConnection != null)
+                    {
+                        permanentConnection.close();
+                    }
+                }
+                catch(final RepositoryException e)
+                {
+                    throw new DeleteArtifactException("Repository exception occurred", e, artifactId);
+                }
             }
         }
         
@@ -435,13 +455,19 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         }
         finally
         {
-            if(managementConnection != null)
+            try
             {
-                managementConnection.close();
+                if(managementConnection != null)
+                {
+                    managementConnection.close();
+                }
             }
-            if(permanentConnection != null)
+            finally
             {
-                permanentConnection.close();
+                if(permanentConnection != null)
+                {
+                    permanentConnection.close();
+                }
             }
         }
     }
@@ -469,14 +495,14 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         {
             try
             {
-                if(permanentConnection != null && permanentConnection.isOpen())
+                if(permanentConnection != null)
                 {
                     permanentConnection.close();
                 }
             }
             finally
             {
-                if(managementConnection != null && managementConnection.isOpen())
+                if(managementConnection != null)
                 {
                     managementConnection.close();
                 }
@@ -723,14 +749,14 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         {
             try
             {
-                if(permanentConnection != null && permanentConnection.isOpen())
+                if(permanentConnection != null)
                 {
                     permanentConnection.close();
                 }
             }
             finally
             {
-                if(managementConnection != null && managementConnection.isOpen())
+                if(managementConnection != null)
                 {
                     managementConnection.close();
                 }
@@ -774,14 +800,14 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         {
             try
             {
-                if(permanentConnection != null && permanentConnection.isOpen())
+                if(permanentConnection != null)
                 {
                     permanentConnection.close();
                 }
             }
             finally
             {
-                if(managementConnection != null && managementConnection.isOpen())
+                if(managementConnection != null)
                 {
                     managementConnection.close();
                 }
@@ -824,14 +850,14 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         {
             try
             {
-                if(permanentConnection != null && permanentConnection.isOpen())
+                if(permanentConnection != null)
                 {
                     permanentConnection.close();
                 }
             }
             finally
             {
-                if(managementConnection != null && managementConnection.isOpen())
+                if(managementConnection != null)
                 {
                     managementConnection.close();
                 }
@@ -882,14 +908,14 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         {
             try
             {
-                if(permanentConnection != null && permanentConnection.isOpen())
+                if(permanentConnection != null)
                 {
                     permanentConnection.close();
                 }
             }
             finally
             {
-                if(managementConnection != null && managementConnection.isOpen())
+                if(managementConnection != null)
                 {
                     managementConnection.close();
                 }
@@ -930,14 +956,14 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         {
             try
             {
-                if(permanentConnection != null && permanentConnection.isOpen())
+                if(permanentConnection != null)
                 {
                     permanentConnection.close();
                 }
             }
             finally
             {
-                if(managementConnection != null && managementConnection.isOpen())
+                if(managementConnection != null)
                 {
                     managementConnection.close();
                 }
@@ -1045,6 +1071,13 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         {
             try
             {
+                if(managementConnection != null)
+                {
+                    managementConnection.close();
+                }
+            }
+            finally
+            {
                 for(final RepositoryConnection nextPermanentConnection : cache.values())
                 {
                     try
@@ -1058,13 +1091,6 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
                     {
                         this.log.error("Found exception closing connection", e);
                     }
-                }
-            }
-            finally
-            {
-                if(managementConnection != null && managementConnection.isOpen())
-                {
-                    managementConnection.close();
                 }
             }
         }
@@ -1534,21 +1560,30 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         }
         catch(final Throwable e)
         {
-            if(temporaryConnection != null && temporaryConnection.isActive())
+            try
             {
-                temporaryConnection.rollback();
+                if(managementConnection != null && managementConnection.isActive())
+                {
+                    managementConnection.rollback();
+                }
             }
-            
-            if(permanentConnection != null && permanentConnection.isActive())
+            finally
             {
-                permanentConnection.rollback();
+                try
+                {
+                    if(permanentConnection != null && permanentConnection.isActive())
+                    {
+                        permanentConnection.rollback();
+                    }
+                }
+                finally
+                {
+                    if(temporaryConnection != null && temporaryConnection.isActive())
+                    {
+                        temporaryConnection.rollback();
+                    }
+                }
             }
-            
-            if(managementConnection != null && managementConnection.isActive())
-            {
-                managementConnection.rollback();
-            }
-            
             throw e;
         }
         finally
@@ -1573,7 +1608,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             {
                 try
                 {
-                    if(managementConnection != null && managementConnection.isOpen())
+                    if(managementConnection != null)
                     {
                         managementConnection.close();
                     }
@@ -1586,7 +1621,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
                 {
                     try
                     {
-                        if(permanentConnection != null && permanentConnection.isOpen())
+                        if(permanentConnection != null)
                         {
                             permanentConnection.close();
                         }
@@ -1599,7 +1634,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
                     {
                         try
                         {
-                            if(temporaryConnection != null && temporaryConnection.isOpen())
+                            if(temporaryConnection != null)
                             {
                                 temporaryConnection.close();
                             }
@@ -1752,7 +1787,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             // release resources
             try
             {
-                if(managementConnection != null && managementConnection.isOpen())
+                if(managementConnection != null)
                 {
                     managementConnection.close();
                 }
@@ -1834,22 +1869,22 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         {
             try
             {
-                if(permanentConnection != null && permanentConnection.isOpen())
+                if(managementConnection != null)
                 {
-                    permanentConnection.close();
+                    managementConnection.close();
                 }
             }
             catch(final RepositoryException e)
             {
-                throw e;
+                this.log.error("Found exception closing repository connection", e);
             }
             finally
             {
                 try
                 {
-                    if(managementConnection != null && managementConnection.isOpen())
+                    if(permanentConnection != null)
                     {
-                        managementConnection.close();
+                        permanentConnection.close();
                     }
                 }
                 catch(final RepositoryException e)
@@ -2188,50 +2223,63 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         }
         finally
         {
-            if(managementConnection != null && managementConnection.isOpen())
+            try
             {
-                try
+                if(managementConnection != null)
                 {
                     managementConnection.close();
                 }
-                catch(final RepositoryException e)
-                {
-                    this.log.error("Found exception closing repository connection", e);
-                }
             }
-            
-            if(permanentConnection != null && permanentConnection.isOpen())
+            catch(final RepositoryException e)
+            {
+                this.log.error("Found exception closing repository connection", e);
+            }
+            finally
             {
                 try
                 {
-                    permanentConnection.close();
+                    if(permanentConnection != null)
+                    {
+                        permanentConnection.close();
+                    }
                 }
                 catch(final RepositoryException e)
                 {
                     this.log.error("Found exception closing repository connection", e);
                 }
-            }
-            
-            // release resources
-            if(inferredOWLOntologyID != null && currentSchemaImports != null)
-            {
-                this.getOWLManager().removeCache(inferredOWLOntologyID.getBaseOWLOntologyID(), currentSchemaImports);
-                this.getOWLManager()
-                        .removeCache(inferredOWLOntologyID.getInferredOWLOntologyID(), currentSchemaImports);
-            }
-            
-            if(tempRepositoryConnection != null && tempRepositoryConnection.isOpen())
-            {
-                try
+                finally
                 {
-                    tempRepositoryConnection.close();
-                }
-                catch(final RepositoryException e)
-                {
-                    this.log.error("Found exception closing repository connection", e);
+                    try
+                    {
+                        // release resources
+                        if(inferredOWLOntologyID != null && currentSchemaImports != null)
+                        {
+                            this.getOWLManager().removeCache(inferredOWLOntologyID.getBaseOWLOntologyID(),
+                                    currentSchemaImports);
+                            this.getOWLManager().removeCache(inferredOWLOntologyID.getInferredOWLOntologyID(),
+                                    currentSchemaImports);
+                        }
+                    }
+                    finally
+                    {
+                        try
+                        {
+                            if(tempRepositoryConnection != null)
+                            {
+                                tempRepositoryConnection.close();
+                            }
+                        }
+                        catch(final RepositoryException e)
+                        {
+                            this.log.error("Found exception closing repository connection", e);
+                        }
+                        finally
+                        {
+                            tempRepository.shutDown();
+                        }
+                    }
                 }
             }
-            tempRepository.shutDown();
             
         }
     }

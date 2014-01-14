@@ -143,8 +143,10 @@ public class AddObjectResourceImpl extends AbstractPoddResourceImpl
             dataModel.put("parentPredicateUri", parentPredicateUri);
         }
         
-        return RestletUtils.getHtmlRepresentation(this.getPoddApplication().getPropertyUtil().get(PoddWebConstants.PROPERTY_TEMPLATE_BASE, PoddWebConstants.DEFAULT_TEMPLATE_BASE), dataModel,
-                MediaType.TEXT_HTML, this.getPoddApplication().getTemplateConfiguration());
+        return RestletUtils.getHtmlRepresentation(
+                this.getPoddApplication().getPropertyUtil()
+                        .get(PoddWebConstants.PROPERTY_TEMPLATE_BASE, PoddWebConstants.DEFAULT_TEMPLATE_BASE),
+                dataModel, MediaType.TEXT_HTML, this.getPoddApplication().getTemplateConfiguration());
     }
     
     /*
@@ -196,18 +198,30 @@ public class AddObjectResourceImpl extends AbstractPoddResourceImpl
             {
                 try
                 {
-                    if(managementConnection != null && managementConnection.isOpen())
+                    if(managementConnection != null)
                     {
-                        managementConnection.rollback(); // read only, nothing to commit
-                        managementConnection.close();
+                        try
+                        {
+                            managementConnection.rollback(); // read only, nothing to commit
+                        }
+                        finally
+                        {
+                            managementConnection.close();
+                        }
                     }
                 }
                 finally
                 {
-                    if(permanentConnection != null && permanentConnection.isOpen())
+                    if(permanentConnection != null)
                     {
-                        permanentConnection.rollback(); // read only, nothing to commit
-                        permanentConnection.close();
+                        try
+                        {
+                            permanentConnection.rollback(); // read only, nothing to commit
+                        }
+                        finally
+                        {
+                            permanentConnection.close();
+                        }
                     }
                 }
             }

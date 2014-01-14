@@ -1957,16 +1957,20 @@ public abstract class AbstractPoddArtifactManagerTest
         }
         finally
         {
-            if(permanentConnection != null && permanentConnection.isOpen())
+            try
             {
-                permanentConnection.close();
+                if(permanentConnection != null)
+                {
+                    permanentConnection.close();
+                }
             }
-            permanentConnection = null;
-            if(managementConnection != null && managementConnection.isOpen())
+            finally
             {
-                managementConnection.close();
+                if(managementConnection != null)
+                {
+                    managementConnection.close();
+                }
             }
-            managementConnection = null;
         }
     }
     
@@ -2270,16 +2274,20 @@ public abstract class AbstractPoddArtifactManagerTest
         }
         finally
         {
-            if(permanentConnection != null && permanentConnection.isOpen())
+            try
             {
-                permanentConnection.close();
+                if(permanentConnection != null)
+                {
+                    permanentConnection.close();
+                }
             }
-            permanentConnection = null;
-            if(managementConnection != null && managementConnection.isOpen())
+            finally
             {
-                managementConnection.close();
+                if(managementConnection != null)
+                {
+                    managementConnection.close();
+                }
             }
-            managementConnection = null;
         }
     }
     
@@ -2345,17 +2353,20 @@ public abstract class AbstractPoddArtifactManagerTest
         }
         finally
         {
-            if(permanentConnection != null && permanentConnection.isOpen())
+            try
             {
-                permanentConnection.close();
+                if(permanentConnection != null)
+                {
+                    permanentConnection.close();
+                }
             }
-            permanentConnection = null;
-            
-            if(managementConnection != null && managementConnection.isOpen())
+            finally
             {
-                managementConnection.close();
+                if(managementConnection != null)
+                {
+                    managementConnection.close();
+                }
             }
-            managementConnection = null;
         }
         
     }
@@ -2404,17 +2415,20 @@ public abstract class AbstractPoddArtifactManagerTest
         }
         finally
         {
-            if(permanentConnection != null && permanentConnection.isOpen())
+            try
             {
-                permanentConnection.close();
+                if(permanentConnection != null)
+                {
+                    permanentConnection.close();
+                }
             }
-            permanentConnection = null;
-            
-            if(managementConnection != null && managementConnection.isOpen())
+            finally
             {
-                managementConnection.close();
+                if(managementConnection != null)
+                {
+                    managementConnection.close();
+                }
             }
-            managementConnection = null;
         }
         
     }
@@ -2462,17 +2476,20 @@ public abstract class AbstractPoddArtifactManagerTest
         }
         finally
         {
-            if(permanentConnection != null && permanentConnection.isOpen())
+            try
             {
-                permanentConnection.close();
+                if(permanentConnection != null)
+                {
+                    permanentConnection.close();
+                }
             }
-            permanentConnection = null;
-            
-            if(managementConnection != null && managementConnection.isOpen())
+            finally
             {
-                managementConnection.close();
+                if(managementConnection != null)
+                {
+                    managementConnection.close();
+                }
             }
-            managementConnection = null;
         }
     }
     
@@ -2554,17 +2571,20 @@ public abstract class AbstractPoddArtifactManagerTest
         }
         finally
         {
-            if(permanentConnection != null && permanentConnection.isOpen())
+            try
             {
-                permanentConnection.close();
+                if(permanentConnection != null)
+                {
+                    permanentConnection.close();
+                }
             }
-            permanentConnection = null;
-            
-            if(managementConnection != null && managementConnection.isOpen())
+            finally
             {
-                managementConnection.close();
+                if(managementConnection != null)
+                {
+                    managementConnection.close();
+                }
             }
-            managementConnection = null;
         }
     }
     
@@ -2617,17 +2637,20 @@ public abstract class AbstractPoddArtifactManagerTest
         }
         finally
         {
-            if(permanentConnection != null && permanentConnection.isOpen())
+            try
             {
-                permanentConnection.close();
+                if(permanentConnection != null)
+                {
+                    permanentConnection.close();
+                }
             }
-            permanentConnection = null;
-            
-            if(managementConnection != null && managementConnection.isOpen())
+            finally
             {
-                managementConnection.close();
+                if(managementConnection != null)
+                {
+                    managementConnection.close();
+                }
             }
-            managementConnection = null;
         }
     }
     
@@ -2678,17 +2701,20 @@ public abstract class AbstractPoddArtifactManagerTest
         }
         finally
         {
-            if(permanentConnection != null && permanentConnection.isOpen())
+            try
             {
-                permanentConnection.close();
+                if(permanentConnection != null)
+                {
+                    permanentConnection.close();
+                }
             }
-            permanentConnection = null;
-            
-            if(managementConnection != null && managementConnection.isOpen())
+            finally
             {
-                managementConnection.close();
+                if(managementConnection != null)
+                {
+                    managementConnection.close();
+                }
             }
-            managementConnection = null;
         }
     }
     
@@ -3254,13 +3280,14 @@ public abstract class AbstractPoddArtifactManagerTest
             final long expectedConcreteStatementCount, final RepositoryConnection managementConnection)
         throws Exception
     {
-        final Set<? extends OWLOntologyID> schemaImports = this.testArtifactManager.getSchemaImports(updatedArtifact);
-        
-        final RepositoryConnection permanentConnection =
-                this.testRepositoryManager.getPermanentRepository(schemaImports).getConnection();
+        RepositoryConnection permanentConnection = null;
         
         try
         {
+            final Set<? extends OWLOntologyID> schemaImports =
+                    this.testArtifactManager.getSchemaImports(updatedArtifact);
+            permanentConnection = this.testRepositoryManager.getPermanentRepository(schemaImports).getConnection();
+            
             Assert.assertEquals("Unexpected concrete statement count", expectedConcreteStatementCount,
                     permanentConnection.size(updatedArtifact.getVersionIRI().toOpenRDFURI()));
             
@@ -3281,7 +3308,10 @@ public abstract class AbstractPoddArtifactManagerTest
         }
         finally
         {
-            permanentConnection.close();
+            if(permanentConnection != null)
+            {
+                permanentConnection.close();
+            }
         }
     }
     
