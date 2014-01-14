@@ -171,7 +171,8 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
     }
     
     @Override
-    public boolean deleteArtifact(final InferredOWLOntologyID artifactId) throws PoddException
+    public boolean deleteArtifact(final InferredOWLOntologyID artifactId) throws PoddException,
+        UnsupportedRDFormatException, OpenRDFException, IOException
     {
         if(artifactId.getOntologyIRI() == null)
         {
@@ -181,9 +182,11 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         RepositoryConnection permanentConnection = null;
         RepositoryConnection managementConnection = null;
         
+        List<InferredOWLOntologyID> requestedArtifactIds = null;
+        final Set<? extends OWLOntologyID> schemaImports = this.getSchemaImports(artifactId);
+        
         try
         {
-            final Set<? extends OWLOntologyID> schemaImports = this.getSchemaImports(artifactId);
             permanentConnection = this.getRepositoryManager().getPermanentRepository(schemaImports).getConnection();
             permanentConnection.begin();
             managementConnection = this.getRepositoryManager().getManagementRepository().getConnection();
@@ -195,7 +198,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
                 throw new DeleteArtifactException("Published Artifacts cannot be deleted", artifactId);
             }
             
-            List<InferredOWLOntologyID> requestedArtifactIds =
+            requestedArtifactIds =
                     this.getSesameManager().getAllOntologyVersions(artifactId.getOntologyIRI(), managementConnection,
                             this.getRepositoryManager().getArtifactManagementGraph());
             
@@ -216,14 +219,6 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
                     this.getRepositoryManager().getArtifactManagementGraph());
             permanentConnection.commit();
             managementConnection.commit();
-            
-            // - ensure deleted ontologies are removed from the
-            // OWLOntologyManager's cache
-            for(final InferredOWLOntologyID deletedOntologyId : requestedArtifactIds)
-            {
-                this.getOWLManager().removeCache(deletedOntologyId.getBaseOWLOntologyID(), schemaImports);
-                this.getOWLManager().removeCache(deletedOntologyId.getInferredOWLOntologyID(), schemaImports);
-            }
             
             return !requestedArtifactIds.isEmpty();
         }
@@ -268,7 +263,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             }
             catch(final RepositoryException e)
             {
-                throw new DeleteArtifactException("Repository exception occurred", e, artifactId);
+                this.log.error("Found error closing repository connection", e);
             }
             finally
             {
@@ -281,7 +276,35 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
                 }
                 catch(final RepositoryException e)
                 {
-                    throw new DeleteArtifactException("Repository exception occurred", e, artifactId);
+                    this.log.error("Found error closing repository connection", e);
+                }
+                finally
+                {
+                    // - ensure deleted ontologies are removed from the
+                    // OWLOntologyManager's cache
+                    for(final InferredOWLOntologyID deletedOntologyId : requestedArtifactIds)
+                    {
+                        try
+                        {
+                            this.getOWLManager().removeCache(deletedOntologyId.getBaseOWLOntologyID(), schemaImports);
+                        }
+                        catch(OWLException e)
+                        {
+                            this.log.error("Found error clearing cache", e);
+                        }
+                        finally
+                        {
+                            try
+                            {
+                                this.getOWLManager().removeCache(deletedOntologyId.getInferredOWLOntologyID(),
+                                        schemaImports);
+                            }
+                            catch(OWLException e)
+                            {
+                                this.log.error("Found error clearing cache", e);
+                            }
+                        }
+                    }
                 }
             }
         }
