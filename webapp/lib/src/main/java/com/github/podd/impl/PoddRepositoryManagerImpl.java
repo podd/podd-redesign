@@ -664,11 +664,11 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
                                     break;
                                 }
                             }
-                            if(!found)
-                            {
-                                allMatched = false;
-                                break;
-                            }
+                        }
+                        if(!found)
+                        {
+                            allMatched = false;
+                            break;
                         }
                     }
                     
