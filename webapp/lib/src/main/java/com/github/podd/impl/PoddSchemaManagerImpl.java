@@ -447,7 +447,7 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
         }
         catch(final Throwable e)
         {
-            if(managementConnection != null && managementConnection.isActive())
+            if(managementConnection != null)
             {
                 managementConnection.rollback();
             }
@@ -456,7 +456,7 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
         }
         finally
         {
-            if(managementConnection != null && managementConnection.isOpen())
+            if(managementConnection != null)
             {
                 managementConnection.close();
             }

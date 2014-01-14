@@ -288,7 +288,8 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
                         {
                             try
                             {
-                                this.getOWLManager().removeCache(deletedOntologyId.getBaseOWLOntologyID(), schemaImports);
+                                this.getOWLManager().removeCache(deletedOntologyId.getBaseOWLOntologyID(),
+                                        schemaImports);
                             }
                             catch(OWLException e)
                             {
@@ -1588,7 +1589,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         {
             try
             {
-                if(managementConnection != null && managementConnection.isActive())
+                if(managementConnection != null)
                 {
                     managementConnection.rollback();
                 }
@@ -1597,14 +1598,14 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             {
                 try
                 {
-                    if(permanentConnection != null && permanentConnection.isActive())
+                    if(permanentConnection != null)
                     {
                         permanentConnection.rollback();
                     }
                 }
                 finally
                 {
-                    if(temporaryConnection != null && temporaryConnection.isActive())
+                    if(temporaryConnection != null)
                     {
                         temporaryConnection.rollback();
                     }
@@ -1671,9 +1672,16 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
                         }
                         finally
                         {
-                            if(tempRepository != null)
+                            try
                             {
-                                tempRepository.shutDown();
+                                if(tempRepository != null)
+                                {
+                                    tempRepository.shutDown();
+                                }
+                            }
+                            catch(final RepositoryException e)
+                            {
+                                this.log.error("Found exception shutting down temporary repository", e);
                             }
                         }
                     }
