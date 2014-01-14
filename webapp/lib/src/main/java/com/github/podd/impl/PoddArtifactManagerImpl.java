@@ -282,26 +282,29 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
                 {
                     // - ensure deleted ontologies are removed from the
                     // OWLOntologyManager's cache
-                    for(final InferredOWLOntologyID deletedOntologyId : requestedArtifactIds)
+                    if(requestedArtifactIds != null)
                     {
-                        try
-                        {
-                            this.getOWLManager().removeCache(deletedOntologyId.getBaseOWLOntologyID(), schemaImports);
-                        }
-                        catch(OWLException e)
-                        {
-                            this.log.error("Found error clearing cache", e);
-                        }
-                        finally
+                        for(final InferredOWLOntologyID deletedOntologyId : requestedArtifactIds)
                         {
                             try
                             {
-                                this.getOWLManager().removeCache(deletedOntologyId.getInferredOWLOntologyID(),
-                                        schemaImports);
+                                this.getOWLManager().removeCache(deletedOntologyId.getBaseOWLOntologyID(), schemaImports);
                             }
                             catch(OWLException e)
                             {
                                 this.log.error("Found error clearing cache", e);
+                            }
+                            finally
+                            {
+                                try
+                                {
+                                    this.getOWLManager().removeCache(deletedOntologyId.getInferredOWLOntologyID(),
+                                            schemaImports);
+                                }
+                                catch(OWLException e)
+                                {
+                                    this.log.error("Found error clearing cache", e);
+                                }
                             }
                         }
                     }
