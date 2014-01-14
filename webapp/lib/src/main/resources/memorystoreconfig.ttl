@@ -2,10 +2,12 @@
 @prefix rep: <http://www.openrdf.org/config/repository#>.
 @prefix sr: <http://www.openrdf.org/config/repository/sail#>.
 @prefix sail: <http://www.openrdf.org/config/sail#>.
+@prefix sailmemory: <http://www.openrdf.org/config/sail/memory#>.
 
 # SailRepository on top of MemoryStore, for testing
 [] rep:repositoryType "openrdf:SailRepository" ;
       sr:sailImpl [
-         sail:sailType "openrdf:MemoryStore"
+         sail:sailType "openrdf:MemoryStore" ;
+         sailmemory:persist "true" 
       ]
 .
