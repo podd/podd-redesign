@@ -532,7 +532,7 @@ public abstract class AbstractPoddArtifactManagerTest
         this.artifactGraph = PODD.VF.createURI("urn:test:artifact-graph");
         
         this.testPath = tempDir.newFolder("test-podd-repository-manager").toPath();
-        this.managementRepository = new SailRepository(new MemoryStore());
+        this.managementRepository = new SailRepository(new MemoryStore(tempDir.newFolder("managementRepository")));
         this.managementRepository.initialize();
         this.testManagementConnection = managementRepository.getConnection();
         
@@ -1109,6 +1109,8 @@ public abstract class AbstractPoddArtifactManagerTest
         Assert.assertFalse("Exported artifact was empty", model.isEmpty());
         Assert.assertEquals("Incorrect statement count in exported artifact",
                 TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES, model.size());
+        
+        this.testManagementConnection.close();
         
         this.setupManagers();
         
@@ -2858,6 +2860,8 @@ public abstract class AbstractPoddArtifactManagerTest
         this.verifyLoadedArtifact(artifactIDv1, 12, TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES,
                 TestConstants.TEST_ARTIFACT_BASIC_1_20130206_INFERRED_TRIPLES, false);
         
+        this.testManagementConnection.close();
+        
         // Simulate reloading all of the application
         this.setupManagers();
         
@@ -3220,16 +3224,20 @@ public abstract class AbstractPoddArtifactManagerTest
         }
         finally
         {
-            if(permanentConnection != null && permanentConnection.isOpen())
+            try
             {
-                permanentConnection.close();
+                if(permanentConnection != null)
+                {
+                    permanentConnection.close();
+                }
             }
-            permanentConnection = null;
-            if(managementConnection != null && managementConnection.isOpen())
+            finally
             {
-                managementConnection.close();
+                if(managementConnection != null)
+                {
+                    managementConnection.close();
+                }
             }
-            managementConnection = null;
         }
     }
     
