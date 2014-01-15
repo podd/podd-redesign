@@ -2331,7 +2331,8 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         }
         
         RepositoryConnection managementConnection = null;
-        RepositoryConnection permanentConnection = null;
+        RepositoryConnection oldPermanentConnection = null;
+        RepositoryConnection newPermanentConnection = null;
         RepositoryConnection tempRepositoryConnection = null;
         Repository tempRepository = null;
         try
@@ -2351,14 +2352,19 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             
             this.log.info("Starting exporting artifact to RDF: {}", artifactVersion);
             
-            permanentConnection = this.repositoryManager.getPermanentRepositoryConnection(newSchemaOntologyIds);
-            permanentConnection.begin();
+            oldPermanentConnection = this.repositoryManager.getPermanentRepositoryConnection(oldSchemaOntologyIds);
+            oldPermanentConnection.begin();
             
             // Export the artifact without including the old inferred triples, and they will be
             // regenerated using the new schema ontologies
             final Model model =
-                    this.exportArtifactInternal(false, permanentConnection,
+                    this.exportArtifactInternal(false, oldPermanentConnection,
                             this.getSesameManager().versionContexts(artifactVersion));
+            
+            if(model.isEmpty())
+            {
+                throw new RuntimeException("Was not able to export artifact as it did not seem to exist");
+            }
             
             this.log.info("Finished exporting artifact to RDF: {}", artifactVersion);
             
@@ -2406,20 +2412,24 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             // this.log.info("Finished caching schema ontologies for artifact migration: {}",
             // artifactVersion);
             
-            //tempRepositoryConnection.commit();
+            // tempRepositoryConnection.commit();
             
             this.log.info("Starting reload of artifact to Repository: {}", artifactVersion);
+            
+            newPermanentConnection = this.repositoryManager.getPermanentRepositoryConnection(newSchemaOntologyIds);
+            newPermanentConnection.begin();
             
             // If the following does not succeed, then it throws an exception and we rollback
             // permanentConnection
             final InferredOWLOntologyID result =
-                    this.loadInferStoreArtifact(tempRepositoryConnection, permanentConnection, managementConnection,
+                    this.loadInferStoreArtifact(tempRepositoryConnection, newPermanentConnection, managementConnection,
                             newVersionIRI.toOpenRDFURI(), DataReferenceVerificationPolicy.DO_NOT_VERIFY, false,
                             newSchemaOntologyIds);
             
             this.log.info("Completed reload of artifact to Repository: {}", artifactVersion);
             
-            permanentConnection.commit();
+            oldPermanentConnection.commit();
+            newPermanentConnection.commit();
             managementConnection.commit();
             return result;
         }
@@ -2440,9 +2450,9 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             {
                 try
                 {
-                    if(permanentConnection != null)
+                    if(newPermanentConnection != null)
                     {
-                        permanentConnection.rollback();
+                        newPermanentConnection.rollback();
                     }
                 }
                 catch(final Throwable e1)
@@ -2453,14 +2463,28 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
                 {
                     try
                     {
-                        if(tempRepositoryConnection != null)
+                        if(oldPermanentConnection != null)
                         {
-                            tempRepositoryConnection.rollback();
+                            oldPermanentConnection.rollback();
                         }
                     }
                     catch(final Throwable e1)
                     {
-                        log.error("Found exception while rolling back temporary connection", e);
+                        log.error("Found exception while rolling back permanent connection", e);
+                    }
+                    finally
+                    {
+                        try
+                        {
+                            if(tempRepositoryConnection != null)
+                            {
+                                tempRepositoryConnection.rollback();
+                            }
+                        }
+                        catch(final Throwable e1)
+                        {
+                            log.error("Found exception while rolling back temporary connection", e);
+                        }
                     }
                 }
             }
@@ -2479,25 +2503,35 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             {
                 try
                 {
-                    if(permanentConnection != null)
+                    if(newPermanentConnection != null)
                     {
-                        permanentConnection.close();
+                        newPermanentConnection.close();
                     }
                 }
                 finally
                 {
                     try
                     {
-                        if(tempRepositoryConnection != null)
+                        if(oldPermanentConnection != null)
                         {
-                            tempRepositoryConnection.close();
+                            oldPermanentConnection.close();
                         }
                     }
                     finally
                     {
-                        if(tempRepository != null)
+                        try
                         {
-                            tempRepository.shutDown();
+                            if(tempRepositoryConnection != null)
+                            {
+                                tempRepositoryConnection.close();
+                            }
+                        }
+                        finally
+                        {
+                            if(tempRepository != null)
+                            {
+                                tempRepository.shutDown();
+                            }
                         }
                     }
                 }
