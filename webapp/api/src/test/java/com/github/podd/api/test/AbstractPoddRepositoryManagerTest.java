@@ -337,7 +337,19 @@ public abstract class AbstractPoddRepositoryManagerTest
     @Test
     public final void testGetManagementRepository() throws Exception
     {
-        Assert.assertNotNull("Management repository was null", this.testRepositoryManager.getManagementRepositoryConnection());
+        RepositoryConnection managementRepositoryConnection =
+                this.testRepositoryManager.getManagementRepositoryConnection();
+        try
+        {
+            Assert.assertNotNull("Management repository was null", managementRepositoryConnection);
+        }
+        finally
+        {
+            if(managementRepositoryConnection != null)
+            {
+                managementRepositoryConnection.close();
+            }
+        }
     }
     
     /**
@@ -348,18 +360,41 @@ public abstract class AbstractPoddRepositoryManagerTest
     @Test
     public final void testGetPermanentRepositorySingleSchema() throws Exception
     {
-        RepositoryConnection permanentRepository1 =
-                this.testRepositoryManager
-                        .getPermanentRepositoryConnection(Collections.<OWLOntologyID> singleton(testOntologyID));
-        Assert.assertNotNull("Permanent repository was null", permanentRepository1);
+        RepositoryConnection permanentRepository1 = null;
+        RepositoryConnection permanentRepository2 = null;
         
-        RepositoryConnection permanentRepository2 =
-                this.testRepositoryManager.getPermanentRepositoryConnection(Collections
-                        .<OWLOntologyID> singleton(this.testOntologyID));
-        Assert.assertNotNull("Permanent repository was null", permanentRepository2);
-        
-        // Must be exactly the same object
-        Assert.assertEquals(permanentRepository1, permanentRepository2);
+        try
+        {
+            permanentRepository1 =
+                    this.testRepositoryManager.getPermanentRepositoryConnection(Collections
+                            .<OWLOntologyID> singleton(testOntologyID));
+            Assert.assertNotNull("Permanent repository was null", permanentRepository1);
+            
+            permanentRepository2 =
+                    this.testRepositoryManager.getPermanentRepositoryConnection(Collections
+                            .<OWLOntologyID> singleton(this.testOntologyID));
+            Assert.assertNotNull("Permanent repository was null", permanentRepository2);
+            
+            // Must be exactly the same object
+            // Assert.assertEquals(permanentRepository1, permanentRepository2);
+        }
+        finally
+        {
+            try
+            {
+                if(permanentRepository1 != null)
+                {
+                    permanentRepository1.close();
+                }
+            }
+            finally
+            {
+                if(permanentRepository2 != null)
+                {
+                    permanentRepository2.close();
+                }
+            }
+        }
     }
     
     /**
@@ -369,19 +404,41 @@ public abstract class AbstractPoddRepositoryManagerTest
     @Test
     public final void testGetPermanentRepositorySingleSchemaReload() throws Exception
     {
-        // Verify sanity first
-        RepositoryConnection permanentRepository1 =
-                this.testRepositoryManager
-                        .getPermanentRepositoryConnection(Collections.<OWLOntologyID> singleton(testOntologyID));
-        Assert.assertNotNull("Permanent repository was null", permanentRepository1);
+        RepositoryConnection permanentRepository1 = null;
+        RepositoryConnection permanentRepository2 = null;
         
-        RepositoryConnection permanentRepository2 =
-                this.testRepositoryManager.getPermanentRepositoryConnection(Collections
-                        .<OWLOntologyID> singleton(this.testOntologyID));
-        Assert.assertNotNull("Permanent repository was null", permanentRepository2);
-        
-        // Must be exactly the same object
-        //Assert.assertEquals(permanentRepository1, permanentRepository2);
+        try
+        {
+            permanentRepository1 =
+                    this.testRepositoryManager.getPermanentRepositoryConnection(Collections
+                            .<OWLOntologyID> singleton(testOntologyID));
+            Assert.assertNotNull("Permanent repository was null", permanentRepository1);
+            
+            permanentRepository2 =
+                    this.testRepositoryManager.getPermanentRepositoryConnection(Collections
+                            .<OWLOntologyID> singleton(this.testOntologyID));
+            Assert.assertNotNull("Permanent repository was null", permanentRepository2);
+            
+            // Must be exactly the same object
+            // Assert.assertEquals(permanentRepository1, permanentRepository2);
+        }
+        finally
+        {
+            try
+            {
+                if(permanentRepository1 != null)
+                {
+                    permanentRepository1.close();
+                }
+            }
+            finally
+            {
+                if(permanentRepository2 != null)
+                {
+                    permanentRepository2.close();
+                }
+            }
+        }
         
         // shutdown the repository manager
         this.testRepositoryManager.shutDown();
@@ -398,17 +455,41 @@ public abstract class AbstractPoddRepositoryManagerTest
         
         // Repeat the double load process on the existing repository to test the other possible code
         // paths
-        RepositoryConnection permanentRepository3 =
-                reloadedRepositoryManager.getPermanentRepositoryConnection(Collections.<OWLOntologyID> singleton(testOntologyID));
-        Assert.assertNotNull("Permanent repository was null", permanentRepository3);
+        RepositoryConnection permanentRepository3 = null;
+        RepositoryConnection permanentRepository4 = null;
         
-        RepositoryConnection permanentRepository4 =
-                reloadedRepositoryManager.getPermanentRepositoryConnection(Collections
-                        .<OWLOntologyID> singleton(this.testOntologyID));
-        Assert.assertNotNull("Permanent repository was null", permanentRepository4);
-        
-        // Must be exactly the same object
-        //Assert.assertEquals(permanentRepository3, permanentRepository4);
+        try
+        {
+            permanentRepository3 =
+                    reloadedRepositoryManager.getPermanentRepositoryConnection(Collections
+                            .<OWLOntologyID> singleton(testOntologyID));
+            Assert.assertNotNull("Permanent repository was null", permanentRepository3);
+            
+            permanentRepository4 =
+                    reloadedRepositoryManager.getPermanentRepositoryConnection(Collections
+                            .<OWLOntologyID> singleton(this.testOntologyID));
+            Assert.assertNotNull("Permanent repository was null", permanentRepository4);
+            
+            // Must be exactly the same object
+            // Assert.assertEquals(permanentRepository1, permanentRepository2);
+        }
+        finally
+        {
+            try
+            {
+                if(permanentRepository3 != null)
+                {
+                    permanentRepository3.close();
+                }
+            }
+            finally
+            {
+                if(permanentRepository4 != null)
+                {
+                    permanentRepository4.close();
+                }
+            }
+        }
         
     }
     
@@ -420,8 +501,7 @@ public abstract class AbstractPoddRepositoryManagerTest
     public final void testGetPermanentRepositorySingleSchemaReloadWithStatements() throws Exception
     {
         // Verify sanity first
-        RepositoryConnection managementConnection =
-                this.testRepositoryManager.getManagementRepositoryConnection();
+        RepositoryConnection managementConnection = this.testRepositoryManager.getManagementRepositoryConnection();
         try
         {
             Assert.assertEquals(0, managementConnection.size());
@@ -431,43 +511,59 @@ public abstract class AbstractPoddRepositoryManagerTest
             managementConnection.close();
         }
         
-        RepositoryConnection permanentRepository1 =
-                this.testRepositoryManager
-                        .getPermanentRepositoryConnection(Collections.<OWLOntologyID> singleton(testOntologyID));
-        Assert.assertNotNull("Permanent repository was null", permanentRepository1);
+        RepositoryConnection permanentRepository1 = null;
+        RepositoryConnection permanentRepository2 = null;
         
-        RepositoryConnection permanentRepository2 =
-                this.testRepositoryManager.getPermanentRepositoryConnection(Collections
-                        .<OWLOntologyID> singleton(this.testOntologyID));
-        Assert.assertNotNull("Permanent repository was null", permanentRepository2);
-        
-        RepositoryConnection managementConnection2 =
-                this.testRepositoryManager.getManagementRepositoryConnection();
         try
         {
-            Assert.assertEquals(8, managementConnection2.size());
-        }
-        finally
-        {
-            managementConnection2.close();
-        }
-        
-        RepositoryConnection firstConnection = permanentRepository1;
-        try
-        {
+            permanentRepository1 =
+                    this.testRepositoryManager.getPermanentRepositoryConnection(Collections
+                            .<OWLOntologyID> singleton(testOntologyID));
+            Assert.assertNotNull("Permanent repository was null", permanentRepository1);
+            
+            permanentRepository2 =
+                    this.testRepositoryManager.getPermanentRepositoryConnection(Collections
+                            .<OWLOntologyID> singleton(this.testOntologyID));
+            Assert.assertNotNull("Permanent repository was null", permanentRepository2);
+            
+            // Must be exactly the same object
+            // Assert.assertEquals(permanentRepository1, permanentRepository2);
+            RepositoryConnection managementConnection2 = this.testRepositoryManager.getManagementRepositoryConnection();
+            try
+            {
+                Assert.assertEquals(8, managementConnection2.size());
+            }
+            finally
+            {
+                managementConnection2.close();
+            }
+            
             Model model =
                     Rio.parse(this.getClass().getResourceAsStream("/test/artifacts/basic-1.ttl"), "", RDFFormat.TURTLE);
-            firstConnection.add(model, testVersionUriA1);
-            Assert.assertEquals(32, firstConnection.size(this.testVersionUriA1));
-            Assert.assertEquals(32, firstConnection.size());
+            permanentRepository1.add(model, testVersionUriA1);
+            Assert.assertEquals(32, permanentRepository1.size(this.testVersionUriA1));
+            Assert.assertEquals(32, permanentRepository1.size());
         }
         finally
         {
-            firstConnection.close();
+            try
+            {
+                if(permanentRepository1 != null)
+                {
+                    permanentRepository1.close();
+                }
+            }
+            finally
+            {
+                if(permanentRepository2 != null)
+                {
+                    permanentRepository2.close();
+                }
+            }
         }
         
         // Must be exactly the same object
-        //Assert.assertEquals(permanentRepository1, permanentRepository2);
+        // Assert.assertEquals(permanentRepository1, permanentRepository2);
         
         // shutdown the repository manager
         this.testRepositoryManager.shutDown();
@@ -484,27 +580,45 @@ public abstract class AbstractPoddRepositoryManagerTest
         
         // Repeat the double load process on the existing repository to test the other possible code
         // paths
-        RepositoryConnection permanentRepository3 =
-                reloadedRepositoryManager.getPermanentRepositoryConnection(Collections.<OWLOntologyID> singleton(testOntologyID));
-        Assert.assertNotNull("Permanent repository was null", permanentRepository3);
-        
-        RepositoryConnection permanentRepository4 =
-                reloadedRepositoryManager.getPermanentRepositoryConnection(Collections
-                        .<OWLOntologyID> singleton(this.testOntologyID));
-        Assert.assertNotNull("Permanent repository was null", permanentRepository4);
-        
-        // Must be exactly the same object
-        //Assert.assertEquals(permanentRepository3, permanentRepository4);
-        
-        RepositoryConnection secondConnection = permanentRepository3;
+        RepositoryConnection permanentRepository3 = null;
+        RepositoryConnection permanentRepository4 = null;
         try
         {
-            Assert.assertEquals(32, secondConnection.size(this.testVersionUriA1));
-            Assert.assertEquals(32, secondConnection.size());
+            permanentRepository3 =
+                    reloadedRepositoryManager.getPermanentRepositoryConnection(Collections
+                            .<OWLOntologyID> singleton(testOntologyID));
+            Assert.assertNotNull("Permanent repository was null", permanentRepository3);
+            
+            permanentRepository4 =
+                    reloadedRepositoryManager.getPermanentRepositoryConnection(Collections
+                            .<OWLOntologyID> singleton(this.testOntologyID));
+            Assert.assertNotNull("Permanent repository was null", permanentRepository4);
+            
+            // Must be exactly the same object
+            // Assert.assertEquals(permanentRepository1, permanentRepository2);
+            
+            // Must be exactly the same object
+            // Assert.assertEquals(permanentRepository3, permanentRepository4);
+            
+            Assert.assertEquals(32, permanentRepository3.size(this.testVersionUriA1));
+            Assert.assertEquals(32, permanentRepository3.size());
         }
         finally
         {
-            secondConnection.close();
+            try
+            {
+                if(permanentRepository3 != null)
+                {
+                    permanentRepository3.close();
+                }
+            }
+            finally
+            {
+                if(permanentRepository4 != null)
+                {
+                    permanentRepository4.close();
+                }
+            }
         }
     }
     
@@ -527,14 +641,22 @@ public abstract class AbstractPoddRepositoryManagerTest
     @Test
     public final void testGetPermanentRepositoryNull() throws Exception
     {
+        RepositoryConnection permanentRepositoryConnection = null;
         try
         {
-            this.testRepositoryManager.getPermanentRepositoryConnection(null);
+            permanentRepositoryConnection = this.testRepositoryManager.getPermanentRepositoryConnection(null);
             Assert.fail("Did not receive the expected exception");
         }
         catch(final NullPointerException e)
         {
             
+        }
+        finally
+        {
+            if(permanentRepositoryConnection != null)
+            {
+                permanentRepositoryConnection.close();
+            }
         }
     }
     

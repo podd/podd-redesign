@@ -191,7 +191,7 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
                 permanentRepository = getPermanentRepositoryInternal(schemaOntologies);
                 if(permanentRepository == null)
                 {
-                    this.log.info("Permanent repository not cached, but may exist");
+                    this.log.debug("Permanent repository not cached, but may exist");
                     
                     RepositoryConnection managementConnection = null;
                     try
@@ -278,7 +278,7 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
                         // reference to the existing repository
                         if(repositoryUri == null)
                         {
-                            this.log.info("Permanent repository not created yet");
+                            this.log.debug("Permanent repository not created yet");
                             // Create a new one
                             repositoryUri =
                                     managementConnection.getValueFactory().createURI("urn:podd:repository:",
@@ -312,7 +312,7 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
                             }
                             else
                             {
-                                this.log.info("Permanent repository created: {}", newRepositoryID);
+                                this.log.debug("Permanent repository created: {}", newRepositoryID);
                                 permanentRepository = nextRepository;
                                 
                                 // In this case, we need to copy the relevant schema ontologies over
@@ -394,8 +394,11 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
                         }
                         else
                         {
-                            this.log.info("Permanent repository created but not cached: {}", repositoryUri);
-                            new RuntimeException().printStackTrace();
+                            this.log.debug("Permanent repository created but not cached: {}", repositoryUri);
+                            if(this.log.isTraceEnabled())
+                            {
+                                new RuntimeException().printStackTrace();
+                            }
                             // create reference to existing repositoryUri
                             Model model = new LinkedHashModel();
                             managementConnection.exportStatements(repositoryUri, null, null, false,
@@ -457,7 +460,7 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
                 }
             }
         }
-        this.log.info("Returning from get permanent repository");
+        this.log.debug("Returning from get permanent repository");
         return permanentRepository.getConnection();
     }
     
