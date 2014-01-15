@@ -72,6 +72,7 @@ import org.slf4j.LoggerFactory;
 import com.github.ansell.propertyutil.PropertyUtil;
 import com.github.podd.api.PoddRepositoryManager;
 import com.github.podd.utils.ManualShutdownRepository;
+import com.github.podd.utils.OntologyUtils;
 import com.github.podd.utils.PODD;
 
 /**
@@ -168,7 +169,7 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
         throws OpenRDFException, IOException
     {
         this.log.info("Entering get permanent repository");
-        this.log.debug("Get permanent repository schemas: {}", schemaOntologies);
+        this.log.info("Get permanent repository schemas: {}", schemaOntologies);
         Objects.requireNonNull(schemaOntologies, "Schema ontologies must not be null");
         
         if(schemaOntologies.isEmpty())
@@ -176,7 +177,11 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
             throw new IllegalArgumentException("Schema ontologies cannot be empty");
         }
         
-        ManualShutdownRepository permanentRepository = this.permanentRepositories.get(schemaOntologies);
+        new RuntimeException().printStackTrace();
+        
+        ManualShutdownRepository permanentRepository = getPermanentRepositoryInternal(schemaOntologies);
+        
+        //ManualShutdownRepository permanentRepository = this.permanentRepositories.get(schemaOntologies);
         // This synchronisation should not inhibit most operations, but is necessary to prevent
         // multiple repositories with the same schema ontologies, given that there is a relatively
         // large latency in the new repository create process
@@ -186,7 +191,7 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
         {
             synchronized(this.permanentRepositories)
             {
-                permanentRepository = this.permanentRepositories.get(schemaOntologies);
+                permanentRepository = getPermanentRepositoryInternal(schemaOntologies);
                 if(permanentRepository == null)
                 {
                     this.log.info("Permanent repository not cached, but may exist");
@@ -456,6 +461,18 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
         return permanentRepository.getConnection();
     }
     
+    private ManualShutdownRepository getPermanentRepositoryInternal(Set<? extends OWLOntologyID> schemaOntologies)
+    {
+        for(Entry<Set<? extends OWLOntologyID>, ManualShutdownRepository> nextEntry : permanentRepositories.entrySet())
+        {
+            if(OntologyUtils.ontologyVersionsMatch(schemaOntologies, nextEntry.getKey()))
+            {
+                return nextEntry.getValue();
+            }
+        }
+        return null;
+    }
+
     @Override
     public URI getSchemaManagementGraph()
     {

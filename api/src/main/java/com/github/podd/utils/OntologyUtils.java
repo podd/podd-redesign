@@ -1023,4 +1023,37 @@ public class OntologyUtils
     private OntologyUtils()
     {
     }
+
+    public static boolean ontologyVersionsMatch(Set<? extends OWLOntologyID> set1,
+            Set<? extends OWLOntologyID> set2)
+    {
+        if(set2.size() == set1.size())
+        {
+            for(OWLOntologyID nextSchema1 : set1)
+            {
+                boolean foundMatch = false;
+                if(nextSchema1 instanceof InferredOWLOntologyID)
+                {
+                    nextSchema1 = ((InferredOWLOntologyID)nextSchema1).getBaseOWLOntologyID();
+                }
+                for(OWLOntologyID nextSchema2 : set2)
+                {
+                    if(nextSchema2 instanceof InferredOWLOntologyID)
+                    {
+                        nextSchema2 = ((InferredOWLOntologyID)nextSchema2).getBaseOWLOntologyID();
+                    }
+                    if(nextSchema1.equals(nextSchema2))
+                    {
+                        foundMatch = true;
+                        continue;
+                    }
+                }
+                if(!foundMatch)
+                {
+                    return false;
+                }
+            }
+        }
+        return false;
+    }
 }
