@@ -34,19 +34,21 @@ public interface PODD
     public static final String DATA_REPOSITORY = "http://purl.org/podd/ns/dataRepository#";
     
     public static final String PROPERTY_USER_MANAGEMENT_GRAPH = "podd.graph.usermanagement";
-    /** Default value is urn:podd:default:usermanagementgraph: */
+    /** Default value is urn:podd:default:graph:usermanagement */
     public static final URI DEFAULT_USER_MANAGEMENT_GRAPH = PODD.VF.createURI("urn:podd:default:graph:usermanagement");
     
     public static final String PROPERTY_ARTIFACT_MANAGEMENT_GRAPH = "podd.graph.artifactmanagement";
-    /** Default value is urn:podd:default:artifactmanagementgraph: */
+    /** Default value is urn:podd:default:graph:artifactmanagement */
     public static final URI DEFAULT_ARTIFACT_MANAGEMENT_GRAPH = PODD.VF
             .createURI("urn:podd:default:graph:artifactmanagement");
     
     public static final String PROPERTY_DATA_REPOSITORY_MANAGEMENT_GRAPH = "podd.graph.datarepositorymanagement";
+    /** Default value is urn:podd:default:graph:datarepositorymanagement */
     public static final URI DEFAULT_DATA_REPOSITORY_MANAGEMENT_GRAPH = PODD.VF
             .createURI("urn:podd:default:graph:datarepositorymanagement");
     
     public static final String PROPERTY_REPOSITORY_MANAGEMENT_GRAPH = "podd.graph.repositorymanagement";
+    /** Default value is urn:podd:default:graph:repositorymanagement */
     public static final URI DEFAULT_REPOSITORY_MANAGEMENT_GRAPH = PODD.VF
             .createURI("urn:podd:default:graph:repositorymanagement");
     
