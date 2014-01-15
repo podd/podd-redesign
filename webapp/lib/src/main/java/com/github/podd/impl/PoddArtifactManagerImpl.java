@@ -416,10 +416,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             final Set<? extends OWLOntologyID> schemaImports = this.getSchemaImports(ontologyId);
             conn = this.getRepositoryManager().getPermanentRepositoryConnection(schemaImports);
             
-            final Model model = new LinkedHashModel();
-            conn.exportStatements(null, null, null, includeInferred, new StatementCollector(model),
-                    contexts.toArray(new Resource[] {}));
-            return model;
+            return this.exportArtifactInternal(includeInferred, conn, contexts.toArray(new Resource[] {}));
         }
         finally
         {
@@ -428,6 +425,15 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
                 conn.close();
             }
         }
+    }
+    
+    private Model exportArtifactInternal(final boolean includeInferred, final RepositoryConnection permanentConnection,
+            final Resource... contexts) throws OpenRDFException, PoddException, IOException
+    {
+        final Model model = new LinkedHashModel();
+        permanentConnection
+                .exportStatements(null, null, null, includeInferred, new StatementCollector(model), contexts);
+        return model;
     }
     
     @Override
@@ -2083,8 +2089,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             
             currentSchemaImports = this.getSchemaImports(artifactID);
             
-            permanentConnection =
-                    this.getRepositoryManager().getPermanentRepositoryConnection(currentSchemaImports);
+            permanentConnection = this.getRepositoryManager().getPermanentRepositoryConnection(currentSchemaImports);
             permanentConnection.begin();
             
             // load and copy the artifact's concrete statements to the temporary
@@ -2346,9 +2351,14 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             
             this.log.info("Starting exporting artifact to RDF: {}", artifactVersion);
             
+            permanentConnection = this.repositoryManager.getPermanentRepositoryConnection(newSchemaOntologyIds);
+            permanentConnection.begin();
+            
             // Export the artifact without including the old inferred triples, and they will be
             // regenerated using the new schema ontologies
-            final Model model = this.exportArtifact(artifactVersion, false);
+            final Model model =
+                    this.exportArtifactInternal(false, permanentConnection,
+                            this.getSesameManager().versionContexts(artifactVersion));
             
             this.log.info("Finished exporting artifact to RDF: {}", artifactVersion);
             
@@ -2399,9 +2409,6 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             tempRepositoryConnection.commit();
             
             this.log.info("Starting reload of artifact to Repository: {}", artifactVersion);
-            
-            permanentConnection = this.repositoryManager.getPermanentRepositoryConnection(newSchemaOntologyIds);
-            permanentConnection.begin();
             
             // If the following does not succeed, then it throws an exception and we rollback
             // permanentConnection
