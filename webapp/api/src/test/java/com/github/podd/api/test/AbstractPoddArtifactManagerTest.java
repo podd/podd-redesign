@@ -543,6 +543,11 @@ public abstract class AbstractPoddArtifactManagerTest
      */
     private final void setupManagers() throws Exception
     {
+        if(this.testRepositoryManager != null)
+        {
+            this.testRepositoryManager.shutDown();
+        }
+        
         this.testRepositoryManager = this.getNewRepositoryManager(managementRepository, testPath);
         this.testRepositoryManager.setSchemaManagementGraph(this.schemaGraph);
         this.testRepositoryManager.setArtifactManagementGraph(this.artifactGraph);
