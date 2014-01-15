@@ -26,10 +26,10 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Map;
-import java.util.UUID;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -326,31 +326,34 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
                                     permanentConnection.begin();
                                     for(final OWLOntologyID nextSchemaOntology : schemaOntologies)
                                     {
-                                        // TODO: Check if the ontology version exists in the
-                                        // management connection
-                                        if(!permanentConnection.hasStatement(null, null, null, false,
-                                                nextSchemaOntology.getVersionIRI().toOpenRDFURI()))
+                                        if(nextSchemaOntology.getVersionIRI() != null)
                                         {
-                                            permanentConnection.add(managementConnection.getStatements(null, null,
-                                                    null, false, nextSchemaOntology.getVersionIRI().toOpenRDFURI()),
-                                                    nextSchemaOntology.getVersionIRI().toOpenRDFURI());
-                                        }
-                                        
-                                        final RepositoryResult<Statement> statements =
-                                                managementConnection.getStatements(nextSchemaOntology.getVersionIRI()
-                                                        .toOpenRDFURI(), PODD.PODD_BASE_INFERRED_VERSION, null, false,
-                                                        this.getSchemaManagementGraph());
-                                        
-                                        for(final Statement nextInferredStatement : Iterations.asList(statements))
-                                        {
-                                            if(nextInferredStatement.getObject() instanceof URI)
+                                            // TODO: Check if the ontology version exists in the
+                                            // management connection
+                                            if(!permanentConnection.hasStatement(null, null, null, false,
+                                                    nextSchemaOntology.getVersionIRI().toOpenRDFURI()))
                                             {
-                                                if(!permanentConnection.hasStatement(null, null, null, false,
-                                                        (URI)nextInferredStatement.getObject()))
+                                                permanentConnection.add(managementConnection.getStatements(null, null,
+                                                        null, false, nextSchemaOntology.getVersionIRI().toOpenRDFURI()),
+                                                        nextSchemaOntology.getVersionIRI().toOpenRDFURI());
+                                            }
+                                            
+                                            final RepositoryResult<Statement> statements =
+                                                    managementConnection.getStatements(nextSchemaOntology.getVersionIRI()
+                                                            .toOpenRDFURI(), PODD.PODD_BASE_INFERRED_VERSION, null, false,
+                                                            this.getSchemaManagementGraph());
+                                            
+                                            for(final Statement nextInferredStatement : Iterations.asList(statements))
+                                            {
+                                                if(nextInferredStatement.getObject() instanceof URI)
                                                 {
-                                                    permanentConnection.add(managementConnection.getStatements(null,
-                                                            null, null, false, (URI)nextInferredStatement.getObject()),
-                                                            (URI)nextInferredStatement.getObject());
+                                                    if(!permanentConnection.hasStatement(null, null, null, false,
+                                                            (URI)nextInferredStatement.getObject()))
+                                                    {
+                                                        permanentConnection.add(managementConnection.getStatements(null,
+                                                                null, null, false, (URI)nextInferredStatement.getObject()),
+                                                                (URI)nextInferredStatement.getObject());
+                                                    }
                                                 }
                                             }
                                         }
