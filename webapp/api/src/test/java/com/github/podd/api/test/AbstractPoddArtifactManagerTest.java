@@ -546,6 +546,8 @@ public abstract class AbstractPoddArtifactManagerTest
         if(this.testRepositoryManager != null)
         {
             this.testRepositoryManager.shutDown();
+            // Reinitialise management repository before creating new repository manager using it
+            this.managementRepository.initialize();
         }
         
         this.testRepositoryManager = this.getNewRepositoryManager(managementRepository, testPath);
