@@ -429,7 +429,7 @@ public class SparqlResourceImpl extends AbstractPoddResourceImpl
                 catch(final RepositoryException e)
                 {
                     // TODO Auto-generated catch block
-                    e.printStackTrace();
+                    //e.printStackTrace();
                     this.log.error("Could not close repository connection: ", e);
                 }
             }

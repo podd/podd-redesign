@@ -142,17 +142,17 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
     @Override
     public RepositoryConnection getManagementRepositoryConnection() throws OpenRDFException
     {
-        this.log.info("Get management repository");
+        this.log.debug("Get management repository");
         return this.managementRepository.getConnection();
     }
     
     @Override
     public Repository getNewTemporaryRepository() throws OpenRDFException
     {
-        this.log.info("Started creating temporary MemoryStore repository");
+        this.log.debug("Started creating temporary MemoryStore repository");
         final Repository result = new SailRepository(new MemoryStore());
         result.initialize();
-        this.log.info("Finished creating temporary MemoryStore repository");
+        this.log.debug("Finished creating temporary MemoryStore repository");
         
         return result;
     }
@@ -161,8 +161,8 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
     public RepositoryConnection getPermanentRepositoryConnection(final Set<? extends OWLOntologyID> schemaOntologies)
         throws OpenRDFException, IOException
     {
-        this.log.info("Entering get permanent repository");
-        this.log.info("Get permanent repository schemas: {}", schemaOntologies);
+        this.log.debug("Entering get permanent repository");
+        this.log.debug("Get permanent repository schemas: {}", schemaOntologies);
         Objects.requireNonNull(schemaOntologies, "Schema ontologies must not be null");
         
         if(schemaOntologies.isEmpty())
@@ -170,7 +170,10 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
             throw new IllegalArgumentException("Schema ontologies cannot be empty");
         }
         
-        new RuntimeException().printStackTrace();
+        if(log.isTraceEnabled())
+        {
+            new RuntimeException().printStackTrace();
+        }
         
         ManualShutdownRepository permanentRepository = getPermanentRepositoryInternal(schemaOntologies);
         
@@ -555,7 +558,7 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
         {
             if(this.managementRepository != null)
             {
-                this.log.info("Shutting down management repository");
+                this.log.debug("Shutting down management repository");
                 this.managementRepository.realShutDown();
             }
         }
@@ -573,7 +576,7 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
                 {
                     try
                     {
-                        this.log.info("Shutting down repository for schema ontologies: {} ", nextRepository.getKey());
+                        this.log.debug("Shutting down repository for schema ontologies: {} ", nextRepository.getKey());
                         nextRepository.getValue().realShutDown();
                     }
                     catch(final RepositoryException e)
@@ -599,7 +602,7 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
                 {
                     try
                     {
-                        this.log.info("Shutting down repository manager: {} ", nextManager.getKey());
+                        this.log.debug("Shutting down repository manager: {} ", nextManager.getKey());
                         nextManager.getValue().shutDown();
                     }
                     catch(final RuntimeException e)
