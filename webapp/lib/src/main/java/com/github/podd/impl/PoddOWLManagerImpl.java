@@ -289,12 +289,15 @@ public class PoddOWLManagerImpl implements PoddOWLManager
         
         synchronized(cachedManager)
         {
+            this.log.info("About to cache ontologies: {}", manifestImports);
             for(final OWLOntologyID ontologyID : manifestImports)
             {
+                this.log.info("About to cache ontology: {}", ontologyID);
                 // NOTE: if InferredOntologyIRI is null, only the base ontology is
                 // cached
                 this.cacheSchemaOntologyInternal(managementConnection, ontologyID, cachedManager);
             }
+            this.log.info("Finished caching ontologies: {}", manifestImports);
         }
         return cachedManager;
     }

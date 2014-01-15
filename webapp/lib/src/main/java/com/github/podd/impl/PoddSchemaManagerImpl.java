@@ -377,7 +377,7 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
             final List<InferredOWLOntologyID> ontologyIDs =
                     OntologyUtils.loadSchemasFromManifest(managementConnection,
                             this.repositoryManager.getSchemaManagementGraph(), model);
-             managementConnection.add(model, this.repositoryManager.getSchemaManagementGraph());
+            managementConnection.add(model, this.repositoryManager.getSchemaManagementGraph());
             
             final Set<InferredOWLOntologyID> currentSchemaOntologies = this.getSchemaOntologies();
             
@@ -397,11 +397,22 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
             
             final List<InferredOWLOntologyID> results = new ArrayList<>();
             
+            this.log.info("About to load ontologies in order: {}", loadingOrder);
             for(final Entry<OWLOntologyID, Boolean> loadEntry : loadingOrder.entrySet())
             {
+                this.log.info("Ontologies loaded so far: {}", results);
                 if(loadEntry.getValue())
                 {
                     this.log.info("Not loading ontology as it was already available: {}", loadEntry.getKey());
+                    if(loadEntry.getKey() instanceof InferredOWLOntologyID)
+                    {
+                        results.add((InferredOWLOntologyID)loadEntry.getKey());
+                    }
+                    else
+                    {
+                        results.add(new InferredOWLOntologyID(loadEntry.getKey().getOntologyIRI(), loadEntry.getKey()
+                                .getVersionIRI(), null));
+                    }
                 }
                 else
                 {
@@ -536,6 +547,8 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
         throws OWLException, IOException, PoddException, EmptyOntologyException, RepositoryException,
         OWLRuntimeException, OpenRDFException
     {
+        this.log.info("Dependent ontologies for next schema upload: {}", dependentSchemaOntologies);
+        
         final OWLOntologyDocumentSource owlSource =
                 new StreamDocumentSource(inputStream, fileFormat.getDefaultMIMEType());
         final InferredOWLOntologyID nextInferredOntology =
