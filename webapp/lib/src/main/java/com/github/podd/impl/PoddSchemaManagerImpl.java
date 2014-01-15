@@ -338,6 +338,8 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
         final List<OWLOntologyID> manifestImports =
                 OntologyUtils.schemaManifestImports(model, new LinkedHashSet<>(dependentSchemaOntologies));
         
+        this.log.info("Uploading schema ontologies: {}", manifestImports);
+        
         return this.uploadSchemaOntologiesInOrder(model, manifestImports);
     }
     
