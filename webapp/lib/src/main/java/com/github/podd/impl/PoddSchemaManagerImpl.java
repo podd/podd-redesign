@@ -434,6 +434,8 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
                 }
             }
             
+            this.log.info("Completed loading schema ontologies");
+            
             managementConnection.commit();
             return results;
         }
