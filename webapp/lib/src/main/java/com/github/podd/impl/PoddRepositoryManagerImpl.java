@@ -574,51 +574,57 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
         }
         finally
         {
-            for(final Entry<Set<? extends OWLOntologyID>, ManualShutdownRepository> nextRepository : this.permanentRepositories
-                    .entrySet())
+            synchronized(this.permanentRepositories)
             {
-                try
+                for(final Entry<Set<? extends OWLOntologyID>, ManualShutdownRepository> nextRepository : this.permanentRepositories
+                        .entrySet())
                 {
-                    this.log.info("Shutting down repository for schema ontologies: {} ", nextRepository.getKey());
-                    nextRepository.getValue().realShutDown();
-                }
-                catch(final RepositoryException e)
-                {
-                    this.log.error("Found exception shutting down permanent repository for schema ontologies: "
-                            + nextRepository.getKey(), e);
-                    if(foundException == null)
+                    try
                     {
-                        foundException = e;
+                        this.log.info("Shutting down repository for schema ontologies: {} ", nextRepository.getKey());
+                        nextRepository.getValue().realShutDown();
                     }
-                    else
+                    catch(final RepositoryException e)
                     {
-                        foundException.addSuppressed(e);
+                        this.log.error("Found exception shutting down permanent repository for schema ontologies: "
+                                + nextRepository.getKey(), e);
+                        if(foundException == null)
+                        {
+                            foundException = e;
+                        }
+                        else
+                        {
+                            foundException.addSuppressed(e);
+                        }
                     }
                 }
+                this.permanentRepositories.clear();
             }
-            this.permanentRepositories.clear();
             
-            for(final Entry<URI, RepositoryManager> nextManager : this.sesameRepositoryManagers.entrySet())
+            synchronized(this.sesameRepositoryManagers)
             {
-                try
+                for(final Entry<URI, RepositoryManager> nextManager : this.sesameRepositoryManagers.entrySet())
                 {
-                    this.log.info("Shutting down repository manager: {} ", nextManager.getKey());
-                    nextManager.getValue().shutDown();
-                }
-                catch(final RuntimeException e)
-                {
-                    this.log.error("Found exception shutting down repository manager: " + nextManager.getKey(), e);
-                    if(foundException == null)
+                    try
                     {
-                        foundException = new RepositoryException("Could not shutdown a repository manager", e);
+                        this.log.info("Shutting down repository manager: {} ", nextManager.getKey());
+                        nextManager.getValue().shutDown();
                     }
-                    else
+                    catch(final RuntimeException e)
                     {
-                        foundException.addSuppressed(e);
+                        this.log.error("Found exception shutting down repository manager: " + nextManager.getKey(), e);
+                        if(foundException == null)
+                        {
+                            foundException = new RepositoryException("Could not shutdown a repository manager", e);
+                        }
+                        else
+                        {
+                            foundException.addSuppressed(e);
+                        }
                     }
                 }
+                this.sesameRepositoryManagers.clear();
             }
-            this.sesameRepositoryManagers.clear();
         }
         
         this.managementRepository = null;
