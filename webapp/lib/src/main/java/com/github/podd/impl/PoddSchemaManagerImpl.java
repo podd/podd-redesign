@@ -31,6 +31,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.Model;
@@ -329,7 +331,12 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
         final Set<URI> schemaVersionUris = new HashSet<>();
         OntologyUtils.extractOntologyAndVersions(model, schemaOntologyUris, schemaVersionUris);
         OntologyUtils.validateSchemaManifestImports(model, schemaOntologyUris, schemaVersionUris);
-        
+        ConcurrentMap<URI, URI> currentVersionsMap = new ConcurrentHashMap<URI, URI>();
+        // Find current version for each schema ontology
+        for(final URI nextSchemaOntologyUri : schemaOntologyUris)
+        {
+            OntologyUtils.mapCurrentVersion(model, currentVersionsMap, nextSchemaOntologyUri);
+        }
         // Map<URI, Set<OWLOntologyID>> allImports =
         // OntologyUtils.schemaManifestImports(model, schemaOntologyUris, schemaVersionUris);
         
@@ -340,7 +347,7 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
         
         this.log.info("Uploading schema ontologies: {}", manifestImports);
         
-        return this.uploadSchemaOntologiesInOrder(model, manifestImports);
+        return this.uploadSchemaOntologiesInOrder(model, manifestImports, currentVersionsMap);
     }
     
     /**
@@ -358,8 +365,8 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
      * @throws PoddException
      */
     private List<InferredOWLOntologyID> uploadSchemaOntologiesInOrder(final Model model,
-            final List<OWLOntologyID> nextImportOrder) throws ModelException, OpenRDFException, IOException,
-        OWLException, PoddException
+            final List<OWLOntologyID> nextImportOrder, final ConcurrentMap<URI, URI> currentVersionsMap)
+        throws ModelException, OpenRDFException, IOException, OWLException, PoddException
     {
         Objects.requireNonNull(model, "Schema Ontology model was null");
         Objects.requireNonNull(nextImportOrder, "Schema Ontology import order was null");
@@ -438,6 +445,12 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
                                 this.uploadSchemaOntologyInternal(schemaOntologyID, inputStream, fileFormat,
                                         managementConnection, this.repositoryManager.getSchemaManagementGraph(),
                                         new LinkedHashSet<OWLOntologyID>(results));
+                        
+                        throw new RuntimeException("Need to call setCurrentSchemaOntologyVersion here");
+                        
+                        // Also need to pull back in the change that inlines
+                        // getCurrentSchemaOntologies() above, which may have broke tests due to the
+                        // absence of the above method
                         
                         results.add(nextResult);
                     }
