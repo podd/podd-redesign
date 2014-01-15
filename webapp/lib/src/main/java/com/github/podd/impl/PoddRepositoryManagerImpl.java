@@ -70,6 +70,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.github.ansell.propertyutil.PropertyUtil;
+import com.github.ansell.restletutils.SesameRealmConstants;
 import com.github.podd.api.PoddRepositoryManager;
 import com.github.podd.utils.ManualShutdownRepository;
 import com.github.podd.utils.OntologyUtils;
@@ -102,7 +103,7 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
     
     private RepositoryImplConfig permanentRepositoryConfigForNew;
     
-    private ConcurrentMap<String, RepositoryManager> sesameRepositoryManagers = new ConcurrentHashMap<>();
+    private ConcurrentMap<URI, RepositoryManager> sesameRepositoryManagers = new ConcurrentHashMap<>();
     
     /**
      * 
@@ -181,7 +182,8 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
         
         ManualShutdownRepository permanentRepository = getPermanentRepositoryInternal(schemaOntologies);
         
-        //ManualShutdownRepository permanentRepository = this.permanentRepositories.get(schemaOntologies);
+        // ManualShutdownRepository permanentRepository =
+        // this.permanentRepositories.get(schemaOntologies);
         // This synchronisation should not inhibit most operations, but is necessary to prevent
         // multiple repositories with the same schema ontologies, given that there is a relatively
         // large latency in the new repository create process
@@ -214,23 +216,30 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
                         Resource repositoryManagerURI = sesameRepositoryManagerMap.keySet().iterator().next();
                         URI repositoryUri = null;
                         
-                        List<Statement> repositoriesInManager =
-                                Iterations.asList(managementConnection.getStatements(repositoryManagerURI,
-                                        PODD.PODD_REPOSITORY_MANAGER_CONTAINS_REPOSITORY, null, false,
-                                        this.repositoryGraph));
-                        for(Statement nextRepositoryStatement : repositoriesInManager)
+                        Model repositoriesInManagerModel = new LinkedHashModel();
+                        managementConnection.exportStatements(repositoryManagerURI,
+                                PODD.PODD_REPOSITORY_MANAGER_CONTAINS_REPOSITORY, null, false, new StatementCollector(
+                                        repositoriesInManagerModel), this.repositoryGraph);
+                        for(Value nextRepository : repositoriesInManagerModel.objects())
                         {
-                            if(nextRepositoryStatement.getObject() instanceof URI)
+                            if(nextRepository instanceof URI)
                             {
                                 Model model = new LinkedHashModel();
-                                managementConnection.exportStatements((URI)nextRepositoryStatement.getObject(),
+                                managementConnection.exportStatements((URI)nextRepository,
                                         PODD.PODD_REPOSITORY_CONTAINS_SCHEMA_VERSION, null, true,
                                         new StatementCollector(model), this.repositoryGraph);
                                 
+                                Set<Value> schemasInRepository =
+                                        model.filter((URI)nextRepository, PODD.PODD_REPOSITORY_CONTAINS_SCHEMA_VERSION,
+                                                null).objects();
                                 boolean missingSchema = false;
+                                if(schemasInRepository.size() != schemaOntologies.size())
+                                {
+                                    continue;
+                                }
                                 for(OWLOntologyID nextSchemaOntology : schemaOntologies)
                                 {
-                                    if(!model.contains((URI)nextRepositoryStatement.getObject(),
+                                    if(!model.contains((URI)nextRepository,
                                             PODD.PODD_REPOSITORY_CONTAINS_SCHEMA_VERSION, nextSchemaOntology
                                                     .getVersionIRI().toOpenRDFURI()))
                                     {
@@ -239,34 +248,30 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
                                     }
                                 }
                                 
-                                if(!missingSchema)
+                                for(Value nextSchema : schemasInRepository)
                                 {
-                                    for(Value nextSchema : model.filter((URI)nextRepositoryStatement.getObject(),
-                                            PODD.PODD_REPOSITORY_CONTAINS_SCHEMA_VERSION, null).objects())
+                                    if(nextSchema instanceof URI)
                                     {
-                                        if(nextSchema instanceof URI)
+                                        boolean foundNextSchema = false;
+                                        for(OWLOntologyID nextSchemaOntology : schemaOntologies)
                                         {
-                                            boolean foundNextSchema = false;
-                                            for(OWLOntologyID nextSchemaOntology : schemaOntologies)
+                                            if(nextSchemaOntology.getVersionIRI().toOpenRDFURI().equals(nextSchema))
                                             {
-                                                if(nextSchemaOntology.getVersionIRI().toOpenRDFURI().equals(nextSchema))
-                                                {
-                                                    foundNextSchema = true;
-                                                    break;
-                                                }
-                                            }
-                                            if(!foundNextSchema)
-                                            {
-                                                missingSchema = true;
+                                                foundNextSchema = true;
                                                 break;
                                             }
+                                        }
+                                        if(!foundNextSchema)
+                                        {
+                                            missingSchema = true;
+                                            break;
                                         }
                                     }
                                 }
                                 
                                 if(!missingSchema)
                                 {
-                                    repositoryUri = (URI)nextRepositoryStatement.getObject();
+                                    repositoryUri = (URI)nextRepository;
                                     break;
                                 }
                             }
@@ -472,7 +477,7 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
         }
         return null;
     }
-
+    
     @Override
     public URI getSchemaManagementGraph()
     {
@@ -593,7 +598,7 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
             }
             this.permanentRepositories.clear();
             
-            for(final Entry<String, RepositoryManager> nextManager : this.sesameRepositoryManagers.entrySet())
+            for(final Entry<URI, RepositoryManager> nextManager : this.sesameRepositoryManagers.entrySet())
             {
                 try
                 {
@@ -648,30 +653,59 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
         
         for(Resource nextRepositoryManager : model.filter(null, RDF.TYPE, PODD.PODD_REPOSITORY_MANAGER).subjects())
         {
-            Set<Value> repositories =
-                    model.filter(nextRepositoryManager, PODD.PODD_REPOSITORY_MANAGER_CONTAINS_REPOSITORY, null)
-                            .objects();
-            for(Value nextRepository : repositories)
+            if(nextRepositoryManager instanceof URI)
             {
-                if(nextRepository instanceof URI)
+                Set<Value> repositories =
+                        model.filter(nextRepositoryManager, PODD.PODD_REPOSITORY_MANAGER_CONTAINS_REPOSITORY, null)
+                                .objects();
+                for(Value nextRepository : repositories)
                 {
-                    Model schemas =
-                            model.filter((URI)nextRepository, PODD.PODD_REPOSITORY_CONTAINS_SCHEMA_VERSION, null);
-                    
-                    boolean allMatched = true;
-                    // Check that all of the schemas supported by this repository are in the
-                    // requested list of schema imports
-                    for(Value nextSchema : schemas.objects())
+                    if(nextRepository instanceof URI)
                     {
-                        if(nextSchema instanceof URI)
+                        Model schemas =
+                                model.filter((URI)nextRepository, PODD.PODD_REPOSITORY_CONTAINS_SCHEMA_VERSION, null);
+                        
+                        boolean allMatched = true;
+                        // Check that all of the schemas supported by this repository are in the
+                        // requested list of schema imports
+                        for(Value nextSchema : schemas.objects())
+                        {
+                            if(nextSchema instanceof URI)
+                            {
+                                boolean found = false;
+                                for(OWLOntologyID nextSchemaImport : schemaImports)
+                                {
+                                    if(nextSchemaImport.getVersionIRI().toOpenRDFURI().equals(nextSchema))
+                                    {
+                                        found = true;
+                                        break;
+                                    }
+                                }
+                                if(!found)
+                                {
+                                    allMatched = false;
+                                    break;
+                                }
+                            }
+                        }
+                        
+                        // Check also that all of the requested schema imports are in the repository
+                        // Need to perform this check to ensure that there is an exact match
+                        // If there is not an exact match, and OWL database may not produce the
+                        // correct
+                        // set of inferences
+                        for(OWLOntologyID nextSchemaImport : schemaImports)
                         {
                             boolean found = false;
-                            for(OWLOntologyID nextSchemaImport : schemaImports)
+                            for(Value nextSchema : schemas.objects())
                             {
-                                if(nextSchemaImport.getVersionIRI().toOpenRDFURI().equals(nextSchema))
+                                if(nextSchema instanceof URI)
                                 {
-                                    found = true;
-                                    break;
+                                    if(nextSchemaImport.getVersionIRI().toOpenRDFURI().equals(nextSchema))
+                                    {
+                                        found = true;
+                                        break;
+                                    }
                                 }
                             }
                             if(!found)
@@ -680,79 +714,100 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
                                 break;
                             }
                         }
-                    }
-                    
-                    // Check also that all of the requested schema imports are in the repository
-                    // Need to perform this check to ensure that there is an exact match
-                    // If there is not an exact match, and OWL database may not produce the correct
-                    // set of inferences
-                    for(OWLOntologyID nextSchemaImport : schemaImports)
-                    {
-                        boolean found = false;
-                        for(Value nextSchema : schemas.objects())
-                        {
-                            if(nextSchema instanceof URI)
-                            {
-                                if(nextSchemaImport.getVersionIRI().toOpenRDFURI().equals(nextSchema))
-                                {
-                                    found = true;
-                                    break;
-                                }
-                            }
-                        }
-                        if(!found)
-                        {
-                            allMatched = false;
-                            break;
-                        }
-                    }
-                    
-                    if(allMatched)
-                    {
-                        URI repositoryManagerType =
-                                model.filter(nextRepositoryManager, PODD.PODD_REPOSITORY_MANAGER_TYPE, null)
-                                        .objectURI();
                         
-                        if(repositoryManagerType.equals(PODD.PODD_REPOSITORY_MANAGER_TYPE_LOCAL))
+                        if(allMatched)
                         {
-                            Literal directory =
-                                    model.filter(nextRepositoryManager, PODD.PODD_REPOSITORY_MANAGER_LOCAL_DIRECTORY,
-                                            null).objectLiteral();
-                            if(directory != null)
+                            RepositoryManager repositoryManager = sesameRepositoryManagers.get(nextRepositoryManager);
+                            if(repositoryManager != null)
                             {
-                                LocalRepositoryManager localRepositoryManager =
-                                        new LocalRepositoryManager(Paths.get(directory.stringValue()).toFile());
-                                localRepositoryManager.initialize();
-                                return Collections.<Resource, RepositoryManager> singletonMap(nextRepositoryManager,
-                                        localRepositoryManager);
+                                return Collections.singletonMap(nextRepositoryManager, repositoryManager);
                             }
                             else
                             {
-                                Path path = Files.createTempDirectory("podd-temp-repositories-");
-                                this.log.warn("Temporary local repositories in use!!!: {} {}", path.toString(),
-                                        schemaImports);
-                                LocalRepositoryManager localRepositoryManager =
-                                        new LocalRepositoryManager(path.toFile());
-                                localRepositoryManager.initialize();
-                                return Collections.<Resource, RepositoryManager> singletonMap(nextRepositoryManager,
-                                        localRepositoryManager);
+                                synchronized(sesameRepositoryManagers)
+                                {
+                                    repositoryManager = sesameRepositoryManagers.get(nextRepositoryManager);
+                                    if(repositoryManager != null)
+                                    {
+                                        return Collections.singletonMap(nextRepositoryManager, repositoryManager);
+                                    }
+                                    else
+                                    {
+                                        URI repositoryManagerType =
+                                                model.filter(nextRepositoryManager, PODD.PODD_REPOSITORY_MANAGER_TYPE,
+                                                        null).objectURI();
+                                        
+                                        if(repositoryManagerType.equals(PODD.PODD_REPOSITORY_MANAGER_TYPE_LOCAL))
+                                        {
+                                            Literal directory =
+                                                    model.filter(nextRepositoryManager,
+                                                            PODD.PODD_REPOSITORY_MANAGER_LOCAL_DIRECTORY, null)
+                                                            .objectLiteral();
+                                            if(directory != null)
+                                            {
+                                                RepositoryManager localRepositoryManager =
+                                                        new LocalRepositoryManager(Paths.get(directory.stringValue())
+                                                                .toFile());
+                                                localRepositoryManager.initialize();
+                                                RepositoryManager putIfAbsent =
+                                                        sesameRepositoryManagers.putIfAbsent(
+                                                                (URI)nextRepositoryManager, localRepositoryManager);
+                                                if(putIfAbsent != null)
+                                                {
+                                                    localRepositoryManager.shutDown();
+                                                    localRepositoryManager = putIfAbsent;
+                                                }
+                                                return Collections.<Resource, RepositoryManager> singletonMap(
+                                                        nextRepositoryManager, localRepositoryManager);
+                                            }
+                                            else
+                                            {
+                                                Path path = Files.createTempDirectory("podd-temp-repositories-");
+                                                this.log.warn("Temporary local repositories in use!!!: {} {}",
+                                                        path.toString(), schemaImports);
+                                                RepositoryManager localRepositoryManager =
+                                                        new LocalRepositoryManager(path.toFile());
+                                                localRepositoryManager.initialize();
+                                                RepositoryManager putIfAbsent =
+                                                        sesameRepositoryManagers.putIfAbsent(
+                                                                (URI)nextRepositoryManager, localRepositoryManager);
+                                                if(putIfAbsent != null)
+                                                {
+                                                    localRepositoryManager.shutDown();
+                                                    localRepositoryManager = putIfAbsent;
+                                                }
+                                                return Collections.<Resource, RepositoryManager> singletonMap(
+                                                        nextRepositoryManager, localRepositoryManager);
+                                            }
+                                        }
+                                        else if(repositoryManagerType.equals(PODD.PODD_REPOSITORY_MANAGER_TYPE_REMOTE))
+                                        {
+                                            Literal serverURL =
+                                                    model.filter(nextRepositoryManager,
+                                                            PODD.PODD_REPOSITORY_MANAGER_REMOTE_SERVER_URL, null)
+                                                            .objectLiteral();
+                                            RepositoryManager remoteRepositoryManager =
+                                                    new RemoteRepositoryManager(serverURL.stringValue());
+                                            remoteRepositoryManager.initialize();
+                                            RepositoryManager putIfAbsent =
+                                                    sesameRepositoryManagers.putIfAbsent((URI)nextRepositoryManager,
+                                                            remoteRepositoryManager);
+                                            if(putIfAbsent != null)
+                                            {
+                                                remoteRepositoryManager.shutDown();
+                                                remoteRepositoryManager = putIfAbsent;
+                                            }
+                                            return Collections.<Resource, RepositoryManager> singletonMap(
+                                                    nextRepositoryManager, remoteRepositoryManager);
+                                        }
+                                        else
+                                        {
+                                            throw new RuntimeException("Did not recognise repository manager type: "
+                                                    + repositoryManagerType.stringValue());
+                                        }
+                                    }
+                                }
                             }
-                        }
-                        else if(repositoryManagerType.equals(PODD.PODD_REPOSITORY_MANAGER_TYPE_REMOTE))
-                        {
-                            Literal serverURL =
-                                    model.filter(nextRepositoryManager, PODD.PODD_REPOSITORY_MANAGER_REMOTE_SERVER_URL,
-                                            null).objectLiteral();
-                            RemoteRepositoryManager remoteRepositoryManager =
-                                    new RemoteRepositoryManager(serverURL.stringValue());
-                            remoteRepositoryManager.initialize();
-                            return Collections.<Resource, RepositoryManager> singletonMap(nextRepositoryManager,
-                                    remoteRepositoryManager);
-                        }
-                        else
-                        {
-                            throw new RuntimeException("Did not recognise repository manager type: "
-                                    + repositoryManagerType.stringValue());
                         }
                     }
                 }
@@ -761,48 +816,59 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
         
         // None were found so create a new repository manager based on configuration
         
-        RepositoryManager repositoryManager = null;
-        
-        Resource newRepositoryManagerURI =
-                managementConnection.getValueFactory().createURI(
-                        "urn:podd:repositorymanager:" + UUID.randomUUID().toString());
-        
-        managementConnection.add(newRepositoryManagerURI, RDF.TYPE, PODD.PODD_REPOSITORY_MANAGER,
-                repositoryManagementContext);
-        
-        // We decide whether we will create a remote or a local repository manager based on the
-        // default permanent repository server URL
-        final String repositoryManagerUrl = defaultPermanentRepositoryServerUrl;
-        
-        if(repositoryManagerUrl == null || repositoryManagerUrl.trim().isEmpty())
+        synchronized(sesameRepositoryManagers)
         {
-            Path nextPath = poddHomeDirectory.resolve(newRepositoryManagerURI.stringValue());
-            if(!Files.exists(nextPath, LinkOption.NOFOLLOW_LINKS))
-            {
-                Files.createDirectories(nextPath);
-            }
-            repositoryManager = new LocalRepositoryManager(nextPath.toFile());
-            repositoryManager.initialize();
+            RepositoryManager repositoryManager = null;
             
-            Literal nextLiteral = managementConnection.getValueFactory().createLiteral(nextPath.toString());
+            Resource newRepositoryManagerURI =
+                    managementConnection.getValueFactory().createURI(
+                            "urn:podd:repositorymanager:" + UUID.randomUUID().toString());
             
-            managementConnection.add(newRepositoryManagerURI, PODD.PODD_REPOSITORY_MANAGER_TYPE,
-                    PODD.PODD_REPOSITORY_MANAGER_TYPE_LOCAL, repositoryManagementContext);
-            managementConnection.add(newRepositoryManagerURI, PODD.PODD_REPOSITORY_MANAGER_LOCAL_DIRECTORY,
-                    nextLiteral, repositoryManagementContext);
-        }
-        else
-        {
-            repositoryManager = new RemoteRepositoryManager(repositoryManagerUrl);
-            repositoryManager.initialize();
-            
-            Literal nextUrl = managementConnection.getValueFactory().createLiteral(repositoryManagerUrl);
-            managementConnection.add(newRepositoryManagerURI, PODD.PODD_REPOSITORY_MANAGER_TYPE,
-                    PODD.PODD_REPOSITORY_MANAGER_TYPE_REMOTE, repositoryManagementContext);
-            managementConnection.add(newRepositoryManagerURI, PODD.PODD_REPOSITORY_MANAGER_REMOTE_SERVER_URL, nextUrl,
+            managementConnection.add(newRepositoryManagerURI, RDF.TYPE, PODD.PODD_REPOSITORY_MANAGER,
                     repositoryManagementContext);
+            
+            // We decide whether we will create a remote or a local repository manager based on the
+            // default permanent repository server URL
+            final String repositoryManagerUrl = defaultPermanentRepositoryServerUrl;
+            
+            if(repositoryManagerUrl == null || repositoryManagerUrl.trim().isEmpty())
+            {
+                Path nextPath = poddHomeDirectory.resolve(newRepositoryManagerURI.stringValue());
+                if(!Files.exists(nextPath, LinkOption.NOFOLLOW_LINKS))
+                {
+                    Files.createDirectories(nextPath);
+                }
+                repositoryManager = new LocalRepositoryManager(nextPath.toFile());
+                repositoryManager.initialize();
+                
+                Literal nextLiteral = managementConnection.getValueFactory().createLiteral(nextPath.toString());
+                
+                managementConnection.add(newRepositoryManagerURI, PODD.PODD_REPOSITORY_MANAGER_TYPE,
+                        PODD.PODD_REPOSITORY_MANAGER_TYPE_LOCAL, repositoryManagementContext);
+                managementConnection.add(newRepositoryManagerURI, PODD.PODD_REPOSITORY_MANAGER_LOCAL_DIRECTORY,
+                        nextLiteral, repositoryManagementContext);
+            }
+            else
+            {
+                repositoryManager = new RemoteRepositoryManager(repositoryManagerUrl);
+                repositoryManager.initialize();
+                
+                Literal nextUrl = managementConnection.getValueFactory().createLiteral(repositoryManagerUrl);
+                managementConnection.add(newRepositoryManagerURI, PODD.PODD_REPOSITORY_MANAGER_TYPE,
+                        PODD.PODD_REPOSITORY_MANAGER_TYPE_REMOTE, repositoryManagementContext);
+                managementConnection.add(newRepositoryManagerURI, PODD.PODD_REPOSITORY_MANAGER_REMOTE_SERVER_URL, nextUrl,
+                        repositoryManagementContext);
+            }
+            
+            RepositoryManager putIfAbsent =
+                    sesameRepositoryManagers.putIfAbsent((URI)newRepositoryManagerURI,
+                            repositoryManager);
+            if(putIfAbsent != null)
+            {
+                repositoryManager.shutDown();
+                repositoryManager = putIfAbsent;
+            }
+            return Collections.<Resource, RepositoryManager> singletonMap(newRepositoryManagerURI, repositoryManager);
         }
-        
-        return Collections.<Resource, RepositoryManager> singletonMap(newRepositoryManagerURI, repositoryManager);
     }
 }

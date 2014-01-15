@@ -2406,7 +2406,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             // this.log.info("Finished caching schema ontologies for artifact migration: {}",
             // artifactVersion);
             
-            tempRepositoryConnection.commit();
+            //tempRepositoryConnection.commit();
             
             this.log.info("Starting reload of artifact to Repository: {}", artifactVersion);
             
