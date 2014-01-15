@@ -364,14 +364,22 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
         Objects.requireNonNull(model, "Schema Ontology model was null");
         Objects.requireNonNull(nextImportOrder, "Schema Ontology import order was null");
         
-        final Set<InferredOWLOntologyID> currentSchemaOntologies = this.getSchemaOntologies();
-        
         final Map<OWLOntologyID, Boolean> loadingOrder = new LinkedHashMap<>();
         
         RepositoryConnection managementConnection = null;
         
         try
         {
+            
+            managementConnection = this.repositoryManager.getManagementRepositoryConnection();
+            managementConnection.begin();
+            
+            final List<InferredOWLOntologyID> ontologyIDs =
+                    OntologyUtils.loadSchemasFromManifest(managementConnection,
+                            this.repositoryManager.getSchemaManagementGraph(), model);
+             managementConnection.add(model, this.repositoryManager.getSchemaManagementGraph());
+            
+            final Set<InferredOWLOntologyID> currentSchemaOntologies = this.getSchemaOntologies();
             
             for(final OWLOntologyID nextImport : nextImportOrder)
             {
@@ -387,23 +395,19 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
                 loadingOrder.put(nextImport, alreadyLoaded);
             }
             
-            managementConnection = this.repositoryManager.getManagementRepositoryConnection();
-            managementConnection.begin();
-            
-            final List<InferredOWLOntologyID> ontologyIDs =
-                    OntologyUtils.loadSchemasFromManifest(managementConnection,
-                            this.repositoryManager.getSchemaManagementGraph(), model);
-            // managementConnection.add(model, this.repositoryManager.getSchemaManagementGraph());
-            
             final List<InferredOWLOntologyID> results = new ArrayList<>();
             
             for(final Entry<OWLOntologyID, Boolean> loadEntry : loadingOrder.entrySet())
             {
-                if(!loadEntry.getValue())
+                if(loadEntry.getValue())
                 {
+                    this.log.info("Not loading ontology as it was already available: {}", loadEntry.getKey());
+                }
+                else
+                {
+                    this.log.info("Need to load ontology that is not already available: {}", loadEntry.getKey());
                     // TODO: Should we store these copies in a separate repository again, to reduce
-                    // bloat in
-                    // the management repository??
+                    // bloat in the management repository??
                     
                     final OWLOntologyID loadEntryID = loadEntry.getKey();
                     final String classpathLocation =

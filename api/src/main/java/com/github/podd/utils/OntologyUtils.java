@@ -259,12 +259,13 @@ public class OntologyUtils
         }
         
         final Model currentVersions = model.filter(null, PODD.OMV_CURRENT_VERSION, null);
-        for(final Resource nextOntology : currentVersions.subjects())
+        for(final Statement nextOntology : currentVersions)
         {
             // Ensure that there is only one current version
-            final URI nextCurrentVersion = model.filter(nextOntology, PODD.OMV_CURRENT_VERSION, null).objectURI();
-            managementConnection.remove(nextOntology, PODD.OMV_CURRENT_VERSION, null, schemaManagementGraph);
-            managementConnection.add(nextOntology, PODD.OMV_CURRENT_VERSION, nextCurrentVersion, schemaManagementGraph);
+            managementConnection.remove(nextOntology.getSubject(), PODD.OMV_CURRENT_VERSION, null,
+                    schemaManagementGraph);
+            managementConnection.add(nextOntology.getSubject(), PODD.OMV_CURRENT_VERSION, nextOntology.getObject(),
+                    schemaManagementGraph);
         }
         
         return ontologyIDs;
@@ -1023,9 +1024,8 @@ public class OntologyUtils
     private OntologyUtils()
     {
     }
-
-    public static boolean ontologyVersionsMatch(Set<? extends OWLOntologyID> set1,
-            Set<? extends OWLOntologyID> set2)
+    
+    public static boolean ontologyVersionsMatch(Set<? extends OWLOntologyID> set1, Set<? extends OWLOntologyID> set2)
     {
         if(set2.size() == set1.size())
         {
