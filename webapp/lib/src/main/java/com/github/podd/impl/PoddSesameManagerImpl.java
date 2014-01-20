@@ -2004,15 +2004,17 @@ public class PoddSesameManagerImpl implements PoddSesameManager
             // then do a similar process with the inferred axioms ontology
             repositoryConnection.add(nextInferredOntologyUri, RDF.TYPE, OWL.ONTOLOGY, context);
             
-            // remove deprecated current inferred version marker
-            // Deprecated in favour of just tracking the podd base inferred version, see below
-            repositoryConnection.remove(nextOntologyUri, PODD.VF.createURI(PODD.PODD_BASE, "currentInferredVersion"),
-                    null, context);
-            
             // link from the ontology version IRI to the matching inferred axioms
             // ontology version
             repositoryConnection.add(nextVersionUri, PODD.PODD_BASE_INFERRED_VERSION, nextInferredOntologyUri, context);
         }
+        
+        // remove deprecated current inferred version marker
+        // Deprecated in favour of just tracking the podd base inferred version, see below
+        // TODO: Add this to migration scripts when they are active
+        repositoryConnection.remove(nextOntologyUri, PODD.VF.createURI(PODD.PODD_BASE, "currentInferredVersion"),
+                null, context);
+        
     }
     
     @Override
