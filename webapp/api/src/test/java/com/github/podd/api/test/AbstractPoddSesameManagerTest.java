@@ -2097,7 +2097,7 @@ public abstract class AbstractPoddSesameManagerTest
                 this.testRepositoryConnection, this.artifactGraph);
         
         // verify: artifact management graph
-        this.verifyManagementGraphContents(7, this.artifactGraph, pArtifactIRI, pVersionIRIv1, pInferredVersionIRIv1);
+        this.verifyManagementGraphContents(6, this.artifactGraph, pArtifactIRI, pVersionIRIv1, pInferredVersionIRIv1);
         
         // prepare: version 2 of test artifact
         final IRI pVersionIRIv2 = IRI.create("http://purl.org/abc-def/artifact:1:version:2");
@@ -2131,7 +2131,7 @@ public abstract class AbstractPoddSesameManagerTest
         }
         
         // verify:
-        this.verifyManagementGraphContents(7, this.artifactGraph, pArtifactIRI, pVersionIRIv2, pInferredVersionIRIv2);
+        this.verifyManagementGraphContents(6, this.artifactGraph, pArtifactIRI, pVersionIRIv2, pInferredVersionIRIv2);
         
         DebugUtils.printContents(this.testRepositoryConnection, pInferredVersionIRIv1.toOpenRDFURI());
         
@@ -2160,7 +2160,7 @@ public abstract class AbstractPoddSesameManagerTest
         
         this.testPoddSesameManager.updateManagedPoddArtifactVersion(nextOntologyIDv1, false,
                 this.testRepositoryConnection, this.artifactGraph);
-        this.verifyManagementGraphContents(7, this.artifactGraph, pArtifactIRI, pVersion1IRIv1, pInferredVersionIRIv1);
+        this.verifyManagementGraphContents(6, this.artifactGraph, pArtifactIRI, pVersion1IRIv1, pInferredVersionIRIv1);
         
         // prepare: update artifact version
         final IRI pVersionIRIv2 = IRI.create("http://purl.org/abc-def/artifact:1:version:2");
@@ -2174,7 +2174,7 @@ public abstract class AbstractPoddSesameManagerTest
         
         // verify: new version overwrites all references to the old version, and number of
         // statements stays the same
-        this.verifyManagementGraphContents(7, this.artifactGraph, pArtifactIRI, pVersionIRIv2, pInferredVersionIRIv2);
+        this.verifyManagementGraphContents(6, this.artifactGraph, pArtifactIRI, pVersionIRIv2, pInferredVersionIRIv2);
     }
     
     /**
@@ -2199,7 +2199,7 @@ public abstract class AbstractPoddSesameManagerTest
                 this.testRepositoryConnection, this.artifactGraph);
         
         // verify:
-        this.verifyManagementGraphContents(7, this.artifactGraph, pArtifactIRI, pVersionIRI, pInferredVersionIRI);
+        this.verifyManagementGraphContents(6, this.artifactGraph, pArtifactIRI, pVersionIRI, pInferredVersionIRI);
     }
     
     /**
@@ -2223,7 +2223,7 @@ public abstract class AbstractPoddSesameManagerTest
         
         this.testPoddSesameManager.updateManagedPoddArtifactVersion(nextOntologyIDv1, false,
                 this.testRepositoryConnection, this.artifactGraph);
-        this.verifyManagementGraphContents(7, this.artifactGraph, pArtifactIRI, pVersionIRIv1, pInferredVersionIRIv1);
+        this.verifyManagementGraphContents(6, this.artifactGraph, pArtifactIRI, pVersionIRIv1, pInferredVersionIRIv1);
         
         // prepare: version 2
         final IRI pVersionIRIv2 = IRI.create("http://purl.org/abc-def/artifact:1:version:2");
@@ -2256,7 +2256,7 @@ public abstract class AbstractPoddSesameManagerTest
         
         this.testPoddSesameManager.updateManagedPoddArtifactVersion(nextOntologyIDv1, false,
                 this.testRepositoryConnection, this.artifactGraph);
-        this.verifyManagementGraphContents(7, this.artifactGraph, pArtifactIRI, pVersionIRIv1, pInferredVersionIRIv1);
+        this.verifyManagementGraphContents(6, this.artifactGraph, pArtifactIRI, pVersionIRIv1, pInferredVersionIRIv1);
         
         // prepare: version 2
         final IRI pVersionIRIv2 = IRI.create("http://purl.org/abc-def/artifact:1:version:2");
@@ -2374,7 +2374,7 @@ public abstract class AbstractPoddSesameManagerTest
      *            Expected size of the management graph
      * @param testGraph
      *            The management context/graph
-     * @param ontologyIRI
+     * @param expectedOntologyIRI
      *            Ontology/artifact IRI to check against
      * @param expectedVersionIRI
      *            Expected current version IRI of the given ontology/artifact
@@ -2382,24 +2382,30 @@ public abstract class AbstractPoddSesameManagerTest
      *            Expected inferred version of the given ontology/artifact
      * @throws Exception
      */
-    private void verifyManagementGraphContents(final int graphSize, final URI testGraph, final IRI ontologyIRI,
+    private void verifyManagementGraphContents(final int graphSize, final URI testGraph, final IRI expectedOntologyIRI,
             final IRI expectedVersionIRI, final IRI expectedInferredVersionIRI) throws Exception
     {
+        if(this.testRepositoryConnection.size(testGraph) != graphSize)
+        {
+            DebugUtils.printContents(testRepositoryConnection, testGraph);
+        }
+        
         Assert.assertEquals("Graph not of expected size", graphSize, this.testRepositoryConnection.size(testGraph));
         
         final Model stmtList =
                 new LinkedHashModel(Iterations.asList(this.testRepositoryConnection.getStatements(null,
                         PODD.OMV_CURRENT_VERSION, null, false, testGraph)));
         Assert.assertEquals("Graph should have one OMV_CURRENT_VERSION statement", 1, stmtList.size());
-        Assert.assertEquals("Wrong ontology IRI", ontologyIRI.toOpenRDFURI(), stmtList.subjects().iterator().next());
+        Assert.assertEquals("Wrong ontology IRI", expectedOntologyIRI.toOpenRDFURI(), stmtList.subjects().iterator()
+                .next());
         Assert.assertEquals("Wrong version IRI", expectedVersionIRI.toOpenRDFURI(), stmtList.objectURI());
         
         final Model inferredVersionStatementList =
                 new LinkedHashModel(Iterations.asList(this.testRepositoryConnection.getStatements(null,
                         PODD.PODD_BASE_INFERRED_VERSION, null, false, testGraph)));
         Assert.assertEquals("Graph should have one INFERRED_VERSION statement", 1, inferredVersionStatementList.size());
-        Assert.assertEquals("Wrong ontology IRI", ontologyIRI.toOpenRDFURI(), inferredVersionStatementList.subjects()
-                .iterator().next());
+        Assert.assertEquals("Wrong version IRI", expectedVersionIRI.toOpenRDFURI(), inferredVersionStatementList
+                .subjects().iterator().next());
         Assert.assertEquals("Wrong version IRI", expectedInferredVersionIRI.toOpenRDFURI(),
                 inferredVersionStatementList.objectURI());
     }

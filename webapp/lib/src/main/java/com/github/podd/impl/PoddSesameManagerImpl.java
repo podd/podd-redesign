@@ -223,11 +223,12 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         final Set<InferredOWLOntologyID> returnList = new HashSet<InferredOWLOntologyID>();
         final StringBuilder sb = new StringBuilder(1024);
         
-        sb.append("SELECT ?ontologyIri ?cv ?civ WHERE { ");
+        sb.append("SELECT ?ontologyIri ?currentVersionIri ?inferredVersionIri WHERE { ");
         
         sb.append(" ?ontologyIri <" + RDF.TYPE.stringValue() + "> <" + OWL.ONTOLOGY.stringValue() + "> . ");
-        sb.append(" ?ontologyIri <" + PODD.OMV_CURRENT_VERSION.stringValue() + "> ?cv . ");
-        sb.append(" OPTIONAL { ?cv <" + PODD.PODD_BASE_INFERRED_VERSION.stringValue() + "> ?civ . } ");
+        sb.append(" ?ontologyIri <" + PODD.OMV_CURRENT_VERSION.stringValue() + "> ?currentVersionIri . ");
+        sb.append(" OPTIONAL { ?currentVersionIri <" + PODD.PODD_BASE_INFERRED_VERSION.stringValue()
+                + "> ?inferredVersionIri . } ");
         
         sb.append(" }");
         
@@ -239,7 +240,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         for(final BindingSet nextResult : queryResults.getBindingSets())
         {
             final String nextOntologyIRI = nextResult.getValue("ontologyIri").stringValue();
-            final String nextVersionIRI = nextResult.getValue("cv").stringValue();
+            final String nextVersionIRI = nextResult.getValue("currentVersionIri").stringValue();
             IRI nextInferredIRI = null;
             if(nextResult.hasBinding("inferredVersionIri"))
             {
@@ -1977,6 +1978,8 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         
         // type the ontology
         repositoryConnection.add(nextOntologyUri, RDF.TYPE, OWL.ONTOLOGY, context);
+        // type the version
+        repositoryConnection.add(nextVersionUri, RDF.TYPE, OWL.ONTOLOGY, context);
         // setup a version number link for this version
         repositoryConnection.add(nextOntologyUri, PODD.OWL_VERSION_IRI, nextVersionUri, context);
         
