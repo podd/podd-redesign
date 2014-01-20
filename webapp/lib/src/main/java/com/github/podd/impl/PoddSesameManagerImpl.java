@@ -574,7 +574,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         sb1.append("SELECT DISTINCT ?cv ?civ WHERE { ");
         sb1.append(" ?ontologyIri <" + RDF.TYPE.stringValue() + "> <" + OWL.ONTOLOGY.stringValue() + "> . ");
         sb1.append(" ?ontologyIri <" + PODD.OMV_CURRENT_VERSION.stringValue() + "> ?cv . ");
-        sb1.append(" OPTIONAL { ?ontologyIri <" + PODD.PODD_BASE_CURRENT_INFERRED_VERSION.stringValue() + "> ?civ . } ");
+        sb1.append(" OPTIONAL { ?cv <" + PODD.PODD_BASE_INFERRED_VERSION.stringValue() + "> ?civ . } ");
         
         sb1.append(" }");
         
@@ -609,15 +609,16 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         final StringBuilder sb2 = new StringBuilder(1024);
         sb2.append("SELECT DISTINCT ?x ?cv ?civ WHERE { ");
         sb2.append(" ?x <" + RDF.TYPE.stringValue() + "> <" + OWL.ONTOLOGY.stringValue() + "> . ");
+        sb2.append(" ?x <" + OWL.VERSIONIRI.stringValue() + "> ?nextVersion . ");
         sb2.append(" ?x <" + OWL.VERSIONIRI.stringValue() + "> ?cv . ");
         sb2.append(" ?x <" + PODD.OMV_CURRENT_VERSION.stringValue() + "> ?cv . ");
-        sb2.append(" OPTIONAL { ?x <" + PODD.PODD_BASE_CURRENT_INFERRED_VERSION.stringValue() + "> ?civ . } ");
+        sb2.append(" OPTIONAL { ?cv <" + PODD.PODD_BASE_INFERRED_VERSION.stringValue() + "> ?civ . } ");
         sb2.append(" }");
         
         this.log.debug("Generated SPARQL {} with versionIri bound to {}", sb2, ontologyIRI);
         
         final TupleQuery query2 = repositoryConnection.prepareTupleQuery(QueryLanguage.SPARQL, sb2.toString());
-        query2.setBinding("cv", ontologyIRI.toOpenRDFURI());
+        query2.setBinding("nextVersion", ontologyIRI.toOpenRDFURI());
         query2.setDataset(dataset);
         
         final TupleQueryResult queryResults2 = query2.evaluate();
@@ -628,6 +629,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         for(final BindingSet nextResult : nextResults2.getBindingSets())
         {
             final String nextOntologyIRI = nextResult.getValue("x").stringValue();
+            final String nextVersionIRI = nextResult.getValue("cv").stringValue();
             IRI nextInferredIRI;
             if(nextResult.hasBinding("civ"))
             {
@@ -638,7 +640,8 @@ public class PoddSesameManagerImpl implements PoddSesameManager
                 nextInferredIRI = null;
             }
             
-            returnList.add(new InferredOWLOntologyID(IRI.create(nextOntologyIRI), ontologyIRI, nextInferredIRI));
+            returnList.add(new InferredOWLOntologyID(IRI.create(nextOntologyIRI), IRI.create(nextVersionIRI),
+                    nextInferredIRI));
         }
         
         return returnList;
