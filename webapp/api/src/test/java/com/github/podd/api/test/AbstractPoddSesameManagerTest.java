@@ -2046,14 +2046,14 @@ public abstract class AbstractPoddSesameManagerTest
                 this.testRepositoryConnection, this.schemaGraph);
         
         // verify only inferred ontology version is updated
-        this.verifyManagementGraphContents(9, this.schemaGraph, pOntologyIRI, pVersionIRI, pInferredVersionIRIUpdated);
+        this.verifyManagementGraphContents(10, this.schemaGraph, pOntologyIRI, pVersionIRI, pInferredVersionIRIUpdated);
         
         // invoke with "updateCurrent" allowed
         this.testPoddSesameManager.updateManagedSchemaOntologyVersion(nextOntologyIDUpdated, true,
                 this.testRepositoryConnection, this.schemaGraph);
         
         // verify both ontology current version and inferred ontology version haven been updated
-        this.verifyManagementGraphContents(9, this.schemaGraph, pOntologyIRI, pVersionIRIUpdated,
+        this.verifyManagementGraphContents(10, this.schemaGraph, pOntologyIRI, pVersionIRIUpdated,
                 pInferredVersionIRIUpdated);
         
     }
@@ -2276,7 +2276,7 @@ public abstract class AbstractPoddSesameManagerTest
         
         // verify: version 2 is inserted, as verified by the extra statements, but the current
         // versions are not modified this time
-        this.verifyManagementGraphContents(11, this.artifactGraph, pArtifactIRI, pVersionIRIv1, pInferredVersionIRIv1);
+        this.verifyManagementGraphContents(10, this.artifactGraph, pArtifactIRI, pVersionIRIv1, pInferredVersionIRIv1);
         
         // update to version 3
         final IRI pVersionIRIv3 = IRI.create("http://purl.org/abc-def/artifact:1:version:3");
@@ -2401,8 +2401,8 @@ public abstract class AbstractPoddSesameManagerTest
         Assert.assertEquals("Wrong version IRI", expectedVersionIRI.toOpenRDFURI(), stmtList.objectURI());
         
         final Model inferredVersionStatementList =
-                new LinkedHashModel(Iterations.asList(this.testRepositoryConnection.getStatements(null,
-                        PODD.PODD_BASE_INFERRED_VERSION, null, false, testGraph)));
+                new LinkedHashModel(Iterations.asList(this.testRepositoryConnection.getStatements(
+                        expectedVersionIRI.toOpenRDFURI(), PODD.PODD_BASE_INFERRED_VERSION, null, false, testGraph)));
         Assert.assertEquals("Graph should have one INFERRED_VERSION statement", 1, inferredVersionStatementList.size());
         Assert.assertEquals("Wrong version IRI", expectedVersionIRI.toOpenRDFURI(), inferredVersionStatementList
                 .subjects().iterator().next());
