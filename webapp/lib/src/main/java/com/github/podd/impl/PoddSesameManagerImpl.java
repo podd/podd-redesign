@@ -227,7 +227,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         
         sb.append(" ?ontologyIri <" + RDF.TYPE.stringValue() + "> <" + OWL.ONTOLOGY.stringValue() + "> . ");
         sb.append(" ?ontologyIri <" + PODD.OMV_CURRENT_VERSION.stringValue() + "> ?cv . ");
-        sb.append(" ?ontologyIri <" + PODD.PODD_BASE_CURRENT_INFERRED_VERSION.stringValue() + "> ?civ . ");
+        sb.append(" OPTIONAL { ?cv <" + PODD.PODD_BASE_INFERRED_VERSION.stringValue() + "> ?civ . } ");
         
         sb.append(" }");
         
@@ -240,10 +240,14 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         {
             final String nextOntologyIRI = nextResult.getValue("ontologyIri").stringValue();
             final String nextVersionIRI = nextResult.getValue("cv").stringValue();
-            final String nextInferredIRI = nextResult.getValue("civ").stringValue();
+            IRI nextInferredIRI = null;
+            if(nextResult.hasBinding("inferredVersionIri"))
+            {
+                nextInferredIRI = IRI.create(nextResult.getValue("inferredVersionIri").stringValue());
+            }
             
-            returnList.add(new InferredOWLOntologyID(IRI.create(nextOntologyIRI), IRI.create(nextVersionIRI), IRI
-                    .create(nextInferredIRI)));
+            returnList.add(new InferredOWLOntologyID(IRI.create(nextOntologyIRI), IRI.create(nextVersionIRI),
+                    nextInferredIRI));
         }
         return returnList;
     }
@@ -260,7 +264,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
     public Set<InferredOWLOntologyID> getAllSchemaOntologyVersions(final RepositoryConnection repositoryConnection,
             final URI schemaManagementGraph) throws OpenRDFException
     {
-        final Set<InferredOWLOntologyID> returnList = new HashSet<InferredOWLOntologyID>();
+        final Set<InferredOWLOntologyID> returnList = new LinkedHashSet<InferredOWLOntologyID>();
         final StringBuilder sb = new StringBuilder(1024);
         
         sb.append("SELECT DISTINCT ?ontologyIri ?versionIri ?inferredVersionIri WHERE { ");
@@ -2002,14 +2006,16 @@ public class PoddSesameManagerImpl implements PoddSesameManager
             // then do a similar process with the inferred axioms ontology
             repositoryConnection.add(nextInferredOntologyUri, RDF.TYPE, OWL.ONTOLOGY, context);
             
-            // remove whatever was previously there for the current inferred version
-            // marker
-            repositoryConnection.remove(nextOntologyUri, PODD.PODD_BASE_CURRENT_INFERRED_VERSION, null, context);
+            // remove deprecated current inferred version marker
+            // Deprecated in favour of just tracking the podd base inferred version, see below
+            repositoryConnection.remove(nextOntologyUri, PODD.VF.createURI(PODD.PODD_BASE, "currentInferredVersion"),
+                    null, context);
             
             // link from the ontology IRI to the current inferred axioms ontology
             // version
-            repositoryConnection.add(nextOntologyUri, PODD.PODD_BASE_CURRENT_INFERRED_VERSION, nextInferredOntologyUri,
-                    context);
+            // repositoryConnection.add(nextOntologyUri, PODD.PODD_BASE_CURRENT_INFERRED_VERSION,
+            // nextInferredOntologyUri,
+            // context);
             
             // link from the ontology version IRI to the matching inferred axioms
             // ontology version
@@ -2049,8 +2055,9 @@ public class PoddSesameManagerImpl implements PoddSesameManager
             repositoryConnection.add(nextOntologyUri, PODD.OMV_CURRENT_VERSION, nextVersionUri, managementGraph);
             // link from the ontology IRI to the current inferred axioms
             // ontology version
-            repositoryConnection.add(nextOntologyUri, PODD.PODD_BASE_CURRENT_INFERRED_VERSION, nextInferredOntologyUri,
-                    managementGraph);
+            // repositoryConnection.add(nextOntologyUri, PODD.PODD_BASE_CURRENT_INFERRED_VERSION,
+            // nextInferredOntologyUri,
+            // managementGraph);
             
             // setup a version number link for this version
             repositoryConnection.add(nextOntologyUri, PODD.OWL_VERSION_IRI, nextVersionUri, managementGraph);
@@ -2123,15 +2130,16 @@ public class PoddSesameManagerImpl implements PoddSesameManager
                 // then insert the new current version marker
                 repositoryConnection.add(nextOntologyUri, PODD.OMV_CURRENT_VERSION, nextVersionUri, managementGraph);
                 
-                // remove whatever was previously there for the current inferred
-                // version marker
-                repositoryConnection.remove(nextOntologyUri, PODD.PODD_BASE_CURRENT_INFERRED_VERSION, null,
-                        managementGraph);
+                // remove deprecated current inferred version marker, see podd base infered version
+                // below
+                repositoryConnection.remove(nextOntologyUri,
+                        PODD.VF.createURI(PODD.PODD_BASE, "currentInferredVersion"), null, managementGraph);
                 
                 // link from the ontology IRI to the current inferred axioms
                 // ontology version
-                repositoryConnection.add(nextOntologyUri, PODD.PODD_BASE_CURRENT_INFERRED_VERSION,
-                        nextInferredOntologyUri, managementGraph);
+                // repositoryConnection.add(nextOntologyUri,
+                // PODD.PODD_BASE_CURRENT_INFERRED_VERSION,
+                // nextInferredOntologyUri, managementGraph);
                 
                 // remove previous versionIRI statements if they are no longer
                 // needed, before adding

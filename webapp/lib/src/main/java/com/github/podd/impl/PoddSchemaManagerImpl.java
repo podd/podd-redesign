@@ -69,6 +69,7 @@ import com.github.podd.exception.UnmanagedSchemaException;
 import com.github.podd.exception.UnmanagedSchemaIRIException;
 import com.github.podd.exception.UnmanagedSchemaOntologyIDException;
 import com.github.podd.restlet.ApplicationUtils;
+import com.github.podd.utils.DebugUtils;
 import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.OntologyUtils;
 import com.github.podd.utils.PODD;
@@ -407,6 +408,8 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
                     OntologyUtils.loadSchemasFromManifest(managementConnection,
                             this.repositoryManager.getSchemaManagementGraph(), model);
             managementConnection.add(model, this.repositoryManager.getSchemaManagementGraph());
+            
+            DebugUtils.printContents(managementConnection, this.repositoryManager.getSchemaManagementGraph());
             
             final Set<InferredOWLOntologyID> existingSchemaOntologies =
                     this.sesameManager.getAllSchemaOntologyVersions(managementConnection,

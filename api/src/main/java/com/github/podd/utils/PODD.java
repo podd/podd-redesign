@@ -216,8 +216,9 @@ public interface PODD
      * Creating a property for PODD to track the currentInferredVersion for the inferred axioms
      * ontology when linking from the ontology IRI.
      */
-    public static final URI PODD_BASE_CURRENT_INFERRED_VERSION = PODD.VF.createURI(PODD.PODD_BASE,
-            "currentInferredVersion");
+    // public static final URI PODD_BASE_CURRENT_INFERRED_VERSION =
+    // PODD.VF.createURI(PODD.PODD_BASE,
+    // "currentInferredVersion");
     
     /** http://purl.org/podd/ns/poddBase#DataReference */
     public static final URI PODD_BASE_DATA_REFERENCE_TYPE = PODD.VF.createURI(PODD.PODD_BASE, "DataReference");

@@ -219,8 +219,9 @@ public abstract class AbstractPoddSesameManagerTest
         this.testRepositoryConnection.add(testOntologyURI, OWL.VERSIONIRI, testVersionURI, this.artifactGraph);
         this.testRepositoryConnection
                 .add(testOntologyURI, PODD.OMV_CURRENT_VERSION, testVersionURI, this.artifactGraph);
-        this.testRepositoryConnection.add(testOntologyURI, PODD.PODD_BASE_CURRENT_INFERRED_VERSION, testInferredURI,
-                this.artifactGraph);
+        // this.testRepositoryConnection.add(testOntologyURI,
+        // PODD.PODD_BASE_CURRENT_INFERRED_VERSION, testInferredURI,
+        // this.artifactGraph);
         this.testRepositoryConnection.add(testVersionURI, PODD.PODD_BASE_INFERRED_VERSION, testInferredURI,
                 this.artifactGraph);
         
@@ -264,8 +265,9 @@ public abstract class AbstractPoddSesameManagerTest
         this.testRepositoryConnection.add(pbVersionURI, PODD.PODD_BASE_INFERRED_VERSION, pbInferredURI,
                 this.schemaGraph);
         this.testRepositoryConnection.add(pbBaseOntologyURI, PODD.OMV_CURRENT_VERSION, pbVersionURI, this.schemaGraph);
-        this.testRepositoryConnection.add(pbBaseOntologyURI, PODD.PODD_BASE_CURRENT_INFERRED_VERSION, pbInferredURI,
-                this.schemaGraph);
+        // this.testRepositoryConnection.add(pbBaseOntologyURI,
+        // PODD.PODD_BASE_CURRENT_INFERRED_VERSION, pbInferredURI,
+        // this.schemaGraph);
         /*
          * The Management graph for Podd-Base created above is as follows.
          * 
@@ -294,8 +296,9 @@ public abstract class AbstractPoddSesameManagerTest
         this.testRepositoryConnection.add(pScienceOntologyURI, PODD.OMV_CURRENT_VERSION, pScienceVersionURI,
                 this.schemaGraph);
         this.testRepositoryConnection.add(pScienceOntologyURI, OWL.IMPORTS, pbVersionURI, this.schemaGraph);
-        this.testRepositoryConnection.add(pScienceOntologyURI, PODD.PODD_BASE_CURRENT_INFERRED_VERSION,
-                pScienceInferredURI, this.schemaGraph);
+        // this.testRepositoryConnection.add(pScienceOntologyURI,
+        // PODD.PODD_BASE_CURRENT_INFERRED_VERSION,
+        // pScienceInferredURI, this.schemaGraph);
         this.testRepositoryConnection.add(pScienceVersionURI, PODD.PODD_BASE_INFERRED_VERSION, pScienceInferredURI,
                 this.schemaGraph);
         
@@ -313,8 +316,9 @@ public abstract class AbstractPoddSesameManagerTest
                 this.schemaGraph);
         this.testRepositoryConnection.add(pPlantOntologyURI, OWL.IMPORTS, pScienceVersionURI, this.schemaGraph);
         this.testRepositoryConnection.add(pPlantOntologyURI, OWL.IMPORTS, pbVersionURI, this.schemaGraph);
-        this.testRepositoryConnection.add(pPlantOntologyURI, PODD.PODD_BASE_CURRENT_INFERRED_VERSION,
-                pPlantInferredURIv2, this.schemaGraph);
+        // this.testRepositoryConnection.add(pPlantOntologyURI,
+        // PODD.PODD_BASE_CURRENT_INFERRED_VERSION,
+        // pPlantInferredURIv2, this.schemaGraph);
         this.testRepositoryConnection.add(pPlantVersionURI, PODD.PODD_BASE_INFERRED_VERSION, pPlantInferredURI,
                 this.schemaGraph);
         
@@ -462,6 +466,7 @@ public abstract class AbstractPoddSesameManagerTest
         {
             Assert.assertTrue("Missing ontology IRI", expectedIriList.contains(ontoID.getOntologyIRI()));
             Assert.assertTrue("Missing version IRI", expectedIriList.contains(ontoID.getVersionIRI()));
+            Assert.assertNotNull("Inferred IRI was null: " + ontoID, ontoID.getInferredOntologyIRI());
             Assert.assertTrue("Missing inferred IRI", expectedIriList.contains(ontoID.getInferredOntologyIRI()));
         }
     }
@@ -2391,9 +2396,8 @@ public abstract class AbstractPoddSesameManagerTest
         
         final Model inferredVersionStatementList =
                 new LinkedHashModel(Iterations.asList(this.testRepositoryConnection.getStatements(null,
-                        PODD.PODD_BASE_CURRENT_INFERRED_VERSION, null, false, testGraph)));
-        Assert.assertEquals("Graph should have one CURRENT_INFERRED_VERSION statement", 1,
-                inferredVersionStatementList.size());
+                        PODD.PODD_BASE_INFERRED_VERSION, null, false, testGraph)));
+        Assert.assertEquals("Graph should have one INFERRED_VERSION statement", 1, inferredVersionStatementList.size());
         Assert.assertEquals("Wrong ontology IRI", ontologyIRI.toOpenRDFURI(), inferredVersionStatementList.subjects()
                 .iterator().next());
         Assert.assertEquals("Wrong version IRI", expectedInferredVersionIRI.toOpenRDFURI(),

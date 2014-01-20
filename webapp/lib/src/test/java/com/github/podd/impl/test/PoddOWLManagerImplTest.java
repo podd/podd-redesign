@@ -778,8 +778,8 @@ public class PoddOWLManagerImplTest extends AbstractPoddOWLManagerTest
         this.testManagementConnection.add(pbBaseOntologyURI, PODD.OWL_VERSION_IRI, pbVersionURI, schemaGraph);
         this.testManagementConnection.add(pbBaseOntologyURI, PODD.OMV_CURRENT_VERSION, pbVersionURI, schemaGraph);
         this.testManagementConnection.add(pbVersionURI, RDF.TYPE, OWL.ONTOLOGY, schemaGraph);
-        this.testManagementConnection.add(pbBaseOntologyURI, PODD.PODD_BASE_CURRENT_INFERRED_VERSION,
-                pbInferredOntologyID.getInferredOntologyIRI().toOpenRDFURI(), schemaGraph);
+        this.testManagementConnection.add(pbVersionURI, PODD.PODD_BASE_INFERRED_VERSION, pbInferredOntologyID
+                .getInferredOntologyIRI().toOpenRDFURI(), schemaGraph);
         
         // Podd-Science
         this.testManagementConnection.add(pScienceBaseOntologyURI, RDF.TYPE, OWL.ONTOLOGY, schemaGraph);
@@ -789,7 +789,7 @@ public class PoddOWLManagerImplTest extends AbstractPoddOWLManagerTest
                 schemaGraph);
         this.testManagementConnection.add(pScienceVersionURI, RDF.TYPE, OWL.ONTOLOGY, schemaGraph);
         this.testManagementConnection.add(pScienceVersionURI, OWL.IMPORTS, pbVersionURI, schemaGraph);
-        this.testManagementConnection.add(pScienceBaseOntologyURI, PODD.PODD_BASE_CURRENT_INFERRED_VERSION,
+        this.testManagementConnection.add(pScienceVersionURI, PODD.PODD_BASE_INFERRED_VERSION,
                 pScienceInferredOntologyID.getInferredOntologyIRI().toOpenRDFURI(), schemaGraph);
         
         // invoke method to test
@@ -920,8 +920,8 @@ public class PoddOWLManagerImplTest extends AbstractPoddOWLManagerTest
         this.testManagementConnection.add(pbBaseOntologyURI, PODD.OWL_VERSION_IRI, pbVersionURI, schemaGraph);
         this.testManagementConnection.add(pbBaseOntologyURI, PODD.OMV_CURRENT_VERSION, pbVersionURI, schemaGraph);
         this.testManagementConnection.add(pbVersionURI, RDF.TYPE, OWL.ONTOLOGY, schemaGraph);
-        this.testManagementConnection.add(pbBaseOntologyURI, PODD.PODD_BASE_CURRENT_INFERRED_VERSION,
-                pbInferredOntologyID.getInferredOntologyIRI().toOpenRDFURI(), schemaGraph);
+        this.testManagementConnection.add(pbVersionURI, PODD.PODD_BASE_INFERRED_VERSION, pbInferredOntologyID
+                .getInferredOntologyIRI().toOpenRDFURI(), schemaGraph);
         
         // Podd-Science
         this.testManagementConnection.add(pScienceBaseOntologyURI, RDF.TYPE, OWL.ONTOLOGY, schemaGraph);
@@ -931,7 +931,7 @@ public class PoddOWLManagerImplTest extends AbstractPoddOWLManagerTest
                 schemaGraph);
         this.testManagementConnection.add(pScienceVersionURI, RDF.TYPE, OWL.ONTOLOGY, schemaGraph);
         this.testManagementConnection.add(pScienceVersionURI, OWL.IMPORTS, pbVersionURI, schemaGraph);
-        this.testManagementConnection.add(pScienceBaseOntologyURI, PODD.PODD_BASE_CURRENT_INFERRED_VERSION,
+        this.testManagementConnection.add(pScienceVersionURI, PODD.PODD_BASE_INFERRED_VERSION,
                 pScienceInferredOntologyID.getInferredOntologyIRI().toOpenRDFURI(), schemaGraph);
         
         // Podd-Plant
@@ -942,8 +942,8 @@ public class PoddOWLManagerImplTest extends AbstractPoddOWLManagerTest
         this.testManagementConnection.add(pPlantVersionURI, RDF.TYPE, OWL.ONTOLOGY, schemaGraph);
         this.testManagementConnection.add(pPlantVersionURI, OWL.IMPORTS, pScienceVersionURI, schemaGraph);
         this.testManagementConnection.add(pPlantVersionURI, OWL.IMPORTS, pbVersionURI, schemaGraph);
-        this.testManagementConnection.add(pPlantBaseOntologyURI, PODD.PODD_BASE_CURRENT_INFERRED_VERSION,
-                pPlantInferredOntologyID.getInferredOntologyIRI().toOpenRDFURI(), schemaGraph);
+        this.testManagementConnection.add(pPlantVersionURI, PODD.PODD_BASE_INFERRED_VERSION, pPlantInferredOntologyID
+                .getInferredOntologyIRI().toOpenRDFURI(), schemaGraph);
         
         // invoke method to test
         manager.cacheSchemaOntologies(new LinkedHashSet<>(schemaOntologies), this.testManagementConnection, schemaGraph);

@@ -3200,13 +3200,14 @@ public abstract class AbstractPoddArtifactManagerTest
                 inferredVersionStatementList.get(0).getObject().toString());
         
         // verify: CURRENT_INFERRED_VERSION
-        final List<Statement> currentInferredVersionStatementList =
-                Iterations.asList(repositoryConnection.getStatements(ontologyIRI.toOpenRDFURI(),
-                        PODD.PODD_BASE_CURRENT_INFERRED_VERSION, null, false, managementGraph));
-        Assert.assertEquals("Graph should have one CURRENT_INFERRED_VERSION statement", 1,
-                currentInferredVersionStatementList.size());
-        Assert.assertEquals("Wrong CURRENT_INFERRED_VERSION in Object", inferredVersionIRI.toString(),
-                currentInferredVersionStatementList.get(0).getObject().toString());
+        // final List<Statement> currentInferredVersionStatementList =
+        // Iterations.asList(repositoryConnection.getStatements(ontologyIRI.toOpenRDFURI(),
+        // PODD.PODD_BASE_CURRENT_INFERRED_VERSION, null, false, managementGraph));
+        // Assert.assertEquals("Graph should have one CURRENT_INFERRED_VERSION statement", 1,
+        // currentInferredVersionStatementList.size());
+        // Assert.assertEquals("Wrong CURRENT_INFERRED_VERSION in Object",
+        // inferredVersionIRI.toString(),
+        // currentInferredVersionStatementList.get(0).getObject().toString());
     }
     
     /**

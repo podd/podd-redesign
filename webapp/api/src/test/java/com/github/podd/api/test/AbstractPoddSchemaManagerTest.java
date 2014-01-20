@@ -731,8 +731,8 @@ public abstract class AbstractPoddSchemaManagerTest
     {
         this.loadDefaultSchemaOntologies();
         
-        Assert.assertEquals(6, this.testSchemaManager.getCurrentSchemaOntologies().size());
         Assert.assertEquals(12, this.testSchemaManager.getSchemaOntologies().size());
+        Assert.assertEquals(6, this.testSchemaManager.getCurrentSchemaOntologies().size());
     }
     
     /**
@@ -745,8 +745,8 @@ public abstract class AbstractPoddSchemaManagerTest
     {
         this.loadSchemaOntologies("/test/schema-manifest-a1b1.ttl", 2);
         
-        Assert.assertEquals(2, this.testSchemaManager.getCurrentSchemaOntologies().size());
         Assert.assertEquals(2, this.testSchemaManager.getSchemaOntologies().size());
+        Assert.assertEquals(2, this.testSchemaManager.getCurrentSchemaOntologies().size());
     }
     
     /**
@@ -759,8 +759,8 @@ public abstract class AbstractPoddSchemaManagerTest
     {
         this.loadSchemaOntologies("/test/schema-manifest-a1b1c1.ttl", 3);
         
-        Assert.assertEquals(3, this.testSchemaManager.getCurrentSchemaOntologies().size());
         Assert.assertEquals(3, this.testSchemaManager.getSchemaOntologies().size());
+        Assert.assertEquals(3, this.testSchemaManager.getCurrentSchemaOntologies().size());
     }
     
     /**
@@ -799,10 +799,10 @@ public abstract class AbstractPoddSchemaManagerTest
     {
         this.loadSchemaOntologies("/test/schema-manifest-a1b2c1.ttl", 4);
         
-        Assert.assertEquals("Incorrect no. of current schema ontologies", 3, this.testSchemaManager
-                .getCurrentSchemaOntologies().size());
         Assert.assertEquals("Incorrect no. of total schema ontologies", 4, this.testSchemaManager.getSchemaOntologies()
                 .size());
+        Assert.assertEquals("Incorrect no. of current schema ontologies", 3, this.testSchemaManager
+                .getCurrentSchemaOntologies().size());
     }
     
     /**
@@ -816,10 +816,10 @@ public abstract class AbstractPoddSchemaManagerTest
     {
         this.loadSchemaOntologies("/test/schema-manifest-a1b2c3.ttl", 5);
         
-        Assert.assertEquals("Incorrect no. of current schema ontologies", 3, this.testSchemaManager
-                .getCurrentSchemaOntologies().size());
         Assert.assertEquals("Incorrect no. of total schema ontologies", 5, this.testSchemaManager.getSchemaOntologies()
                 .size());
+        Assert.assertEquals("Incorrect no. of current schema ontologies", 3, this.testSchemaManager
+                .getCurrentSchemaOntologies().size());
     }
     
     /**
@@ -833,10 +833,10 @@ public abstract class AbstractPoddSchemaManagerTest
     {
         this.loadSchemaOntologies("/test/schema-manifest-abc4.ttl", 6);
         
-        Assert.assertEquals("Incorrect no. of current schema ontologies", 3, this.testSchemaManager
-                .getCurrentSchemaOntologies().size());
         Assert.assertEquals("Incorrect no. of total schema ontologies", 6, this.testSchemaManager.getSchemaOntologies()
                 .size());
+        Assert.assertEquals("Incorrect no. of current schema ontologies", 3, this.testSchemaManager
+                .getCurrentSchemaOntologies().size());
     }
     
     /**
@@ -853,10 +853,10 @@ public abstract class AbstractPoddSchemaManagerTest
     {
         this.loadSchemaOntologies("/test/schema-manifest-inconsistent-import-hierarchy.ttl", 6);
         
-        Assert.assertEquals("Incorrect no. of current schema ontologies", 3, this.testSchemaManager
-                .getCurrentSchemaOntologies().size());
         Assert.assertEquals("Incorrect no. of total schema ontologies", 6, this.testSchemaManager.getSchemaOntologies()
                 .size());
+        Assert.assertEquals("Incorrect no. of current schema ontologies", 3, this.testSchemaManager
+                .getCurrentSchemaOntologies().size());
     }
     
     /**

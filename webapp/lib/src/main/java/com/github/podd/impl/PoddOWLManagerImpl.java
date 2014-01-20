@@ -152,12 +152,19 @@ public class PoddOWLManagerImpl implements PoddOWLManager
         final List<InferredOWLOntologyID> importsList = new ArrayList<InferredOWLOntologyID>();
         
         final String subject = ontologyID.getOntologyIRI().toQuotedString();
-        final String sparqlQuery =
-                "SELECT ?x ?xv ?xiv WHERE { " + subject + " <" + OWL.IMPORTS.stringValue() + "> ?xv ." + "?x <"
-                        + PODD.OWL_VERSION_IRI + "> ?xv ." + "?x <" + PODD.PODD_BASE_CURRENT_INFERRED_VERSION
-                        + "> ?xiv ." + " }";
+        
+        final StringBuilder sparqlQuery = new StringBuilder();
+        sparqlQuery.append("SELECT ?x ?xv ?xiv WHERE { ");
+        sparqlQuery.append(subject);
+        sparqlQuery.append(" <").append(OWL.IMPORTS.stringValue()).append(">");
+        sparqlQuery.append(" ?xv .");
+        sparqlQuery.append(" ?x <").append(PODD.OWL_VERSION_IRI.stringValue()).append(">");
+        sparqlQuery.append(" ?xv .");
+        sparqlQuery.append(" ?xv <").append(PODD.PODD_BASE_INFERRED_VERSION.stringValue()).append("> ?xiv .");
+        sparqlQuery.append(" }");
+        
         this.log.debug("Generated SPARQL {}", sparqlQuery);
-        final TupleQuery query = conn.prepareTupleQuery(QueryLanguage.SPARQL, sparqlQuery);
+        final TupleQuery query = conn.prepareTupleQuery(QueryLanguage.SPARQL, sparqlQuery.toString());
         
         final DatasetImpl dataset = new DatasetImpl();
         dataset.addDefaultGraph(context);
