@@ -99,7 +99,7 @@ public class PoddOWLManagerImplTest extends AbstractPoddOWLManagerTest
         
         final PoddSesameManagerImpl testSesameManager = new PoddSesameManagerImpl();
         
-        final Repository managementRepository = new SailRepository(new MemoryStore());
+        final Repository managementRepository = new SailRepository(new MemoryStore(tempDir.newFolder("memorystore")));
         managementRepository.initialize();
         
         this.testManagementConnection = managementRepository.getConnection();

@@ -246,7 +246,7 @@ public abstract class AbstractPoddRepositoryManagerTest
         this.schemaGraph = PODD.VF.createURI("urn:test:schema-graph");
         this.artifactGraph = PODD.VF.createURI("urn:test:artifact-graph");
         
-        Path testTempManagementRepositoryPath = testTempRepositoryManagerPath.resolve("managementrepository");
+        Path testTempManagementRepositoryPath = tempDir.newFolder("managementrepository").toPath();
         
         managementRepository = new SailRepository(new MemoryStore(testTempManagementRepositoryPath.toFile()));
         managementRepository.initialize();
