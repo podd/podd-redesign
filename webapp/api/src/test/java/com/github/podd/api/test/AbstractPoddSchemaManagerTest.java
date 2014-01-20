@@ -347,7 +347,9 @@ public abstract class AbstractPoddSchemaManagerTest
         // prepare: load schema ontologies into PODD
         final List<InferredOWLOntologyID> schemaOntologies = this.loadDefaultSchemaOntologies();
         final InputStream in = this.getClass().getResourceAsStream("/test/ontologies/poddPlantVXYZ.owl");
-        this.testSchemaManager.uploadSchemaOntology(in, RDFFormat.RDFXML, new LinkedHashSet<>(schemaOntologies));
+        InferredOWLOntologyID poddPlantVXYZID =
+                this.testSchemaManager
+                        .uploadSchemaOntology(in, RDFFormat.RDFXML, new LinkedHashSet<>(schemaOntologies));
         
         final String[] testIRIs =
                 { "http://purl.org/podd/ns/poddUser", "http://purl.org/podd/ns/poddBase",

@@ -300,9 +300,31 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
     
     @Override
     public void setCurrentSchemaOntologyVersion(final OWLOntologyID schemaOntologyID)
-        throws UnmanagedSchemaOntologyIDException, IllegalArgumentException
+        throws UnmanagedSchemaOntologyIDException, IllegalArgumentException, OpenRDFException
     {
-        throw new RuntimeException("TODO: Implement setCurrentSchemaOntologyVersion");
+        RepositoryConnection managementConnection = null;
+        try
+        {
+            managementConnection = this.repositoryManager.getManagementRepositoryConnection();
+            
+            this.setCurrentSchemaOntologyVersionInternal(schemaOntologyID, managementConnection,
+                    this.repositoryManager.getSchemaManagementGraph());
+        }
+        finally
+        {
+            if(managementConnection != null)
+            {
+                managementConnection.close();
+            }
+        }
+    }
+    
+    private void setCurrentSchemaOntologyVersionInternal(final OWLOntologyID schemaOntologyID,
+            final RepositoryConnection managementConnection, final URI schemaManagementContext)
+        throws UnmanagedSchemaOntologyIDException, OpenRDFException
+    {
+        this.sesameManager.updateManagedSchemaOntologyVersion(schemaOntologyID, true, managementConnection,
+                schemaManagementContext);
     }
     
     @Override
@@ -386,12 +408,14 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
                             this.repositoryManager.getSchemaManagementGraph(), model);
             managementConnection.add(model, this.repositoryManager.getSchemaManagementGraph());
             
-            final Set<InferredOWLOntologyID> currentSchemaOntologies = this.getSchemaOntologies();
+            final Set<InferredOWLOntologyID> existingSchemaOntologies =
+                    this.sesameManager.getAllSchemaOntologyVersions(managementConnection,
+                            this.repositoryManager.getSchemaManagementGraph());
             
             for(final OWLOntologyID nextImport : nextImportOrder)
             {
                 boolean alreadyLoaded = false;
-                for(final InferredOWLOntologyID nextCurrentSchemaOntology : currentSchemaOntologies)
+                for(final InferredOWLOntologyID nextCurrentSchemaOntology : existingSchemaOntologies)
                 {
                     if(nextImport.equals(nextCurrentSchemaOntology))
                     {
@@ -446,7 +470,11 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
                                         managementConnection, this.repositoryManager.getSchemaManagementGraph(),
                                         new LinkedHashSet<OWLOntologyID>(results));
                         
-                        throw new RuntimeException("Need to call setCurrentSchemaOntologyVersion here");
+                        this.setCurrentSchemaOntologyVersionInternal(nextResult, managementConnection,
+                                this.repositoryManager.getSchemaManagementGraph());
+                        
+                        // throw new
+                        // RuntimeException("Need to call setCurrentSchemaOntologyVersion here");
                         
                         // Also need to pull back in the change that inlines
                         // getCurrentSchemaOntologies() above, which may have broke tests due to the

@@ -63,6 +63,7 @@ import com.github.podd.api.PoddSesameManager;
 import com.github.podd.exception.SchemaManifestException;
 import com.github.podd.exception.UnmanagedArtifactIRIException;
 import com.github.podd.exception.UnmanagedSchemaIRIException;
+import com.github.podd.utils.DebugUtils;
 import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.OntologyUtils;
 import com.github.podd.utils.PODD;
@@ -566,12 +567,14 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         dataset.addDefaultGraph(managementGraph);
         dataset.addNamedGraph(managementGraph);
         
+        DebugUtils.printContents(repositoryConnection, managementGraph);
+        
         // 1: see if the given IRI exists as an ontology IRI
         final StringBuilder sb1 = new StringBuilder(1024);
-        sb1.append("SELECT ?cv ?civ WHERE { ");
+        sb1.append("SELECT DISTINCT ?cv ?civ WHERE { ");
         sb1.append(" ?ontologyIri <" + RDF.TYPE.stringValue() + "> <" + OWL.ONTOLOGY.stringValue() + "> . ");
         sb1.append(" ?ontologyIri <" + PODD.OMV_CURRENT_VERSION.stringValue() + "> ?cv . ");
-        sb1.append(" ?ontologyIri <" + PODD.PODD_BASE_CURRENT_INFERRED_VERSION.stringValue() + "> ?civ . ");
+        sb1.append(" OPTIONAL { ?ontologyIri <" + PODD.PODD_BASE_CURRENT_INFERRED_VERSION.stringValue() + "> ?civ . } ");
         
         sb1.append(" }");
         
@@ -589,26 +592,32 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         for(final BindingSet nextResult : nextResults1.getBindingSets())
         {
             final URI nextVersionIRI = (URI)nextResult.getValue("cv");
-            final URI nextInferredIRI = (URI)nextResult.getValue("civ");
+            IRI nextInferredIRI;
+            if(nextResult.hasBinding("civ"))
+            {
+                nextInferredIRI = IRI.create(nextResult.getValue("civ").stringValue());
+            }
+            else
+            {
+                nextInferredIRI = null;
+            }
             
-            returnList.add(new InferredOWLOntologyID(ontologyIRI, IRI.create(nextVersionIRI), IRI
-                    .create(nextInferredIRI)));
+            returnList.add(new InferredOWLOntologyID(ontologyIRI, IRI.create(nextVersionIRI), nextInferredIRI));
         }
         
         // 2: see if the given IRI exists as a version IRI
         final StringBuilder sb2 = new StringBuilder(1024);
-        sb2.append("SELECT ?x ?cv ?civ WHERE { ");
+        sb2.append("SELECT DISTINCT ?x ?cv ?civ WHERE { ");
         sb2.append(" ?x <" + RDF.TYPE.stringValue() + "> <" + OWL.ONTOLOGY.stringValue() + "> . ");
-        sb2.append(" ?x <" + OWL.VERSIONIRI.stringValue() + "> ?versionIri . ");
         sb2.append(" ?x <" + OWL.VERSIONIRI.stringValue() + "> ?cv . ");
         sb2.append(" ?x <" + PODD.OMV_CURRENT_VERSION.stringValue() + "> ?cv . ");
-        sb2.append(" ?x <" + PODD.PODD_BASE_CURRENT_INFERRED_VERSION.stringValue() + "> ?civ . ");
+        sb2.append(" OPTIONAL { ?x <" + PODD.PODD_BASE_CURRENT_INFERRED_VERSION.stringValue() + "> ?civ . } ");
         sb2.append(" }");
         
         this.log.debug("Generated SPARQL {} with versionIri bound to {}", sb2, ontologyIRI);
         
         final TupleQuery query2 = repositoryConnection.prepareTupleQuery(QueryLanguage.SPARQL, sb2.toString());
-        query2.setBinding("versionIri", ontologyIRI.toOpenRDFURI());
+        query2.setBinding("cv", ontologyIRI.toOpenRDFURI());
         query2.setDataset(dataset);
         
         final TupleQueryResult queryResults2 = query2.evaluate();
@@ -619,11 +628,17 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         for(final BindingSet nextResult : nextResults2.getBindingSets())
         {
             final String nextOntologyIRI = nextResult.getValue("x").stringValue();
-            final String nextVersionIRI = nextResult.getValue("cv").stringValue();
-            final String nextInferredIRI = nextResult.getValue("civ").stringValue();
+            IRI nextInferredIRI;
+            if(nextResult.hasBinding("civ"))
+            {
+                nextInferredIRI = IRI.create(nextResult.getValue("civ").stringValue());
+            }
+            else
+            {
+                nextInferredIRI = null;
+            }
             
-            returnList.add(new InferredOWLOntologyID(IRI.create(nextOntologyIRI), IRI.create(nextVersionIRI), IRI
-                    .create(nextInferredIRI)));
+            returnList.add(new InferredOWLOntologyID(IRI.create(nextOntologyIRI), ontologyIRI, nextInferredIRI));
         }
         
         return returnList;
@@ -1941,9 +1956,8 @@ public class PoddSesameManagerImpl implements PoddSesameManager
     }
     
     @Override
-    public void updateManagedSchemaOntologyVersion(final InferredOWLOntologyID nextOntologyID,
-            final boolean updateCurrent, final RepositoryConnection repositoryConnection, final URI context)
-        throws OpenRDFException
+    public void updateManagedSchemaOntologyVersion(final OWLOntologyID nextOntologyID, final boolean updateCurrent,
+            final RepositoryConnection repositoryConnection, final URI context) throws OpenRDFException
     {
         final URI nextOntologyUri = nextOntologyID.getOntologyIRI().toOpenRDFURI();
         final URI nextVersionUri = nextOntologyID.getVersionIRI().toOpenRDFURI();
@@ -1953,7 +1967,6 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         // though, the
         // version is equal to the ontology IRI in the prototype code. See
         // generateInferredOntologyID method for the corresponding code.
-        final URI nextInferredOntologyUri = nextOntologyID.getInferredOntologyIRI().toOpenRDFURI();
         
         // type the ontology
         repositoryConnection.add(nextOntologyUri, RDF.TYPE, OWL.ONTOLOGY, context);
@@ -1977,22 +1990,28 @@ public class PoddSesameManagerImpl implements PoddSesameManager
             repositoryConnection.add(nextOntologyUri, PODD.OMV_CURRENT_VERSION, nextVersionUri, context);
         }
         
-        // then do a similar process with the inferred axioms ontology
-        repositoryConnection.add(nextInferredOntologyUri, RDF.TYPE, OWL.ONTOLOGY, context);
-        
-        // remove whatever was previously there for the current inferred version
-        // marker
-        repositoryConnection.remove(nextOntologyUri, PODD.PODD_BASE_CURRENT_INFERRED_VERSION, null, context);
-        
-        // link from the ontology IRI to the current inferred axioms ontology
-        // version
-        repositoryConnection.add(nextOntologyUri, PODD.PODD_BASE_CURRENT_INFERRED_VERSION, nextInferredOntologyUri,
-                context);
-        
-        // link from the ontology version IRI to the matching inferred axioms
-        // ontology version
-        repositoryConnection.add(nextVersionUri, PODD.PODD_BASE_INFERRED_VERSION, nextInferredOntologyUri, context);
-        
+        if(nextOntologyID instanceof InferredOWLOntologyID
+                && ((InferredOWLOntologyID)nextOntologyID).getInferredOntologyIRI() != null)
+        {
+            
+            final URI nextInferredOntologyUri =
+                    ((InferredOWLOntologyID)nextOntologyID).getInferredOntologyIRI().toOpenRDFURI();
+            // then do a similar process with the inferred axioms ontology
+            repositoryConnection.add(nextInferredOntologyUri, RDF.TYPE, OWL.ONTOLOGY, context);
+            
+            // remove whatever was previously there for the current inferred version
+            // marker
+            repositoryConnection.remove(nextOntologyUri, PODD.PODD_BASE_CURRENT_INFERRED_VERSION, null, context);
+            
+            // link from the ontology IRI to the current inferred axioms ontology
+            // version
+            repositoryConnection.add(nextOntologyUri, PODD.PODD_BASE_CURRENT_INFERRED_VERSION, nextInferredOntologyUri,
+                    context);
+            
+            // link from the ontology version IRI to the matching inferred axioms
+            // ontology version
+            repositoryConnection.add(nextVersionUri, PODD.PODD_BASE_INFERRED_VERSION, nextInferredOntologyUri, context);
+        }
     }
     
     @Override
