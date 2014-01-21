@@ -2374,6 +2374,10 @@ public abstract class AbstractPoddSesameManagerTest
                 this.loadOntologyFromResource(TestConstants.TEST_ARTIFACT_20130206,
                         TestConstants.TEST_ARTIFACT_20130206_INFERRED, RDFFormat.TURTLE);
         
+        Assert.assertNotNull(ontologyID.getOntologyIRI());
+        Assert.assertNotNull(ontologyID.getVersionIRI());
+        Assert.assertNotNull(ontologyID.getInferredOntologyIRI());
+        
         final URI[] versionAndSchemaContexts =
                 this.testPoddSesameManager.versionAndInferredAndSchemaContexts(ontologyID,
                         this.testRepositoryConnection, this.schemaGraph, this.artifactGraph);

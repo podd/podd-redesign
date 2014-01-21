@@ -1389,6 +1389,10 @@ public abstract class AbstractPoddArtifactManagerTest
         this.verifyLoadedArtifact(artifactIDv1, 11, TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES,
                 TestConstants.TEST_ARTIFACT_BASIC_1_20130206_INFERRED_TRIPLES, false);
         
+        Assert.assertNotNull(artifactIDv1.getOntologyIRI());
+        Assert.assertNotNull(artifactIDv1.getVersionIRI());
+        Assert.assertNotNull(artifactIDv1.getInferredOntologyIRI());
+        
         RepositoryConnection managementConnection = this.testRepositoryManager.getManagementRepositoryConnection();
         try
         {

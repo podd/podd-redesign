@@ -1177,11 +1177,9 @@ public abstract class AbstractPoddSchemaManagerTest
     @Test
     public final void testUploadSchemaOntologyInvalidRdfXml() throws Exception
     {
-        try
+        try (final InputStream testInputStream =
+                this.getClass().getResourceAsStream("/test/ontologies/justatextfile.owl");)
         {
-            final InputStream testInputStream =
-                    this.getClass().getResourceAsStream("/test/ontologies/justatextfile.owl");
-            
             this.testSchemaManager.uploadSchemaOntology(testInputStream, RDFFormat.RDFXML,
                     Collections.<OWLOntologyID> emptySet());
             
@@ -1202,11 +1200,9 @@ public abstract class AbstractPoddSchemaManagerTest
     @Test
     public final void testUploadSchemaOntologyInvalidTurtle() throws Exception
     {
-        try
+        try (final InputStream testInputStream =
+                this.getClass().getResourceAsStream("/test/ontologies/invalidturtle.ttl");)
         {
-            final InputStream testInputStream =
-                    this.getClass().getResourceAsStream("/test/ontologies/invalidturtle.ttl");
-            
             this.testSchemaManager.uploadSchemaOntology(testInputStream, RDFFormat.RDFXML,
                     Collections.<OWLOntologyID> emptySet());
             
@@ -1292,7 +1288,6 @@ public abstract class AbstractPoddSchemaManagerTest
      * {@link com.github.podd.api.PoddSchemaManager#uploadSchemaOntology(java.io.InputStream, org.openrdf.rio.RDFFormat)}
      * .
      */
-    @Ignore("TODO: Enable support for this test")
     @Test
     public final void testUploadSchemaOntologyWithOntologyIRIAndVersionIRI() throws Exception
     {
@@ -1311,7 +1306,18 @@ public abstract class AbstractPoddSchemaManagerTest
             schemaOntologies.add(nextSchemaOntology);
         }
         
-        // TODO: verify
+        Set<InferredOWLOntologyID> currentSchemaOntologies = this.testSchemaManager.getCurrentSchemaOntologies();
+        
+        Assert.assertEquals(4, currentSchemaOntologies.size());
+        
+        for(InferredOWLOntologyID nextSchemaOntology : schemaOntologies)
+        {
+            Assert.assertNotNull(nextSchemaOntology.getOntologyIRI());
+            Assert.assertNotNull(nextSchemaOntology.getVersionIRI());
+            Assert.assertNotNull(nextSchemaOntology.getInferredOntologyIRI());
+            
+            Assert.assertTrue(currentSchemaOntologies.contains(nextSchemaOntology));
+        }
     }
     
 }
