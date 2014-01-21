@@ -16,6 +16,8 @@
  */
 package com.github.podd.api.test;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -328,12 +330,33 @@ public abstract class AbstractPoddSchemaManagerTest
      * {@link com.github.podd.api.PoddSchemaManager#downloadSchemaOntologyWithInferences(org.semanticweb.owlapi.model.OWLOntologyID, java.io.OutputStream, org.openrdf.rio.RDFFormat)}
      * .
      */
-    @Ignore
     @Test
     public final void testDownloadSchemaOntologyWithInferencesOnlyOntologyIRI() throws Exception
     {
-        this.testSchemaManager.downloadSchemaOntology(schemaOntologyID, outputStream, format, includeInferences);
-        Assert.fail("Not yet implemented"); // TODO
+        List<InferredOWLOntologyID> defaultSchemaOntologies = this.loadDefaultSchemaOntologies();
+        
+        for(InferredOWLOntologyID nextDefaultSchema : defaultSchemaOntologies)
+        {
+            ByteArrayOutputStream withInferencesOutputStream = new ByteArrayOutputStream();
+            this.testSchemaManager.downloadSchemaOntology(nextDefaultSchema, withInferencesOutputStream,
+                    RDFFormat.RDFJSON, true);
+            Model withInferences =
+                    Rio.parse(new ByteArrayInputStream(withInferencesOutputStream.toByteArray()), "", RDFFormat.RDFJSON);
+            
+            ByteArrayOutputStream withoutInferencesOutputStream = new ByteArrayOutputStream();
+            this.testSchemaManager.downloadSchemaOntology(nextDefaultSchema, withoutInferencesOutputStream,
+                    RDFFormat.RDFJSON, false);
+            Model withoutInferences =
+                    Rio.parse(new ByteArrayInputStream(withoutInferencesOutputStream.toByteArray()), "",
+                            RDFFormat.RDFJSON);
+            
+            // Verify that both were not empty
+            Assert.assertFalse(withInferences.isEmpty());
+            Assert.assertFalse(withoutInferences.isEmpty());
+            
+            // Verify that there were value added inference statements
+            Assert.assertTrue(withInferences.size() > withoutInferences.size());
+        }
     }
     
     /**
