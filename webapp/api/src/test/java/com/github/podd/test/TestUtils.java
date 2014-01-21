@@ -19,6 +19,10 @@ package com.github.podd.test;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
+import java.util.Map.Entry;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import org.junit.Assert;
 import org.openrdf.OpenRDFException;
@@ -39,6 +43,7 @@ import com.github.podd.exception.PoddException;
 import com.github.podd.restlet.PoddSesameRealm;
 import com.github.podd.restlet.PoddWebServiceApplication;
 import com.github.podd.utils.InferredOWLOntologyID;
+import com.github.podd.utils.OntologyUtils;
 import com.github.podd.utils.PODD;
 import com.github.podd.utils.PoddRoles;
 import com.github.podd.utils.PoddUser;
@@ -94,6 +99,27 @@ public class TestUtils
             Assert.assertNotNull("Ontology IRI was null for schema", nextSchema.getOntologyIRI());
             Assert.assertNotNull("Version IRI was null for schema: " + nextSchema, nextSchema.getVersionIRI());
             Assert.assertNotNull("Inferred IRI was null for schema: " + nextSchema, nextSchema.getInferredOntologyIRI());
+        }
+        
+        final ConcurrentMap<URI, URI> currentVersionsMap = new ConcurrentHashMap<>(schemaOntologies.size());
+        
+        // Find current version for each schema ontology
+        for(final InferredOWLOntologyID nextSchemaOntologyId : schemaOntologies)
+        {
+            OntologyUtils.mapCurrentVersion(model, currentVersionsMap, nextSchemaOntologyId.getOntologyIRI()
+                    .toOpenRDFURI());
+        }
+        
+        for(Entry<URI, URI> nextEntry : currentVersionsMap.entrySet())
+        {
+            for(InferredOWLOntologyID nextSchema : schemaOntologies)
+            {
+                if(nextSchema.getOntologyIRI().toOpenRDFURI().equals(nextEntry.getKey())
+                        && nextSchema.getVersionIRI().toOpenRDFURI().equals(nextEntry.getValue()))
+                {
+                    schemaManager.setCurrentSchemaOntologyVersion(nextSchema);
+                }
+            }
         }
         
         return schemaOntologies;
