@@ -122,7 +122,8 @@ public class TestUtils
         UnsupportedRDFormatException, IOException
     {
         InputStream inputStream = AbstractPoddOWLManagerTest.class.getResourceAsStream(classpath);
-        final Model statements = Rio.parse(inputStream, "", RDFFormat.RDFXML);
+        final Model statements =
+                Rio.parse(inputStream, "", Rio.getParserFormatForFileName(classpath, RDFFormat.RDFXML));
         
         final RioMemoryTripleSource owlSource =
                 new RioMemoryTripleSource(statements.iterator(), Namespaces.asMap(statements.getNamespaces()));
