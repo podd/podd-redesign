@@ -174,9 +174,9 @@ public abstract class AbstractPoddSchemaManagerTest
         
         for(InferredOWLOntologyID nextSchema : schemaOntologies)
         {
-            Assert.assertNotNull(nextSchema.getOntologyIRI());
-            Assert.assertNotNull(nextSchema.getVersionIRI());
-            Assert.assertNotNull(nextSchema.getInferredOntologyIRI());
+            Assert.assertNotNull("Ontology IRI was null for schema", nextSchema.getOntologyIRI());
+            Assert.assertNotNull("Version IRI was null for schema: " + nextSchema, nextSchema.getVersionIRI());
+            Assert.assertNotNull("Inferred IRI was null for schema: " + nextSchema, nextSchema.getInferredOntologyIRI());
         }
         
         return schemaOntologies;
