@@ -172,6 +172,13 @@ public abstract class AbstractPoddSchemaManagerTest
         Assert.assertEquals("Unexpected number of schema ontologies loaded", expectedSchemaOntologies,
                 schemaOntologies.size());
         
+        for(InferredOWLOntologyID nextSchema : schemaOntologies)
+        {
+            Assert.assertNotNull(nextSchema.getOntologyIRI());
+            Assert.assertNotNull(nextSchema.getVersionIRI());
+            Assert.assertNotNull(nextSchema.getInferredOntologyIRI());
+        }
+        
         return schemaOntologies;
     }
     
