@@ -634,7 +634,7 @@ public abstract class AbstractPoddArtifactManagerTest
         final InputStream inputStream = this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_20130206);
         
         final InferredOWLOntologyID artifactId = this.testArtifactManager.loadArtifact(inputStream, RDFFormat.TURTLE);
-        this.verifyLoadedArtifact(artifactId, 12, TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES,
+        this.verifyLoadedArtifact(artifactId, 11, TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES,
                 TestConstants.TEST_ARTIFACT_BASIC_1_20130206_INFERRED_TRIPLES, false);
         
         final InferredOWLOntologyID updatedArtifact;
@@ -709,7 +709,7 @@ public abstract class AbstractPoddArtifactManagerTest
         
         final InferredOWLOntologyID resultArtifactId =
                 this.testArtifactManager.loadArtifact(inputStream, RDFFormat.TURTLE);
-        this.verifyLoadedArtifact(resultArtifactId, 12, TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES,
+        this.verifyLoadedArtifact(resultArtifactId, 11, TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES,
                 TestConstants.TEST_ARTIFACT_BASIC_1_20130206_INFERRED_TRIPLES, false);
         
         // invoke test method: DELETE artifact
@@ -733,7 +733,7 @@ public abstract class AbstractPoddArtifactManagerTest
         
         final InferredOWLOntologyID resultArtifactId2 =
                 this.testArtifactManager.loadArtifact(inputStream2, RDFFormat.TURTLE);
-        this.verifyLoadedArtifact(resultArtifactId2, 12, TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES,
+        this.verifyLoadedArtifact(resultArtifactId2, 11, TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES,
                 TestConstants.TEST_ARTIFACT_BASIC_1_20130206_INFERRED_TRIPLES, false);
     }
     
@@ -761,7 +761,7 @@ public abstract class AbstractPoddArtifactManagerTest
         resultArtifactId = this.testArtifactManager.publishArtifact(resultArtifactId);
         
         // verify:
-        this.verifyLoadedArtifact(resultArtifactId, 12,
+        this.verifyLoadedArtifact(resultArtifactId, 11,
                 TestConstants.TEST_ARTIFACT_BASIC_1_INTERNAL_OBJECT_CONCRETE_TRIPLES,
                 TestConstants.TEST_ARTIFACT_BASIC_1_INTERNAL_OBJECT_INFERRED_TRIPLES, true);
         
@@ -797,7 +797,7 @@ public abstract class AbstractPoddArtifactManagerTest
                 this.testArtifactManager.loadArtifact(inputStream, RDFFormat.RDFXML);
         
         // verify:
-        this.verifyLoadedArtifact(resultArtifactId, 11,
+        this.verifyLoadedArtifact(resultArtifactId, 10,
                 TestConstants.TEST_ARTIFACT_BASIC_1_INTERNAL_OBJECT_CONCRETE_TRIPLES,
                 TestConstants.TEST_ARTIFACT_BASIC_1_INTERNAL_OBJECT_INFERRED_TRIPLES, false);
         
@@ -874,7 +874,7 @@ public abstract class AbstractPoddArtifactManagerTest
         this.loadVersion1SchemaOntologies();
         final InputStream inputStream = this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_20130206);
         final InferredOWLOntologyID artifactID = this.testArtifactManager.loadArtifact(inputStream, RDFFormat.TURTLE);
-        this.verifyLoadedArtifact(artifactID, 12, TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES,
+        this.verifyLoadedArtifact(artifactID, 11, TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES,
                 TestConstants.TEST_ARTIFACT_BASIC_1_20130206_INFERRED_TRIPLES, false);
         
         final Object[][] testData =
@@ -917,7 +917,7 @@ public abstract class AbstractPoddArtifactManagerTest
         this.loadVersion1SchemaOntologies();
         final InputStream inputStream = this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_20130206);
         final InferredOWLOntologyID artifactID = this.testArtifactManager.loadArtifact(inputStream, RDFFormat.TURTLE);
-        this.verifyLoadedArtifact(artifactID, 12, TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES,
+        this.verifyLoadedArtifact(artifactID, 11, TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES,
                 TestConstants.TEST_ARTIFACT_BASIC_1_20130206_INFERRED_TRIPLES, false);
         
         final URI objectToDelete =
@@ -957,7 +957,7 @@ public abstract class AbstractPoddArtifactManagerTest
         this.loadVersion1SchemaOntologies();
         final InputStream inputStream = this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_20130206);
         final InferredOWLOntologyID artifactID = this.testArtifactManager.loadArtifact(inputStream, RDFFormat.TURTLE);
-        this.verifyLoadedArtifact(artifactID, 12, TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES,
+        this.verifyLoadedArtifact(artifactID, 11, TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES,
                 TestConstants.TEST_ARTIFACT_BASIC_1_20130206_INFERRED_TRIPLES, false);
         
         final InferredOWLOntologyID publishedArtifact = this.testArtifactManager.publishArtifact(artifactID);
@@ -1034,7 +1034,7 @@ public abstract class AbstractPoddArtifactManagerTest
         this.loadVersion1SchemaOntologies();
         final InputStream inputStream = this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_20130206);
         final InferredOWLOntologyID artifactID = this.testArtifactManager.loadArtifact(inputStream, RDFFormat.TURTLE);
-        this.verifyLoadedArtifact(artifactID, 12, TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES,
+        this.verifyLoadedArtifact(artifactID, 11, TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES,
                 TestConstants.TEST_ARTIFACT_BASIC_1_20130206_INFERRED_TRIPLES, false);
         
         final URI objectToDelete = PODD.VF.createURI("http://purl.org/podd/basic-1-20130206/object:2966");
@@ -1067,7 +1067,7 @@ public abstract class AbstractPoddArtifactManagerTest
         final InputStream inputStream1 = this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_20130206);
         final InferredOWLOntologyID artifactIDv1 =
                 this.testArtifactManager.loadArtifact(inputStream1, RDFFormat.TURTLE);
-        this.verifyLoadedArtifact(artifactIDv1, 12, TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES,
+        this.verifyLoadedArtifact(artifactIDv1, 11, TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES,
                 TestConstants.TEST_ARTIFACT_BASIC_1_20130206_INFERRED_TRIPLES, false);
         
         final Model model = this.testArtifactManager.exportArtifact(artifactIDv1, false);
@@ -1086,7 +1086,7 @@ public abstract class AbstractPoddArtifactManagerTest
         final InputStream inputStream1 = this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_20130206);
         final InferredOWLOntologyID artifactIDv1 =
                 this.testArtifactManager.loadArtifact(inputStream1, RDFFormat.TURTLE);
-        this.verifyLoadedArtifact(artifactIDv1, 12, TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES,
+        this.verifyLoadedArtifact(artifactIDv1, 11, TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES,
                 TestConstants.TEST_ARTIFACT_BASIC_1_20130206_INFERRED_TRIPLES, false);
         
         final Model model = this.testArtifactManager.exportArtifact(artifactIDv1, false);
@@ -1121,7 +1121,7 @@ public abstract class AbstractPoddArtifactManagerTest
         final InputStream inputStream1 = this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_20130206);
         final InferredOWLOntologyID artifactIDv1 =
                 this.testArtifactManager.loadArtifact(inputStream1, RDFFormat.TURTLE);
-        this.verifyLoadedArtifact(artifactIDv1, 12, TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES,
+        this.verifyLoadedArtifact(artifactIDv1, 11, TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES,
                 TestConstants.TEST_ARTIFACT_BASIC_1_20130206_INFERRED_TRIPLES, false);
         
         final ByteArrayOutputStream output = new ByteArrayOutputStream();
@@ -1159,7 +1159,7 @@ public abstract class AbstractPoddArtifactManagerTest
         final InputStream inputStream1 = this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_20130206);
         final InferredOWLOntologyID artifactIDv1 =
                 this.testArtifactManager.loadArtifact(inputStream1, RDFFormat.TURTLE);
-        this.verifyLoadedArtifact(artifactIDv1, 12, TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES,
+        this.verifyLoadedArtifact(artifactIDv1, 11, TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES,
                 TestConstants.TEST_ARTIFACT_BASIC_1_20130206_INFERRED_TRIPLES, false);
         
         this.internalTestExportObjectMetadata(artifactIDv1);
@@ -1179,7 +1179,7 @@ public abstract class AbstractPoddArtifactManagerTest
         final InputStream inputStream1 = this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_20130206);
         final InferredOWLOntologyID artifactIDv1 =
                 this.testArtifactManager.loadArtifact(inputStream1, RDFFormat.TURTLE);
-        this.verifyLoadedArtifact(artifactIDv1, 12, TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES,
+        this.verifyLoadedArtifact(artifactIDv1, 11, TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES,
                 TestConstants.TEST_ARTIFACT_BASIC_1_20130206_INFERRED_TRIPLES, false);
         
         this.internalTestExportObjectMetadata(artifactIDv1);
@@ -1219,7 +1219,7 @@ public abstract class AbstractPoddArtifactManagerTest
         final InputStream inputStream1 = this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_20130206);
         final InferredOWLOntologyID artifactIDv1 =
                 this.testArtifactManager.loadArtifact(inputStream1, RDFFormat.TURTLE);
-        this.verifyLoadedArtifact(artifactIDv1, 12, TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES,
+        this.verifyLoadedArtifact(artifactIDv1, 11, TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES,
                 TestConstants.TEST_ARTIFACT_BASIC_1_20130206_INFERRED_TRIPLES, false);
         
         final String[] objectUris =
@@ -1261,7 +1261,7 @@ public abstract class AbstractPoddArtifactManagerTest
         // prepare: upload a test artifact
         final InputStream inputStream1 = this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_20130206);
         final InferredOWLOntologyID ontologyID = this.testArtifactManager.loadArtifact(inputStream1, RDFFormat.TURTLE);
-        this.verifyLoadedArtifact(ontologyID, 12, TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES,
+        this.verifyLoadedArtifact(ontologyID, 11, TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES,
                 TestConstants.TEST_ARTIFACT_BASIC_1_20130206_INFERRED_TRIPLES, false);
         
         final Object[][] testData =
@@ -1304,7 +1304,7 @@ public abstract class AbstractPoddArtifactManagerTest
         final InputStream inputStream1 = this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_20130206);
         final InferredOWLOntologyID artifactIDv1 =
                 this.testArtifactManager.loadArtifact(inputStream1, RDFFormat.TURTLE);
-        this.verifyLoadedArtifact(artifactIDv1, 12, TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES,
+        this.verifyLoadedArtifact(artifactIDv1, 11, TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES,
                 TestConstants.TEST_ARTIFACT_BASIC_1_20130206_INFERRED_TRIPLES, false);
         
         RepositoryConnection managementConnection = this.testRepositoryManager.getManagementRepositoryConnection();
@@ -1344,7 +1344,7 @@ public abstract class AbstractPoddArtifactManagerTest
         final InputStream inputStream1 = this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_20130206);
         final InferredOWLOntologyID artifactIDv1 =
                 this.testArtifactManager.loadArtifact(inputStream1, RDFFormat.TURTLE);
-        this.verifyLoadedArtifact(artifactIDv1, 12, TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES,
+        this.verifyLoadedArtifact(artifactIDv1, 11, TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES,
                 TestConstants.TEST_ARTIFACT_BASIC_1_20130206_INFERRED_TRIPLES, false);
         
         RepositoryConnection managementConnection = this.testRepositoryManager.getManagementRepositoryConnection();
@@ -1423,7 +1423,7 @@ public abstract class AbstractPoddArtifactManagerTest
         final InputStream inputStream1 = this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_20130206);
         final InferredOWLOntologyID artifactIDv1 =
                 this.testArtifactManager.loadArtifact(inputStream1, RDFFormat.TURTLE);
-        this.verifyLoadedArtifact(artifactIDv1, 12, TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES,
+        this.verifyLoadedArtifact(artifactIDv1, 11, TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES,
                 TestConstants.TEST_ARTIFACT_BASIC_1_20130206_INFERRED_TRIPLES, false);
         
         final Object[][] testData =
@@ -1472,7 +1472,7 @@ public abstract class AbstractPoddArtifactManagerTest
         final InputStream inputStream1 = this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_20130206);
         final InferredOWLOntologyID artifactIDv1 =
                 this.testArtifactManager.loadArtifact(inputStream1, RDFFormat.TURTLE);
-        this.verifyLoadedArtifact(artifactIDv1, 12, TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES,
+        this.verifyLoadedArtifact(artifactIDv1, 11, TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES,
                 TestConstants.TEST_ARTIFACT_BASIC_1_20130206_INFERRED_TRIPLES, false);
         
         final Object[][] testData =
@@ -1559,7 +1559,7 @@ public abstract class AbstractPoddArtifactManagerTest
         final InputStream inputStream =
                 this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_BASIC_1_INTERNAL_OBJECT);
         final InferredOWLOntologyID artifactID = this.testArtifactManager.loadArtifact(inputStream, RDFFormat.RDFXML);
-        this.verifyLoadedArtifact(artifactID, 11, TestConstants.TEST_ARTIFACT_BASIC_1_INTERNAL_OBJECT_CONCRETE_TRIPLES,
+        this.verifyLoadedArtifact(artifactID, 10, TestConstants.TEST_ARTIFACT_BASIC_1_INTERNAL_OBJECT_CONCRETE_TRIPLES,
                 TestConstants.TEST_ARTIFACT_BASIC_1_INTERNAL_OBJECT_INFERRED_TRIPLES, false);
         
         final Set<? extends OWLOntologyID> schemaImports = this.testArtifactManager.getSchemaImports(artifactID);
@@ -1581,7 +1581,7 @@ public abstract class AbstractPoddArtifactManagerTest
                 this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_BASIC_1_INTERNAL_OBJECT);
         final InferredOWLOntologyID unpublishedArtifactId =
                 this.testArtifactManager.loadArtifact(inputStream, RDFFormat.RDFXML);
-        this.verifyLoadedArtifact(unpublishedArtifactId, 11,
+        this.verifyLoadedArtifact(unpublishedArtifactId, 10,
                 TestConstants.TEST_ARTIFACT_BASIC_1_INTERNAL_OBJECT_CONCRETE_TRIPLES,
                 TestConstants.TEST_ARTIFACT_BASIC_1_INTERNAL_OBJECT_INFERRED_TRIPLES, false);
         
@@ -1625,7 +1625,7 @@ public abstract class AbstractPoddArtifactManagerTest
         final RDFFormat format = Rio.getParserFormatForMIMEType(mimeType, RDFFormat.RDFXML);
         
         final InferredOWLOntologyID unpublishedArtifactId = this.testArtifactManager.loadArtifact(inputStream, format);
-        this.verifyLoadedArtifact(unpublishedArtifactId, 11,
+        this.verifyLoadedArtifact(unpublishedArtifactId, 10,
                 TestConstants.TEST_ARTIFACT_BASIC_1_INTERNAL_OBJECT_CONCRETE_TRIPLES,
                 TestConstants.TEST_ARTIFACT_BASIC_1_INTERNAL_OBJECT_INFERRED_TRIPLES, false);
         
@@ -1656,21 +1656,18 @@ public abstract class AbstractPoddArtifactManagerTest
     {
         this.loadVersion1SchemaOntologies();
         
-        final InputStream inputStream =
-                this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_BASIC_1_INTERNAL_OBJECT);
-        
-        // MIME type should be either given by the user, detected from the content type on the
-        // request, or autodetected using the Any23 Mime Detector
-        final String mimeType = "application/rdf+xml";
-        final RDFFormat format = Rio.getParserFormatForMIMEType(mimeType, RDFFormat.RDFXML);
-        
-        // invoke test method
-        final InferredOWLOntologyID resultArtifactId = this.testArtifactManager.loadArtifact(inputStream, format);
-        
-        // verify:
-        this.verifyLoadedArtifact(resultArtifactId, 11,
-                TestConstants.TEST_ARTIFACT_BASIC_1_INTERNAL_OBJECT_CONCRETE_TRIPLES,
-                TestConstants.TEST_ARTIFACT_BASIC_1_INTERNAL_OBJECT_INFERRED_TRIPLES, false);
+        try (final InputStream inputStream =
+                this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_BASIC_1_INTERNAL_OBJECT);)
+        {
+            // invoke test method
+            final InferredOWLOntologyID resultArtifactId =
+                    this.testArtifactManager.loadArtifact(inputStream, RDFFormat.RDFXML);
+            
+            // verify:
+            this.verifyLoadedArtifact(resultArtifactId, 10,
+                    TestConstants.TEST_ARTIFACT_BASIC_1_INTERNAL_OBJECT_CONCRETE_TRIPLES,
+                    TestConstants.TEST_ARTIFACT_BASIC_1_INTERNAL_OBJECT_INFERRED_TRIPLES, false);
+        }
     }
     
     @Ignore("TODO: Enable periodically to debug concurrency issues")
@@ -2039,7 +2036,7 @@ public abstract class AbstractPoddArtifactManagerTest
         final InferredOWLOntologyID firstArtifactId =
                 this.testArtifactManager.loadArtifact(inputStream4FirstArtifact, RDFFormat.RDFXML);
         
-        this.verifyLoadedArtifact(firstArtifactId, 11, TestConstants.TEST_ARTIFACT_PURLS_v1_CONCRETE_TRIPLES,
+        this.verifyLoadedArtifact(firstArtifactId, 10, TestConstants.TEST_ARTIFACT_PURLS_v1_CONCRETE_TRIPLES,
                 TestConstants.TEST_ARTIFACT_PURLS_v1_INFERRED_TRIPLES, false);
         
         // load 2nd artifact
@@ -2076,7 +2073,7 @@ public abstract class AbstractPoddArtifactManagerTest
         final InferredOWLOntologyID firstArtifactId =
                 this.testArtifactManager.loadArtifact(inputStream4FirstArtifact, RDFFormat.RDFXML);
         
-        this.verifyLoadedArtifact(firstArtifactId, 11,
+        this.verifyLoadedArtifact(firstArtifactId, 10,
                 TestConstants.TEST_ARTIFACT_BASIC_1_INTERNAL_OBJECT_CONCRETE_TRIPLES,
                 TestConstants.TEST_ARTIFACT_BASIC_1_INTERNAL_OBJECT_INFERRED_TRIPLES, false);
         
@@ -2086,10 +2083,10 @@ public abstract class AbstractPoddArtifactManagerTest
         final InferredOWLOntologyID secondArtifactId =
                 this.testArtifactManager.loadArtifact(inputStream4SecondArtifact, RDFFormat.RDFXML);
         
-        this.verifyLoadedArtifact(firstArtifactId, 22,
+        this.verifyLoadedArtifact(firstArtifactId, 20,
                 TestConstants.TEST_ARTIFACT_BASIC_1_INTERNAL_OBJECT_CONCRETE_TRIPLES,
                 TestConstants.TEST_ARTIFACT_BASIC_1_INTERNAL_OBJECT_INFERRED_TRIPLES, false);
-        this.verifyLoadedArtifact(secondArtifactId, 22, TestConstants.TEST_ARTIFACT_BASIC_PROJECT_2_CONCRETE_TRIPLES,
+        this.verifyLoadedArtifact(secondArtifactId, 20, TestConstants.TEST_ARTIFACT_BASIC_PROJECT_2_CONCRETE_TRIPLES,
                 TestConstants.TEST_ARTIFACT_BASIC_PROJECT_2_INFERRED_TRIPLES, true);
     }
     
@@ -2112,7 +2109,7 @@ public abstract class AbstractPoddArtifactManagerTest
         final InferredOWLOntologyID artifactId =
                 this.testArtifactManager.loadArtifact(inputStream4Artifact, RDFFormat.RDFXML);
         
-        this.verifyLoadedArtifact(artifactId, 11, TestConstants.TEST_ARTIFACT_BASIC_PROJECT_PUBLISHED_CONCRETE_TRIPLES,
+        this.verifyLoadedArtifact(artifactId, 10, TestConstants.TEST_ARTIFACT_BASIC_PROJECT_PUBLISHED_CONCRETE_TRIPLES,
                 TestConstants.TEST_ARTIFACT_BASIC_PROJECT_PUBLISHED_INFERRED_TRIPLES, true);
         
         Assert.assertFalse("Version IRI in source should have been ignored", artifactId.getVersionIRI().toString()
@@ -2133,13 +2130,10 @@ public abstract class AbstractPoddArtifactManagerTest
         
         final InputStream inputStream =
                 this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_BASIC_1_INTERNAL_OBJECT);
-        // MIME type should be either given by the user, detected from the content type on the
-        // request, or autodetected using the Any23 Mime Detector
-        final String mimeType = "application/rdf+xml";
-        final RDFFormat format = Rio.getParserFormatForMIMEType(mimeType, RDFFormat.RDFXML);
         
-        final InferredOWLOntologyID unpublishedArtifactId = this.testArtifactManager.loadArtifact(inputStream, format);
-        this.verifyLoadedArtifact(unpublishedArtifactId, 11,
+        final InferredOWLOntologyID unpublishedArtifactId =
+                this.testArtifactManager.loadArtifact(inputStream, RDFFormat.RDFXML);
+        this.verifyLoadedArtifact(unpublishedArtifactId, 10,
                 TestConstants.TEST_ARTIFACT_BASIC_1_INTERNAL_OBJECT_CONCRETE_TRIPLES,
                 TestConstants.TEST_ARTIFACT_BASIC_1_INTERNAL_OBJECT_INFERRED_TRIPLES, false);
         
@@ -2196,7 +2190,7 @@ public abstract class AbstractPoddArtifactManagerTest
         final InputStream inputStream1 = this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_20130206);
         final InferredOWLOntologyID artifactIDv1 =
                 this.testArtifactManager.loadArtifact(inputStream1, RDFFormat.TURTLE);
-        this.verifyLoadedArtifact(artifactIDv1, 12, TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES,
+        this.verifyLoadedArtifact(artifactIDv1, 11, TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES,
                 TestConstants.TEST_ARTIFACT_BASIC_1_20130206_INFERRED_TRIPLES, false);
         
         final String searchTerm = "lat";
@@ -2222,7 +2216,7 @@ public abstract class AbstractPoddArtifactManagerTest
     {
         try
         {
-            this.internalTestUpdateArtifact(TestConstants.TEST_ARTIFACT_20130206, RDFFormat.TURTLE, 12,
+            this.internalTestUpdateArtifact(TestConstants.TEST_ARTIFACT_20130206, RDFFormat.TURTLE, 11,
                     TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES,
                     TestConstants.TEST_ARTIFACT_BASIC_1_20130206_INFERRED_TRIPLES, false,
                     TestConstants.TEST_ARTIFACT_FRAGMENT_INCONSISTENT_OBJECT, RDFFormat.TURTLE,
@@ -2399,7 +2393,7 @@ public abstract class AbstractPoddArtifactManagerTest
     public final void testUpdateArtifactAddNewPoddObjectWithFileReferences() throws Exception
     {
         final InferredOWLOntologyID updatedArtifact =
-                this.internalTestUpdateArtifact(TestConstants.TEST_ARTIFACT_20130206, RDFFormat.TURTLE, 12,
+                this.internalTestUpdateArtifact(TestConstants.TEST_ARTIFACT_20130206, RDFFormat.TURTLE, 11,
                         TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES,
                         TestConstants.TEST_ARTIFACT_BASIC_1_20130206_INFERRED_TRIPLES, false,
                         TestConstants.TEST_ARTIFACT_FRAGMENT_NEW_FILE_REF_OBJECT, RDFFormat.RDFXML,
@@ -2458,7 +2452,7 @@ public abstract class AbstractPoddArtifactManagerTest
     public final void testUpdateArtifactAddNewPoddObjectWithMerge() throws Exception
     {
         final InferredOWLOntologyID updatedArtifact =
-                this.internalTestUpdateArtifact(TestConstants.TEST_ARTIFACT_20130206, RDFFormat.TURTLE, 12,
+                this.internalTestUpdateArtifact(TestConstants.TEST_ARTIFACT_20130206, RDFFormat.TURTLE, 11,
                         TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES,
                         TestConstants.TEST_ARTIFACT_BASIC_1_20130206_INFERRED_TRIPLES, false,
                         TestConstants.TEST_ARTIFACT_FRAGMENT_NEW_PUBLICATION_OBJECT, RDFFormat.TURTLE,
@@ -2548,7 +2542,7 @@ public abstract class AbstractPoddArtifactManagerTest
     public final void testUpdateArtifactModifyPoddObjectWithReplace() throws Exception
     {
         final InferredOWLOntologyID updatedArtifact =
-                this.internalTestUpdateArtifact(TestConstants.TEST_ARTIFACT_20130206, RDFFormat.TURTLE, 12,
+                this.internalTestUpdateArtifact(TestConstants.TEST_ARTIFACT_20130206, RDFFormat.TURTLE, 11,
                         TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES,
                         TestConstants.TEST_ARTIFACT_BASIC_1_20130206_INFERRED_TRIPLES, false,
                         TestConstants.TEST_ARTIFACT_FRAGMENT_MODIFIED_PUBLICATION_OBJECT, RDFFormat.TURTLE,
@@ -2613,7 +2607,7 @@ public abstract class AbstractPoddArtifactManagerTest
     public final void testUpdateArtifactMovePoddObject() throws Exception
     {
         final InferredOWLOntologyID updatedArtifact =
-                this.internalTestUpdateArtifact(TestConstants.TEST_ARTIFACT_20130206, RDFFormat.TURTLE, 12,
+                this.internalTestUpdateArtifact(TestConstants.TEST_ARTIFACT_20130206, RDFFormat.TURTLE, 11,
                         TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES,
                         TestConstants.TEST_ARTIFACT_BASIC_1_20130206_INFERRED_TRIPLES, false,
                         TestConstants.TEST_ARTIFACT_FRAGMENT_MOVE_DEMO_INVESTIGATION, RDFFormat.TURTLE,
@@ -2679,7 +2673,7 @@ public abstract class AbstractPoddArtifactManagerTest
     public final void testUpdateArtifactWithDanglingObjects() throws Exception
     {
         final InferredOWLOntologyID updatedArtifact =
-                this.internalTestUpdateArtifact(TestConstants.TEST_ARTIFACT_20130206, RDFFormat.TURTLE, 12,
+                this.internalTestUpdateArtifact(TestConstants.TEST_ARTIFACT_20130206, RDFFormat.TURTLE, 11,
                         TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES,
                         TestConstants.TEST_ARTIFACT_BASIC_1_20130206_INFERRED_TRIPLES, false,
                         TestConstants.TEST_ARTIFACT_FRAGMENT_MODIFY_DEMO_INVESTIGATION, RDFFormat.TURTLE,
@@ -2744,7 +2738,7 @@ public abstract class AbstractPoddArtifactManagerTest
     {
         try
         {
-            this.internalTestUpdateArtifact(TestConstants.TEST_ARTIFACT_20130206, RDFFormat.TURTLE, 12,
+            this.internalTestUpdateArtifact(TestConstants.TEST_ARTIFACT_20130206, RDFFormat.TURTLE, 11,
                     TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES,
                     TestConstants.TEST_ARTIFACT_BASIC_1_20130206_INFERRED_TRIPLES, false,
                     TestConstants.TEST_ARTIFACT_FRAGMENT_MODIFY_DEMO_INVESTIGATION, RDFFormat.TURTLE,
@@ -2867,7 +2861,7 @@ public abstract class AbstractPoddArtifactManagerTest
         final InputStream inputStream1 = this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_20130206);
         final InferredOWLOntologyID artifactIDv1 =
                 this.testArtifactManager.loadArtifact(inputStream1, RDFFormat.TURTLE);
-        this.verifyLoadedArtifact(artifactIDv1, 12, TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES,
+        this.verifyLoadedArtifact(artifactIDv1, 11, TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES,
                 TestConstants.TEST_ARTIFACT_BASIC_1_20130206_INFERRED_TRIPLES, false);
         
         // Upload version 2 schemas
