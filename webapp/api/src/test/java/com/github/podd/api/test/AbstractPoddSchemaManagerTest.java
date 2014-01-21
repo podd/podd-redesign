@@ -1307,8 +1307,11 @@ public abstract class AbstractPoddSchemaManagerTest
         }
         
         Set<InferredOWLOntologyID> currentSchemaOntologies = this.testSchemaManager.getCurrentSchemaOntologies();
+        Set<InferredOWLOntologyID> allSchemaOntologies = this.testSchemaManager.getSchemaOntologies();
         
         Assert.assertEquals(4, currentSchemaOntologies.size());
+        Assert.assertEquals(4, allSchemaOntologies.size());
+        Assert.assertEquals(4, schemaOntologies.size());
         
         for(InferredOWLOntologyID nextSchemaOntology : schemaOntologies)
         {
@@ -1317,6 +1320,7 @@ public abstract class AbstractPoddSchemaManagerTest
             Assert.assertNotNull(nextSchemaOntology.getInferredOntologyIRI());
             
             Assert.assertTrue(currentSchemaOntologies.contains(nextSchemaOntology));
+            Assert.assertTrue(allSchemaOntologies.contains(nextSchemaOntology));
         }
     }
     
