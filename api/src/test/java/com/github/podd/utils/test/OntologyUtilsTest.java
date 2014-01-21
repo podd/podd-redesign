@@ -617,6 +617,46 @@ public class OntologyUtilsTest
     }
     
     @Test
+    public void testGetSchemaManifestImportsRealisticPoddV1DcFoaf() throws Exception
+    {
+        final Model model =
+                Rio.parse(this.getClass().getResourceAsStream("/test/test-podd-schema-manifest.ttl"), "",
+                        RDFFormat.TURTLE);
+        
+        // DebugUtils.printContents(model);
+        final List<OWLOntologyID> schemaManifestImports =
+                OntologyUtils.schemaManifestImports(model,
+                        new LinkedHashSet<OWLOntologyID>(Arrays.asList(this.testPoddDcV1, this.testPoddFoafV1)));
+        
+        Assert.assertNotNull(schemaManifestImports);
+        Assert.assertEquals(2, schemaManifestImports.size());
+        Assert.assertTrue(schemaManifestImports.contains(this.testPoddDcV1));
+        Assert.assertTrue(schemaManifestImports.contains(this.testPoddFoafV1));
+        Assert.assertEquals(this.testPoddDcV1, schemaManifestImports.get(0));
+        Assert.assertEquals(this.testPoddFoafV1, schemaManifestImports.get(1));
+    }
+    
+    @Test
+    public void testGetSchemaManifestImportsRealisticPoddV2DcFoaf() throws Exception
+    {
+        final Model model =
+                Rio.parse(this.getClass().getResourceAsStream("/test/test-podd-schema-manifest.ttl"), "",
+                        RDFFormat.TURTLE);
+        
+        // DebugUtils.printContents(model);
+        final List<OWLOntologyID> schemaManifestImports =
+                OntologyUtils.schemaManifestImports(model,
+                        new LinkedHashSet<OWLOntologyID>(Arrays.asList(this.testPoddDcV2, this.testPoddFoafV2)));
+        
+        Assert.assertNotNull(schemaManifestImports);
+        Assert.assertEquals(2, schemaManifestImports.size());
+        Assert.assertTrue(schemaManifestImports.contains(this.testPoddDcV2));
+        Assert.assertTrue(schemaManifestImports.contains(this.testPoddFoafV2));
+        Assert.assertEquals(this.testPoddDcV2, schemaManifestImports.get(0));
+        Assert.assertEquals(this.testPoddFoafV2, schemaManifestImports.get(1));
+    }
+    
+    @Test
     public void testGetSchemaManifestImportsRealisticPoddV2Plant() throws Exception
     {
         final Model model =

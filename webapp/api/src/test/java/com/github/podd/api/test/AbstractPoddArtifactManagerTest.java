@@ -118,10 +118,10 @@ import com.github.podd.utils.PoddObjectLabel;
 public abstract class AbstractPoddArtifactManagerTest
 {
     /**
-     * All of the unit tests individually timeout after 30 seconds.
+     * All of the unit tests individually timeout after 3000 seconds.
      */
     @Rule
-    public Timeout timeout = new Timeout(30000);
+    public Timeout timeout = new Timeout(3000000);
     
     @Rule
     public TemporaryFolder tempDir = new TemporaryFolder();
