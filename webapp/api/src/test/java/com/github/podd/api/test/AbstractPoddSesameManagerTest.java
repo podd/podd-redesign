@@ -261,7 +261,7 @@ public abstract class AbstractPoddSesameManagerTest
         // Podd-Base
         this.testRepositoryConnection.add(pbBaseOntologyURI, RDF.TYPE, OWL.ONTOLOGY, this.schemaGraph);
         this.testRepositoryConnection.add(pbInferredURI, RDF.TYPE, OWL.ONTOLOGY, this.schemaGraph);
-        this.testRepositoryConnection.add(pbBaseOntologyURI, PODD.OWL_VERSION_IRI, pbVersionURI, this.schemaGraph);
+        this.testRepositoryConnection.add(pbBaseOntologyURI, OWL.VERSIONIRI, pbVersionURI, this.schemaGraph);
         this.testRepositoryConnection.add(pbVersionURI, PODD.PODD_BASE_INFERRED_VERSION, pbInferredURI,
                 this.schemaGraph);
         this.testRepositoryConnection.add(pbBaseOntologyURI, PODD.OMV_CURRENT_VERSION, pbVersionURI, this.schemaGraph);
@@ -291,7 +291,7 @@ public abstract class AbstractPoddSesameManagerTest
         // Podd-Science
         this.testRepositoryConnection.add(pScienceOntologyURI, RDF.TYPE, OWL.ONTOLOGY, this.schemaGraph);
         this.testRepositoryConnection.add(pScienceInferredURI, RDF.TYPE, OWL.ONTOLOGY, this.schemaGraph);
-        this.testRepositoryConnection.add(pScienceOntologyURI, PODD.OWL_VERSION_IRI, pScienceVersionURI,
+        this.testRepositoryConnection.add(pScienceOntologyURI, OWL.VERSIONIRI, pScienceVersionURI,
                 this.schemaGraph);
         this.testRepositoryConnection.add(pScienceOntologyURI, PODD.OMV_CURRENT_VERSION, pScienceVersionURI,
                 this.schemaGraph);
@@ -308,9 +308,9 @@ public abstract class AbstractPoddSesameManagerTest
         this.testRepositoryConnection.add(pPlantVersionURIv2, RDF.TYPE, OWL.ONTOLOGY, this.schemaGraph);
         this.testRepositoryConnection.add(pPlantInferredURIv2, RDF.TYPE, OWL.ONTOLOGY, this.schemaGraph);
         
-        this.testRepositoryConnection.add(pPlantOntologyURI, PODD.OWL_VERSION_IRI, pPlantVersionURI, this.schemaGraph);
+        this.testRepositoryConnection.add(pPlantOntologyURI, OWL.VERSIONIRI, pPlantVersionURI, this.schemaGraph);
         this.testRepositoryConnection
-                .add(pPlantOntologyURI, PODD.OWL_VERSION_IRI, pPlantVersionURIv2, this.schemaGraph);
+                .add(pPlantOntologyURI, OWL.VERSIONIRI, pPlantVersionURIv2, this.schemaGraph);
         
         this.testRepositoryConnection.add(pPlantOntologyURI, PODD.OMV_CURRENT_VERSION, pPlantVersionURIv2,
                 this.schemaGraph);

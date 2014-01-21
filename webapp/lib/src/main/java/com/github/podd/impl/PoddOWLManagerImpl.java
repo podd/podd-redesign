@@ -158,7 +158,7 @@ public class PoddOWLManagerImpl implements PoddOWLManager
         sparqlQuery.append(subject);
         sparqlQuery.append(" <").append(OWL.IMPORTS.stringValue()).append(">");
         sparqlQuery.append(" ?xv .");
-        sparqlQuery.append(" ?x <").append(PODD.OWL_VERSION_IRI.stringValue()).append(">");
+        sparqlQuery.append(" ?x <").append(OWL.VERSIONIRI.stringValue()).append(">");
         sparqlQuery.append(" ?xv .");
         sparqlQuery.append(" ?xv <").append(PODD.PODD_BASE_INFERRED_VERSION.stringValue()).append("> ?xiv .");
         sparqlQuery.append(" }");

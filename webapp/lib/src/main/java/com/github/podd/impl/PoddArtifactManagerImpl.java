@@ -1561,8 +1561,8 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
                 this.log.info("Setting version IRI to <{}>", newVersionIRI);
             }
             
-            temporaryConnection.remove(ontologyIRI.toOpenRDFURI(), PODD.OWL_VERSION_IRI, null, randomContext);
-            temporaryConnection.add(ontologyIRI.toOpenRDFURI(), PODD.OWL_VERSION_IRI, newVersionIRI.toOpenRDFURI(),
+            temporaryConnection.remove(ontologyIRI.toOpenRDFURI(), OWL.VERSIONIRI, null, randomContext);
+            temporaryConnection.add(ontologyIRI.toOpenRDFURI(), OWL.VERSIONIRI, newVersionIRI.toOpenRDFURI(),
                     randomContext);
             
             // check and update statements with default timestamp values
@@ -2200,9 +2200,9 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             
             // set version IRI in temporary repository
             this.log.info("Setting version IRI to <{}>", newVersionIRI);
-            tempRepositoryConnection.remove(artifactID.getOntologyIRI().toOpenRDFURI(), PODD.OWL_VERSION_IRI, null,
+            tempRepositoryConnection.remove(artifactID.getOntologyIRI().toOpenRDFURI(), OWL.VERSIONIRI, null,
                     tempContext);
-            tempRepositoryConnection.add(artifactID.getOntologyIRI().toOpenRDFURI(), PODD.OWL_VERSION_IRI,
+            tempRepositoryConnection.add(artifactID.getOntologyIRI().toOpenRDFURI(), OWL.VERSIONIRI,
                     newVersionIRI, tempContext);
             
             // check and ensure schema ontology imports are for version IRIs

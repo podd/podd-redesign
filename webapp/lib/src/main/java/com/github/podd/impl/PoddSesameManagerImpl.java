@@ -1979,7 +1979,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         // type the version
         repositoryConnection.add(nextVersionUri, RDF.TYPE, OWL.ONTOLOGY, context);
         // setup a version number link for this version
-        repositoryConnection.add(nextOntologyUri, PODD.OWL_VERSION_IRI, nextVersionUri, context);
+        repositoryConnection.add(nextOntologyUri, OWL.VERSIONIRI, nextVersionUri, context);
         
         final List<Statement> currentVersions =
                 Iterations.asList(repositoryConnection.getStatements(nextOntologyUri, PODD.OMV_CURRENT_VERSION, null,
@@ -2060,7 +2060,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
             // managementGraph);
             
             // setup a version number link for this version
-            repositoryConnection.add(nextOntologyUri, PODD.OWL_VERSION_IRI, nextVersionUri, managementGraph);
+            repositoryConnection.add(nextOntologyUri, OWL.VERSIONIRI, nextVersionUri, managementGraph);
             // link from the ontology version IRI to the matching inferred
             // axioms ontology version
             repositoryConnection.add(nextVersionUri, PODD.PODD_BASE_INFERRED_VERSION, nextInferredOntologyUri,
@@ -2075,7 +2075,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
                 // remove the content of any contexts that are the object of
                 // versionIRI statements
                 final List<Statement> previousVersions =
-                        Iterations.asList(repositoryConnection.getStatements(nextOntologyUri, PODD.OWL_VERSION_IRI,
+                        Iterations.asList(repositoryConnection.getStatements(nextOntologyUri, OWL.VERSIONIRI,
                                 null, true, managementGraph));
                 
                 for(final Statement nextPreviousVersion : previousVersions)
@@ -2133,11 +2133,11 @@ public class PoddSesameManagerImpl implements PoddSesameManager
                 
                 // remove previous versionIRI statements if they are no longer
                 // needed, before adding the new version below
-                repositoryConnection.remove(nextOntologyUri, PODD.OWL_VERSION_IRI, null, managementGraph);
+                repositoryConnection.remove(nextOntologyUri, OWL.VERSIONIRI, null, managementGraph);
             }
             
             // always setup a version number link for this version
-            repositoryConnection.add(nextOntologyUri, PODD.OWL_VERSION_IRI, nextVersionUri, managementGraph);
+            repositoryConnection.add(nextOntologyUri, OWL.VERSIONIRI, nextVersionUri, managementGraph);
             
             // always setup an inferred axioms ontology version for this version
             repositoryConnection.add(nextVersionUri, PODD.PODD_BASE_INFERRED_VERSION, nextInferredOntologyUri,

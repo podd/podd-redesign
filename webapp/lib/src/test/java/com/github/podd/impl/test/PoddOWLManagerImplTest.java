@@ -775,7 +775,7 @@ public class PoddOWLManagerImplTest extends AbstractPoddOWLManagerTest
         
         // Podd-Base
         this.testManagementConnection.add(pbBaseOntologyURI, RDF.TYPE, OWL.ONTOLOGY, schemaGraph);
-        this.testManagementConnection.add(pbBaseOntologyURI, PODD.OWL_VERSION_IRI, pbVersionURI, schemaGraph);
+        this.testManagementConnection.add(pbBaseOntologyURI, OWL.VERSIONIRI, pbVersionURI, schemaGraph);
         this.testManagementConnection.add(pbBaseOntologyURI, PODD.OMV_CURRENT_VERSION, pbVersionURI, schemaGraph);
         this.testManagementConnection.add(pbVersionURI, RDF.TYPE, OWL.ONTOLOGY, schemaGraph);
         this.testManagementConnection.add(pbVersionURI, PODD.PODD_BASE_INFERRED_VERSION, pbInferredOntologyID
@@ -783,7 +783,7 @@ public class PoddOWLManagerImplTest extends AbstractPoddOWLManagerTest
         
         // Podd-Science
         this.testManagementConnection.add(pScienceBaseOntologyURI, RDF.TYPE, OWL.ONTOLOGY, schemaGraph);
-        this.testManagementConnection.add(pScienceBaseOntologyURI, PODD.OWL_VERSION_IRI, pScienceVersionURI,
+        this.testManagementConnection.add(pScienceBaseOntologyURI, OWL.VERSIONIRI, pScienceVersionURI,
                 schemaGraph);
         this.testManagementConnection.add(pScienceBaseOntologyURI, PODD.OMV_CURRENT_VERSION, pScienceVersionURI,
                 schemaGraph);
@@ -917,7 +917,7 @@ public class PoddOWLManagerImplTest extends AbstractPoddOWLManagerTest
         
         // Podd-Base
         this.testManagementConnection.add(pbBaseOntologyURI, RDF.TYPE, OWL.ONTOLOGY, schemaGraph);
-        this.testManagementConnection.add(pbBaseOntologyURI, PODD.OWL_VERSION_IRI, pbVersionURI, schemaGraph);
+        this.testManagementConnection.add(pbBaseOntologyURI, OWL.VERSIONIRI, pbVersionURI, schemaGraph);
         this.testManagementConnection.add(pbBaseOntologyURI, PODD.OMV_CURRENT_VERSION, pbVersionURI, schemaGraph);
         this.testManagementConnection.add(pbVersionURI, RDF.TYPE, OWL.ONTOLOGY, schemaGraph);
         this.testManagementConnection.add(pbVersionURI, PODD.PODD_BASE_INFERRED_VERSION, pbInferredOntologyID
@@ -925,7 +925,7 @@ public class PoddOWLManagerImplTest extends AbstractPoddOWLManagerTest
         
         // Podd-Science
         this.testManagementConnection.add(pScienceBaseOntologyURI, RDF.TYPE, OWL.ONTOLOGY, schemaGraph);
-        this.testManagementConnection.add(pScienceBaseOntologyURI, PODD.OWL_VERSION_IRI, pScienceVersionURI,
+        this.testManagementConnection.add(pScienceBaseOntologyURI, OWL.VERSIONIRI, pScienceVersionURI,
                 schemaGraph);
         this.testManagementConnection.add(pScienceBaseOntologyURI, PODD.OMV_CURRENT_VERSION, pScienceVersionURI,
                 schemaGraph);
@@ -936,7 +936,7 @@ public class PoddOWLManagerImplTest extends AbstractPoddOWLManagerTest
         
         // Podd-Plant
         this.testManagementConnection.add(pPlantBaseOntologyURI, RDF.TYPE, OWL.ONTOLOGY, schemaGraph);
-        this.testManagementConnection.add(pPlantBaseOntologyURI, PODD.OWL_VERSION_IRI, pPlantVersionURI, schemaGraph);
+        this.testManagementConnection.add(pPlantBaseOntologyURI, OWL.VERSIONIRI, pPlantVersionURI, schemaGraph);
         this.testManagementConnection.add(pPlantBaseOntologyURI, PODD.OMV_CURRENT_VERSION, pPlantVersionURI,
                 schemaGraph);
         this.testManagementConnection.add(pPlantVersionURI, RDF.TYPE, OWL.ONTOLOGY, schemaGraph);

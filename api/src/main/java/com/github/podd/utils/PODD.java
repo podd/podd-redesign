@@ -19,7 +19,6 @@ package com.github.podd.utils;
 import org.openrdf.model.URI;
 import org.openrdf.model.ValueFactory;
 import org.openrdf.model.impl.ValueFactoryImpl;
-import org.openrdf.model.vocabulary.OWL;
 
 /**
  * Interface containing URI constants for the Ontologies needed in PODD.
@@ -116,8 +115,6 @@ public interface PODD
     
     public static final URI OWL_QUALIFIED_CARDINALITY = PODD.VF
             .createURI("http://www.w3.org/2002/07/owl#qualifiedCardinality");
-    
-    public static final URI OWL_VERSION_IRI = OWL.VERSIONIRI;
     
     /** Path to default alias file */
     public static final String PATH_DEFAULT_ALIASES_FILE = "/com/github/podd/api/file/default-file-repositories.ttl";
