@@ -117,10 +117,10 @@ import com.github.podd.utils.PoddObjectLabel;
 public abstract class AbstractPoddArtifactManagerTest
 {
     /**
-     * All of the unit tests individually timeout after 600 seconds.
+     * All of the unit tests individually timeout after 30 seconds.
      */
     @Rule
-    public Timeout timeout = new Timeout(600000);
+    public Timeout timeout = new Timeout(30000);
     
     @Rule
     public TemporaryFolder tempDir = new TemporaryFolder();
@@ -1382,7 +1382,7 @@ public abstract class AbstractPoddArtifactManagerTest
         final InputStream inputStream1 = this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_20130206);
         final InferredOWLOntologyID artifactIDv1 =
                 this.testArtifactManager.loadArtifact(inputStream1, RDFFormat.TURTLE);
-        this.verifyLoadedArtifact(artifactIDv1, 12, TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES,
+        this.verifyLoadedArtifact(artifactIDv1, 11, TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES,
                 TestConstants.TEST_ARTIFACT_BASIC_1_20130206_INFERRED_TRIPLES, false);
         
         RepositoryConnection managementConnection = this.testRepositoryManager.getManagementRepositoryConnection();
@@ -1919,12 +1919,14 @@ public abstract class AbstractPoddArtifactManagerTest
         try
         {
             managementConnection = this.testRepositoryManager.getManagementRepositoryConnection();
+            managementConnection.begin();
             // prepare: load poddScience v2
             final InferredOWLOntologyID inferredPScienceOntologyID =
                     this.loadInferStoreSchema("/test/ontologies/poddScienceVXYZ.owl", RDFFormat.RDFXML, 1265, 220,
                             managementConnection, new LinkedHashSet<InferredOWLOntologyID>(version1SchemaOntologies));
             this.testSesameManager.updateManagedSchemaOntologyVersion(inferredPScienceOntologyID, true,
                     managementConnection, this.schemaGraph);
+            managementConnection.commit();
             
             // load test artifact
             final InputStream inputStream4Artifact =
@@ -1932,7 +1934,7 @@ public abstract class AbstractPoddArtifactManagerTest
             final InferredOWLOntologyID artifactId =
                     this.testArtifactManager.loadArtifact(inputStream4Artifact, RDFFormat.RDFXML);
             
-            this.verifyLoadedArtifact(artifactId, 11, TestConstants.TEST_ARTIFACT_IMPORT_PSCIENCEv1_CONCRETE_TRIPLES,
+            this.verifyLoadedArtifact(artifactId, 10, TestConstants.TEST_ARTIFACT_IMPORT_PSCIENCEv1_CONCRETE_TRIPLES,
                     TestConstants.TEST_ARTIFACT_IMPORT_PSCIENCEv1_INFERRED_TRIPLES, false);
             
             // verify:
@@ -2319,7 +2321,7 @@ public abstract class AbstractPoddArtifactManagerTest
                 PODD.VF.createURI("http://purl.org/podd/ns/poddPlant#PlantScan-6e"));
         
         final InferredOWLOntologyID updatedArtifact =
-                this.internalTestUpdateArtifact(TestConstants.TEST_ARTIFACT_20130206, RDFFormat.TURTLE, 12,
+                this.internalTestUpdateArtifact(TestConstants.TEST_ARTIFACT_20130206, RDFFormat.TURTLE, 11,
                         TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES,
                         TestConstants.TEST_ARTIFACT_BASIC_1_20130206_INFERRED_TRIPLES, false,
                         TestConstants.TEST_ARTIFACT_FRAGMENT_NEW_PLATFORM_OBJECTS, RDFFormat.TURTLE,
@@ -2894,7 +2896,7 @@ public abstract class AbstractPoddArtifactManagerTest
         final InputStream inputStream1 = this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_20130206);
         final InferredOWLOntologyID artifactIDv1 =
                 this.testArtifactManager.loadArtifact(inputStream1, RDFFormat.TURTLE);
-        this.verifyLoadedArtifact(artifactIDv1, 12, TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES,
+        this.verifyLoadedArtifact(artifactIDv1, 11, TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES,
                 TestConstants.TEST_ARTIFACT_BASIC_1_20130206_INFERRED_TRIPLES, false);
         
         // Simulate reloading all of the application
@@ -2904,11 +2906,15 @@ public abstract class AbstractPoddArtifactManagerTest
         final List<InferredOWLOntologyID> version2SchemaOntologies = this.loadVersion2SchemaOntologies();
         
         // Update from version 1 to version 2
-        this.testArtifactManager.updateSchemaImports(new InferredOWLOntologyID(artifactIDv1.getOntologyIRI(),
-                artifactIDv1.getVersionIRI(), artifactIDv1.getInferredOntologyIRI()), new LinkedHashSet<OWLOntologyID>(
-                version1SchemaOntologies), new LinkedHashSet<OWLOntologyID>(version2SchemaOntologies));
+        InferredOWLOntologyID artifactIDv2 =
+                this.testArtifactManager.updateSchemaImports(new InferredOWLOntologyID(artifactIDv1.getOntologyIRI(),
+                        artifactIDv1.getVersionIRI(), artifactIDv1.getInferredOntologyIRI()),
+                        new LinkedHashSet<OWLOntologyID>(version1SchemaOntologies), new LinkedHashSet<OWLOntologyID>(
+                                version2SchemaOntologies));
         
         final InferredOWLOntologyID afterUpdate = this.testArtifactManager.getArtifact(artifactIDv1.getOntologyIRI());
+        
+        Assert.assertEquals("Result from updateSchemaImports does not match result from getArtifact", artifactIDv2, afterUpdate);
         
         Assert.assertEquals(afterUpdate.getOntologyIRI(), artifactIDv1.getOntologyIRI());
         // Verify version for artifact changed after the schema import update, to ensure that they
@@ -2997,7 +3003,7 @@ public abstract class AbstractPoddArtifactManagerTest
         final InputStream inputStream1 = this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_20130206);
         final InferredOWLOntologyID artifactIDv1 =
                 this.testArtifactManager.loadArtifact(inputStream1, RDFFormat.TURTLE);
-        this.verifyLoadedArtifact(artifactIDv1, 12, TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES,
+        this.verifyLoadedArtifact(artifactIDv1, 11, TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES,
                 TestConstants.TEST_ARTIFACT_BASIC_1_20130206_INFERRED_TRIPLES, false);
         
         Set<? extends OWLOntologyID> realSchemaImports = this.testArtifactManager.getSchemaImports(artifactIDv1);
@@ -3172,6 +3178,11 @@ public abstract class AbstractPoddArtifactManagerTest
             final int graphSize, final URI managementGraph, final IRI ontologyIRI, final IRI versionIRI,
             final IRI inferredVersionIRI) throws RepositoryException
     {
+        if(repositoryConnection.size(managementGraph) != graphSize)
+        {
+            DebugUtils.printContents(repositoryConnection, managementGraph);
+        }
+        
         Assert.assertEquals("Graph not of expected size", graphSize, repositoryConnection.size(managementGraph));
         
         // verify: OWL_VERSION
