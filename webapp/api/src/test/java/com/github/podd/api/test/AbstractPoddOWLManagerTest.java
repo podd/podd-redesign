@@ -222,14 +222,21 @@ public abstract class AbstractPoddOWLManagerTest
             Model inferredStatements = new LinkedHashModel();
             managementConnection.export(new StatementCollector(inferredStatements), ontologyID.getInferredOntologyIRI()
                     .toOpenRDFURI());
+            Model managementStatements = new LinkedHashModel();
+            managementConnection.export(new StatementCollector(managementStatements), schemaGraph);
             
             Assert.assertFalse(concreteStatements.isEmpty());
             Assert.assertFalse(inferredStatements.isEmpty());
+            // loadAndInfer must not touch the management graph, or require it to contain any
+            // statements, as it is necessary to use this method in the bootstrap process
+            Assert.assertTrue(managementStatements.isEmpty());
+            
             Assert.assertFalse(ModelUtil.isSubset(concreteStatements, inferredStatements));
             Assert.assertFalse(ModelUtil.isSubset(inferredStatements, concreteStatements));
             
             Assert.assertEquals(6, concreteStatements.size());
             Assert.assertEquals(3, inferredStatements.size());
+            Assert.assertEquals(0, managementStatements.size());
         }
         finally
         {

@@ -709,9 +709,10 @@ public class PoddOWLManagerImpl implements PoddOWLManager
     {
         InferredOWLOntologyID inferredOWLOntologyID = null;
         OWLOntology nextOntology = null;
+        OWLOntologyManager cachedManager = null;
         try
         {
-            final OWLOntologyManager cachedManager =
+            cachedManager =
                     this.cacheSchemaOntologies(dependentSchemaOntologies, managementConnection, schemaManagementContext);
             synchronized(cachedManager)
             {
@@ -795,28 +796,37 @@ public class PoddOWLManagerImpl implements PoddOWLManager
         }
         catch(final Throwable e)
         {
-            try
+            if(cachedManager != null)
             {
-                try
+                synchronized(cachedManager)
                 {
-                    if(nextOntology != null && removeFromCacheOnException)
+                    try
                     {
-                        this.removeCache(nextOntology.getOntologyID(), dependentSchemaOntologies);
+                        try
+                        {
+                            if(nextOntology != null && removeFromCacheOnException)
+                            {
+                                this.removeCacheInternal(nextOntology.getOntologyID(), dependentSchemaOntologies,
+                                        cachedManager);
+                            }
+                        }
+                        finally
+                        {
+                            if(inferredOWLOntologyID != null && removeFromCacheOnException)
+                            {
+                                this.removeCacheInternal(inferredOWLOntologyID.getInferredOWLOntologyID(),
+                                        dependentSchemaOntologies, cachedManager);
+                            }
+                        }
+                    }
+                    catch(final Throwable e1)
+                    {
+                        // Do not propagate this exception as it will clobber the real exception
+                        // that we
+                        // want to rethrow
+                        this.log.error("Found exception while clearing memory cache: ", e1);
                     }
                 }
-                finally
-                {
-                    if(inferredOWLOntologyID != null && removeFromCacheOnException)
-                    {
-                        this.removeCache(inferredOWLOntologyID.getInferredOWLOntologyID(), dependentSchemaOntologies);
-                    }
-                }
-            }
-            catch(final Throwable e1)
-            {
-                // Do not propagate this exception as it will clobber the real exception that we
-                // want to rethrow
-                this.log.error("Found exception while clearing memory cache: ", e1);
             }
             
             throw e;
@@ -944,57 +954,66 @@ public class PoddOWLManagerImpl implements PoddOWLManager
         // cache
         synchronized(cachedManager)
         {
-            if(ontologyID == null)
+            return this.removeCacheInternal(ontologyID, dependentSchemaOntologies, cachedManager);
+        }
+    }
+    
+    private boolean removeCacheInternal(final OWLOntologyID ontologyID,
+            final Set<? extends OWLOntologyID> dependentSchemaOntologies, OWLOntologyManager cachedManager)
+        throws OWLException
+    {
+        // Use ontology ID == null to clear the cache
+        if(ontologyID == null)
+        {
+            this.log.info("Clearing manager cache: {}", dependentSchemaOntologies);
+            for(final OWLOntology nextOntology : cachedManager.getOntologies())
             {
-                for(final OWLOntology nextOntology : cachedManager.getOntologies())
+                cachedManager.removeOntology(nextOntology.getOntologyID());
+            }
+            this.managerCache.remove(dependentSchemaOntologies);
+            return true;
+        }
+        else
+        {
+            if(ontologyID instanceof InferredOWLOntologyID)
+            {
+                final boolean containsInferredOntology =
+                        cachedManager.contains(((InferredOWLOntologyID)ontologyID).getInferredOntologyIRI());
+                if(containsInferredOntology)
                 {
-                    cachedManager.removeOntology(nextOntology.getOntologyID());
+                    cachedManager.removeOntology(cachedManager.getOntology(((InferredOWLOntologyID)ontologyID)
+                            .getInferredOntologyIRI()));
                 }
-                this.managerCache.remove(dependentSchemaOntologies);
-                return true;
+                // TODO: Verify that this .contains method matches our desired
+                // semantics
+                final boolean containsOntology =
+                        cachedManager.contains(((InferredOWLOntologyID)ontologyID).getBaseOWLOntologyID());
+                
+                if(containsOntology)
+                {
+                    cachedManager.removeOntology(((InferredOWLOntologyID)ontologyID).getBaseOWLOntologyID());
+                    return !cachedManager.contains(((InferredOWLOntologyID)ontologyID).getBaseOWLOntologyID());
+                }
+                
+                return containsInferredOntology || containsOntology;
             }
             else
             {
-                if(ontologyID instanceof InferredOWLOntologyID)
+                // TODO: Verify that this .contains method matches our desired
+                // semantics
+                final boolean containsOntology = cachedManager.contains(ontologyID);
+                
+                if(containsOntology)
                 {
-                    final boolean containsInferredOntology =
-                            cachedManager.contains(((InferredOWLOntologyID)ontologyID).getInferredOntologyIRI());
-                    if(containsInferredOntology)
-                    {
-                        cachedManager.removeOntology(cachedManager.getOntology(((InferredOWLOntologyID)ontologyID)
-                                .getInferredOntologyIRI()));
-                    }
-                    // TODO: Verify that this .contains method matches our desired
-                    // semantics
-                    final boolean containsOntology =
-                            cachedManager.contains(((InferredOWLOntologyID)ontologyID).getBaseOWLOntologyID());
+                    cachedManager.removeOntology(ontologyID);
                     
-                    if(containsOntology)
-                    {
-                        cachedManager.removeOntology(((InferredOWLOntologyID)ontologyID).getBaseOWLOntologyID());
-                        return !cachedManager.contains(((InferredOWLOntologyID)ontologyID).getBaseOWLOntologyID());
-                    }
-                    
-                    return containsInferredOntology || containsOntology;
+                    // return true if the ontology manager does not contain the
+                    // ontology at this point
+                    return !cachedManager.contains(ontologyID);
                 }
                 else
                 {
-                    // TODO: Verify that this .contains method matches our desired
-                    // semantics
-                    final boolean containsOntology = cachedManager.contains(ontologyID);
-                    
-                    if(containsOntology)
-                    {
-                        cachedManager.removeOntology(ontologyID);
-                        
-                        // return true if the ontology manager does not contain the
-                        // ontology at this point
-                        return !cachedManager.contains(ontologyID);
-                    }
-                    else
-                    {
-                        return false;
-                    }
+                    return false;
                 }
             }
         }
