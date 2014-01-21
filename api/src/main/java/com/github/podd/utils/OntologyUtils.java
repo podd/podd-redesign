@@ -445,10 +445,13 @@ public class OntologyUtils
                 final URI putIfAbsent = currentVersionsMap.putIfAbsent(nextSchemaOntologyUri, nextCurrentVersionURI);
                 if(putIfAbsent != null)
                 {
-                    OntologyUtils.log.error("Found multiple version URIs for ontology: {} old={} new={}",
-                            nextSchemaOntologyUri, putIfAbsent, nextCurrentVersionURI);
-                    throw new SchemaManifestException(IRI.create(nextSchemaOntologyUri),
-                            "Found multiple version IRIs for ontology");
+                    if(!putIfAbsent.equals(nextCurrentVersionURI))
+                    {
+                        OntologyUtils.log.error("Found multiple version URIs for ontology: {} old={} new={}",
+                                nextSchemaOntologyUri, putIfAbsent, nextCurrentVersionURI);
+                        throw new SchemaManifestException(IRI.create(nextSchemaOntologyUri),
+                                "Found multiple version IRIs for ontology");
+                    }
                 }
             }
             
