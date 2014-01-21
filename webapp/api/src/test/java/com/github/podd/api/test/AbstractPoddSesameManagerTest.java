@@ -248,9 +248,9 @@ public abstract class AbstractPoddSesameManagerTest
                 ValueFactoryImpl.getInstance().createURI("urn:inferred:http://purl.org/podd/ns/version/poddScience/43");
         
         final URI pPlantOntologyURI = ValueFactoryImpl.getInstance().createURI("http://purl.org/podd/ns/poddPlant");
-        final URI pPlantVersionURI =
+        final URI pPlantVersionURIv1 =
                 ValueFactoryImpl.getInstance().createURI("http://purl.org/podd/ns/version/poddPlant/1");
-        final URI pPlantInferredURI =
+        final URI pPlantInferredURIv1 =
                 ValueFactoryImpl.getInstance().createURI("urn:inferred:http://purl.org/podd/ns/version/poddPlant/1");
         
         final URI pPlantVersionURIv2 =
@@ -265,28 +265,6 @@ public abstract class AbstractPoddSesameManagerTest
         this.testRepositoryConnection.add(pbVersionURI, PODD.PODD_BASE_INFERRED_VERSION, pbInferredURI,
                 this.schemaGraph);
         this.testRepositoryConnection.add(pbBaseOntologyURI, PODD.OMV_CURRENT_VERSION, pbVersionURI, this.schemaGraph);
-        // this.testRepositoryConnection.add(pbBaseOntologyURI,
-        // PODD.PODD_BASE_CURRENT_INFERRED_VERSION, pbInferredURI,
-        // this.schemaGraph);
-        /*
-         * The Management graph for Podd-Base created above is as follows.
-         * 
-         * <http://purl.org/podd/ns/poddBase> <RDF:Type> <OWL:Ontology>
-         * 
-         * <urn:inferred:http://purl.org/podd/ns/version/poddBase/1> <RDF:Type> <OWL:Ontology>
-         * 
-         * <http://purl.org/podd/ns/poddBase> <OWL:VersionIRI>
-         * <http://purl.org/podd/ns/version/poddBase/1>
-         * 
-         * <http://purl.org/podd/ns/version/poddBase/1> <poddBase:InferredVersion>
-         * <urn:inferred:http://purl.org/podd/ns/version/poddBase/1>
-         * 
-         * <http://purl.org/podd/ns/poddBase> <OMV:CurrentVersion>
-         * <http://purl.org/podd/ns/version/poddBase/1>
-         * 
-         * <http://purl.org/podd/ns/poddBase> <poddBase:CurrentInferredVersion>
-         * <urn:inferred:http://purl.org/podd/ns/version/poddBase/1>
-         */
         
         // Podd-Science
         this.testRepositoryConnection.add(pScienceOntologyURI, RDF.TYPE, OWL.ONTOLOGY, this.schemaGraph);
@@ -295,29 +273,24 @@ public abstract class AbstractPoddSesameManagerTest
         this.testRepositoryConnection.add(pScienceOntologyURI, PODD.OMV_CURRENT_VERSION, pScienceVersionURI,
                 this.schemaGraph);
         this.testRepositoryConnection.add(pScienceOntologyURI, OWL.IMPORTS, pbVersionURI, this.schemaGraph);
-        // this.testRepositoryConnection.add(pScienceOntologyURI,
-        // PODD.PODD_BASE_CURRENT_INFERRED_VERSION,
-        // pScienceInferredURI, this.schemaGraph);
         this.testRepositoryConnection.add(pScienceVersionURI, PODD.PODD_BASE_INFERRED_VERSION, pScienceInferredURI,
                 this.schemaGraph);
         
         // Podd-Plant
         this.testRepositoryConnection.add(pPlantOntologyURI, RDF.TYPE, OWL.ONTOLOGY, this.schemaGraph);
-        this.testRepositoryConnection.add(pPlantInferredURI, RDF.TYPE, OWL.ONTOLOGY, this.schemaGraph);
+        this.testRepositoryConnection.add(pPlantVersionURIv1, RDF.TYPE, OWL.ONTOLOGY, this.schemaGraph);
+        this.testRepositoryConnection.add(pPlantInferredURIv1, RDF.TYPE, OWL.ONTOLOGY, this.schemaGraph);
         this.testRepositoryConnection.add(pPlantVersionURIv2, RDF.TYPE, OWL.ONTOLOGY, this.schemaGraph);
         this.testRepositoryConnection.add(pPlantInferredURIv2, RDF.TYPE, OWL.ONTOLOGY, this.schemaGraph);
         
-        this.testRepositoryConnection.add(pPlantOntologyURI, OWL.VERSIONIRI, pPlantVersionURI, this.schemaGraph);
+        this.testRepositoryConnection.add(pPlantOntologyURI, OWL.VERSIONIRI, pPlantVersionURIv1, this.schemaGraph);
         this.testRepositoryConnection.add(pPlantOntologyURI, OWL.VERSIONIRI, pPlantVersionURIv2, this.schemaGraph);
         
         this.testRepositoryConnection.add(pPlantOntologyURI, PODD.OMV_CURRENT_VERSION, pPlantVersionURIv2,
                 this.schemaGraph);
         this.testRepositoryConnection.add(pPlantOntologyURI, OWL.IMPORTS, pScienceVersionURI, this.schemaGraph);
         this.testRepositoryConnection.add(pPlantOntologyURI, OWL.IMPORTS, pbVersionURI, this.schemaGraph);
-        // this.testRepositoryConnection.add(pPlantOntologyURI,
-        // PODD.PODD_BASE_CURRENT_INFERRED_VERSION,
-        // pPlantInferredURIv2, this.schemaGraph);
-        this.testRepositoryConnection.add(pPlantVersionURI, PODD.PODD_BASE_INFERRED_VERSION, pPlantInferredURI,
+        this.testRepositoryConnection.add(pPlantVersionURIv1, PODD.PODD_BASE_INFERRED_VERSION, pPlantInferredURIv1,
                 this.schemaGraph);
         
         this.testRepositoryConnection.add(pPlantVersionURIv2, PODD.PODD_BASE_INFERRED_VERSION, pPlantInferredURIv2,
