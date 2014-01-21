@@ -51,19 +51,15 @@ public final class OntologyImportsComparator implements Comparator<URI>
             OntologyImportsComparator.log.error("Ontologies have mutual imports: {} {}", o1, o2);
             throw new RuntimeException("Ontologies have mutual imports: " + o1.stringValue() + " " + o2.stringValue());
         }
+        else if(set1.equals(set2))
+        {
+            return EQUALS;
+        }
         else if(set1.contains(o2))
         {
             return AFTER;
         }
         else if(set2.contains(o1))
-        {
-            return BEFORE;
-        }
-        else if(set1.size() > set2.size())
-        {
-            return AFTER;
-        }
-        else if(set2.size() > set1.size())
         {
             return BEFORE;
         }
@@ -117,12 +113,31 @@ public final class OntologyImportsComparator implements Comparator<URI>
                 return BEFORE;
             }
             
+            for(URI nextImport1 : tempSet1)
+            {
+                int compare = this.compare(nextImport1, o2);
+                if(compare != EQUALS)
+                {
+                    return compare;
+                }
+            }
+            
+            for(URI nextImport2 : tempSet2)
+            {
+                int compare = this.compare(o1, nextImport2);
+                if(compare != EQUALS)
+                {
+                    return compare;
+                }
+            }
+            
             // Default to lexical mapping, as there is no direct semantic link between
             // them
             // at this point
             // FIXME: This should not be part of the comparison as the imports map
             // should always contain one of the URIs
-            return o1.stringValue().compareTo(o2.stringValue());
+            // return o1.stringValue().compareTo(o2.stringValue());
+            throw new RuntimeException("Could not determine comparison result for ontology imports: " + o1 + " " + o2);
         }
     }
 }
