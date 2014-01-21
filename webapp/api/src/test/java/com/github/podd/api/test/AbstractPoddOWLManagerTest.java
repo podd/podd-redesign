@@ -29,11 +29,15 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+import org.openrdf.model.Model;
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
+import org.openrdf.model.impl.LinkedHashModel;
+import org.openrdf.model.util.ModelUtil;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.rio.RDFFormat;
+import org.openrdf.rio.helpers.StatementCollector;
 import org.semanticweb.owlapi.io.OWLOntologyDocumentSource;
 import org.semanticweb.owlapi.model.OWLOntologyID;
 import org.semanticweb.owlapi.model.OWLOntologyManagerFactory;
@@ -201,15 +205,28 @@ public abstract class AbstractPoddOWLManagerTest
             OWLOntologyID replacementOntologyID = null;
             
             RioMemoryTripleSource owlSource = TestUtils.getRioTripleSource("/test/ontologies/version/1/a1.owl");
-            
+            managementConnection.begin();
             InferredOWLOntologyID ontologyID =
                     this.testOwlManager.loadAndInfer(owlSource, managementConnection, replacementOntologyID,
                             Collections.<InferredOWLOntologyID> emptySet(), managementConnection, this.schemaGraph);
+            managementConnection.commit();
             
             Assert.assertNotNull(ontologyID);
             Assert.assertNotNull(ontologyID.getOntologyIRI());
             Assert.assertNotNull(ontologyID.getVersionIRI());
             Assert.assertNotNull(ontologyID.getInferredOntologyIRI());
+            
+            Model concreteStatements = new LinkedHashModel();
+            managementConnection.export(new StatementCollector(concreteStatements), ontologyID.getVersionIRI()
+                    .toOpenRDFURI());
+            Model inferredStatements = new LinkedHashModel();
+            managementConnection.export(new StatementCollector(inferredStatements), ontologyID.getInferredOntologyIRI()
+                    .toOpenRDFURI());
+            
+            Assert.assertFalse(concreteStatements.isEmpty());
+            Assert.assertFalse(inferredStatements.isEmpty());
+            Assert.assertFalse(ModelUtil.isSubset(concreteStatements, inferredStatements));
+            Assert.assertFalse(ModelUtil.isSubset(inferredStatements, concreteStatements));
         }
         finally
         {
