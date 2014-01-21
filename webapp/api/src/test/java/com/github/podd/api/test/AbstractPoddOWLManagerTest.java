@@ -183,6 +183,7 @@ public abstract class AbstractPoddOWLManagerTest
     @Test
     public void testLoadAndInfer() throws Exception
     {
+        
         // this.testOWLManager.loadAndInfer(owlSource, permanentRepositoryConnection,
         // replacementOntologyID, dependentSchemaOntologies, managementConnection,
         // schemaManagementContext)

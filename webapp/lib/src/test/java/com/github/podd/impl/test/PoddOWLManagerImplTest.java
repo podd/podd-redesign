@@ -116,10 +116,6 @@ public class PoddOWLManagerImplTest extends AbstractPoddOWLManagerTest
     {
         super.setUp();
         
-        this.testSchemaManager = new PoddSchemaManagerImpl();
-        this.testSchemaManager.setOwlManager(this.testOwlManager);
-        this.testSchemaManager.setSesameManager(testSesameManager);
-        this.testSchemaManager.setRepositoryManager(this.testRepositoryManager);
         
     }
     
@@ -452,7 +448,7 @@ public class PoddOWLManagerImplTest extends AbstractPoddOWLManagerTest
      * .
      * 
      */
-    @Ignore("TODO: Enable this test using new methods")
+    @Ignore
     @Test
     public void testDumpOntologyToRepositoryWithEmptyOntology() throws Exception
     {

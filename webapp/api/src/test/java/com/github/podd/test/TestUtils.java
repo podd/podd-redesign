@@ -16,11 +16,24 @@
  */
 package com.github.podd.test;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.List;
+
+import org.junit.Assert;
+import org.openrdf.OpenRDFException;
+import org.openrdf.model.Model;
 import org.openrdf.model.URI;
+import org.openrdf.rio.RDFFormat;
+import org.openrdf.rio.Rio;
+import org.semanticweb.owlapi.model.OWLException;
 
 import com.github.ansell.restletutils.test.RestletTestUtils;
+import com.github.podd.api.PoddSchemaManager;
+import com.github.podd.exception.PoddException;
 import com.github.podd.restlet.PoddSesameRealm;
 import com.github.podd.restlet.PoddWebServiceApplication;
+import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.PODD;
 import com.github.podd.utils.PoddRoles;
 import com.github.podd.utils.PoddUser;
@@ -50,6 +63,48 @@ public class TestUtils
         
         // ApplicationUtils.log.debug("Added Test User to PODD: {} <{}>", testUser.getIdentifier(),
         // testUserUri);
+    }
+    
+    public static List<InferredOWLOntologyID> loadSchemaOntologies(final String schemaManifest,
+            final int expectedSchemaOntologies, PoddSchemaManager schemaManager) throws OpenRDFException, IOException,
+        OWLException, PoddException
+    {
+        Model model = null;
+        try (final InputStream schemaManifestStream =
+                TestUtils.class.getResourceAsStream(schemaManifest);)
+        {
+            final RDFFormat format = Rio.getParserFormatForFileName(schemaManifest, RDFFormat.RDFXML);
+            model = Rio.parse(schemaManifestStream, "", format);
+        }
+        
+        Assert.assertNotNull("Manifest was not loaded", model);
+        Assert.assertFalse("Manifest was not loaded correctly", model.isEmpty());
+        
+        final List<InferredOWLOntologyID> schemaOntologies = schemaManager.uploadSchemaOntologies(model);
+        
+        Assert.assertEquals("Unexpected number of schema ontologies loaded", expectedSchemaOntologies,
+                schemaOntologies.size());
+        
+        for(InferredOWLOntologyID nextSchema : schemaOntologies)
+        {
+            Assert.assertNotNull("Ontology IRI was null for schema", nextSchema.getOntologyIRI());
+            Assert.assertNotNull("Version IRI was null for schema: " + nextSchema, nextSchema.getVersionIRI());
+            Assert.assertNotNull("Inferred IRI was null for schema: " + nextSchema, nextSchema.getInferredOntologyIRI());
+        }
+        
+        return schemaOntologies;
+    }
+
+    /**
+     * This internal method loads the default schema ontologies to PODD. Should be used as a setUp()
+     * mechanism where needed.
+     */
+    public static List<InferredOWLOntologyID> loadDefaultSchemaOntologies(PoddSchemaManager schemaManager)
+        throws Exception
+    {
+        // NOTE: Update the number 12 here when updates are made to the schema manifest used by this
+        // test
+        return loadSchemaOntologies(PODD.PATH_DEFAULT_SCHEMAS, 12, schemaManager);
     }
     
     /**
