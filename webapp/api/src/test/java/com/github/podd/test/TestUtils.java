@@ -24,12 +24,17 @@ import org.junit.Assert;
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.Model;
 import org.openrdf.model.URI;
+import org.openrdf.model.util.Namespaces;
 import org.openrdf.rio.RDFFormat;
+import org.openrdf.rio.RDFParseException;
 import org.openrdf.rio.Rio;
+import org.openrdf.rio.UnsupportedRDFormatException;
 import org.semanticweb.owlapi.model.OWLException;
+import org.semanticweb.owlapi.rio.RioMemoryTripleSource;
 
 import com.github.ansell.restletutils.test.RestletTestUtils;
 import com.github.podd.api.PoddSchemaManager;
+import com.github.podd.api.test.AbstractPoddOWLManagerTest;
 import com.github.podd.exception.PoddException;
 import com.github.podd.restlet.PoddSesameRealm;
 import com.github.podd.restlet.PoddWebServiceApplication;
@@ -70,8 +75,7 @@ public class TestUtils
         OWLException, PoddException
     {
         Model model = null;
-        try (final InputStream schemaManifestStream =
-                TestUtils.class.getResourceAsStream(schemaManifest);)
+        try (final InputStream schemaManifestStream = TestUtils.class.getResourceAsStream(schemaManifest);)
         {
             final RDFFormat format = Rio.getParserFormatForFileName(schemaManifest, RDFFormat.RDFXML);
             model = Rio.parse(schemaManifestStream, "", format);
@@ -94,7 +98,7 @@ public class TestUtils
         
         return schemaOntologies;
     }
-
+    
     /**
      * This internal method loads the default schema ontologies to PODD. Should be used as a setUp()
      * mechanism where needed.
@@ -112,5 +116,17 @@ public class TestUtils
      */
     private TestUtils()
     {
+    }
+    
+    public static RioMemoryTripleSource getRioTripleSource(String classpath) throws RDFParseException,
+        UnsupportedRDFormatException, IOException
+    {
+        InputStream inputStream = AbstractPoddOWLManagerTest.class.getResourceAsStream(classpath);
+        final Model statements = Rio.parse(inputStream, "", RDFFormat.RDFXML);
+        
+        final RioMemoryTripleSource owlSource =
+                new RioMemoryTripleSource(statements.iterator(), Namespaces.asMap(statements.getNamespaces()));
+        
+        return owlSource;
     }
 }

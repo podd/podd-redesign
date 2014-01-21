@@ -16,6 +16,10 @@
  */
 package com.github.podd.api.test;
 
+import info.aduna.iteration.Iterations;
+
+import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -25,13 +29,16 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.rio.RDFFormat;
+import org.semanticweb.owlapi.io.OWLOntologyDocumentSource;
 import org.semanticweb.owlapi.model.OWLOntologyID;
 import org.semanticweb.owlapi.model.OWLOntologyManagerFactory;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
+import org.semanticweb.owlapi.rio.RioMemoryTripleSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,6 +46,7 @@ import com.github.podd.api.PoddOWLManager;
 import com.github.podd.api.PoddRepositoryManager;
 import com.github.podd.api.PoddSchemaManager;
 import com.github.podd.api.PoddSesameManager;
+import com.github.podd.test.TestUtils;
 import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.PODD;
 
@@ -158,6 +166,10 @@ public abstract class AbstractPoddOWLManagerTest
     @After
     public void tearDown() throws Exception
     {
+        this.schemaGraph = null;
+        this.testSchemaManager = null;
+        this.testSesameManager = null;
+        this.testOwlManager = null;
         this.testRepositoryManager.shutDown();
     }
     
@@ -183,9 +195,25 @@ public abstract class AbstractPoddOWLManagerTest
     @Test
     public void testLoadAndInfer() throws Exception
     {
-        
-        // this.testOWLManager.loadAndInfer(owlSource, permanentRepositoryConnection,
-        // replacementOntologyID, dependentSchemaOntologies, managementConnection,
-        // schemaManagementContext)
+        RepositoryConnection managementConnection = this.testRepositoryManager.getManagementRepositoryConnection();
+        try
+        {
+            OWLOntologyID replacementOntologyID = null;
+            
+            RioMemoryTripleSource owlSource = TestUtils.getRioTripleSource("/test/ontologies/version/1/a1.owl");
+            
+            InferredOWLOntologyID ontologyID =
+                    this.testOwlManager.loadAndInfer(owlSource, managementConnection, replacementOntologyID,
+                            Collections.<InferredOWLOntologyID> emptySet(), managementConnection, this.schemaGraph);
+            
+            Assert.assertNotNull(ontologyID);
+            Assert.assertNotNull(ontologyID.getOntologyIRI());
+            Assert.assertNotNull(ontologyID.getVersionIRI());
+            Assert.assertNotNull(ontologyID.getInferredOntologyIRI());
+        }
+        finally
+        {
+            managementConnection.close();
+        }
     }
 }
