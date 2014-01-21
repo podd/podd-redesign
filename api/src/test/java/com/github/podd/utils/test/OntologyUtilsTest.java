@@ -674,6 +674,31 @@ public class OntologyUtilsTest
     }
     
     @Test
+    public void testGetSchemaManifestImportsRealisticPoddV1DcBase() throws Exception
+    {
+        final Model model =
+                Rio.parse(this.getClass().getResourceAsStream("/test/test-podd-schema-manifest.ttl"), "",
+                        RDFFormat.TURTLE);
+        
+        // DebugUtils.printContents(model);
+        final List<OWLOntologyID> schemaManifestImports =
+                OntologyUtils.schemaManifestImports(model,
+                        new HashSet<OWLOntologyID>(Arrays.asList(this.testPoddBaseV1)));
+        
+        Assert.assertNotNull(schemaManifestImports);
+        Assert.assertEquals(4, schemaManifestImports.size());
+        Assert.assertTrue(schemaManifestImports.contains(this.testPoddDcV1));
+        Assert.assertTrue(schemaManifestImports.contains(this.testPoddFoafV1));
+        Assert.assertTrue(schemaManifestImports.contains(this.testPoddUserV1));
+        Assert.assertTrue(schemaManifestImports.contains(this.testPoddBaseV1));
+        Assert.assertEquals(this.testPoddDcV1, schemaManifestImports.get(0));
+        Assert.assertEquals(this.testPoddFoafV1, schemaManifestImports.get(1));
+        Assert.assertEquals(this.testPoddUserV1, schemaManifestImports.get(2));
+        Assert.assertEquals(this.testPoddBaseV1, schemaManifestImports.get(3));
+        
+    }
+    
+    @Test
     public void testGetSchemaManifestImportsRealisticPoddV2All() throws Exception
     {
         final Model model =
