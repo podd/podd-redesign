@@ -737,7 +737,7 @@ public class OntologyUtilsTest
     }
     
     @Test
-    public void testGetSchemaManifestImportsRealisticPoddV1V2AllToBase() throws Exception
+    public void testGetSchemaManifestImportsRealisticPoddV1V2AllToBaseInOrder() throws Exception
     {
         final Model model =
                 Rio.parse(this.getClass().getResourceAsStream("/test/test-podd-schema-manifest.ttl"), "",
@@ -747,9 +747,50 @@ public class OntologyUtilsTest
         final List<OWLOntologyID> schemaManifestImports =
                 OntologyUtils.schemaManifestImports(
                         model,
-                        new HashSet<OWLOntologyID>(Arrays.asList(this.testPoddDcV1, this.testPoddDcV2,
+                        new LinkedHashSet<OWLOntologyID>(Arrays.asList(this.testPoddDcV1, this.testPoddDcV2,
                                 this.testPoddFoafV1, this.testPoddFoafV2, this.testPoddUserV1, this.testPoddUserV2,
                                 this.testPoddBaseV1, this.testPoddBaseV2)));
+        
+        Assert.assertNotNull(schemaManifestImports);
+        Assert.assertEquals(8, schemaManifestImports.size());
+        Assert.assertTrue(schemaManifestImports.contains(this.testPoddDcV1));
+        Assert.assertTrue(schemaManifestImports.contains(this.testPoddDcV2));
+        Assert.assertTrue(schemaManifestImports.contains(this.testPoddFoafV1));
+        Assert.assertTrue(schemaManifestImports.contains(this.testPoddFoafV2));
+        Assert.assertTrue(schemaManifestImports.contains(this.testPoddUserV1));
+        Assert.assertTrue(schemaManifestImports.contains(this.testPoddUserV2));
+        Assert.assertTrue(schemaManifestImports.contains(this.testPoddBaseV1));
+        Assert.assertTrue(schemaManifestImports.contains(this.testPoddBaseV2));
+        
+        Assert.assertTrue(schemaManifestImports.indexOf(testPoddDcV1) < schemaManifestImports.indexOf(testPoddFoafV1));
+        Assert.assertTrue(schemaManifestImports.indexOf(testPoddDcV1) < schemaManifestImports.indexOf(testPoddUserV1));
+        Assert.assertTrue(schemaManifestImports.indexOf(testPoddDcV1) < schemaManifestImports.indexOf(testPoddBaseV1));
+        Assert.assertTrue(schemaManifestImports.indexOf(testPoddFoafV1) < schemaManifestImports.indexOf(testPoddUserV1));
+        Assert.assertTrue(schemaManifestImports.indexOf(testPoddFoafV1) < schemaManifestImports.indexOf(testPoddBaseV1));
+        Assert.assertTrue(schemaManifestImports.indexOf(testPoddUserV1) < schemaManifestImports.indexOf(testPoddBaseV1));
+        
+        Assert.assertTrue(schemaManifestImports.indexOf(testPoddDcV2) < schemaManifestImports.indexOf(testPoddFoafV2));
+        Assert.assertTrue(schemaManifestImports.indexOf(testPoddDcV2) < schemaManifestImports.indexOf(testPoddUserV2));
+        Assert.assertTrue(schemaManifestImports.indexOf(testPoddDcV2) < schemaManifestImports.indexOf(testPoddBaseV2));
+        Assert.assertTrue(schemaManifestImports.indexOf(testPoddFoafV2) < schemaManifestImports.indexOf(testPoddUserV2));
+        Assert.assertTrue(schemaManifestImports.indexOf(testPoddFoafV2) < schemaManifestImports.indexOf(testPoddBaseV2));
+        Assert.assertTrue(schemaManifestImports.indexOf(testPoddUserV2) < schemaManifestImports.indexOf(testPoddBaseV2));
+    }
+    
+    @Test
+    public void testGetSchemaManifestImportsRealisticPoddV1V2AllToBaseReverseOrder() throws Exception
+    {
+        final Model model =
+                Rio.parse(this.getClass().getResourceAsStream("/test/test-podd-schema-manifest.ttl"), "",
+                        RDFFormat.TURTLE);
+        
+        // DebugUtils.printContents(model);
+        final List<OWLOntologyID> schemaManifestImports =
+                OntologyUtils.schemaManifestImports(
+                        model,
+                        new LinkedHashSet<OWLOntologyID>(Arrays.asList(this.testPoddBaseV1, this.testPoddBaseV2,
+                                this.testPoddUserV1, this.testPoddUserV2, this.testPoddFoafV1, this.testPoddFoafV2,
+                                this.testPoddDcV1, this.testPoddDcV2)));
         
         Assert.assertNotNull(schemaManifestImports);
         Assert.assertEquals(8, schemaManifestImports.size());
