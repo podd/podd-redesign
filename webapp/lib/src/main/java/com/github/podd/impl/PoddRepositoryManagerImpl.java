@@ -333,15 +333,17 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
                                             if(!permanentConnection.hasStatement(null, null, null, false,
                                                     nextSchemaOntology.getVersionIRI().toOpenRDFURI()))
                                             {
-                                                permanentConnection.add(managementConnection.getStatements(null, null,
-                                                        null, false, nextSchemaOntology.getVersionIRI().toOpenRDFURI()),
+                                                permanentConnection.add(
+                                                        managementConnection.getStatements(null, null, null, false,
+                                                                nextSchemaOntology.getVersionIRI().toOpenRDFURI()),
                                                         nextSchemaOntology.getVersionIRI().toOpenRDFURI());
                                             }
                                             
                                             final RepositoryResult<Statement> statements =
-                                                    managementConnection.getStatements(nextSchemaOntology.getVersionIRI()
-                                                            .toOpenRDFURI(), PODD.PODD_BASE_INFERRED_VERSION, null, false,
-                                                            this.getSchemaManagementGraph());
+                                                    managementConnection.getStatements(nextSchemaOntology
+                                                            .getVersionIRI().toOpenRDFURI(),
+                                                            PODD.PODD_BASE_INFERRED_VERSION, null, false, this
+                                                                    .getSchemaManagementGraph());
                                             
                                             for(final Statement nextInferredStatement : Iterations.asList(statements))
                                             {
@@ -350,8 +352,9 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
                                                     if(!permanentConnection.hasStatement(null, null, null, false,
                                                             (URI)nextInferredStatement.getObject()))
                                                     {
-                                                        permanentConnection.add(managementConnection.getStatements(null,
-                                                                null, null, false, (URI)nextInferredStatement.getObject()),
+                                                        permanentConnection.add(managementConnection.getStatements(
+                                                                null, null, null, false,
+                                                                (URI)nextInferredStatement.getObject()),
                                                                 (URI)nextInferredStatement.getObject());
                                                     }
                                                 }
@@ -518,6 +521,10 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
                     returnValue = false;
                 }
                 else if(nextContext.equals(this.getFileRepositoryManagementGraph()))
+                {
+                    returnValue = false;
+                }
+                else if(nextContext.equals(this.repositoryGraph))
                 {
                     returnValue = false;
                 }
@@ -863,13 +870,12 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
                 Literal nextUrl = managementConnection.getValueFactory().createLiteral(repositoryManagerUrl);
                 managementConnection.add(newRepositoryManagerURI, PODD.PODD_REPOSITORY_MANAGER_TYPE,
                         PODD.PODD_REPOSITORY_MANAGER_TYPE_REMOTE, repositoryManagementContext);
-                managementConnection.add(newRepositoryManagerURI, PODD.PODD_REPOSITORY_MANAGER_REMOTE_SERVER_URL, nextUrl,
-                        repositoryManagementContext);
+                managementConnection.add(newRepositoryManagerURI, PODD.PODD_REPOSITORY_MANAGER_REMOTE_SERVER_URL,
+                        nextUrl, repositoryManagementContext);
             }
             
             RepositoryManager putIfAbsent =
-                    sesameRepositoryManagers.putIfAbsent((URI)newRepositoryManagerURI,
-                            repositoryManager);
+                    sesameRepositoryManagers.putIfAbsent((URI)newRepositoryManagerURI, repositoryManager);
             if(putIfAbsent != null)
             {
                 repositoryManager.shutDown();
