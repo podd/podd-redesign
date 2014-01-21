@@ -227,6 +227,9 @@ public abstract class AbstractPoddOWLManagerTest
             Assert.assertFalse(inferredStatements.isEmpty());
             Assert.assertFalse(ModelUtil.isSubset(concreteStatements, inferredStatements));
             Assert.assertFalse(ModelUtil.isSubset(inferredStatements, concreteStatements));
+            
+            Assert.assertEquals(6, concreteStatements.size());
+            Assert.assertEquals(3, inferredStatements.size());
         }
         finally
         {
