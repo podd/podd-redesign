@@ -105,6 +105,7 @@ import com.github.podd.exception.EmptyOntologyException;
 import com.github.podd.exception.InconsistentOntologyException;
 import com.github.podd.exception.OntologyNotInProfileException;
 import com.github.podd.exception.PoddException;
+import com.github.podd.utils.DebugUtils;
 import com.github.podd.utils.DeduplicatingRDFInserter;
 import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.OntologyUtils;
@@ -288,6 +289,8 @@ public class PoddOWLManagerImpl implements PoddOWLManager
         
         final Model schemaManagementTriples = new LinkedHashModel();
         managementConnection.export(new StatementCollector(schemaManagementTriples), schemaManagementContext);
+        
+        DebugUtils.printContents(schemaManagementTriples);
         
         final List<OWLOntologyID> manifestImports =
                 OntologyUtils.schemaManifestImports(schemaManagementTriples, ontologyIDs);

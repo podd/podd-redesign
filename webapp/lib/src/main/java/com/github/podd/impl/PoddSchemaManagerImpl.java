@@ -42,6 +42,7 @@ import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.openrdf.model.impl.LinkedHashModel;
 import org.openrdf.model.util.ModelException;
+import org.openrdf.model.vocabulary.OWL;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.RepositoryResult;
@@ -500,6 +501,16 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
                         
                         this.setUpdateManagedSchemaOntologyVersionInternal(nextResult, updateCurrent,
                                 managementConnection, this.repositoryManager.getSchemaManagementGraph());
+                        
+                        List<Statement> importStatements =
+                                Iterations.asList(managementConnection.getStatements(nextResult.getOntologyIRI()
+                                        .toOpenRDFURI(), OWL.IMPORTS, null, true, nextResult.getVersionIRI()
+                                        .toOpenRDFURI()));
+                        for(Statement nextImportStatement : importStatements)
+                        {
+                            managementConnection.add(nextResult.getVersionIRI().toOpenRDFURI(), OWL.IMPORTS,
+                                    nextImportStatement.getObject(), this.repositoryManager.getSchemaManagementGraph());
+                        }
                         
                         results.add(nextResult);
                     }
