@@ -332,6 +332,7 @@ public abstract class AbstractPoddSchemaManagerTest
     @Test
     public final void testDownloadSchemaOntologyWithInferencesOnlyOntologyIRI() throws Exception
     {
+        this.testSchemaManager.downloadSchemaOntology(schemaOntologyID, outputStream, format, includeInferences);
         Assert.fail("Not yet implemented"); // TODO
     }
     
