@@ -25,6 +25,9 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+import org.openrdf.model.URI;
+import org.openrdf.repository.Repository;
+import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.rio.RDFFormat;
 import org.semanticweb.owlapi.model.OWLOntologyID;
 import org.semanticweb.owlapi.model.OWLOntologyManagerFactory;
@@ -33,7 +36,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.github.podd.api.PoddOWLManager;
+import com.github.podd.api.PoddRepositoryManager;
+import com.github.podd.api.PoddSchemaManager;
+import com.github.podd.api.PoddSesameManager;
 import com.github.podd.utils.InferredOWLOntologyID;
+import com.github.podd.utils.PODD;
 
 /**
  * Abstract test to verify that the PoddOWLManager API contract is followed by implementations.
@@ -50,7 +57,15 @@ public abstract class AbstractPoddOWLManagerTest
     
     protected Logger log = LoggerFactory.getLogger(this.getClass());
     
-    protected PoddOWLManager testOWLManager;
+    protected PoddOWLManager testOwlManager;
+    
+    protected URI schemaGraph;
+    
+    protected PoddRepositoryManager testRepositoryManager;
+    
+    protected PoddSchemaManager testSchemaManager;
+    
+    protected PoddSesameManager testSesameManager;
     
     /**
      * @return A new OWLReasonerFactory instance for use with the PoddOWLManager
@@ -72,6 +87,25 @@ public abstract class AbstractPoddOWLManagerTest
             OWLReasonerFactory nextReasonerFactory);
     
     /**
+     * 
+     * @return A new instance of {@link PoddRepositoryManager}, for each call to this method.
+     * @throws Exception
+     */
+    protected abstract PoddRepositoryManager getNewPoddRepositoryManagerInstance() throws Exception;
+    
+    /**
+     * 
+     * @return A new instance of {@link PoddSchemaManager}, for each call to this method.
+     */
+    protected abstract PoddSchemaManager getNewPoddSchemaManagerInstance();
+    
+    /**
+     * 
+     * @return A new instance of {@link PoddSesameManager}, for each call to this method.
+     */
+    protected abstract PoddSesameManager getNewPoddSesameManagerInstance();
+    
+    /**
      * Helper method which loads podd:dcTerms, podd:foaf and podd:User schema ontologies.
      */
     protected abstract List<InferredOWLOntologyID> loadDcFoafAndPoddUserSchemaOntologies() throws Exception;
@@ -88,7 +122,8 @@ public abstract class AbstractPoddOWLManagerTest
      */
     protected abstract InferredOWLOntologyID loadInferStoreOntology(final String resourcePath, final RDFFormat format,
             final long assertedStatements, final long inferredStatements,
-            final Set<? extends OWLOntologyID> dependentSchemaOntologies) throws Exception;
+            final Set<? extends OWLOntologyID> dependentSchemaOntologies,
+            final RepositoryConnection managementConnection) throws Exception;
     
     /**
      * @throws java.lang.Exception
@@ -101,9 +136,20 @@ public abstract class AbstractPoddOWLManagerTest
         
         final OWLOntologyManagerFactory managerFactory = this.getNewOWLOntologyManagerFactory();
         
-        this.testOWLManager = this.getNewPoddOWLManagerInstance(managerFactory, reasonerFactory);
-        Assert.assertNotNull("Null implementation of test OWLManager", this.testOWLManager);
+        this.testOwlManager = this.getNewPoddOWLManagerInstance(managerFactory, reasonerFactory);
+        Assert.assertNotNull("Null implementation of test OWLManager", this.testOwlManager);
         
+        this.schemaGraph = PODD.VF.createURI("urn:test:owlmanager:schemagraph");
+        
+        this.testSchemaManager = this.getNewPoddSchemaManagerInstance();
+        
+        this.testRepositoryManager = this.getNewPoddRepositoryManagerInstance();
+        this.testSchemaManager.setRepositoryManager(this.testRepositoryManager);
+        
+        this.testSesameManager = this.getNewPoddSesameManagerInstance();
+        this.testSchemaManager.setSesameManager(this.testSesameManager);
+        
+        this.testSchemaManager.setOwlManager(this.testOwlManager);
     }
     
     /**
@@ -112,8 +158,7 @@ public abstract class AbstractPoddOWLManagerTest
     @After
     public void tearDown() throws Exception
     {
-        
-        this.testOWLManager = null;
+        this.testRepositoryManager.shutDown();
     }
     
     /**
@@ -127,7 +172,7 @@ public abstract class AbstractPoddOWLManagerTest
     {
         try
         {
-            this.testOWLManager.removeCache(null, null);
+            this.testOwlManager.removeCache(null, null);
             Assert.fail("Should have thrown a NullPointerException");
         }
         catch(final NullPointerException e)
@@ -135,4 +180,11 @@ public abstract class AbstractPoddOWLManagerTest
         }
     }
     
+    @Test
+    public void testLoadAndInfer() throws Exception
+    {
+        // this.testOWLManager.loadAndInfer(owlSource, permanentRepositoryConnection,
+        // replacementOntologyID, dependentSchemaOntologies, managementConnection,
+        // schemaManagementContext)
+    }
 }
