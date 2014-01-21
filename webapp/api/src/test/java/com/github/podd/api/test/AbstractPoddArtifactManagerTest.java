@@ -3246,8 +3246,10 @@ public abstract class AbstractPoddArtifactManagerTest
                 model.filter(ontologyIRI.toOpenRDFURI(), PODD.OMV_CURRENT_VERSION, null).size());
         
         // verify: INFERRED_VERSION
-        Assert.assertTrue("Graph should have the correct PODD_BASE_INFERRED_VERSION statement",
-                model.contains(versionIRI.toOpenRDFURI(), PODD.PODD_BASE_INFERRED_VERSION, versionIRI.toOpenRDFURI()));
+        Assert.assertTrue(
+                "Graph should have the correct PODD_BASE_INFERRED_VERSION statement",
+                model.contains(versionIRI.toOpenRDFURI(), PODD.PODD_BASE_INFERRED_VERSION,
+                        inferredVersionIRI.toOpenRDFURI()));
         Assert.assertEquals("Graph should have exactly one PODD_BASE_INFERRED_VERSION statement for version", 1, model
                 .filter(versionIRI.toOpenRDFURI(), PODD.PODD_BASE_INFERRED_VERSION, null).size());
     }
