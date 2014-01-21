@@ -572,16 +572,25 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
             
             // TODO: Call this method directly from other methods so that the whole transaction can
             // be rolled back if there are any failures!
-            final InferredOWLOntologyID result =
+            final InferredOWLOntologyID nextResult =
                     this.uploadSchemaOntologyInternal(schemaOntologyID, inputStream, fileFormat, managementConnection,
                             this.repositoryManager.getSchemaManagementGraph(), dependentSchemaOntologies);
             
-            this.setUpdateManagedSchemaOntologyVersionInternal(result, true, managementConnection,
+            this.setUpdateManagedSchemaOntologyVersionInternal(nextResult, true, managementConnection,
                     this.repositoryManager.getSchemaManagementGraph());
+            
+            List<Statement> importStatements =
+                    Iterations.asList(managementConnection.getStatements(nextResult.getOntologyIRI().toOpenRDFURI(),
+                            OWL.IMPORTS, null, true, nextResult.getVersionIRI().toOpenRDFURI()));
+            for(Statement nextImportStatement : importStatements)
+            {
+                managementConnection.add(nextResult.getVersionIRI().toOpenRDFURI(), OWL.IMPORTS,
+                        nextImportStatement.getObject(), this.repositoryManager.getSchemaManagementGraph());
+            }
             
             managementConnection.commit();
             
-            return result;
+            return nextResult;
         }
         catch(final Throwable e)
         {
