@@ -1322,6 +1322,26 @@ public abstract class AbstractPoddSchemaManagerTest
             Assert.assertTrue(currentSchemaOntologies.contains(nextSchemaOntology));
             Assert.assertTrue(allSchemaOntologies.contains(nextSchemaOntology));
         }
+        
+        for(InferredOWLOntologyID nextSchemaOntology : currentSchemaOntologies)
+        {
+            Assert.assertNotNull(nextSchemaOntology.getOntologyIRI());
+            Assert.assertNotNull(nextSchemaOntology.getVersionIRI());
+            Assert.assertNotNull(nextSchemaOntology.getInferredOntologyIRI());
+            
+            Assert.assertTrue(schemaOntologies.contains(nextSchemaOntology));
+            Assert.assertTrue(allSchemaOntologies.contains(nextSchemaOntology));
+        }
+        
+        for(InferredOWLOntologyID nextSchemaOntology : allSchemaOntologies)
+        {
+            Assert.assertNotNull(nextSchemaOntology.getOntologyIRI());
+            Assert.assertNotNull(nextSchemaOntology.getVersionIRI());
+            Assert.assertNotNull(nextSchemaOntology.getInferredOntologyIRI());
+            
+            Assert.assertTrue(currentSchemaOntologies.contains(nextSchemaOntology));
+            Assert.assertTrue(schemaOntologies.contains(nextSchemaOntology));
+        }
     }
     
 }
