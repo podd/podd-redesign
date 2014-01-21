@@ -3027,7 +3027,6 @@ public abstract class AbstractPoddArtifactManagerTest
      * {@link com.github.podd.api.PoddArtifactManager#updateSchemaImports(InferredOWLOntologyID, Set, Set)}
      * .
      */
-    @Ignore("TODO: Enable manual upload tests")
     @Test
     public final void testUpdateSchemaImportsEmptySchemas() throws Exception
     {
@@ -3037,16 +3036,20 @@ public abstract class AbstractPoddArtifactManagerTest
         final InputStream inputStream1 = this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_20130206);
         final InferredOWLOntologyID artifactIDv1 =
                 this.testArtifactManager.loadArtifact(inputStream1, RDFFormat.TURTLE);
-        this.verifyLoadedArtifact(artifactIDv1, 12, TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES,
+        this.verifyLoadedArtifact(artifactIDv1, 11, TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES,
                 TestConstants.TEST_ARTIFACT_BASIC_1_20130206_INFERRED_TRIPLES, false);
         
-        final InferredOWLOntologyID updateSchemaImports =
-                this.testArtifactManager.updateSchemaImports(new InferredOWLOntologyID(artifactIDv1.getOntologyIRI(),
-                        artifactIDv1.getVersionIRI(), artifactIDv1.getInferredOntologyIRI()),
-                        new HashSet<OWLOntologyID>(), new HashSet<OWLOntologyID>());
-        
-        Assert.assertEquals(updateSchemaImports.getOntologyIRI(), artifactIDv1.getOntologyIRI());
-        Assert.assertNotEquals(updateSchemaImports.getVersionIRI(), artifactIDv1.getVersionIRI());
+        try
+        {
+            this.testArtifactManager.updateSchemaImports(new InferredOWLOntologyID(artifactIDv1.getOntologyIRI(),
+                    artifactIDv1.getVersionIRI(), artifactIDv1.getInferredOntologyIRI()), new HashSet<OWLOntologyID>(),
+                    new HashSet<OWLOntologyID>());
+            Assert.fail("Did not receive the expected exception");
+        }
+        catch(IllegalArgumentException e)
+        {
+            Assert.assertEquals("Schema ontologies cannot be empty", e.getMessage());
+        }
     }
     
     /**
