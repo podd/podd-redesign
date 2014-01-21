@@ -291,8 +291,7 @@ public abstract class AbstractPoddSesameManagerTest
         // Podd-Science
         this.testRepositoryConnection.add(pScienceOntologyURI, RDF.TYPE, OWL.ONTOLOGY, this.schemaGraph);
         this.testRepositoryConnection.add(pScienceInferredURI, RDF.TYPE, OWL.ONTOLOGY, this.schemaGraph);
-        this.testRepositoryConnection.add(pScienceOntologyURI, OWL.VERSIONIRI, pScienceVersionURI,
-                this.schemaGraph);
+        this.testRepositoryConnection.add(pScienceOntologyURI, OWL.VERSIONIRI, pScienceVersionURI, this.schemaGraph);
         this.testRepositoryConnection.add(pScienceOntologyURI, PODD.OMV_CURRENT_VERSION, pScienceVersionURI,
                 this.schemaGraph);
         this.testRepositoryConnection.add(pScienceOntologyURI, OWL.IMPORTS, pbVersionURI, this.schemaGraph);
@@ -309,8 +308,7 @@ public abstract class AbstractPoddSesameManagerTest
         this.testRepositoryConnection.add(pPlantInferredURIv2, RDF.TYPE, OWL.ONTOLOGY, this.schemaGraph);
         
         this.testRepositoryConnection.add(pPlantOntologyURI, OWL.VERSIONIRI, pPlantVersionURI, this.schemaGraph);
-        this.testRepositoryConnection
-                .add(pPlantOntologyURI, OWL.VERSIONIRI, pPlantVersionURIv2, this.schemaGraph);
+        this.testRepositoryConnection.add(pPlantOntologyURI, OWL.VERSIONIRI, pPlantVersionURIv2, this.schemaGraph);
         
         this.testRepositoryConnection.add(pPlantOntologyURI, PODD.OMV_CURRENT_VERSION, pPlantVersionURIv2,
                 this.schemaGraph);
@@ -462,6 +460,38 @@ public abstract class AbstractPoddSesameManagerTest
                         this.schemaGraph);
         
         Assert.assertEquals("Incorrect number of schema ontologies", 3, allSchemaOntologyVersions.size());
+        for(final InferredOWLOntologyID ontoID : allSchemaOntologyVersions)
+        {
+            Assert.assertTrue("Missing ontology IRI", expectedIriList.contains(ontoID.getOntologyIRI()));
+            Assert.assertTrue("Missing version IRI", expectedIriList.contains(ontoID.getVersionIRI()));
+            Assert.assertNotNull("Inferred IRI was null: " + ontoID, ontoID.getInferredOntologyIRI());
+            Assert.assertTrue("Missing inferred IRI", expectedIriList.contains(ontoID.getInferredOntologyIRI()));
+        }
+    }
+    
+    @Test
+    public void testGetAllSchemaOntologyVersions() throws Exception
+    {
+        this.populateSchemaManagementGraph();
+        
+        final Set<IRI> expectedIriList =
+                new HashSet<>(Arrays.asList(IRI.create("http://purl.org/podd/ns/poddBase"),
+                        IRI.create("http://purl.org/podd/ns/version/poddBase/1"),
+                        IRI.create("urn:inferred:http://purl.org/podd/ns/version/poddBase/1"),
+                        IRI.create("http://purl.org/podd/ns/poddScience"),
+                        IRI.create("http://purl.org/podd/ns/version/poddScience/27"),
+                        IRI.create("urn:inferred:http://purl.org/podd/ns/version/poddScience/43"),
+                        IRI.create("http://purl.org/podd/ns/poddPlant"),
+                        IRI.create("http://purl.org/podd/ns/version/poddPlant/1"),
+                        IRI.create("urn:inferred:http://purl.org/podd/ns/version/poddPlant/1"),
+                        IRI.create("http://purl.org/podd/ns/version/poddPlant/2"),
+                        IRI.create("urn:inferred:http://purl.org/podd/ns/version/poddPlant/2")));
+        
+        final Set<InferredOWLOntologyID> allSchemaOntologyVersions =
+                this.testPoddSesameManager
+                        .getAllSchemaOntologyVersions(this.testRepositoryConnection, this.schemaGraph);
+        
+        Assert.assertEquals("Incorrect number of schema ontologies", 4, allSchemaOntologyVersions.size());
         for(final InferredOWLOntologyID ontoID : allSchemaOntologyVersions)
         {
             Assert.assertTrue("Missing ontology IRI", expectedIriList.contains(ontoID.getOntologyIRI()));
