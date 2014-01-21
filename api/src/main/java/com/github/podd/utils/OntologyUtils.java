@@ -811,7 +811,7 @@ public class OntologyUtils
         
         OntologyUtils.postSort(orderImports, importsMap);
         
-        final List<InferredOWLOntologyID> ontologyIDs = OntologyUtils.modelToOntologyIDs(model, true, false);
+        final List<InferredOWLOntologyID> ontologyIDs = OntologyUtils.modelToOntologyIDs(model, false, true);
         
         final Set<OWLOntologyID> finalOrderImports =
                 OntologyUtils.finalOrderImports(results, ontologyIDs, orderImports, artifactImports, importsMap);
