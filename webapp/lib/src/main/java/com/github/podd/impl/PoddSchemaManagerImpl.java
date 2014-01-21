@@ -308,7 +308,7 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
         {
             managementConnection = this.repositoryManager.getManagementRepositoryConnection();
             
-            this.setCurrentSchemaOntologyVersionInternal(schemaOntologyID, managementConnection,
+            this.setUpdateManagedSchemaOntologyVersionInternal(schemaOntologyID, true, managementConnection,
                     this.repositoryManager.getSchemaManagementGraph());
         }
         finally
@@ -320,11 +320,11 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
         }
     }
     
-    private void setCurrentSchemaOntologyVersionInternal(final OWLOntologyID schemaOntologyID,
-            final RepositoryConnection managementConnection, final URI schemaManagementContext)
+    private void setUpdateManagedSchemaOntologyVersionInternal(final OWLOntologyID schemaOntologyID,
+            boolean updateCurrent, final RepositoryConnection managementConnection, final URI schemaManagementContext)
         throws UnmanagedSchemaOntologyIDException, OpenRDFException
     {
-        this.sesameManager.updateManagedSchemaOntologyVersion(schemaOntologyID, true, managementConnection,
+        this.sesameManager.updateManagedSchemaOntologyVersion(schemaOntologyID, updateCurrent, managementConnection,
                 schemaManagementContext);
     }
     
@@ -378,8 +378,12 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
      * IRIs, import all of the ontologies which have new versions.
      * 
      * @param model
+     *            The complete schema ontology information.
      * @param nextImportOrder
-     * @param allOntologyIDs
+     *            The order of the schema imports.
+     * @param currentVersionsMap
+     *            A map specifying what the current versions for each schema ontology are to be
+     *            after the uploads complete.
      * @return The IDs for the schema ontologies that were successfully uploaded.
      * @throws ModelException
      * @throws OpenRDFException
@@ -444,6 +448,8 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
                     }
                     else
                     {
+                        this.log.error("Found an already loaded ontology without an inferred IRI: {}",
+                                loadEntry.getKey());
                         results.add(new InferredOWLOntologyID(loadEntry.getKey().getOntologyIRI(), loadEntry.getKey()
                                 .getVersionIRI(), null));
                     }
@@ -473,15 +479,17 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
                                         managementConnection, this.repositoryManager.getSchemaManagementGraph(),
                                         new LinkedHashSet<OWLOntologyID>(results));
                         
-                        this.setCurrentSchemaOntologyVersionInternal(nextResult, managementConnection,
-                                this.repositoryManager.getSchemaManagementGraph());
+                        boolean updateCurrent = true;
+                        if(currentVersionsMap.containsKey(nextResult.getOntologyIRI()))
+                        {
+                            if(!currentVersionsMap.get(nextResult.getOntologyIRI()).equals(nextResult.getVersionIRI()))
+                            {
+                                updateCurrent = false;
+                            }
+                        }
                         
-                        // throw new
-                        // RuntimeException("Need to call setCurrentSchemaOntologyVersion here");
-                        
-                        // Also need to pull back in the change that inlines
-                        // getCurrentSchemaOntologies() above, which may have broke tests due to the
-                        // absence of the above method
+                        this.setUpdateManagedSchemaOntologyVersionInternal(nextResult, updateCurrent,
+                                managementConnection, this.repositoryManager.getSchemaManagementGraph());
                         
                         results.add(nextResult);
                     }
@@ -547,6 +555,9 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
                     this.uploadSchemaOntologyInternal(schemaOntologyID, inputStream, fileFormat, managementConnection,
                             this.repositoryManager.getSchemaManagementGraph(), dependentSchemaOntologies);
             
+            this.setUpdateManagedSchemaOntologyVersionInternal(result, true, managementConnection,
+                    this.repositoryManager.getSchemaManagementGraph());
+            
             managementConnection.commit();
             
             return result;
@@ -601,8 +612,9 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
         
         // update the link in the schema ontology management graph
         // TODO: This may not be the right method for this purpose
-        this.sesameManager.updateManagedSchemaOntologyVersion(nextInferredOntology, true, managementConnection,
-                schemaManagementGraph);
+        // this.sesameManager.updateManagedSchemaOntologyVersion(nextInferredOntology, true,
+        // managementConnection,
+        // schemaManagementGraph);
         
         return nextInferredOntology;
         // TODO: Why are we not able to return nextInferredOntology here
