@@ -22,8 +22,6 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map.Entry;
@@ -734,110 +732,7 @@ public class OntologyUtils
     
     private static void postSort(final List<URI> importOrder, final ConcurrentMap<URI, Set<URI>> importsMap)
     {
-        Collections.sort(importOrder, new Comparator<URI>()
-            {
-                @Override
-                public int compare(final URI o1, final URI o2)
-                {
-                    if(o1.equals(o2))
-                    {
-                        return 0;
-                    }
-                    
-                    Set<URI> set1 = importsMap.get(o1);
-                    Set<URI> set2 = importsMap.get(o2);
-                    
-                    if(set1 == null)
-                    {
-                        set1 = Collections.emptySet();
-                    }
-                    
-                    if(set2 == null)
-                    {
-                        set2 = Collections.emptySet();
-                    }
-                    
-                    if(set1.contains(o2) && set2.contains(o1))
-                    {
-                        OntologyUtils.log.error("Ontologies have mutual imports: {} {}", o1, o2);
-                        throw new RuntimeException("Ontologies have mutual imports: " + o1.stringValue() + " "
-                                + o2.stringValue());
-                    }
-                    else if(set1.contains(o2))
-                    {
-                        return 1;
-                    }
-                    else if(set2.contains(o1))
-                    {
-                        return -1;
-                    }
-                    else if(set1.size() > set2.size())
-                    {
-                        return 1;
-                    }
-                    else if(set2.size() > set1.size())
-                    {
-                        return -1;
-                    }
-                    else
-                    {
-                        Set<URI> tempSet1;
-                        if(set1.isEmpty())
-                        {
-                            tempSet1 = Collections.emptySet();
-                        }
-                        else
-                        {
-                            tempSet1 = new HashSet<>(set1);
-                        }
-                        Set<URI> tempSet2;
-                        if(set2.isEmpty())
-                        {
-                            tempSet2 = Collections.emptySet();
-                        }
-                        else
-                        {
-                            tempSet2 = new HashSet<>(set2);
-                        }
-                        if(!set2.isEmpty())
-                        {
-                            for(URI nextImport1 : set1)
-                            {
-                                if(set2.contains(nextImport1))
-                                {
-                                    tempSet1.remove(nextImport1);
-                                }
-                            }
-                        }
-                        if(!set1.isEmpty())
-                        {
-                            for(URI nextImport2 : set2)
-                            {
-                                if(set1.contains(nextImport2))
-                                {
-                                    tempSet2.remove(nextImport2);
-                                }
-                            }
-                        }
-                        
-                        if(tempSet1.size() > tempSet2.size())
-                        {
-                            return 1;
-                        }
-                        else if(tempSet2.size() > tempSet1.size())
-                        {
-                            return -1;
-                        }
-                        
-                        // Default to lexical mapping, as there is no direct semantic link between
-                        // them
-                        // at this point
-                        // FIXME: This should not be part of the comparison as the imports map
-                        // should always contain one of the URIs
-                        return o1.stringValue().compareTo(o2.stringValue());
-                    }
-                }
-            });
+        Collections.sort(importOrder, new OntologyImportsComparator(importsMap));
     }
     
     /**
