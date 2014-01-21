@@ -14,6 +14,10 @@ public final class OntologyImportsComparator implements Comparator<URI>
 {
     private static final Logger log = LoggerFactory.getLogger(OntologyImportsComparator.class);
     
+    private static final int BEFORE = -1;
+    private static final int EQUALS = 0;
+    private static final int AFTER = 1;
+    
     private final ConcurrentMap<URI, Set<URI>> importsMap;
     
     OntologyImportsComparator(ConcurrentMap<URI, Set<URI>> importsMap)
@@ -26,7 +30,7 @@ public final class OntologyImportsComparator implements Comparator<URI>
     {
         if(o1.equals(o2))
         {
-            return 0;
+            return EQUALS;
         }
         
         Set<URI> set1 = importsMap.get(o1);
@@ -49,19 +53,19 @@ public final class OntologyImportsComparator implements Comparator<URI>
         }
         else if(set1.contains(o2))
         {
-            return 1;
+            return AFTER;
         }
         else if(set2.contains(o1))
         {
-            return -1;
+            return BEFORE;
         }
         else if(set1.size() > set2.size())
         {
-            return 1;
+            return AFTER;
         }
         else if(set2.size() > set1.size())
         {
-            return -1;
+            return BEFORE;
         }
         else
         {
@@ -106,11 +110,11 @@ public final class OntologyImportsComparator implements Comparator<URI>
             
             if(tempSet1.size() > tempSet2.size())
             {
-                return 1;
+                return AFTER;
             }
             else if(tempSet2.size() > tempSet1.size())
             {
-                return -1;
+                return BEFORE;
             }
             
             // Default to lexical mapping, as there is no direct semantic link between
