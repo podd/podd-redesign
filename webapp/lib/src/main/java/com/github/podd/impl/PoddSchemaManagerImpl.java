@@ -408,10 +408,14 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
             managementConnection = this.repositoryManager.getManagementRepositoryConnection();
             managementConnection.begin();
             
-            final List<InferredOWLOntologyID> ontologyIDs =
-                    OntologyUtils.loadSchemasFromManifest(managementConnection,
-                            this.repositoryManager.getSchemaManagementGraph(), model);
-            managementConnection.add(model, this.repositoryManager.getSchemaManagementGraph());
+            // HACK: The raw schema manifest does not necessarily include the inferred ontology
+            // information which breaks the workflow if the non-inferred ontology IDs are triggered
+            // now
+            
+            // final List<InferredOWLOntologyID> ontologyIDs =
+            // OntologyUtils.loadSchemasFromManifest(managementConnection,
+            // this.repositoryManager.getSchemaManagementGraph(), model);
+            // managementConnection.add(model, this.repositoryManager.getSchemaManagementGraph());
             
             DebugUtils.printContents(managementConnection, this.repositoryManager.getSchemaManagementGraph());
             
@@ -426,11 +430,17 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
                 {
                     if(nextImport.equals(nextCurrentSchemaOntology))
                     {
+                        // Must do it this way to preserve inferred ontology information which may
+                        // not be present in nextImport
+                        loadingOrder.put(nextCurrentSchemaOntology, true);
                         alreadyLoaded = true;
                         break;
                     }
                 }
-                loadingOrder.put(nextImport, alreadyLoaded);
+                if(!alreadyLoaded)
+                {
+                    loadingOrder.put(nextImport, alreadyLoaded);
+                }
             }
             
             final List<InferredOWLOntologyID> results = new ArrayList<>();
