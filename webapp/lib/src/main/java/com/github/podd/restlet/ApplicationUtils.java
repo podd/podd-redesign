@@ -504,9 +504,9 @@ public class ApplicationUtils
                 model = Rio.parse(schemaManifestStream, "", format);
             }
             
-            if(ApplicationUtils.log.isDebugEnabled())
+            if(ApplicationUtils.log.isInfoEnabled())
             {
-                ApplicationUtils.log.debug("Schema manifest contents");
+                ApplicationUtils.log.info("Schema manifest contents");
                 DebugUtils.printContents(model);
             }
             ApplicationUtils.log.info("About to upload schema ontologies");

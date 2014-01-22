@@ -423,6 +423,8 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
                     this.sesameManager.getAllSchemaOntologyVersions(managementConnection,
                             this.repositoryManager.getSchemaManagementGraph());
             
+            this.log.info("Existing schema ontologies at this point: {}", existingSchemaOntologies);
+            
             for(final OWLOntologyID nextImport : nextImportOrder)
             {
                 boolean alreadyLoaded = false;
@@ -506,6 +508,9 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
                                 Iterations.asList(managementConnection.getStatements(nextResult.getOntologyIRI()
                                         .toOpenRDFURI(), OWL.IMPORTS, null, true, nextResult.getVersionIRI()
                                         .toOpenRDFURI()));
+                        
+                        this.log.info("Imports to copy for ontology: {} {}", nextResult, importStatements);
+                        
                         for(Statement nextImportStatement : importStatements)
                         {
                             managementConnection.add(nextResult.getVersionIRI().toOpenRDFURI(), OWL.IMPORTS,
