@@ -1601,6 +1601,27 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
                     this.loadInferStoreArtifact(temporaryConnection, permanentConnection, managementConnection,
                             randomContext, dataReferenceVerificationPolicy, false, schemaImports);
             
+            this.getSesameManager().updateManagedPoddArtifactVersion(inferredOWLOntologyID, true, managementConnection,
+                    this.getRepositoryManager().getArtifactManagementGraph());
+            
+            managementConnection.remove(inferredOWLOntologyID.getOntologyIRI().toOpenRDFURI(), OWL.IMPORTS, null, this
+                    .getRepositoryManager().getArtifactManagementGraph());
+            
+            for(final Statement nextImport : Iterations.asList(permanentConnection.getStatements(inferredOWLOntologyID
+                    .getOntologyIRI().toOpenRDFURI(), OWL.IMPORTS, null, true, inferredOWLOntologyID.getVersionIRI()
+                    .toOpenRDFURI())))
+            {
+                managementConnection.add(inferredOWLOntologyID.getOntologyIRI().toOpenRDFURI(), OWL.IMPORTS,
+                        nextImport.getObject(), this.getRepositoryManager().getArtifactManagementGraph());
+            }
+            
+            for(OWLOntologyID nextSchemaImport : schemaImports)
+            {
+                managementConnection.add(inferredOWLOntologyID.getOntologyIRI().toOpenRDFURI(), OWL.IMPORTS,
+                        nextSchemaImport.getVersionIRI().toOpenRDFURI(), this.getRepositoryManager()
+                                .getArtifactManagementGraph());
+            }
+            
             permanentConnection.commit();
             managementConnection.commit();
             
@@ -1754,19 +1775,6 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         // the parent object
         this.handleFileReferences(permanentConnection, fileReferencePolicy, inferredOWLOntologyID.getVersionIRI()
                 .toOpenRDFURI(), inferredOWLOntologyID.getInferredOntologyIRI().toOpenRDFURI());
-        
-        this.getSesameManager().updateManagedPoddArtifactVersion(inferredOWLOntologyID, true, managementConnection,
-                this.getRepositoryManager().getArtifactManagementGraph());
-        
-        managementConnection.remove(inferredOWLOntologyID.getOntologyIRI().toOpenRDFURI(), OWL.IMPORTS, null, this
-                .getRepositoryManager().getArtifactManagementGraph());
-        
-        for(final Statement nextImport : Iterations.asList(tempRepositoryConnection.getStatements(null, OWL.IMPORTS,
-                null, true, tempContext)))
-        {
-            managementConnection.add(inferredOWLOntologyID.getOntologyIRI().toOpenRDFURI(), OWL.IMPORTS,
-                    nextImport.getObject(), this.getRepositoryManager().getArtifactManagementGraph());
-        }
         
         return inferredOWLOntologyID;
     }
@@ -2238,6 +2246,9 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
                     this.loadInferStoreArtifact(tempRepositoryConnection, permanentConnection, managementConnection,
                             tempContext, fileReferenceAction, false, currentSchemaImports);
             
+            this.getSesameManager().updateManagedPoddArtifactVersion(inferredOWLOntologyID, true, managementConnection,
+                    this.getRepositoryManager().getArtifactManagementGraph());
+            
             permanentConnection.commit();
             managementConnection.commit();
             tempRepositoryConnection.rollback();
@@ -2437,17 +2448,20 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             
             // If the following does not succeed, then it throws an exception and we rollback
             // permanentConnection
-            final InferredOWLOntologyID result =
+            final InferredOWLOntologyID inferredOWLOntologyID =
                     this.loadInferStoreArtifact(tempRepositoryConnection, newPermanentConnection, managementConnection,
                             newVersionIRI.toOpenRDFURI(), DataReferenceVerificationPolicy.DO_NOT_VERIFY, false,
                             newSchemaOntologyIds);
             
             this.log.info("Completed reload of artifact to Repository: {}", artifactVersion);
             
+            this.getSesameManager().updateManagedPoddArtifactVersion(inferredOWLOntologyID, true, managementConnection,
+                    this.getRepositoryManager().getArtifactManagementGraph());
+            
             oldPermanentConnection.commit();
             newPermanentConnection.commit();
             managementConnection.commit();
-            return result;
+            return inferredOWLOntologyID;
         }
         catch(final Throwable e)
         {
