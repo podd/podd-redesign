@@ -218,7 +218,7 @@ public class UploadArtifactResourceImpl extends AbstractPoddResourceImpl
         // Output the base template, with contentTemplate from the dataModel
         // defining the
         // template to use for the content in the body of the page
-        return RestletUtils.getHtmlRepresentation(PoddWebConstants.PROPERTY_TEMPLATE_BASE, dataModel,
+        return RestletUtils.getHtmlRepresentation(this.getPoddApplication().getPropertyUtil().get(PoddWebConstants.PROPERTY_TEMPLATE_BASE, PoddWebConstants.DEFAULT_TEMPLATE_BASE), dataModel,
                 MediaType.TEXT_HTML, this.getPoddApplication().getTemplateConfiguration());
     }
     
@@ -246,7 +246,7 @@ public class UploadArtifactResourceImpl extends AbstractPoddResourceImpl
         // Output the base template, with contentTemplate from the dataModel
         // defining the
         // template to use for the content in the body of the page
-        return RestletUtils.getHtmlRepresentation(PoddWebConstants.PROPERTY_TEMPLATE_BASE, dataModel,
+        return RestletUtils.getHtmlRepresentation(this.getPoddApplication().getPropertyUtil().get(PoddWebConstants.PROPERTY_TEMPLATE_BASE, PoddWebConstants.DEFAULT_TEMPLATE_BASE), dataModel,
                 MediaType.TEXT_HTML, this.getPoddApplication().getTemplateConfiguration());
     }
     
@@ -292,7 +292,7 @@ public class UploadArtifactResourceImpl extends AbstractPoddResourceImpl
                 }
             }
             
-            RepositoryConnection conn = null;
+            RepositoryConnection permanentConnection = null;
             
             try
             {
@@ -300,14 +300,14 @@ public class UploadArtifactResourceImpl extends AbstractPoddResourceImpl
                 // PoddArtifactManagerImpl
                 final Set<? extends OWLOntologyID> schemaImports =
                         this.getPoddArtifactManager().getSchemaImports(artifactId);
-                conn = this.getPoddRepositoryManager().getPermanentRepository(schemaImports).getConnection();
+                permanentConnection = this.getPoddRepositoryManager().getPermanentRepositoryConnection(schemaImports);
                 final URI topObjectIRI =
-                        this.getPoddArtifactManager().getSesameManager().getTopObjectIRI(artifactId, conn);
+                        this.getPoddArtifactManager().getSesameManager().getTopObjectIRI(artifactId, permanentConnection);
                 
                 writer.handleStatement(PODD.VF.createStatement(artifactId.getOntologyIRI().toOpenRDFURI(),
                         PODD.PODD_BASE_HAS_TOP_OBJECT, topObjectIRI));
                 final Set<Statement> topObjectTypes =
-                        Iterations.asSet(conn.getStatements(topObjectIRI, RDF.TYPE, null, true, artifactId
+                        Iterations.asSet(permanentConnection.getStatements(topObjectIRI, RDF.TYPE, null, true, artifactId
                                 .getVersionIRI().toOpenRDFURI()));
                 
                 for(final Statement nextTopObjectType : topObjectTypes)
@@ -324,11 +324,11 @@ public class UploadArtifactResourceImpl extends AbstractPoddResourceImpl
             }
             finally
             {
-                if(conn != null)
+                if(permanentConnection != null)
                 {
                     try
                     {
-                        conn.close();
+                        permanentConnection.close();
                     }
                     catch(final RepositoryException e)
                     {

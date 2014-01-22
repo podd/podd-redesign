@@ -16,6 +16,10 @@
  */
 package com.github.podd.api.test;
 
+import info.aduna.iteration.Iterations;
+
+import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -25,15 +29,30 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+import org.openrdf.model.Model;
+import org.openrdf.model.Statement;
+import org.openrdf.model.URI;
+import org.openrdf.model.impl.LinkedHashModel;
+import org.openrdf.model.util.ModelUtil;
+import org.openrdf.repository.Repository;
+import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.rio.RDFFormat;
+import org.openrdf.rio.helpers.StatementCollector;
+import org.semanticweb.owlapi.io.OWLOntologyDocumentSource;
 import org.semanticweb.owlapi.model.OWLOntologyID;
 import org.semanticweb.owlapi.model.OWLOntologyManagerFactory;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
+import org.semanticweb.owlapi.rio.RioMemoryTripleSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.github.podd.api.PoddOWLManager;
+import com.github.podd.api.PoddRepositoryManager;
+import com.github.podd.api.PoddSchemaManager;
+import com.github.podd.api.PoddSesameManager;
+import com.github.podd.test.TestUtils;
 import com.github.podd.utils.InferredOWLOntologyID;
+import com.github.podd.utils.PODD;
 
 /**
  * Abstract test to verify that the PoddOWLManager API contract is followed by implementations.
@@ -50,7 +69,15 @@ public abstract class AbstractPoddOWLManagerTest
     
     protected Logger log = LoggerFactory.getLogger(this.getClass());
     
-    protected PoddOWLManager testOWLManager;
+    protected PoddOWLManager testOwlManager;
+    
+    protected URI schemaGraph;
+    
+    protected PoddRepositoryManager testRepositoryManager;
+    
+    protected PoddSchemaManager testSchemaManager;
+    
+    protected PoddSesameManager testSesameManager;
     
     /**
      * @return A new OWLReasonerFactory instance for use with the PoddOWLManager
@@ -72,6 +99,25 @@ public abstract class AbstractPoddOWLManagerTest
             OWLReasonerFactory nextReasonerFactory);
     
     /**
+     * 
+     * @return A new instance of {@link PoddRepositoryManager}, for each call to this method.
+     * @throws Exception
+     */
+    protected abstract PoddRepositoryManager getNewPoddRepositoryManagerInstance() throws Exception;
+    
+    /**
+     * 
+     * @return A new instance of {@link PoddSchemaManager}, for each call to this method.
+     */
+    protected abstract PoddSchemaManager getNewPoddSchemaManagerInstance();
+    
+    /**
+     * 
+     * @return A new instance of {@link PoddSesameManager}, for each call to this method.
+     */
+    protected abstract PoddSesameManager getNewPoddSesameManagerInstance();
+    
+    /**
      * Helper method which loads podd:dcTerms, podd:foaf and podd:User schema ontologies.
      */
     protected abstract List<InferredOWLOntologyID> loadDcFoafAndPoddUserSchemaOntologies() throws Exception;
@@ -88,7 +134,8 @@ public abstract class AbstractPoddOWLManagerTest
      */
     protected abstract InferredOWLOntologyID loadInferStoreOntology(final String resourcePath, final RDFFormat format,
             final long assertedStatements, final long inferredStatements,
-            final Set<? extends OWLOntologyID> dependentSchemaOntologies) throws Exception;
+            final Set<? extends OWLOntologyID> dependentSchemaOntologies,
+            final RepositoryConnection managementConnection) throws Exception;
     
     /**
      * @throws java.lang.Exception
@@ -101,9 +148,20 @@ public abstract class AbstractPoddOWLManagerTest
         
         final OWLOntologyManagerFactory managerFactory = this.getNewOWLOntologyManagerFactory();
         
-        this.testOWLManager = this.getNewPoddOWLManagerInstance(managerFactory, reasonerFactory);
-        Assert.assertNotNull("Null implementation of test OWLManager", this.testOWLManager);
+        this.testOwlManager = this.getNewPoddOWLManagerInstance(managerFactory, reasonerFactory);
+        Assert.assertNotNull("Null implementation of test OWLManager", this.testOwlManager);
         
+        this.schemaGraph = PODD.VF.createURI("urn:test:owlmanager:schemagraph");
+        
+        this.testSchemaManager = this.getNewPoddSchemaManagerInstance();
+        
+        this.testRepositoryManager = this.getNewPoddRepositoryManagerInstance();
+        this.testSchemaManager.setRepositoryManager(this.testRepositoryManager);
+        
+        this.testSesameManager = this.getNewPoddSesameManagerInstance();
+        this.testSchemaManager.setSesameManager(this.testSesameManager);
+        
+        this.testSchemaManager.setOwlManager(this.testOwlManager);
     }
     
     /**
@@ -112,8 +170,11 @@ public abstract class AbstractPoddOWLManagerTest
     @After
     public void tearDown() throws Exception
     {
-        
-        this.testOWLManager = null;
+        this.schemaGraph = null;
+        this.testSchemaManager = null;
+        this.testSesameManager = null;
+        this.testOwlManager = null;
+        this.testRepositoryManager.shutDown();
     }
     
     /**
@@ -127,7 +188,7 @@ public abstract class AbstractPoddOWLManagerTest
     {
         try
         {
-            this.testOWLManager.removeCache(null, null);
+            this.testOwlManager.removeCache(null, null);
             Assert.fail("Should have thrown a NullPointerException");
         }
         catch(final NullPointerException e)
@@ -135,4 +196,51 @@ public abstract class AbstractPoddOWLManagerTest
         }
     }
     
+    @Test
+    public void testLoadAndInfer() throws Exception
+    {
+        RepositoryConnection managementConnection = this.testRepositoryManager.getManagementRepositoryConnection();
+        try
+        {
+            OWLOntologyID replacementOntologyID = null;
+            
+            RioMemoryTripleSource owlSource = TestUtils.getRioTripleSource("/test/ontologies/version/1/a1.owl");
+            managementConnection.begin();
+            InferredOWLOntologyID ontologyID =
+                    this.testOwlManager.loadAndInfer(owlSource, managementConnection, replacementOntologyID,
+                            Collections.<InferredOWLOntologyID> emptySet(), managementConnection, this.schemaGraph);
+            managementConnection.commit();
+            
+            Assert.assertNotNull(ontologyID);
+            Assert.assertNotNull(ontologyID.getOntologyIRI());
+            Assert.assertNotNull(ontologyID.getVersionIRI());
+            Assert.assertNotNull(ontologyID.getInferredOntologyIRI());
+            
+            Model concreteStatements = new LinkedHashModel();
+            managementConnection.export(new StatementCollector(concreteStatements), ontologyID.getVersionIRI()
+                    .toOpenRDFURI());
+            Model inferredStatements = new LinkedHashModel();
+            managementConnection.export(new StatementCollector(inferredStatements), ontologyID.getInferredOntologyIRI()
+                    .toOpenRDFURI());
+            Model managementStatements = new LinkedHashModel();
+            managementConnection.export(new StatementCollector(managementStatements), schemaGraph);
+            
+            Assert.assertFalse(concreteStatements.isEmpty());
+            Assert.assertFalse(inferredStatements.isEmpty());
+            // loadAndInfer must not touch the management graph, or require it to contain any
+            // statements, as it is necessary to use this method in the bootstrap process
+            Assert.assertTrue(managementStatements.isEmpty());
+            
+            Assert.assertFalse(ModelUtil.isSubset(concreteStatements, inferredStatements));
+            Assert.assertFalse(ModelUtil.isSubset(inferredStatements, concreteStatements));
+            
+            Assert.assertEquals(6, concreteStatements.size());
+            Assert.assertEquals(3, inferredStatements.size());
+            Assert.assertEquals(0, managementStatements.size());
+        }
+        finally
+        {
+            managementConnection.close();
+        }
+    }
 }

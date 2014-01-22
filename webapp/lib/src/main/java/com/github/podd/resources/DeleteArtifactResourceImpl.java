@@ -16,12 +16,15 @@
  */
 package com.github.podd.resources;
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.openrdf.OpenRDFException;
 import org.openrdf.model.URI;
+import org.openrdf.rio.UnsupportedRDFormatException;
 import org.restlet.data.MediaType;
 import org.restlet.data.Status;
 import org.restlet.representation.Representation;
@@ -102,7 +105,7 @@ public class DeleteArtifactResourceImpl extends AbstractPoddResourceImpl
                 throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Could not delete artifact");
             }
         }
-        catch(final PoddException e)
+        catch(final PoddException | UnsupportedRDFormatException | OpenRDFException | IOException e)
         {
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL,
                     "Could not delete artifact due to an internal error", e);
@@ -138,8 +141,10 @@ public class DeleteArtifactResourceImpl extends AbstractPoddResourceImpl
         // Output the base template, with contentTemplate from the dataModel
         // defining the
         // template to use for the content in the body of the page
-        return RestletUtils.getHtmlRepresentation(PoddWebConstants.PROPERTY_TEMPLATE_BASE, dataModel,
-                MediaType.TEXT_HTML, this.getPoddApplication().getTemplateConfiguration());
+        return RestletUtils.getHtmlRepresentation(
+                this.getPoddApplication().getPropertyUtil()
+                        .get(PoddWebConstants.PROPERTY_TEMPLATE_BASE, PoddWebConstants.DEFAULT_TEMPLATE_BASE),
+                dataModel, MediaType.TEXT_HTML, this.getPoddApplication().getTemplateConfiguration());
     }
     
     // FIXME: populating dummy info for test

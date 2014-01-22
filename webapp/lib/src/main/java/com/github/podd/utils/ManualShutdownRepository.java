@@ -42,6 +42,13 @@ public class ManualShutdownRepository extends RepositoryWrapper
     
     public void realShutDown() throws RepositoryException
     {
-        this.getDelegate().shutDown();
+        if(this.getDelegate() instanceof ManualShutdownRepository)
+        {
+            ((ManualShutdownRepository)this.getDelegate()).realShutDown();
+        }
+        else
+        {
+            this.getDelegate().shutDown();
+        }
     }
 }

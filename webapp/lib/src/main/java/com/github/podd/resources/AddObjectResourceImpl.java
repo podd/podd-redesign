@@ -143,8 +143,10 @@ public class AddObjectResourceImpl extends AbstractPoddResourceImpl
             dataModel.put("parentPredicateUri", parentPredicateUri);
         }
         
-        return RestletUtils.getHtmlRepresentation(PoddWebConstants.PROPERTY_TEMPLATE_BASE, dataModel,
-                MediaType.TEXT_HTML, this.getPoddApplication().getTemplateConfiguration());
+        return RestletUtils.getHtmlRepresentation(
+                this.getPoddApplication().getPropertyUtil()
+                        .get(PoddWebConstants.PROPERTY_TEMPLATE_BASE, PoddWebConstants.DEFAULT_TEMPLATE_BASE),
+                dataModel, MediaType.TEXT_HTML, this.getPoddApplication().getTemplateConfiguration());
     }
     
     /*
@@ -164,7 +166,7 @@ public class AddObjectResourceImpl extends AbstractPoddResourceImpl
             RepositoryConnection permanentConnection = null;
             try
             {
-                managementConnection = this.getPoddRepositoryManager().getManagementRepository().getConnection();
+                managementConnection = this.getPoddRepositoryManager().getManagementRepositoryConnection();
                 managementConnection.begin();
                 
                 InferredOWLOntologyID ontologyID = null;
@@ -174,7 +176,7 @@ public class AddObjectResourceImpl extends AbstractPoddResourceImpl
                     final Set<? extends OWLOntologyID> schemaImports =
                             this.getPoddArtifactManager().getSchemaImports(ontologyID);
                     permanentConnection =
-                            this.getPoddRepositoryManager().getPermanentRepository(schemaImports).getConnection();
+                            this.getPoddRepositoryManager().getPermanentRepositoryConnection(schemaImports);
                     
                     objectLabel =
                             this.getPoddSesameManager().getObjectLabel(ontologyID, PODD.VF.createURI(objectType),
@@ -196,18 +198,30 @@ public class AddObjectResourceImpl extends AbstractPoddResourceImpl
             {
                 try
                 {
-                    if(managementConnection != null && managementConnection.isOpen())
+                    if(managementConnection != null)
                     {
-                        managementConnection.rollback(); // read only, nothing to commit
-                        managementConnection.close();
+                        try
+                        {
+                            managementConnection.rollback(); // read only, nothing to commit
+                        }
+                        finally
+                        {
+                            managementConnection.close();
+                        }
                     }
                 }
                 finally
                 {
-                    if(permanentConnection != null && permanentConnection.isOpen())
+                    if(permanentConnection != null)
                     {
-                        permanentConnection.rollback(); // read only, nothing to commit
-                        permanentConnection.close();
+                        try
+                        {
+                            permanentConnection.rollback(); // read only, nothing to commit
+                        }
+                        finally
+                        {
+                            permanentConnection.close();
+                        }
                     }
                 }
             }
@@ -215,7 +229,8 @@ public class AddObjectResourceImpl extends AbstractPoddResourceImpl
         catch(UnmanagedArtifactIRIException | UnmanagedSchemaIRIException | OpenRDFException
                 | UnmanagedArtifactVersionException | SchemaManifestException e)
         {
-            e.printStackTrace();
+            this.log.warn("Found error while looking for object type label: {}", objectType);
+            //e.printStackTrace();
             // failed to find Label
             final URI objectTypeUri = PODD.VF.createURI(objectType);
             objectLabel = new PoddObjectLabelImpl(null, objectTypeUri, objectType);

@@ -105,6 +105,7 @@ import com.github.podd.exception.EmptyOntologyException;
 import com.github.podd.exception.InconsistentOntologyException;
 import com.github.podd.exception.OntologyNotInProfileException;
 import com.github.podd.exception.PoddException;
+import com.github.podd.utils.DebugUtils;
 import com.github.podd.utils.DeduplicatingRDFInserter;
 import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.OntologyUtils;
@@ -152,12 +153,19 @@ public class PoddOWLManagerImpl implements PoddOWLManager
         final List<InferredOWLOntologyID> importsList = new ArrayList<InferredOWLOntologyID>();
         
         final String subject = ontologyID.getOntologyIRI().toQuotedString();
-        final String sparqlQuery =
-                "SELECT ?x ?xv ?xiv WHERE { " + subject + " <" + OWL.IMPORTS.stringValue() + "> ?xv ." + "?x <"
-                        + PODD.OWL_VERSION_IRI + "> ?xv ." + "?x <" + PODD.PODD_BASE_CURRENT_INFERRED_VERSION
-                        + "> ?xiv ." + " }";
+        
+        final StringBuilder sparqlQuery = new StringBuilder();
+        sparqlQuery.append("SELECT ?x ?xv ?xiv WHERE { ");
+        sparqlQuery.append(subject);
+        sparqlQuery.append(" <").append(OWL.IMPORTS.stringValue()).append(">");
+        sparqlQuery.append(" ?xv .");
+        sparqlQuery.append(" ?x <").append(OWL.VERSIONIRI.stringValue()).append(">");
+        sparqlQuery.append(" ?xv .");
+        sparqlQuery.append(" ?xv <").append(PODD.PODD_BASE_INFERRED_VERSION.stringValue()).append("> ?xiv .");
+        sparqlQuery.append(" }");
+        
         this.log.debug("Generated SPARQL {}", sparqlQuery);
-        final TupleQuery query = conn.prepareTupleQuery(QueryLanguage.SPARQL, sparqlQuery);
+        final TupleQuery query = conn.prepareTupleQuery(QueryLanguage.SPARQL, sparqlQuery.toString());
         
         final DatasetImpl dataset = new DatasetImpl();
         dataset.addDefaultGraph(context);
@@ -282,19 +290,27 @@ public class PoddOWLManagerImpl implements PoddOWLManager
         final Model schemaManagementTriples = new LinkedHashModel();
         managementConnection.export(new StatementCollector(schemaManagementTriples), schemaManagementContext);
         
+        DebugUtils.printContents(schemaManagementTriples);
+        
         final List<OWLOntologyID> manifestImports =
                 OntologyUtils.schemaManifestImports(schemaManagementTriples, ontologyIDs);
+        
+        // TODO: Check the exact imports for the given ontology and refine to exclude unrelated
+        // schema ontologies?
         
         final OWLOntologyManager cachedManager = this.getCachedManager(ontologyIDs);
         
         synchronized(cachedManager)
         {
+            this.log.info("About to cache ontologies: {}", manifestImports);
             for(final OWLOntologyID ontologyID : manifestImports)
             {
+                this.log.info("About to cache ontology: {}", ontologyID);
                 // NOTE: if InferredOntologyIRI is null, only the base ontology is
                 // cached
                 this.cacheSchemaOntologyInternal(managementConnection, ontologyID, cachedManager);
             }
+            this.log.info("Finished caching ontologies: {}", manifestImports);
         }
         return cachedManager;
     }
@@ -699,9 +715,10 @@ public class PoddOWLManagerImpl implements PoddOWLManager
     {
         InferredOWLOntologyID inferredOWLOntologyID = null;
         OWLOntology nextOntology = null;
+        OWLOntologyManager cachedManager = null;
         try
         {
-            final OWLOntologyManager cachedManager =
+            cachedManager =
                     this.cacheSchemaOntologies(dependentSchemaOntologies, managementConnection, schemaManagementContext);
             synchronized(cachedManager)
             {
@@ -785,28 +802,37 @@ public class PoddOWLManagerImpl implements PoddOWLManager
         }
         catch(final Throwable e)
         {
-            try
+            if(cachedManager != null)
             {
-                try
+                synchronized(cachedManager)
                 {
-                    if(nextOntology != null && removeFromCacheOnException)
+                    try
                     {
-                        this.removeCache(nextOntology.getOntologyID(), dependentSchemaOntologies);
+                        try
+                        {
+                            if(nextOntology != null && removeFromCacheOnException)
+                            {
+                                this.removeCacheInternal(nextOntology.getOntologyID(), dependentSchemaOntologies,
+                                        cachedManager);
+                            }
+                        }
+                        finally
+                        {
+                            if(inferredOWLOntologyID != null && removeFromCacheOnException)
+                            {
+                                this.removeCacheInternal(inferredOWLOntologyID.getInferredOWLOntologyID(),
+                                        dependentSchemaOntologies, cachedManager);
+                            }
+                        }
+                    }
+                    catch(final Throwable e1)
+                    {
+                        // Do not propagate this exception as it will clobber the real exception
+                        // that we
+                        // want to rethrow
+                        this.log.error("Found exception while clearing memory cache: ", e1);
                     }
                 }
-                finally
-                {
-                    if(inferredOWLOntologyID != null && removeFromCacheOnException)
-                    {
-                        this.removeCache(inferredOWLOntologyID.getInferredOWLOntologyID(), dependentSchemaOntologies);
-                    }
-                }
-            }
-            catch(final Throwable e1)
-            {
-                // Do not propagate this exception as it will clobber the real exception that we
-                // want to rethrow
-                this.log.error("Found exception while clearing memory cache: ", e1);
             }
             
             throw e;
@@ -934,57 +960,66 @@ public class PoddOWLManagerImpl implements PoddOWLManager
         // cache
         synchronized(cachedManager)
         {
-            if(ontologyID == null)
+            return this.removeCacheInternal(ontologyID, dependentSchemaOntologies, cachedManager);
+        }
+    }
+    
+    private boolean removeCacheInternal(final OWLOntologyID ontologyID,
+            final Set<? extends OWLOntologyID> dependentSchemaOntologies, OWLOntologyManager cachedManager)
+        throws OWLException
+    {
+        // Use ontology ID == null to clear the cache
+        if(ontologyID == null)
+        {
+            this.log.info("Clearing manager cache: {}", dependentSchemaOntologies);
+            for(final OWLOntology nextOntology : cachedManager.getOntologies())
             {
-                for(final OWLOntology nextOntology : cachedManager.getOntologies())
+                cachedManager.removeOntology(nextOntology.getOntologyID());
+            }
+            this.managerCache.remove(dependentSchemaOntologies);
+            return true;
+        }
+        else
+        {
+            if(ontologyID instanceof InferredOWLOntologyID)
+            {
+                final boolean containsInferredOntology =
+                        cachedManager.contains(((InferredOWLOntologyID)ontologyID).getInferredOntologyIRI());
+                if(containsInferredOntology)
                 {
-                    cachedManager.removeOntology(nextOntology.getOntologyID());
+                    cachedManager.removeOntology(cachedManager.getOntology(((InferredOWLOntologyID)ontologyID)
+                            .getInferredOntologyIRI()));
                 }
-                this.managerCache.remove(dependentSchemaOntologies);
-                return true;
+                // TODO: Verify that this .contains method matches our desired
+                // semantics
+                final boolean containsOntology =
+                        cachedManager.contains(((InferredOWLOntologyID)ontologyID).getBaseOWLOntologyID());
+                
+                if(containsOntology)
+                {
+                    cachedManager.removeOntology(((InferredOWLOntologyID)ontologyID).getBaseOWLOntologyID());
+                    return !cachedManager.contains(((InferredOWLOntologyID)ontologyID).getBaseOWLOntologyID());
+                }
+                
+                return containsInferredOntology || containsOntology;
             }
             else
             {
-                if(ontologyID instanceof InferredOWLOntologyID)
+                // TODO: Verify that this .contains method matches our desired
+                // semantics
+                final boolean containsOntology = cachedManager.contains(ontologyID);
+                
+                if(containsOntology)
                 {
-                    final boolean containsInferredOntology =
-                            cachedManager.contains(((InferredOWLOntologyID)ontologyID).getInferredOntologyIRI());
-                    if(containsInferredOntology)
-                    {
-                        cachedManager.removeOntology(cachedManager.getOntology(((InferredOWLOntologyID)ontologyID)
-                                .getInferredOntologyIRI()));
-                    }
-                    // TODO: Verify that this .contains method matches our desired
-                    // semantics
-                    final boolean containsOntology =
-                            cachedManager.contains(((InferredOWLOntologyID)ontologyID).getBaseOWLOntologyID());
+                    cachedManager.removeOntology(ontologyID);
                     
-                    if(containsOntology)
-                    {
-                        cachedManager.removeOntology(((InferredOWLOntologyID)ontologyID).getBaseOWLOntologyID());
-                        return !cachedManager.contains(((InferredOWLOntologyID)ontologyID).getBaseOWLOntologyID());
-                    }
-                    
-                    return containsInferredOntology || containsOntology;
+                    // return true if the ontology manager does not contain the
+                    // ontology at this point
+                    return !cachedManager.contains(ontologyID);
                 }
                 else
                 {
-                    // TODO: Verify that this .contains method matches our desired
-                    // semantics
-                    final boolean containsOntology = cachedManager.contains(ontologyID);
-                    
-                    if(containsOntology)
-                    {
-                        cachedManager.removeOntology(ontologyID);
-                        
-                        // return true if the ontology manager does not contain the
-                        // ontology at this point
-                        return !cachedManager.contains(ontologyID);
-                    }
-                    else
-                    {
-                        return false;
-                    }
+                    return false;
                 }
             }
         }

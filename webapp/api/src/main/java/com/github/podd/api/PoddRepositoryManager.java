@@ -19,11 +19,13 @@
  */
 package com.github.podd.api;
 
+import java.io.IOException;
 import java.util.Set;
 
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.URI;
 import org.openrdf.repository.Repository;
+import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
 import org.semanticweb.owlapi.model.OWLOntologyID;
 
@@ -54,7 +56,7 @@ public interface PoddRepositoryManager
      * @throws OpenRDFException
      *             If there are any errors with the repository at this stage.
      */
-    Repository getManagementRepository() throws OpenRDFException;
+    RepositoryConnection getManagementRepositoryConnection() throws OpenRDFException;
     
     /**
      * Get a new temporary repository.
@@ -73,8 +75,11 @@ public interface PoddRepositoryManager
      * @return A link to the initialised repository managed by this manager.
      * @throws OpenRDFException
      *             If there are any errors with the repository at this stage.
+     * @throws IOException
+     *             If there are errors finding the repository.
      */
-    Repository getPermanentRepository(Set<? extends OWLOntologyID> schemaOntologies) throws OpenRDFException;
+    RepositoryConnection getPermanentRepositoryConnection(Set<? extends OWLOntologyID> schemaOntologies) throws OpenRDFException,
+        IOException;
     
     /**
      * Gets a federated repository over the permanent repository for the given schema ontologies,
@@ -87,26 +92,15 @@ public interface PoddRepositoryManager
      * @param schemaOntologies
      * @return
      * @throws OpenRDFException
+     * @throws IOException 
      */
-    Repository getReadOnlyFederatedRepository(Set<? extends OWLOntologyID> schemaOntologies) throws OpenRDFException;
+    Repository getReadOnlyFederatedRepository(Set<? extends OWLOntologyID> schemaOntologies) throws OpenRDFException, IOException;
     
     /**
      * 
      * @return The schema management graph URI for this repository manager.
      */
     URI getSchemaManagementGraph();
-    
-    /**
-     * Identfies the given repository as being a suitable target for artifacts importing the given
-     * schema ontologies.
-     * 
-     * @param schemaOntologies
-     *            A set of schema ontologies that match the given repository.
-     * @param repository
-     *            The repository target.
-     */
-    void mapPermanentRepository(Set<? extends OWLOntologyID> schemaOntologies, Repository repository)
-        throws OpenRDFException;
     
     /**
      * Verifies that the context is not null, not the default graph (sesame:nil), and is not one of

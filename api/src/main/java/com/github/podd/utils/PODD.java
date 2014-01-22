@@ -19,7 +19,6 @@ package com.github.podd.utils;
 import org.openrdf.model.URI;
 import org.openrdf.model.ValueFactory;
 import org.openrdf.model.impl.ValueFactoryImpl;
-import org.openrdf.model.vocabulary.OWL;
 
 /**
  * Interface containing URI constants for the Ontologies needed in PODD.
@@ -33,19 +32,29 @@ public interface PODD
     
     public static final String DATA_REPOSITORY = "http://purl.org/podd/ns/dataRepository#";
     
-    /** Default value is urn:podd:default:usermanagementgraph: */
-    public static final URI DEFAULT_USER_MANAGEMENT_GRAPH = PODD.VF.createURI("urn:podd:default:usermanagementgraph:");
+    public static final String PROPERTY_USER_MANAGEMENT_GRAPH = "podd.graph.usermanagement";
+    /** Default value is urn:podd:default:graph:usermanagement */
+    public static final URI DEFAULT_USER_MANAGEMENT_GRAPH = PODD.VF.createURI("urn:podd:default:graph:usermanagement");
     
-    /** Default value is urn:podd:default:artifactmanagementgraph: */
+    public static final String PROPERTY_ARTIFACT_MANAGEMENT_GRAPH = "podd.graph.artifactmanagement";
+    /** Default value is urn:podd:default:graph:artifactmanagement */
     public static final URI DEFAULT_ARTIFACT_MANAGEMENT_GRAPH = PODD.VF
-            .createURI("urn:podd:default:artifactmanagementgraph:");
+            .createURI("urn:podd:default:graph:artifactmanagement");
     
-    public static final URI DEFAULT_FILE_REPOSITORY_MANAGEMENT_GRAPH = PODD.VF
-            .createURI("urn:podd:default:filerepositorymanagementgraph:");
+    public static final String PROPERTY_DATA_REPOSITORY_MANAGEMENT_GRAPH = "podd.graph.datarepositorymanagement";
+    /** Default value is urn:podd:default:graph:datarepositorymanagement */
+    public static final URI DEFAULT_DATA_REPOSITORY_MANAGEMENT_GRAPH = PODD.VF
+            .createURI("urn:podd:default:graph:datarepositorymanagement");
     
-    /** Default value is urn:podd:default:schemamanagementgraph */
+    public static final String PROPERTY_REPOSITORY_MANAGEMENT_GRAPH = "podd.graph.repositorymanagement";
+    /** Default value is urn:podd:default:graph:repositorymanagement */
+    public static final URI DEFAULT_REPOSITORY_MANAGEMENT_GRAPH = PODD.VF
+            .createURI("urn:podd:default:graph:repositorymanagement");
+    
+    public static final String PROPERTY_SCHEMA_MANAGEMENT_GRAPH = "podd.schemagraph";
+    /** Default value is urn:podd:default:graph:schemamanagement */
     public static final URI DEFAULT_SCHEMA_MANAGEMENT_GRAPH = PODD.VF
-            .createURI("urn:podd:default:schemamanagementgraph");
+            .createURI("urn:podd:default:graph:schemamanagement");
     
     /** http://purl.org/podd/ns/err#contains */
     public static final URI ERR_CONTAINS = PODD.VF.createURI(PODD.PODD_ERROR, "contains");
@@ -106,8 +115,6 @@ public interface PODD
     
     public static final URI OWL_QUALIFIED_CARDINALITY = PODD.VF
             .createURI("http://www.w3.org/2002/07/owl#qualifiedCardinality");
-    
-    public static final URI OWL_VERSION_IRI = OWL.VERSIONIRI;
     
     /** Path to default alias file */
     public static final String PATH_DEFAULT_ALIASES_FILE = "/com/github/podd/api/file/default-file-repositories.ttl";
@@ -206,8 +213,9 @@ public interface PODD
      * Creating a property for PODD to track the currentInferredVersion for the inferred axioms
      * ontology when linking from the ontology IRI.
      */
-    public static final URI PODD_BASE_CURRENT_INFERRED_VERSION = PODD.VF.createURI(PODD.PODD_BASE,
-            "currentInferredVersion");
+    // public static final URI PODD_BASE_CURRENT_INFERRED_VERSION =
+    // PODD.VF.createURI(PODD.PODD_BASE,
+    // "currentInferredVersion");
     
     /** http://purl.org/podd/ns/poddBase#DataReference */
     public static final URI PODD_BASE_DATA_REFERENCE_TYPE = PODD.VF.createURI(PODD.PODD_BASE, "DataReference");
@@ -549,5 +557,36 @@ public interface PODD
     public static final URI TEST_ARTIFACT = PODD.VF.createURI("http://purl.org/podd/ns/artifact/artifact89");
     
     public static final URI PODD_SCHEMA_CLASSPATH = PODD.VF.createURI("http://purl.org/podd/ns/schema#classpath");
+    
+    public static final URI PODD_REPOSITORY_MANAGER = PODD.VF
+            .createURI("http://purl.org/podd/ns/repository#RepositoryManager");
+    
+    public static final URI PODD_REPOSITORY = PODD.VF.createURI("http://purl.org/podd/ns/repository#Repository");
+    
+    public static final URI PODD_REPOSITORY_MANAGER_CONTAINS_REPOSITORY = PODD.VF
+            .createURI("http://purl.org/podd/ns/repository#repositoryManagerContainsRepository");
+    
+    public static final URI PODD_REPOSITORY_ID_IN_MANAGER = PODD.VF
+            .createURI("http://purl.org/podd/ns/repository#repositoryIdInManager");
+    
+    public static final URI PODD_REPOSITORY_MANAGER_TYPE = PODD.VF
+            .createURI("http://purl.org/podd/ns/repository#repositoryManagerType");
+    
+    public static final URI PODD_REPOSITORY_MANAGER_TYPE_LOCAL = PODD.VF
+            .createURI("http://purl.org/podd/ns/repository#RepositoryManagerTypeLocal");
+    
+    public static final URI PODD_REPOSITORY_MANAGER_LOCAL_DIRECTORY = PODD.VF
+            .createURI("http://purl.org/podd/ns/repository#repositoryManagerLocalDirectory");
+    
+    public static final URI PODD_REPOSITORY_MANAGER_REMOTE_SERVER_URL = PODD.VF
+            .createURI("http://purl.org/podd/ns/repository#repositoryManagerRemoteServerUrl");
+    
+    public static final URI PODD_REPOSITORY_MANAGER_TYPE_REMOTE = PODD.VF
+            .createURI("http://purl.org/podd/ns/repository#RepositoryManagerTypeRemote");
+    
+    public static final URI PODD_REPOSITORY_CONTAINS_SCHEMA_IRI = PODD.VF
+            .createURI("http://purl.org/podd/ns/repository#containsSchemaIRI");
+    public static final URI PODD_REPOSITORY_CONTAINS_SCHEMA_VERSION = PODD.VF
+            .createURI("http://purl.org/podd/ns/repository#containsSchemaVersion");
     
 }

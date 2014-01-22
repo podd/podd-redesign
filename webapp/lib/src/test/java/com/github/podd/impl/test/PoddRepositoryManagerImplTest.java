@@ -16,6 +16,8 @@
  */
 package com.github.podd.impl.test;
 
+import java.nio.file.Path;
+
 import org.junit.Assert;
 import org.openrdf.model.Model;
 import org.openrdf.model.Resource;
@@ -30,6 +32,7 @@ import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.Rio;
 import org.openrdf.sail.memory.MemoryStore;
 
+import com.github.ansell.propertyutil.PropertyUtil;
 import com.github.podd.api.PoddRepositoryManager;
 import com.github.podd.api.test.AbstractPoddRepositoryManagerTest;
 import com.github.podd.impl.PoddRepositoryManagerImpl;
@@ -42,20 +45,14 @@ public class PoddRepositoryManagerImplTest extends AbstractPoddRepositoryManager
 {
     
     @Override
-    protected PoddRepositoryManager getNewPoddRepositoryManagerInstance() throws Exception
+    protected PoddRepositoryManager getNewPoddRepositoryManagerInstance(Repository managementRepository, Path tempDirPath) throws Exception
     {
-        final Repository managementRepository = new SailRepository(new MemoryStore());
-        managementRepository.initialize();
-        
         final Model graph =
                 Rio.parse(this.getClass().getResourceAsStream("/memorystoreconfig.ttl"), "", RDFFormat.TURTLE);
         final Resource repositoryNode = GraphUtil.getUniqueSubject(graph, RepositoryConfigSchema.REPOSITORYTYPE, null);
         final RepositoryImplConfig repositoryImplConfig = RepositoryImplConfigBase.create(graph, repositoryNode);
         Assert.assertNotNull(repositoryImplConfig);
         Assert.assertNotNull(repositoryImplConfig.getType());
-        final LocalRepositoryManager repositoryManager =
-                new LocalRepositoryManager(this.tempDir.newFolder("repositorymanager"));
-        repositoryManager.initialize();
-        return new PoddRepositoryManagerImpl(managementRepository, repositoryManager, repositoryImplConfig);
+        return new PoddRepositoryManagerImpl(managementRepository, repositoryImplConfig, "", tempDirPath, new PropertyUtil("podd"));
     }
 }

@@ -24,6 +24,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -234,8 +236,8 @@ public class ApplicationUtils
     public static Repository getNewManagementRepository(final PropertyUtil props) throws RepositoryException
     {
         final String repositoryUrl =
-                props.get(PoddWebConstants.PROPERTY_MANAGEMENT_SESAME_URL,
-                        PoddWebConstants.DEFAULT_MANAGEMENT_SESAME_URL);
+                props.get(PoddWebConstants.PROPERTY_MANAGEMENT_SESAME_LOCATION,
+                        PoddWebConstants.DEFAULT_MANAGEMENT_SESAME_LOCATION);
         
         return ApplicationUtils.getNewRepositoryInternal(repositoryUrl);
     }
@@ -325,30 +327,13 @@ public class ApplicationUtils
         final Model graph = Rio.parse(repositoryImplConfigStream, "", RDFFormat.TURTLE);
         final Resource repositoryNode = GraphUtil.getUniqueSubject(graph, RepositoryConfigSchema.REPOSITORYTYPE, null);
         final RepositoryImplConfig repositoryImplConfig = RepositoryImplConfigBase.create(graph, repositoryNode);
-        RepositoryManager repositoryManager;
-        final String repositoryManagerUrl =
-                props.get(PoddWebConstants.PROPERTY_PERMANENT_SESAME_REPOSITORY_LOCATION,
-                        PoddWebConstants.DEFAULT_PERMANENT_SESAME_REPOSITORY_LOCATION);
-        if(repositoryManagerUrl == null || repositoryManagerUrl.trim().isEmpty())
-        {
-            repositoryManager =
-                    new LocalRepositoryManager(Files.createTempDirectory("podd-temp-repositories-").toFile());
-        }
-        else
-        {
-            repositoryManager = new RemoteRepositoryManager(repositoryManagerUrl);
-        }
-        repositoryManager.initialize();
         
-        application.setPoddRepositoryManager(new PoddRepositoryManagerImpl(nextManagementRepository, repositoryManager,
-                repositoryImplConfig));
+        String poddHome = props.get(PoddWebConstants.PROPERTY_PODD_HOME, "");
+        Path poddHomePath = Paths.get(poddHome);
         
-        application.getPoddRepositoryManager().setSchemaManagementGraph(
-                PODD.VF.createURI(props.get(PoddWebConstants.PROPERTY_SCHEMA_GRAPH,
-                        PoddWebConstants.DEFAULT_SCHEMA_GRAPH)));
-        application.getPoddRepositoryManager().setArtifactManagementGraph(
-                PODD.VF.createURI(props.get(PoddWebConstants.PROPERTY_ARTIFACT_GRAPH,
-                        PoddWebConstants.DEFAULT_ARTIFACT_GRAPH)));
+        application.setPoddRepositoryManager(new PoddRepositoryManagerImpl(nextManagementRepository,
+                repositoryImplConfig, props.get(PoddWebConstants.PROPERTY_PERMANENT_SESAME_REPOSITORY_SERVER,
+                        PoddWebConstants.DEFAULT_PERMANENT_SESAME_REPOSITORY_SERVER), poddHomePath, props));
         
         // File Reference manager
         final DataReferenceProcessorRegistry nextFileRegistry = new DataReferenceProcessorRegistry();
@@ -431,7 +416,8 @@ public class ApplicationUtils
         ApplicationUtils.setupSchemas(application);
         
         final PoddSesameRealm nextRealm =
-                new PoddSesameRealm(nextManagementRepository, PODD.DEFAULT_USER_MANAGEMENT_GRAPH);
+                new PoddSesameRealm(nextManagementRepository, PODD.VF.createURI(props.get(
+                        PODD.PROPERTY_USER_MANAGEMENT_GRAPH, PODD.DEFAULT_USER_MANAGEMENT_GRAPH.stringValue())));
         
         // FIXME: Make this configurable
         nextRealm.setName("PODDRealm");

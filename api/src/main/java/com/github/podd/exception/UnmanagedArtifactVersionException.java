@@ -118,7 +118,7 @@ public class UnmanagedArtifactVersionException extends UnmanagedSchemaException
             model.add(errorResource, PODD.ERR_SOURCE, this.getUnmanagedVersionIRI().toOpenRDFURI());
             
             model.add(errorResource, OWL.ONTOLOGY, this.getOntologyID().toOpenRDFURI());
-            model.add(errorResource, PODD.OWL_VERSION_IRI, this.getArtifactVersion().toOpenRDFURI());
+            model.add(errorResource, OWL.VERSIONIRI, this.getArtifactVersion().toOpenRDFURI());
         }
         
         return model;

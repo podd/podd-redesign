@@ -48,6 +48,7 @@ import org.semanticweb.owlapi.model.OWLOntologyManagerFactoryRegistry;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactoryRegistry;
 
+import com.github.ansell.propertyutil.PropertyUtil;
 import com.github.podd.api.PoddOWLManager;
 import com.github.podd.api.file.DataReference;
 import com.github.podd.api.file.PoddDataRepository;
@@ -170,11 +171,9 @@ public class PoddFileRepositoryManagerImplTest extends AbstractPoddFileRepositor
         final RepositoryImplConfig repositoryImplConfig = RepositoryImplConfigBase.create(graph, repositoryNode);
         Assert.assertNotNull(repositoryImplConfig);
         Assert.assertNotNull(repositoryImplConfig.getType());
-        final LocalRepositoryManager repositoryManager =
-                new LocalRepositoryManager(this.tempDir.newFolder("repositorymanager"));
-        repositoryManager.initialize();
         final PoddRepositoryManagerImpl repositoryManagerImpl =
-                new PoddRepositoryManagerImpl(managementRepository, repositoryManager, repositoryImplConfig);
+                new PoddRepositoryManagerImpl(managementRepository, repositoryImplConfig, "", tempDir.newFolder(
+                        "test-podd-repository-manager").toPath(), new PropertyUtil("podd"));
         
         final PoddOWLManager owlManager =
                 new PoddOWLManagerImpl(this.getNewOWLOntologyManagerFactory(), this.getNewReasonerFactory());

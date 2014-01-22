@@ -192,7 +192,7 @@ public class UserEditResourceImpl extends AbstractUserResourceImpl
             dataModel.put("statusList", statuses);
         }
         
-        return RestletUtils.getHtmlRepresentation(PoddWebConstants.PROPERTY_TEMPLATE_BASE, dataModel,
+        return RestletUtils.getHtmlRepresentation(this.getPoddApplication().getPropertyUtil().get(PoddWebConstants.PROPERTY_TEMPLATE_BASE, PoddWebConstants.DEFAULT_TEMPLATE_BASE), dataModel,
                 MediaType.TEXT_HTML, this.getPoddApplication().getTemplateConfiguration());
     }
     

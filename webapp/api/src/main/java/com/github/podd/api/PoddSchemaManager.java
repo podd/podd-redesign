@@ -185,9 +185,10 @@ public interface PoddSchemaManager
      * @throws IllegalArgumentException
      *             If the given schemaOntologyID does not contain both an ontology IRI and a version
      *             IRI.
+     * @throws OpenRDFException
      */
     void setCurrentSchemaOntologyVersion(OWLOntologyID schemaOntologyID) throws UnmanagedSchemaOntologyIDException,
-        IllegalArgumentException;
+        IllegalArgumentException, OpenRDFException;
     
     /**
      * Sets the shared PoddOWLManager to use for Schema Ontologies and Artifact Ontologies.

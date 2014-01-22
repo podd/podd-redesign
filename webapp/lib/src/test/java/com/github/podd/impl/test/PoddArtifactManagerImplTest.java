@@ -16,6 +16,7 @@
  */
 package com.github.podd.impl.test;
 
+import java.nio.file.Path;
 import java.util.Collection;
 import java.util.List;
 
@@ -38,6 +39,7 @@ import org.semanticweb.owlapi.model.OWLOntologyManagerFactoryRegistry;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactoryRegistry;
 
+import com.github.ansell.propertyutil.PropertyUtil;
 import com.github.podd.api.PoddArtifactManager;
 import com.github.podd.api.PoddOWLManager;
 import com.github.podd.api.PoddRepositoryManager;
@@ -119,10 +121,8 @@ public class PoddArtifactManagerImplTest extends AbstractPoddArtifactManagerTest
     }
     
     @Override
-    protected PoddRepositoryManager getNewRepositoryManager() throws Exception
+    protected PoddRepositoryManager getNewRepositoryManager(Repository managementRepository, Path testPath) throws Exception
     {
-        final Repository managementRepository = new SailRepository(new MemoryStore());
-        managementRepository.initialize();
         
         final Model graph =
                 Rio.parse(this.getClass().getResourceAsStream("/memorystoreconfig.ttl"), "", RDFFormat.TURTLE);
@@ -130,10 +130,7 @@ public class PoddArtifactManagerImplTest extends AbstractPoddArtifactManagerTest
         final RepositoryImplConfig repositoryImplConfig = RepositoryImplConfigBase.create(graph, repositoryNode);
         Assert.assertNotNull(repositoryImplConfig);
         Assert.assertNotNull(repositoryImplConfig.getType());
-        final LocalRepositoryManager repositoryManager =
-                new LocalRepositoryManager(this.tempDir.newFolder("repositorymanager"));
-        repositoryManager.initialize();
-        return new PoddRepositoryManagerImpl(managementRepository, repositoryManager, repositoryImplConfig);
+        return new PoddRepositoryManagerImpl(managementRepository, repositoryImplConfig, "", testPath, new PropertyUtil("podd"));
     }
     
     @Override

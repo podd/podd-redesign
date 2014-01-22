@@ -29,6 +29,7 @@ import org.openrdf.model.Model;
 import org.openrdf.model.URI;
 import org.openrdf.repository.RepositoryConnection;
 import org.semanticweb.owlapi.model.IRI;
+import org.semanticweb.owlapi.model.OWLOntologyID;
 
 import com.github.podd.exception.SchemaManifestException;
 import com.github.podd.exception.UnmanagedArtifactIRIException;
@@ -533,7 +534,7 @@ public interface PoddSesameManager
      * @param context
      * @throws OpenRDFException
      */
-    void updateManagedSchemaOntologyVersion(InferredOWLOntologyID nextOntologyID, boolean updateCurrent,
+    void updateManagedSchemaOntologyVersion(OWLOntologyID nextOntologyID, boolean updateCurrent,
             RepositoryConnection repositoryConnection, URI context) throws OpenRDFException;
     
     /**
