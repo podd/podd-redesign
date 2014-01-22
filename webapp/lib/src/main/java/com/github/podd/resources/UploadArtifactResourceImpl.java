@@ -283,7 +283,10 @@ public class UploadArtifactResourceImpl extends AbstractPoddResourceImpl
         {
             try
             {
-                managementConnection.close();
+                if(managementConnection != null)
+                {
+                    managementConnection.close();
+                }
             }
             catch(RepositoryException e)
             {
