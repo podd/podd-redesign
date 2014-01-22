@@ -8,6 +8,6 @@
 [] rep:repositoryType "openrdf:SailRepository" ;
       sr:sailImpl [
          sail:sailType "openrdf:NativeStore";
-         sail:tripleIndexes "spoc,cspo,posc,cpos,cpso,psoc"
+         native:tripleIndexes "spoc,cspo,posc,cpos,cpso,psoc"
       ]
 .
