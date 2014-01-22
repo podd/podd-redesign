@@ -478,12 +478,24 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             {
                 model = this.sesameManager.getObjectTypeContainsMetadata(objectType, permanentConnection, contexts);
             }
-            else
+            else if(containsPropertyPolicy == MetadataPolicy.EXCLUDE_CONTAINS)
             {
                 model =
                         this.sesameManager.getObjectTypeMetadata(objectType, includeDoNotDisplayProperties,
                                 containsPropertyPolicy, permanentConnection, contexts);
             }
+            else if(containsPropertyPolicy == MetadataPolicy.INCLUDE_ALL)
+            {
+                model =
+                        this.sesameManager.getObjectTypeMetadata(objectType, includeDoNotDisplayProperties,
+                                containsPropertyPolicy, permanentConnection, contexts);
+            }
+            else
+            {
+                // Will need to implement the policy separately
+                throw new PoddRuntimeException("Did not recognise metadata policy: "+ containsPropertyPolicy);
+            }
+            
             Rio.write(model, outputStream, format);
         }
         finally
