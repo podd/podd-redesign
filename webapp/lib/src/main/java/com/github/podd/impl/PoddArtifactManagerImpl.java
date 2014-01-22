@@ -1761,9 +1761,8 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         managementConnection.remove(inferredOWLOntologyID.getOntologyIRI().toOpenRDFURI(), OWL.IMPORTS, null, this
                 .getRepositoryManager().getArtifactManagementGraph());
         
-        for(final Statement nextImport : Iterations.asList(permanentConnection.getStatements(inferredOWLOntologyID
-                .getOntologyIRI().toOpenRDFURI(), OWL.IMPORTS, null, true, inferredOWLOntologyID.getVersionIRI()
-                .toOpenRDFURI())))
+        for(final Statement nextImport : Iterations.asList(tempRepositoryConnection.getStatements(null, OWL.IMPORTS,
+                null, true, tempContext)))
         {
             managementConnection.add(inferredOWLOntologyID.getOntologyIRI().toOpenRDFURI(), OWL.IMPORTS,
                     nextImport.getObject(), this.getRepositoryManager().getArtifactManagementGraph());
