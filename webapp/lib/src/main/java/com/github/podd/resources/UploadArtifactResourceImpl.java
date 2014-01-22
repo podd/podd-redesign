@@ -79,6 +79,7 @@ import com.github.podd.restlet.PoddAction;
 import com.github.podd.restlet.PoddSesameRealm;
 import com.github.podd.restlet.PoddWebServiceApplication;
 import com.github.podd.restlet.RestletUtils;
+import com.github.podd.utils.DebugUtils;
 import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.OntologyUtils;
 import com.github.podd.utils.PODD;
@@ -218,8 +219,10 @@ public class UploadArtifactResourceImpl extends AbstractPoddResourceImpl
         // Output the base template, with contentTemplate from the dataModel
         // defining the
         // template to use for the content in the body of the page
-        return RestletUtils.getHtmlRepresentation(this.getPoddApplication().getPropertyUtil().get(PoddWebConstants.PROPERTY_TEMPLATE_BASE, PoddWebConstants.DEFAULT_TEMPLATE_BASE), dataModel,
-                MediaType.TEXT_HTML, this.getPoddApplication().getTemplateConfiguration());
+        return RestletUtils.getHtmlRepresentation(
+                this.getPoddApplication().getPropertyUtil()
+                        .get(PoddWebConstants.PROPERTY_TEMPLATE_BASE, PoddWebConstants.DEFAULT_TEMPLATE_BASE),
+                dataModel, MediaType.TEXT_HTML, this.getPoddApplication().getTemplateConfiguration());
     }
     
     /**
@@ -246,8 +249,10 @@ public class UploadArtifactResourceImpl extends AbstractPoddResourceImpl
         // Output the base template, with contentTemplate from the dataModel
         // defining the
         // template to use for the content in the body of the page
-        return RestletUtils.getHtmlRepresentation(this.getPoddApplication().getPropertyUtil().get(PoddWebConstants.PROPERTY_TEMPLATE_BASE, PoddWebConstants.DEFAULT_TEMPLATE_BASE), dataModel,
-                MediaType.TEXT_HTML, this.getPoddApplication().getTemplateConfiguration());
+        return RestletUtils.getHtmlRepresentation(
+                this.getPoddApplication().getPropertyUtil()
+                        .get(PoddWebConstants.PROPERTY_TEMPLATE_BASE, PoddWebConstants.DEFAULT_TEMPLATE_BASE),
+                dataModel, MediaType.TEXT_HTML, this.getPoddApplication().getTemplateConfiguration());
     }
     
     @Post(":rdf|rj|json|ttl")
@@ -262,6 +267,29 @@ public class UploadArtifactResourceImpl extends AbstractPoddResourceImpl
         
         this.log.info("Successfully loaded artifact {}", artifactId);
         
+        RepositoryConnection managementConnection = null;
+        
+        try
+        {
+            managementConnection = this.getPoddRepositoryManager().getManagementRepositoryConnection();
+            DebugUtils
+                    .printContents(managementConnection, this.getPoddRepositoryManager().getArtifactManagementGraph());
+        }
+        catch(OpenRDFException e)
+        {
+            log.error("Error debugging artifact management graph", e);
+        }
+        finally
+        {
+            try
+            {
+                managementConnection.close();
+            }
+            catch(RepositoryException e)
+            {
+                log.error("Error closing repository connection", e);
+            }
+        }
         final ByteArrayOutputStream output = new ByteArrayOutputStream(8096);
         
         final RDFWriter writer =
@@ -302,13 +330,14 @@ public class UploadArtifactResourceImpl extends AbstractPoddResourceImpl
                         this.getPoddArtifactManager().getSchemaImports(artifactId);
                 permanentConnection = this.getPoddRepositoryManager().getPermanentRepositoryConnection(schemaImports);
                 final URI topObjectIRI =
-                        this.getPoddArtifactManager().getSesameManager().getTopObjectIRI(artifactId, permanentConnection);
+                        this.getPoddArtifactManager().getSesameManager()
+                                .getTopObjectIRI(artifactId, permanentConnection);
                 
                 writer.handleStatement(PODD.VF.createStatement(artifactId.getOntologyIRI().toOpenRDFURI(),
                         PODD.PODD_BASE_HAS_TOP_OBJECT, topObjectIRI));
                 final Set<Statement> topObjectTypes =
-                        Iterations.asSet(permanentConnection.getStatements(topObjectIRI, RDF.TYPE, null, true, artifactId
-                                .getVersionIRI().toOpenRDFURI()));
+                        Iterations.asSet(permanentConnection.getStatements(topObjectIRI, RDF.TYPE, null, true,
+                                artifactId.getVersionIRI().toOpenRDFURI()));
                 
                 for(final Statement nextTopObjectType : topObjectTypes)
                 {
