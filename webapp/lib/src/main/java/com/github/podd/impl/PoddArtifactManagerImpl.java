@@ -493,7 +493,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             else
             {
                 // Will need to implement the policy separately
-                throw new PoddRuntimeException("Did not recognise metadata policy: "+ containsPropertyPolicy);
+                throw new PoddRuntimeException("Did not recognise metadata policy: " + containsPropertyPolicy);
             }
             
             Rio.write(model, outputStream, format);
@@ -1048,7 +1048,12 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             managementConnection.export(new StatementCollector(model), this.getRepositoryManager()
                     .getSchemaManagementGraph());
             
-            return new LinkedHashSet<>(OntologyUtils.artifactImports(inferredOWLOntologyID, model));
+            Set<OWLOntologyID> result =
+                    new LinkedHashSet<>(OntologyUtils.artifactImports(inferredOWLOntologyID, model));
+            
+            this.log.info("Returning from getSchemaImports: {} {}", artifactID, result);
+            
+            return result;
         }
         finally
         {
@@ -2214,8 +2219,8 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             this.log.info("Setting version IRI to <{}>", newVersionIRI);
             tempRepositoryConnection.remove(artifactID.getOntologyIRI().toOpenRDFURI(), OWL.VERSIONIRI, null,
                     tempContext);
-            tempRepositoryConnection.add(artifactID.getOntologyIRI().toOpenRDFURI(), OWL.VERSIONIRI,
-                    newVersionIRI, tempContext);
+            tempRepositoryConnection.add(artifactID.getOntologyIRI().toOpenRDFURI(), OWL.VERSIONIRI, newVersionIRI,
+                    tempContext);
             
             // check and ensure schema ontology imports are for version IRIs
             // WARNING: This method MUST not be used to update schema imports. If they are updated
