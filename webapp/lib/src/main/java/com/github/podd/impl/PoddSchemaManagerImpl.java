@@ -517,6 +517,11 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
                                     nextImportStatement.getObject(), this.repositoryManager.getSchemaManagementGraph());
                         }
                         
+                        // Add from the schema manifest
+                        managementConnection.add(
+                                model.filter(nextResult.getVersionIRI().toOpenRDFURI(), OWL.IMPORTS, null),
+                                this.repositoryManager.getSchemaManagementGraph());
+                        
                         managementConnection.commit();
                         
                         results.add(nextResult);
