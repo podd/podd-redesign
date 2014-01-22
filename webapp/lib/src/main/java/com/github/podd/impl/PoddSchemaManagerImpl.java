@@ -407,7 +407,6 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
         {
             
             managementConnection = this.repositoryManager.getManagementRepositoryConnection();
-            managementConnection.begin();
             
             // HACK: The raw schema manifest does not necessarily include the inferred ontology
             // information which breaks the workflow if the non-inferred ontology IDs are triggered
@@ -484,6 +483,7 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
                                     "Could not find schema at designated classpath location: " + classpathLocation);
                         }
                         
+                        managementConnection.begin();
                         final OWLOntologyID schemaOntologyID = null;
                         final InferredOWLOntologyID nextResult =
                                 this.uploadSchemaOntologyInternal(schemaOntologyID, inputStream, fileFormat,
@@ -512,6 +512,8 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
                                     nextImportStatement.getObject(), this.repositoryManager.getSchemaManagementGraph());
                         }
                         
+                        managementConnection.commit();
+                        
                         results.add(nextResult);
                     }
                     
@@ -520,7 +522,6 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
             
             this.log.info("Completed loading schema ontologies");
             
-            managementConnection.commit();
             return results;
         }
         catch(final Throwable e)
