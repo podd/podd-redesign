@@ -73,7 +73,7 @@ public class UserPasswordResourceImplTest extends AbstractResourceImplTest
             final Representation input = new StringRepresentation(out.toString(), mediaType);
             
             final Representation modifiedResults =
-                    RestletTestUtils.doTestAuthenticatedRequest(userPasswordClientResource, Method.POST, input,
+                    this.doTestAuthenticatedRequest(userPasswordClientResource, Method.POST, input,
                             mediaType, Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
             
             // verify: response has correct identifier
@@ -87,7 +87,7 @@ public class UserPasswordResourceImplTest extends AbstractResourceImplTest
             userDetailsClientResource2.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, testIdentifier);
             try
             {
-                RestletTestUtils.doTestAuthenticatedRequest(userDetailsClientResource2, Method.GET, null, mediaType,
+                this.doTestAuthenticatedRequest(userDetailsClientResource2, Method.GET, null, mediaType,
                         Status.CLIENT_ERROR_UNAUTHORIZED, AbstractResourceImplTest.NO_ADMIN);
                 Assert.fail("Should have thrown a ResourceException as password should now be invalid");
             }
@@ -136,7 +136,7 @@ public class UserPasswordResourceImplTest extends AbstractResourceImplTest
             final Representation input = new StringRepresentation(out.toString(), mediaType);
             
             final Representation modifiedResults =
-                    RestletTestUtils.doTestAuthenticatedRequest(userPasswordClientResource, Method.POST, input,
+                    this.doTestAuthenticatedRequest(userPasswordClientResource, Method.POST, input,
                             mediaType, Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
             
             // verify: response has correct identifier
@@ -151,7 +151,7 @@ public class UserPasswordResourceImplTest extends AbstractResourceImplTest
             
             try
             {
-                RestletTestUtils.doTestAuthenticatedRequest(userDetailsClientResource2, Method.GET, null, mediaType,
+                this.doTestAuthenticatedRequest(userDetailsClientResource2, Method.GET, null, mediaType,
                         Status.CLIENT_ERROR_UNAUTHORIZED, AbstractResourceImplTest.WITH_ADMIN);
                 Assert.fail("Should have thrown a ResourceException as password should now be invalid");
             }
@@ -182,7 +182,7 @@ public class UserPasswordResourceImplTest extends AbstractResourceImplTest
             userPasswordClientResource.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, testIdentifier);
             
             final Representation results =
-                    RestletTestUtils.doTestAuthenticatedRequest(userPasswordClientResource, Method.GET, null,
+                    this.doTestAuthenticatedRequest(userPasswordClientResource, Method.GET, null,
                             MediaType.TEXT_HTML, Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
             
             final String body = this.getText(results);

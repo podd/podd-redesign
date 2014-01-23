@@ -92,8 +92,6 @@ public class PoddSesameRealm extends Realm
     
     /**
      * Enroler class based on the default security model.
-     * 
-     * NOTE: 2013/01/22 - this class uses PoddRoles
      */
     private class DefaultPoddSesameRealmEnroler implements Enroler
     {
@@ -156,8 +154,6 @@ public class PoddSesameRealm extends Realm
     /**
      * Verifier class based on the default security model. It looks up users in the mapped
      * organizations.
-     * 
-     * NOTE: 2013/01/22 - this class is identical to the DefaultPoddSesameRealmVerifier.java
      */
     private class DefaultPoddSesameRealmVerifier extends LocalVerifier
     {

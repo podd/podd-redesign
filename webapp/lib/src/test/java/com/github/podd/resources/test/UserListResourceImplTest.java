@@ -36,7 +36,7 @@ public class UserListResourceImplTest extends AbstractResourceImplTest
         final ClientResource userListClientResource = new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_LIST));
         try
         {
-            RestletTestUtils.doTestAuthenticatedRequest(userListClientResource, Method.GET, null,
+            this.doTestAuthenticatedRequest(userListClientResource, Method.GET, null,
                     MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK, AbstractResourceImplTest.NO_ADMIN);
             Assert.fail("Should've failed due to lack of authorization");
         }
@@ -58,7 +58,7 @@ public class UserListResourceImplTest extends AbstractResourceImplTest
         try
         {
             final Representation results =
-                    RestletTestUtils.doTestAuthenticatedRequest(userListClientResource, Method.GET, null,
+                    this.doTestAuthenticatedRequest(userListClientResource, Method.GET, null,
                             MediaType.TEXT_HTML, Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
             
             final String body = this.getText(results);
@@ -81,7 +81,7 @@ public class UserListResourceImplTest extends AbstractResourceImplTest
         try
         {
             final Representation results =
-                    RestletTestUtils.doTestAuthenticatedRequest(userListClientResource, Method.GET, null, mediaType,
+                    this.doTestAuthenticatedRequest(userListClientResource, Method.GET, null, mediaType,
                             Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
             
             final Model resultsModel = this.assertRdf(results, format, 16);

@@ -169,7 +169,7 @@ public class DataReferenceAttachResourceImplTest extends AbstractResourceImplTes
                             MediaType.APPLICATION_RDF_XML);
             
             final Representation results =
-                    RestletTestUtils.doTestAuthenticatedRequest(fileRefAttachClientResource, Method.POST, input,
+                    this.doTestAuthenticatedRequest(fileRefAttachClientResource, Method.POST, input,
                             MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
             
             final Model ontologyIDModel = this.assertRdf(results, RDFFormat.RDFXML, 3);
@@ -256,7 +256,7 @@ public class DataReferenceAttachResourceImplTest extends AbstractResourceImplTes
                         new StringRepresentation(fileReferenceAsString, MediaType.APPLICATION_RDF_XML);
                 
                 final Representation results =
-                        RestletTestUtils.doTestAuthenticatedRequest(fileRefAttachClientResource, Method.POST, input,
+                        this.doTestAuthenticatedRequest(fileRefAttachClientResource, Method.POST, input,
                                 MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
                 
                 final String body = this.getText(results);
@@ -315,7 +315,7 @@ public class DataReferenceAttachResourceImplTest extends AbstractResourceImplTes
                             MediaType.APPLICATION_RDF_TURTLE);
             
             final Representation results =
-                    RestletTestUtils.doTestAuthenticatedRequest(fileRefAttachClientResource, Method.POST, input,
+                    this.doTestAuthenticatedRequest(fileRefAttachClientResource, Method.POST, input,
                             MediaType.APPLICATION_RDF_TURTLE, Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
             
             final String body = this.getText(results);
@@ -376,7 +376,7 @@ public class DataReferenceAttachResourceImplTest extends AbstractResourceImplTes
                         new StringRepresentation(fileReferenceAsString, MediaType.APPLICATION_RDF_TURTLE);
                 
                 final Representation results =
-                        RestletTestUtils.doTestAuthenticatedRequest(fileRefAttachClientResource, Method.POST, input,
+                        this.doTestAuthenticatedRequest(fileRefAttachClientResource, Method.POST, input,
                                 MediaType.APPLICATION_RDF_TURTLE, Status.SUCCESS_OK,
                                 AbstractResourceImplTest.WITH_ADMIN);
                 

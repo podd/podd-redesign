@@ -58,7 +58,7 @@ public class ListArtifactsResourceImplTest extends AbstractResourceImplTest
             // Representation results =
             // listArtifactsClientResource.get(MediaType.TEXT_HTML);
             final Representation results =
-                    RestletTestUtils.doTestAuthenticatedRequest(listArtifactsClientResource, Method.GET, null,
+                    this.doTestAuthenticatedRequest(listArtifactsClientResource, Method.GET, null,
                             MediaType.TEXT_HTML, Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
             
             final String body = this.getText(results);
@@ -98,7 +98,7 @@ public class ListArtifactsResourceImplTest extends AbstractResourceImplTest
             // Representation results =
             // listArtifactsClientResource.get(MediaType.TEXT_HTML);
             final Representation results =
-                    RestletTestUtils.doTestAuthenticatedRequest(listArtifactsClientResource, Method.GET, null,
+                    this.doTestAuthenticatedRequest(listArtifactsClientResource, Method.GET, null,
                             MediaType.TEXT_HTML, Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
             
             final String body = this.getText(results);
@@ -138,7 +138,7 @@ public class ListArtifactsResourceImplTest extends AbstractResourceImplTest
             // Representation results =
             // listArtifactsClientResource.get(MediaType.TEXT_HTML);
             final Representation results =
-                    RestletTestUtils.doTestAuthenticatedRequest(listArtifactsClientResource, Method.GET, null,
+                    this.doTestAuthenticatedRequest(listArtifactsClientResource, Method.GET, null,
                             RestletUtilMediaType.APPLICATION_RDF_JSON, Status.SUCCESS_OK,
                             AbstractResourceImplTest.WITH_ADMIN);
             
@@ -174,7 +174,7 @@ public class ListArtifactsResourceImplTest extends AbstractResourceImplTest
             // Representation results =
             // listArtifactsClientResource.get(MediaType.TEXT_HTML);
             final Representation results =
-                    RestletTestUtils.doTestAuthenticatedRequest(listArtifactsClientResource, Method.GET, null,
+                    this.doTestAuthenticatedRequest(listArtifactsClientResource, Method.GET, null,
                             RestletUtilMediaType.APPLICATION_RDF_JSON, Status.SUCCESS_OK,
                             AbstractResourceImplTest.WITH_ADMIN);
             

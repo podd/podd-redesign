@@ -59,7 +59,11 @@ import org.openrdf.rio.UnsupportedRDFormatException;
 import org.restlet.Client;
 import org.restlet.Component;
 import org.restlet.Context;
+import org.restlet.Response;
 import org.restlet.Server;
+import org.restlet.data.ChallengeRequest;
+import org.restlet.data.ChallengeResponse;
+import org.restlet.data.ChallengeScheme;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Protocol;
@@ -68,6 +72,7 @@ import org.restlet.representation.FileRepresentation;
 import org.restlet.representation.Representation;
 import org.restlet.representation.StringRepresentation;
 import org.restlet.resource.ClientResource;
+import org.restlet.resource.ResourceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -277,6 +282,111 @@ public class AbstractResourceImplTest
         return fileRep;
     }
     
+    public Representation doTestAuthenticatedRequest(final ClientResource clientResource, final Method requestMethod,
+            final Representation inputRepresentation, final MediaType requestMediaType,
+            final Status expectedResponseStatus, final boolean requiresAdminPrivileges)
+    {
+        Representation result = null;
+        
+        try
+        {
+            if(requestMethod.equals(Method.DELETE))
+            {
+                result = clientResource.delete(requestMediaType);
+            }
+            else if(requestMethod.equals(Method.PUT))
+            {
+                result = clientResource.put(inputRepresentation, requestMediaType);
+            }
+            else if(requestMethod.equals(Method.GET))
+            {
+                result = clientResource.get(requestMediaType);
+            }
+            else if(requestMethod.equals(Method.POST))
+            {
+                result = clientResource.post(inputRepresentation, requestMediaType);
+            }
+            else
+            {
+                throw new RuntimeException("Did not recognise request method: " + requestMethod.toString());
+            }
+            Assert.fail("Expected to receive an authentication challenge");
+        }
+        catch(final ResourceException re)
+        {
+            Assert.assertNotNull(re.getStatus());
+            
+            Assert.assertEquals(Status.CLIENT_ERROR_UNAUTHORIZED.getCode(), re.getStatus().getCode());
+        }
+        
+        // add the challenge response to complete the authentication on the client side
+        if(requiresAdminPrivileges)
+        {
+            clientResource.setChallengeResponse(RestletTestUtils.getTestChallengeResponseAdmin(clientResource));
+        }
+        else
+        {
+            clientResource.setChallengeResponse(RestletTestUtils.getTestChallengeResponse(clientResource));
+        }
+        
+        if(requestMethod.equals(Method.DELETE))
+        {
+            result = clientResource.delete(requestMediaType);
+        }
+        else if(requestMethod.equals(Method.PUT))
+        {
+            result = clientResource.put(inputRepresentation, requestMediaType);
+        }
+        else if(requestMethod.equals(Method.GET))
+        {
+            result = clientResource.get(requestMediaType);
+        }
+        else if(requestMethod.equals(Method.POST))
+        {
+            result = clientResource.post(inputRepresentation, requestMediaType);
+        }
+        else
+        {
+            throw new RuntimeException("Did not recognise request method: " + requestMethod.toString());
+        }
+        
+        Assert.assertEquals(expectedResponseStatus.getCode(), clientResource.getResponse().getStatus().getCode());
+        
+        return result;
+    }
+    
+    public ChallengeResponse getTestChallengeResponse(final ClientResource clientResource)
+    {
+        return this.getTestChallengeResponse(clientResource.getChallengeRequests(), ChallengeScheme.HTTP_DIGEST,
+                clientResource.getResponse(), RestletTestUtils.TEST_USERNAME, RestletTestUtils.TEST_PASSWORD);
+    }
+    
+    public ChallengeResponse getTestChallengeResponse(final List<ChallengeRequest> list,
+            final ChallengeScheme httpDigest, final Response response, final String userName, final char[] password)
+    {
+        ChallengeRequest c1 = null;
+        for(final ChallengeRequest challengeRequest : list)
+        {
+            if(ChallengeScheme.HTTP_DIGEST.equals(challengeRequest.getScheme()))
+            {
+                c1 = challengeRequest;
+                break;
+            }
+        }
+        
+        // 2- Create the Challenge response used by the client to authenticate its requests.
+        final ChallengeResponse challengeResponse = new ChallengeResponse(c1, response, userName, password);
+        
+        return challengeResponse;
+    }
+    
+    public ChallengeResponse getTestChallengeResponseAdmin(final ClientResource clientResource)
+    {
+        return this.getTestChallengeResponse(clientResource.getChallengeRequests(), ChallengeScheme.HTTP_DIGEST,
+                clientResource.getResponse(), RestletTestUtils.TEST_ADMIN_USERNAME,
+                RestletTestUtils.TEST_ADMIN_PASSWORD);
+    }
+    
     /**
      * Retrieves the asserted statements of a given artifact from the Server as a String.
      * 
@@ -297,7 +407,7 @@ public class AbstractResourceImplTest
             getArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactUri);
             
             final Representation results =
-                    RestletTestUtils.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null,
+                    this.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null,
                             RestletUtilMediaType.APPLICATION_RDF_JSON, Status.SUCCESS_OK,
                             AbstractResourceImplTest.WITH_ADMIN);
             
@@ -329,7 +439,7 @@ public class AbstractResourceImplTest
             getArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactUri);
             
             final Representation results =
-                    RestletTestUtils.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null, mediaType,
+                    this.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null, mediaType,
                             Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
             
             return this.getText(results);
@@ -450,7 +560,7 @@ public class AbstractResourceImplTest
             final Representation input = this.buildRepresentationFromResource(resourceName, mediaType);
             
             final Representation results =
-                    RestletTestUtils.doTestAuthenticatedRequest(uploadArtifactClientResource, Method.POST, input,
+                    this.doTestAuthenticatedRequest(uploadArtifactClientResource, Method.POST, input,
                             MediaType.APPLICATION_RDF_TURTLE, Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
             final String body = this.getText(results);
             // this.log.info(body);
@@ -570,7 +680,7 @@ public class AbstractResourceImplTest
             final Representation input = new StringRepresentation(out.toString(), mediaType);
             
             final Representation results =
-                    RestletTestUtils.doTestAuthenticatedRequest(userAddClientResource, Method.POST, input, mediaType,
+                    this.doTestAuthenticatedRequest(userAddClientResource, Method.POST, input, mediaType,
                             Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
             
             // verify: response has 1 statement and identifier is correct
@@ -624,7 +734,7 @@ public class AbstractResourceImplTest
             Rio.write(newModel, out, format);
             final Representation input = new StringRepresentation(out.toString(), mediaType);
             final Representation modifiedResults =
-                    RestletTestUtils.doTestAuthenticatedRequest(userRolesClientResource, Method.POST, input, mediaType,
+                    this.doTestAuthenticatedRequest(userRolesClientResource, Method.POST, input, mediaType,
                             Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
             final Model model = this.assertRdf(modifiedResults, RDFFormat.RDFXML, 1);
             Assert.assertEquals("Unexpected user identifier", userIdentifier,

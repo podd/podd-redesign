@@ -51,7 +51,7 @@ public class GetMetadataResourceImplTest extends AbstractResourceImplTest
             createObjectClientResource.addQueryParameter(PoddWebConstants.KEY_OBJECT_TYPE_IDENTIFIER, objectType);
             
             final Representation results =
-                    RestletTestUtils.doTestAuthenticatedRequest(createObjectClientResource, Method.GET, null,
+                    this.doTestAuthenticatedRequest(createObjectClientResource, Method.GET, null,
                             MediaType.APPLICATION_RDF_TURTLE, Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
             
             // FIXME: Is there a better way to do this
@@ -87,7 +87,7 @@ public class GetMetadataResourceImplTest extends AbstractResourceImplTest
                     PoddWebConstants.METADATA_ONLY_CONTAINS);
             
             final Representation results =
-                    RestletTestUtils.doTestAuthenticatedRequest(createObjectClientResource, Method.GET, null,
+                    this.doTestAuthenticatedRequest(createObjectClientResource, Method.GET, null,
                             MediaType.APPLICATION_RDF_TURTLE, Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
             
             // verify:
@@ -143,7 +143,7 @@ public class GetMetadataResourceImplTest extends AbstractResourceImplTest
                         PoddWebConstants.METADATA_ONLY_CONTAINS);
                 
                 final Representation results =
-                        RestletTestUtils.doTestAuthenticatedRequest(createObjectClientResource, Method.GET, null,
+                        this.doTestAuthenticatedRequest(createObjectClientResource, Method.GET, null,
                                 MediaType.APPLICATION_RDF_TURTLE, Status.SUCCESS_OK,
                                 AbstractResourceImplTest.WITH_ADMIN);
                 
@@ -178,7 +178,7 @@ public class GetMetadataResourceImplTest extends AbstractResourceImplTest
                     PoddWebConstants.METADATA_ONLY_CONTAINS);
             
             final Representation results =
-                    RestletTestUtils.doTestAuthenticatedRequest(createObjectClientResource, Method.GET, null,
+                    this.doTestAuthenticatedRequest(createObjectClientResource, Method.GET, null,
                             MediaType.APPLICATION_RDF_TURTLE, Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
             
             // final String body = getText(results);
@@ -225,7 +225,7 @@ public class GetMetadataResourceImplTest extends AbstractResourceImplTest
             createObjectClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactUri);
             
             final Representation results =
-                    RestletTestUtils.doTestAuthenticatedRequest(createObjectClientResource, Method.GET, null,
+                    this.doTestAuthenticatedRequest(createObjectClientResource, Method.GET, null,
                             MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
             
             // verify: received contents are in RDF
@@ -258,7 +258,7 @@ public class GetMetadataResourceImplTest extends AbstractResourceImplTest
             // poddBase:contains
             
             final Representation results =
-                    RestletTestUtils.doTestAuthenticatedRequest(createObjectClientResource, Method.GET, null,
+                    this.doTestAuthenticatedRequest(createObjectClientResource, Method.GET, null,
                             MediaType.APPLICATION_RDF_TURTLE, Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
             
             // verify:
@@ -296,7 +296,7 @@ public class GetMetadataResourceImplTest extends AbstractResourceImplTest
             // poddBase:contains
             
             final Representation results =
-                    RestletTestUtils.doTestAuthenticatedRequest(createObjectClientResource, Method.GET, null,
+                    this.doTestAuthenticatedRequest(createObjectClientResource, Method.GET, null,
                             MediaType.APPLICATION_RDF_TURTLE, Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
             
             // verify:
@@ -329,7 +329,7 @@ public class GetMetadataResourceImplTest extends AbstractResourceImplTest
             // poddBase:contains
             
             final Representation results =
-                    RestletTestUtils.doTestAuthenticatedRequest(createObjectClientResource, Method.GET, null,
+                    this.doTestAuthenticatedRequest(createObjectClientResource, Method.GET, null,
                             MediaType.APPLICATION_RDF_TURTLE, Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
             
             // verify:

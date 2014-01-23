@@ -128,7 +128,7 @@ public class UploadArtifactResourcePerformanceTest extends AbstractResourceImplT
             getArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactUri);
             
             final Representation results =
-                    RestletTestUtils.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null,
+                    this.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null,
                             MediaType.APPLICATION_RDF_TURTLE, Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
             
             // load into a Model and find statement count
@@ -157,7 +157,7 @@ public class UploadArtifactResourcePerformanceTest extends AbstractResourceImplT
         final Representation input = this.buildRepresentationFromResource(this.filename, this.mediaType);
         
         final Representation results =
-                RestletTestUtils.doTestAuthenticatedRequest(uploadArtifactClientResource, Method.POST, input,
+                this.doTestAuthenticatedRequest(uploadArtifactClientResource, Method.POST, input,
                         MediaType.TEXT_PLAIN, Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
         
         // verify: results (expecting the added artifact's ontology IRI)

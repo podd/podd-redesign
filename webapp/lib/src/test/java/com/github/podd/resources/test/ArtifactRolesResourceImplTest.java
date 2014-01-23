@@ -45,7 +45,7 @@ public class ArtifactRolesResourceImplTest extends AbstractResourceImplTest
             getArtifactRolesClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactUri);
             
             final Representation results =
-                    RestletTestUtils.doTestAuthenticatedRequest(getArtifactRolesClientResource, Method.GET, null,
+                    this.doTestAuthenticatedRequest(getArtifactRolesClientResource, Method.GET, null,
                             MediaType.TEXT_HTML, Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
             
             final String body = this.getText(results);
@@ -77,7 +77,7 @@ public class ArtifactRolesResourceImplTest extends AbstractResourceImplTest
             getArtifactRolesClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactUri);
             
             final Representation results =
-                    RestletTestUtils.doTestAuthenticatedRequest(getArtifactRolesClientResource, Method.GET, null,
+                    this.doTestAuthenticatedRequest(getArtifactRolesClientResource, Method.GET, null,
                             RestletUtilMediaType.APPLICATION_RDF_JSON, Status.SUCCESS_OK,
                             AbstractResourceImplTest.WITH_ADMIN);
             

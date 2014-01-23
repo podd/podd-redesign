@@ -64,7 +64,7 @@ public class AddObjectResourceImplTest extends AbstractResourceImplTest
                     "http://purl.org/podd/ns/poddScience#hasPublication");
             
             final Representation results =
-                    RestletTestUtils.doTestAuthenticatedRequest(addObjectClientResource, Method.GET, null,
+                    this.doTestAuthenticatedRequest(addObjectClientResource, Method.GET, null,
                             MediaType.TEXT_HTML, Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
             
             final String body = this.getText(results);
@@ -103,7 +103,7 @@ public class AddObjectResourceImplTest extends AbstractResourceImplTest
                     "http://purl.org/podd/ns/poddScience#Project");
             
             final Representation results =
-                    RestletTestUtils.doTestAuthenticatedRequest(addObjectClientResource, Method.GET, null,
+                    this.doTestAuthenticatedRequest(addObjectClientResource, Method.GET, null,
                             MediaType.TEXT_HTML, Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
             
             final String body = this.getText(results);

@@ -93,7 +93,7 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
             getArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER,
                     "http://purl.org/podd/ns/artifact/artifact89");
             
-            RestletTestUtils.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null,
+            this.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null,
                     MediaType.APPLICATION_RDF_XML, Status.CLIENT_ERROR_NOT_FOUND, AbstractResourceImplTest.WITH_ADMIN);
             Assert.fail("Should have thrown a ResourceException with Status Code 404");
         }
@@ -121,7 +121,7 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
             getArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER,
                     "http://purl.org/podd/ns/artifact/artifact89");
             
-            RestletTestUtils.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null,
+            this.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null,
                     MediaType.APPLICATION_RDF_XML, Status.CLIENT_ERROR_NOT_FOUND, AbstractResourceImplTest.NO_ADMIN);
             Assert.fail("Should have thrown a ResourceException with Status Code 404");
         }
@@ -202,7 +202,7 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
             getArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactUri);
             
             final Representation results =
-                    RestletTestUtils.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null,
+                    this.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null,
                             MediaType.TEXT_HTML, Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
             
             final String body = this.getText(results);
@@ -241,7 +241,7 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
             getArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactUri);
             
             final Representation results =
-                    RestletTestUtils.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null,
+                    this.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null,
                             MediaType.TEXT_HTML, Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
             
             final String body = this.getText(results);
@@ -293,7 +293,7 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
             getArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactUri);
             
             final Representation results =
-                    RestletTestUtils.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null,
+                    this.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null,
                             RestletUtilMediaType.APPLICATION_RDF_JSON, Status.SUCCESS_OK,
                             AbstractResourceImplTest.WITH_ADMIN);
             
@@ -341,7 +341,7 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
             getArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactUri);
             
             final Representation results =
-                    RestletTestUtils.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null,
+                    this.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null,
                             MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
             
             final String body = this.getText(results);
@@ -387,7 +387,7 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
             getArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactUri);
             
             final Representation results =
-                    RestletTestUtils.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null,
+                    this.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null,
                             MediaType.APPLICATION_RDF_TURTLE, Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
             
             final String body = this.getText(results).trim();
@@ -439,7 +439,7 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
             getArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_OBJECT_IDENTIFIER, objectUri);
             
             final Representation results =
-                    RestletTestUtils.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null,
+                    this.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null,
                             MediaType.TEXT_HTML, Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
             
             final String body = this.getText(results);
@@ -478,7 +478,7 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
             getArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_OBJECT_IDENTIFIER, objectUri);
             
             final Representation results =
-                    RestletTestUtils.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null,
+                    this.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null,
                             MediaType.TEXT_HTML, Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
             
             final String body = this.getText(results);
@@ -520,7 +520,7 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
             getArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactUri);
             
             final Representation results =
-                    RestletTestUtils.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null,
+                    this.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null,
                             MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK, AbstractResourceImplTest.NO_ADMIN);
             
             final String body = this.getText(results);
@@ -568,7 +568,7 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
             getArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactUri);
             
             final Representation results =
-                    RestletTestUtils.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null,
+                    this.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null,
                             MediaType.TEXT_HTML, Status.SUCCESS_OK, AbstractResourceImplTest.NO_ADMIN);
             
             final String body = this.getText(results);
@@ -610,7 +610,7 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
             getArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactUri);
             
             final Representation results =
-                    RestletTestUtils.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null,
+                    this.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null,
                             MediaType.TEXT_HTML, Status.SUCCESS_OK, AbstractResourceImplTest.NO_ADMIN);
             
             final String body = this.getText(results);

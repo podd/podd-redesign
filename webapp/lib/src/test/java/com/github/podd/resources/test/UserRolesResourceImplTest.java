@@ -115,7 +115,7 @@ public class UserRolesResourceImplTest extends AbstractResourceImplTest
             Rio.write(newModel, out, format);
             final Representation input = new StringRepresentation(out.toString(), mediaType);
             final Representation modifiedResults =
-                    RestletTestUtils.doTestAuthenticatedRequest(userRolesClientResource, Method.POST, input, mediaType,
+                    this.doTestAuthenticatedRequest(userRolesClientResource, Method.POST, input, mediaType,
                             Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
             final Model model = this.assertRdf(modifiedResults, RDFFormat.RDFXML, 1);
             Assert.assertEquals("Unexpected user identifier", testIdentifier,
@@ -129,7 +129,7 @@ public class UserRolesResourceImplTest extends AbstractResourceImplTest
                 userDetailsClientResource.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, testIdentifier);
                 
                 final Representation updatedResults =
-                        RestletTestUtils.doTestAuthenticatedRequest(userDetailsClientResource, Method.GET, null,
+                        this.doTestAuthenticatedRequest(userDetailsClientResource, Method.GET, null,
                                 mediaType, Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
                 final Model resultsModel = this.assertRdf(updatedResults, format, 43);
                 Assert.assertEquals("Unexpected user identifier", testIdentifier,
@@ -204,7 +204,7 @@ public class UserRolesResourceImplTest extends AbstractResourceImplTest
             Rio.write(newModel, out, format);
             final Representation input = new StringRepresentation(out.toString(), mediaType);
             final Representation modifiedResults =
-                    RestletTestUtils.doTestAuthenticatedRequest(userRolesClientResource, Method.POST, input, mediaType,
+                    this.doTestAuthenticatedRequest(userRolesClientResource, Method.POST, input, mediaType,
                             Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
             final Model model = this.assertRdf(modifiedResults, RDFFormat.RDFXML, 1);
             Assert.assertEquals("Unexpected user identifier", testIdentifier,
@@ -218,7 +218,7 @@ public class UserRolesResourceImplTest extends AbstractResourceImplTest
                 userDetailsClientResource.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, testIdentifier);
                 
                 final Representation updatedResults =
-                        RestletTestUtils.doTestAuthenticatedRequest(userDetailsClientResource, Method.GET, null,
+                        this.doTestAuthenticatedRequest(userDetailsClientResource, Method.GET, null,
                                 mediaType, Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
                 final Model resultsModel = this.assertRdf(updatedResults, format, 31);
                 Assert.assertEquals("Unexpected user identifier", testIdentifier,
@@ -296,7 +296,7 @@ public class UserRolesResourceImplTest extends AbstractResourceImplTest
             
             try
             {
-                RestletTestUtils.doTestAuthenticatedRequest(userRolesClientResource, Method.POST, input, mediaType,
+                this.doTestAuthenticatedRequest(userRolesClientResource, Method.POST, input, mediaType,
                         Status.CLIENT_ERROR_UNAUTHORIZED, AbstractResourceImplTest.NO_ADMIN);
                 Assert.fail("Should have failed authorization");
             }
@@ -313,7 +313,7 @@ public class UserRolesResourceImplTest extends AbstractResourceImplTest
                 userDetailsClientResource.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, testIdentifier);
                 
                 final Representation updatedResults =
-                        RestletTestUtils.doTestAuthenticatedRequest(userDetailsClientResource, Method.GET, null,
+                        this.doTestAuthenticatedRequest(userDetailsClientResource, Method.GET, null,
                                 mediaType, Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
                 final Model resultsModel = this.assertRdf(updatedResults, format, 15);
                 Assert.assertEquals("Unexpected user identifier", testIdentifier,
@@ -389,7 +389,7 @@ public class UserRolesResourceImplTest extends AbstractResourceImplTest
         {
             userRolesClientResource.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, testIdentifier);
             userRolesClientResource.addQueryParameter(PoddWebConstants.KEY_DELETE, "true");
-            RestletTestUtils.doTestAuthenticatedRequest(userRolesClientResource, Method.POST, input, mediaType,
+            this.doTestAuthenticatedRequest(userRolesClientResource, Method.POST, input, mediaType,
                     Status.CLIENT_ERROR_UNAUTHORIZED, AbstractResourceImplTest.NO_ADMIN);
             Assert.fail("Should have failed authorization");
         }
@@ -410,7 +410,7 @@ public class UserRolesResourceImplTest extends AbstractResourceImplTest
             userDetailsClientResource.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, testIdentifier);
             
             final Representation updatedResults =
-                    RestletTestUtils.doTestAuthenticatedRequest(userDetailsClientResource, Method.GET, null, mediaType,
+                    this.doTestAuthenticatedRequest(userDetailsClientResource, Method.GET, null, mediaType,
                             Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
             final Model resultsModel = this.assertRdf(updatedResults, format, 20);
             Assert.assertEquals("Unexpected user identifier", testIdentifier,
@@ -438,7 +438,7 @@ public class UserRolesResourceImplTest extends AbstractResourceImplTest
         try
         {
             final Representation results =
-                    RestletTestUtils.doTestAuthenticatedRequest(userRolesClientResource, Method.GET, null,
+                    this.doTestAuthenticatedRequest(userRolesClientResource, Method.GET, null,
                             MediaType.TEXT_HTML, Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
             
             final String body = results.getText();
@@ -478,7 +478,7 @@ public class UserRolesResourceImplTest extends AbstractResourceImplTest
             userRolesClientResource.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, testIdentifier);
             
             final Representation results =
-                    RestletTestUtils.doTestAuthenticatedRequest(userRolesClientResource, Method.GET, null,
+                    this.doTestAuthenticatedRequest(userRolesClientResource, Method.GET, null,
                             MediaType.TEXT_HTML, Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
             
             final String body = results.getText();

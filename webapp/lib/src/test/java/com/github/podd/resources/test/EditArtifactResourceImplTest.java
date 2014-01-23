@@ -80,7 +80,7 @@ public class EditArtifactResourceImplTest extends AbstractResourceImplTest
                             MediaType.APPLICATION_RDF_XML);
             
             final Representation results =
-                    RestletTestUtils.doTestAuthenticatedRequest(editArtifactClientResource, Method.POST, input,
+                    this.doTestAuthenticatedRequest(editArtifactClientResource, Method.POST, input,
                             MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
             
             final String body = this.getText(results);
@@ -129,7 +129,7 @@ public class EditArtifactResourceImplTest extends AbstractResourceImplTest
                             MediaType.APPLICATION_RDF_TURTLE);
             
             final Representation results =
-                    RestletTestUtils.doTestAuthenticatedRequest(editArtifactClientResource, Method.POST, input,
+                    this.doTestAuthenticatedRequest(editArtifactClientResource, Method.POST, input,
                             MediaType.APPLICATION_RDF_TURTLE, Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
             
             final String updatedArtifactDetails = this.getText(results);
@@ -181,7 +181,7 @@ public class EditArtifactResourceImplTest extends AbstractResourceImplTest
                             MediaType.APPLICATION_RDF_TURTLE);
             
             final Representation results =
-                    RestletTestUtils.doTestAuthenticatedRequest(editArtifactClientResource, Method.POST, input,
+                    this.doTestAuthenticatedRequest(editArtifactClientResource, Method.POST, input,
                             MediaType.APPLICATION_RDF_TURTLE, Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
             
             final String updatedArtifactDetails = this.getText(results);
@@ -247,7 +247,7 @@ public class EditArtifactResourceImplTest extends AbstractResourceImplTest
                             MediaType.APPLICATION_RDF_TURTLE);
             
             final Representation results =
-                    RestletTestUtils.doTestAuthenticatedRequest(editArtifactClientResource, Method.POST, input,
+                    this.doTestAuthenticatedRequest(editArtifactClientResource, Method.POST, input,
                             MediaType.APPLICATION_RDF_TURTLE, Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
             
             final String updatedArtifactDetails = this.getText(results);
@@ -318,7 +318,7 @@ public class EditArtifactResourceImplTest extends AbstractResourceImplTest
                     this.buildRepresentationFromResource(TestConstants.TEST_ARTIFACT_FRAGMENT_NEW_FILE_REF_OBJECT,
                             MediaType.APPLICATION_RDF_XML);
             
-            RestletTestUtils.doTestAuthenticatedRequest(editArtifactClientResource, Method.POST, input,
+            this.doTestAuthenticatedRequest(editArtifactClientResource, Method.POST, input,
                     MediaType.APPLICATION_RDF_XML, Status.CLIENT_ERROR_NOT_FOUND, AbstractResourceImplTest.WITH_ADMIN);
             Assert.fail("Should have failed due to incorrect artifact IRI");
         }
@@ -369,7 +369,7 @@ public class EditArtifactResourceImplTest extends AbstractResourceImplTest
             final Representation input =
                     this.buildRepresentationFromResource(TestConstants.TEST_ARTIFACT_FRAGMENT_NEW_FILE_REF_OBJECT,
                             MediaType.APPLICATION_RDF_XML);
-            RestletTestUtils.doTestAuthenticatedRequest(editArtifactClientResource, Method.POST, input,
+            this.doTestAuthenticatedRequest(editArtifactClientResource, Method.POST, input,
                     MediaType.APPLICATION_RDF_XML, Status.CLIENT_ERROR_CONFLICT, AbstractResourceImplTest.WITH_ADMIN);
             Assert.fail("Should have failed due to incorrect version IRI");
         }
@@ -511,7 +511,7 @@ public class EditArtifactResourceImplTest extends AbstractResourceImplTest
             editArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_OBJECT_IDENTIFIER, objectUri);
             
             final Representation results =
-                    RestletTestUtils.doTestAuthenticatedRequest(editArtifactClientResource, Method.GET, null,
+                    this.doTestAuthenticatedRequest(editArtifactClientResource, Method.GET, null,
                             MediaType.TEXT_HTML, Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
             
             final String body = this.getText(results);
@@ -545,7 +545,7 @@ public class EditArtifactResourceImplTest extends AbstractResourceImplTest
             // shown.
             
             final Representation results =
-                    RestletTestUtils.doTestAuthenticatedRequest(editArtifactClientResource, Method.GET, null,
+                    this.doTestAuthenticatedRequest(editArtifactClientResource, Method.GET, null,
                             MediaType.TEXT_HTML, Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
             
             final String body = this.getText(results);

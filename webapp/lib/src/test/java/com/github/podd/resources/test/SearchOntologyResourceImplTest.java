@@ -68,7 +68,7 @@ public class SearchOntologyResourceImplTest extends AbstractResourceImplTest
             
             // invoke the search resource
             final Representation results =
-                    RestletTestUtils.doTestAuthenticatedRequest(searchClientResource, Method.GET, null,
+                    this.doTestAuthenticatedRequest(searchClientResource, Method.GET, null,
                             requestMediaType, Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
             
             final RDFFormat format = Rio.getParserFormatForMIMEType(requestMediaType.getName(), RDFFormat.RDFXML);
@@ -216,7 +216,7 @@ public class SearchOntologyResourceImplTest extends AbstractResourceImplTest
             
             // invoke service
             final Representation results =
-                    RestletTestUtils.doTestAuthenticatedRequest(searchClientResource, Method.POST, input,
+                    this.doTestAuthenticatedRequest(searchClientResource, Method.POST, input,
                             inputMediaType, Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
             
             // verify: response
