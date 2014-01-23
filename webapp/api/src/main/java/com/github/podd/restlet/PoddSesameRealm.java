@@ -526,6 +526,8 @@ public class PoddSesameRealm extends Realm
                     // will now need to provide a new hash
                     throw new PoddRuntimeException("Inconsistent database state detected");
                 }
+                
+                existingHash = ((Literal)hashList.get(0).getObject()).getLabel();
             }
             
             // remove all of the previously known statements
