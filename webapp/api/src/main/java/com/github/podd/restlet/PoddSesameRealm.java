@@ -18,6 +18,8 @@ package com.github.podd.restlet;
 
 import info.aduna.iteration.Iterations;
 
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -78,6 +80,7 @@ import com.github.ansell.restletutils.RestletUtilRole;
 import com.github.ansell.restletutils.SesameRealmConstants;
 import com.github.podd.exception.PoddRuntimeException;
 import com.github.podd.utils.PODD;
+import com.github.podd.utils.PasswordHash;
 import com.github.podd.utils.PoddRoles;
 import com.github.podd.utils.PoddUser;
 import com.github.podd.utils.PoddUserStatus;
@@ -181,21 +184,12 @@ public class PoddSesameRealm extends Realm
         @Override
         public char[] getLocalSecret(final String identifier)
         {
-            char[] result = null;
-            final User user = PoddSesameRealm.this.findUser(identifier);
-            
-            if(user != null)
-            {
-                result = user.getSecret();
-            }
-            
-            return result;
+            throw new PoddRuntimeException("This method should never be called");
         }
         
         /**
-         * FIXME: Replace this with an implementation that hashes the given secret and compares the
-         * hash value rather than comparing the secret directly, so we don't need to store the
-         * password in the database.
+         * This replaces the default implementation in LocalVerifier with an implementation that
+         * transparently uses a hash for comparison
          */
         @Override
         public int verify(final String identifier, final char[] secret)
@@ -203,15 +197,13 @@ public class PoddSesameRealm extends Realm
             try
             {
                 PoddUserSecretHash secretHash = PoddSesameRealm.this.getUserSecretHash(identifier);
-                return secretHash.compare(secret) ? Verifier.RESULT_VALID
-                        : Verifier.RESULT_INVALID;
+                return secretHash.compare(secret) ? Verifier.RESULT_VALID : Verifier.RESULT_INVALID;
             }
-            catch(OpenRDFException e)
+            catch(OpenRDFException | NoSuchAlgorithmException | InvalidKeySpecException e)
             {
                 throw new PoddRuntimeException("Could not verify user identity", e);
             }
         }
-        
         
     }
     
@@ -270,6 +262,16 @@ public class PoddSesameRealm extends Realm
             conn = this.repository.getConnection();
             PoddUser findUser = this.findUser(identifier, conn);
             
+            List<Statement> hashList =
+                    Iterations.asList(conn.getStatements(findUser.getUri(), PODD.PODD_USER_SECRET_HASH, null, false,
+                            userManagerContexts));
+            
+            if(hashList.isEmpty() || hashList.size() > 1)
+            {
+                throw new PoddRuntimeException("Could not verify user identity");
+            }
+            
+            return new PoddUserSecretHash(((Literal)hashList.get(0)).getLabel(), findUser);
         }
         finally
         {
@@ -278,10 +280,8 @@ public class PoddSesameRealm extends Realm
                 conn.close();
             }
         }
-        
-        return null;
     }
-
+    
     /**
      * Recursively adds groups where a given user is a member.
      * 
@@ -445,10 +445,18 @@ public class PoddSesameRealm extends Realm
     
     public final URI addUser(final PoddUser nextUser)
     {
-        return this.addUser(nextUser, true);
+        try
+        {
+            return this.addUser(nextUser, true);
+        }
+        catch(NoSuchAlgorithmException | InvalidKeySpecException | OpenRDFException e)
+        {
+            throw new PoddRuntimeException("Could not add user", e);
+        }
     }
     
-    protected URI addUser(final PoddUser nextUser, final boolean isNew)
+    protected URI addUser(final PoddUser nextUser, final boolean isNew) throws NoSuchAlgorithmException,
+        InvalidKeySpecException, OpenRDFException
     {
         RepositoryConnection conn = null;
         try
@@ -495,27 +503,56 @@ public class PoddSesameRealm extends Realm
                         // multiple users with this identifier in the database
                         nextUserUUID = (URI)nextUserIdentifierStatement.getSubject();
                     }
-                    
-                    final List<Statement> currentUserStatements =
-                            Iterations.asList(conn.getStatements(nextUserIdentifierStatement.getSubject(), null, null,
-                                    true, this.getContexts()));
-                    
-                    // remove all of the previously known statements
-                    conn.remove(currentUserStatements, this.getContexts());
                 }
             }
+            
+            String existingHash = null;
+            
+            if(conn.hasStatement(nextUserUUID, PODD.PODD_USER_SECRET_HASH, null, false, this.getContexts()))
+            {
+                List<Statement> hashList =
+                        Iterations.asList(conn.getStatements(nextUserUUID, PODD.PODD_USER_SECRET_HASH, null, false,
+                                this.getContexts()));
+                
+                if(hashList.isEmpty())
+                {
+                    // Should not happen in normal circumstances as we are wrapping with
+                    // conn.hasStatement
+                    throw new PoddRuntimeException("Inconsistent database state detected");
+                }
+                else if(hashList.size() > 1)
+                {
+                    // Cannot detect a unique hash in database for user, if they are updating, they
+                    // will now need to provide a new hash
+                    throw new PoddRuntimeException("Inconsistent database state detected");
+                }
+            }
+            
+            // remove all of the previously known statements
+            conn.remove(nextUserUUID, null, null, this.getContexts());
             
             conn.add(nextUserUUID, RDF.TYPE, SesameRealmConstants.OAS_USER, this.getContexts());
             
             conn.add(nextUserUUID, SesameRealmConstants.OAS_USERIDENTIFIER,
                     this.vf.createLiteral(nextUser.getIdentifier()), this.getContexts());
             
+            if(existingHash == null && nextUser.getSecret() == null)
+            {
+                throw new PoddRuntimeException("Must provide a password for user");
+            }
+            
+            String createHash = null;
+            
             if(nextUser.getSecret() != null)
             {
-                // TODO: Hash this
-                conn.add(nextUserUUID, SesameRealmConstants.OAS_USERSECRET,
-                        this.vf.createLiteral(new String(nextUser.getSecret())), this.getContexts());
+                createHash = PasswordHash.createHash(nextUser.getSecret());
             }
+            else
+            {
+                createHash = existingHash;
+            }
+            
+            conn.add(nextUserUUID, PODD.PODD_USER_SECRET_HASH, this.vf.createLiteral(createHash), this.getContexts());
             
             if(nextUser.getFirstName() != null)
             {
@@ -587,7 +624,7 @@ public class PoddSesameRealm extends Realm
             
             return nextUserUUID;
         }
-        catch(final IllegalStateException e)
+        catch(final Throwable e)
         {
             if(conn != null)
             {
@@ -601,22 +638,6 @@ public class PoddSesameRealm extends Realm
                 }
             }
             throw e;
-        }
-        catch(final OpenRDFException e)
-        {
-            this.log.error("Found repository exception while adding user", e);
-            if(conn != null)
-            {
-                try
-                {
-                    conn.rollback();
-                }
-                catch(final RepositoryException e1)
-                {
-                    this.log.error("Found unexpected exception while rolling back repository connection after exception");
-                }
-            }
-            throw new RuntimeException("Found repository exception while adding user", e);
         }
         finally
         {
@@ -2941,27 +2962,30 @@ public class PoddSesameRealm extends Realm
     
     public URI updateUser(final PoddUser nextUser)
     {
-        return this.addUser(nextUser, false);
+        try
+        {
+            return this.addUser(nextUser, false);
+        }
+        catch(NoSuchAlgorithmException | InvalidKeySpecException | OpenRDFException e)
+        {
+            throw new PoddRuntimeException("Could not update user", e);
+        }
     }
     
     private static final class PoddUserSecretHash
     {
-        private char[] secret;
-        private char[] hash;
+        private String hash;
         private PoddUser user;
-
-        public PoddUserSecretHash(char[] secret, char[] hash, PoddUser user)
+        
+        public PoddUserSecretHash(String hash, PoddUser user)
         {
-            this.secret = secret;
             this.hash = hash;
             this.user = user;
         }
         
-        public boolean compare(char[] secret) {
-            
-            throw new PoddRuntimeException("TODO: Implement me");
+        public final boolean compare(char[] secret) throws NoSuchAlgorithmException, InvalidKeySpecException
+        {
+            return PasswordHash.validatePassword(secret, hash);
         }
     }
 }
-
-

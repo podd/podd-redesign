@@ -533,6 +533,9 @@ public interface PODD
     /** http://purl.org/podd/ns/poddUser#position */
     public static final URI PODD_USER_POSITION = PODD.VF.createURI(PODD.PODD_USER, "position");
     
+    /** http://purl.org/podd/ns/poddUser#secretHash */
+    public static final URI PODD_USER_SECRET_HASH = PODD.VF.createURI(PODD.PODD_USER, "secretHash");
+    
     /** http://purl.org/podd/ns/poddUser#status */
     public static final URI PODD_USER_STATUS = PODD.VF.createURI(PODD.PODD_USER, "status");
     
@@ -588,5 +591,5 @@ public interface PODD
             .createURI("http://purl.org/podd/ns/repository#containsSchemaIRI");
     public static final URI PODD_REPOSITORY_CONTAINS_SCHEMA_VERSION = PODD.VF
             .createURI("http://purl.org/podd/ns/repository#containsSchemaVersion");
-    
+
 }
