@@ -38,6 +38,7 @@ import org.openrdf.sail.memory.MemoryStore;
 import org.restlet.security.Role;
 
 import com.github.ansell.restletutils.SesameRealmConstants;
+import com.github.podd.exception.PoddRuntimeException;
 import com.github.podd.restlet.PoddSesameRealm;
 import com.github.podd.utils.PODD;
 import com.github.podd.utils.PoddRoles;
@@ -173,15 +174,24 @@ public class PoddSesameRealmTest
         final PoddUser testUser =
                 new PoddUser(testIdentifier, null, "First", "Last", testIdentifier, PoddUserStatus.INACTIVE,
                         PODD.VF.createURI("http://example.org/" + testIdentifier), "Some Organization", "SOME_ORCID_ID");
-        this.testRealm.addUser(testUser);
-        
-        final PoddUser retrievedUser = this.testRealm.findUser(testIdentifier);
-        Assert.assertEquals("Returned user different to original", testUser, retrievedUser);
-        Assert.assertTrue("Returned user is not a PoddUser", retrievedUser instanceof PoddUser);
-        
-        final PoddUser recvdPoddUser = retrievedUser;
-        Assert.assertEquals("Returned user has incorrect status", PoddUserStatus.INACTIVE,
-                recvdPoddUser.getUserStatus());
+        try
+        {
+            this.testRealm.addUser(testUser);
+            
+            final PoddUser retrievedUser = this.testRealm.findUser(testIdentifier);
+            Assert.assertEquals("Returned user different to original", testUser, retrievedUser);
+            Assert.assertTrue("Returned user is not a PoddUser", retrievedUser instanceof PoddUser);
+            
+            final PoddUser recvdPoddUser = retrievedUser;
+            Assert.assertEquals("Returned user has incorrect status", PoddUserStatus.INACTIVE,
+                    recvdPoddUser.getUserStatus());
+            
+            Assert.fail("Did not receive expected exception");
+        }
+        catch(PoddRuntimeException e)
+        {
+            Assert.assertEquals("Must provide a password for user", e.getMessage());
+        }
     }
     
     @Test
@@ -191,15 +201,23 @@ public class PoddSesameRealmTest
         final PoddUser testUser =
                 new PoddUser(testIdentifier, null, "First", "Last", testIdentifier, PoddUserStatus.ACTIVE,
                         PODD.VF.createURI("http://example.org/" + testIdentifier), "Some Organization", "SOME_ORCID_ID");
-        this.testRealm.addUser(testUser);
-        
-        final PoddUser retrievedUser = this.testRealm.findUser(testIdentifier);
-        Assert.assertEquals("Returned user different to original", testUser, retrievedUser);
-        Assert.assertTrue("Returned user is not a PoddUser", retrievedUser instanceof PoddUser);
-        
-        final PoddUser recvdPoddUser = retrievedUser;
-        Assert.assertEquals("Returned user has incorrect status", PoddUserStatus.INACTIVE,
-                recvdPoddUser.getUserStatus());
+        try
+        {
+            this.testRealm.addUser(testUser);
+            
+            final PoddUser retrievedUser = this.testRealm.findUser(testIdentifier);
+            Assert.assertEquals("Returned user different to original", testUser, retrievedUser);
+            Assert.assertTrue("Returned user is not a PoddUser", retrievedUser instanceof PoddUser);
+            
+            final PoddUser recvdPoddUser = retrievedUser;
+            Assert.assertEquals("Returned user has incorrect status", PoddUserStatus.INACTIVE,
+                    recvdPoddUser.getUserStatus());
+            Assert.fail("Did not receive expected exception");
+        }
+        catch(PoddRuntimeException e)
+        {
+            Assert.assertEquals("Must provide a password for user", e.getMessage());
+        }
     }
     
     @Test

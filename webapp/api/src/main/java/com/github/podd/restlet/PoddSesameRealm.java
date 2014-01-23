@@ -660,15 +660,8 @@ public class PoddSesameRealm extends Realm
     {
         this.log.debug("Building PoddUser from SPARQL results");
         
-        char[] secret = null;
-        
-        if(bindingSet.hasBinding(PoddSesameRealm.PARAM_USER_SECRET))
-        {
-            secret = bindingSet.getValue(PoddSesameRealm.PARAM_USER_SECRET).stringValue().toCharArray();
-        }
-        
         final PoddUser result =
-                new PoddUser(userIdentifier, secret, bindingSet.getValue(PoddSesameRealm.PARAM_USER_FIRSTNAME)
+                new PoddUser(userIdentifier, null, bindingSet.getValue(PoddSesameRealm.PARAM_USER_FIRSTNAME)
                         .stringValue(), bindingSet.getValue(PoddSesameRealm.PARAM_USER_LASTNAME).stringValue(),
                         bindingSet.getValue(PoddSesameRealm.PARAM_USER_EMAIL).stringValue(), PoddUserStatus.INACTIVE);
         
@@ -679,8 +672,15 @@ public class PoddSesameRealm extends Realm
             userStatus = PoddUserStatus.getUserStatusByUri((URI)statusVal);
         }
         
+        char[] secret = null;
+        
+        if(bindingSet.hasBinding(PoddSesameRealm.PARAM_USER_SECRET))
+        {
+            secret = bindingSet.getValue(PoddSesameRealm.PARAM_USER_SECRET).stringValue().trim().toCharArray();
+        }
+        
         // Do not allow users without secrets to perform actions
-        if(secret == null)
+        if(secret == null || secret.length == 0)
         {
             userStatus = PoddUserStatus.INACTIVE;
         }
@@ -893,7 +893,7 @@ public class PoddSesameRealm extends Realm
         
         query.append(" OPTIONAL{ ?");
         query.append(PoddSesameRealm.PARAM_USER_URI);
-        query.append(" <" + SesameRealmConstants.OAS_USERSECRET + "> ");
+        query.append(" <" + PODD.PODD_USER_SECRET_HASH + "> ");
         query.append(" ?");
         query.append(PoddSesameRealm.PARAM_USER_SECRET);
         query.append(" . } ");
@@ -1034,7 +1034,7 @@ public class PoddSesameRealm extends Realm
         
         query.append(" ?");
         query.append(PoddSesameRealm.PARAM_USER_URI);
-        query.append(" <" + SesameRealmConstants.OAS_USERSECRET + "> ");
+        query.append(" <" + PODD.PODD_USER_SECRET_HASH + "> ");
         query.append(" ?");
         query.append(PoddSesameRealm.PARAM_USER_SECRET);
         query.append(" . ");

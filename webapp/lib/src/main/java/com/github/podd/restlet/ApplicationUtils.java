@@ -425,7 +425,7 @@ public class ApplicationUtils
         // Check if there is a current admin, and only add our test admin user if there is no admin
         // in the system
         boolean foundCurrentAdmin = false;
-        for(final RestletUtilUser nextUser : nextRealm.getUsers())
+        for(final PoddUser nextUser : nextRealm.getUsers())
         {
             if(nextRealm.findRoles(nextUser).contains(PoddRoles.ADMIN.getRole()))
             {
