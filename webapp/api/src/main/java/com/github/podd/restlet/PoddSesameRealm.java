@@ -76,6 +76,7 @@ import org.slf4j.LoggerFactory;
 
 import com.github.ansell.restletutils.RestletUtilRole;
 import com.github.ansell.restletutils.SesameRealmConstants;
+import com.github.podd.exception.PoddRuntimeException;
 import com.github.podd.utils.PODD;
 import com.github.podd.utils.PoddRoles;
 import com.github.podd.utils.PoddUser;
@@ -199,9 +200,19 @@ public class PoddSesameRealm extends Realm
         @Override
         public int verify(final String identifier, final char[] secret)
         {
-            return SecretVerifier.compare(secret, this.getLocalSecret(identifier)) ? Verifier.RESULT_VALID
-                    : Verifier.RESULT_INVALID;
+            try
+            {
+                PoddUserSecretHash secretHash = PoddSesameRealm.this.getUserSecretHash(identifier);
+                return secretHash.compare(secret) ? Verifier.RESULT_VALID
+                        : Verifier.RESULT_INVALID;
+            }
+            catch(OpenRDFException e)
+            {
+                throw new PoddRuntimeException("Could not verify user identity", e);
+            }
         }
+        
+        
     }
     
     protected static final String PARAM_USER_URI = "userUri";
@@ -251,6 +262,26 @@ public class PoddSesameRealm extends Realm
         // this.users = new CopyOnWriteArrayList<User>();
     }
     
+    public PoddUserSecretHash getUserSecretHash(String identifier) throws OpenRDFException
+    {
+        RepositoryConnection conn = null;
+        try
+        {
+            conn = this.repository.getConnection();
+            PoddUser findUser = this.findUser(identifier, conn);
+            
+        }
+        finally
+        {
+            if(conn != null)
+            {
+                conn.close();
+            }
+        }
+        
+        return null;
+    }
+
     /**
      * Recursively adds groups where a given user is a member.
      * 
@@ -2913,4 +2944,24 @@ public class PoddSesameRealm extends Realm
         return this.addUser(nextUser, false);
     }
     
+    private static final class PoddUserSecretHash
+    {
+        private char[] secret;
+        private char[] hash;
+        private PoddUser user;
+
+        public PoddUserSecretHash(char[] secret, char[] hash, PoddUser user)
+        {
+            this.secret = secret;
+            this.hash = hash;
+            this.user = user;
+        }
+        
+        public boolean compare(char[] secret) {
+            
+            throw new PoddRuntimeException("TODO: Implement me");
+        }
+    }
 }
+
+
