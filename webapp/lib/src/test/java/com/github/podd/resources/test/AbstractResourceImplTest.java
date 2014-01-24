@@ -311,7 +311,7 @@ public class AbstractResourceImplTest
         
         if(!this.login(username, password, currentCookies))
         {
-            Assert.fail("Failed to login as admin");
+            throw new ResourceException(Status.CLIENT_ERROR_UNAUTHORIZED, "Login was not successful");
         }
         try
         {
