@@ -239,19 +239,18 @@ public class ApplicationUtils
     
     private static Repository getNewRepositoryInternal(final String repositoryUrl) throws RepositoryException
     {
+        Repository repository;
         // if we weren't able to find a repository URL in the configuration, we
         // setup an in-memory store
         if(repositoryUrl == null || repositoryUrl.trim().isEmpty())
         {
-            final Repository repository = new SailRepository(new MemoryStore());
+            repository = new SailRepository(new MemoryStore());
             
             try
             {
                 repository.initialize();
                 
-                ApplicationUtils.log.info("Created an in memory store as repository for PODD");
-                
-                return repository;
+                ApplicationUtils.log.info("Created an in memory store as management repository for PODD");
             }
             catch(final RepositoryException ex)
             {
@@ -261,15 +260,14 @@ public class ApplicationUtils
         }
         else
         {
-            final Repository repository = new HTTPRepository(repositoryUrl.trim());
+            repository = new HTTPRepository(repositoryUrl.trim());
             
             try
             {
                 repository.initialize();
                 
-                ApplicationUtils.log.info("Using sesame http repository as repository for PODD: {}", repositoryUrl);
-                
-                return repository;
+                ApplicationUtils.log.info("Using sesame http repository as management repository for PODD: {}",
+                        repositoryUrl);
             }
             catch(final RepositoryException ex)
             {
@@ -277,6 +275,25 @@ public class ApplicationUtils
                 throw new RuntimeException("Could not initialise Sesame HTTP repository with URL=" + repositoryUrl);
             }
         }
+        
+        RepositoryConnection testConnection = null;
+        try
+        {
+            testConnection = repository.getConnection();
+            
+            testConnection.setNamespace("poddBase", PODD.PODD_BASE);
+            testConnection.setNamespace("poddScience", PODD.PODD_SCIENCE);
+            testConnection.setNamespace("poddPlant", PODD.PODD_PLANT);
+            testConnection.setNamespace("poddUser", PODD.PODD_USER);
+        }
+        finally
+        {
+            if(testConnection != null)
+            {
+                testConnection.close();
+            }
+        }
+        return repository;
     }
     
     public static Configuration getNewTemplateConfiguration(final Context newChildContext)
