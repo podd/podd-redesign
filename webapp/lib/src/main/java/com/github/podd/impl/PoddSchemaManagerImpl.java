@@ -322,8 +322,8 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
     }
     
     private void setUpdateManagedSchemaOntologyVersionInternal(final OWLOntologyID schemaOntologyID,
-            boolean updateCurrent, final RepositoryConnection managementConnection, final URI schemaManagementContext)
-        throws UnmanagedSchemaOntologyIDException, OpenRDFException
+            final boolean updateCurrent, final RepositoryConnection managementConnection,
+            final URI schemaManagementContext) throws UnmanagedSchemaOntologyIDException, OpenRDFException
     {
         this.sesameManager.updateManagedSchemaOntologyVersion(schemaOntologyID, updateCurrent, managementConnection,
                 schemaManagementContext);
@@ -355,7 +355,7 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
         final Set<URI> schemaVersionUris = new HashSet<>();
         OntologyUtils.extractOntologyAndVersions(model, schemaOntologyUris, schemaVersionUris);
         OntologyUtils.validateSchemaManifestImports(model, schemaOntologyUris, schemaVersionUris);
-        ConcurrentMap<URI, URI> currentVersionsMap = new ConcurrentHashMap<URI, URI>();
+        final ConcurrentMap<URI, URI> currentVersionsMap = new ConcurrentHashMap<URI, URI>();
         // Find current version for each schema ontology
         for(final URI nextSchemaOntologyUri : schemaOntologyUris)
         {
@@ -504,14 +504,14 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
                         this.setUpdateManagedSchemaOntologyVersionInternal(nextResult, updateCurrent,
                                 managementConnection, this.repositoryManager.getSchemaManagementGraph());
                         
-                        List<Statement> importStatements =
+                        final List<Statement> importStatements =
                                 Iterations.asList(managementConnection.getStatements(nextResult.getOntologyIRI()
                                         .toOpenRDFURI(), OWL.IMPORTS, null, true, nextResult.getVersionIRI()
                                         .toOpenRDFURI()));
                         
                         this.log.info("Imports to copy for ontology: {} {}", nextResult, importStatements);
                         
-                        for(Statement nextImportStatement : importStatements)
+                        for(final Statement nextImportStatement : importStatements)
                         {
                             managementConnection.add(nextResult.getVersionIRI().toOpenRDFURI(), OWL.IMPORTS,
                                     nextImportStatement.getObject(), this.repositoryManager.getSchemaManagementGraph());
@@ -590,10 +590,10 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
             this.setUpdateManagedSchemaOntologyVersionInternal(nextResult, true, managementConnection,
                     this.repositoryManager.getSchemaManagementGraph());
             
-            List<Statement> importStatements =
+            final List<Statement> importStatements =
                     Iterations.asList(managementConnection.getStatements(nextResult.getOntologyIRI().toOpenRDFURI(),
                             OWL.IMPORTS, null, true, nextResult.getVersionIRI().toOpenRDFURI()));
-            for(Statement nextImportStatement : importStatements)
+            for(final Statement nextImportStatement : importStatements)
             {
                 managementConnection.add(nextResult.getVersionIRI().toOpenRDFURI(), OWL.IMPORTS,
                         nextImportStatement.getObject(), this.repositoryManager.getSchemaManagementGraph());

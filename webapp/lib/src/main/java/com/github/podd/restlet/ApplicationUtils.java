@@ -23,7 +23,6 @@ import info.aduna.iteration.Iterations;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -49,9 +48,6 @@ import org.openrdf.repository.config.RepositoryConfigSchema;
 import org.openrdf.repository.config.RepositoryImplConfig;
 import org.openrdf.repository.config.RepositoryImplConfigBase;
 import org.openrdf.repository.http.HTTPRepository;
-import org.openrdf.repository.manager.LocalRepositoryManager;
-import org.openrdf.repository.manager.RemoteRepositoryManager;
-import org.openrdf.repository.manager.RepositoryManager;
 import org.openrdf.repository.sail.SailRepository;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.RDFHandlerException;
@@ -77,7 +73,6 @@ import org.slf4j.LoggerFactory;
 
 import com.github.ansell.propertyutil.PropertyUtil;
 import com.github.ansell.restletutils.FixedRedirectCookieAuthenticator;
-import com.github.ansell.restletutils.RestletUtilUser;
 import com.github.podd.api.PoddArtifactManager;
 import com.github.podd.api.PoddOWLManager;
 import com.github.podd.api.PoddSchemaManager;
@@ -244,19 +239,18 @@ public class ApplicationUtils
     
     private static Repository getNewRepositoryInternal(final String repositoryUrl) throws RepositoryException
     {
+        Repository repository;
         // if we weren't able to find a repository URL in the configuration, we
         // setup an in-memory store
         if(repositoryUrl == null || repositoryUrl.trim().isEmpty())
         {
-            final Repository repository = new SailRepository(new MemoryStore());
+            repository = new SailRepository(new MemoryStore());
             
             try
             {
                 repository.initialize();
                 
-                ApplicationUtils.log.info("Created an in memory store as repository for PODD");
-                
-                return repository;
+                ApplicationUtils.log.info("Created an in memory store as management repository for PODD");
             }
             catch(final RepositoryException ex)
             {
@@ -266,15 +260,14 @@ public class ApplicationUtils
         }
         else
         {
-            final Repository repository = new HTTPRepository(repositoryUrl.trim());
+            repository = new HTTPRepository(repositoryUrl.trim());
             
             try
             {
                 repository.initialize();
                 
-                ApplicationUtils.log.info("Using sesame http repository as repository for PODD: {}", repositoryUrl);
-                
-                return repository;
+                ApplicationUtils.log.info("Using sesame http repository as management repository for PODD: {}",
+                        repositoryUrl);
             }
             catch(final RepositoryException ex)
             {
@@ -282,6 +275,25 @@ public class ApplicationUtils
                 throw new RuntimeException("Could not initialise Sesame HTTP repository with URL=" + repositoryUrl);
             }
         }
+        
+        RepositoryConnection testConnection = null;
+        try
+        {
+            testConnection = repository.getConnection();
+            
+            testConnection.setNamespace("poddBase", PODD.PODD_BASE);
+            testConnection.setNamespace("poddScience", PODD.PODD_SCIENCE);
+            testConnection.setNamespace("poddPlant", PODD.PODD_PLANT);
+            testConnection.setNamespace("poddUser", PODD.PODD_USER);
+        }
+        finally
+        {
+            if(testConnection != null)
+            {
+                testConnection.close();
+            }
+        }
+        return repository;
     }
     
     public static Configuration getNewTemplateConfiguration(final Context newChildContext)
@@ -328,8 +340,8 @@ public class ApplicationUtils
         final Resource repositoryNode = GraphUtil.getUniqueSubject(graph, RepositoryConfigSchema.REPOSITORYTYPE, null);
         final RepositoryImplConfig repositoryImplConfig = RepositoryImplConfigBase.create(graph, repositoryNode);
         
-        String poddHome = props.get(PoddWebConstants.PROPERTY_PODD_HOME, "");
-        Path poddHomePath = Paths.get(poddHome);
+        final String poddHome = props.get(PoddWebConstants.PROPERTY_PODD_HOME, "");
+        final Path poddHomePath = Paths.get(poddHome);
         
         application.setPoddRepositoryManager(new PoddRepositoryManagerImpl(nextManagementRepository,
                 repositoryImplConfig, props.get(PoddWebConstants.PROPERTY_PERMANENT_SESAME_REPOSITORY_SERVER,
@@ -425,7 +437,7 @@ public class ApplicationUtils
         // Check if there is a current admin, and only add our test admin user if there is no admin
         // in the system
         boolean foundCurrentAdmin = false;
-        for(final RestletUtilUser nextUser : nextRealm.getUsers())
+        for(final PoddUser nextUser : nextRealm.getUsers())
         {
             if(nextRealm.findRoles(nextUser).contains(PoddRoles.ADMIN.getRole()))
             {

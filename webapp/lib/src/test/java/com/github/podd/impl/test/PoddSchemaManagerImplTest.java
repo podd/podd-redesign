@@ -78,8 +78,8 @@ public class PoddSchemaManagerImplTest extends AbstractPoddSchemaManagerTest
     @Override
     protected PoddRepositoryManager getNewPoddRepositoryManagerInstance() throws Exception
     {
-        File repositoryManagerDirectory = this.tempDir.newFolder("repositorymanager");
-        File managementRepositoryDirectory = this.tempDir.newFolder("managementrepository");
+        final File repositoryManagerDirectory = this.tempDir.newFolder("repositorymanager");
+        final File managementRepositoryDirectory = this.tempDir.newFolder("managementrepository");
         
         final Repository managementRepository = new SailRepository(new MemoryStore(managementRepositoryDirectory));
         managementRepository.initialize();

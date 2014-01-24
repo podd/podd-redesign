@@ -37,8 +37,6 @@ import org.restlet.representation.Variant;
 import org.restlet.resource.Get;
 import org.restlet.resource.Post;
 import org.restlet.resource.ResourceException;
-import org.restlet.security.LocalVerifier;
-import org.restlet.security.MapVerifier;
 import org.restlet.security.Role;
 import org.restlet.security.SecretVerifier;
 import org.restlet.security.User;
@@ -85,14 +83,15 @@ public class UserPasswordResourceImpl extends AbstractUserResourceImpl
                 throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Failed to access Verifier");
             }
             
-            char[] localSecret = null;
-            if(verifier instanceof MapVerifier)
+            if(verifier instanceof SecretVerifier)
             {
-                localSecret = ((MapVerifier)verifier).getLocalSecret(identifierInModel);
-            }
-            else if(verifier instanceof LocalVerifier)
-            {
-                localSecret = ((LocalVerifier)verifier).getLocalSecret(identifierInModel);
+                final int verifyResult =
+                        ((SecretVerifier)verifier).verify(identifierInModel, oldPassword.toCharArray());
+                
+                if(verifyResult != Verifier.RESULT_VALID)
+                {
+                    throw new ResourceException(Status.CLIENT_ERROR_UNAUTHORIZED, "Old password is invalid.");
+                }
             }
             else
             {
@@ -100,15 +99,11 @@ public class UserPasswordResourceImpl extends AbstractUserResourceImpl
                 throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Failed to access Verifier");
             }
             
-            if(!SecretVerifier.compare(localSecret, oldPassword.toCharArray()))
-            {
-                throw new ResourceException(Status.CLIENT_ERROR_UNAUTHORIZED, "Old password is invalid.");
-            }
         }
         
         // update sesame Realm with new password
         final String newPassword = model.filter(null, SesameRealmConstants.OAS_USERSECRET, null).objectString();
-        this.log.info("[DEBUG] new password is [{}]", newPassword);
+        //this.log.info("[DEBUG] new password is [{}]", newPassword);
         changePwdUser.setSecret(newPassword.toCharArray());
         
         return nextRealm.updateUser(changePwdUser);
@@ -247,8 +242,10 @@ public class UserPasswordResourceImpl extends AbstractUserResourceImpl
         // Output the base template, with contentTemplate from the dataModel
         // defining the
         // template to use for the content in the body of the page
-        return RestletUtils.getHtmlRepresentation(this.getPoddApplication().getPropertyUtil().get(PoddWebConstants.PROPERTY_TEMPLATE_BASE, PoddWebConstants.DEFAULT_TEMPLATE_BASE), dataModel,
-                MediaType.TEXT_HTML, this.getPoddApplication().getTemplateConfiguration());
+        return RestletUtils.getHtmlRepresentation(
+                this.getPoddApplication().getPropertyUtil()
+                        .get(PoddWebConstants.PROPERTY_TEMPLATE_BASE, PoddWebConstants.DEFAULT_TEMPLATE_BASE),
+                dataModel, MediaType.TEXT_HTML, this.getPoddApplication().getTemplateConfiguration());
     }
     
 }

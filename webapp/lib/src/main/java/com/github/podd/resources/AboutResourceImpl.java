@@ -64,8 +64,10 @@ public class AboutResourceImpl extends AbstractPoddResourceImpl
         // defining the
         // template
         // to use for the content in the body of the page
-        return RestletUtils.getHtmlRepresentation(this.getPoddApplication().getPropertyUtil().get(PoddWebConstants.PROPERTY_TEMPLATE_BASE, PoddWebConstants.DEFAULT_TEMPLATE_BASE), dataModel,
-                MediaType.TEXT_HTML, this.getPoddApplication().getTemplateConfiguration());
+        return RestletUtils.getHtmlRepresentation(
+                this.getPoddApplication().getPropertyUtil()
+                        .get(PoddWebConstants.PROPERTY_TEMPLATE_BASE, PoddWebConstants.DEFAULT_TEMPLATE_BASE),
+                dataModel, MediaType.TEXT_HTML, this.getPoddApplication().getTemplateConfiguration());
     }
     
 }

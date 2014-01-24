@@ -2012,8 +2012,8 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         // remove deprecated current inferred version marker
         // Deprecated in favour of just tracking the podd base inferred version, see below
         // TODO: Add this to migration scripts when they are active
-        repositoryConnection.remove(nextOntologyUri, PODD.VF.createURI(PODD.PODD_BASE, "currentInferredVersion"),
-                null, context);
+        repositoryConnection.remove(nextOntologyUri, PODD.VF.createURI(PODD.PODD_BASE, "currentInferredVersion"), null,
+                context);
         
     }
     
@@ -2075,8 +2075,8 @@ public class PoddSesameManagerImpl implements PoddSesameManager
                 // remove the content of any contexts that are the object of
                 // versionIRI statements
                 final List<Statement> previousVersions =
-                        Iterations.asList(repositoryConnection.getStatements(nextOntologyUri, OWL.VERSIONIRI,
-                                null, true, managementGraph));
+                        Iterations.asList(repositoryConnection.getStatements(nextOntologyUri, OWL.VERSIONIRI, null,
+                                true, managementGraph));
                 
                 for(final Statement nextPreviousVersion : previousVersions)
                 {

@@ -18,6 +18,8 @@ package com.github.podd.restlet;
 
 import info.aduna.iteration.Iterations;
 
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -68,7 +70,6 @@ import org.restlet.security.Group;
 import org.restlet.security.LocalVerifier;
 import org.restlet.security.Realm;
 import org.restlet.security.Role;
-import org.restlet.security.SecretVerifier;
 import org.restlet.security.User;
 import org.restlet.security.Verifier;
 import org.slf4j.Logger;
@@ -76,7 +77,9 @@ import org.slf4j.LoggerFactory;
 
 import com.github.ansell.restletutils.RestletUtilRole;
 import com.github.ansell.restletutils.SesameRealmConstants;
+import com.github.podd.exception.PoddRuntimeException;
 import com.github.podd.utils.PODD;
+import com.github.podd.utils.PasswordHash;
 import com.github.podd.utils.PoddRoles;
 import com.github.podd.utils.PoddUser;
 import com.github.podd.utils.PoddUserStatus;
@@ -88,8 +91,6 @@ public class PoddSesameRealm extends Realm
     
     /**
      * Enroler class based on the default security model.
-     * 
-     * NOTE: 2013/01/22 - this class uses PoddRoles
      */
     private class DefaultPoddSesameRealmEnroler implements Enroler
     {
@@ -152,8 +153,6 @@ public class PoddSesameRealm extends Realm
     /**
      * Verifier class based on the default security model. It looks up users in the mapped
      * organizations.
-     * 
-     * NOTE: 2013/01/22 - this class is identical to the DefaultPoddSesameRealmVerifier.java
      */
     private class DefaultPoddSesameRealmVerifier extends LocalVerifier
     {
@@ -180,28 +179,27 @@ public class PoddSesameRealm extends Realm
         @Override
         public char[] getLocalSecret(final String identifier)
         {
-            char[] result = null;
-            final User user = PoddSesameRealm.this.findUser(identifier);
-            
-            if(user != null)
-            {
-                result = user.getSecret();
-            }
-            
-            return result;
+            throw new PoddRuntimeException("This method should never be called");
         }
         
         /**
-         * FIXME: Replace this with an implementation that hashes the given secret and compares the
-         * hash value rather than comparing the secret directly, so we don't need to store the
-         * password in the database.
+         * This replaces the default implementation in LocalVerifier with an implementation that
+         * transparently uses a hash for comparison
          */
         @Override
         public int verify(final String identifier, final char[] secret)
         {
-            return SecretVerifier.compare(secret, this.getLocalSecret(identifier)) ? Verifier.RESULT_VALID
-                    : Verifier.RESULT_INVALID;
+            try
+            {
+                final PoddUserSecretHash secretHash = PoddSesameRealm.this.getUserSecretHash(identifier);
+                return secretHash.compare(secret) ? Verifier.RESULT_VALID : Verifier.RESULT_INVALID;
+            }
+            catch(OpenRDFException | NoSuchAlgorithmException | InvalidKeySpecException e)
+            {
+                throw new PoddRuntimeException("Could not verify user identity", e);
+            }
         }
+        
     }
     
     protected static final String PARAM_USER_URI = "userUri";
@@ -249,6 +247,34 @@ public class PoddSesameRealm extends Realm
         // this.rootGroups = new CopyOnWriteArrayList<Group>();
         // this.roleMappings = new CopyOnWriteArrayList<RoleMapping>();
         // this.users = new CopyOnWriteArrayList<User>();
+    }
+    
+    public PoddUserSecretHash getUserSecretHash(final String identifier) throws OpenRDFException
+    {
+        RepositoryConnection conn = null;
+        try
+        {
+            conn = this.repository.getConnection();
+            final PoddUser findUser = this.findUser(identifier, conn);
+            
+            final List<Statement> hashList =
+                    Iterations.asList(conn.getStatements(findUser.getUri(), PODD.PODD_USER_SECRET_HASH, null, false,
+                            this.userManagerContexts));
+            
+            if(hashList.isEmpty() || hashList.size() > 1)
+            {
+                throw new PoddRuntimeException("Could not verify user identity");
+            }
+            
+            return new PoddUserSecretHash(((Literal)hashList.get(0).getObject()).getLabel(), findUser);
+        }
+        finally
+        {
+            if(conn != null)
+            {
+                conn.close();
+            }
+        }
     }
     
     /**
@@ -414,10 +440,18 @@ public class PoddSesameRealm extends Realm
     
     public final URI addUser(final PoddUser nextUser)
     {
-        return this.addUser(nextUser, true);
+        try
+        {
+            return this.addUser(nextUser, true);
+        }
+        catch(NoSuchAlgorithmException | InvalidKeySpecException | OpenRDFException e)
+        {
+            throw new PoddRuntimeException("Could not add user", e);
+        }
     }
     
-    protected URI addUser(final PoddUser nextUser, final boolean isNew)
+    protected URI addUser(final PoddUser nextUser, final boolean isNew) throws NoSuchAlgorithmException,
+        InvalidKeySpecException, OpenRDFException
     {
         RepositoryConnection conn = null;
         try
@@ -464,27 +498,58 @@ public class PoddSesameRealm extends Realm
                         // multiple users with this identifier in the database
                         nextUserUUID = (URI)nextUserIdentifierStatement.getSubject();
                     }
-                    
-                    final List<Statement> currentUserStatements =
-                            Iterations.asList(conn.getStatements(nextUserIdentifierStatement.getSubject(), null, null,
-                                    true, this.getContexts()));
-                    
-                    // remove all of the previously known statements
-                    conn.remove(currentUserStatements, this.getContexts());
                 }
             }
+            
+            String existingHash = null;
+            
+            if(conn.hasStatement(nextUserUUID, PODD.PODD_USER_SECRET_HASH, null, false, this.getContexts()))
+            {
+                final List<Statement> hashList =
+                        Iterations.asList(conn.getStatements(nextUserUUID, PODD.PODD_USER_SECRET_HASH, null, false,
+                                this.getContexts()));
+                
+                if(hashList.isEmpty())
+                {
+                    // Should not happen in normal circumstances as we are wrapping with
+                    // conn.hasStatement
+                    throw new PoddRuntimeException("Inconsistent database state detected");
+                }
+                else if(hashList.size() > 1)
+                {
+                    // Cannot detect a unique hash in database for user, if they are updating, they
+                    // will now need to provide a new hash
+                    throw new PoddRuntimeException("Inconsistent database state detected");
+                }
+                
+                existingHash = ((Literal)hashList.get(0).getObject()).getLabel();
+            }
+            
+            // remove all of the previously known statements
+            conn.remove(nextUserUUID, null, null, this.getContexts());
             
             conn.add(nextUserUUID, RDF.TYPE, SesameRealmConstants.OAS_USER, this.getContexts());
             
             conn.add(nextUserUUID, SesameRealmConstants.OAS_USERIDENTIFIER,
                     this.vf.createLiteral(nextUser.getIdentifier()), this.getContexts());
             
+            if(existingHash == null && nextUser.getSecret() == null)
+            {
+                throw new PoddRuntimeException("Must provide a password for user");
+            }
+            
+            String createHash = null;
+            
             if(nextUser.getSecret() != null)
             {
-                // TODO: Hash this
-                conn.add(nextUserUUID, SesameRealmConstants.OAS_USERSECRET,
-                        this.vf.createLiteral(new String(nextUser.getSecret())), this.getContexts());
+                createHash = PasswordHash.createHash(nextUser.getSecret());
             }
+            else
+            {
+                createHash = existingHash;
+            }
+            
+            conn.add(nextUserUUID, PODD.PODD_USER_SECRET_HASH, this.vf.createLiteral(createHash), this.getContexts());
             
             if(nextUser.getFirstName() != null)
             {
@@ -556,7 +621,7 @@ public class PoddSesameRealm extends Realm
             
             return nextUserUUID;
         }
-        catch(final IllegalStateException e)
+        catch(final Throwable e)
         {
             if(conn != null)
             {
@@ -570,22 +635,6 @@ public class PoddSesameRealm extends Realm
                 }
             }
             throw e;
-        }
-        catch(final OpenRDFException e)
-        {
-            this.log.error("Found repository exception while adding user", e);
-            if(conn != null)
-            {
-                try
-                {
-                    conn.rollback();
-                }
-                catch(final RepositoryException e1)
-                {
-                    this.log.error("Found unexpected exception while rolling back repository connection after exception");
-                }
-            }
-            throw new RuntimeException("Found repository exception while adding user", e);
         }
         finally
         {
@@ -608,15 +657,8 @@ public class PoddSesameRealm extends Realm
     {
         this.log.debug("Building PoddUser from SPARQL results");
         
-        char[] secret = null;
-        
-        if(bindingSet.hasBinding(PoddSesameRealm.PARAM_USER_SECRET))
-        {
-            secret = bindingSet.getValue(PoddSesameRealm.PARAM_USER_SECRET).stringValue().toCharArray();
-        }
-        
         final PoddUser result =
-                new PoddUser(userIdentifier, secret, bindingSet.getValue(PoddSesameRealm.PARAM_USER_FIRSTNAME)
+                new PoddUser(userIdentifier, null, bindingSet.getValue(PoddSesameRealm.PARAM_USER_FIRSTNAME)
                         .stringValue(), bindingSet.getValue(PoddSesameRealm.PARAM_USER_LASTNAME).stringValue(),
                         bindingSet.getValue(PoddSesameRealm.PARAM_USER_EMAIL).stringValue(), PoddUserStatus.INACTIVE);
         
@@ -627,8 +669,15 @@ public class PoddSesameRealm extends Realm
             userStatus = PoddUserStatus.getUserStatusByUri((URI)statusVal);
         }
         
+        char[] secret = null;
+        
+        if(bindingSet.hasBinding(PoddSesameRealm.PARAM_USER_SECRET))
+        {
+            secret = bindingSet.getValue(PoddSesameRealm.PARAM_USER_SECRET).stringValue().trim().toCharArray();
+        }
+        
         // Do not allow users without secrets to perform actions
-        if(secret == null)
+        if(secret == null || secret.length == 0)
         {
             userStatus = PoddUserStatus.INACTIVE;
         }
@@ -841,7 +890,7 @@ public class PoddSesameRealm extends Realm
         
         query.append(" OPTIONAL{ ?");
         query.append(PoddSesameRealm.PARAM_USER_URI);
-        query.append(" <" + SesameRealmConstants.OAS_USERSECRET + "> ");
+        query.append(" <" + PODD.PODD_USER_SECRET_HASH + "> ");
         query.append(" ?");
         query.append(PoddSesameRealm.PARAM_USER_SECRET);
         query.append(" . } ");
@@ -982,7 +1031,7 @@ public class PoddSesameRealm extends Realm
         
         query.append(" ?");
         query.append(PoddSesameRealm.PARAM_USER_URI);
-        query.append(" <" + SesameRealmConstants.OAS_USERSECRET + "> ");
+        query.append(" <" + PODD.PODD_USER_SECRET_HASH + "> ");
         query.append(" ?");
         query.append(PoddSesameRealm.PARAM_USER_SECRET);
         query.append(" . ");
@@ -2910,7 +2959,30 @@ public class PoddSesameRealm extends Realm
     
     public URI updateUser(final PoddUser nextUser)
     {
-        return this.addUser(nextUser, false);
+        try
+        {
+            return this.addUser(nextUser, false);
+        }
+        catch(NoSuchAlgorithmException | InvalidKeySpecException | OpenRDFException e)
+        {
+            throw new PoddRuntimeException("Could not update user", e);
+        }
     }
     
+    private static final class PoddUserSecretHash
+    {
+        private String hash;
+        private PoddUser user;
+        
+        public PoddUserSecretHash(final String hash, final PoddUser user)
+        {
+            this.hash = hash;
+            this.user = user;
+        }
+        
+        public final boolean compare(final char[] secret) throws NoSuchAlgorithmException, InvalidKeySpecException
+        {
+            return PasswordHash.validatePassword(secret, this.hash);
+        }
+    }
 }

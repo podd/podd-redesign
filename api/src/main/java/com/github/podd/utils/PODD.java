@@ -533,6 +533,9 @@ public interface PODD
     /** http://purl.org/podd/ns/poddUser#position */
     public static final URI PODD_USER_POSITION = PODD.VF.createURI(PODD.PODD_USER, "position");
     
+    /** http://purl.org/podd/ns/poddUser#secretHash */
+    public static final URI PODD_USER_SECRET_HASH = PODD.VF.createURI(PODD.PODD_USER, "secretHash");
+    
     /** http://purl.org/podd/ns/poddUser#status */
     public static final URI PODD_USER_STATUS = PODD.VF.createURI(PODD.PODD_USER, "status");
     

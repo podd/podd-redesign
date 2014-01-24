@@ -793,7 +793,7 @@ public class OntologyUtils
         
         final Set<URI> artifactImports = new LinkedHashSet<>();
         
-        for(URI nextOrderedImport : orderImports)
+        for(final URI nextOrderedImport : orderImports)
         {
             for(final OWLOntologyID nextDependentSchemaOntology : dependentSchemaOntologies)
             {
@@ -923,7 +923,8 @@ public class OntologyUtils
     {
     }
     
-    public static boolean ontologyVersionsMatch(Set<? extends OWLOntologyID> set1, Set<? extends OWLOntologyID> set2)
+    public static boolean ontologyVersionsMatch(final Set<? extends OWLOntologyID> set1,
+            final Set<? extends OWLOntologyID> set2)
     {
         if(set2.size() == set1.size())
         {

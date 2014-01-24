@@ -29,7 +29,6 @@ import org.restlet.representation.Representation;
 import org.restlet.resource.ClientResource;
 import org.restlet.resource.ResourceException;
 
-import com.github.ansell.restletutils.test.RestletTestUtils;
 import com.github.podd.api.test.TestConstants;
 import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.PoddWebConstants;
@@ -148,7 +147,7 @@ public class SparqlResourceImplTest extends AbstractResourceImplTest
             
             // invoke service
             final Representation results =
-                    RestletTestUtils.doTestAuthenticatedRequest(searchClientResource, Method.GET, null,
+                    this.doTestAuthenticatedRequest(searchClientResource, Method.GET, null,
                             MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
             
             // verify: response
@@ -186,7 +185,7 @@ public class SparqlResourceImplTest extends AbstractResourceImplTest
             
             // invoke service
             final Representation results =
-                    RestletTestUtils.doTestAuthenticatedRequest(searchClientResource, Method.POST, postQuery,
+                    this.doTestAuthenticatedRequest(searchClientResource, Method.POST, postQuery,
                             MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
             
             // verify: response
@@ -225,7 +224,7 @@ public class SparqlResourceImplTest extends AbstractResourceImplTest
             
             // invoke service
             final Representation results =
-                    RestletTestUtils.doTestAuthenticatedRequest(searchClientResource, Method.GET, null,
+                    this.doTestAuthenticatedRequest(searchClientResource, Method.GET, null,
                             MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
             
             // verify: response
@@ -264,7 +263,7 @@ public class SparqlResourceImplTest extends AbstractResourceImplTest
             
             // invoke service
             final Representation results =
-                    RestletTestUtils.doTestAuthenticatedRequest(searchClientResource, Method.GET, null,
+                    this.doTestAuthenticatedRequest(searchClientResource, Method.GET, null,
                             MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
             
             // verify: response
@@ -303,7 +302,7 @@ public class SparqlResourceImplTest extends AbstractResourceImplTest
             
             // invoke service
             final Representation results =
-                    RestletTestUtils.doTestAuthenticatedRequest(searchClientResource, Method.GET, null,
+                    this.doTestAuthenticatedRequest(searchClientResource, Method.GET, null,
                             MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
             
             // verify: response

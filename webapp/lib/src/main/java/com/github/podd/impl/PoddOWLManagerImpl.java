@@ -279,7 +279,7 @@ public class PoddOWLManagerImpl implements PoddOWLManager
             throw new NullPointerException("OWLOntology collection is incomplete");
         }
         
-        for(OWLOntologyID nextOntologyID : ontologyIDs)
+        for(final OWLOntologyID nextOntologyID : ontologyIDs)
         {
             if(nextOntologyID.getOntologyIRI() == null)
             {
@@ -965,7 +965,7 @@ public class PoddOWLManagerImpl implements PoddOWLManager
     }
     
     private boolean removeCacheInternal(final OWLOntologyID ontologyID,
-            final Set<? extends OWLOntologyID> dependentSchemaOntologies, OWLOntologyManager cachedManager)
+            final Set<? extends OWLOntologyID> dependentSchemaOntologies, final OWLOntologyManager cachedManager)
         throws OWLException
     {
         // Use ontology ID == null to clear the cache

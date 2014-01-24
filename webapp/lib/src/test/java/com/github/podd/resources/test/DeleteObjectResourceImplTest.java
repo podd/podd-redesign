@@ -27,7 +27,6 @@ import org.restlet.data.Status;
 import org.restlet.representation.Representation;
 import org.restlet.resource.ClientResource;
 
-import com.github.ansell.restletutils.test.RestletTestUtils;
 import com.github.podd.api.test.TestConstants;
 import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.PODD;
@@ -49,7 +48,7 @@ public class DeleteObjectResourceImplTest extends AbstractResourceImplTest
             getArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactUri);
             
             final Representation getArtifactResult =
-                    RestletTestUtils.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null,
+                    this.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null,
                             MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
             
             final Model model = this.assertRdf(getArtifactResult, RDFFormat.RDFXML, expectedStatementCount);
@@ -83,7 +82,7 @@ public class DeleteObjectResourceImplTest extends AbstractResourceImplTest
             deleteObjectClientResource.addQueryParameter(PoddWebConstants.KEY_CASCADE, Boolean.toString(false));
             
             final Representation results =
-                    RestletTestUtils.doTestAuthenticatedRequest(deleteObjectClientResource, Method.DELETE, null,
+                    this.doTestAuthenticatedRequest(deleteObjectClientResource, Method.DELETE, null,
                             MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
             
             // verify: response contains updated artifact's ID

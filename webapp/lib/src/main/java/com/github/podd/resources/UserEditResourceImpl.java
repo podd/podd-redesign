@@ -99,7 +99,7 @@ public class UserEditResourceImpl extends AbstractUserResourceImpl
             final Model modifiedUserModel = Rio.parse(inputStream, "", inputFormat);
             
             // - create PoddUser with edited details
-            this.modelToUser(modifiedUserModel, poddUser);
+            this.mergeModelWithUser(modifiedUserModel, poddUser);
             
             // modify User record in the Realm
             userUri = nextRealm.updateUser(poddUser);
@@ -192,8 +192,10 @@ public class UserEditResourceImpl extends AbstractUserResourceImpl
             dataModel.put("statusList", statuses);
         }
         
-        return RestletUtils.getHtmlRepresentation(this.getPoddApplication().getPropertyUtil().get(PoddWebConstants.PROPERTY_TEMPLATE_BASE, PoddWebConstants.DEFAULT_TEMPLATE_BASE), dataModel,
-                MediaType.TEXT_HTML, this.getPoddApplication().getTemplateConfiguration());
+        return RestletUtils.getHtmlRepresentation(
+                this.getPoddApplication().getPropertyUtil()
+                        .get(PoddWebConstants.PROPERTY_TEMPLATE_BASE, PoddWebConstants.DEFAULT_TEMPLATE_BASE),
+                dataModel, MediaType.TEXT_HTML, this.getPoddApplication().getTemplateConfiguration());
     }
     
     /**
@@ -204,7 +206,7 @@ public class UserEditResourceImpl extends AbstractUserResourceImpl
      * @throws ResourceException
      *             if mandatory data is missing.
      */
-    private void modelToUser(final Model model, final PoddUser currentUser)
+    private void mergeModelWithUser(final Model model, final PoddUser currentUser)
     {
         // User identifier and email are fixed and cannot be changed
         

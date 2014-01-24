@@ -73,37 +73,50 @@ public class UserPasswordResourceImplTest extends AbstractResourceImplTest
             final Representation input = new StringRepresentation(out.toString(), mediaType);
             
             final Representation modifiedResults =
-                    RestletTestUtils.doTestAuthenticatedRequest(userPasswordClientResource, Method.POST, input,
-                            mediaType, Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
+                    this.doTestAuthenticatedRequest(userPasswordClientResource, Method.POST, input, mediaType,
+                            Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
             
             // verify: response has correct identifier
             final Model model = this.assertRdf(new StringReader(this.getText(modifiedResults)), RDFFormat.RDFXML, 1);
             Assert.assertEquals("Unexpected user identifier", testIdentifier,
                     model.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).objectString());
-            
-            // verify: request with old login details should fail
-            final ClientResource userDetailsClientResource2 =
-                    new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_DETAILS));
-            userDetailsClientResource2.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, testIdentifier);
-            try
-            {
-                RestletTestUtils.doTestAuthenticatedRequest(userDetailsClientResource2, Method.GET, null, mediaType,
-                        Status.CLIENT_ERROR_UNAUTHORIZED, AbstractResourceImplTest.NO_ADMIN);
-                Assert.fail("Should have thrown a ResourceException as password should now be invalid");
-            }
-            catch(final ResourceException e)
-            {
-                Assert.assertEquals("Was expecting an UNAUTHORIZED error", Status.CLIENT_ERROR_UNAUTHORIZED,
-                        e.getStatus());
-            }
-            finally
-            {
-                this.releaseClient(userDetailsClientResource2);
-            }
         }
         finally
         {
             this.releaseClient(userPasswordClientResource);
+        }
+        
+        // verify: request with new login details should succeed
+        final ClientResource userDetailsClientResource2 =
+                new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_DETAILS));
+        userDetailsClientResource2.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, testIdentifier);
+        try
+        {
+            this.doTestAuthenticatedRequest(userDetailsClientResource2, Method.GET, null, mediaType, Status.SUCCESS_OK,
+                    testIdentifier, newPassword.toCharArray());
+        }
+        finally
+        {
+            this.releaseClient(userDetailsClientResource2);
+        }
+        
+        // verify: request with old login details should fail
+        final ClientResource userDetailsClientResource3 =
+                new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_DETAILS));
+        userDetailsClientResource3.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, testIdentifier);
+        try
+        {
+            this.doTestAuthenticatedRequest(userDetailsClientResource3, Method.GET, null, mediaType,
+                    Status.CLIENT_ERROR_UNAUTHORIZED, AbstractResourceImplTest.NO_ADMIN);
+            Assert.fail("Should have thrown a ResourceException as password should now be invalid");
+        }
+        catch(final ResourceException e)
+        {
+            Assert.assertEquals("Was expecting an UNAUTHORIZED error", Status.CLIENT_ERROR_UNAUTHORIZED, e.getStatus());
+        }
+        finally
+        {
+            this.releaseClient(userDetailsClientResource3);
         }
     }
     
@@ -136,38 +149,52 @@ public class UserPasswordResourceImplTest extends AbstractResourceImplTest
             final Representation input = new StringRepresentation(out.toString(), mediaType);
             
             final Representation modifiedResults =
-                    RestletTestUtils.doTestAuthenticatedRequest(userPasswordClientResource, Method.POST, input,
-                            mediaType, Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
+                    this.doTestAuthenticatedRequest(userPasswordClientResource, Method.POST, input, mediaType,
+                            Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
             
             // verify: response has correct identifier
             final Model model = this.assertRdf(modifiedResults, RDFFormat.RDFXML, 1);
             Assert.assertEquals("Unexpected user identifier", testIdentifier,
                     model.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).objectString());
-            
-            // verify: request with old login details should fail
-            final ClientResource userDetailsClientResource2 =
-                    new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_DETAILS));
-            userDetailsClientResource2.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, testIdentifier);
-            
-            try
-            {
-                RestletTestUtils.doTestAuthenticatedRequest(userDetailsClientResource2, Method.GET, null, mediaType,
-                        Status.CLIENT_ERROR_UNAUTHORIZED, AbstractResourceImplTest.WITH_ADMIN);
-                Assert.fail("Should have thrown a ResourceException as password should now be invalid");
-            }
-            catch(final ResourceException e)
-            {
-                Assert.assertEquals("Was expecting an UNAUTHORIZED error", Status.CLIENT_ERROR_UNAUTHORIZED,
-                        e.getStatus());
-            }
-            finally
-            {
-                this.releaseClient(userDetailsClientResource2);
-            }
         }
         finally
         {
             this.releaseClient(userPasswordClientResource);
+        }
+        
+        // verify: request with new login details should succeed
+        final ClientResource userDetailsClientResource2 =
+                new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_DETAILS));
+        
+        try
+        {
+            userDetailsClientResource2.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, testIdentifier);
+            this.doTestAuthenticatedRequest(userDetailsClientResource2, Method.GET, null, mediaType, Status.SUCCESS_OK,
+                    RestletTestUtils.TEST_ADMIN_USERNAME, newPassword.toCharArray());
+        }
+        finally
+        {
+            this.releaseClient(userDetailsClientResource2);
+        }
+        
+        // verify: request with old login details should fail
+        final ClientResource userDetailsClientResource3 =
+                new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_DETAILS));
+        
+        try
+        {
+            userDetailsClientResource3.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, testIdentifier);
+            this.doTestAuthenticatedRequest(userDetailsClientResource3, Method.GET, null, mediaType, Status.SUCCESS_OK,
+                    RestletTestUtils.TEST_ADMIN_USERNAME, oldPassword.toCharArray());
+            Assert.fail("Should have thrown a ResourceException as password should now be invalid");
+        }
+        catch(final ResourceException e)
+        {
+            Assert.assertEquals("Was expecting an UNAUTHORIZED error", Status.CLIENT_ERROR_UNAUTHORIZED, e.getStatus());
+        }
+        finally
+        {
+            this.releaseClient(userDetailsClientResource3);
         }
     }
     
@@ -182,8 +209,8 @@ public class UserPasswordResourceImplTest extends AbstractResourceImplTest
             userPasswordClientResource.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, testIdentifier);
             
             final Representation results =
-                    RestletTestUtils.doTestAuthenticatedRequest(userPasswordClientResource, Method.GET, null,
-                            MediaType.TEXT_HTML, Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
+                    this.doTestAuthenticatedRequest(userPasswordClientResource, Method.GET, null, MediaType.TEXT_HTML,
+                            Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
             
             final String body = this.getText(results);
             // System.out.println(body);

@@ -26,11 +26,8 @@ import org.openrdf.repository.Repository;
 import org.openrdf.repository.config.RepositoryConfigSchema;
 import org.openrdf.repository.config.RepositoryImplConfig;
 import org.openrdf.repository.config.RepositoryImplConfigBase;
-import org.openrdf.repository.manager.LocalRepositoryManager;
-import org.openrdf.repository.sail.SailRepository;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.Rio;
-import org.openrdf.sail.memory.MemoryStore;
 
 import com.github.ansell.propertyutil.PropertyUtil;
 import com.github.podd.api.PoddRepositoryManager;
@@ -45,7 +42,8 @@ public class PoddRepositoryManagerImplTest extends AbstractPoddRepositoryManager
 {
     
     @Override
-    protected PoddRepositoryManager getNewPoddRepositoryManagerInstance(Repository managementRepository, Path tempDirPath) throws Exception
+    protected PoddRepositoryManager getNewPoddRepositoryManagerInstance(final Repository managementRepository,
+            final Path tempDirPath) throws Exception
     {
         final Model graph =
                 Rio.parse(this.getClass().getResourceAsStream("/memorystoreconfig.ttl"), "", RDFFormat.TURTLE);
@@ -53,6 +51,7 @@ public class PoddRepositoryManagerImplTest extends AbstractPoddRepositoryManager
         final RepositoryImplConfig repositoryImplConfig = RepositoryImplConfigBase.create(graph, repositoryNode);
         Assert.assertNotNull(repositoryImplConfig);
         Assert.assertNotNull(repositoryImplConfig.getType());
-        return new PoddRepositoryManagerImpl(managementRepository, repositoryImplConfig, "", tempDirPath, new PropertyUtil("podd"));
+        return new PoddRepositoryManagerImpl(managementRepository, repositoryImplConfig, "", tempDirPath,
+                new PropertyUtil("podd"));
     }
 }

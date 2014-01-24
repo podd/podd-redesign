@@ -291,7 +291,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
                                 this.getOWLManager().removeCache(deletedOntologyId.getBaseOWLOntologyID(),
                                         schemaImports);
                             }
-                            catch(OWLException e)
+                            catch(final OWLException e)
                             {
                                 this.log.error("Found error clearing cache", e);
                             }
@@ -302,7 +302,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
                                     this.getOWLManager().removeCache(deletedOntologyId.getInferredOWLOntologyID(),
                                             schemaImports);
                                 }
-                                catch(OWLException e)
+                                catch(final OWLException e)
                                 {
                                     this.log.error("Found error clearing cache", e);
                                 }
@@ -932,7 +932,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         UnmanagedSchemaIRIException, SchemaManifestException, UnsupportedRDFormatException, IOException,
         UnmanagedArtifactIRIException, UnmanagedArtifactVersionException
     {
-        Repository permanentRepository = null;
+        final Repository permanentRepository = null;
         RepositoryConnection permanentConnection = null;
         RepositoryConnection managementConnection = null;
         try
@@ -1048,7 +1048,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             managementConnection.export(new StatementCollector(model), this.getRepositoryManager()
                     .getSchemaManagementGraph());
             
-            Set<OWLOntologyID> result =
+            final Set<OWLOntologyID> result =
                     new LinkedHashSet<>(OntologyUtils.artifactImports(inferredOWLOntologyID, model));
             
             this.log.info("Returning from getSchemaImports: {} {}", artifactID, result);
@@ -1615,7 +1615,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
                         nextImport.getObject(), this.getRepositoryManager().getArtifactManagementGraph());
             }
             
-            for(OWLOntologyID nextSchemaImport : schemaImports)
+            for(final OWLOntologyID nextSchemaImport : schemaImports)
             {
                 managementConnection.add(inferredOWLOntologyID.getOntologyIRI().toOpenRDFURI(), OWL.IMPORTS,
                         nextSchemaImport.getVersionIRI().toOpenRDFURI(), this.getRepositoryManager()
@@ -2474,7 +2474,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             }
             catch(final Throwable e1)
             {
-                log.error("Found exception while rolling back management connection", e);
+                this.log.error("Found exception while rolling back management connection", e);
             }
             finally
             {
@@ -2487,7 +2487,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
                 }
                 catch(final Throwable e1)
                 {
-                    log.error("Found exception while rolling back permanent connection", e);
+                    this.log.error("Found exception while rolling back permanent connection", e);
                 }
                 finally
                 {
@@ -2500,7 +2500,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
                     }
                     catch(final Throwable e1)
                     {
-                        log.error("Found exception while rolling back permanent connection", e);
+                        this.log.error("Found exception while rolling back permanent connection", e);
                     }
                     finally
                     {
@@ -2513,7 +2513,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
                         }
                         catch(final Throwable e1)
                         {
-                            log.error("Found exception while rolling back temporary connection", e);
+                            this.log.error("Found exception while rolling back temporary connection", e);
                         }
                     }
                 }

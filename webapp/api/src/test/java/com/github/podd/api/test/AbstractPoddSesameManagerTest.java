@@ -16,8 +16,6 @@
  */
 package com.github.podd.api.test;
 
-import info.aduna.iteration.Iterations;
-
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -2414,7 +2412,7 @@ public abstract class AbstractPoddSesameManagerTest
     {
         if(this.testRepositoryConnection.size(testGraph) != graphSize)
         {
-            DebugUtils.printContents(testRepositoryConnection, testGraph);
+            DebugUtils.printContents(this.testRepositoryConnection, testGraph);
         }
         
         Assert.assertEquals("Graph not of expected size", graphSize, this.testRepositoryConnection.size(testGraph));

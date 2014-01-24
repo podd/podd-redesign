@@ -36,7 +36,7 @@ public final class OntologyImportsComparator implements Comparator<URI>
     
     private final ConcurrentMap<URI, Set<URI>> importsMap;
     
-    OntologyImportsComparator(ConcurrentMap<URI, Set<URI>> importsMap)
+    OntologyImportsComparator(final ConcurrentMap<URI, Set<URI>> importsMap)
     {
         this.importsMap = importsMap;
     }
@@ -46,11 +46,11 @@ public final class OntologyImportsComparator implements Comparator<URI>
     {
         if(o1.equals(o2))
         {
-            return EQUALS;
+            return OntologyImportsComparator.EQUALS;
         }
         
-        Set<URI> set1 = importsMap.get(o1);
-        Set<URI> set2 = importsMap.get(o2);
+        Set<URI> set1 = this.importsMap.get(o1);
+        Set<URI> set2 = this.importsMap.get(o2);
         
         if(set1 == null)
         {
@@ -69,15 +69,15 @@ public final class OntologyImportsComparator implements Comparator<URI>
         }
         else if(set1.equals(set2))
         {
-            return EQUALS;
+            return OntologyImportsComparator.EQUALS;
         }
         else if(set1.contains(o2))
         {
-            return AFTER;
+            return OntologyImportsComparator.AFTER;
         }
         else if(set2.contains(o1))
         {
-            return BEFORE;
+            return OntologyImportsComparator.BEFORE;
         }
         else
         {
@@ -101,7 +101,7 @@ public final class OntologyImportsComparator implements Comparator<URI>
             }
             if(!set2.isEmpty())
             {
-                for(URI nextImport1 : set1)
+                for(final URI nextImport1 : set1)
                 {
                     if(set2.contains(nextImport1))
                     {
@@ -111,7 +111,7 @@ public final class OntologyImportsComparator implements Comparator<URI>
             }
             if(!set1.isEmpty())
             {
-                for(URI nextImport2 : set2)
+                for(final URI nextImport2 : set2)
                 {
                     if(set1.contains(nextImport2))
                     {
@@ -122,26 +122,26 @@ public final class OntologyImportsComparator implements Comparator<URI>
             
             if(tempSet1.size() > tempSet2.size())
             {
-                return AFTER;
+                return OntologyImportsComparator.AFTER;
             }
             else if(tempSet2.size() > tempSet1.size())
             {
-                return BEFORE;
+                return OntologyImportsComparator.BEFORE;
             }
             
-            for(URI nextImport1 : tempSet1)
+            for(final URI nextImport1 : tempSet1)
             {
-                int compare = this.compare(nextImport1, o2);
-                if(compare != EQUALS)
+                final int compare = this.compare(nextImport1, o2);
+                if(compare != OntologyImportsComparator.EQUALS)
                 {
                     return compare;
                 }
             }
             
-            for(URI nextImport2 : tempSet2)
+            for(final URI nextImport2 : tempSet2)
             {
-                int compare = this.compare(o1, nextImport2);
-                if(compare != EQUALS)
+                final int compare = this.compare(o1, nextImport2);
+                if(compare != OntologyImportsComparator.EQUALS)
                 {
                     return compare;
                 }

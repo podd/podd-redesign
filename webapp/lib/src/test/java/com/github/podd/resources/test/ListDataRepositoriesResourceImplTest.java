@@ -30,7 +30,6 @@ import org.restlet.resource.ClientResource;
 import org.restlet.resource.ResourceException;
 
 import com.github.ansell.restletutils.RestletUtilMediaType;
-import com.github.ansell.restletutils.test.RestletTestUtils;
 import com.github.podd.utils.PODD;
 import com.github.podd.utils.PoddWebConstants;
 
@@ -52,7 +51,7 @@ public class ListDataRepositoriesResourceImplTest extends AbstractResourceImplTe
         try
         {
             final Representation result =
-                    RestletTestUtils.doTestAuthenticatedRequest(dataRepositoriesClientResource, Method.GET, null,
+                    this.doTestAuthenticatedRequest(dataRepositoriesClientResource, Method.GET, null,
                             MediaType.TEXT_HTML, Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
             final String body = this.getText(result);
             
@@ -83,7 +82,7 @@ public class ListDataRepositoriesResourceImplTest extends AbstractResourceImplTe
         try
         {
             final Representation result =
-                    RestletTestUtils.doTestAuthenticatedRequest(dataRepositoriesClientResource, Method.GET, null,
+                    this.doTestAuthenticatedRequest(dataRepositoriesClientResource, Method.GET, null,
                             MediaType.TEXT_HTML, Status.SUCCESS_OK, AbstractResourceImplTest.NO_ADMIN);
             final String body = this.getText(result);
             
@@ -138,7 +137,7 @@ public class ListDataRepositoriesResourceImplTest extends AbstractResourceImplTe
         try
         {
             final Representation results =
-                    RestletTestUtils.doTestAuthenticatedRequest(dataRepositoriesClientResource, Method.GET, null,
+                    this.doTestAuthenticatedRequest(dataRepositoriesClientResource, Method.GET, null,
                             RestletUtilMediaType.APPLICATION_RDF_JSON, Status.SUCCESS_OK,
                             AbstractResourceImplTest.WITH_ADMIN);
             
@@ -168,7 +167,7 @@ public class ListDataRepositoriesResourceImplTest extends AbstractResourceImplTe
         try
         {
             final Representation results =
-                    RestletTestUtils.doTestAuthenticatedRequest(dataRepositoriesClientResource, Method.GET, null,
+                    this.doTestAuthenticatedRequest(dataRepositoriesClientResource, Method.GET, null,
                             RestletUtilMediaType.APPLICATION_RDF_JSON, Status.SUCCESS_OK,
                             AbstractResourceImplTest.NO_ADMIN);
             final Model model = this.assertRdf(results, RDFFormat.RDFJSON, 4);
@@ -221,7 +220,7 @@ public class ListDataRepositoriesResourceImplTest extends AbstractResourceImplTe
         try
         {
             final Representation results =
-                    RestletTestUtils.doTestAuthenticatedRequest(dataRepositoriesClientResource, Method.GET, null,
+                    this.doTestAuthenticatedRequest(dataRepositoriesClientResource, Method.GET, null,
                             MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
             
             // verify:
@@ -251,7 +250,7 @@ public class ListDataRepositoriesResourceImplTest extends AbstractResourceImplTe
         try
         {
             final Representation results =
-                    RestletTestUtils.doTestAuthenticatedRequest(dataRepositoriesClientResource, Method.GET, null,
+                    this.doTestAuthenticatedRequest(dataRepositoriesClientResource, Method.GET, null,
                             MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK, AbstractResourceImplTest.NO_ADMIN);
             final Model model = this.assertRdf(results, RDFFormat.RDFXML, 4);
             

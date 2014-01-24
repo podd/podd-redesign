@@ -275,9 +275,9 @@ public class UploadArtifactResourceImpl extends AbstractPoddResourceImpl
             DebugUtils
                     .printContents(managementConnection, this.getPoddRepositoryManager().getArtifactManagementGraph());
         }
-        catch(OpenRDFException e)
+        catch(final OpenRDFException e)
         {
-            log.error("Error debugging artifact management graph", e);
+            this.log.error("Error debugging artifact management graph", e);
         }
         finally
         {
@@ -288,9 +288,9 @@ public class UploadArtifactResourceImpl extends AbstractPoddResourceImpl
                     managementConnection.close();
                 }
             }
-            catch(RepositoryException e)
+            catch(final RepositoryException e)
             {
-                log.error("Error closing repository connection", e);
+                this.log.error("Error closing repository connection", e);
             }
         }
         final ByteArrayOutputStream output = new ByteArrayOutputStream(8096);

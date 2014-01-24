@@ -532,8 +532,8 @@ public abstract class AbstractPoddArtifactManagerTest
         this.schemaGraph = PODD.VF.createURI("urn:test:schema-graph");
         this.artifactGraph = PODD.VF.createURI("urn:test:artifact-graph");
         
-        this.testPath = tempDir.newFolder("test-podd-repository-manager").toPath();
-        this.managementRepository = new SailRepository(new MemoryStore(tempDir.newFolder("managementRepository")));
+        this.testPath = this.tempDir.newFolder("test-podd-repository-manager").toPath();
+        this.managementRepository = new SailRepository(new MemoryStore(this.tempDir.newFolder("managementRepository")));
         this.managementRepository.initialize();
         
         this.setupManagers();
@@ -551,7 +551,7 @@ public abstract class AbstractPoddArtifactManagerTest
             this.managementRepository.initialize();
         }
         
-        this.testRepositoryManager = this.getNewRepositoryManager(managementRepository, testPath);
+        this.testRepositoryManager = this.getNewRepositoryManager(this.managementRepository, this.testPath);
         this.testRepositoryManager.setSchemaManagementGraph(this.schemaGraph);
         this.testRepositoryManager.setArtifactManagementGraph(this.artifactGraph);
         
@@ -1307,7 +1307,8 @@ public abstract class AbstractPoddArtifactManagerTest
         this.verifyLoadedArtifact(artifactIDv1, 12, TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES,
                 TestConstants.TEST_ARTIFACT_BASIC_1_20130206_INFERRED_TRIPLES, false);
         
-        RepositoryConnection managementConnection = this.testRepositoryManager.getManagementRepositoryConnection();
+        final RepositoryConnection managementConnection =
+                this.testRepositoryManager.getManagementRepositoryConnection();
         try
         {
             final URI[] schemaContexts =
@@ -1347,7 +1348,8 @@ public abstract class AbstractPoddArtifactManagerTest
         this.verifyLoadedArtifact(artifactIDv1, 12, TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES,
                 TestConstants.TEST_ARTIFACT_BASIC_1_20130206_INFERRED_TRIPLES, false);
         
-        RepositoryConnection managementConnection = this.testRepositoryManager.getManagementRepositoryConnection();
+        final RepositoryConnection managementConnection =
+                this.testRepositoryManager.getManagementRepositoryConnection();
         try
         {
             final URI[] schemaContexts =
@@ -1393,7 +1395,8 @@ public abstract class AbstractPoddArtifactManagerTest
         Assert.assertNotNull(artifactIDv1.getVersionIRI());
         Assert.assertNotNull(artifactIDv1.getInferredOntologyIRI());
         
-        RepositoryConnection managementConnection = this.testRepositoryManager.getManagementRepositoryConnection();
+        final RepositoryConnection managementConnection =
+                this.testRepositoryManager.getManagementRepositoryConnection();
         try
         {
             final URI[] schemaContexts =
@@ -1839,7 +1842,8 @@ public abstract class AbstractPoddArtifactManagerTest
         // Keep track of the ontologies that have been loaded to ensure they are in memory when
         // inferring the next schema
         final Set<InferredOWLOntologyID> loadedOntologies = new LinkedHashSet<>();
-        RepositoryConnection managementConnection = this.testRepositoryManager.getManagementRepositoryConnection();
+        final RepositoryConnection managementConnection =
+                this.testRepositoryManager.getManagementRepositoryConnection();
         try
         {
             // prepare: load schema ontologies
@@ -2908,7 +2912,7 @@ public abstract class AbstractPoddArtifactManagerTest
         final List<InferredOWLOntologyID> version2SchemaOntologies = this.loadVersion2SchemaOntologies();
         
         // Update from version 1 to version 2
-        InferredOWLOntologyID artifactIDv2 =
+        final InferredOWLOntologyID artifactIDv2 =
                 this.testArtifactManager.updateSchemaImports(new InferredOWLOntologyID(artifactIDv1.getOntologyIRI(),
                         artifactIDv1.getVersionIRI(), artifactIDv1.getInferredOntologyIRI()),
                         new LinkedHashSet<OWLOntologyID>(version1SchemaOntologies), new LinkedHashSet<OWLOntologyID>(
@@ -3009,7 +3013,7 @@ public abstract class AbstractPoddArtifactManagerTest
         this.verifyLoadedArtifact(artifactIDv1, 12, TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES,
                 TestConstants.TEST_ARTIFACT_BASIC_1_20130206_INFERRED_TRIPLES, false);
         
-        Set<? extends OWLOntologyID> realSchemaImports = this.testArtifactManager.getSchemaImports(artifactIDv1);
+        final Set<? extends OWLOntologyID> realSchemaImports = this.testArtifactManager.getSchemaImports(artifactIDv1);
         Assert.assertFalse(realSchemaImports.isEmpty());
         
         this.testRepositoryManager.shutDown();
@@ -3050,7 +3054,7 @@ public abstract class AbstractPoddArtifactManagerTest
                     new HashSet<OWLOntologyID>());
             Assert.fail("Did not receive the expected exception");
         }
-        catch(IllegalArgumentException e)
+        catch(final IllegalArgumentException e)
         {
             Assert.assertEquals("Schema ontologies cannot be empty", e.getMessage());
         }
@@ -3151,7 +3155,7 @@ public abstract class AbstractPoddArtifactManagerTest
         final RDFFormat readFormat = RDFFormat.TURTLE;
         final InferredOWLOntologyID resultArtifactId = this.testArtifactManager.loadArtifact(inputStream, readFormat);
         
-        RepositoryConnection managementConnection = this.managementRepository.getConnection();
+        final RepositoryConnection managementConnection = this.managementRepository.getConnection();
         try
         {
             this.dumpRdfToFile(managementConnection, resultArtifactId.getInferredOntologyIRI().toOpenRDFURI(),
@@ -3184,10 +3188,10 @@ public abstract class AbstractPoddArtifactManagerTest
     private void verifyArtifactManagementGraphContents(final int graphSize, final IRI ontologyIRI,
             final IRI versionIRI, final IRI inferredVersionIRI) throws RepositoryException, RDFHandlerException
     {
-        RepositoryConnection managementConnection = this.managementRepository.getConnection();
+        final RepositoryConnection managementConnection = this.managementRepository.getConnection();
         try
         {
-            verifyArtifactManagementGraphContents(managementConnection, graphSize,
+            this.verifyArtifactManagementGraphContents(managementConnection, graphSize,
                     this.testRepositoryManager.getArtifactManagementGraph(), ontologyIRI, versionIRI,
                     inferredVersionIRI);
         }
@@ -3230,7 +3234,7 @@ public abstract class AbstractPoddArtifactManagerTest
         Assert.assertNotNull("Version IRI was null", versionIRI);
         Assert.assertNotNull("Inferred Version IRI was null", inferredVersionIRI);
         
-        Model model = new LinkedHashModel();
+        final Model model = new LinkedHashModel();
         repositoryConnection.export(new StatementCollector(model), managementGraph);
         
         // verify: OWL_VERSION

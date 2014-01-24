@@ -21,7 +21,6 @@ import org.restlet.data.Status;
 import org.restlet.representation.Representation;
 import org.restlet.resource.ClientResource;
 
-import com.github.ansell.restletutils.test.RestletTestUtils;
 import com.github.podd.utils.PODD;
 import com.github.podd.utils.PoddRoles;
 import com.github.podd.utils.PoddUserStatus;
@@ -57,7 +56,7 @@ public class UserSearchResourceImplTest extends AbstractResourceImplTest
             userSearchClientResource.addQueryParameter(PoddWebConstants.KEY_SEARCHTERM, "anoth");
             
             final Representation results =
-                    RestletTestUtils.doTestAuthenticatedRequest(userSearchClientResource, Method.GET, null, mediaType,
+                    this.doTestAuthenticatedRequest(userSearchClientResource, Method.GET, null, mediaType,
                             Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
             
             final Model resultsModel = this.assertRdf(results, format, 2);

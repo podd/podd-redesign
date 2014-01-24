@@ -22,7 +22,8 @@ package com.github.podd.utils;
  */
 public interface PoddWebConstants
 {
-    public static final String DEF_CHALLENGE_AUTH_METHOD = "digest";
+    // public static final String DEF_CHALLENGE_AUTH_METHOD = "digest";
+    public static final String DEF_CHALLENGE_AUTH_METHOD = "cookie";
     
     public static final String COOKIE_NAME = "PODDAuthentication";
     

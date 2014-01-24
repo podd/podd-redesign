@@ -66,8 +66,8 @@ public class UserDetailsResourceImplTest extends AbstractResourceImplTest
         {
             userDetailsClientResource.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, "noSuchUser");
             
-            RestletTestUtils.doTestAuthenticatedRequest(userDetailsClientResource, Method.GET, null,
-                    MediaType.TEXT_HTML, Status.CLIENT_ERROR_NOT_FOUND, AbstractResourceImplTest.WITH_ADMIN);
+            this.doTestAuthenticatedRequest(userDetailsClientResource, Method.GET, null, MediaType.TEXT_HTML,
+                    Status.CLIENT_ERROR_NOT_FOUND, AbstractResourceImplTest.WITH_ADMIN);
         }
         catch(final ResourceException e)
         {
@@ -92,8 +92,8 @@ public class UserDetailsResourceImplTest extends AbstractResourceImplTest
             userDetailsClientResource.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER,
                     RestletTestUtils.TEST_ADMIN_USERNAME);
             
-            RestletTestUtils.doTestAuthenticatedRequest(userDetailsClientResource, Method.GET, null,
-                    MediaType.TEXT_HTML, Status.CLIENT_ERROR_UNAUTHORIZED, AbstractResourceImplTest.NO_ADMIN);
+            this.doTestAuthenticatedRequest(userDetailsClientResource, Method.GET, null, MediaType.TEXT_HTML,
+                    Status.CLIENT_ERROR_UNAUTHORIZED, AbstractResourceImplTest.NO_ADMIN);
             Assert.fail("Should have thrown a ResourceException with Status Code 401");
         }
         catch(final ResourceException e)
@@ -156,8 +156,8 @@ public class UserDetailsResourceImplTest extends AbstractResourceImplTest
             userDetailsClientResource.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, testIdentifier);
             
             final Representation results =
-                    RestletTestUtils.doTestAuthenticatedRequest(userDetailsClientResource, Method.GET, null,
-                            MediaType.TEXT_HTML, Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
+                    this.doTestAuthenticatedRequest(userDetailsClientResource, Method.GET, null, MediaType.TEXT_HTML,
+                            Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
             
             final String body = this.getText(results);
             Assert.assertTrue(body.contains("User Name: "));
@@ -184,8 +184,8 @@ public class UserDetailsResourceImplTest extends AbstractResourceImplTest
                     RestletTestUtils.TEST_ADMIN_USERNAME);
             
             final Representation results =
-                    RestletTestUtils.doTestAuthenticatedRequest(userDetailsClientResource, Method.GET, null,
-                            MediaType.TEXT_HTML, Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
+                    this.doTestAuthenticatedRequest(userDetailsClientResource, Method.GET, null, MediaType.TEXT_HTML,
+                            Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
             
             final String body = this.getText(results);
             Assert.assertTrue(body.contains("Personal Details"));
@@ -216,7 +216,7 @@ public class UserDetailsResourceImplTest extends AbstractResourceImplTest
                     RestletTestUtils.TEST_ADMIN_USERNAME);
             
             final Representation results =
-                    RestletTestUtils.doTestAuthenticatedRequest(userDetailsClientResource, Method.GET, null, mediaType,
+                    this.doTestAuthenticatedRequest(userDetailsClientResource, Method.GET, null, mediaType,
                             Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
             
             final Model resultsModel = this.assertRdf(results, format, 11);
@@ -267,7 +267,7 @@ public class UserDetailsResourceImplTest extends AbstractResourceImplTest
             userDetailsClientResource.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, testIdentifier);
             
             final Representation results =
-                    RestletTestUtils.doTestAuthenticatedRequest(userDetailsClientResource, Method.GET, null, mediaType,
+                    this.doTestAuthenticatedRequest(userDetailsClientResource, Method.GET, null, mediaType,
                             Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
             
             final Model resultsModel = this.assertRdf(results, format, 12);

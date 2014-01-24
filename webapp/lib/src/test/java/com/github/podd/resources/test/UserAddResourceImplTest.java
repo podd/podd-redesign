@@ -43,7 +43,6 @@ import org.restlet.resource.ClientResource;
 import org.restlet.resource.ResourceException;
 
 import com.github.ansell.restletutils.SesameRealmConstants;
-import com.github.ansell.restletutils.test.RestletTestUtils;
 import com.github.podd.utils.PODD;
 import com.github.podd.utils.PoddRoles;
 import com.github.podd.utils.PoddUserStatus;
@@ -109,7 +108,7 @@ public class UserAddResourceImplTest extends AbstractResourceImplTest
             final Representation input = new StringRepresentation(out.toString(), mediaType);
             
             final Representation results =
-                    RestletTestUtils.doTestAuthenticatedRequest(userAddClientResource, Method.POST, input, mediaType,
+                    this.doTestAuthenticatedRequest(userAddClientResource, Method.POST, input, mediaType,
                             Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
             
             // verify: response has same correct identifier
@@ -134,8 +133,8 @@ public class UserAddResourceImplTest extends AbstractResourceImplTest
         try
         {
             final Representation results =
-                    RestletTestUtils.doTestAuthenticatedRequest(userAddClientResource, Method.GET, null,
-                            MediaType.TEXT_HTML, Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
+                    this.doTestAuthenticatedRequest(userAddClientResource, Method.GET, null, MediaType.TEXT_HTML,
+                            Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
             
             final String body = this.getText(results);
             this.assertFreemarker(body);
@@ -177,7 +176,7 @@ public class UserAddResourceImplTest extends AbstractResourceImplTest
             userDetailsClientResource.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, testIdentifier);
             
             final Representation results =
-                    RestletTestUtils.doTestAuthenticatedRequest(userDetailsClientResource, Method.GET, null, mediaType,
+                    this.doTestAuthenticatedRequest(userDetailsClientResource, Method.GET, null, mediaType,
                             Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
             
             final Model resultsModel = this.assertRdf(new StringReader(this.getText(results)), format, 19);
@@ -222,7 +221,7 @@ public class UserAddResourceImplTest extends AbstractResourceImplTest
             userDetailsClientResource.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, testIdentifier);
             
             final Representation results =
-                    RestletTestUtils.doTestAuthenticatedRequest(userDetailsClientResource, Method.GET, null, mediaType,
+                    this.doTestAuthenticatedRequest(userDetailsClientResource, Method.GET, null, mediaType,
                             Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
             
             final Model resultsModel = this.assertRdf(results, format, 8);
@@ -274,7 +273,7 @@ public class UserAddResourceImplTest extends AbstractResourceImplTest
             userDetailsClientResource.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, testIdentifier);
             
             final Representation results =
-                    RestletTestUtils.doTestAuthenticatedRequest(userDetailsClientResource, Method.GET, null, mediaType,
+                    this.doTestAuthenticatedRequest(userDetailsClientResource, Method.GET, null, mediaType,
                             Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
             
             final Model resultsModel = this.assertRdf(results, format, 12);
@@ -331,7 +330,7 @@ public class UserAddResourceImplTest extends AbstractResourceImplTest
         
         try
         {
-            RestletTestUtils.doTestAuthenticatedRequest(userAddClientResource, Method.POST, input, mediaType,
+            this.doTestAuthenticatedRequest(userAddClientResource, Method.POST, input, mediaType,
                     Status.CLIENT_ERROR_CONFLICT, AbstractResourceImplTest.WITH_ADMIN);
             Assert.fail("Should throw an exception because Identifier already used");
         }
@@ -360,7 +359,7 @@ public class UserAddResourceImplTest extends AbstractResourceImplTest
         
         try
         {
-            RestletTestUtils.doTestAuthenticatedRequest(userAddClientResource, Method.GET, null, MediaType.TEXT_HTML,
+            this.doTestAuthenticatedRequest(userAddClientResource, Method.GET, null, MediaType.TEXT_HTML,
                     Status.CLIENT_ERROR_UNAUTHORIZED, AbstractResourceImplTest.NO_ADMIN);
             Assert.fail("Should have thrown a ResourceException");
         }
@@ -407,8 +406,8 @@ public class UserAddResourceImplTest extends AbstractResourceImplTest
         
         try
         {
-            RestletTestUtils.doTestAuthenticatedRequest(userAddClientResource, Method.POST, input, mediaType,
-                    Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
+            this.doTestAuthenticatedRequest(userAddClientResource, Method.POST, input, mediaType, Status.SUCCESS_OK,
+                    AbstractResourceImplTest.WITH_ADMIN);
             Assert.fail("Should have failed due to missing email");
         }
         catch(final ResourceException e)

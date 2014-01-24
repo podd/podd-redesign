@@ -20,7 +20,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Map.Entry;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -76,8 +75,8 @@ public class TestUtils
     }
     
     public static List<InferredOWLOntologyID> loadSchemaOntologies(final String schemaManifest,
-            final int expectedSchemaOntologies, PoddSchemaManager schemaManager) throws OpenRDFException, IOException,
-        OWLException, PoddException
+            final int expectedSchemaOntologies, final PoddSchemaManager schemaManager) throws OpenRDFException,
+        IOException, OWLException, PoddException
     {
         Model model = null;
         try (final InputStream schemaManifestStream = TestUtils.class.getResourceAsStream(schemaManifest);)
@@ -94,7 +93,7 @@ public class TestUtils
         Assert.assertEquals("Unexpected number of schema ontologies loaded", expectedSchemaOntologies,
                 schemaOntologies.size());
         
-        for(InferredOWLOntologyID nextSchema : schemaOntologies)
+        for(final InferredOWLOntologyID nextSchema : schemaOntologies)
         {
             Assert.assertNotNull("Ontology IRI was null for schema", nextSchema.getOntologyIRI());
             Assert.assertNotNull("Version IRI was null for schema: " + nextSchema, nextSchema.getVersionIRI());
@@ -110,9 +109,9 @@ public class TestUtils
                     .toOpenRDFURI());
         }
         
-        for(Entry<URI, URI> nextEntry : currentVersionsMap.entrySet())
+        for(final Entry<URI, URI> nextEntry : currentVersionsMap.entrySet())
         {
-            for(InferredOWLOntologyID nextSchema : schemaOntologies)
+            for(final InferredOWLOntologyID nextSchema : schemaOntologies)
             {
                 if(nextSchema.getOntologyIRI().toOpenRDFURI().equals(nextEntry.getKey())
                         && nextSchema.getVersionIRI().toOpenRDFURI().equals(nextEntry.getValue()))
@@ -129,12 +128,12 @@ public class TestUtils
      * This internal method loads the default schema ontologies to PODD. Should be used as a setUp()
      * mechanism where needed.
      */
-    public static List<InferredOWLOntologyID> loadDefaultSchemaOntologies(PoddSchemaManager schemaManager)
+    public static List<InferredOWLOntologyID> loadDefaultSchemaOntologies(final PoddSchemaManager schemaManager)
         throws Exception
     {
         // NOTE: Update the number 12 here when updates are made to the schema manifest used by this
         // test
-        return loadSchemaOntologies(PODD.PATH_DEFAULT_SCHEMAS, 12, schemaManager);
+        return TestUtils.loadSchemaOntologies(PODD.PATH_DEFAULT_SCHEMAS, 12, schemaManager);
     }
     
     /**
@@ -144,10 +143,10 @@ public class TestUtils
     {
     }
     
-    public static RioMemoryTripleSource getRioTripleSource(String classpath) throws RDFParseException,
+    public static RioMemoryTripleSource getRioTripleSource(final String classpath) throws RDFParseException,
         UnsupportedRDFormatException, IOException
     {
-        InputStream inputStream = AbstractPoddOWLManagerTest.class.getResourceAsStream(classpath);
+        final InputStream inputStream = AbstractPoddOWLManagerTest.class.getResourceAsStream(classpath);
         final Model statements =
                 Rio.parse(inputStream, "", Rio.getParserFormatForFileName(classpath, RDFFormat.RDFXML));
         

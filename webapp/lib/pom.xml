@@ -255,6 +255,11 @@
 			<groupId>org.openrdf.sesame</groupId>
 			<artifactId>sesame-sail-federation</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>org.openrdf.sesame</groupId>
+			<artifactId>sesame-sail-nativerdf</artifactId>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 	<build>
 		<testResources>

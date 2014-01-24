@@ -45,7 +45,6 @@ import org.slf4j.LoggerFactory;
 
 import com.github.podd.api.PoddRepositoryManager;
 import com.github.podd.utils.InferredOWLOntologyID;
-import com.github.podd.utils.OntologyUtils;
 import com.github.podd.utils.PODD;
 
 /**
@@ -242,24 +241,24 @@ public abstract class AbstractPoddRepositoryManagerTest
         this.testC1 = this.owlid(this.testOntologyUriC, this.testVersionUriC1);
         this.testVersionUriC3 = this.uri("http://example.org/podd/ns/version/poddC/3");
         this.testC3 = this.owlid(this.testOntologyUriC, this.testVersionUriC3);
-        testTempRepositoryManagerPath = tempDir.newFolder("test-podd-base-directory").toPath();
+        this.testTempRepositoryManagerPath = this.tempDir.newFolder("test-podd-base-directory").toPath();
         this.schemaGraph = PODD.VF.createURI("urn:test:schema-graph");
         this.artifactGraph = PODD.VF.createURI("urn:test:artifact-graph");
         
-        Path testTempManagementRepositoryPath = tempDir.newFolder("managementrepository").toPath();
+        final Path testTempManagementRepositoryPath = this.tempDir.newFolder("managementrepository").toPath();
         
-        managementRepository = new SailRepository(new MemoryStore(testTempManagementRepositoryPath.toFile()));
-        managementRepository.initialize();
+        this.managementRepository = new SailRepository(new MemoryStore(testTempManagementRepositoryPath.toFile()));
+        this.managementRepository.initialize();
         
-        setupManager();
+        this.setupManager();
     }
     
     private void setupManager() throws Exception
     {
         this.testRepositoryManager =
-                this.getNewPoddRepositoryManagerInstance(managementRepository, testTempRepositoryManagerPath);
-        this.testRepositoryManager.setSchemaManagementGraph(schemaGraph);
-        this.testRepositoryManager.setArtifactManagementGraph(artifactGraph);
+                this.getNewPoddRepositoryManagerInstance(this.managementRepository, this.testTempRepositoryManagerPath);
+        this.testRepositoryManager.setSchemaManagementGraph(this.schemaGraph);
+        this.testRepositoryManager.setArtifactManagementGraph(this.artifactGraph);
         
     }
     
@@ -337,7 +336,7 @@ public abstract class AbstractPoddRepositoryManagerTest
     @Test
     public final void testGetManagementRepository() throws Exception
     {
-        RepositoryConnection managementRepositoryConnection =
+        final RepositoryConnection managementRepositoryConnection =
                 this.testRepositoryManager.getManagementRepositoryConnection();
         try
         {
@@ -367,7 +366,7 @@ public abstract class AbstractPoddRepositoryManagerTest
         {
             permanentRepository1 =
                     this.testRepositoryManager.getPermanentRepositoryConnection(Collections
-                            .<OWLOntologyID> singleton(testOntologyID));
+                            .<OWLOntologyID> singleton(this.testOntologyID));
             Assert.assertNotNull("Permanent repository was null", permanentRepository1);
             
             permanentRepository2 =
@@ -411,7 +410,7 @@ public abstract class AbstractPoddRepositoryManagerTest
         {
             permanentRepository1 =
                     this.testRepositoryManager.getPermanentRepositoryConnection(Collections
-                            .<OWLOntologyID> singleton(testOntologyID));
+                            .<OWLOntologyID> singleton(this.testOntologyID));
             Assert.assertNotNull("Permanent repository was null", permanentRepository1);
             
             permanentRepository2 =
@@ -443,13 +442,13 @@ public abstract class AbstractPoddRepositoryManagerTest
         // shutdown the repository manager
         this.testRepositoryManager.shutDown();
         
-        managementRepository.initialize();
+        this.managementRepository.initialize();
         
         // Reload a repository manager on this path
-        PoddRepositoryManager reloadedRepositoryManager =
-                getNewPoddRepositoryManagerInstance(managementRepository, testTempRepositoryManagerPath);
-        reloadedRepositoryManager.setSchemaManagementGraph(schemaGraph);
-        reloadedRepositoryManager.setArtifactManagementGraph(artifactGraph);
+        final PoddRepositoryManager reloadedRepositoryManager =
+                this.getNewPoddRepositoryManagerInstance(this.managementRepository, this.testTempRepositoryManagerPath);
+        reloadedRepositoryManager.setSchemaManagementGraph(this.schemaGraph);
+        reloadedRepositoryManager.setArtifactManagementGraph(this.artifactGraph);
         
         Assert.assertNotNull(reloadedRepositoryManager);
         
@@ -462,7 +461,7 @@ public abstract class AbstractPoddRepositoryManagerTest
         {
             permanentRepository3 =
                     reloadedRepositoryManager.getPermanentRepositoryConnection(Collections
-                            .<OWLOntologyID> singleton(testOntologyID));
+                            .<OWLOntologyID> singleton(this.testOntologyID));
             Assert.assertNotNull("Permanent repository was null", permanentRepository3);
             
             permanentRepository4 =
@@ -501,7 +500,8 @@ public abstract class AbstractPoddRepositoryManagerTest
     public final void testGetPermanentRepositorySingleSchemaReloadWithStatements() throws Exception
     {
         // Verify sanity first
-        RepositoryConnection managementConnection = this.testRepositoryManager.getManagementRepositoryConnection();
+        final RepositoryConnection managementConnection =
+                this.testRepositoryManager.getManagementRepositoryConnection();
         try
         {
             Assert.assertEquals(0, managementConnection.size());
@@ -518,7 +518,7 @@ public abstract class AbstractPoddRepositoryManagerTest
         {
             permanentRepository1 =
                     this.testRepositoryManager.getPermanentRepositoryConnection(Collections
-                            .<OWLOntologyID> singleton(testOntologyID));
+                            .<OWLOntologyID> singleton(this.testOntologyID));
             Assert.assertNotNull("Permanent repository was null", permanentRepository1);
             
             permanentRepository2 =
@@ -528,7 +528,8 @@ public abstract class AbstractPoddRepositoryManagerTest
             
             // Must be exactly the same object
             // Assert.assertEquals(permanentRepository1, permanentRepository2);
-            RepositoryConnection managementConnection2 = this.testRepositoryManager.getManagementRepositoryConnection();
+            final RepositoryConnection managementConnection2 =
+                    this.testRepositoryManager.getManagementRepositoryConnection();
             try
             {
                 Assert.assertEquals(8, managementConnection2.size());
@@ -538,9 +539,9 @@ public abstract class AbstractPoddRepositoryManagerTest
                 managementConnection2.close();
             }
             
-            Model model =
+            final Model model =
                     Rio.parse(this.getClass().getResourceAsStream("/test/artifacts/basic-1.ttl"), "", RDFFormat.TURTLE);
-            permanentRepository1.add(model, testVersionUriA1);
+            permanentRepository1.add(model, this.testVersionUriA1);
             Assert.assertEquals(32, permanentRepository1.size(this.testVersionUriA1));
             Assert.assertEquals(32, permanentRepository1.size());
         }
@@ -568,13 +569,13 @@ public abstract class AbstractPoddRepositoryManagerTest
         // shutdown the repository manager
         this.testRepositoryManager.shutDown();
         
-        managementRepository.initialize();
+        this.managementRepository.initialize();
         
         // Reload a repository manager on this path
-        PoddRepositoryManager reloadedRepositoryManager =
-                getNewPoddRepositoryManagerInstance(managementRepository, testTempRepositoryManagerPath);
-        reloadedRepositoryManager.setSchemaManagementGraph(schemaGraph);
-        reloadedRepositoryManager.setArtifactManagementGraph(artifactGraph);
+        final PoddRepositoryManager reloadedRepositoryManager =
+                this.getNewPoddRepositoryManagerInstance(this.managementRepository, this.testTempRepositoryManagerPath);
+        reloadedRepositoryManager.setSchemaManagementGraph(this.schemaGraph);
+        reloadedRepositoryManager.setArtifactManagementGraph(this.artifactGraph);
         
         Assert.assertNotNull(reloadedRepositoryManager);
         
@@ -586,7 +587,7 @@ public abstract class AbstractPoddRepositoryManagerTest
         {
             permanentRepository3 =
                     reloadedRepositoryManager.getPermanentRepositoryConnection(Collections
-                            .<OWLOntologyID> singleton(testOntologyID));
+                            .<OWLOntologyID> singleton(this.testOntologyID));
             Assert.assertNotNull("Permanent repository was null", permanentRepository3);
             
             permanentRepository4 =

@@ -40,7 +40,6 @@ import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.config.RepositoryConfigSchema;
 import org.openrdf.repository.config.RepositoryImplConfig;
 import org.openrdf.repository.config.RepositoryImplConfigBase;
-import org.openrdf.repository.manager.LocalRepositoryManager;
 import org.openrdf.repository.sail.SailRepository;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.Rio;
@@ -85,7 +84,8 @@ public class PoddOWLManagerImplTest extends AbstractPoddOWLManagerTest
     @Override
     protected PoddRepositoryManager getNewPoddRepositoryManagerInstance() throws Exception
     {
-        Repository managementRepository = new SailRepository(new MemoryStore(tempDir.newFolder("memorystore")));
+        final Repository managementRepository =
+                new SailRepository(new MemoryStore(this.tempDir.newFolder("memorystore")));
         managementRepository.initialize();
         
         final Model graph =
@@ -94,7 +94,7 @@ public class PoddOWLManagerImplTest extends AbstractPoddOWLManagerTest
         final RepositoryImplConfig repositoryImplConfig = RepositoryImplConfigBase.create(graph, repositoryNode);
         Assert.assertNotNull(repositoryImplConfig);
         Assert.assertNotNull(repositoryImplConfig.getType());
-        return new PoddRepositoryManagerImpl(managementRepository, repositoryImplConfig, "", tempDir.newFolder(
+        return new PoddRepositoryManagerImpl(managementRepository, repositoryImplConfig, "", this.tempDir.newFolder(
                 "test-podd-repository-manager").toPath(), new PropertyUtil("podd"));
     }
     
@@ -115,7 +115,6 @@ public class PoddOWLManagerImplTest extends AbstractPoddOWLManagerTest
     public void setUp() throws Exception
     {
         super.setUp();
-        
         
     }
     
@@ -180,8 +179,8 @@ public class PoddOWLManagerImplTest extends AbstractPoddOWLManagerTest
     @Override
     protected InferredOWLOntologyID loadInferStoreOntology(final String resourcePath, final RDFFormat format,
             final long assertedStatements, final long inferredStatements,
-            final Set<? extends OWLOntologyID> dependentSchemaOntologies, RepositoryConnection managementConnection)
-        throws Exception
+            final Set<? extends OWLOntologyID> dependentSchemaOntologies,
+            final RepositoryConnection managementConnection) throws Exception
     {
         final PoddOWLManagerImpl manager = (PoddOWLManagerImpl)this.testOwlManager;
         
@@ -426,7 +425,8 @@ public class PoddOWLManagerImplTest extends AbstractPoddOWLManagerTest
         
         final URI context = ValueFactoryImpl.getInstance().createURI("urn:test:dump:context:");
         
-        RepositoryConnection managementConnection = this.testRepositoryManager.getManagementRepositoryConnection();
+        final RepositoryConnection managementConnection =
+                this.testRepositoryManager.getManagementRepositoryConnection();
         try
         {
             ((PoddOWLManagerImpl)this.testOwlManager).dumpOntologyToRepository(nextOntology, managementConnection,
@@ -495,7 +495,8 @@ public class PoddOWLManagerImplTest extends AbstractPoddOWLManagerTest
         Assert.assertNotNull("Could not find resource", inputStream);
         final OWLOntology nextOntology = testOWLOntologyManager.loadOntologyFromOntologyDocument(inputStream);
         
-        RepositoryConnection managementConnection = this.testRepositoryManager.getManagementRepositoryConnection();
+        final RepositoryConnection managementConnection =
+                this.testRepositoryManager.getManagementRepositoryConnection();
         try
         {
             ((PoddOWLManagerImpl)this.testOwlManager).dumpOntologyToRepository(nextOntology, managementConnection);
@@ -516,7 +517,8 @@ public class PoddOWLManagerImplTest extends AbstractPoddOWLManagerTest
     {
         final OWLOntologyID ontologyId = new OWLOntologyID();
         
-        RepositoryConnection managementConnection = this.testRepositoryManager.getManagementRepositoryConnection();
+        final RepositoryConnection managementConnection =
+                this.testRepositoryManager.getManagementRepositoryConnection();
         try
         {
             ((PoddOWLManagerImpl)this.testOwlManager).buildTwoLevelOrderedImportsList(null, managementConnection,
@@ -538,7 +540,8 @@ public class PoddOWLManagerImplTest extends AbstractPoddOWLManagerTest
     {
         final OWLOntologyID ontologyId = new OWLOntologyID();
         
-        RepositoryConnection managementConnection = this.testRepositoryManager.getManagementRepositoryConnection();
+        final RepositoryConnection managementConnection =
+                this.testRepositoryManager.getManagementRepositoryConnection();
         try
         {
             ((PoddOWLManagerImpl)this.testOwlManager).buildTwoLevelOrderedImportsList(ontologyId, managementConnection,
@@ -560,7 +563,8 @@ public class PoddOWLManagerImplTest extends AbstractPoddOWLManagerTest
     {
         final OWLOntologyID ontologyId = new OWLOntologyID(IRI.create("urn:test:doesnotexist"));
         
-        RepositoryConnection managementConnection = this.testRepositoryManager.getManagementRepositoryConnection();
+        final RepositoryConnection managementConnection =
+                this.testRepositoryManager.getManagementRepositoryConnection();
         try
         {
             final List<InferredOWLOntologyID> orderedImportsList =
@@ -581,7 +585,8 @@ public class PoddOWLManagerImplTest extends AbstractPoddOWLManagerTest
         final OWLOntologyID ontologyId =
                 new OWLOntologyID(IRI.create("urn:test:doesnotexist"), IRI.create("urn:test:withversion"));
         
-        RepositoryConnection managementConnection = this.testRepositoryManager.getManagementRepositoryConnection();
+        final RepositoryConnection managementConnection =
+                this.testRepositoryManager.getManagementRepositoryConnection();
         try
         {
             final List<InferredOWLOntologyID> orderedImportsList =
@@ -608,7 +613,8 @@ public class PoddOWLManagerImplTest extends AbstractPoddOWLManagerTest
     {
         final List<InferredOWLOntologyID> schemaOntologies = this.loadDcFoafAndPoddUserSchemaOntologies();
         
-        RepositoryConnection managementConnection = this.testRepositoryManager.getManagementRepositoryConnection();
+        final RepositoryConnection managementConnection =
+                this.testRepositoryManager.getManagementRepositoryConnection();
         try
         {
             // prepare: load, infer and store PODD-Base ontology
@@ -659,7 +665,8 @@ public class PoddOWLManagerImplTest extends AbstractPoddOWLManagerTest
     {
         final List<InferredOWLOntologyID> schemaOntologies = this.loadDcFoafAndPoddUserSchemaOntologies();
         
-        RepositoryConnection managementConnection = this.testRepositoryManager.getManagementRepositoryConnection();
+        final RepositoryConnection managementConnection =
+                this.testRepositoryManager.getManagementRepositoryConnection();
         try
         {
             // prepare: load, infer and store a schema ontology
@@ -710,7 +717,8 @@ public class PoddOWLManagerImplTest extends AbstractPoddOWLManagerTest
                 this.testOwlManager.isCached(inferredOntologyID.getBaseOWLOntologyID(),
                         Collections.<OWLOntologyID> emptySet()));
         
-        RepositoryConnection managementConnection = this.testRepositoryManager.getManagementRepositoryConnection();
+        final RepositoryConnection managementConnection =
+                this.testRepositoryManager.getManagementRepositoryConnection();
         try
         {
             ((PoddOWLManagerImpl)this.testOwlManager).cacheSchemaOntologies(Collections.singleton(inferredOntologyID),
@@ -738,7 +746,8 @@ public class PoddOWLManagerImplTest extends AbstractPoddOWLManagerTest
     {
         final InferredOWLOntologyID inferredOntologyID = new InferredOWLOntologyID((IRI)null, null, null);
         
-        RepositoryConnection managementConnection = this.testRepositoryManager.getManagementRepositoryConnection();
+        final RepositoryConnection managementConnection =
+                this.testRepositoryManager.getManagementRepositoryConnection();
         try
         {
             ((PoddOWLManagerImpl)this.testOwlManager).cacheSchemaOntologies(Collections.singleton(inferredOntologyID),
@@ -777,7 +786,8 @@ public class PoddOWLManagerImplTest extends AbstractPoddOWLManagerTest
     @Test
     public void testCacheSchemaOntologyWithNullOntologyID() throws Exception
     {
-        RepositoryConnection managementConnection = this.testRepositoryManager.getManagementRepositoryConnection();
+        final RepositoryConnection managementConnection =
+                this.testRepositoryManager.getManagementRepositoryConnection();
         try
         {
             ((PoddOWLManagerImpl)this.testOwlManager).cacheSchemaOntologies(null, managementConnection, null);
@@ -805,7 +815,8 @@ public class PoddOWLManagerImplTest extends AbstractPoddOWLManagerTest
         final PoddOWLManagerImpl manager = ((PoddOWLManagerImpl)this.testOwlManager);
         final List<InferredOWLOntologyID> schemaOntologies = this.loadDcFoafAndPoddUserSchemaOntologies();
         
-        RepositoryConnection managementConnection = this.testRepositoryManager.getManagementRepositoryConnection();
+        final RepositoryConnection managementConnection =
+                this.testRepositoryManager.getManagementRepositoryConnection();
         try
         {
             // prepare: 1) load, infer, store PODD-Base ontology
@@ -901,7 +912,8 @@ public class PoddOWLManagerImplTest extends AbstractPoddOWLManagerTest
         final PoddOWLManagerImpl manager = ((PoddOWLManagerImpl)this.testOwlManager);
         final List<InferredOWLOntologyID> schemaOntologies = this.loadDcFoafAndPoddUserSchemaOntologies();
         
-        RepositoryConnection managementConnection = this.testRepositoryManager.getManagementRepositoryConnection();
+        final RepositoryConnection managementConnection =
+                this.testRepositoryManager.getManagementRepositoryConnection();
         try
         {
             final InferredOWLOntologyID inferredOntologyID =
@@ -944,7 +956,8 @@ public class PoddOWLManagerImplTest extends AbstractPoddOWLManagerTest
         final PoddOWLManagerImpl manager = ((PoddOWLManagerImpl)this.testOwlManager);
         final List<InferredOWLOntologyID> schemaOntologies = this.loadDcFoafAndPoddUserSchemaOntologies();
         
-        RepositoryConnection managementConnection = this.testRepositoryManager.getManagementRepositoryConnection();
+        final RepositoryConnection managementConnection =
+                this.testRepositoryManager.getManagementRepositoryConnection();
         try
         {
             // prepare: 1) load, infer, store PODD-Base ontology

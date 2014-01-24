@@ -16,10 +16,7 @@
  */
 package com.github.podd.api.test;
 
-import info.aduna.iteration.Iterations;
-
 import java.util.Collections;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -30,15 +27,12 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.openrdf.model.Model;
-import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.openrdf.model.impl.LinkedHashModel;
 import org.openrdf.model.util.ModelUtil;
-import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.helpers.StatementCollector;
-import org.semanticweb.owlapi.io.OWLOntologyDocumentSource;
 import org.semanticweb.owlapi.model.OWLOntologyID;
 import org.semanticweb.owlapi.model.OWLOntologyManagerFactory;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
@@ -199,14 +193,15 @@ public abstract class AbstractPoddOWLManagerTest
     @Test
     public void testLoadAndInfer() throws Exception
     {
-        RepositoryConnection managementConnection = this.testRepositoryManager.getManagementRepositoryConnection();
+        final RepositoryConnection managementConnection =
+                this.testRepositoryManager.getManagementRepositoryConnection();
         try
         {
-            OWLOntologyID replacementOntologyID = null;
+            final OWLOntologyID replacementOntologyID = null;
             
-            RioMemoryTripleSource owlSource = TestUtils.getRioTripleSource("/test/ontologies/version/1/a1.owl");
+            final RioMemoryTripleSource owlSource = TestUtils.getRioTripleSource("/test/ontologies/version/1/a1.owl");
             managementConnection.begin();
-            InferredOWLOntologyID ontologyID =
+            final InferredOWLOntologyID ontologyID =
                     this.testOwlManager.loadAndInfer(owlSource, managementConnection, replacementOntologyID,
                             Collections.<InferredOWLOntologyID> emptySet(), managementConnection, this.schemaGraph);
             managementConnection.commit();
@@ -216,14 +211,14 @@ public abstract class AbstractPoddOWLManagerTest
             Assert.assertNotNull(ontologyID.getVersionIRI());
             Assert.assertNotNull(ontologyID.getInferredOntologyIRI());
             
-            Model concreteStatements = new LinkedHashModel();
+            final Model concreteStatements = new LinkedHashModel();
             managementConnection.export(new StatementCollector(concreteStatements), ontologyID.getVersionIRI()
                     .toOpenRDFURI());
-            Model inferredStatements = new LinkedHashModel();
+            final Model inferredStatements = new LinkedHashModel();
             managementConnection.export(new StatementCollector(inferredStatements), ontologyID.getInferredOntologyIRI()
                     .toOpenRDFURI());
-            Model managementStatements = new LinkedHashModel();
-            managementConnection.export(new StatementCollector(managementStatements), schemaGraph);
+            final Model managementStatements = new LinkedHashModel();
+            managementConnection.export(new StatementCollector(managementStatements), this.schemaGraph);
             
             Assert.assertFalse(concreteStatements.isEmpty());
             Assert.assertFalse(inferredStatements.isEmpty());

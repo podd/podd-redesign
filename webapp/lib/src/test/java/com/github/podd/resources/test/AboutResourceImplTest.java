@@ -27,7 +27,6 @@ import org.restlet.ext.html.FormDataSet;
 import org.restlet.representation.Representation;
 import org.restlet.resource.ClientResource;
 
-import com.github.ansell.restletutils.test.RestletTestUtils;
 import com.github.podd.restlet.test.PoddRestletTestUtils;
 import com.github.podd.utils.PoddWebConstants;
 
@@ -47,7 +46,7 @@ public class AboutResourceImplTest extends AbstractResourceImplTest
         final ClientResource aboutClientResource = new ClientResource(this.getUrl(PoddWebConstants.PATH_ABOUT));
         
         final Representation results =
-                RestletTestUtils.doTestAuthenticatedRequest(aboutClientResource, Method.GET, null, MediaType.TEXT_HTML,
+                this.doTestAuthenticatedRequest(aboutClientResource, Method.GET, null, MediaType.TEXT_HTML,
                         Status.SUCCESS_OK, AbstractResourceImplTest.NO_ADMIN);
         
     }
@@ -91,8 +90,8 @@ public class AboutResourceImplTest extends AbstractResourceImplTest
         form.getEntries().add(new FormData("password", "testAdminPassword"));
         
         final Representation results =
-                RestletTestUtils.doTestAuthenticatedRequest(creationClientResource, Method.POST, form,
-                        MediaType.TEXT_HTML, Status.SUCCESS_OK, AbstractResourceImplTest.NO_ADMIN);
+                this.doTestAuthenticatedRequest(creationClientResource, Method.POST, form, MediaType.TEXT_HTML,
+                        Status.SUCCESS_OK, AbstractResourceImplTest.NO_ADMIN);
         
     }
     
