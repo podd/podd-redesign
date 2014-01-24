@@ -312,36 +312,27 @@ public class AbstractResourceImplTest
         
         Representation result = null;
         
-        try
+        clientResource.getCookies().addAll(this.currentCookies);
+        
+        if(requestMethod.equals(Method.DELETE))
         {
-            clientResource.getCookies().addAll(this.currentCookies);
-            
-            if(requestMethod.equals(Method.DELETE))
-            {
-                result = clientResource.delete(requestMediaType);
-            }
-            else if(requestMethod.equals(Method.PUT))
-            {
-                result = clientResource.put(inputRepresentation, requestMediaType);
-            }
-            else if(requestMethod.equals(Method.GET))
-            {
-                result = clientResource.get(requestMediaType);
-            }
-            else if(requestMethod.equals(Method.POST))
-            {
-                result = clientResource.post(inputRepresentation, requestMediaType);
-            }
-            else
-            {
-                throw new RuntimeException("Did not recognise request method: " + requestMethod.toString());
-            }
+            result = clientResource.delete(requestMediaType);
         }
-        catch(final ResourceException re)
+        else if(requestMethod.equals(Method.PUT))
         {
-            Assert.assertNotNull(re.getStatus());
-            
-            Assert.assertEquals(Status.CLIENT_ERROR_UNAUTHORIZED.getCode(), re.getStatus().getCode());
+            result = clientResource.put(inputRepresentation, requestMediaType);
+        }
+        else if(requestMethod.equals(Method.GET))
+        {
+            result = clientResource.get(requestMediaType);
+        }
+        else if(requestMethod.equals(Method.POST))
+        {
+            result = clientResource.post(inputRepresentation, requestMediaType);
+        }
+        else
+        {
+            throw new RuntimeException("Did not recognise request method: " + requestMethod.toString());
         }
         
         Assert.assertEquals(expectedResponseStatus.getCode(), clientResource.getResponse().getStatus().getCode());
