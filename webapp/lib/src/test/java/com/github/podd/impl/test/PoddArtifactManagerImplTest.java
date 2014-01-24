@@ -29,11 +29,8 @@ import org.openrdf.repository.Repository;
 import org.openrdf.repository.config.RepositoryConfigSchema;
 import org.openrdf.repository.config.RepositoryImplConfig;
 import org.openrdf.repository.config.RepositoryImplConfigBase;
-import org.openrdf.repository.manager.LocalRepositoryManager;
-import org.openrdf.repository.sail.SailRepository;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.Rio;
-import org.openrdf.sail.memory.MemoryStore;
 import org.semanticweb.owlapi.model.OWLOntologyManagerFactory;
 import org.semanticweb.owlapi.model.OWLOntologyManagerFactoryRegistry;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
@@ -121,7 +118,8 @@ public class PoddArtifactManagerImplTest extends AbstractPoddArtifactManagerTest
     }
     
     @Override
-    protected PoddRepositoryManager getNewRepositoryManager(Repository managementRepository, Path testPath) throws Exception
+    protected PoddRepositoryManager getNewRepositoryManager(final Repository managementRepository, final Path testPath)
+        throws Exception
     {
         
         final Model graph =
@@ -130,7 +128,8 @@ public class PoddArtifactManagerImplTest extends AbstractPoddArtifactManagerTest
         final RepositoryImplConfig repositoryImplConfig = RepositoryImplConfigBase.create(graph, repositoryNode);
         Assert.assertNotNull(repositoryImplConfig);
         Assert.assertNotNull(repositoryImplConfig.getType());
-        return new PoddRepositoryManagerImpl(managementRepository, repositoryImplConfig, "", testPath, new PropertyUtil("podd"));
+        return new PoddRepositoryManagerImpl(managementRepository, repositoryImplConfig, "", testPath,
+                new PropertyUtil("podd"));
     }
     
     @Override

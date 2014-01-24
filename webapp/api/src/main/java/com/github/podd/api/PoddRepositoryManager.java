@@ -78,8 +78,8 @@ public interface PoddRepositoryManager
      * @throws IOException
      *             If there are errors finding the repository.
      */
-    RepositoryConnection getPermanentRepositoryConnection(Set<? extends OWLOntologyID> schemaOntologies) throws OpenRDFException,
-        IOException;
+    RepositoryConnection getPermanentRepositoryConnection(Set<? extends OWLOntologyID> schemaOntologies)
+        throws OpenRDFException, IOException;
     
     /**
      * Gets a federated repository over the permanent repository for the given schema ontologies,
@@ -92,9 +92,10 @@ public interface PoddRepositoryManager
      * @param schemaOntologies
      * @return
      * @throws OpenRDFException
-     * @throws IOException 
+     * @throws IOException
      */
-    Repository getReadOnlyFederatedRepository(Set<? extends OWLOntologyID> schemaOntologies) throws OpenRDFException, IOException;
+    Repository getReadOnlyFederatedRepository(Set<? extends OWLOntologyID> schemaOntologies) throws OpenRDFException,
+        IOException;
     
     /**
      * 

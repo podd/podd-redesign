@@ -188,7 +188,7 @@ public class PoddSesameRealmTest
             
             Assert.fail("Did not receive expected exception");
         }
-        catch(PoddRuntimeException e)
+        catch(final PoddRuntimeException e)
         {
             Assert.assertEquals("Must provide a password for user", e.getMessage());
         }
@@ -214,7 +214,7 @@ public class PoddSesameRealmTest
                     recvdPoddUser.getUserStatus());
             Assert.fail("Did not receive expected exception");
         }
-        catch(PoddRuntimeException e)
+        catch(final PoddRuntimeException e)
         {
             Assert.assertEquals("Must provide a password for user", e.getMessage());
         }

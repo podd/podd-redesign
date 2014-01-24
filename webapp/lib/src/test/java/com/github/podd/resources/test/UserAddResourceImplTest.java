@@ -43,7 +43,6 @@ import org.restlet.resource.ClientResource;
 import org.restlet.resource.ResourceException;
 
 import com.github.ansell.restletutils.SesameRealmConstants;
-import com.github.ansell.restletutils.test.RestletTestUtils;
 import com.github.podd.utils.PODD;
 import com.github.podd.utils.PoddRoles;
 import com.github.podd.utils.PoddUserStatus;
@@ -134,8 +133,8 @@ public class UserAddResourceImplTest extends AbstractResourceImplTest
         try
         {
             final Representation results =
-                    this.doTestAuthenticatedRequest(userAddClientResource, Method.GET, null,
-                            MediaType.TEXT_HTML, Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
+                    this.doTestAuthenticatedRequest(userAddClientResource, Method.GET, null, MediaType.TEXT_HTML,
+                            Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
             
             final String body = this.getText(results);
             this.assertFreemarker(body);
@@ -407,8 +406,8 @@ public class UserAddResourceImplTest extends AbstractResourceImplTest
         
         try
         {
-            this.doTestAuthenticatedRequest(userAddClientResource, Method.POST, input, mediaType,
-                    Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
+            this.doTestAuthenticatedRequest(userAddClientResource, Method.POST, input, mediaType, Status.SUCCESS_OK,
+                    AbstractResourceImplTest.WITH_ADMIN);
             Assert.fail("Should have failed due to missing email");
         }
         catch(final ResourceException e)

@@ -40,7 +40,6 @@ import org.restlet.resource.ClientResource;
 import org.restlet.resource.ResourceException;
 
 import com.github.ansell.restletutils.SesameRealmConstants;
-import com.github.ansell.restletutils.test.RestletTestUtils;
 import com.github.podd.utils.PODD;
 import com.github.podd.utils.PoddRoles;
 import com.github.podd.utils.PoddUserStatus;
@@ -68,8 +67,8 @@ public class UserEditResourceImplTest extends AbstractResourceImplTest
             userEditClientResource.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, testIdentifier);
             
             final Representation results =
-                    this.doTestAuthenticatedRequest(userEditClientResource, Method.GET, null,
-                            MediaType.TEXT_HTML, Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
+                    this.doTestAuthenticatedRequest(userEditClientResource, Method.GET, null, MediaType.TEXT_HTML,
+                            Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
             
             final String body = this.getText(results);
             System.out.println(body);
@@ -138,8 +137,8 @@ public class UserEditResourceImplTest extends AbstractResourceImplTest
                 final Representation input = new StringRepresentation(out.toString(), mediaType);
                 
                 final Representation modifiedResults =
-                        this.doTestAuthenticatedRequest(userEditClientResource, Method.POST, input,
-                                mediaType, Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
+                        this.doTestAuthenticatedRequest(userEditClientResource, Method.POST, input, mediaType,
+                                Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
                 
                 // verify: response has correct identifier
                 final Model model = this.assertRdf(modifiedResults, RDFFormat.RDFXML, 1);
@@ -155,8 +154,8 @@ public class UserEditResourceImplTest extends AbstractResourceImplTest
                     userDetailsClientResource2.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, testIdentifier);
                     
                     final Representation updatedResults =
-                            this.doTestAuthenticatedRequest(userDetailsClientResource2, Method.GET, null,
-                                    mediaType, Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
+                            this.doTestAuthenticatedRequest(userDetailsClientResource2, Method.GET, null, mediaType,
+                                    Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
                     
                     final Model resultsModel = this.assertRdf(updatedResults, format, 11);
                     
@@ -219,8 +218,8 @@ public class UserEditResourceImplTest extends AbstractResourceImplTest
             userEditClientResource.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, testIdentifier);
             
             final Representation results =
-                    this.doTestAuthenticatedRequest(userEditClientResource, Method.GET, null,
-                            MediaType.TEXT_HTML, Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
+                    this.doTestAuthenticatedRequest(userEditClientResource, Method.GET, null, MediaType.TEXT_HTML,
+                            Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
             
             final String body = this.getText(results);
             // System.out.println(body);
@@ -303,8 +302,8 @@ public class UserEditResourceImplTest extends AbstractResourceImplTest
                 final Representation input = new StringRepresentation(out.toString(), mediaType);
                 
                 final Representation modifiedResults =
-                        this.doTestAuthenticatedRequest(userEditClientResource, Method.POST, input,
-                                mediaType, Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
+                        this.doTestAuthenticatedRequest(userEditClientResource, Method.POST, input, mediaType,
+                                Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
                 
                 // verify: response has correct identifier
                 final Model model = this.assertRdf(modifiedResults, RDFFormat.RDFXML, 1);
@@ -320,8 +319,8 @@ public class UserEditResourceImplTest extends AbstractResourceImplTest
                     userDetailsClientResource2.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, testIdentifier);
                     
                     final Representation updatedResults =
-                            this.doTestAuthenticatedRequest(userDetailsClientResource2, Method.GET, null,
-                                    mediaType, Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
+                            this.doTestAuthenticatedRequest(userDetailsClientResource2, Method.GET, null, mediaType,
+                                    Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
                     
                     final Model resultsModel = this.assertRdf(updatedResults, format, 16);
                     

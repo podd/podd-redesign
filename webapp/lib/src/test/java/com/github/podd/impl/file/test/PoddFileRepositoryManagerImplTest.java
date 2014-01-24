@@ -38,7 +38,6 @@ import org.openrdf.repository.Repository;
 import org.openrdf.repository.config.RepositoryConfigSchema;
 import org.openrdf.repository.config.RepositoryImplConfig;
 import org.openrdf.repository.config.RepositoryImplConfigBase;
-import org.openrdf.repository.manager.LocalRepositoryManager;
 import org.openrdf.repository.sail.SailRepository;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.Rio;
@@ -172,7 +171,7 @@ public class PoddFileRepositoryManagerImplTest extends AbstractPoddFileRepositor
         Assert.assertNotNull(repositoryImplConfig);
         Assert.assertNotNull(repositoryImplConfig.getType());
         final PoddRepositoryManagerImpl repositoryManagerImpl =
-                new PoddRepositoryManagerImpl(managementRepository, repositoryImplConfig, "", tempDir.newFolder(
+                new PoddRepositoryManagerImpl(managementRepository, repositoryImplConfig, "", this.tempDir.newFolder(
                         "test-podd-repository-manager").toPath(), new PropertyUtil("podd"));
         
         final PoddOWLManager owlManager =

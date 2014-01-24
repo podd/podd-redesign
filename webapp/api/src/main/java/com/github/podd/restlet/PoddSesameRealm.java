@@ -70,7 +70,6 @@ import org.restlet.security.Group;
 import org.restlet.security.LocalVerifier;
 import org.restlet.security.Realm;
 import org.restlet.security.Role;
-import org.restlet.security.SecretVerifier;
 import org.restlet.security.User;
 import org.restlet.security.Verifier;
 import org.slf4j.Logger;
@@ -192,7 +191,7 @@ public class PoddSesameRealm extends Realm
         {
             try
             {
-                PoddUserSecretHash secretHash = PoddSesameRealm.this.getUserSecretHash(identifier);
+                final PoddUserSecretHash secretHash = PoddSesameRealm.this.getUserSecretHash(identifier);
                 return secretHash.compare(secret) ? Verifier.RESULT_VALID : Verifier.RESULT_INVALID;
             }
             catch(OpenRDFException | NoSuchAlgorithmException | InvalidKeySpecException e)
@@ -250,17 +249,17 @@ public class PoddSesameRealm extends Realm
         // this.users = new CopyOnWriteArrayList<User>();
     }
     
-    public PoddUserSecretHash getUserSecretHash(String identifier) throws OpenRDFException
+    public PoddUserSecretHash getUserSecretHash(final String identifier) throws OpenRDFException
     {
         RepositoryConnection conn = null;
         try
         {
             conn = this.repository.getConnection();
-            PoddUser findUser = this.findUser(identifier, conn);
+            final PoddUser findUser = this.findUser(identifier, conn);
             
-            List<Statement> hashList =
+            final List<Statement> hashList =
                     Iterations.asList(conn.getStatements(findUser.getUri(), PODD.PODD_USER_SECRET_HASH, null, false,
-                            userManagerContexts));
+                            this.userManagerContexts));
             
             if(hashList.isEmpty() || hashList.size() > 1)
             {
@@ -506,7 +505,7 @@ public class PoddSesameRealm extends Realm
             
             if(conn.hasStatement(nextUserUUID, PODD.PODD_USER_SECRET_HASH, null, false, this.getContexts()))
             {
-                List<Statement> hashList =
+                final List<Statement> hashList =
                         Iterations.asList(conn.getStatements(nextUserUUID, PODD.PODD_USER_SECRET_HASH, null, false,
                                 this.getContexts()));
                 
@@ -2975,15 +2974,15 @@ public class PoddSesameRealm extends Realm
         private String hash;
         private PoddUser user;
         
-        public PoddUserSecretHash(String hash, PoddUser user)
+        public PoddUserSecretHash(final String hash, final PoddUser user)
         {
             this.hash = hash;
             this.user = user;
         }
         
-        public final boolean compare(char[] secret) throws NoSuchAlgorithmException, InvalidKeySpecException
+        public final boolean compare(final char[] secret) throws NoSuchAlgorithmException, InvalidKeySpecException
         {
-            return PasswordHash.validatePassword(secret, hash);
+            return PasswordHash.validatePassword(secret, this.hash);
         }
     }
 }

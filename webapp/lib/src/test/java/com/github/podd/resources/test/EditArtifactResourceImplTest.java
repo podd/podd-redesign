@@ -511,8 +511,8 @@ public class EditArtifactResourceImplTest extends AbstractResourceImplTest
             editArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_OBJECT_IDENTIFIER, objectUri);
             
             final Representation results =
-                    this.doTestAuthenticatedRequest(editArtifactClientResource, Method.GET, null,
-                            MediaType.TEXT_HTML, Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
+                    this.doTestAuthenticatedRequest(editArtifactClientResource, Method.GET, null, MediaType.TEXT_HTML,
+                            Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
             
             final String body = this.getText(results);
             
@@ -545,8 +545,8 @@ public class EditArtifactResourceImplTest extends AbstractResourceImplTest
             // shown.
             
             final Representation results =
-                    this.doTestAuthenticatedRequest(editArtifactClientResource, Method.GET, null,
-                            MediaType.TEXT_HTML, Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
+                    this.doTestAuthenticatedRequest(editArtifactClientResource, Method.GET, null, MediaType.TEXT_HTML,
+                            Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
             
             final String body = this.getText(results);
             

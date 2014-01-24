@@ -35,7 +35,6 @@ import org.restlet.resource.ClientResource;
 import org.restlet.resource.ResourceException;
 
 import com.github.ansell.restletutils.SesameRealmConstants;
-import com.github.ansell.restletutils.test.RestletTestUtils;
 import com.github.podd.utils.PODD;
 import com.github.podd.utils.PoddWebConstants;
 
@@ -73,8 +72,8 @@ public class UserPasswordResourceImplTest extends AbstractResourceImplTest
             final Representation input = new StringRepresentation(out.toString(), mediaType);
             
             final Representation modifiedResults =
-                    this.doTestAuthenticatedRequest(userPasswordClientResource, Method.POST, input,
-                            mediaType, Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
+                    this.doTestAuthenticatedRequest(userPasswordClientResource, Method.POST, input, mediaType,
+                            Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
             
             // verify: response has correct identifier
             final Model model = this.assertRdf(new StringReader(this.getText(modifiedResults)), RDFFormat.RDFXML, 1);
@@ -136,8 +135,8 @@ public class UserPasswordResourceImplTest extends AbstractResourceImplTest
             final Representation input = new StringRepresentation(out.toString(), mediaType);
             
             final Representation modifiedResults =
-                    this.doTestAuthenticatedRequest(userPasswordClientResource, Method.POST, input,
-                            mediaType, Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
+                    this.doTestAuthenticatedRequest(userPasswordClientResource, Method.POST, input, mediaType,
+                            Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
             
             // verify: response has correct identifier
             final Model model = this.assertRdf(modifiedResults, RDFFormat.RDFXML, 1);
@@ -182,8 +181,8 @@ public class UserPasswordResourceImplTest extends AbstractResourceImplTest
             userPasswordClientResource.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, testIdentifier);
             
             final Representation results =
-                    this.doTestAuthenticatedRequest(userPasswordClientResource, Method.GET, null,
-                            MediaType.TEXT_HTML, Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
+                    this.doTestAuthenticatedRequest(userPasswordClientResource, Method.GET, null, MediaType.TEXT_HTML,
+                            Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
             
             final String body = this.getText(results);
             // System.out.println(body);

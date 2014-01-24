@@ -762,19 +762,31 @@ public class OntologyUtilsTest
         Assert.assertTrue(schemaManifestImports.contains(this.testPoddBaseV1));
         Assert.assertTrue(schemaManifestImports.contains(this.testPoddBaseV2));
         
-        Assert.assertTrue(schemaManifestImports.indexOf(testPoddDcV1) < schemaManifestImports.indexOf(testPoddFoafV1));
-        Assert.assertTrue(schemaManifestImports.indexOf(testPoddDcV1) < schemaManifestImports.indexOf(testPoddUserV1));
-        Assert.assertTrue(schemaManifestImports.indexOf(testPoddDcV1) < schemaManifestImports.indexOf(testPoddBaseV1));
-        Assert.assertTrue(schemaManifestImports.indexOf(testPoddFoafV1) < schemaManifestImports.indexOf(testPoddUserV1));
-        Assert.assertTrue(schemaManifestImports.indexOf(testPoddFoafV1) < schemaManifestImports.indexOf(testPoddBaseV1));
-        Assert.assertTrue(schemaManifestImports.indexOf(testPoddUserV1) < schemaManifestImports.indexOf(testPoddBaseV1));
+        Assert.assertTrue(schemaManifestImports.indexOf(this.testPoddDcV1) < schemaManifestImports
+                .indexOf(this.testPoddFoafV1));
+        Assert.assertTrue(schemaManifestImports.indexOf(this.testPoddDcV1) < schemaManifestImports
+                .indexOf(this.testPoddUserV1));
+        Assert.assertTrue(schemaManifestImports.indexOf(this.testPoddDcV1) < schemaManifestImports
+                .indexOf(this.testPoddBaseV1));
+        Assert.assertTrue(schemaManifestImports.indexOf(this.testPoddFoafV1) < schemaManifestImports
+                .indexOf(this.testPoddUserV1));
+        Assert.assertTrue(schemaManifestImports.indexOf(this.testPoddFoafV1) < schemaManifestImports
+                .indexOf(this.testPoddBaseV1));
+        Assert.assertTrue(schemaManifestImports.indexOf(this.testPoddUserV1) < schemaManifestImports
+                .indexOf(this.testPoddBaseV1));
         
-        Assert.assertTrue(schemaManifestImports.indexOf(testPoddDcV2) < schemaManifestImports.indexOf(testPoddFoafV2));
-        Assert.assertTrue(schemaManifestImports.indexOf(testPoddDcV2) < schemaManifestImports.indexOf(testPoddUserV2));
-        Assert.assertTrue(schemaManifestImports.indexOf(testPoddDcV2) < schemaManifestImports.indexOf(testPoddBaseV2));
-        Assert.assertTrue(schemaManifestImports.indexOf(testPoddFoafV2) < schemaManifestImports.indexOf(testPoddUserV2));
-        Assert.assertTrue(schemaManifestImports.indexOf(testPoddFoafV2) < schemaManifestImports.indexOf(testPoddBaseV2));
-        Assert.assertTrue(schemaManifestImports.indexOf(testPoddUserV2) < schemaManifestImports.indexOf(testPoddBaseV2));
+        Assert.assertTrue(schemaManifestImports.indexOf(this.testPoddDcV2) < schemaManifestImports
+                .indexOf(this.testPoddFoafV2));
+        Assert.assertTrue(schemaManifestImports.indexOf(this.testPoddDcV2) < schemaManifestImports
+                .indexOf(this.testPoddUserV2));
+        Assert.assertTrue(schemaManifestImports.indexOf(this.testPoddDcV2) < schemaManifestImports
+                .indexOf(this.testPoddBaseV2));
+        Assert.assertTrue(schemaManifestImports.indexOf(this.testPoddFoafV2) < schemaManifestImports
+                .indexOf(this.testPoddUserV2));
+        Assert.assertTrue(schemaManifestImports.indexOf(this.testPoddFoafV2) < schemaManifestImports
+                .indexOf(this.testPoddBaseV2));
+        Assert.assertTrue(schemaManifestImports.indexOf(this.testPoddUserV2) < schemaManifestImports
+                .indexOf(this.testPoddBaseV2));
     }
     
     @Test
@@ -803,19 +815,31 @@ public class OntologyUtilsTest
         Assert.assertTrue(schemaManifestImports.contains(this.testPoddBaseV1));
         Assert.assertTrue(schemaManifestImports.contains(this.testPoddBaseV2));
         
-        Assert.assertTrue(schemaManifestImports.indexOf(testPoddDcV1) < schemaManifestImports.indexOf(testPoddFoafV1));
-        Assert.assertTrue(schemaManifestImports.indexOf(testPoddDcV1) < schemaManifestImports.indexOf(testPoddUserV1));
-        Assert.assertTrue(schemaManifestImports.indexOf(testPoddDcV1) < schemaManifestImports.indexOf(testPoddBaseV1));
-        Assert.assertTrue(schemaManifestImports.indexOf(testPoddFoafV1) < schemaManifestImports.indexOf(testPoddUserV1));
-        Assert.assertTrue(schemaManifestImports.indexOf(testPoddFoafV1) < schemaManifestImports.indexOf(testPoddBaseV1));
-        Assert.assertTrue(schemaManifestImports.indexOf(testPoddUserV1) < schemaManifestImports.indexOf(testPoddBaseV1));
+        Assert.assertTrue(schemaManifestImports.indexOf(this.testPoddDcV1) < schemaManifestImports
+                .indexOf(this.testPoddFoafV1));
+        Assert.assertTrue(schemaManifestImports.indexOf(this.testPoddDcV1) < schemaManifestImports
+                .indexOf(this.testPoddUserV1));
+        Assert.assertTrue(schemaManifestImports.indexOf(this.testPoddDcV1) < schemaManifestImports
+                .indexOf(this.testPoddBaseV1));
+        Assert.assertTrue(schemaManifestImports.indexOf(this.testPoddFoafV1) < schemaManifestImports
+                .indexOf(this.testPoddUserV1));
+        Assert.assertTrue(schemaManifestImports.indexOf(this.testPoddFoafV1) < schemaManifestImports
+                .indexOf(this.testPoddBaseV1));
+        Assert.assertTrue(schemaManifestImports.indexOf(this.testPoddUserV1) < schemaManifestImports
+                .indexOf(this.testPoddBaseV1));
         
-        Assert.assertTrue(schemaManifestImports.indexOf(testPoddDcV2) < schemaManifestImports.indexOf(testPoddFoafV2));
-        Assert.assertTrue(schemaManifestImports.indexOf(testPoddDcV2) < schemaManifestImports.indexOf(testPoddUserV2));
-        Assert.assertTrue(schemaManifestImports.indexOf(testPoddDcV2) < schemaManifestImports.indexOf(testPoddBaseV2));
-        Assert.assertTrue(schemaManifestImports.indexOf(testPoddFoafV2) < schemaManifestImports.indexOf(testPoddUserV2));
-        Assert.assertTrue(schemaManifestImports.indexOf(testPoddFoafV2) < schemaManifestImports.indexOf(testPoddBaseV2));
-        Assert.assertTrue(schemaManifestImports.indexOf(testPoddUserV2) < schemaManifestImports.indexOf(testPoddBaseV2));
+        Assert.assertTrue(schemaManifestImports.indexOf(this.testPoddDcV2) < schemaManifestImports
+                .indexOf(this.testPoddFoafV2));
+        Assert.assertTrue(schemaManifestImports.indexOf(this.testPoddDcV2) < schemaManifestImports
+                .indexOf(this.testPoddUserV2));
+        Assert.assertTrue(schemaManifestImports.indexOf(this.testPoddDcV2) < schemaManifestImports
+                .indexOf(this.testPoddBaseV2));
+        Assert.assertTrue(schemaManifestImports.indexOf(this.testPoddFoafV2) < schemaManifestImports
+                .indexOf(this.testPoddUserV2));
+        Assert.assertTrue(schemaManifestImports.indexOf(this.testPoddFoafV2) < schemaManifestImports
+                .indexOf(this.testPoddBaseV2));
+        Assert.assertTrue(schemaManifestImports.indexOf(this.testPoddUserV2) < schemaManifestImports
+                .indexOf(this.testPoddBaseV2));
     }
     
     @Test
@@ -844,19 +868,31 @@ public class OntologyUtilsTest
         Assert.assertTrue(schemaManifestImports.contains(this.testPoddBaseV1));
         Assert.assertTrue(schemaManifestImports.contains(this.testPoddBaseV2));
         
-        Assert.assertTrue(schemaManifestImports.indexOf(testPoddDcV1) < schemaManifestImports.indexOf(testPoddFoafV1));
-        Assert.assertTrue(schemaManifestImports.indexOf(testPoddDcV1) < schemaManifestImports.indexOf(testPoddUserV1));
-        Assert.assertTrue(schemaManifestImports.indexOf(testPoddDcV1) < schemaManifestImports.indexOf(testPoddBaseV1));
-        Assert.assertTrue(schemaManifestImports.indexOf(testPoddFoafV1) < schemaManifestImports.indexOf(testPoddUserV1));
-        Assert.assertTrue(schemaManifestImports.indexOf(testPoddFoafV1) < schemaManifestImports.indexOf(testPoddBaseV1));
-        Assert.assertTrue(schemaManifestImports.indexOf(testPoddUserV1) < schemaManifestImports.indexOf(testPoddBaseV1));
+        Assert.assertTrue(schemaManifestImports.indexOf(this.testPoddDcV1) < schemaManifestImports
+                .indexOf(this.testPoddFoafV1));
+        Assert.assertTrue(schemaManifestImports.indexOf(this.testPoddDcV1) < schemaManifestImports
+                .indexOf(this.testPoddUserV1));
+        Assert.assertTrue(schemaManifestImports.indexOf(this.testPoddDcV1) < schemaManifestImports
+                .indexOf(this.testPoddBaseV1));
+        Assert.assertTrue(schemaManifestImports.indexOf(this.testPoddFoafV1) < schemaManifestImports
+                .indexOf(this.testPoddUserV1));
+        Assert.assertTrue(schemaManifestImports.indexOf(this.testPoddFoafV1) < schemaManifestImports
+                .indexOf(this.testPoddBaseV1));
+        Assert.assertTrue(schemaManifestImports.indexOf(this.testPoddUserV1) < schemaManifestImports
+                .indexOf(this.testPoddBaseV1));
         
-        Assert.assertTrue(schemaManifestImports.indexOf(testPoddDcV2) < schemaManifestImports.indexOf(testPoddFoafV2));
-        Assert.assertTrue(schemaManifestImports.indexOf(testPoddDcV2) < schemaManifestImports.indexOf(testPoddUserV2));
-        Assert.assertTrue(schemaManifestImports.indexOf(testPoddDcV2) < schemaManifestImports.indexOf(testPoddBaseV2));
-        Assert.assertTrue(schemaManifestImports.indexOf(testPoddFoafV2) < schemaManifestImports.indexOf(testPoddUserV2));
-        Assert.assertTrue(schemaManifestImports.indexOf(testPoddFoafV2) < schemaManifestImports.indexOf(testPoddBaseV2));
-        Assert.assertTrue(schemaManifestImports.indexOf(testPoddUserV2) < schemaManifestImports.indexOf(testPoddBaseV2));
+        Assert.assertTrue(schemaManifestImports.indexOf(this.testPoddDcV2) < schemaManifestImports
+                .indexOf(this.testPoddFoafV2));
+        Assert.assertTrue(schemaManifestImports.indexOf(this.testPoddDcV2) < schemaManifestImports
+                .indexOf(this.testPoddUserV2));
+        Assert.assertTrue(schemaManifestImports.indexOf(this.testPoddDcV2) < schemaManifestImports
+                .indexOf(this.testPoddBaseV2));
+        Assert.assertTrue(schemaManifestImports.indexOf(this.testPoddFoafV2) < schemaManifestImports
+                .indexOf(this.testPoddUserV2));
+        Assert.assertTrue(schemaManifestImports.indexOf(this.testPoddFoafV2) < schemaManifestImports
+                .indexOf(this.testPoddBaseV2));
+        Assert.assertTrue(schemaManifestImports.indexOf(this.testPoddUserV2) < schemaManifestImports
+                .indexOf(this.testPoddBaseV2));
     }
     
     /**
@@ -871,7 +907,7 @@ public class OntologyUtilsTest
                 Rio.parse(this.getClass().getResourceAsStream("/test/test-podd-schema-manifest.ttl"), "",
                         RDFFormat.TURTLE);
         
-        List<OWLOntologyID> imports =
+        final List<OWLOntologyID> imports =
                 new ArrayList<OWLOntologyID>(Arrays.asList(this.testPoddBaseV1, this.testPoddUserV1,
                         this.testPoddUserV2, this.testPoddFoafV1, this.testPoddBaseV2, this.testPoddFoafV2,
                         this.testPoddDcV1, this.testPoddDcV2));
@@ -893,19 +929,31 @@ public class OntologyUtilsTest
         Assert.assertTrue(schemaManifestImports.contains(this.testPoddBaseV1));
         Assert.assertTrue(schemaManifestImports.contains(this.testPoddBaseV2));
         
-        Assert.assertTrue(schemaManifestImports.indexOf(testPoddDcV1) < schemaManifestImports.indexOf(testPoddFoafV1));
-        Assert.assertTrue(schemaManifestImports.indexOf(testPoddDcV1) < schemaManifestImports.indexOf(testPoddUserV1));
-        Assert.assertTrue(schemaManifestImports.indexOf(testPoddDcV1) < schemaManifestImports.indexOf(testPoddBaseV1));
-        Assert.assertTrue(schemaManifestImports.indexOf(testPoddFoafV1) < schemaManifestImports.indexOf(testPoddUserV1));
-        Assert.assertTrue(schemaManifestImports.indexOf(testPoddFoafV1) < schemaManifestImports.indexOf(testPoddBaseV1));
-        Assert.assertTrue(schemaManifestImports.indexOf(testPoddUserV1) < schemaManifestImports.indexOf(testPoddBaseV1));
+        Assert.assertTrue(schemaManifestImports.indexOf(this.testPoddDcV1) < schemaManifestImports
+                .indexOf(this.testPoddFoafV1));
+        Assert.assertTrue(schemaManifestImports.indexOf(this.testPoddDcV1) < schemaManifestImports
+                .indexOf(this.testPoddUserV1));
+        Assert.assertTrue(schemaManifestImports.indexOf(this.testPoddDcV1) < schemaManifestImports
+                .indexOf(this.testPoddBaseV1));
+        Assert.assertTrue(schemaManifestImports.indexOf(this.testPoddFoafV1) < schemaManifestImports
+                .indexOf(this.testPoddUserV1));
+        Assert.assertTrue(schemaManifestImports.indexOf(this.testPoddFoafV1) < schemaManifestImports
+                .indexOf(this.testPoddBaseV1));
+        Assert.assertTrue(schemaManifestImports.indexOf(this.testPoddUserV1) < schemaManifestImports
+                .indexOf(this.testPoddBaseV1));
         
-        Assert.assertTrue(schemaManifestImports.indexOf(testPoddDcV2) < schemaManifestImports.indexOf(testPoddFoafV2));
-        Assert.assertTrue(schemaManifestImports.indexOf(testPoddDcV2) < schemaManifestImports.indexOf(testPoddUserV2));
-        Assert.assertTrue(schemaManifestImports.indexOf(testPoddDcV2) < schemaManifestImports.indexOf(testPoddBaseV2));
-        Assert.assertTrue(schemaManifestImports.indexOf(testPoddFoafV2) < schemaManifestImports.indexOf(testPoddUserV2));
-        Assert.assertTrue(schemaManifestImports.indexOf(testPoddFoafV2) < schemaManifestImports.indexOf(testPoddBaseV2));
-        Assert.assertTrue(schemaManifestImports.indexOf(testPoddUserV2) < schemaManifestImports.indexOf(testPoddBaseV2));
+        Assert.assertTrue(schemaManifestImports.indexOf(this.testPoddDcV2) < schemaManifestImports
+                .indexOf(this.testPoddFoafV2));
+        Assert.assertTrue(schemaManifestImports.indexOf(this.testPoddDcV2) < schemaManifestImports
+                .indexOf(this.testPoddUserV2));
+        Assert.assertTrue(schemaManifestImports.indexOf(this.testPoddDcV2) < schemaManifestImports
+                .indexOf(this.testPoddBaseV2));
+        Assert.assertTrue(schemaManifestImports.indexOf(this.testPoddFoafV2) < schemaManifestImports
+                .indexOf(this.testPoddUserV2));
+        Assert.assertTrue(schemaManifestImports.indexOf(this.testPoddFoafV2) < schemaManifestImports
+                .indexOf(this.testPoddBaseV2));
+        Assert.assertTrue(schemaManifestImports.indexOf(this.testPoddUserV2) < schemaManifestImports
+                .indexOf(this.testPoddBaseV2));
     }
     
     /**
@@ -920,7 +968,7 @@ public class OntologyUtilsTest
                 Rio.parse(this.getClass().getResourceAsStream("/test/test-podd-schema-manifest.ttl"), "",
                         RDFFormat.TURTLE);
         
-        List<OWLOntologyID> imports =
+        final List<OWLOntologyID> imports =
                 new ArrayList<OWLOntologyID>(Arrays.asList(this.testPoddBaseV1, this.testPoddUserV1,
                         this.testPoddUserV2, this.testPoddFoafV1, this.testPoddBaseV2, this.testPoddFoafV2,
                         this.testPoddDcV1, this.testPoddDcV2, this.testPoddScienceV1, this.testPoddScienceV2));
@@ -944,35 +992,47 @@ public class OntologyUtilsTest
         Assert.assertTrue(schemaManifestImports.contains(this.testPoddScienceV1));
         Assert.assertTrue(schemaManifestImports.contains(this.testPoddScienceV2));
         
-        Assert.assertTrue(schemaManifestImports.indexOf(testPoddDcV1) < schemaManifestImports.indexOf(testPoddFoafV1));
-        Assert.assertTrue(schemaManifestImports.indexOf(testPoddDcV1) < schemaManifestImports.indexOf(testPoddUserV1));
-        Assert.assertTrue(schemaManifestImports.indexOf(testPoddDcV1) < schemaManifestImports.indexOf(testPoddBaseV1));
-        Assert.assertTrue(schemaManifestImports.indexOf(testPoddDcV1) < schemaManifestImports
-                .indexOf(testPoddScienceV1));
-        Assert.assertTrue(schemaManifestImports.indexOf(testPoddFoafV1) < schemaManifestImports.indexOf(testPoddUserV1));
-        Assert.assertTrue(schemaManifestImports.indexOf(testPoddFoafV1) < schemaManifestImports.indexOf(testPoddBaseV1));
-        Assert.assertTrue(schemaManifestImports.indexOf(testPoddFoafV1) < schemaManifestImports
-                .indexOf(testPoddScienceV1));
-        Assert.assertTrue(schemaManifestImports.indexOf(testPoddUserV1) < schemaManifestImports.indexOf(testPoddBaseV1));
-        Assert.assertTrue(schemaManifestImports.indexOf(testPoddUserV1) < schemaManifestImports
-                .indexOf(testPoddScienceV1));
-        Assert.assertTrue(schemaManifestImports.indexOf(testPoddBaseV1) < schemaManifestImports
-                .indexOf(testPoddScienceV1));
+        Assert.assertTrue(schemaManifestImports.indexOf(this.testPoddDcV1) < schemaManifestImports
+                .indexOf(this.testPoddFoafV1));
+        Assert.assertTrue(schemaManifestImports.indexOf(this.testPoddDcV1) < schemaManifestImports
+                .indexOf(this.testPoddUserV1));
+        Assert.assertTrue(schemaManifestImports.indexOf(this.testPoddDcV1) < schemaManifestImports
+                .indexOf(this.testPoddBaseV1));
+        Assert.assertTrue(schemaManifestImports.indexOf(this.testPoddDcV1) < schemaManifestImports
+                .indexOf(this.testPoddScienceV1));
+        Assert.assertTrue(schemaManifestImports.indexOf(this.testPoddFoafV1) < schemaManifestImports
+                .indexOf(this.testPoddUserV1));
+        Assert.assertTrue(schemaManifestImports.indexOf(this.testPoddFoafV1) < schemaManifestImports
+                .indexOf(this.testPoddBaseV1));
+        Assert.assertTrue(schemaManifestImports.indexOf(this.testPoddFoafV1) < schemaManifestImports
+                .indexOf(this.testPoddScienceV1));
+        Assert.assertTrue(schemaManifestImports.indexOf(this.testPoddUserV1) < schemaManifestImports
+                .indexOf(this.testPoddBaseV1));
+        Assert.assertTrue(schemaManifestImports.indexOf(this.testPoddUserV1) < schemaManifestImports
+                .indexOf(this.testPoddScienceV1));
+        Assert.assertTrue(schemaManifestImports.indexOf(this.testPoddBaseV1) < schemaManifestImports
+                .indexOf(this.testPoddScienceV1));
         
-        Assert.assertTrue(schemaManifestImports.indexOf(testPoddDcV2) < schemaManifestImports.indexOf(testPoddFoafV2));
-        Assert.assertTrue(schemaManifestImports.indexOf(testPoddDcV2) < schemaManifestImports.indexOf(testPoddUserV2));
-        Assert.assertTrue(schemaManifestImports.indexOf(testPoddDcV2) < schemaManifestImports.indexOf(testPoddBaseV2));
-        Assert.assertTrue(schemaManifestImports.indexOf(testPoddDcV2) < schemaManifestImports
-                .indexOf(testPoddScienceV2));
-        Assert.assertTrue(schemaManifestImports.indexOf(testPoddFoafV2) < schemaManifestImports.indexOf(testPoddUserV2));
-        Assert.assertTrue(schemaManifestImports.indexOf(testPoddFoafV2) < schemaManifestImports.indexOf(testPoddBaseV2));
-        Assert.assertTrue(schemaManifestImports.indexOf(testPoddFoafV2) < schemaManifestImports
-                .indexOf(testPoddScienceV2));
-        Assert.assertTrue(schemaManifestImports.indexOf(testPoddUserV2) < schemaManifestImports.indexOf(testPoddBaseV2));
-        Assert.assertTrue(schemaManifestImports.indexOf(testPoddUserV2) < schemaManifestImports
-                .indexOf(testPoddScienceV2));
-        Assert.assertTrue(schemaManifestImports.indexOf(testPoddBaseV2) < schemaManifestImports
-                .indexOf(testPoddScienceV2));
+        Assert.assertTrue(schemaManifestImports.indexOf(this.testPoddDcV2) < schemaManifestImports
+                .indexOf(this.testPoddFoafV2));
+        Assert.assertTrue(schemaManifestImports.indexOf(this.testPoddDcV2) < schemaManifestImports
+                .indexOf(this.testPoddUserV2));
+        Assert.assertTrue(schemaManifestImports.indexOf(this.testPoddDcV2) < schemaManifestImports
+                .indexOf(this.testPoddBaseV2));
+        Assert.assertTrue(schemaManifestImports.indexOf(this.testPoddDcV2) < schemaManifestImports
+                .indexOf(this.testPoddScienceV2));
+        Assert.assertTrue(schemaManifestImports.indexOf(this.testPoddFoafV2) < schemaManifestImports
+                .indexOf(this.testPoddUserV2));
+        Assert.assertTrue(schemaManifestImports.indexOf(this.testPoddFoafV2) < schemaManifestImports
+                .indexOf(this.testPoddBaseV2));
+        Assert.assertTrue(schemaManifestImports.indexOf(this.testPoddFoafV2) < schemaManifestImports
+                .indexOf(this.testPoddScienceV2));
+        Assert.assertTrue(schemaManifestImports.indexOf(this.testPoddUserV2) < schemaManifestImports
+                .indexOf(this.testPoddBaseV2));
+        Assert.assertTrue(schemaManifestImports.indexOf(this.testPoddUserV2) < schemaManifestImports
+                .indexOf(this.testPoddScienceV2));
+        Assert.assertTrue(schemaManifestImports.indexOf(this.testPoddBaseV2) < schemaManifestImports
+                .indexOf(this.testPoddScienceV2));
     }
     
     /**
@@ -987,7 +1047,7 @@ public class OntologyUtilsTest
                 Rio.parse(this.getClass().getResourceAsStream("/test/test-podd-schema-manifest.ttl"), "",
                         RDFFormat.TURTLE);
         
-        List<OWLOntologyID> imports =
+        final List<OWLOntologyID> imports =
                 new ArrayList<OWLOntologyID>(Arrays.asList(this.testPoddBaseV1, this.testPoddUserV1,
                         this.testPoddUserV2, this.testPoddFoafV1, this.testPoddPlantV1, this.testPoddPlantV2,
                         this.testPoddBaseV2, this.testPoddFoafV2, this.testPoddDcV1, this.testPoddDcV2,
@@ -1015,37 +1075,37 @@ public class OntologyUtilsTest
         Assert.assertTrue(result.contains(this.testPoddPlantV1));
         Assert.assertTrue(result.contains(this.testPoddPlantV2));
         
-        Assert.assertTrue(result.indexOf(testPoddDcV1) < result.indexOf(testPoddFoafV1));
-        Assert.assertTrue(result.indexOf(testPoddDcV1) < result.indexOf(testPoddUserV1));
-        Assert.assertTrue(result.indexOf(testPoddDcV1) < result.indexOf(testPoddBaseV1));
-        Assert.assertTrue(result.indexOf(testPoddDcV1) < result.indexOf(testPoddScienceV1));
-        Assert.assertTrue(result.indexOf(testPoddDcV1) < result.indexOf(testPoddPlantV1));
-        Assert.assertTrue(result.indexOf(testPoddFoafV1) < result.indexOf(testPoddUserV1));
-        Assert.assertTrue(result.indexOf(testPoddFoafV1) < result.indexOf(testPoddBaseV1));
-        Assert.assertTrue(result.indexOf(testPoddFoafV1) < result.indexOf(testPoddScienceV1));
-        Assert.assertTrue(result.indexOf(testPoddFoafV1) < result.indexOf(testPoddPlantV1));
-        Assert.assertTrue(result.indexOf(testPoddUserV1) < result.indexOf(testPoddBaseV1));
-        Assert.assertTrue(result.indexOf(testPoddUserV1) < result.indexOf(testPoddScienceV1));
-        Assert.assertTrue(result.indexOf(testPoddUserV1) < result.indexOf(testPoddPlantV1));
-        Assert.assertTrue(result.indexOf(testPoddBaseV1) < result.indexOf(testPoddScienceV1));
-        Assert.assertTrue(result.indexOf(testPoddBaseV1) < result.indexOf(testPoddPlantV1));
-        Assert.assertTrue(result.indexOf(testPoddScienceV1) < result.indexOf(testPoddPlantV1));
+        Assert.assertTrue(result.indexOf(this.testPoddDcV1) < result.indexOf(this.testPoddFoafV1));
+        Assert.assertTrue(result.indexOf(this.testPoddDcV1) < result.indexOf(this.testPoddUserV1));
+        Assert.assertTrue(result.indexOf(this.testPoddDcV1) < result.indexOf(this.testPoddBaseV1));
+        Assert.assertTrue(result.indexOf(this.testPoddDcV1) < result.indexOf(this.testPoddScienceV1));
+        Assert.assertTrue(result.indexOf(this.testPoddDcV1) < result.indexOf(this.testPoddPlantV1));
+        Assert.assertTrue(result.indexOf(this.testPoddFoafV1) < result.indexOf(this.testPoddUserV1));
+        Assert.assertTrue(result.indexOf(this.testPoddFoafV1) < result.indexOf(this.testPoddBaseV1));
+        Assert.assertTrue(result.indexOf(this.testPoddFoafV1) < result.indexOf(this.testPoddScienceV1));
+        Assert.assertTrue(result.indexOf(this.testPoddFoafV1) < result.indexOf(this.testPoddPlantV1));
+        Assert.assertTrue(result.indexOf(this.testPoddUserV1) < result.indexOf(this.testPoddBaseV1));
+        Assert.assertTrue(result.indexOf(this.testPoddUserV1) < result.indexOf(this.testPoddScienceV1));
+        Assert.assertTrue(result.indexOf(this.testPoddUserV1) < result.indexOf(this.testPoddPlantV1));
+        Assert.assertTrue(result.indexOf(this.testPoddBaseV1) < result.indexOf(this.testPoddScienceV1));
+        Assert.assertTrue(result.indexOf(this.testPoddBaseV1) < result.indexOf(this.testPoddPlantV1));
+        Assert.assertTrue(result.indexOf(this.testPoddScienceV1) < result.indexOf(this.testPoddPlantV1));
         
-        Assert.assertTrue(result.indexOf(testPoddDcV2) < result.indexOf(testPoddFoafV2));
-        Assert.assertTrue(result.indexOf(testPoddDcV2) < result.indexOf(testPoddUserV2));
-        Assert.assertTrue(result.indexOf(testPoddDcV2) < result.indexOf(testPoddBaseV2));
-        Assert.assertTrue(result.indexOf(testPoddDcV2) < result.indexOf(testPoddScienceV2));
-        Assert.assertTrue(result.indexOf(testPoddDcV2) < result.indexOf(testPoddPlantV2));
-        Assert.assertTrue(result.indexOf(testPoddFoafV2) < result.indexOf(testPoddUserV2));
-        Assert.assertTrue(result.indexOf(testPoddFoafV2) < result.indexOf(testPoddBaseV2));
-        Assert.assertTrue(result.indexOf(testPoddFoafV2) < result.indexOf(testPoddScienceV2));
-        Assert.assertTrue(result.indexOf(testPoddFoafV2) < result.indexOf(testPoddPlantV2));
-        Assert.assertTrue(result.indexOf(testPoddUserV2) < result.indexOf(testPoddBaseV2));
-        Assert.assertTrue(result.indexOf(testPoddUserV2) < result.indexOf(testPoddScienceV2));
-        Assert.assertTrue(result.indexOf(testPoddUserV2) < result.indexOf(testPoddPlantV2));
-        Assert.assertTrue(result.indexOf(testPoddBaseV2) < result.indexOf(testPoddScienceV2));
-        Assert.assertTrue(result.indexOf(testPoddBaseV2) < result.indexOf(testPoddPlantV2));
-        Assert.assertTrue(result.indexOf(testPoddScienceV2) < result.indexOf(testPoddPlantV2));
+        Assert.assertTrue(result.indexOf(this.testPoddDcV2) < result.indexOf(this.testPoddFoafV2));
+        Assert.assertTrue(result.indexOf(this.testPoddDcV2) < result.indexOf(this.testPoddUserV2));
+        Assert.assertTrue(result.indexOf(this.testPoddDcV2) < result.indexOf(this.testPoddBaseV2));
+        Assert.assertTrue(result.indexOf(this.testPoddDcV2) < result.indexOf(this.testPoddScienceV2));
+        Assert.assertTrue(result.indexOf(this.testPoddDcV2) < result.indexOf(this.testPoddPlantV2));
+        Assert.assertTrue(result.indexOf(this.testPoddFoafV2) < result.indexOf(this.testPoddUserV2));
+        Assert.assertTrue(result.indexOf(this.testPoddFoafV2) < result.indexOf(this.testPoddBaseV2));
+        Assert.assertTrue(result.indexOf(this.testPoddFoafV2) < result.indexOf(this.testPoddScienceV2));
+        Assert.assertTrue(result.indexOf(this.testPoddFoafV2) < result.indexOf(this.testPoddPlantV2));
+        Assert.assertTrue(result.indexOf(this.testPoddUserV2) < result.indexOf(this.testPoddBaseV2));
+        Assert.assertTrue(result.indexOf(this.testPoddUserV2) < result.indexOf(this.testPoddScienceV2));
+        Assert.assertTrue(result.indexOf(this.testPoddUserV2) < result.indexOf(this.testPoddPlantV2));
+        Assert.assertTrue(result.indexOf(this.testPoddBaseV2) < result.indexOf(this.testPoddScienceV2));
+        Assert.assertTrue(result.indexOf(this.testPoddBaseV2) < result.indexOf(this.testPoddPlantV2));
+        Assert.assertTrue(result.indexOf(this.testPoddScienceV2) < result.indexOf(this.testPoddPlantV2));
     }
     
     @Test

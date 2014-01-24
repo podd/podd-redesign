@@ -31,7 +31,6 @@ import org.restlet.resource.ClientResource;
 import org.restlet.resource.ResourceException;
 
 import com.github.ansell.restletutils.RestletUtilMediaType;
-import com.github.ansell.restletutils.test.RestletTestUtils;
 import com.github.podd.api.test.TestConstants;
 import com.github.podd.utils.DebugUtils;
 import com.github.podd.utils.PoddRoles;
@@ -93,8 +92,8 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
             getArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER,
                     "http://purl.org/podd/ns/artifact/artifact89");
             
-            this.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null,
-                    MediaType.APPLICATION_RDF_XML, Status.CLIENT_ERROR_NOT_FOUND, AbstractResourceImplTest.WITH_ADMIN);
+            this.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null, MediaType.APPLICATION_RDF_XML,
+                    Status.CLIENT_ERROR_NOT_FOUND, AbstractResourceImplTest.WITH_ADMIN);
             Assert.fail("Should have thrown a ResourceException with Status Code 404");
         }
         catch(final ResourceException e)
@@ -121,8 +120,8 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
             getArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER,
                     "http://purl.org/podd/ns/artifact/artifact89");
             
-            this.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null,
-                    MediaType.APPLICATION_RDF_XML, Status.CLIENT_ERROR_NOT_FOUND, AbstractResourceImplTest.NO_ADMIN);
+            this.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null, MediaType.APPLICATION_RDF_XML,
+                    Status.CLIENT_ERROR_NOT_FOUND, AbstractResourceImplTest.NO_ADMIN);
             Assert.fail("Should have thrown a ResourceException with Status Code 404");
         }
         catch(final ResourceException e)
@@ -202,8 +201,8 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
             getArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactUri);
             
             final Representation results =
-                    this.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null,
-                            MediaType.TEXT_HTML, Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
+                    this.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null, MediaType.TEXT_HTML,
+                            Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
             
             final String body = this.getText(results);
             
@@ -241,8 +240,8 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
             getArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactUri);
             
             final Representation results =
-                    this.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null,
-                            MediaType.TEXT_HTML, Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
+                    this.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null, MediaType.TEXT_HTML,
+                            Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
             
             final String body = this.getText(results);
             
@@ -439,8 +438,8 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
             getArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_OBJECT_IDENTIFIER, objectUri);
             
             final Representation results =
-                    this.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null,
-                            MediaType.TEXT_HTML, Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
+                    this.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null, MediaType.TEXT_HTML,
+                            Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
             
             final String body = this.getText(results);
             
@@ -478,8 +477,8 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
             getArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_OBJECT_IDENTIFIER, objectUri);
             
             final Representation results =
-                    this.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null,
-                            MediaType.TEXT_HTML, Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
+                    this.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null, MediaType.TEXT_HTML,
+                            Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
             
             final String body = this.getText(results);
             
@@ -568,8 +567,8 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
             getArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactUri);
             
             final Representation results =
-                    this.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null,
-                            MediaType.TEXT_HTML, Status.SUCCESS_OK, AbstractResourceImplTest.NO_ADMIN);
+                    this.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null, MediaType.TEXT_HTML,
+                            Status.SUCCESS_OK, AbstractResourceImplTest.NO_ADMIN);
             
             final String body = this.getText(results);
             
@@ -610,8 +609,8 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
             getArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactUri);
             
             final Representation results =
-                    this.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null,
-                            MediaType.TEXT_HTML, Status.SUCCESS_OK, AbstractResourceImplTest.NO_ADMIN);
+                    this.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null, MediaType.TEXT_HTML,
+                            Status.SUCCESS_OK, AbstractResourceImplTest.NO_ADMIN);
             
             final String body = this.getText(results);
             

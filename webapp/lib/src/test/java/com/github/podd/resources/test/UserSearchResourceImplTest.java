@@ -21,7 +21,6 @@ import org.restlet.data.Status;
 import org.restlet.representation.Representation;
 import org.restlet.resource.ClientResource;
 
-import com.github.ansell.restletutils.test.RestletTestUtils;
 import com.github.podd.utils.PODD;
 import com.github.podd.utils.PoddRoles;
 import com.github.podd.utils.PoddUserStatus;

@@ -19,7 +19,6 @@ import org.restlet.resource.ClientResource;
 import org.restlet.resource.ResourceException;
 
 import com.github.ansell.restletutils.SesameRealmConstants;
-import com.github.ansell.restletutils.test.RestletTestUtils;
 import com.github.podd.utils.PODD;
 import com.github.podd.utils.PoddWebConstants;
 
@@ -36,8 +35,8 @@ public class UserListResourceImplTest extends AbstractResourceImplTest
         final ClientResource userListClientResource = new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_LIST));
         try
         {
-            this.doTestAuthenticatedRequest(userListClientResource, Method.GET, null,
-                    MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK, AbstractResourceImplTest.NO_ADMIN);
+            this.doTestAuthenticatedRequest(userListClientResource, Method.GET, null, MediaType.APPLICATION_RDF_XML,
+                    Status.SUCCESS_OK, AbstractResourceImplTest.NO_ADMIN);
             Assert.fail("Should've failed due to lack of authorization");
         }
         catch(final ResourceException e)
@@ -58,8 +57,8 @@ public class UserListResourceImplTest extends AbstractResourceImplTest
         try
         {
             final Representation results =
-                    this.doTestAuthenticatedRequest(userListClientResource, Method.GET, null,
-                            MediaType.TEXT_HTML, Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
+                    this.doTestAuthenticatedRequest(userListClientResource, Method.GET, null, MediaType.TEXT_HTML,
+                            Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
             
             final String body = this.getText(results);
             System.out.println(body);

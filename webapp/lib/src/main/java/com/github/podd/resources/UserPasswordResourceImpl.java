@@ -37,8 +37,6 @@ import org.restlet.representation.Variant;
 import org.restlet.resource.Get;
 import org.restlet.resource.Post;
 import org.restlet.resource.ResourceException;
-import org.restlet.security.LocalVerifier;
-import org.restlet.security.MapVerifier;
 import org.restlet.security.Role;
 import org.restlet.security.SecretVerifier;
 import org.restlet.security.User;
@@ -87,7 +85,8 @@ public class UserPasswordResourceImpl extends AbstractUserResourceImpl
             
             if(verifier instanceof SecretVerifier)
             {
-                int verifyResult = ((SecretVerifier)verifier).verify(identifierInModel, oldPassword.toCharArray());
+                final int verifyResult =
+                        ((SecretVerifier)verifier).verify(identifierInModel, oldPassword.toCharArray());
                 
                 if(verifyResult != Verifier.RESULT_VALID)
                 {

@@ -591,5 +591,5 @@ public interface PODD
             .createURI("http://purl.org/podd/ns/repository#containsSchemaIRI");
     public static final URI PODD_REPOSITORY_CONTAINS_SCHEMA_VERSION = PODD.VF
             .createURI("http://purl.org/podd/ns/repository#containsSchemaVersion");
-
+    
 }

@@ -44,7 +44,6 @@ import org.restlet.resource.ClientResource;
 import org.restlet.resource.ResourceException;
 
 import com.github.ansell.restletutils.SesameRealmConstants;
-import com.github.ansell.restletutils.test.RestletTestUtils;
 import com.github.podd.api.test.TestConstants;
 import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.PODD;
@@ -129,8 +128,8 @@ public class UserRolesResourceImplTest extends AbstractResourceImplTest
                 userDetailsClientResource.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, testIdentifier);
                 
                 final Representation updatedResults =
-                        this.doTestAuthenticatedRequest(userDetailsClientResource, Method.GET, null,
-                                mediaType, Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
+                        this.doTestAuthenticatedRequest(userDetailsClientResource, Method.GET, null, mediaType,
+                                Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
                 final Model resultsModel = this.assertRdf(updatedResults, format, 43);
                 Assert.assertEquals("Unexpected user identifier", testIdentifier,
                         resultsModel.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).objectString());
@@ -218,8 +217,8 @@ public class UserRolesResourceImplTest extends AbstractResourceImplTest
                 userDetailsClientResource.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, testIdentifier);
                 
                 final Representation updatedResults =
-                        this.doTestAuthenticatedRequest(userDetailsClientResource, Method.GET, null,
-                                mediaType, Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
+                        this.doTestAuthenticatedRequest(userDetailsClientResource, Method.GET, null, mediaType,
+                                Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
                 final Model resultsModel = this.assertRdf(updatedResults, format, 31);
                 Assert.assertEquals("Unexpected user identifier", testIdentifier,
                         resultsModel.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).objectString());
@@ -313,8 +312,8 @@ public class UserRolesResourceImplTest extends AbstractResourceImplTest
                 userDetailsClientResource.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, testIdentifier);
                 
                 final Representation updatedResults =
-                        this.doTestAuthenticatedRequest(userDetailsClientResource, Method.GET, null,
-                                mediaType, Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
+                        this.doTestAuthenticatedRequest(userDetailsClientResource, Method.GET, null, mediaType,
+                                Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
                 final Model resultsModel = this.assertRdf(updatedResults, format, 15);
                 Assert.assertEquals("Unexpected user identifier", testIdentifier,
                         resultsModel.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).objectString());
@@ -438,8 +437,8 @@ public class UserRolesResourceImplTest extends AbstractResourceImplTest
         try
         {
             final Representation results =
-                    this.doTestAuthenticatedRequest(userRolesClientResource, Method.GET, null,
-                            MediaType.TEXT_HTML, Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
+                    this.doTestAuthenticatedRequest(userRolesClientResource, Method.GET, null, MediaType.TEXT_HTML,
+                            Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
             
             final String body = results.getText();
             System.out.println(body);
@@ -478,8 +477,8 @@ public class UserRolesResourceImplTest extends AbstractResourceImplTest
             userRolesClientResource.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, testIdentifier);
             
             final Representation results =
-                    this.doTestAuthenticatedRequest(userRolesClientResource, Method.GET, null,
-                            MediaType.TEXT_HTML, Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
+                    this.doTestAuthenticatedRequest(userRolesClientResource, Method.GET, null, MediaType.TEXT_HTML,
+                            Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
             
             final String body = results.getText();
             System.out.println(body);

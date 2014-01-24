@@ -23,7 +23,6 @@ import info.aduna.iteration.Iterations;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -49,9 +48,6 @@ import org.openrdf.repository.config.RepositoryConfigSchema;
 import org.openrdf.repository.config.RepositoryImplConfig;
 import org.openrdf.repository.config.RepositoryImplConfigBase;
 import org.openrdf.repository.http.HTTPRepository;
-import org.openrdf.repository.manager.LocalRepositoryManager;
-import org.openrdf.repository.manager.RemoteRepositoryManager;
-import org.openrdf.repository.manager.RepositoryManager;
 import org.openrdf.repository.sail.SailRepository;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.RDFHandlerException;
@@ -77,7 +73,6 @@ import org.slf4j.LoggerFactory;
 
 import com.github.ansell.propertyutil.PropertyUtil;
 import com.github.ansell.restletutils.FixedRedirectCookieAuthenticator;
-import com.github.ansell.restletutils.RestletUtilUser;
 import com.github.podd.api.PoddArtifactManager;
 import com.github.podd.api.PoddOWLManager;
 import com.github.podd.api.PoddSchemaManager;
@@ -328,8 +323,8 @@ public class ApplicationUtils
         final Resource repositoryNode = GraphUtil.getUniqueSubject(graph, RepositoryConfigSchema.REPOSITORYTYPE, null);
         final RepositoryImplConfig repositoryImplConfig = RepositoryImplConfigBase.create(graph, repositoryNode);
         
-        String poddHome = props.get(PoddWebConstants.PROPERTY_PODD_HOME, "");
-        Path poddHomePath = Paths.get(poddHome);
+        final String poddHome = props.get(PoddWebConstants.PROPERTY_PODD_HOME, "");
+        final Path poddHomePath = Paths.get(poddHome);
         
         application.setPoddRepositoryManager(new PoddRepositoryManagerImpl(nextManagementRepository,
                 repositoryImplConfig, props.get(PoddWebConstants.PROPERTY_PERMANENT_SESAME_REPOSITORY_SERVER,

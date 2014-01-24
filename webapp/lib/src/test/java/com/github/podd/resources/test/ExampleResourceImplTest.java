@@ -30,8 +30,6 @@ import org.restlet.representation.Representation;
 import org.restlet.resource.ClientResource;
 import org.restlet.resource.ResourceException;
 
-import com.github.ansell.restletutils.test.RestletTestUtils;
-
 /**
  * An example use of Restlet for testing.
  * 
@@ -86,8 +84,8 @@ public class ExampleResourceImplTest extends AbstractResourceImplTest
         form.getEntries().add(new FormData("firstName", "Mister"));
         
         final Representation results =
-                this.doTestAuthenticatedRequest(creationClientResource, Method.PUT, form,
-                        MediaType.TEXT_HTML, Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
+                this.doTestAuthenticatedRequest(creationClientResource, Method.PUT, form, MediaType.TEXT_HTML,
+                        Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
         
     }
     
@@ -108,8 +106,8 @@ public class ExampleResourceImplTest extends AbstractResourceImplTest
         form.getEntries().add(new FormData("email", "test@email.com"));
         
         final Representation results =
-                this.doTestAuthenticatedRequest(creationClientResource, Method.PUT, form,
-                        MediaType.TEXT_HTML, Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
+                this.doTestAuthenticatedRequest(creationClientResource, Method.PUT, form, MediaType.TEXT_HTML,
+                        Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
         
     }
     
@@ -179,8 +177,8 @@ public class ExampleResourceImplTest extends AbstractResourceImplTest
             form.getEntries().add(new FormData("email", "test@email.com"));
             
             final Representation results =
-                    this.doTestAuthenticatedRequest(creationClientResource, Method.PUT, null,
-                            MediaType.TEXT_HTML, Status.CLIENT_ERROR_UNAUTHORIZED, AbstractResourceImplTest.NO_ADMIN);
+                    this.doTestAuthenticatedRequest(creationClientResource, Method.PUT, null, MediaType.TEXT_HTML,
+                            Status.CLIENT_ERROR_UNAUTHORIZED, AbstractResourceImplTest.NO_ADMIN);
             
             Assert.fail("Did not receive expected exception");
         }
@@ -200,8 +198,8 @@ public class ExampleResourceImplTest extends AbstractResourceImplTest
         final ClientResource creationClientResource = new ClientResource(this.getUrl("/user/create"));
         
         final Representation results =
-                this.doTestAuthenticatedRequest(creationClientResource, Method.GET, null,
-                        MediaType.TEXT_HTML, Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
+                this.doTestAuthenticatedRequest(creationClientResource, Method.GET, null, MediaType.TEXT_HTML,
+                        Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
         
     }
     
@@ -215,8 +213,8 @@ public class ExampleResourceImplTest extends AbstractResourceImplTest
         final ClientResource creationClientResource = new ClientResource(this.getUrl("/user"));
         
         final Representation results =
-                this.doTestAuthenticatedRequest(creationClientResource, Method.GET, null,
-                        MediaType.TEXT_HTML, Status.SUCCESS_OK, AbstractResourceImplTest.NO_ADMIN);
+                this.doTestAuthenticatedRequest(creationClientResource, Method.GET, null, MediaType.TEXT_HTML,
+                        Status.SUCCESS_OK, AbstractResourceImplTest.NO_ADMIN);
         
     }
     

@@ -230,7 +230,7 @@ public class AddObjectResourceImpl extends AbstractPoddResourceImpl
                 | UnmanagedArtifactVersionException | SchemaManifestException e)
         {
             this.log.warn("Found error while looking for object type label: {}", objectType);
-            //e.printStackTrace();
+            // e.printStackTrace();
             // failed to find Label
             final URI objectTypeUri = PODD.VF.createURI(objectType);
             objectLabel = new PoddObjectLabelImpl(null, objectTypeUri, objectType);

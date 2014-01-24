@@ -24,7 +24,6 @@ import org.restlet.data.Status;
 import org.restlet.resource.ClientResource;
 import org.restlet.resource.ResourceException;
 
-import com.github.ansell.restletutils.test.RestletTestUtils;
 import com.github.podd.api.test.TestConstants;
 import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.PoddWebConstants;
@@ -68,8 +67,8 @@ public class DeleteArtifactResourceImplTest extends AbstractResourceImplTest
         {
             getArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactID
                     .getOntologyIRI().toString());
-            this.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null,
-                    MediaType.APPLICATION_RDF_XML, Status.CLIENT_ERROR_NOT_FOUND, AbstractResourceImplTest.WITH_ADMIN);
+            this.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null, MediaType.APPLICATION_RDF_XML,
+                    Status.CLIENT_ERROR_NOT_FOUND, AbstractResourceImplTest.WITH_ADMIN);
             Assert.fail("Should have failed with a NOT_FOUND error");
         }
         catch(final ResourceException e)

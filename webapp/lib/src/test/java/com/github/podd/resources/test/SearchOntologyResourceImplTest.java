@@ -35,7 +35,6 @@ import org.restlet.representation.StringRepresentation;
 import org.restlet.resource.ClientResource;
 import org.restlet.resource.ResourceException;
 
-import com.github.ansell.restletutils.test.RestletTestUtils;
 import com.github.podd.api.test.TestConstants;
 import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.PODD;
@@ -68,8 +67,8 @@ public class SearchOntologyResourceImplTest extends AbstractResourceImplTest
             
             // invoke the search resource
             final Representation results =
-                    this.doTestAuthenticatedRequest(searchClientResource, Method.GET, null,
-                            requestMediaType, Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
+                    this.doTestAuthenticatedRequest(searchClientResource, Method.GET, null, requestMediaType,
+                            Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
             
             final RDFFormat format = Rio.getParserFormatForMIMEType(requestMediaType.getName(), RDFFormat.RDFXML);
             // construct a Model out of the result
@@ -216,8 +215,8 @@ public class SearchOntologyResourceImplTest extends AbstractResourceImplTest
             
             // invoke service
             final Representation results =
-                    this.doTestAuthenticatedRequest(searchClientResource, Method.POST, input,
-                            inputMediaType, Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
+                    this.doTestAuthenticatedRequest(searchClientResource, Method.POST, input, inputMediaType,
+                            Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
             
             // verify: response
             final Model resultModel = this.assertRdf(results, RDFFormat.RDFXML, 5);

@@ -84,11 +84,12 @@ public interface PoddArtifactManager
      *            The {@link OWLOntologyID} containing the details of the artifact to delete.
      * @throws PoddException
      *             If an error occurred while deleting the artifact.
-     * @throws IOException 
-     * @throws OpenRDFException 
-     * @throws UnsupportedRDFormatException 
+     * @throws IOException
+     * @throws OpenRDFException
+     * @throws UnsupportedRDFormatException
      */
-    boolean deleteArtifact(InferredOWLOntologyID artifactId) throws PoddException, UnsupportedRDFormatException, OpenRDFException, IOException;
+    boolean deleteArtifact(InferredOWLOntologyID artifactId) throws PoddException, UnsupportedRDFormatException,
+        OpenRDFException, IOException;
     
     /**
      * Deletes the specified PODD object within an artifact. The artifact containing the object
