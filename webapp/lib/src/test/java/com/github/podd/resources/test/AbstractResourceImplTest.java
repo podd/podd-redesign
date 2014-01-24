@@ -322,11 +322,11 @@ public class AbstractResourceImplTest
         // add the challenge response to complete the authentication on the client side
         if(requiresAdminPrivileges)
         {
-            clientResource.setChallengeResponse(RestletTestUtils.getTestChallengeResponseAdmin(clientResource));
+            clientResource.setChallengeResponse(this.getTestChallengeResponseAdmin(clientResource));
         }
         else
         {
-            clientResource.setChallengeResponse(RestletTestUtils.getTestChallengeResponse(clientResource));
+            clientResource.setChallengeResponse(this.getTestChallengeResponse(clientResource));
         }
         
         if(requestMethod.equals(Method.DELETE))
@@ -357,7 +357,7 @@ public class AbstractResourceImplTest
     
     public ChallengeResponse getTestChallengeResponse(final ClientResource clientResource)
     {
-        return this.getTestChallengeResponse(clientResource.getChallengeRequests(), ChallengeScheme.HTTP_DIGEST,
+        return this.getTestChallengeResponse(clientResource.getChallengeRequests(), ChallengeScheme.HTTP_COOKIE,
                 clientResource.getResponse(), RestletTestUtils.TEST_USERNAME, RestletTestUtils.TEST_PASSWORD);
     }
     
@@ -367,7 +367,7 @@ public class AbstractResourceImplTest
         ChallengeRequest c1 = null;
         for(final ChallengeRequest challengeRequest : list)
         {
-            if(ChallengeScheme.HTTP_DIGEST.equals(challengeRequest.getScheme()))
+            if(ChallengeScheme.HTTP_COOKIE.equals(challengeRequest.getScheme()))
             {
                 c1 = challengeRequest;
                 break;
@@ -382,7 +382,7 @@ public class AbstractResourceImplTest
     
     public ChallengeResponse getTestChallengeResponseAdmin(final ClientResource clientResource)
     {
-        return this.getTestChallengeResponse(clientResource.getChallengeRequests(), ChallengeScheme.HTTP_DIGEST,
+        return this.getTestChallengeResponse(clientResource.getChallengeRequests(), ChallengeScheme.HTTP_COOKIE,
                 clientResource.getResponse(), RestletTestUtils.TEST_ADMIN_USERNAME,
                 RestletTestUtils.TEST_ADMIN_PASSWORD);
     }
