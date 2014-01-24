@@ -291,25 +291,30 @@ public class AbstractResourceImplTest
             final Representation inputRepresentation, final MediaType requestMediaType,
             final Status expectedResponseStatus, final boolean requiresAdminPrivileges) throws Exception
     {
+        if(requiresAdminPrivileges)
+        {
+            return doTestAuthenticatedRequest(clientResource, requestMethod, inputRepresentation, requestMediaType,
+                    expectedResponseStatus, RestletTestUtils.TEST_ADMIN_USERNAME, RestletTestUtils.TEST_ADMIN_PASSWORD);
+        }
+        else
+        {
+            return doTestAuthenticatedRequest(clientResource, requestMethod, inputRepresentation, requestMediaType,
+                    expectedResponseStatus, RestletTestUtils.TEST_USERNAME, RestletTestUtils.TEST_PASSWORD);
+        }
+    }
+    
+    public Representation doTestAuthenticatedRequest(final ClientResource clientResource, final Method requestMethod,
+            final Representation inputRepresentation, final MediaType requestMediaType,
+            final Status expectedResponseStatus, final String username, final char[] password) throws Exception
+    {
         Series<CookieSetting> currentCookies = new Series<CookieSetting>(CookieSetting.class);
         
+        if(!this.login(username, password, currentCookies))
+        {
+            Assert.fail("Failed to login as admin");
+        }
         try
         {
-            if(requiresAdminPrivileges)
-            {
-                if(!this.login(RestletTestUtils.TEST_ADMIN_USERNAME, RestletTestUtils.TEST_ADMIN_PASSWORD,
-                        currentCookies))
-                {
-                    Assert.fail("Failed to login as admin");
-                }
-            }
-            else
-            {
-                if(!this.login(RestletTestUtils.TEST_USERNAME, RestletTestUtils.TEST_PASSWORD, currentCookies))
-                {
-                    Assert.fail("Failed to login as normal user");
-                }
-            }
             
             Representation result = null;
             
