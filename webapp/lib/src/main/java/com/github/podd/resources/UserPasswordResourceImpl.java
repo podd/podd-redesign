@@ -103,7 +103,7 @@ public class UserPasswordResourceImpl extends AbstractUserResourceImpl
         
         // update sesame Realm with new password
         final String newPassword = model.filter(null, SesameRealmConstants.OAS_USERSECRET, null).objectString();
-        this.log.info("[DEBUG] new password is [{}]", newPassword);
+        //this.log.info("[DEBUG] new password is [{}]", newPassword);
         changePwdUser.setSecret(newPassword.toCharArray());
         
         return nextRealm.updateUser(changePwdUser);

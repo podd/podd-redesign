@@ -295,7 +295,6 @@ public class UserRolesResourceImplTest extends AbstractResourceImplTest
             
             try
             {
-                this.logout();
                 this.doTestAuthenticatedRequest(userRolesClientResource, Method.POST, input, mediaType,
                         Status.CLIENT_ERROR_UNAUTHORIZED, AbstractResourceImplTest.NO_ADMIN);
                 Assert.fail("Should have failed authorization");
@@ -390,7 +389,6 @@ public class UserRolesResourceImplTest extends AbstractResourceImplTest
             userRolesClientResource.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, testIdentifier);
             userRolesClientResource.addQueryParameter(PoddWebConstants.KEY_DELETE, "true");
             
-            this.logout();
             this.doTestAuthenticatedRequest(userRolesClientResource, Method.POST, input, mediaType,
                     Status.CLIENT_ERROR_UNAUTHORIZED, AbstractResourceImplTest.NO_ADMIN);
             Assert.fail("Should have failed authorization");

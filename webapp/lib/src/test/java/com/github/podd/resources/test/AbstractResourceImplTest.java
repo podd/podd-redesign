@@ -47,6 +47,7 @@ import org.junit.rules.TemporaryFolder;
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.Model;
 import org.openrdf.model.Resource;
+import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.openrdf.model.ValueFactory;
 import org.openrdf.model.impl.LinkedHashModel;
@@ -152,10 +153,10 @@ public class AbstractResourceImplTest
     public TemporaryFolder tempDirectory = new TemporaryFolder();
     
     /**
-     * Timeout tests after 60 seconds.
+     * Timeout tests after 600 seconds.
      */
     @Rule
-    public TimeoutWithStackTraces timeout = new TimeoutWithStackTraces(60000);
+    public TimeoutWithStackTraces timeout = new TimeoutWithStackTraces(600000);
     
     /**
      * The set of ports that have been used in tests so far in this virtual machine.
@@ -191,8 +192,6 @@ public class AbstractResourceImplTest
      * Store this for testing restarting the application for consistency and correctness.
      */
     private PoddWebServiceApplication poddApplication;
-    
-    private Series<CookieSetting> currentCookies = new Series<CookieSetting>(CookieSetting.class);
     
     public AbstractResourceImplTest()
     {
@@ -292,29 +291,29 @@ public class AbstractResourceImplTest
             final Representation inputRepresentation, final MediaType requestMediaType,
             final Status expectedResponseStatus, final boolean requiresAdminPrivileges) throws Exception
     {
+        Series<CookieSetting> currentCookies = new Series<CookieSetting>(CookieSetting.class);
+        
         try
         {
-            if(!this.isLoggedIn())
+            if(requiresAdminPrivileges)
             {
-                if(requiresAdminPrivileges)
+                if(!this.login(RestletTestUtils.TEST_ADMIN_USERNAME, RestletTestUtils.TEST_ADMIN_PASSWORD,
+                        currentCookies))
                 {
-                    if(!this.login(RestletTestUtils.TEST_ADMIN_USERNAME, RestletTestUtils.TEST_ADMIN_PASSWORD))
-                    {
-                        Assert.fail("Failed to login as admin");
-                    }
+                    Assert.fail("Failed to login as admin");
                 }
-                else
+            }
+            else
+            {
+                if(!this.login(RestletTestUtils.TEST_USERNAME, RestletTestUtils.TEST_PASSWORD, currentCookies))
                 {
-                    if(!this.login(RestletTestUtils.TEST_USERNAME, RestletTestUtils.TEST_PASSWORD))
-                    {
-                        Assert.fail("Failed to login as normal user");
-                    }
+                    Assert.fail("Failed to login as normal user");
                 }
             }
             
             Representation result = null;
             
-            clientResource.getCookies().addAll(this.currentCookies);
+            clientResource.getCookies().addAll(currentCookies);
             
             if(requestMethod.equals(Method.DELETE))
             {
@@ -343,7 +342,7 @@ public class AbstractResourceImplTest
         }
         finally
         {
-            this.logout();
+            this.logout(currentCookies);
         }
     }
     
@@ -497,11 +496,6 @@ public class AbstractResourceImplTest
         }
     }
     
-    protected boolean isLoggedIn()
-    {
-        return !this.currentCookies.isEmpty();
-    }
-    
     /**
      * Loads a test artifact in RDF/XML format.
      * 
@@ -549,8 +543,6 @@ public class AbstractResourceImplTest
         finally
         {
             this.releaseClient(uploadArtifactClientResource);
-            
-            this.logout();
         }
     }
     
@@ -675,13 +667,14 @@ public class AbstractResourceImplTest
         }
     }
     
-    protected boolean login(final String username, final char[] testAdminPassword) throws Exception
+    protected boolean login(final String username, final char[] testAdminPassword,
+            final Series<CookieSetting> currentCookies) throws Exception
     {
         final ClientResource resource = new ClientResource(this.getUrl(PoddWebConstants.PATH_LOGIN_SUBMIT));
         
         try
         {
-            resource.getCookies().addAll(this.currentCookies);
+            resource.getCookies().addAll(currentCookies);
             
             // TODO: when Cookies natively supported by Client Resource, or another method remove
             // this
@@ -712,16 +705,17 @@ public class AbstractResourceImplTest
                 // HACK
                 if(resource.getStatus().equals(Status.REDIRECTION_SEE_OTHER) || resource.getStatus().isSuccess())
                 {
-                    this.currentCookies = resource.getCookieSettings();
+                    currentCookies.clear();
+                    currentCookies.addAll(resource.getCookieSettings());
                 }
                 else
                 {
                     this.log.error("Found unrecognised status after login: {}", resource.getStatus());
                 }
                 
-                this.log.info("cookies: {}", this.currentCookies);
+                this.log.info("cookies: {}", currentCookies);
                 
-                boolean result = !this.currentCookies.isEmpty();
+                boolean result = !currentCookies.isEmpty();
                 
                 this.log.info("Logged in=" + result);
                 
@@ -729,7 +723,7 @@ public class AbstractResourceImplTest
             }
             catch(final Throwable e)
             {
-                this.currentCookies.clear();
+                currentCookies.clear();
                 this.log.warn("Error with request", e);
                 throw e;
             }
@@ -744,15 +738,15 @@ public class AbstractResourceImplTest
         }
     }
     
-    protected boolean logout() throws Exception
+    protected boolean logout(final Series<CookieSetting> currentCookies) throws Exception
     {
-        this.log.info("cookies: {}", this.currentCookies);
+        this.log.info("cookies: {}", currentCookies);
         
         final ClientResource resource = new ClientResource(this.getUrl(PoddWebConstants.PATH_LOGOUT));
         try
         {
             // add the cookie settings so that the server knows who to logout
-            resource.getCookies().addAll(this.currentCookies);
+            resource.getCookies().addAll(currentCookies);
             
             // TODO: when Cookies natively supported by Client Resource, or another method remove
             // this
@@ -764,7 +758,8 @@ public class AbstractResourceImplTest
             final Representation rep = resource.get();
             try
             {
-                this.currentCookies = resource.getCookieSettings();
+                currentCookies.clear();
+                currentCookies.addAll(resource.getCookieSettings());
                 
                 this.log.info("logout result status: {}", resource.getStatus());
                 
@@ -778,15 +773,15 @@ public class AbstractResourceImplTest
                     this.log.info("logout result was null");
                 }
                 
-                this.log.info("cookies: {}", this.currentCookies);
+                this.log.info("cookies: {}", currentCookies);
                 
-                this.currentCookies.clear();
+                currentCookies.clear();
                 
                 return true;
             }
             catch(final Throwable e)
             {
-                this.currentCookies.clear();
+                currentCookies.clear();
                 this.log.warn("Error with request", e);
                 throw e;
             }
