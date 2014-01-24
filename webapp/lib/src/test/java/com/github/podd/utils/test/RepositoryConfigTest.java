@@ -16,10 +16,14 @@
  */
 package com.github.podd.utils.test;
 
+import java.io.File;
+
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 import org.openrdf.model.Model;
 import org.openrdf.model.Resource;
 import org.openrdf.model.util.GraphUtil;
@@ -39,6 +43,10 @@ import org.openrdf.rio.Rio;
  */
 public class RepositoryConfigTest
 {
+    @Rule
+    public TemporaryFolder tempDir = new TemporaryFolder();
+    
+    private File testDir;
     
     /**
      * @throws java.lang.Exception
@@ -46,6 +54,7 @@ public class RepositoryConfigTest
     @Before
     public void setUp() throws Exception
     {
+        testDir = tempDir.newFolder("repositoryconfigtest");
     }
     
     /**
@@ -54,10 +63,11 @@ public class RepositoryConfigTest
     @After
     public void tearDown() throws Exception
     {
+        testDir = null;
     }
     
     @Test
-    public final void testParsing() throws Exception
+    public final void testParsingMemoryStore() throws Exception
     {
         final Model graph =
                 Rio.parse(this.getClass().getResourceAsStream("/memorystoreconfig.ttl"), "", RDFFormat.TURTLE);
@@ -72,9 +82,25 @@ public class RepositoryConfigTest
         
         final Repository repository = repositoryFactory.getRepository(repositoryImplConfig);
         Assert.assertNotNull(repository);
+        repository.setDataDir(testDir);
         repository.initialize();
-        // Assert.assertTrue("Did not create a SailRepositoryConfig object",
-        // repositoryConfig instanceof SailRepositoryConfig);
     }
     
+    @Test
+    public final void testParsingNativeStore() throws Exception
+    {
+        final Model graph =
+                Rio.parse(this.getClass().getResourceAsStream("/nativestoreconfig.ttl"), "", RDFFormat.TURTLE);
+        final Resource repositoryNode = GraphUtil.getUniqueSubject(graph, RepositoryConfigSchema.REPOSITORYTYPE, null);
+        final RepositoryImplConfig repositoryImplConfig = RepositoryImplConfigBase.create(graph, repositoryNode);
+        Assert.assertNotNull(repositoryImplConfig);
+        Assert.assertNotNull(repositoryImplConfig.getType());
+        final RepositoryFactory repositoryFactory =
+                RepositoryRegistry.getInstance().get(repositoryImplConfig.getType());
+        
+        final Repository repository = repositoryFactory.getRepository(repositoryImplConfig);
+        Assert.assertNotNull(repository);
+        repository.setDataDir(testDir);
+        repository.initialize();
+    }
 }
