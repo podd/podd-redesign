@@ -266,7 +266,7 @@ public class PoddSesameRealm extends Realm
                 throw new PoddRuntimeException("Could not verify user identity");
             }
             
-            return new PoddUserSecretHash(((Literal)hashList.get(0)).getLabel(), findUser);
+            return new PoddUserSecretHash(((Literal)hashList.get(0).getObject()).getLabel(), findUser);
         }
         finally
         {

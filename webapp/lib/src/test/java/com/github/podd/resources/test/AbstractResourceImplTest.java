@@ -64,6 +64,9 @@ import org.restlet.Server;
 import org.restlet.data.ChallengeRequest;
 import org.restlet.data.ChallengeResponse;
 import org.restlet.data.ChallengeScheme;
+import org.restlet.data.CharacterSet;
+import org.restlet.data.CookieSetting;
+import org.restlet.data.Form;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Protocol;
@@ -73,6 +76,7 @@ import org.restlet.representation.Representation;
 import org.restlet.representation.StringRepresentation;
 import org.restlet.resource.ClientResource;
 import org.restlet.resource.ResourceException;
+import org.restlet.util.Series;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -188,6 +192,8 @@ public class AbstractResourceImplTest
      */
     private PoddWebServiceApplication poddApplication;
     
+    private Series<CookieSetting> currentCookies = new Series<CookieSetting>(CookieSetting.class);
+    
     public AbstractResourceImplTest()
     {
         super();
@@ -284,12 +290,32 @@ public class AbstractResourceImplTest
     
     public Representation doTestAuthenticatedRequest(final ClientResource clientResource, final Method requestMethod,
             final Representation inputRepresentation, final MediaType requestMediaType,
-            final Status expectedResponseStatus, final boolean requiresAdminPrivileges)
+            final Status expectedResponseStatus, final boolean requiresAdminPrivileges) throws Exception
     {
+        if(!this.isLoggedIn())
+        {
+            if(requiresAdminPrivileges)
+            {
+                if(!this.login(RestletTestUtils.TEST_ADMIN_USERNAME, RestletTestUtils.TEST_ADMIN_PASSWORD))
+                {
+                    Assert.fail("Failed to login as admin");
+                }
+            }
+            else
+            {
+                if(!this.login(RestletTestUtils.TEST_USERNAME, RestletTestUtils.TEST_PASSWORD))
+                {
+                    Assert.fail("Failed to login as normal user");
+                }
+            }
+        }
+        
         Representation result = null;
         
         try
         {
+            clientResource.getCookies().addAll(this.currentCookies);
+            
             if(requestMethod.equals(Method.DELETE))
             {
                 result = clientResource.delete(requestMediaType);
@@ -310,7 +336,6 @@ public class AbstractResourceImplTest
             {
                 throw new RuntimeException("Did not recognise request method: " + requestMethod.toString());
             }
-            Assert.fail("Expected to receive an authentication challenge");
         }
         catch(final ResourceException re)
         {
@@ -319,72 +344,9 @@ public class AbstractResourceImplTest
             Assert.assertEquals(Status.CLIENT_ERROR_UNAUTHORIZED.getCode(), re.getStatus().getCode());
         }
         
-        // add the challenge response to complete the authentication on the client side
-        if(requiresAdminPrivileges)
-        {
-            clientResource.setChallengeResponse(this.getTestChallengeResponseAdmin(clientResource));
-        }
-        else
-        {
-            clientResource.setChallengeResponse(this.getTestChallengeResponse(clientResource));
-        }
-        
-        if(requestMethod.equals(Method.DELETE))
-        {
-            result = clientResource.delete(requestMediaType);
-        }
-        else if(requestMethod.equals(Method.PUT))
-        {
-            result = clientResource.put(inputRepresentation, requestMediaType);
-        }
-        else if(requestMethod.equals(Method.GET))
-        {
-            result = clientResource.get(requestMediaType);
-        }
-        else if(requestMethod.equals(Method.POST))
-        {
-            result = clientResource.post(inputRepresentation, requestMediaType);
-        }
-        else
-        {
-            throw new RuntimeException("Did not recognise request method: " + requestMethod.toString());
-        }
-        
         Assert.assertEquals(expectedResponseStatus.getCode(), clientResource.getResponse().getStatus().getCode());
         
         return result;
-    }
-    
-    public ChallengeResponse getTestChallengeResponse(final ClientResource clientResource)
-    {
-        return this.getTestChallengeResponse(clientResource.getChallengeRequests(), ChallengeScheme.HTTP_COOKIE,
-                clientResource.getResponse(), RestletTestUtils.TEST_USERNAME, RestletTestUtils.TEST_PASSWORD);
-    }
-    
-    public ChallengeResponse getTestChallengeResponse(final List<ChallengeRequest> list,
-            final ChallengeScheme httpDigest, final Response response, final String userName, final char[] password)
-    {
-        ChallengeRequest c1 = null;
-        for(final ChallengeRequest challengeRequest : list)
-        {
-            if(ChallengeScheme.HTTP_COOKIE.equals(challengeRequest.getScheme()))
-            {
-                c1 = challengeRequest;
-                break;
-            }
-        }
-        
-        // 2- Create the Challenge response used by the client to authenticate its requests.
-        final ChallengeResponse challengeResponse = new ChallengeResponse(c1, response, userName, password);
-        
-        return challengeResponse;
-    }
-    
-    public ChallengeResponse getTestChallengeResponseAdmin(final ClientResource clientResource)
-    {
-        return this.getTestChallengeResponse(clientResource.getChallengeRequests(), ChallengeScheme.HTTP_COOKIE,
-                clientResource.getResponse(), RestletTestUtils.TEST_ADMIN_USERNAME,
-                RestletTestUtils.TEST_ADMIN_PASSWORD);
     }
     
     /**
@@ -471,6 +433,11 @@ public class AbstractResourceImplTest
         }
     }
     
+    protected final PoddWebServiceApplication getPoddApplication()
+    {
+        return this.poddApplication;
+    }
+    
     /**
      * Override this to change the test aliases for a given test.
      * 
@@ -492,7 +459,11 @@ public class AbstractResourceImplTest
         final StringWriter result = new StringWriter();
         try
         {
-            IOUtils.copy(representation.getStream(), result, StandardCharsets.UTF_8);
+            InputStream stream = representation.getStream();
+            if(stream != null)
+            {
+                IOUtils.copy(stream, result, StandardCharsets.UTF_8);
+            }
         }
         finally
         {
@@ -526,6 +497,11 @@ public class AbstractResourceImplTest
         {
             return "http://localhost:" + this.testPort + "/podd" + path;
         }
+    }
+    
+    protected boolean isLoggedIn()
+    {
+        return !this.currentCookies.isEmpty();
     }
     
     /**
@@ -699,6 +675,124 @@ public class AbstractResourceImplTest
         }
     }
     
+    protected boolean login(final String username, final char[] testAdminPassword) throws Exception
+    {
+        final ClientResource resource = new ClientResource(this.getUrl(PoddWebConstants.PATH_LOGIN_SUBMIT));
+        
+        try
+        {
+            resource.getCookies().addAll(this.currentCookies);
+            
+            // TODO: when Cookies natively supported by Client Resource, or another method remove
+            // this
+            // Until then, this is necessary to manually attach the cookies after login to the
+            // redirected address.
+            // GitHub issue for this: https://github.com/restlet/restlet-framework-java/issues/21
+            resource.setFollowingRedirects(false);
+            
+            final Form form = new Form();
+            form.add("username", username);
+            form.add("password", new String(testAdminPassword));
+            
+            final Representation rep = resource.post(form.getWebRepresentation(CharacterSet.UTF_8));
+            
+            try
+            {
+                this.log.info("login result status: {}", resource.getStatus());
+                if(rep != null)
+                {
+                    // FIXME: Representation.getText may be implemented badly, so avoid calling it
+                    // this.log.info("login result: {}", rep.getText());
+                }
+                else
+                {
+                    this.log.info("login result was null");
+                }
+                
+                // HACK
+                if(resource.getStatus().equals(Status.REDIRECTION_SEE_OTHER) || resource.getStatus().isSuccess())
+                {
+                    this.currentCookies = resource.getCookieSettings();
+                }
+                
+                this.log.info("cookies: {}", this.currentCookies);
+                
+                return !this.currentCookies.isEmpty();
+            }
+            catch(final Throwable e)
+            {
+                this.currentCookies.clear();
+                this.log.warn("Error with request", e);
+                throw e;
+            }
+            finally
+            {
+                this.getText(rep);
+            }
+        }
+        finally
+        {
+            this.releaseClient(resource);
+        }
+    }
+    
+    protected boolean logout() throws Exception
+    {
+        this.log.info("cookies: {}", this.currentCookies);
+        
+        final ClientResource resource = new ClientResource(this.getUrl(PoddWebConstants.PATH_LOGOUT));
+        try
+        {
+            // add the cookie settings so that the server knows who to logout
+            resource.getCookies().addAll(this.currentCookies);
+            
+            // TODO: when Cookies natively supported by Client Resource, or another method remove
+            // this
+            // Until then, this is necessary to manually attach the cookies after login to the
+            // redirected address.
+            // GitHub issue for this: https://github.com/restlet/restlet-framework-java/issues/21
+            resource.setFollowingRedirects(false);
+            
+            final Representation rep = resource.get();
+            try
+            {
+                this.currentCookies = resource.getCookieSettings();
+                
+                this.log.info("logout result status: {}", resource.getStatus());
+                
+                if(rep != null)
+                {
+                    // FIXME: Representation.getText may be implemented badly, so avoid calling it
+                    // this.log.info("logout result: {}", rep.getText());
+                }
+                else
+                {
+                    this.log.info("logout result was null");
+                }
+                
+                this.log.info("cookies: {}", this.currentCookies);
+                
+                this.currentCookies.clear();
+                
+                return true;
+            }
+            catch(final Throwable e)
+            {
+                this.currentCookies.clear();
+                this.log.warn("Error with request", e);
+                throw e;
+            }
+            finally
+            {
+                this.getText(rep);
+            }
+        }
+        finally
+        {
+            this.releaseClient(resource);
+        }
+    }
+    
     /**
      * Maps the given User and Role with an optional object URI.
      * 
@@ -801,11 +895,6 @@ public class AbstractResourceImplTest
         }
         
         this.testDir = this.tempDirectory.newFolder(this.getClass().getSimpleName()).toPath();
-    }
-    
-    protected final PoddWebServiceApplication getPoddApplication()
-    {
-        return this.poddApplication;
     }
     
     /**
