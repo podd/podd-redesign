@@ -474,10 +474,8 @@ public class EditArtifactResourceImplTest extends AbstractResourceImplTest
                             TestConstants.TEST_ARTIFACT_FRAGMENT_MODIFY_DEMO_INVESTIGATION,
                             MediaType.APPLICATION_RDF_TURTLE);
             
-            RestletTestUtils
-                    .doTestAuthenticatedRequest(editArtifactClientResource, Method.POST, input,
-                            MediaType.APPLICATION_RDF_TURTLE, Status.SERVER_ERROR_INTERNAL,
-                            AbstractResourceImplTest.WITH_ADMIN);
+            this.doTestAuthenticatedRequest(editArtifactClientResource, Method.POST, input,
+                    MediaType.APPLICATION_RDF_TURTLE, Status.SERVER_ERROR_INTERNAL, AbstractResourceImplTest.WITH_ADMIN);
             Assert.fail("Should have failed when dangling objects were identified");
         }
         catch(final ResourceException e)

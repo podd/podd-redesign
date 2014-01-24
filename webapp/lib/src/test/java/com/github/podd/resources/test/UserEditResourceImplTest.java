@@ -533,6 +533,7 @@ public class UserEditResourceImplTest extends AbstractResourceImplTest
             {
                 userEditClientResource.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, testIdentifier);
                 
+                this.logout();
                 this.doTestAuthenticatedRequest(userEditClientResource, Method.POST, input, mediaType,
                         Status.CLIENT_ERROR_UNAUTHORIZED, AbstractResourceImplTest.NO_ADMIN);
                 Assert.fail("Should have thrown a ResourceException due to lack of authorization");

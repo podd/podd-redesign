@@ -437,10 +437,8 @@ public class DataReferenceAttachResourceImplTest extends AbstractResourceImplTes
             fileRefAttachClientResource.addQueryParameter(PoddWebConstants.KEY_VERIFICATION_POLICY,
                     Boolean.toString(true));
             
-            RestletTestUtils
-                    .doTestAuthenticatedRequest(fileRefAttachClientResource, Method.POST, input,
-                            MediaType.APPLICATION_RDF_XML, Status.CLIENT_ERROR_BAD_REQUEST,
-                            AbstractResourceImplTest.WITH_ADMIN);
+            this.doTestAuthenticatedRequest(fileRefAttachClientResource, Method.POST, input,
+                    MediaType.APPLICATION_RDF_XML, Status.CLIENT_ERROR_BAD_REQUEST, AbstractResourceImplTest.WITH_ADMIN);
             Assert.fail("Should have thrown a ResourceException");
         }
         catch(final ResourceException e)
@@ -552,10 +550,8 @@ public class DataReferenceAttachResourceImplTest extends AbstractResourceImplTes
             fileRefAttachClientResource.addQueryParameter(PoddWebConstants.KEY_VERIFICATION_POLICY,
                     Boolean.toString(true));
             
-            RestletTestUtils
-                    .doTestAuthenticatedRequest(fileRefAttachClientResource, Method.POST, input,
-                            MediaType.APPLICATION_RDF_XML, Status.CLIENT_ERROR_BAD_REQUEST,
-                            AbstractResourceImplTest.WITH_ADMIN);
+            this.doTestAuthenticatedRequest(fileRefAttachClientResource, Method.POST, input,
+                    MediaType.APPLICATION_RDF_XML, Status.CLIENT_ERROR_BAD_REQUEST, AbstractResourceImplTest.WITH_ADMIN);
             Assert.fail("Should have thrown a ResourceException");
         }
         catch(final ResourceException e)

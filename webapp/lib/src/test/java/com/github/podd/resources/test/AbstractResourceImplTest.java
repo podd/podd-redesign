@@ -292,52 +292,59 @@ public class AbstractResourceImplTest
             final Representation inputRepresentation, final MediaType requestMediaType,
             final Status expectedResponseStatus, final boolean requiresAdminPrivileges) throws Exception
     {
-        if(!this.isLoggedIn())
+        try
         {
-            if(requiresAdminPrivileges)
+            if(!this.isLoggedIn())
             {
-                if(!this.login(RestletTestUtils.TEST_ADMIN_USERNAME, RestletTestUtils.TEST_ADMIN_PASSWORD))
+                if(requiresAdminPrivileges)
                 {
-                    Assert.fail("Failed to login as admin");
+                    if(!this.login(RestletTestUtils.TEST_ADMIN_USERNAME, RestletTestUtils.TEST_ADMIN_PASSWORD))
+                    {
+                        Assert.fail("Failed to login as admin");
+                    }
                 }
+                else
+                {
+                    if(!this.login(RestletTestUtils.TEST_USERNAME, RestletTestUtils.TEST_PASSWORD))
+                    {
+                        Assert.fail("Failed to login as normal user");
+                    }
+                }
+            }
+            
+            Representation result = null;
+            
+            clientResource.getCookies().addAll(this.currentCookies);
+            
+            if(requestMethod.equals(Method.DELETE))
+            {
+                result = clientResource.delete(requestMediaType);
+            }
+            else if(requestMethod.equals(Method.PUT))
+            {
+                result = clientResource.put(inputRepresentation, requestMediaType);
+            }
+            else if(requestMethod.equals(Method.GET))
+            {
+                result = clientResource.get(requestMediaType);
+            }
+            else if(requestMethod.equals(Method.POST))
+            {
+                result = clientResource.post(inputRepresentation, requestMediaType);
             }
             else
             {
-                if(!this.login(RestletTestUtils.TEST_USERNAME, RestletTestUtils.TEST_PASSWORD))
-                {
-                    Assert.fail("Failed to login as normal user");
-                }
+                throw new RuntimeException("Did not recognise request method: " + requestMethod.toString());
             }
+            
+            Assert.assertEquals(expectedResponseStatus.getCode(), clientResource.getResponse().getStatus().getCode());
+            
+            return result;
         }
-        
-        Representation result = null;
-        
-        clientResource.getCookies().addAll(this.currentCookies);
-        
-        if(requestMethod.equals(Method.DELETE))
+        finally
         {
-            result = clientResource.delete(requestMediaType);
+            this.logout();
         }
-        else if(requestMethod.equals(Method.PUT))
-        {
-            result = clientResource.put(inputRepresentation, requestMediaType);
-        }
-        else if(requestMethod.equals(Method.GET))
-        {
-            result = clientResource.get(requestMediaType);
-        }
-        else if(requestMethod.equals(Method.POST))
-        {
-            result = clientResource.post(inputRepresentation, requestMediaType);
-        }
-        else
-        {
-            throw new RuntimeException("Did not recognise request method: " + requestMethod.toString());
-        }
-        
-        Assert.assertEquals(expectedResponseStatus.getCode(), clientResource.getResponse().getStatus().getCode());
-        
-        return result;
     }
     
     /**
@@ -542,6 +549,8 @@ public class AbstractResourceImplTest
         finally
         {
             this.releaseClient(uploadArtifactClientResource);
+            
+            this.logout();
         }
     }
     
@@ -705,10 +714,18 @@ public class AbstractResourceImplTest
                 {
                     this.currentCookies = resource.getCookieSettings();
                 }
+                else
+                {
+                    this.log.error("Found unrecognised status after login: {}", resource.getStatus());
+                }
                 
                 this.log.info("cookies: {}", this.currentCookies);
                 
-                return !this.currentCookies.isEmpty();
+                boolean result = !this.currentCookies.isEmpty();
+                
+                this.log.info("Logged in=" + result);
+                
+                return result;
             }
             catch(final Throwable e)
             {

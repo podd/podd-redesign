@@ -80,6 +80,7 @@ public class UserPasswordResourceImplTest extends AbstractResourceImplTest
             Assert.assertEquals("Unexpected user identifier", testIdentifier,
                     model.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).objectString());
             
+            
             // verify: request with old login details should fail
             final ClientResource userDetailsClientResource2 =
                     new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_DETAILS));
