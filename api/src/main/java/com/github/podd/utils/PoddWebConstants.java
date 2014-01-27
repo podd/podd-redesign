@@ -16,6 +16,8 @@
  */
 package com.github.podd.utils;
 
+import javax.crypto.Cipher;
+
 /**
  * @author kutila
  * 
@@ -27,6 +29,22 @@ public interface PoddWebConstants
     public static final String PROPERTY_COOKIE_NAME = "podd.cookiename";
     
     public static final String DEF_COOKIE_NAME = "PODDAuthentication";
+    
+    /**
+     * An algorithm accessible using {@link Cipher#getInstance(String)} that is used to encrypt the
+     * cookie.
+     */
+    public static final String PROPERTY_COOKIE_ENCRYPTION_ALGORITHM = "podd.cookie.encryption.algorithm";
+    
+    public static final String DEF_COOKIE_ENCRYPTION_ALGORITHM = "AES";
+    
+    /**
+     * The key to be used for the algorithm defined by {@link #PROPERTY_COOKIE_ENCRYPTION_ALGORITHM}
+     * to encrypt the cookie.
+     */
+    public static final String PROPERTY_COOKIE_ENCRYPTION_KEY = "podd.cookie.encryption.key";
+    
+    public static final String DEF_COOKIE_ENCRYPTION_KEY = "s3cr3t2345667123";
     
     /**
      * Property for freemarker template used as the base for rendering all HTML pages

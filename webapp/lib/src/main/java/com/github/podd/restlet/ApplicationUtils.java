@@ -156,43 +156,45 @@ public class ApplicationUtils
         {
             ApplicationUtils.log.info("Using cookie authenticator");
             
-            // FIXME: Stub implementation
-            final byte[] secretKey = "s3cr3t2345667123".getBytes(StandardCharsets.UTF_8);
+            final byte[] encryptionKey =
+                    props.get(PoddWebConstants.PROPERTY_COOKIE_ENCRYPTION_KEY,
+                            PoddWebConstants.DEF_COOKIE_ENCRYPTION_KEY).getBytes(StandardCharsets.UTF_8);
             
-            result = new FixedRedirectCookieAuthenticator(newChildContext, nextRealm.getName(), secretKey);
+            FixedRedirectCookieAuthenticator auth =
+                    new FixedRedirectCookieAuthenticator(newChildContext, nextRealm.getName(), encryptionKey);
+            
+            auth.setEncryptAlgorithm(props.get(PoddWebConstants.PROPERTY_COOKIE_ENCRYPTION_ALGORITHM,
+                    PoddWebConstants.DEF_COOKIE_ENCRYPTION_ALGORITHM));
             
             // The submit path is the path that the form on the login page is actually submitted to
-            ((FixedRedirectCookieAuthenticator)result).setLoginPath(props.get(
-                    PoddWebConstants.PROPERTY_PATH_LOGIN_SUBMIT, PoddWebConstants.DEF_PATH_LOGIN_SUBMIT));
-            ((FixedRedirectCookieAuthenticator)result).setLogoutPath(props.get(PoddWebConstants.PROPERTY_PATH_LOGOUT,
-                    PoddWebConstants.DEF_PATH_LOGOUT));
+            auth.setLoginPath(props.get(PoddWebConstants.PROPERTY_PATH_LOGIN_SUBMIT,
+                    PoddWebConstants.DEF_PATH_LOGIN_SUBMIT));
+            auth.setLogoutPath(props.get(PoddWebConstants.PROPERTY_PATH_LOGOUT, PoddWebConstants.DEF_PATH_LOGOUT));
             
-            // FIXME: Make this configurable
-            ((FixedRedirectCookieAuthenticator)result).setCookieName(props.get(PoddWebConstants.PROPERTY_COOKIE_NAME,
-                    PoddWebConstants.DEF_COOKIE_NAME));
-            // FIXME: Make this configurable
-            ((FixedRedirectCookieAuthenticator)result).setIdentifierFormName(props.get(
-                    PoddWebConstants.PROPERTY_LOGIN_FIELD_USERNAME, PoddWebConstants.DEF_LOGIN_FIELD_USERNAME));
-            // FIXME: Make this configurable
-            ((FixedRedirectCookieAuthenticator)result).setSecretFormName(props.get(
-                    PoddWebConstants.PROPERTY_LOGIN_FIELD_PASSWORD, PoddWebConstants.DEF_LOGIN_FIELD_PASSWORD));
-            ((FixedRedirectCookieAuthenticator)result).setFixedRedirectUri(props.get(
-                    PoddWebConstants.PROPERTY_PATH_REDIRECT_LOGGED_IN, PoddWebConstants.DEF_PATH_REDIRECT_LOGGED_IN));
+            auth.setCookieName(props.get(PoddWebConstants.PROPERTY_COOKIE_NAME, PoddWebConstants.DEF_COOKIE_NAME));
+            auth.setIdentifierFormName(props.get(PoddWebConstants.PROPERTY_LOGIN_FIELD_USERNAME,
+                    PoddWebConstants.DEF_LOGIN_FIELD_USERNAME));
+            auth.setSecretFormName(props.get(PoddWebConstants.PROPERTY_LOGIN_FIELD_PASSWORD,
+                    PoddWebConstants.DEF_LOGIN_FIELD_PASSWORD));
+            auth.setFixedRedirectUri(props.get(PoddWebConstants.PROPERTY_PATH_REDIRECT_LOGGED_IN,
+                    PoddWebConstants.DEF_PATH_REDIRECT_LOGGED_IN));
             
             // Authenticator must be intercepting login and logout requests
-            ((FixedRedirectCookieAuthenticator)result).setInterceptingLogin(true);
-            ((FixedRedirectCookieAuthenticator)result).setInterceptingLogout(true);
+            auth.setInterceptingLogin(true);
+            auth.setInterceptingLogout(true);
             
-            result.setMultiAuthenticating(false);
+            auth.setMultiAuthenticating(false);
             
             // These are the two independent links between the authenticator and the realm
-            result.setVerifier(nextRealm.getVerifier());
-            result.setEnroler(nextRealm.getEnroler());
+            auth.setVerifier(nextRealm.getVerifier());
+            auth.setEnroler(nextRealm.getEnroler());
             
             // Authentication must be optional to allow unauthenticated resource access, to display
             // the login page and for public access. We still fail if authentication fails in
             // authenticated resources.
-            result.setOptional(true);
+            auth.setOptional(true);
+            
+            result = auth;
         }
         else
         {
