@@ -145,13 +145,12 @@ public class ApplicationUtils
     }
     
     public static ChallengeAuthenticator getNewAuthenticator(final Realm nextRealm, final Context newChildContext,
-            final PropertyUtil propertyUtil)
+            final PropertyUtil props)
     {
         ChallengeAuthenticator result = null;
         
         final String authMethod =
-                propertyUtil.get(PoddWebConstants.PROPERTY_CHALLENGE_AUTH_METHOD,
-                        PoddWebConstants.DEF_CHALLENGE_AUTH_METHOD);
+                props.get(PoddWebConstants.PROPERTY_CHALLENGE_AUTH_METHOD, PoddWebConstants.DEF_CHALLENGE_AUTH_METHOD);
         
         if(authMethod.equalsIgnoreCase("cookie"))
         {
@@ -162,25 +161,38 @@ public class ApplicationUtils
             
             result = new FixedRedirectCookieAuthenticator(newChildContext, nextRealm.getName(), secretKey);
             
-            ((FixedRedirectCookieAuthenticator)result).setLoginPath(PoddWebConstants.PATH_LOGIN_SUBMIT);
-            ((FixedRedirectCookieAuthenticator)result).setLogoutPath(PoddWebConstants.PATH_LOGOUT);
+            // The submit path is the path that the form on the login page is actually submitted to
+            ((FixedRedirectCookieAuthenticator)result).setLoginPath(props.get(
+                    PoddWebConstants.PROPERTY_PATH_LOGIN_SUBMIT, PoddWebConstants.DEF_PATH_LOGIN_SUBMIT));
+            ((FixedRedirectCookieAuthenticator)result).setLogoutPath(props.get(PoddWebConstants.PROPERTY_PATH_LOGOUT,
+                    PoddWebConstants.DEF_PATH_LOGOUT));
             
             // FIXME: Make this configurable
-            ((FixedRedirectCookieAuthenticator)result).setCookieName(PoddWebConstants.COOKIE_NAME);
+            ((FixedRedirectCookieAuthenticator)result).setCookieName(props.get(PoddWebConstants.PROPERTY_COOKIE_NAME,
+                    PoddWebConstants.DEF_COOKIE_NAME));
             // FIXME: Make this configurable
-            ((FixedRedirectCookieAuthenticator)result).setIdentifierFormName("username");
+            ((FixedRedirectCookieAuthenticator)result).setIdentifierFormName(props.get(
+                    PoddWebConstants.PROPERTY_LOGIN_FIELD_USERNAME, PoddWebConstants.DEF_LOGIN_FIELD_USERNAME));
             // FIXME: Make this configurable
-            ((FixedRedirectCookieAuthenticator)result).setSecretFormName("password");
+            ((FixedRedirectCookieAuthenticator)result).setSecretFormName(props.get(
+                    PoddWebConstants.PROPERTY_LOGIN_FIELD_PASSWORD, PoddWebConstants.DEF_LOGIN_FIELD_PASSWORD));
+            ((FixedRedirectCookieAuthenticator)result).setFixedRedirectUri(props.get(
+                    PoddWebConstants.PROPERTY_PATH_REDIRECT_LOGGED_IN, PoddWebConstants.DEF_PATH_REDIRECT_LOGGED_IN));
+            
+            // Authenticator must be intercepting login and logout requests
             ((FixedRedirectCookieAuthenticator)result).setInterceptingLogin(true);
             ((FixedRedirectCookieAuthenticator)result).setInterceptingLogout(true);
-            ((FixedRedirectCookieAuthenticator)result).setFixedRedirectUri(PoddWebConstants.PATH_REDIRECT_LOGGED_IN);
             
             result.setMultiAuthenticating(false);
             
+            // These are the two independent links between the authenticator and the realm
             result.setVerifier(nextRealm.getVerifier());
             result.setEnroler(nextRealm.getEnroler());
-            result.setOptional(true);
             
+            // Authentication must be optional to allow unauthenticated resource access, to display
+            // the login page and for public access. We still fail if authentication fails in
+            // authenticated resources.
+            result.setOptional(true);
         }
         else
         {

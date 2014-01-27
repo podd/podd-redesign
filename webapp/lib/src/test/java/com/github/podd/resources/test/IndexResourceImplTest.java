@@ -44,7 +44,7 @@ public class IndexResourceImplTest extends AbstractResourceImplTest
         try
         {
             final Representation results =
-                    PoddRestletTestUtils.doTestUnAuthenticatedRequest(indexClientResource, Method.GET, null,
+                    PoddRestletTestUtils.doTestUnauthenticatedRequest(indexClientResource, Method.GET, null,
                             MediaType.TEXT_HTML, Status.SUCCESS_OK);
             
             final String body = this.getText(results);

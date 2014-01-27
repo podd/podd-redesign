@@ -22,10 +22,11 @@ package com.github.podd.utils;
  */
 public interface PoddWebConstants
 {
-    // public static final String DEF_CHALLENGE_AUTH_METHOD = "digest";
     public static final String DEF_CHALLENGE_AUTH_METHOD = "cookie";
     
-    public static final String COOKIE_NAME = "PODDAuthentication";
+    public static final String PROPERTY_COOKIE_NAME = "podd.cookiename";
+    
+    public static final String DEF_COOKIE_NAME = "PODDAuthentication";
     
     /**
      * Property for freemarker template used as the base for rendering all HTML pages
@@ -50,19 +51,40 @@ public interface PoddWebConstants
     public static final String PATH_LOGIN_FORM = "loginpage";
     
     /**
-     * Path to submit login details
+     * Property defining the path to submit login details
      */
-    public static final String PATH_LOGIN_SUBMIT = "login";
+    public static final String PROPERTY_PATH_LOGIN_SUBMIT = "podd.path.loginsubmit";
     
     /**
-     * Path to logout from PODD
+     * Default Path to submit login details
+     * 
+     * Default: "login"
      */
-    public static final String PATH_LOGOUT = "logout";
+    public static final String DEF_PATH_LOGIN_SUBMIT = "login";
     
     /**
-     * Path to redirect user on successful login
+     * Property defining the path to logout from PODD
      */
-    public static final String PATH_REDIRECT_LOGGED_IN = "";
+    public static final String PROPERTY_PATH_LOGOUT = "podd.path.logout";
+    
+    /**
+     * Default Path to logout from PODD
+     * 
+     * Default: "logout"
+     */
+    public static final String DEF_PATH_LOGOUT = "logout";
+    
+    /**
+     * Property defining the Path to redirect user on successful login.
+     */
+    public static final String PROPERTY_PATH_REDIRECT_LOGGED_IN = "";
+    
+    /**
+     * Default Path to redirect user on successful login
+     * 
+     * Default: ""
+     */
+    public static final String DEF_PATH_REDIRECT_LOGGED_IN = "";
     
     /**
      * Path to "about" page
@@ -235,6 +257,7 @@ public interface PoddWebConstants
     public static final String KEY_HELP_PAGE_IDENTIFIER = "helppage";
     
     public static final String PROPERTY_CHALLENGE_AUTH_METHOD = "podd.webservice.auth.challenge.method";
+    
     public static final String PROPERTY_TEST_WEBSERVICE_RESET_KEY = "podd.webservice.reset.key";
     
     public static final String PROPERTY_PURL_PREFIX = "podd.purl.prefix";
@@ -356,5 +379,13 @@ public interface PoddWebConstants
     public static final String KEY_SPARQLQUERY = "query";
     
     public static final String PATH_SPARQL = "sparql";
+    
+    public static final String PROPERTY_LOGIN_FIELD_USERNAME = "podd.login.field.username";
+    
+    public static final String DEF_LOGIN_FIELD_USERNAME = "username";
+    
+    public static final String PROPERTY_LOGIN_FIELD_PASSWORD = "podd.login.field.password";
+    
+    public static final String DEF_LOGIN_FIELD_PASSWORD = "password";
     
 }

@@ -47,7 +47,6 @@ import org.junit.rules.TemporaryFolder;
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.Model;
 import org.openrdf.model.Resource;
-import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.openrdf.model.ValueFactory;
 import org.openrdf.model.impl.LinkedHashModel;
@@ -60,11 +59,7 @@ import org.openrdf.rio.UnsupportedRDFormatException;
 import org.restlet.Client;
 import org.restlet.Component;
 import org.restlet.Context;
-import org.restlet.Response;
 import org.restlet.Server;
-import org.restlet.data.ChallengeRequest;
-import org.restlet.data.ChallengeResponse;
-import org.restlet.data.ChallengeScheme;
 import org.restlet.data.CharacterSet;
 import org.restlet.data.CookieSetting;
 import org.restlet.data.Form;
@@ -293,13 +288,15 @@ public class AbstractResourceImplTest
     {
         if(requiresAdminPrivileges)
         {
-            return doTestAuthenticatedRequest(clientResource, requestMethod, inputRepresentation, requestMediaType,
-                    expectedResponseStatus, RestletTestUtils.TEST_ADMIN_USERNAME, RestletTestUtils.TEST_ADMIN_PASSWORD);
+            return this.doTestAuthenticatedRequest(clientResource, requestMethod, inputRepresentation,
+                    requestMediaType, expectedResponseStatus, RestletTestUtils.TEST_ADMIN_USERNAME,
+                    RestletTestUtils.TEST_ADMIN_PASSWORD);
         }
         else
         {
-            return doTestAuthenticatedRequest(clientResource, requestMethod, inputRepresentation, requestMediaType,
-                    expectedResponseStatus, RestletTestUtils.TEST_USERNAME, RestletTestUtils.TEST_PASSWORD);
+            return this.doTestAuthenticatedRequest(clientResource, requestMethod, inputRepresentation,
+                    requestMediaType, expectedResponseStatus, RestletTestUtils.TEST_USERNAME,
+                    RestletTestUtils.TEST_PASSWORD);
         }
     }
     
@@ -307,7 +304,7 @@ public class AbstractResourceImplTest
             final Representation inputRepresentation, final MediaType requestMediaType,
             final Status expectedResponseStatus, final String username, final char[] password) throws Exception
     {
-        Series<CookieSetting> currentCookies = new Series<CookieSetting>(CookieSetting.class);
+        final Series<CookieSetting> currentCookies = new Series<CookieSetting>(CookieSetting.class);
         
         if(!this.login(username, password, currentCookies))
         {
@@ -461,7 +458,7 @@ public class AbstractResourceImplTest
         final StringWriter result = new StringWriter();
         try
         {
-            InputStream stream = representation.getStream();
+            final InputStream stream = representation.getStream();
             if(stream != null)
             {
                 IOUtils.copy(stream, result, StandardCharsets.UTF_8);
@@ -675,7 +672,7 @@ public class AbstractResourceImplTest
     protected boolean login(final String username, final char[] testAdminPassword,
             final Series<CookieSetting> currentCookies) throws Exception
     {
-        final ClientResource resource = new ClientResource(this.getUrl(PoddWebConstants.PATH_LOGIN_SUBMIT));
+        final ClientResource resource = new ClientResource(this.getUrl(PoddWebConstants.DEF_PATH_LOGIN_SUBMIT));
         
         try
         {
@@ -720,7 +717,7 @@ public class AbstractResourceImplTest
                 
                 this.log.info("cookies: {}", currentCookies);
                 
-                boolean result = !currentCookies.isEmpty();
+                final boolean result = !currentCookies.isEmpty();
                 
                 this.log.info("Logged in=" + result);
                 
@@ -747,7 +744,7 @@ public class AbstractResourceImplTest
     {
         this.log.info("cookies: {}", currentCookies);
         
-        final ClientResource resource = new ClientResource(this.getUrl(PoddWebConstants.PATH_LOGOUT));
+        final ClientResource resource = new ClientResource(this.getUrl(PoddWebConstants.DEF_PATH_LOGOUT));
         try
         {
             // add the cookie settings so that the server knows who to logout

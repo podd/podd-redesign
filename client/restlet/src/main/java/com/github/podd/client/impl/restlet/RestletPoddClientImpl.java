@@ -681,7 +681,7 @@ public class RestletPoddClientImpl implements PoddClient
     @Override
     public boolean login(final String username, final String password) throws PoddClientException
     {
-        final ClientResource resource = new ClientResource(this.getUrl(PoddWebConstants.PATH_LOGIN_SUBMIT));
+        final ClientResource resource = new ClientResource(this.getUrl(PoddWebConstants.DEF_PATH_LOGIN_SUBMIT));
         resource.getCookies().addAll(this.currentCookies);
         
         // TODO: when Cookies natively supported by Client Resource, or another method remove this
@@ -737,7 +737,7 @@ public class RestletPoddClientImpl implements PoddClient
     {
         this.log.info("cookies: {}", this.currentCookies);
         
-        final ClientResource resource = new ClientResource(this.getUrl(PoddWebConstants.PATH_LOGOUT));
+        final ClientResource resource = new ClientResource(this.getUrl(PoddWebConstants.DEF_PATH_LOGOUT));
         // add the cookie settings so that the server knows who to logout
         resource.getCookies().addAll(this.currentCookies);
         

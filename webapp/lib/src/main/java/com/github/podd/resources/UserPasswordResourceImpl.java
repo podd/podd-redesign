@@ -103,7 +103,7 @@ public class UserPasswordResourceImpl extends AbstractUserResourceImpl
         
         // update sesame Realm with new password
         final String newPassword = model.filter(null, SesameRealmConstants.OAS_USERSECRET, null).objectString();
-        //this.log.info("[DEBUG] new password is [{}]", newPassword);
+        // this.log.info("[DEBUG] new password is [{}]", newPassword);
         changePwdUser.setSecret(newPassword.toCharArray());
         
         return nextRealm.updateUser(changePwdUser);
@@ -162,8 +162,10 @@ public class UserPasswordResourceImpl extends AbstractUserResourceImpl
         // - set Credentials Cookie to expire so that User has to login again
         if(changeOwnPassword)
         {
-            final CookieSetting credentialsCookie =
-                    this.getResponse().getCookieSettings().getFirst(PoddWebConstants.COOKIE_NAME);
+            String cookieName =
+                    this.getPoddApplication().getPropertyUtil()
+                            .get(PoddWebConstants.PROPERTY_COOKIE_NAME, PoddWebConstants.DEF_COOKIE_NAME);
+            final CookieSetting credentialsCookie = this.getResponse().getCookieSettings().getFirst(cookieName);
             if(credentialsCookie != null)
             {
                 credentialsCookie.setMaxAge(0);
@@ -239,9 +241,8 @@ public class UserPasswordResourceImpl extends AbstractUserResourceImpl
             dataModel.put("repositoryRoleList", roles);
         }
         
-        // Output the base template, with contentTemplate from the dataModel
-        // defining the
-        // template to use for the content in the body of the page
+        // Output the base template, with contentTemplate from the dataModel defining the template
+        // to use for the content in the body of the page
         return RestletUtils.getHtmlRepresentation(
                 this.getPoddApplication().getPropertyUtil()
                         .get(PoddWebConstants.PROPERTY_TEMPLATE_BASE, PoddWebConstants.DEFAULT_TEMPLATE_BASE),

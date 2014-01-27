@@ -36,7 +36,7 @@ public class PoddRestletTestUtils extends RestletTestUtils
 {
     private static final Logger log = LoggerFactory.getLogger(PoddRestletTestUtils.class);
     
-    public static Representation doTestUnAuthenticatedRequest(final ClientResource clientResource,
+    public static Representation doTestUnauthenticatedRequest(final ClientResource clientResource,
             final Method requestMethod, final Object inputRepresentation, final MediaType requestMediaType,
             final Status expectedResponseStatus)
     {

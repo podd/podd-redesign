@@ -60,39 +60,11 @@ public class AboutResourceImplTest extends AbstractResourceImplTest
         final ClientResource aboutClientResource = new ClientResource(this.getUrl(PoddWebConstants.PATH_ABOUT));
         
         final Representation results =
-                PoddRestletTestUtils.doTestUnAuthenticatedRequest(aboutClientResource, Method.GET, null,
+                PoddRestletTestUtils.doTestUnauthenticatedRequest(aboutClientResource, Method.GET, null,
                         MediaType.TEXT_HTML, Status.SUCCESS_OK);
         
         final String body = this.getText(results);
         this.assertFreemarker(body);
         Assert.assertTrue(body.contains("The University of Queensland"));
     }
-    
-    /**
-     * Tests that no error occurs when trying to get the get user resource while authenticated with
-     * the admin role.
-     * 
-     * Login page cannot be tested using this approach as in the unit test environment, the server
-     * uses DIGEST authentication.
-     * 
-     */
-    @Ignore
-    @Test
-    public void testGetUserBasicAuthorised() throws Exception
-    {
-        final ClientResource creationClientResource =
-                new ClientResource(this.getUrl(PoddWebConstants.PATH_LOGIN_SUBMIT));
-        
-        final FormDataSet form = new FormDataSet();
-        form.setMultipart(false);
-        form.setMediaType(MediaType.APPLICATION_WWW_FORM);
-        form.getEntries().add(new FormData("username", "testAdminUser"));
-        form.getEntries().add(new FormData("password", "testAdminPassword"));
-        
-        final Representation results =
-                this.doTestAuthenticatedRequest(creationClientResource, Method.POST, form, MediaType.TEXT_HTML,
-                        Status.SUCCESS_OK, AbstractResourceImplTest.NO_ADMIN);
-        
-    }
-    
 }
