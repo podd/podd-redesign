@@ -149,42 +149,11 @@ public class ApplicationUtils
     {
         ChallengeAuthenticator result = null;
         
-        // FIXME: read from a property
         final String authMethod =
                 propertyUtil.get(PoddWebConstants.PROPERTY_CHALLENGE_AUTH_METHOD,
                         PoddWebConstants.DEF_CHALLENGE_AUTH_METHOD);
         
-        if(authMethod.equalsIgnoreCase("digest"))
-        {
-            ApplicationUtils.log.info("Using digest authenticator");
-            // FIXME: Stub implementation
-            result = new DigestAuthenticator(newChildContext, nextRealm.getName(), "s3cret");
-            
-            if(nextRealm.getVerifier() instanceof DigestVerifier)
-            {
-                // NOTE: The verifier in this case must support digest
-                // verification by being an
-                // instance of DigestVerifier
-                result.setVerifier(nextRealm.getVerifier());
-            }
-            else if(nextRealm.getVerifier() instanceof LocalVerifier)
-            {
-                // else we need to map the verifier in
-                ((DigestAuthenticator)result).setWrappedVerifier((LocalVerifier)nextRealm.getVerifier());
-            }
-            else
-            {
-                throw new RuntimeException("Verifier was not valid for use with DigestAuthenticator verifier="
-                        + nextRealm.getVerifier().toString());
-            }
-            
-            result.setEnroler(nextRealm.getEnroler());
-            
-            result.setOptional(true);
-            // Boolean.valueOf(PropertyUtil.getProperty(OasProperties.PROPERTY_CHALLENGE_AUTH_OPTIONAL,
-            // OasProperties.DEFAULT_CHALLENGE_AUTH_OPTIONAL)));
-        }
-        else if(authMethod.equalsIgnoreCase("cookie"))
+        if(authMethod.equalsIgnoreCase("cookie"))
         {
             ApplicationUtils.log.info("Using cookie authenticator");
             
@@ -212,12 +181,6 @@ public class ApplicationUtils
             result.setEnroler(nextRealm.getEnroler());
             result.setOptional(true);
             
-        }
-        else if(authMethod.equalsIgnoreCase("http"))
-        {
-            // FIXME: Implement a stub here
-            ApplicationUtils.log.error("FIXME: Implement HTTP ChallengeAuthenticator authMethod={}", authMethod);
-            throw new RuntimeException("FIXME: Implement HTTP ChallengeAuthenticator");
         }
         else
         {
