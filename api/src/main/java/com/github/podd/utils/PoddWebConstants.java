@@ -95,7 +95,7 @@ public interface PoddWebConstants
     /**
      * Property defining the Path to redirect user on successful login.
      */
-    public static final String PROPERTY_PATH_REDIRECT_LOGGED_IN = "";
+    public static final String PROPERTY_PATH_REDIRECT_LOGGED_IN = "podd.path.redirect.onlogin";
     
     /**
      * Default Path to redirect user on successful login
