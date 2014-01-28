@@ -21,7 +21,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import org.kohsuke.MetaInfServices;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,7 +37,8 @@ import com.github.podd.exception.PoddRuntimeException;
  * @author kutila
  * 
  */
-@MetaInfServices(PoddPurlProcessorFactory.class)
+//Not using this as it doesn't work well with M2E in Eclipse
+//@MetaInfServices(PoddPurlProcessorFactory.class)
 public class UUIDPurlProcessorFactoryImpl implements PoddPurlProcessorFactory
 {
     protected final Logger log = LoggerFactory.getLogger(this.getClass());

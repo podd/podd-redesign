@@ -18,7 +18,6 @@ package com.github.podd.impl.data;
 
 import java.util.Set;
 
-import org.kohsuke.MetaInfServices;
 import org.openrdf.model.Model;
 import org.openrdf.model.Resource;
 import org.openrdf.model.URI;
@@ -36,7 +35,8 @@ import com.github.podd.utils.PODD;
  * @author Peter Ansell p_ansell@yahoo.com
  * 
  */
-@MetaInfServices(PoddDataRepositoryFactory.class)
+//Not using this as it doesn't work well with M2E in Eclipse
+//@MetaInfServices(PoddDataRepositoryFactory.class)
 public class SSHFileRepositoryImplFactory implements PoddDataRepositoryFactory
 {
     @Override

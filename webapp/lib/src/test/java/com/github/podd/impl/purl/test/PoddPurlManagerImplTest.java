@@ -50,6 +50,7 @@ public class PoddPurlManagerImplTest extends AbstractPoddPurlManagerTest
         final PoddPurlProcessorFactoryRegistry registry = new PoddPurlProcessorFactoryRegistry();
         registry.clear();
         
+        // TODO: Remove the need to manually configure the following
         final UUIDPurlProcessorFactoryImpl uuidPurlProcessorFactory = new UUIDPurlProcessorFactoryImpl();
         uuidPurlProcessorFactory.setPrefix(this.purlPrefix);
         registry.add(uuidPurlProcessorFactory);
