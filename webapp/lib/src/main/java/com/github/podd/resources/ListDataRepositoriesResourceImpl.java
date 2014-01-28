@@ -37,8 +37,8 @@ import org.restlet.representation.Variant;
 import org.restlet.resource.Get;
 import org.restlet.resource.ResourceException;
 
-import com.github.podd.api.file.PoddDataRepository;
-import com.github.podd.api.file.PoddDataRepositoryManager;
+import com.github.podd.api.data.PoddDataRepository;
+import com.github.podd.api.data.PoddDataRepositoryManager;
 import com.github.podd.exception.PoddException;
 import com.github.podd.restlet.PoddAction;
 import com.github.podd.restlet.RestletUtils;

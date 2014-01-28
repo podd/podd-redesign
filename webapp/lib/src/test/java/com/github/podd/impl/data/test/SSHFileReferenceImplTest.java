@@ -18,7 +18,7 @@ package com.github.podd.impl.data.test;
 
 import com.github.podd.api.data.SSHFileReference;
 import com.github.podd.api.data.test.AbstractSSHFileReferenceTest;
-import com.github.podd.impl.file.SSHFileReferenceImpl;
+import com.github.podd.impl.data.SSHFileReferenceImpl;
 
 /**
  * @author kutila

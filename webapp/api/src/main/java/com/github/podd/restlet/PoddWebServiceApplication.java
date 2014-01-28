@@ -28,8 +28,8 @@ import com.github.ansell.propertyutil.PropertyUtil;
 import com.github.podd.api.PoddArtifactManager;
 import com.github.podd.api.PoddRepositoryManager;
 import com.github.podd.api.PoddSchemaManager;
-import com.github.podd.api.file.PoddDataRepository;
-import com.github.podd.api.file.PoddDataRepositoryManager;
+import com.github.podd.api.data.PoddDataRepository;
+import com.github.podd.api.data.PoddDataRepositoryManager;
 
 import freemarker.template.Configuration;
 

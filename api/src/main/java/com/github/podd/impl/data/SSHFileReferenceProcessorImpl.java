@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU Affero General Public License along with this program.
  * If not, see <http://www.gnu.org/licenses/>.
  */
-package com.github.podd.impl.file;
+package com.github.podd.impl.data;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -31,17 +31,17 @@ import org.semanticweb.owlapi.model.IRI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.github.podd.api.data.SPARQLDataReference;
-import com.github.podd.api.data.SPARQLDataReferenceProcessor;
+import com.github.podd.api.data.SSHFileReference;
+import com.github.podd.api.data.SSHFileReferenceProcessor;
 import com.github.podd.utils.DebugUtils;
 import com.github.podd.utils.PODD;
 
 /**
- * Processor for File References of type <i>http://purl.org/podd/ns/poddBase#SPARQLDataReference</i>
+ * Processor for File References of type <i>http://purl.org/podd/ns/poddBase#SSHFileReference</i>.
  * 
- * @author Peter Ansell p_ansell@yahoo.com
+ * @author kutila
  */
-public class SPARQLDataReferenceProcessorImpl implements SPARQLDataReferenceProcessor
+public class SSHFileReferenceProcessorImpl implements SSHFileReferenceProcessor
 {
     private final Logger log = LoggerFactory.getLogger(this.getClass());
     
@@ -55,7 +55,7 @@ public class SPARQLDataReferenceProcessorImpl implements SPARQLDataReferenceProc
         
         for(final URI fileType : this.getTypes())
         {
-            final Model matchingModels = rdfStatements.filter((Resource)null, RDF.TYPE, fileType);
+            final Model matchingModels = rdfStatements.filter((Resource)null, null, fileType);
             if(!matchingModels.isEmpty())
             {
                 return true;
@@ -66,14 +66,14 @@ public class SPARQLDataReferenceProcessorImpl implements SPARQLDataReferenceProc
     }
     
     @Override
-    public Collection<SPARQLDataReference> createReferences(final Model rdfStatements)
+    public Collection<SSHFileReference> createReferences(final Model rdfStatements)
     {
         if(rdfStatements == null || rdfStatements.isEmpty())
         {
             return null;
         }
         
-        final Set<SPARQLDataReference> results = new HashSet<SPARQLDataReference>();
+        final Set<SSHFileReference> results = new HashSet<SSHFileReference>();
         
         for(final URI fileType : this.getTypes())
         {
@@ -88,7 +88,7 @@ public class SPARQLDataReferenceProcessorImpl implements SPARQLDataReferenceProc
                     DebugUtils.printContents(model);
                 }
                 
-                final SPARQLDataReference fileReference = new SPARQLDataReferenceImpl();
+                final SSHFileReference fileReference = new SSHFileReferenceImpl();
                 
                 // note: artifact ID is not available to us in here and must be added externally
                 
@@ -103,10 +103,16 @@ public class SPARQLDataReferenceProcessorImpl implements SPARQLDataReferenceProc
                     fileReference.setLabel(label.iterator().next().stringValue());
                 }
                 
-                final Set<Value> graph = model.filter(fileRef, PODD.PODD_BASE_HAS_SPARQL_GRAPH, null).objects();
-                if(!graph.isEmpty())
+                final Set<Value> filename = model.filter(fileRef, PODD.PODD_BASE_HAS_FILENAME, null).objects();
+                if(!filename.isEmpty())
                 {
-                    fileReference.setGraph(graph.iterator().next().stringValue());
+                    fileReference.setFilename(filename.iterator().next().stringValue());
+                }
+                
+                final Set<Value> path = model.filter(fileRef, PODD.PODD_BASE_HAS_FILE_PATH, null).objects();
+                if(!path.isEmpty())
+                {
+                    fileReference.setPath(path.iterator().next().stringValue());
                 }
                 
                 final Set<Value> alias = model.filter(fileRef, PODD.PODD_BASE_HAS_ALIAS, null).objects();
@@ -142,7 +148,7 @@ public class SPARQLDataReferenceProcessorImpl implements SPARQLDataReferenceProc
     @Override
     public Set<URI> getTypes()
     {
-        return Collections.singleton(PODD.PODD_BASE_DATA_REFERENCE_TYPE_SPARQL);
+        return Collections.singleton(PODD.PODD_BASE_FILE_REFERENCE_TYPE_SSH);
     }
     
 }

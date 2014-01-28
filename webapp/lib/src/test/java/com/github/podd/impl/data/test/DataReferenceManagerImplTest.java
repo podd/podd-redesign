@@ -16,9 +16,9 @@
  */
 package com.github.podd.impl.data.test;
 
+import com.github.podd.api.data.DataReferenceManager;
 import com.github.podd.api.data.DataReferenceProcessorRegistry;
 import com.github.podd.api.data.test.AbstractDataReferenceManagerTest;
-import com.github.podd.api.file.DataReferenceManager;
 import com.github.podd.impl.data.DataReferenceManagerImpl;
 
 /**

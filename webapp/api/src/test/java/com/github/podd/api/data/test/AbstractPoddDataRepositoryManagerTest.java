@@ -37,8 +37,8 @@ import org.slf4j.LoggerFactory;
 
 import com.github.podd.api.PoddRepositoryManager;
 import com.github.podd.api.data.DataReference;
-import com.github.podd.api.file.PoddDataRepository;
-import com.github.podd.api.file.PoddDataRepositoryManager;
+import com.github.podd.api.data.PoddDataRepository;
+import com.github.podd.api.data.PoddDataRepositoryManager;
 import com.github.podd.api.test.TestConstants;
 import com.github.podd.exception.DataReferenceInvalidException;
 import com.github.podd.exception.DataReferenceVerificationException;

@@ -18,7 +18,7 @@ package com.github.podd.impl.data.test;
 
 import com.github.podd.api.data.SSHFileReferenceProcessor;
 import com.github.podd.api.data.test.AbstractSSHFileReferenceProcessorTest;
-import com.github.podd.impl.file.SSHFileReferenceProcessorImpl;
+import com.github.podd.impl.data.SSHFileReferenceProcessorImpl;
 
 /**
  * 

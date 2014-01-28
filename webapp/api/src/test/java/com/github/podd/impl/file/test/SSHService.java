@@ -77,7 +77,7 @@ import org.slf4j.LoggerFactory;
 
 import com.github.podd.api.data.SSHFileReference;
 import com.github.podd.api.test.TestConstants;
-import com.github.podd.impl.file.SSHFileReferenceImpl;
+import com.github.podd.impl.data.SSHFileReferenceImpl;
 
 /**
  * A simple SSH Service for testing. This is based on the unit tests in the sshj project.

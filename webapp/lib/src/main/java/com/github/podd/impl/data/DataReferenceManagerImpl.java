@@ -36,10 +36,10 @@ import org.slf4j.LoggerFactory;
 
 import com.github.podd.api.PoddProcessorStage;
 import com.github.podd.api.data.DataReference;
+import com.github.podd.api.data.DataReferenceManager;
 import com.github.podd.api.data.DataReferenceProcessor;
 import com.github.podd.api.data.DataReferenceProcessorFactory;
 import com.github.podd.api.data.DataReferenceProcessorRegistry;
-import com.github.podd.api.file.DataReferenceManager;
 import com.github.podd.utils.PoddRdfUtils;
 
 /**

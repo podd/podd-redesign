@@ -14,16 +14,13 @@
  * You should have received a copy of the GNU Affero General Public License along with this program.
  * If not, see <http://www.gnu.org/licenses/>.
  */
-package com.github.podd.api.file;
+package com.github.podd.api.data;
 
 import java.util.Set;
 
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.URI;
 import org.openrdf.repository.RepositoryConnection;
-
-import com.github.podd.api.data.DataReference;
-import com.github.podd.api.data.DataReferenceProcessorRegistry;
 
 /**
  * A manager object used to maintain data references between PODD Artifacts and the various data

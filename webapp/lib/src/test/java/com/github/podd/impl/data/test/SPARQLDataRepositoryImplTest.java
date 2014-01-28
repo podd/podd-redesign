@@ -35,11 +35,11 @@ import org.openrdf.model.ValueFactory;
 import org.openrdf.model.impl.LinkedHashModel;
 import org.openrdf.model.vocabulary.RDF;
 
+import com.github.podd.api.data.PoddDataRepository;
 import com.github.podd.api.data.SPARQLDataReference;
 import com.github.podd.api.data.test.AbstractPoddDataRepositoryTest;
-import com.github.podd.api.file.PoddDataRepository;
+import com.github.podd.impl.data.SPARQLDataReferenceImpl;
 import com.github.podd.impl.data.SPARQLDataRepositoryImpl;
-import com.github.podd.impl.file.SPARQLDataReferenceImpl;
 import com.github.podd.impl.file.test.SSHService;
 import com.github.podd.utils.PODD;
 

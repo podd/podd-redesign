@@ -41,7 +41,7 @@ import com.github.podd.api.data.SPARQLDataReference;
 import com.github.podd.api.data.SPARQLDataReferenceProcessor;
 import com.github.podd.api.test.AbstractPoddRdfProcessorFactoryTest;
 import com.github.podd.api.test.TestConstants;
-import com.github.podd.impl.file.SPARQLDataReferenceProcessorFactoryImpl;
+import com.github.podd.impl.data.SPARQLDataReferenceProcessorFactoryImpl;
 import com.github.podd.utils.PODD;
 import com.github.podd.utils.PoddRdfUtils;
 

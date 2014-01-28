@@ -14,41 +14,55 @@
  * You should have received a copy of the GNU Affero General Public License along with this program.
  * If not, see <http://www.gnu.org/licenses/>.
  */
-package com.github.podd.impl.file;
+package com.github.podd.impl.data;
 
 import org.openrdf.model.Model;
 import org.openrdf.model.vocabulary.RDF;
 
-import com.github.podd.api.data.SPARQLDataReference;
+import com.github.podd.api.data.SSHFileReference;
 import com.github.podd.utils.PODD;
 
 /**
- * A simple implementation of a SPARQL Data Reference object for use within PODD.
+ * A simple implementation of an SSH File Reference object for use within PODD.
  * 
- * @author Peter Ansell p_ansell@yahoo.com
+ * @author kutila
  */
-public class SPARQLDataReferenceImpl extends AbstractDataReferenceImpl implements SPARQLDataReference
+public class SSHFileReferenceImpl extends AbstractDataReferenceImpl implements SSHFileReference
 {
-    private String graph;
+    
+    private String filename;
+    private String path;
     
     /**
      * Constructor
      */
-    public SPARQLDataReferenceImpl()
+    public SSHFileReferenceImpl()
     {
         super();
     }
     
     @Override
-    public String getGraph()
+    public String getFilename()
     {
-        return this.graph;
+        return this.filename;
     }
     
     @Override
-    public void setGraph(final String filename)
+    public String getPath()
     {
-        this.graph = filename;
+        return this.path;
+    }
+    
+    @Override
+    public void setFilename(final String filename)
+    {
+        this.filename = filename;
+    }
+    
+    @Override
+    public void setPath(final String path)
+    {
+        this.path = path;
     }
     
     @Override
@@ -56,12 +70,18 @@ public class SPARQLDataReferenceImpl extends AbstractDataReferenceImpl implement
     {
         final Model result = super.toRDF();
         
-        result.add(this.getObjectIri().toOpenRDFURI(), RDF.TYPE, PODD.PODD_BASE_DATA_REFERENCE_TYPE_SPARQL);
+        result.add(this.getObjectIri().toOpenRDFURI(), RDF.TYPE, PODD.PODD_BASE_FILE_REFERENCE_TYPE_SSH);
         
-        if(this.getGraph() != null)
+        if(this.getFilename() != null)
         {
-            result.add(this.getObjectIri().toOpenRDFURI(), PODD.PODD_BASE_HAS_SPARQL_GRAPH,
-                    PODD.VF.createLiteral(this.getGraph()));
+            result.add(this.getObjectIri().toOpenRDFURI(), PODD.PODD_BASE_HAS_FILENAME,
+                    PODD.VF.createLiteral(this.getFilename()));
+        }
+        
+        if(this.getPath() != null)
+        {
+            result.add(this.getObjectIri().toOpenRDFURI(), PODD.PODD_BASE_HAS_FILE_PATH,
+                    PODD.VF.createLiteral(this.getPath()));
         }
         
         return result;
@@ -80,7 +100,9 @@ public class SPARQLDataReferenceImpl extends AbstractDataReferenceImpl implement
         b.append(" , ");
         b.append(this.getLabel());
         b.append(" , ");
-        b.append(this.getGraph());
+        b.append(this.filename);
+        b.append(" , ");
+        b.append(this.path);
         b.append(" , ");
         b.append(this.getRepositoryAlias());
         b.append("]");

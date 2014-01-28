@@ -24,8 +24,8 @@ import org.openrdf.model.Resource;
 import org.openrdf.model.URI;
 import org.openrdf.model.vocabulary.RDF;
 
-import com.github.podd.api.file.PoddDataRepository;
-import com.github.podd.api.file.PoddDataRepositoryFactory;
+import com.github.podd.api.data.PoddDataRepository;
+import com.github.podd.api.data.PoddDataRepositoryFactory;
 import com.github.podd.exception.DataRepositoryException;
 import com.github.podd.exception.DataRepositoryIncompleteException;
 import com.github.podd.utils.PODD;

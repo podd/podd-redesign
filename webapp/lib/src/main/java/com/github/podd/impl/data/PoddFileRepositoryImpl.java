@@ -29,7 +29,7 @@ import org.openrdf.model.impl.LinkedHashModel;
 import org.openrdf.model.vocabulary.RDF;
 
 import com.github.podd.api.data.DataReference;
-import com.github.podd.api.file.PoddDataRepository;
+import com.github.podd.api.data.PoddDataRepository;
 import com.github.podd.exception.DataRepositoryIncompleteException;
 import com.github.podd.utils.PODD;
 

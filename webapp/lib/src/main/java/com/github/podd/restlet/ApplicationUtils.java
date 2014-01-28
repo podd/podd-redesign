@@ -74,10 +74,8 @@ import com.github.podd.api.PoddArtifactManager;
 import com.github.podd.api.PoddOWLManager;
 import com.github.podd.api.PoddSchemaManager;
 import com.github.podd.api.PoddSesameManager;
-import com.github.podd.api.data.DataReferenceProcessorFactory;
-import com.github.podd.api.data.DataReferenceProcessorRegistry;
-import com.github.podd.api.file.DataReferenceManager;
-import com.github.podd.api.file.PoddDataRepositoryManager;
+import com.github.podd.api.data.DataReferenceManager;
+import com.github.podd.api.data.PoddDataRepositoryManager;
 import com.github.podd.api.purl.PoddPurlManager;
 import com.github.podd.api.purl.PoddPurlProcessorFactory;
 import com.github.podd.api.purl.PoddPurlProcessorFactoryRegistry;
@@ -89,7 +87,6 @@ import com.github.podd.impl.PoddSchemaManagerImpl;
 import com.github.podd.impl.PoddSesameManagerImpl;
 import com.github.podd.impl.data.DataReferenceManagerImpl;
 import com.github.podd.impl.data.PoddFileRepositoryManagerImpl;
-import com.github.podd.impl.file.SSHFileReferenceProcessorFactoryImpl;
 import com.github.podd.impl.purl.PoddPurlManagerImpl;
 import com.github.podd.impl.purl.UUIDPurlProcessorFactoryImpl;
 import com.github.podd.utils.DebugUtils;
@@ -321,17 +318,8 @@ public class ApplicationUtils
                 repositoryImplConfig, props.get(PoddWebConstants.PROPERTY_PERMANENT_SESAME_REPOSITORY_SERVER,
                         PoddWebConstants.DEFAULT_PERMANENT_SESAME_REPOSITORY_SERVER), poddHomePath, props));
         
-        // File Reference manager
-        final DataReferenceProcessorRegistry nextFileRegistry = new DataReferenceProcessorRegistry();
-        // FIXME: This clears any automatically added entries that come from META-INF/services
-        // entries on the classpath
-        nextFileRegistry.clear();
-        final DataReferenceProcessorFactory nextFileProcessorFactory = new SSHFileReferenceProcessorFactoryImpl();
-        nextFileRegistry.add(nextFileProcessorFactory);
-        
         // File Reference Manager
         final DataReferenceManager nextDataReferenceManager = new DataReferenceManagerImpl();
-        nextDataReferenceManager.setDataProcessorRegistry(nextFileRegistry);
         
         // TODO: Use the automatically loaded registry
         // PURL manager

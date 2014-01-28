@@ -18,7 +18,7 @@ package com.github.podd.impl.data.test;
 
 import com.github.podd.api.data.SPARQLDataReference;
 import com.github.podd.api.data.test.AbstractSPARQLDataReferenceTest;
-import com.github.podd.impl.file.SPARQLDataReferenceImpl;
+import com.github.podd.impl.data.SPARQLDataReferenceImpl;
 
 /**
  * @author kutila

@@ -24,8 +24,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.github.podd.api.data.DataReference;
+import com.github.podd.api.data.PoddDataRepository;
 import com.github.podd.api.data.SPARQLDataReference;
-import com.github.podd.api.file.PoddDataRepository;
 import com.github.podd.exception.DataReferenceNotSupportedException;
 import com.github.podd.exception.DataRepositoryIncompleteException;
 import com.github.podd.utils.PODD;

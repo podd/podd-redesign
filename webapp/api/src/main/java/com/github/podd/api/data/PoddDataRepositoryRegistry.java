@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU Affero General Public License along with this program.
  * If not, see <http://www.gnu.org/licenses/>.
  */
-package com.github.podd.api.file;
+package com.github.podd.api.data;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -26,7 +26,6 @@ import org.openrdf.model.Value;
 import org.openrdf.model.vocabulary.RDF;
 
 import com.github.ansell.abstractserviceloader.AbstractServiceLoader;
-import com.github.podd.api.data.DataReferenceProcessorFactory;
 import com.github.podd.exception.DataRepositoryException;
 
 /**

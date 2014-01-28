@@ -41,7 +41,7 @@ import com.github.podd.api.data.SSHFileReference;
 import com.github.podd.api.data.SSHFileReferenceProcessor;
 import com.github.podd.api.test.AbstractPoddRdfProcessorFactoryTest;
 import com.github.podd.api.test.TestConstants;
-import com.github.podd.impl.file.SSHFileReferenceProcessorFactoryImpl;
+import com.github.podd.impl.data.SSHFileReferenceProcessorFactoryImpl;
 import com.github.podd.utils.PODD;
 import com.github.podd.utils.PoddRdfUtils;
 

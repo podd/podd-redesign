@@ -35,8 +35,8 @@ import org.openrdf.rio.RDFFormat;
 import org.openrdf.sail.memory.MemoryStore;
 
 import com.github.podd.api.data.DataReference;
+import com.github.podd.api.data.DataReferenceManager;
 import com.github.podd.api.data.DataReferenceProcessorRegistry;
-import com.github.podd.api.file.DataReferenceManager;
 import com.github.podd.api.test.TestConstants;
 
 /**

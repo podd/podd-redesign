@@ -51,7 +51,7 @@ import com.github.ansell.restletutils.RestletUtilMediaType;
 import com.github.podd.api.PoddArtifactManager;
 import com.github.podd.api.PoddRepositoryManager;
 import com.github.podd.api.PoddSchemaManager;
-import com.github.podd.api.file.PoddDataRepositoryManager;
+import com.github.podd.api.data.PoddDataRepositoryManager;
 import com.github.podd.exception.PoddRuntimeException;
 import com.github.podd.resources.AboutResourceImpl;
 import com.github.podd.resources.AddObjectResourceImpl;

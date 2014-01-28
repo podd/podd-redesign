@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU Affero General Public License along with this program.
  * If not, see <http://www.gnu.org/licenses/>.
  */
-package com.github.podd.api.file;
+package com.github.podd.api.data;
 
 import java.io.IOException;
 import java.util.Set;
@@ -22,7 +22,6 @@ import java.util.Set;
 import org.openrdf.model.Model;
 import org.openrdf.model.URI;
 
-import com.github.podd.api.data.DataReference;
 import com.github.podd.exception.DataReferenceNotSupportedException;
 
 /**

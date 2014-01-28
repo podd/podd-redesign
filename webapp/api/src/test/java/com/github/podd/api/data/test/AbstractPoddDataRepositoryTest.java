@@ -29,7 +29,7 @@ import org.openrdf.model.Resource;
 import org.openrdf.model.URI;
 
 import com.github.podd.api.data.DataReference;
-import com.github.podd.api.file.PoddDataRepository;
+import com.github.podd.api.data.PoddDataRepository;
 import com.github.podd.exception.DataReferenceNotSupportedException;
 import com.github.podd.exception.DataRepositoryIncompleteException;
 
