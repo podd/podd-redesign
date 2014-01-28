@@ -442,7 +442,7 @@ public class UserRolesResourceImplTest extends AbstractResourceImplTest
                             Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
             
             final String body = results.getText();
-            System.out.println(body);
+            // System.out.println(body);
             this.assertFreemarker(body);
         }
         finally
@@ -482,7 +482,7 @@ public class UserRolesResourceImplTest extends AbstractResourceImplTest
                             Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
             
             final String body = results.getText();
-            System.out.println(body);
+            // System.out.println(body);
             this.assertFreemarker(body);
             
             // Assert.assertTrue("Page missing User identifier",

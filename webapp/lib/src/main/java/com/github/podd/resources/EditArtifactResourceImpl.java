@@ -173,13 +173,9 @@ public class EditArtifactResourceImpl extends AbstractPoddResourceImpl
         {
             throw new ResourceException(Status.CLIENT_ERROR_NOT_FOUND, "Could not find the given artifact", e);
         }
-        catch(final PoddException e)
+        catch(final PoddException | OpenRDFException | IOException | OWLException e)
         {
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Could not create response", e);
-        }
-        catch(OpenRDFException | IOException | OWLException e)
-        {
-            throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Could not create response");
         }
         
         return new ByteArrayRepresentation(output.toByteArray(), MediaType.valueOf(outputFormat.getDefaultMIMEType()));

@@ -443,7 +443,7 @@ public class UploadArtifactResourceImpl extends AbstractPoddResourceImpl
         }
         catch(OpenRDFException | PoddException | IOException | OWLException e)
         {
-            this.log.error("Failed to load artifact {}", e);
+            this.log.error("Failed to load artifact: {}", e.getMessage());
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Error loading artifact to PODD", e);
         }
         

@@ -61,7 +61,7 @@ public class UserListResourceImplTest extends AbstractResourceImplTest
                             Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
             
             final String body = this.getText(results);
-            System.out.println(body);
+            // System.out.println(body);
             this.assertFreemarker(body);
         }
         finally
