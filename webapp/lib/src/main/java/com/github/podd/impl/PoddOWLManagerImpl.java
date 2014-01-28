@@ -119,7 +119,7 @@ import com.github.podd.utils.PODD;
  */
 public class PoddOWLManagerImpl implements PoddOWLManager
 {
-    protected Logger log = LoggerFactory.getLogger(this.getClass());
+    protected final Logger log = LoggerFactory.getLogger(this.getClass());
     
     // private final OWLOntologyManager owlOntologyManager;
     
@@ -290,7 +290,10 @@ public class PoddOWLManagerImpl implements PoddOWLManager
         final Model schemaManagementTriples = new LinkedHashModel();
         managementConnection.export(new StatementCollector(schemaManagementTriples), schemaManagementContext);
         
-        DebugUtils.printContents(schemaManagementTriples);
+        if(log.isDebugEnabled())
+        {
+            DebugUtils.printContents(schemaManagementTriples);
+        }
         
         final List<OWLOntologyID> manifestImports =
                 OntologyUtils.schemaManifestImports(schemaManagementTriples, ontologyIDs);
@@ -302,15 +305,15 @@ public class PoddOWLManagerImpl implements PoddOWLManager
         
         synchronized(cachedManager)
         {
-            this.log.info("About to cache ontologies: {}", manifestImports);
+            this.log.debug("About to cache ontologies: {}", manifestImports);
             for(final OWLOntologyID ontologyID : manifestImports)
             {
-                this.log.info("About to cache ontology: {}", ontologyID);
+                this.log.debug("About to cache ontology: {}", ontologyID);
                 // NOTE: if InferredOntologyIRI is null, only the base ontology is
                 // cached
                 this.cacheSchemaOntologyInternal(managementConnection, ontologyID, cachedManager);
             }
-            this.log.info("Finished caching ontologies: {}", manifestImports);
+            this.log.debug("Finished caching ontologies: {}", manifestImports);
         }
         return cachedManager;
     }

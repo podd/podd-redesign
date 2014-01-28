@@ -417,13 +417,16 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
             // this.repositoryManager.getSchemaManagementGraph(), model);
             // managementConnection.add(model, this.repositoryManager.getSchemaManagementGraph());
             
-            DebugUtils.printContents(managementConnection, this.repositoryManager.getSchemaManagementGraph());
+            if(this.log.isDebugEnabled())
+            {
+                DebugUtils.printContents(managementConnection, this.repositoryManager.getSchemaManagementGraph());
+            }
             
             final Set<InferredOWLOntologyID> existingSchemaOntologies =
                     this.sesameManager.getAllSchemaOntologyVersions(managementConnection,
                             this.repositoryManager.getSchemaManagementGraph());
             
-            this.log.info("Existing schema ontologies at this point: {}", existingSchemaOntologies);
+            this.log.debug("Existing schema ontologies at this point: {}", existingSchemaOntologies);
             
             for(final OWLOntologyID nextImport : nextImportOrder)
             {
@@ -447,13 +450,13 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
             
             final List<InferredOWLOntologyID> results = new ArrayList<>();
             
-            this.log.info("About to load ontologies in order: {}", loadingOrder);
+            this.log.debug("About to load ontologies in order: {}", loadingOrder);
             for(final Entry<OWLOntologyID, Boolean> loadEntry : loadingOrder.entrySet())
             {
-                this.log.info("Ontologies loaded so far: {}", results);
+                this.log.debug("Ontologies loaded so far: {}", results);
                 if(loadEntry.getValue())
                 {
-                    this.log.info("Not loading ontology as it was already available: {}", loadEntry.getKey());
+                    this.log.debug("Not loading ontology as it was already available: {}", loadEntry.getKey());
                     if(loadEntry.getKey() instanceof InferredOWLOntologyID)
                     {
                         results.add((InferredOWLOntologyID)loadEntry.getKey());
@@ -468,7 +471,7 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
                 }
                 else
                 {
-                    this.log.info("Need to load ontology that is not already available: {}", loadEntry.getKey());
+                    this.log.debug("Need to load ontology that is not already available: {}", loadEntry.getKey());
                     // TODO: Should we store these copies in a separate repository again, to reduce
                     // bloat in the management repository??
                     
@@ -509,7 +512,7 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
                                         .toOpenRDFURI(), OWL.IMPORTS, null, true, nextResult.getVersionIRI()
                                         .toOpenRDFURI()));
                         
-                        this.log.info("Imports to copy for ontology: {} {}", nextResult, importStatements);
+                        this.log.debug("Imports to copy for ontology: {} {}", nextResult, importStatements);
                         
                         for(final Statement nextImportStatement : importStatements)
                         {
@@ -643,7 +646,7 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
         throws OWLException, IOException, PoddException, EmptyOntologyException, RepositoryException,
         OWLRuntimeException, OpenRDFException
     {
-        this.log.info("Dependent ontologies for next schema upload: {}", dependentSchemaOntologies);
+        this.log.debug("Dependent ontologies for next schema upload: {}", dependentSchemaOntologies);
         
         final OWLOntologyDocumentSource owlSource =
                 new StreamDocumentSource(inputStream, fileFormat.getDefaultMIMEType());

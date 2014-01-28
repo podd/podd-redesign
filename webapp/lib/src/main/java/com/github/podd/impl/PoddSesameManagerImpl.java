@@ -572,7 +572,10 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         dataset.addDefaultGraph(managementGraph);
         dataset.addNamedGraph(managementGraph);
         
-        DebugUtils.printContents(repositoryConnection, managementGraph);
+        if(log.isDebugEnabled())
+        {
+            DebugUtils.printContents(repositoryConnection, managementGraph);
+        }
         
         // 1: see if the given IRI exists as an ontology IRI
         final StringBuilder sb1 = new StringBuilder(1024);

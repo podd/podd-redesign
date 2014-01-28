@@ -1051,7 +1051,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             final Set<OWLOntologyID> result =
                     new LinkedHashSet<>(OntologyUtils.artifactImports(inferredOWLOntologyID, model));
             
-            this.log.info("Returning from getSchemaImports: {} {}", artifactID, result);
+            this.log.debug("Returning from getSchemaImports: {} {}", artifactID, result);
             
             return result;
         }

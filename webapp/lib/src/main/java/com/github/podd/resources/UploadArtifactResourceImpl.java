@@ -272,8 +272,11 @@ public class UploadArtifactResourceImpl extends AbstractPoddResourceImpl
         try
         {
             managementConnection = this.getPoddRepositoryManager().getManagementRepositoryConnection();
-            DebugUtils
-                    .printContents(managementConnection, this.getPoddRepositoryManager().getArtifactManagementGraph());
+            if(log.isDebugEnabled())
+            {
+                DebugUtils.printContents(managementConnection, this.getPoddRepositoryManager()
+                        .getArtifactManagementGraph());
+            }
         }
         catch(final OpenRDFException e)
         {

@@ -493,23 +493,23 @@ public class ApplicationUtils
                 model = Rio.parse(schemaManifestStream, "", format);
             }
             
-            if(ApplicationUtils.log.isInfoEnabled())
+            if(ApplicationUtils.log.isDebugEnabled())
             {
-                ApplicationUtils.log.info("Schema manifest contents");
+                ApplicationUtils.log.debug("Schema manifest contents");
                 DebugUtils.printContents(model);
             }
-            ApplicationUtils.log.info("About to upload schema ontologies");
+            ApplicationUtils.log.debug("About to upload schema ontologies");
             
             // Returns an ordered list of the schema ontologies that were uploaded
             final List<InferredOWLOntologyID> schemaOntologies = poddSchemaManager.uploadSchemaOntologies(model);
             
             if(!schemaOntologies.isEmpty())
             {
-                ApplicationUtils.log.info("Uploaded new schema ontologies: {}", schemaOntologies);
+                ApplicationUtils.log.debug("Uploaded new schema ontologies: {}", schemaOntologies);
             }
             else
             {
-                ApplicationUtils.log.info("No new schema ontologies uploaded this time");
+                ApplicationUtils.log.debug("No new schema ontologies uploaded this time");
             }
             
             // NOTE: The following is not ordered at this point in time
@@ -518,11 +518,11 @@ public class ApplicationUtils
             
             if(!currentSchemaOntologies.isEmpty())
             {
-                ApplicationUtils.log.info("Existing current schema ontologies: {}", currentSchemaOntologies);
+                ApplicationUtils.log.debug("Existing current schema ontologies: {}", currentSchemaOntologies);
             }
             else
             {
-                ApplicationUtils.log.info("Found no existing current schema ontologies");
+                ApplicationUtils.log.debug("Found no existing current schema ontologies");
             }
             
             final List<InferredOWLOntologyID> updatedCurrentSchemaOntologies = new ArrayList<>();
@@ -554,7 +554,7 @@ public class ApplicationUtils
             
             final List<InferredOWLOntologyID> unpublishedArtifacts = poddArtifactManager.listUnpublishedArtifacts();
             
-            ApplicationUtils.log.info("Existing unpublished artifacts: \n{}", unpublishedArtifacts);
+            ApplicationUtils.log.debug("Existing unpublished artifacts: \n{}", unpublishedArtifacts);
             
             for(final InferredOWLOntologyID nextArtifact : unpublishedArtifacts)
             {
@@ -566,7 +566,7 @@ public class ApplicationUtils
                     continue;
                 }
                 
-                ApplicationUtils.log.info("Fetching schema imports for unpublished artifact: {}",
+                ApplicationUtils.log.debug("Fetching schema imports for unpublished artifact: {}",
                         nextArtifact.getOntologyIRI());
                 
                 final Set<? extends OWLOntologyID> schemaImports = poddArtifactManager.getSchemaImports(nextArtifact);
