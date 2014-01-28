@@ -44,7 +44,7 @@ public interface PoddWebConstants
      */
     public static final String PROPERTY_COOKIE_ENCRYPTION_KEY = "podd.cookie.encryption.key";
     
-    public static final String DEF_COOKIE_ENCRYPTION_KEY = "s3cr3t2345667123";
+    public static final String DEF_COOKIE_ENCRYPTION_KEY = "8183e90c5185e3df";
     
     /**
      * Property for freemarker template used as the base for rendering all HTML pages
