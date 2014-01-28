@@ -162,7 +162,7 @@ public class UserPasswordResourceImpl extends AbstractUserResourceImpl
         // - set Credentials Cookie to expire so that User has to login again
         if(changeOwnPassword)
         {
-            String cookieName =
+            final String cookieName =
                     this.getPoddApplication().getPropertyUtil()
                             .get(PoddWebConstants.PROPERTY_COOKIE_NAME, PoddWebConstants.DEF_COOKIE_NAME);
             final CookieSetting credentialsCookie = this.getResponse().getCookieSettings().getFirst(cookieName);

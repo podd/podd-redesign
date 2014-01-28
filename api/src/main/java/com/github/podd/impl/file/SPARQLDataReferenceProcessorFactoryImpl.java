@@ -24,8 +24,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.github.podd.api.PoddProcessorStage;
-import com.github.podd.api.file.DataReferenceProcessor;
-import com.github.podd.api.file.SPARQLDataReferenceProcessorFactory;
+import com.github.podd.api.data.DataReferenceProcessor;
+import com.github.podd.api.data.SPARQLDataReferenceProcessorFactory;
 import com.github.podd.utils.PODD;
 
 /**

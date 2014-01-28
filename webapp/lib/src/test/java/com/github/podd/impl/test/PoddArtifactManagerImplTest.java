@@ -42,8 +42,8 @@ import com.github.podd.api.PoddOWLManager;
 import com.github.podd.api.PoddRepositoryManager;
 import com.github.podd.api.PoddSchemaManager;
 import com.github.podd.api.PoddSesameManager;
+import com.github.podd.api.data.DataReferenceProcessorFactory;
 import com.github.podd.api.file.DataReferenceManager;
-import com.github.podd.api.file.DataReferenceProcessorFactory;
 import com.github.podd.api.purl.PoddPurlManager;
 import com.github.podd.api.purl.PoddPurlProcessorFactory;
 import com.github.podd.api.test.AbstractPoddArtifactManagerTest;
@@ -52,7 +52,7 @@ import com.github.podd.impl.PoddOWLManagerImpl;
 import com.github.podd.impl.PoddRepositoryManagerImpl;
 import com.github.podd.impl.PoddSchemaManagerImpl;
 import com.github.podd.impl.PoddSesameManagerImpl;
-import com.github.podd.impl.file.FileReferenceManagerImpl;
+import com.github.podd.impl.data.DataReferenceManagerImpl;
 import com.github.podd.impl.file.SSHFileReferenceProcessorFactoryImpl;
 import com.github.podd.impl.purl.PoddPurlManagerImpl;
 import com.github.podd.impl.purl.UUIDPurlProcessorFactoryImpl;
@@ -81,7 +81,7 @@ public class PoddArtifactManagerImplTest extends AbstractPoddArtifactManagerTest
     @Override
     protected DataReferenceManager getNewFileReferenceManager()
     {
-        return new FileReferenceManagerImpl();
+        return new DataReferenceManagerImpl();
     }
     
     @Override

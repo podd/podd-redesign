@@ -31,8 +31,8 @@ import org.semanticweb.owlapi.model.IRI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.github.podd.api.file.SSHFileReference;
-import com.github.podd.api.file.SSHFileReferenceProcessor;
+import com.github.podd.api.data.SSHFileReference;
+import com.github.podd.api.data.SSHFileReferenceProcessor;
 import com.github.podd.utils.DebugUtils;
 import com.github.podd.utils.PODD;
 

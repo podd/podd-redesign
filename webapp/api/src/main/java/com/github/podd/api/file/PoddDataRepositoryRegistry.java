@@ -26,6 +26,7 @@ import org.openrdf.model.Value;
 import org.openrdf.model.vocabulary.RDF;
 
 import com.github.ansell.abstractserviceloader.AbstractServiceLoader;
+import com.github.podd.api.data.DataReferenceProcessorFactory;
 import com.github.podd.exception.DataRepositoryException;
 
 /**

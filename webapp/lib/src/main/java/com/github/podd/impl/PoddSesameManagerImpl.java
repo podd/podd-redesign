@@ -572,7 +572,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         dataset.addDefaultGraph(managementGraph);
         dataset.addNamedGraph(managementGraph);
         
-        if(log.isDebugEnabled())
+        if(this.log.isDebugEnabled())
         {
             DebugUtils.printContents(repositoryConnection, managementGraph);
         }

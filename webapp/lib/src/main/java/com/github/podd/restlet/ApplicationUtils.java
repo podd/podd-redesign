@@ -55,11 +55,8 @@ import org.openrdf.rio.Rio;
 import org.openrdf.rio.UnsupportedRDFormatException;
 import org.openrdf.sail.memory.MemoryStore;
 import org.restlet.Context;
-import org.restlet.ext.crypto.DigestAuthenticator;
-import org.restlet.ext.crypto.DigestVerifier;
 import org.restlet.ext.freemarker.ContextTemplateLoader;
 import org.restlet.security.ChallengeAuthenticator;
-import org.restlet.security.LocalVerifier;
 import org.restlet.security.Realm;
 import org.restlet.security.Role;
 import org.semanticweb.owlapi.model.OWLException;
@@ -77,9 +74,9 @@ import com.github.podd.api.PoddArtifactManager;
 import com.github.podd.api.PoddOWLManager;
 import com.github.podd.api.PoddSchemaManager;
 import com.github.podd.api.PoddSesameManager;
+import com.github.podd.api.data.DataReferenceProcessorFactory;
+import com.github.podd.api.data.DataReferenceProcessorRegistry;
 import com.github.podd.api.file.DataReferenceManager;
-import com.github.podd.api.file.DataReferenceProcessorFactory;
-import com.github.podd.api.file.DataReferenceProcessorRegistry;
 import com.github.podd.api.file.PoddDataRepositoryManager;
 import com.github.podd.api.purl.PoddPurlManager;
 import com.github.podd.api.purl.PoddPurlProcessorFactory;
@@ -90,8 +87,8 @@ import com.github.podd.impl.PoddOWLManagerImpl;
 import com.github.podd.impl.PoddRepositoryManagerImpl;
 import com.github.podd.impl.PoddSchemaManagerImpl;
 import com.github.podd.impl.PoddSesameManagerImpl;
-import com.github.podd.impl.file.FileReferenceManagerImpl;
-import com.github.podd.impl.file.PoddFileRepositoryManagerImpl;
+import com.github.podd.impl.data.DataReferenceManagerImpl;
+import com.github.podd.impl.data.PoddFileRepositoryManagerImpl;
 import com.github.podd.impl.file.SSHFileReferenceProcessorFactoryImpl;
 import com.github.podd.impl.purl.PoddPurlManagerImpl;
 import com.github.podd.impl.purl.UUIDPurlProcessorFactoryImpl;
@@ -160,7 +157,7 @@ public class ApplicationUtils
                     props.get(PoddWebConstants.PROPERTY_COOKIE_ENCRYPTION_KEY,
                             PoddWebConstants.DEF_COOKIE_ENCRYPTION_KEY).getBytes(StandardCharsets.UTF_8);
             
-            FixedRedirectCookieAuthenticator auth =
+            final FixedRedirectCookieAuthenticator auth =
                     new FixedRedirectCookieAuthenticator(newChildContext, nextRealm.getName(), encryptionKey);
             
             auth.setEncryptAlgorithm(props.get(PoddWebConstants.PROPERTY_COOKIE_ENCRYPTION_ALGORITHM,
@@ -333,7 +330,7 @@ public class ApplicationUtils
         nextFileRegistry.add(nextFileProcessorFactory);
         
         // File Reference Manager
-        final DataReferenceManager nextDataReferenceManager = new FileReferenceManagerImpl();
+        final DataReferenceManager nextDataReferenceManager = new DataReferenceManagerImpl();
         nextDataReferenceManager.setDataProcessorRegistry(nextFileRegistry);
         
         // TODO: Use the automatically loaded registry

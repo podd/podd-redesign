@@ -45,7 +45,7 @@ import org.semanticweb.owlapi.model.OWLException;
 
 import com.github.podd.api.DataReferenceVerificationPolicy;
 import com.github.podd.api.PoddArtifactManager;
-import com.github.podd.exception.FileReferenceVerificationFailureException;
+import com.github.podd.exception.DataReferenceVerificationException;
 import com.github.podd.exception.OntologyNotInProfileException;
 import com.github.podd.exception.PoddException;
 import com.github.podd.exception.SchemaManifestException;
@@ -121,7 +121,7 @@ public class DataReferenceAttachResourceImpl extends AbstractPoddResourceImpl
         {
             artifactMap = this.getPoddArtifactManager().attachDataReferences(artifact, model, verificationPolicy);
         }
-        catch(final FileReferenceVerificationFailureException e)
+        catch(final DataReferenceVerificationException e)
         {
             this.log.error("File reference validation errors: {}", e.getValidationFailures());
             throw new ResourceException(Status.SERVER_ERROR_BAD_GATEWAY, "File reference(s) failed verification", e);

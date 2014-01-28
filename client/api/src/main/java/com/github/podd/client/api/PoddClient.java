@@ -30,7 +30,7 @@ import org.semanticweb.owlapi.model.IRI;
 import com.github.ansell.restletutils.RestletUtilRole;
 import com.github.podd.api.DanglingObjectPolicy;
 import com.github.podd.api.DataReferenceVerificationPolicy;
-import com.github.podd.api.file.DataReference;
+import com.github.podd.api.data.DataReference;
 import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.PoddUser;
 

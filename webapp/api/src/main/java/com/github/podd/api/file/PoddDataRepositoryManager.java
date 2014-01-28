@@ -26,6 +26,7 @@ import org.openrdf.model.Model;
 
 import com.github.podd.api.PoddOWLManager;
 import com.github.podd.api.PoddRepositoryManager;
+import com.github.podd.api.data.DataReference;
 import com.github.podd.exception.DataRepositoryException;
 import com.github.podd.exception.DataRepositoryMappingNotFoundException;
 import com.github.podd.exception.PoddException;

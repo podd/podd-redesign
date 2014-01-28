@@ -19,7 +19,7 @@ package com.github.podd.impl.file;
 import org.openrdf.model.Model;
 import org.openrdf.model.vocabulary.RDF;
 
-import com.github.podd.api.file.SPARQLDataReference;
+import com.github.podd.api.data.SPARQLDataReference;
 import com.github.podd.utils.PODD;
 
 /**

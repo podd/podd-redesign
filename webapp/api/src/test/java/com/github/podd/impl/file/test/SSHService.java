@@ -75,7 +75,7 @@ import org.apache.sshd.server.shell.ProcessShellFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.github.podd.api.file.SSHFileReference;
+import com.github.podd.api.data.SSHFileReference;
 import com.github.podd.api.test.TestConstants;
 import com.github.podd.impl.file.SSHFileReferenceImpl;
 

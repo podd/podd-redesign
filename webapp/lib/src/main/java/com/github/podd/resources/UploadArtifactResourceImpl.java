@@ -272,7 +272,7 @@ public class UploadArtifactResourceImpl extends AbstractPoddResourceImpl
         try
         {
             managementConnection = this.getPoddRepositoryManager().getManagementRepositoryConnection();
-            if(log.isDebugEnabled())
+            if(this.log.isDebugEnabled())
             {
                 DebugUtils.printContents(managementConnection, this.getPoddRepositoryManager()
                         .getArtifactManagementGraph());

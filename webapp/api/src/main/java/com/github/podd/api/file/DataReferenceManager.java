@@ -22,6 +22,9 @@ import org.openrdf.OpenRDFException;
 import org.openrdf.model.URI;
 import org.openrdf.repository.RepositoryConnection;
 
+import com.github.podd.api.data.DataReference;
+import com.github.podd.api.data.DataReferenceProcessorRegistry;
+
 /**
  * A manager object used to maintain data references between PODD Artifacts and the various data
  * repositories that contain the actual data.

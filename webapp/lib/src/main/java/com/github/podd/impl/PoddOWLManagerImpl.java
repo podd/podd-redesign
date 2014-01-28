@@ -290,7 +290,7 @@ public class PoddOWLManagerImpl implements PoddOWLManager
         final Model schemaManagementTriples = new LinkedHashModel();
         managementConnection.export(new StatementCollector(schemaManagementTriples), schemaManagementContext);
         
-        if(log.isDebugEnabled())
+        if(this.log.isDebugEnabled())
         {
             DebugUtils.printContents(schemaManagementTriples);
         }

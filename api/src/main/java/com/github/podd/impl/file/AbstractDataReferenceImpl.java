@@ -23,7 +23,7 @@ import org.openrdf.model.vocabulary.RDFS;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLOntologyID;
 
-import com.github.podd.api.file.DataReference;
+import com.github.podd.api.data.DataReference;
 import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.OntologyUtils;
 import com.github.podd.utils.PODD;

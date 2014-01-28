@@ -70,17 +70,17 @@ import com.github.podd.api.PoddRepositoryManager;
 import com.github.podd.api.PoddSchemaManager;
 import com.github.podd.api.PoddSesameManager;
 import com.github.podd.api.UpdatePolicy;
-import com.github.podd.api.file.DataReference;
+import com.github.podd.api.data.DataReference;
 import com.github.podd.api.file.DataReferenceManager;
 import com.github.podd.api.file.PoddDataRepositoryManager;
 import com.github.podd.api.purl.PoddPurlManager;
 import com.github.podd.api.purl.PoddPurlReference;
 import com.github.podd.exception.ArtifactModifyException;
+import com.github.podd.exception.DataReferenceVerificationException;
 import com.github.podd.exception.DeleteArtifactException;
 import com.github.podd.exception.DisconnectedObjectException;
 import com.github.podd.exception.DuplicateArtifactIRIException;
 import com.github.podd.exception.EmptyOntologyException;
-import com.github.podd.exception.FileReferenceVerificationFailureException;
 import com.github.podd.exception.InconsistentOntologyException;
 import com.github.podd.exception.OntologyNotInProfileException;
 import com.github.podd.exception.PoddException;
@@ -1231,7 +1231,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
                 {
                     this.dataRepositoryManager.verifyDataReferences(fileReferenceResults);
                 }
-                catch(final FileReferenceVerificationFailureException e)
+                catch(final DataReferenceVerificationException e)
                 {
                     this.log.warn("From " + fileReferenceResults.size() + " file references, "
                             + e.getValidationFailures().size() + " failed validation.");

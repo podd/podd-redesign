@@ -38,7 +38,7 @@ import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLException;
 import org.semanticweb.owlapi.model.OWLOntologyID;
 
-import com.github.podd.api.file.DataReference;
+import com.github.podd.api.data.DataReference;
 import com.github.podd.api.file.DataReferenceManager;
 import com.github.podd.api.file.PoddDataRepositoryManager;
 import com.github.podd.api.purl.PoddPurlManager;

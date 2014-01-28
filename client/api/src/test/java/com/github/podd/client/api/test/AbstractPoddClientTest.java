@@ -47,7 +47,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.github.ansell.restletutils.RestletUtilRole;
-import com.github.podd.api.file.DataReference;
+import com.github.podd.api.data.DataReference;
 import com.github.podd.client.api.PoddClient;
 import com.github.podd.utils.DebugUtils;
 import com.github.podd.utils.InferredOWLOntologyID;

@@ -19,7 +19,7 @@ package com.github.podd.impl.file;
 import org.openrdf.model.Model;
 import org.openrdf.model.vocabulary.RDF;
 
-import com.github.podd.api.file.SSHFileReference;
+import com.github.podd.api.data.SSHFileReference;
 import com.github.podd.utils.PODD;
 
 /**

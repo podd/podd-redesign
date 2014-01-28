@@ -31,8 +31,8 @@ import org.semanticweb.owlapi.model.IRI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.github.podd.api.file.SPARQLDataReference;
-import com.github.podd.api.file.SPARQLDataReferenceProcessor;
+import com.github.podd.api.data.SPARQLDataReference;
+import com.github.podd.api.data.SPARQLDataReferenceProcessor;
 import com.github.podd.utils.DebugUtils;
 import com.github.podd.utils.PODD;
 

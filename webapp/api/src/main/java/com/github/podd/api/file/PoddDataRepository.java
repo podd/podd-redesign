@@ -22,7 +22,8 @@ import java.util.Set;
 import org.openrdf.model.Model;
 import org.openrdf.model.URI;
 
-import com.github.podd.exception.FileReferenceNotSupportedException;
+import com.github.podd.api.data.DataReference;
+import com.github.podd.exception.DataReferenceNotSupportedException;
 
 /**
  * This interface represents the basic type for all data repositories. PODD uses Data Repositories
@@ -70,9 +71,9 @@ public interface PoddDataRepository<T extends DataReference>
      * @param reference
      *            The DataReference to be validated
      * @return True if the validation was successful, false otherwise
-     * @throws FileReferenceNotSupportedException
+     * @throws DataReferenceNotSupportedException
      * @throws IOException
      */
-    boolean validate(T reference) throws FileReferenceNotSupportedException, IOException;
+    boolean validate(T reference) throws DataReferenceNotSupportedException, IOException;
     
 }

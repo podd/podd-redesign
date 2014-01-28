@@ -54,7 +54,7 @@ public class RepositoryConfigTest
     @Before
     public void setUp() throws Exception
     {
-        testDir = tempDir.newFolder("repositoryconfigtest");
+        this.testDir = this.tempDir.newFolder("repositoryconfigtest");
     }
     
     /**
@@ -63,7 +63,7 @@ public class RepositoryConfigTest
     @After
     public void tearDown() throws Exception
     {
-        testDir = null;
+        this.testDir = null;
     }
     
     @Test
@@ -82,7 +82,7 @@ public class RepositoryConfigTest
         
         final Repository repository = repositoryFactory.getRepository(repositoryImplConfig);
         Assert.assertNotNull(repository);
-        repository.setDataDir(testDir);
+        repository.setDataDir(this.testDir);
         repository.initialize();
     }
     
@@ -100,7 +100,7 @@ public class RepositoryConfigTest
         
         final Repository repository = repositoryFactory.getRepository(repositoryImplConfig);
         Assert.assertNotNull(repository);
-        repository.setDataDir(testDir);
+        repository.setDataDir(this.testDir);
         repository.initialize();
     }
 }

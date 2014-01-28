@@ -31,8 +31,8 @@ import org.restlet.Client;
 import org.restlet.representation.Representation;
 import org.restlet.resource.ClientResource;
 
-import com.github.podd.api.file.DataReference;
-import com.github.podd.api.file.SSHFileReference;
+import com.github.podd.api.data.DataReference;
+import com.github.podd.api.data.SSHFileReference;
 import com.github.podd.client.api.PoddClient;
 import com.github.podd.client.api.test.AbstractPoddClientTest;
 import com.github.podd.client.impl.restlet.RestletPoddClientImpl;
