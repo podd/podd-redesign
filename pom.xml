@@ -81,13 +81,13 @@
 		<junit.version>4.11</junit.version>
 		<mockito.version>1.9.5</mockito.version>
 		<podd-ontologies.version>2-SNAPSHOT</podd-ontologies.version>
-		<owlapi.version>3.4.9.2-ansell</owlapi.version>
+		<owlapi.version>3.4.11.1-ansell</owlapi.version>
 		<pellet.version>2.3.7-ansell-SNAPSHOT</pellet.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<restlet.version>2.1.1</restlet.version>
 		<restletutils.version>0.3</restletutils.version>
-		<sesame.version>2.7.8</sesame.version>
+		<sesame.version>2.7.10</sesame.version>
 		<sesame-rio-extensions.version>0.4</sesame-rio-extensions.version>
 		<slf4j.version>1.7.5</slf4j.version>
 		<sshj.version>0.9.0</sshj.version>
