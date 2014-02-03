@@ -127,7 +127,7 @@ public class SPARQLDataRepositoryImplTest extends AbstractPoddDataRepositoryTest
     protected PoddDataRepository<SPARQLDataReference> getNewPoddDataRepository(final Resource nextDataRepository,
             final Model model) throws Exception
     {
-        final PoddDataRepository result = new SPARQLDataRepositoryImpl(nextDataRepository, model);
+        final PoddDataRepository<SPARQLDataReference> result = new SPARQLDataRepositoryImpl(nextDataRepository, model);
         return result;
     }
     

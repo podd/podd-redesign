@@ -40,7 +40,7 @@ import com.github.podd.utils.PODD;
  * 
  * @author kutila
  */
-abstract class PoddFileRepositoryImpl<T extends DataReference> implements PoddDataRepository<DataReference>
+abstract class PoddFileRepositoryImpl<T extends DataReference> implements PoddDataRepository<T>
 {
     protected Model model;
     

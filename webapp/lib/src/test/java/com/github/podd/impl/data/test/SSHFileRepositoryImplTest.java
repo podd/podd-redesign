@@ -139,7 +139,7 @@ public class SSHFileRepositoryImplTest extends AbstractPoddDataRepositoryTest<SS
     protected PoddDataRepository<SSHFileReference> getNewPoddDataRepository(final Resource nextDataRepository,
             final Model model) throws Exception
     {
-        final PoddDataRepository result = new SSHFileRepositoryImpl(nextDataRepository, model);
+        final PoddDataRepository<SSHFileReference> result = new SSHFileRepositoryImpl(nextDataRepository, model);
         return result;
     }
     

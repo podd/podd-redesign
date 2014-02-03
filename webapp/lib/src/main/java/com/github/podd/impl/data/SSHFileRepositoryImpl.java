@@ -71,7 +71,7 @@ public class SSHFileRepositoryImpl extends PoddFileRepositoryImpl<SSHFileReferen
     }
     
     @Override
-    public boolean canHandle(final DataReference reference)
+    public boolean canHandle(final SSHFileReference reference)
     {
         if(reference == null)
         {
@@ -95,7 +95,8 @@ public class SSHFileRepositoryImpl extends PoddFileRepositoryImpl<SSHFileReferen
     }
     
     @Override
-    public boolean validate(final DataReference dataReference) throws DataReferenceNotSupportedException, IOException
+    public boolean validate(final SSHFileReference dataReference) throws DataReferenceNotSupportedException,
+        IOException
     {
         if(!this.canHandle(dataReference))
         {

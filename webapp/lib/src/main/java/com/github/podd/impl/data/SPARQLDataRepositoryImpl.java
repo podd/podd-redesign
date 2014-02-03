@@ -63,7 +63,7 @@ public class SPARQLDataRepositoryImpl extends PoddFileRepositoryImpl<SPARQLDataR
     }
     
     @Override
-    public boolean canHandle(final DataReference reference)
+    public boolean canHandle(final SPARQLDataReference reference)
     {
         if(reference == null)
         {
@@ -87,7 +87,7 @@ public class SPARQLDataRepositoryImpl extends PoddFileRepositoryImpl<SPARQLDataR
     }
     
     @Override
-    public boolean validate(final DataReference dataReference) throws DataReferenceNotSupportedException, IOException
+    public boolean validate(final SPARQLDataReference dataReference) throws DataReferenceNotSupportedException, IOException
     {
         if(!this.canHandle(dataReference))
         {
