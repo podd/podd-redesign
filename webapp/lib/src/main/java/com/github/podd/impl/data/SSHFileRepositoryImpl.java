@@ -38,7 +38,7 @@ import com.github.podd.utils.PODD;
  * @author kutila
  * 
  */
-public class SSHFileRepositoryImpl extends PoddFileRepositoryImpl<SSHFileReference>
+public class SSHFileRepositoryImpl extends AbstractPoddDataRepositoryImpl<SSHFileReference>
 {
     protected final Logger log = LoggerFactory.getLogger(this.getClass());
     

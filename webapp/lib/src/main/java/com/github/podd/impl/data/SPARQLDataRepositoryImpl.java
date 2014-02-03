@@ -34,7 +34,7 @@ import com.github.podd.utils.PODD;
  * @author Peter Ansell p_ansell@yahoo.com
  * 
  */
-public class SPARQLDataRepositoryImpl extends PoddFileRepositoryImpl<SPARQLDataReference>
+public class SPARQLDataRepositoryImpl extends AbstractPoddDataRepositoryImpl<SPARQLDataReference>
 {
     protected final Logger log = LoggerFactory.getLogger(this.getClass());
     

@@ -40,7 +40,7 @@ import com.github.podd.utils.PODD;
  * 
  * @author kutila
  */
-abstract class PoddFileRepositoryImpl<T extends DataReference> implements PoddDataRepository<T>
+abstract class AbstractPoddDataRepositoryImpl<T extends DataReference> implements PoddDataRepository<T>
 {
     protected Model model;
     
@@ -60,7 +60,7 @@ abstract class PoddFileRepositoryImpl<T extends DataReference> implements PoddDa
      *            A {@link Model} containing data to construct a File Repository configuration.
      * @throws DataRepositoryIncompleteException
      */
-    protected PoddFileRepositoryImpl(final Resource nextDataRepository, final Model model)
+    protected AbstractPoddDataRepositoryImpl(final Resource nextDataRepository, final Model model)
         throws DataRepositoryIncompleteException
     {
         this.aliasUri = nextDataRepository;

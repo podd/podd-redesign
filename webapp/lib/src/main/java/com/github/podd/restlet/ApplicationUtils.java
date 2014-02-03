@@ -86,7 +86,7 @@ import com.github.podd.impl.PoddRepositoryManagerImpl;
 import com.github.podd.impl.PoddSchemaManagerImpl;
 import com.github.podd.impl.PoddSesameManagerImpl;
 import com.github.podd.impl.data.DataReferenceManagerImpl;
-import com.github.podd.impl.data.PoddFileRepositoryManagerImpl;
+import com.github.podd.impl.data.PoddDataRepositoryManagerImpl;
 import com.github.podd.impl.purl.PoddPurlManagerImpl;
 import com.github.podd.impl.purl.UUIDPurlProcessorFactoryImpl;
 import com.github.podd.utils.DebugUtils;
@@ -355,7 +355,7 @@ public class ApplicationUtils
                 new PoddOWLManagerImpl(ontologyManagers.iterator().next(), reasonerFactory);
         
         // File Repository Manager
-        final PoddDataRepositoryManager nextDataRepositoryManager = new PoddFileRepositoryManagerImpl();
+        final PoddDataRepositoryManager nextDataRepositoryManager = new PoddDataRepositoryManagerImpl();
         nextDataRepositoryManager.setRepositoryManager(application.getPoddRepositoryManager());
         nextDataRepositoryManager.setOWLManager(nextOWLManager);
         try

@@ -74,7 +74,7 @@ import com.github.podd.utils.RdfUtility;
  * 
  * @author kutila
  */
-public class PoddFileRepositoryManagerImpl implements PoddDataRepositoryManager
+public class PoddDataRepositoryManagerImpl implements PoddDataRepositoryManager
 {
     private final Logger log = LoggerFactory.getLogger(this.getClass());
     
@@ -87,7 +87,7 @@ public class PoddFileRepositoryManagerImpl implements PoddDataRepositoryManager
     /**
      * 
      */
-    public PoddFileRepositoryManagerImpl()
+    public PoddDataRepositoryManagerImpl()
     {
         try (final InputStream inputA = this.getClass().getResourceAsStream(PODD.PATH_PODD_DATA_REPOSITORY_V1);)
         {
