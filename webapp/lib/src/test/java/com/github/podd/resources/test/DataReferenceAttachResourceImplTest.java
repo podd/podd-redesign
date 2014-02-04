@@ -46,7 +46,7 @@ import org.restlet.resource.ClientResource;
 import org.restlet.resource.ResourceException;
 
 import com.github.podd.api.test.TestConstants;
-import com.github.podd.impl.file.test.SSHService;
+import com.github.podd.impl.data.test.SSHService;
 import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.OntologyUtils;
 import com.github.podd.utils.PODD;

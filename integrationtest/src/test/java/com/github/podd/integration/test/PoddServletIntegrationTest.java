@@ -45,7 +45,7 @@ import org.restlet.util.Series;
 import org.semanticweb.owlapi.model.IRI;
 
 import com.github.podd.api.data.DataReferenceConstants;
-import com.github.podd.impl.file.test.SSHService;
+import com.github.podd.impl.data.test.SSHService;
 import com.github.podd.utils.PoddWebConstants;
 
 /**

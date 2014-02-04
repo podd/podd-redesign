@@ -37,7 +37,7 @@ import com.github.podd.client.api.PoddClient;
 import com.github.podd.client.api.test.AbstractPoddClientTest;
 import com.github.podd.client.impl.restlet.RestletPoddClientImpl;
 import com.github.podd.impl.data.SSHFileReferenceImpl;
-import com.github.podd.impl.file.test.SSHService;
+import com.github.podd.impl.data.test.SSHService;
 
 /**
  * Integration test for the Restlet PODD Client API implementation.
