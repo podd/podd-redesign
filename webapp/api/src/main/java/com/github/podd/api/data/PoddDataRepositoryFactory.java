@@ -49,7 +49,7 @@ public interface PoddDataRepositoryFactory
      * @throws DataRepositoryException
      *             If there was an error creating the repository.
      */
-    PoddDataRepository<?> createDataRepository(Resource nextMatchingRepository, Model statements)
+    PoddDataRepository<? extends DataReference> createDataRepository(Resource nextMatchingRepository, Model statements)
         throws DataRepositoryException;
     
     /**

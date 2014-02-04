@@ -51,7 +51,7 @@ public class PoddDataRepositoryRegistry extends AbstractServiceLoader<String, Po
         super(PoddDataRepositoryFactory.class);
     }
     
-    public PoddDataRepository<?> createDataRepository(final Resource nextMatchingRepository, final Model model)
+    public PoddDataRepository<? extends DataReference> createDataRepository(final Resource nextMatchingRepository, final Model model)
         throws DataRepositoryException
     {
         final Set<Value> types = model.filter(nextMatchingRepository, RDF.TYPE, null).objects();

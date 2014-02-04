@@ -322,7 +322,7 @@ public class PoddDataRepositoryManagerImpl implements PoddDataRepositoryManager
     }
     
     @Override
-    public PoddDataRepository<?> getRepository(final String alias) throws DataRepositoryException, OpenRDFException
+    public PoddDataRepository<? extends DataReference> getRepository(final String alias) throws DataRepositoryException, OpenRDFException
     {
         if(alias == null)
         {
@@ -359,7 +359,7 @@ public class PoddDataRepositoryManagerImpl implements PoddDataRepositoryManager
             
             for(final Resource nextMatchingRepository : matchingRepositories)
             {
-                final PoddDataRepository<?> repository =
+                final PoddDataRepository<? extends DataReference> repository =
                         PoddDataRepositoryRegistry.getInstance().createDataRepository(nextMatchingRepository,
                                 repositories);
                 
