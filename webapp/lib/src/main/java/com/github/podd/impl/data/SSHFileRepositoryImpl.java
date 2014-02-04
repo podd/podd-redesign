@@ -18,6 +18,8 @@ package com.github.podd.impl.data;
 
 import java.io.IOException;
 
+import net.schmizz.sshj.Config;
+import net.schmizz.sshj.DefaultConfig;
 import net.schmizz.sshj.SSHClient;
 import net.schmizz.sshj.sftp.FileAttributes;
 import net.schmizz.sshj.sftp.SFTPClient;
@@ -40,6 +42,8 @@ import com.github.podd.utils.PODD;
  */
 public class SSHFileRepositoryImpl extends AbstractPoddDataRepositoryImpl<SSHFileReference>
 {
+    private static final DefaultConfig DEFAULT_CONFIG =  new DefaultConfig();;
+    
     protected final Logger log = LoggerFactory.getLogger(this.getClass());
     
     public SSHFileRepositoryImpl(final Resource nextDataRepository, final Model model)
@@ -130,7 +134,7 @@ public class SSHFileRepositoryImpl extends AbstractPoddDataRepositoryImpl<SSHFil
         
         this.log.info("Validating file reference: " + host + ":" + port + " " + fileName);
         
-        try (SSHClient sshClient = new SSHClient();)
+        try (SSHClient sshClient = new SSHClient(DEFAULT_CONFIG);)
         {
             sshClient.addHostKeyVerifier(fingerprint);
             sshClient.connect(host, portNo);
