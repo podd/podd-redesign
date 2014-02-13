@@ -58,6 +58,7 @@ import org.restlet.util.Series;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.github.ansell.propertyutil.PropertyUtil;
 import com.github.ansell.restletutils.RestletUtilMediaType;
 import com.github.ansell.restletutils.RestletUtilRole;
 import com.github.ansell.restletutils.SesameRealmConstants;
@@ -81,27 +82,34 @@ import com.github.podd.utils.PoddWebConstants;
  */
 public class RestletPoddClientImpl implements PoddClient
 {
+    public final static String PROPERTY_BUNDLE = "poddclient";
+    
     protected final static String TEMP_UUID_PREFIX = "urn:temp:uuid:";
     
     protected final Logger log = LoggerFactory.getLogger(this.getClass());
     
-    private String serverUrl = null;
+    private volatile String serverUrl = null;
     
     private Series<CookieSetting> currentCookies = new Series<CookieSetting>(CookieSetting.class);
+    
+    private PropertyUtil props;
     
     /**
      * Shortcut to {@link PODD#VF}
      */
     protected final static ValueFactory vf = PODD.VF;
     
+    private static final String PROP_PODD_SERVER_URL = "podd.serverurl";
+    
     public RestletPoddClientImpl()
     {
+        this.props = new PropertyUtil(PROPERTY_BUNDLE);
     }
     
-    public RestletPoddClientImpl(final String serverUrl)
+    public RestletPoddClientImpl(final String poddServerUrl)
     {
         this();
-        this.serverUrl = serverUrl;
+        this.serverUrl = poddServerUrl;
     }
     
     @Override
@@ -384,7 +392,26 @@ public class RestletPoddClientImpl implements PoddClient
     @Override
     public String getPoddServerUrl()
     {
-        return this.serverUrl;
+        String result = this.serverUrl;
+        if(result == null)
+        {
+            synchronized(this)
+            {
+                result = this.serverUrl;
+                if(result == null)
+                {
+                    this.serverUrl =
+                            this.props.get(RestletPoddClientImpl.PROP_PODD_SERVER_URL, "http://localhost:8080/podd/");
+                }
+                result = this.serverUrl;
+            }
+        }
+        return result;
+    }
+    
+    protected PropertyUtil getProps()
+    {
+        return this.props;
     }
     
     /**
