@@ -103,7 +103,7 @@ public class RestletPoddClientImpl implements PoddClient
     
     public RestletPoddClientImpl()
     {
-        this.props = new PropertyUtil(PROPERTY_BUNDLE);
+        this.props = new PropertyUtil(RestletPoddClientImpl.PROPERTY_BUNDLE);
     }
     
     public RestletPoddClientImpl(final String poddServerUrl)

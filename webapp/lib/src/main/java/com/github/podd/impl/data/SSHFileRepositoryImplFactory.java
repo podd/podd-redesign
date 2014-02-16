@@ -35,8 +35,8 @@ import com.github.podd.utils.PODD;
  * @author Peter Ansell p_ansell@yahoo.com
  * 
  */
-//Not using this as it doesn't work well with M2E in Eclipse
-//@MetaInfServices(PoddDataRepositoryFactory.class)
+// Not using this as it doesn't work well with M2E in Eclipse
+// @MetaInfServices(PoddDataRepositoryFactory.class)
 public class SSHFileRepositoryImplFactory implements PoddDataRepositoryFactory
 {
     @Override

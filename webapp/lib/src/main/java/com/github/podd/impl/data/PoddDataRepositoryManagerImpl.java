@@ -322,7 +322,8 @@ public class PoddDataRepositoryManagerImpl implements PoddDataRepositoryManager
     }
     
     @Override
-    public PoddDataRepository<? extends DataReference> getRepository(final String alias) throws DataRepositoryException, OpenRDFException
+    public PoddDataRepository<? extends DataReference> getRepository(final String alias)
+        throws DataRepositoryException, OpenRDFException
     {
         if(alias == null)
         {

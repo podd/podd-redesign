@@ -40,7 +40,6 @@ import com.github.podd.api.data.SPARQLDataReference;
 import com.github.podd.api.data.test.AbstractPoddDataRepositoryTest;
 import com.github.podd.impl.data.SPARQLDataReferenceImpl;
 import com.github.podd.impl.data.SPARQLDataRepositoryImpl;
-import com.github.podd.impl.data.test.SSHService;
 import com.github.podd.utils.PODD;
 
 /**

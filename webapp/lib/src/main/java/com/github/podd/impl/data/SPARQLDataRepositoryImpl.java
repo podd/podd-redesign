@@ -23,7 +23,6 @@ import org.openrdf.model.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.github.podd.api.data.DataReference;
 import com.github.podd.api.data.PoddDataRepository;
 import com.github.podd.api.data.SPARQLDataReference;
 import com.github.podd.exception.DataReferenceNotSupportedException;
@@ -87,7 +86,8 @@ public class SPARQLDataRepositoryImpl extends AbstractPoddDataRepositoryImpl<SPA
     }
     
     @Override
-    public boolean validate(final SPARQLDataReference dataReference) throws DataReferenceNotSupportedException, IOException
+    public boolean validate(final SPARQLDataReference dataReference) throws DataReferenceNotSupportedException,
+        IOException
     {
         if(!this.canHandle(dataReference))
         {
@@ -107,7 +107,7 @@ public class SPARQLDataRepositoryImpl extends AbstractPoddDataRepositoryImpl<SPA
             throw new IOException("Port number could not be parsed correctly: " + port);
         }
         
-        final String graph = ((SPARQLDataReference)dataReference).getGraph();
+        final String graph = dataReference.getGraph();
         
         this.log.info("Validating file reference: " + host + ":" + port + " GRAPH<" + graph + ">");
         

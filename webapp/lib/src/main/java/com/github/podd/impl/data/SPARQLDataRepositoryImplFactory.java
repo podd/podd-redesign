@@ -36,7 +36,7 @@ import com.github.podd.utils.PODD;
  * 
  */
 // Not using this as it doesn't work well with M2E in Eclipse
-//@MetaInfServices(PoddDataRepositoryFactory.class)
+// @MetaInfServices(PoddDataRepositoryFactory.class)
 public class SPARQLDataRepositoryImplFactory implements PoddDataRepositoryFactory
 {
     @Override

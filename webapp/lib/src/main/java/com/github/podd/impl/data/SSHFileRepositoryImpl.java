@@ -18,7 +18,6 @@ package com.github.podd.impl.data;
 
 import java.io.IOException;
 
-import net.schmizz.sshj.Config;
 import net.schmizz.sshj.DefaultConfig;
 import net.schmizz.sshj.SSHClient;
 import net.schmizz.sshj.sftp.FileAttributes;
@@ -29,7 +28,6 @@ import org.openrdf.model.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.github.podd.api.data.DataReference;
 import com.github.podd.api.data.PoddDataRepository;
 import com.github.podd.api.data.SSHFileReference;
 import com.github.podd.exception.DataReferenceNotSupportedException;
@@ -42,7 +40,7 @@ import com.github.podd.utils.PODD;
  */
 public class SSHFileRepositoryImpl extends AbstractPoddDataRepositoryImpl<SSHFileReference>
 {
-    private static final DefaultConfig DEFAULT_CONFIG =  new DefaultConfig();;
+    private static final DefaultConfig DEFAULT_CONFIG = new DefaultConfig();
     
     protected final Logger log = LoggerFactory.getLogger(this.getClass());
     
@@ -125,8 +123,8 @@ public class SSHFileRepositoryImpl extends AbstractPoddDataRepositoryImpl<SSHFil
             throw new IOException("Port number could not be parsed correctly: " + port);
         }
         
-        String fileName = ((SSHFileReference)dataReference).getFilename();
-        final String path = ((SSHFileReference)dataReference).getPath();
+        String fileName = dataReference.getFilename();
+        final String path = dataReference.getPath();
         if(path != null && path.trim().length() > 0)
         {
             fileName = path + "/" + fileName;
@@ -134,7 +132,7 @@ public class SSHFileRepositoryImpl extends AbstractPoddDataRepositoryImpl<SSHFil
         
         this.log.info("Validating file reference: " + host + ":" + port + " " + fileName);
         
-        try (SSHClient sshClient = new SSHClient(DEFAULT_CONFIG);)
+        try (SSHClient sshClient = new SSHClient(SSHFileRepositoryImpl.DEFAULT_CONFIG);)
         {
             sshClient.addHostKeyVerifier(fingerprint);
             sshClient.connect(host, portNo);

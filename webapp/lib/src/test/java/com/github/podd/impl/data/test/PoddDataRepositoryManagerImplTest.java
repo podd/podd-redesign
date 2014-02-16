@@ -57,7 +57,6 @@ import com.github.podd.exception.DataReferenceNotSupportedException;
 import com.github.podd.impl.PoddOWLManagerImpl;
 import com.github.podd.impl.PoddRepositoryManagerImpl;
 import com.github.podd.impl.data.PoddDataRepositoryManagerImpl;
-import com.github.podd.impl.data.test.SSHService;
 import com.github.podd.utils.PODD;
 import com.github.podd.utils.PoddWebConstants;
 
