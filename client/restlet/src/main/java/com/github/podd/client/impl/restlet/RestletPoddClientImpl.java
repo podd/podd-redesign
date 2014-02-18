@@ -409,9 +409,14 @@ public class RestletPoddClientImpl implements PoddClient
         return result;
     }
     
-    protected PropertyUtil getProps()
+    public PropertyUtil getProps()
     {
         return this.props;
+    }
+    
+    public void setProps(final PropertyUtil props)
+    {
+        this.props = props;
     }
     
     /**
