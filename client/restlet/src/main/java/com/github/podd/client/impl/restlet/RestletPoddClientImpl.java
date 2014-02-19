@@ -82,28 +82,30 @@ import com.github.podd.utils.PoddWebConstants;
  */
 public class RestletPoddClientImpl implements PoddClient
 {
-    public final static String PROPERTY_BUNDLE = "poddclient";
-    
-    protected final static String TEMP_UUID_PREFIX = "urn:temp:uuid:";
-    
     protected final Logger log = LoggerFactory.getLogger(this.getClass());
     
-    private volatile String serverUrl = null;
+    public final static String DEFAULT_PROPERTY_BUNDLE = "poddclient";
+    
+    public static final String PROP_PODD_SERVER_URL = "podd.serverurl";
+    
+    public static final String DEFAULT_PODD_SERVER_URL = "http://localhost:8080/podd/";
+    
+    public final static String TEMP_UUID_PREFIX = "urn:temp:uuid:";
     
     private Series<CookieSetting> currentCookies = new Series<CookieSetting>(CookieSetting.class);
     
     private PropertyUtil props;
+    
+    private volatile String serverUrl = null;
     
     /**
      * Shortcut to {@link PODD#VF}
      */
     protected final static ValueFactory vf = PODD.VF;
     
-    private static final String PROP_PODD_SERVER_URL = "podd.serverurl";
-    
     public RestletPoddClientImpl()
     {
-        this.props = new PropertyUtil(RestletPoddClientImpl.PROPERTY_BUNDLE);
+        this.props = new PropertyUtil(RestletPoddClientImpl.DEFAULT_PROPERTY_BUNDLE);
     }
     
     public RestletPoddClientImpl(final String poddServerUrl)
@@ -401,7 +403,8 @@ public class RestletPoddClientImpl implements PoddClient
                 if(result == null)
                 {
                     this.serverUrl =
-                            this.props.get(RestletPoddClientImpl.PROP_PODD_SERVER_URL, "http://localhost:8080/podd/");
+                            this.props.get(RestletPoddClientImpl.PROP_PODD_SERVER_URL,
+                                    RestletPoddClientImpl.DEFAULT_PODD_SERVER_URL);
                 }
                 result = this.serverUrl;
             }
