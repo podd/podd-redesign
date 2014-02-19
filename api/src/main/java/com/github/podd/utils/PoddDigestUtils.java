@@ -9,13 +9,12 @@ import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 public class PoddDigestUtils
 {
-    public ConcurrentMap<Path, ConcurrentMap<String, String>> getDigests(List<Path> pathsToDigest) throws IOException,
+    public static ConcurrentMap<Path, ConcurrentMap<String, String>> getDigests(List<Path> pathsToDigest) throws IOException,
         NoSuchAlgorithmException
     {
         ConcurrentMap<Path, ConcurrentMap<String, String>> result = new ConcurrentHashMap<>();
