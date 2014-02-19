@@ -481,7 +481,9 @@ public abstract class AbstractPoddClientTest
         
         this.testClient.setPoddServerUrl(null);
         
-        Assert.assertNull(this.testClient.getPoddServerUrl());
+        // Implementations may use PoddClient#getProps to regenerate the URL after someone sets it
+        // to null
+        // Assert.assertNull(this.testClient.getPoddServerUrl());
     }
     
     /**
@@ -766,7 +768,9 @@ public abstract class AbstractPoddClientTest
         
         this.testClient.setPoddServerUrl(null);
         
-        Assert.assertNull(this.testClient.getPoddServerUrl());
+        // Implementations may use PoddClient#getProps to regenerate the URL after someone sets it
+        // to null
+        // Assert.assertNull(this.testClient.getPoddServerUrl());
     }
     
     /**
