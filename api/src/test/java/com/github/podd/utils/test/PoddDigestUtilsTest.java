@@ -72,6 +72,8 @@ public class PoddDigestUtilsTest
         
         ConcurrentMap<String, String> emptyFileDigests = digests.get(emptyFile);
         
+        Assert.assertEquals(2, emptyFileDigests.size());
+        
         Assert.assertTrue(emptyFileDigests.containsKey("MD5"));
         Assert.assertTrue(emptyFileDigests.containsKey("SHA-1"));
         
@@ -98,6 +100,8 @@ public class PoddDigestUtilsTest
         Assert.assertTrue(digests.containsKey(shortFile));
         
         ConcurrentMap<String, String> shortFileDifests = digests.get(shortFile);
+        
+        Assert.assertEquals(2, shortFileDifests.size());
         
         Assert.assertTrue(shortFileDifests.containsKey("MD5"));
         Assert.assertTrue(shortFileDifests.containsKey("SHA-1"));
