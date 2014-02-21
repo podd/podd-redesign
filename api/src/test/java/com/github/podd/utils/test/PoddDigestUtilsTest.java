@@ -18,7 +18,9 @@ package com.github.podd.utils.test;
 
 import static org.junit.Assert.*;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
@@ -53,7 +55,7 @@ public class PoddDigestUtilsTest
     }
     
     @Test
-    public final void testGetDigests() throws Exception
+    public final void testGetDigestsEmpty() throws Exception
     {
         Path emptyFile = testDir.resolve("emptyfile.txt");
         Files.createFile(emptyFile);
@@ -75,6 +77,33 @@ public class PoddDigestUtilsTest
         
         Assert.assertEquals("d41d8cd98f00b204e9800998ecf8427e", emptyFileDigests.get("MD5"));
         Assert.assertEquals("da39a3ee5e6b4b0d3255bfef95601890afd80709", emptyFileDigests.get("SHA-1"));
+    }
+    
+    @Test
+    public final void testGetDigestsShort() throws Exception
+    {
+        Path shortFile = testDir.resolve("shortfile.txt");
+        Files.copy(
+                new ByteArrayInputStream("The quick brown fox jumps over the lazy dog".getBytes(StandardCharsets.UTF_8)),
+                shortFile);
+        
+        Assert.assertTrue(Files.exists(shortFile));
+        Assert.assertEquals(43, Files.size(shortFile));
+        
+        ConcurrentMap<Path, ConcurrentMap<String, String>> digests =
+                PoddDigestUtils.getDigests(Arrays.asList(shortFile));
+        
+        Assert.assertEquals(1, digests.size());
+        
+        Assert.assertTrue(digests.containsKey(shortFile));
+        
+        ConcurrentMap<String, String> shortFileDifests = digests.get(shortFile);
+        
+        Assert.assertTrue(shortFileDifests.containsKey("MD5"));
+        Assert.assertTrue(shortFileDifests.containsKey("SHA-1"));
+        
+        Assert.assertEquals("9e107d9d372bb6826bd81d3542a419d6", shortFileDifests.get("MD5"));
+        Assert.assertEquals("2fd4e1c67a2d28fced849ee1bb76e7391b93eb12", shortFileDifests.get("SHA-1"));
     }
     
 }

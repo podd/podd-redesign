@@ -41,6 +41,11 @@ public class PoddDigestUtils
             {
                 DigestInputStream shaStream = new DigestInputStream(inputStream, MessageDigest.getInstance("SHA-1"));
                 DigestInputStream md5Stream = new DigestInputStream(shaStream, MessageDigest.getInstance("MD5"));
+                int b;
+                while((b = md5Stream.read()) != -1)
+                {
+                    // No processing needed
+                }
                 byte[] shaDigest = shaStream.getMessageDigest().digest();
                 byte[] md5Digest = md5Stream.getMessageDigest().digest();
                 String shaDigestString = new BigInteger(1, shaDigest).toString(16);
