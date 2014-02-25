@@ -133,28 +133,4 @@ public class RdfUtilityTest
         Assert.assertEquals("Not the expected number of statements in the Model", 34, model.size());
     }
     
-    @Test
-    public void testisConnectedStructure() throws Exception
-    {
-        for(final Object[] testData : this.testDatas)
-        {
-            final InputStream inputStream = this.getClass().getResourceAsStream((String)testData[0]);
-            Assert.assertNotNull("Missing test resource", testData[0]);
-            
-            final boolean isConnected = RdfUtility.isConnectedStructure(inputStream, (RDFFormat)testData[1]);
-            Assert.assertEquals("Not the expected validity", testData[2], isConnected);
-        }
-    }
-    
-    @Test
-    public void testisConnectedStructureWithMultipleTopObjects() throws Exception
-    {
-        final InputStream inputStream =
-                this.getClass().getResourceAsStream(RdfUtilityTest.TEST_ARTIFACT_INVALID_3_TOP_OBJECTS);
-        Assert.assertNotNull("Missing test resource", RdfUtilityTest.TEST_ARTIFACT_INVALID_3_TOP_OBJECTS);
-        
-        final boolean isConnected = RdfUtility.isConnectedStructure(inputStream, RDFFormat.TURTLE);
-        Assert.assertEquals("Not the expected validity", false, isConnected);
-    }
-    
 }

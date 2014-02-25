@@ -42,14 +42,11 @@ import org.openrdf.query.QueryResults;
 import org.openrdf.query.TupleQuery;
 import org.openrdf.query.impl.DatasetImpl;
 import org.openrdf.query.resultio.helpers.QueryResultCollector;
-import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
-import org.openrdf.repository.sail.SailRepository;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.Rio;
 import org.openrdf.rio.helpers.StatementCollector;
-import org.openrdf.sail.memory.MemoryStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -269,111 +266,6 @@ public class RdfUtility
             throw new IOException("Inputstream was null");
         }
         return Rio.parse(resourceStream, "", format);
-    }
-    
-    /**
-     * Given an artifact, this method evaluates whether all Objects within the artifact are
-     * connected to the Top Object.
-     * 
-     * @param inputStream
-     *            Input stream containing the artifact statements
-     * @param format
-     *            The RDF format in which the statements are provided
-     * @return True if the artifact is structurally valid, false otherwise
-     */
-    public static boolean isConnectedStructure(final InputStream inputStream, RDFFormat format)
-    {
-        if(inputStream == null)
-        {
-            throw new NullPointerException("Input stream must not be null");
-        }
-        
-        if(format == null)
-        {
-            format = RDFFormat.RDFXML;
-        }
-        final URI context = ValueFactoryImpl.getInstance().createURI("urn:concrete:random");
-        
-        Repository tempRepository = null;
-        RepositoryConnection connection = null;
-        
-        try
-        {
-            // create a temporary in-memory repository
-            tempRepository = new SailRepository(new MemoryStore());
-            tempRepository.initialize();
-            connection = tempRepository.getConnection();
-            connection.begin();
-            
-            // load artifact statements into repository
-            connection.add(inputStream, "", format, context);
-            // DebugUtils.printContents(connection, context);
-            
-            return RdfUtility.isConnectedStructure(connection, context);
-            
-        }
-        catch(final Exception e)
-        {
-            // better to throw an exception containing error details
-            RdfUtility.log.error("An exception in checking connectedness of artifact", e);
-            return false;
-        }
-        finally
-        {
-            try
-            {
-                if(connection != null && connection.isOpen())
-                {
-                    connection.rollback();
-                    connection.close();
-                }
-                if(tempRepository != null)
-                {
-                    tempRepository.shutDown();
-                }
-            }
-            catch(final Exception e)
-            {
-                RdfUtility.log.error("Exception while releasing resources", e);
-            }
-        }
-    }
-    
-    /**
-     * Given an artifact, this method evaluates whether all Objects within the artifact are
-     * connected to the Top Object.
-     * 
-     * @param connection
-     *            The RepositoryConnection
-     * @param context
-     *            The Context within the RepositoryConnection.
-     * @return True if all internal objects are connected to the top object, false otherwise.
-     * @throws RepositoryException
-     */
-    public static boolean isConnectedStructure(final RepositoryConnection connection, final URI... context)
-        throws RepositoryException
-    {
-        // - find artifact and top object URIs
-        final List<Statement> topObjects =
-                Iterations.asList(connection.getStatements(null, PODD.PODD_BASE_HAS_TOP_OBJECT, null, false, context));
-        
-        if(topObjects.size() != 1)
-        {
-            RdfUtility.log.info("Artifact should have exactly 1 Top Object");
-            return false;
-        }
-        
-        final URI artifactUri = (URI)topObjects.get(0).getSubject();
-        
-        final Set<URI> disconnectedNodes = RdfUtility.findDisconnectedNodes(artifactUri, connection, context);
-        if(disconnectedNodes == null || disconnectedNodes.isEmpty())
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
     }
     
 }

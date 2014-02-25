@@ -18,6 +18,7 @@ package com.github.podd.impl;
 
 import info.aduna.iteration.Iterations;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -37,6 +38,7 @@ import org.openrdf.model.URI;
 import org.openrdf.model.Value;
 import org.openrdf.model.impl.LinkedHashModel;
 import org.openrdf.model.impl.LiteralImpl;
+import org.openrdf.model.impl.ValueFactoryImpl;
 import org.openrdf.model.vocabulary.OWL;
 import org.openrdf.model.vocabulary.RDF;
 import org.openrdf.model.vocabulary.RDFS;
@@ -50,9 +52,14 @@ import org.openrdf.query.TupleQueryResult;
 import org.openrdf.query.impl.DatasetImpl;
 import org.openrdf.query.resultio.helpers.QueryResultCollector;
 import org.openrdf.queryrender.RenderUtils;
+import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
+import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.RepositoryResult;
+import org.openrdf.repository.sail.SailRepository;
+import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.helpers.StatementCollector;
+import org.openrdf.sail.memory.MemoryStore;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLOntologyID;
 import org.slf4j.Logger;
@@ -1805,6 +1812,111 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         }
         
         return resultList;
+    }
+    
+    /**
+     * Given an artifact, this method evaluates whether all Objects within the artifact are
+     * connected to the Top Object.
+     * 
+     * @param inputStream
+     *            Input stream containing the artifact statements
+     * @param format
+     *            The RDF format in which the statements are provided
+     * @return True if the artifact is structurally valid, false otherwise
+     */
+    public boolean isConnectedStructure(final InputStream inputStream, RDFFormat format)
+    {
+        if(inputStream == null)
+        {
+            throw new NullPointerException("Input stream must not be null");
+        }
+        
+        if(format == null)
+        {
+            format = RDFFormat.RDFXML;
+        }
+        final URI context = ValueFactoryImpl.getInstance().createURI("urn:concrete:random");
+        
+        Repository tempRepository = null;
+        RepositoryConnection connection = null;
+        
+        try
+        {
+            // create a temporary in-memory repository
+            tempRepository = new SailRepository(new MemoryStore());
+            tempRepository.initialize();
+            connection = tempRepository.getConnection();
+            connection.begin();
+            
+            // load artifact statements into repository
+            connection.add(inputStream, "", format, context);
+            // DebugUtils.printContents(connection, context);
+            
+            return this.isConnectedStructure(connection, context);
+            
+        }
+        catch(final Exception e)
+        {
+            // better to throw an exception containing error details
+            this.log.error("An exception in checking connectedness of artifact", e);
+            return false;
+        }
+        finally
+        {
+            try
+            {
+                if(connection != null && connection.isOpen())
+                {
+                    connection.rollback();
+                    connection.close();
+                }
+                if(tempRepository != null)
+                {
+                    tempRepository.shutDown();
+                }
+            }
+            catch(final Exception e)
+            {
+                this.log.error("Exception while releasing resources", e);
+            }
+        }
+    }
+    
+    /**
+     * Given an artifact, this method evaluates whether all Objects within the artifact are
+     * connected to the Top Object.
+     * 
+     * @param connection
+     *            The RepositoryConnection
+     * @param context
+     *            The Context within the RepositoryConnection.
+     * @return True if all internal objects are connected to the top object, false otherwise.
+     * @throws RepositoryException
+     */
+    public boolean isConnectedStructure(final RepositoryConnection connection, final URI... context)
+        throws RepositoryException
+    {
+        // - find artifact and top object URIs
+        final List<Statement> topObjects =
+                Iterations.asList(connection.getStatements(null, PODD.PODD_BASE_HAS_TOP_OBJECT, null, false, context));
+        
+        if(topObjects.size() != 1)
+        {
+            this.log.info("Artifact should have exactly 1 Top Object");
+            return false;
+        }
+        
+        final URI artifactUri = (URI)topObjects.get(0).getSubject();
+        
+        final Set<URI> disconnectedNodes = RdfUtility.findDisconnectedNodes(artifactUri, connection, context);
+        if(disconnectedNodes == null || disconnectedNodes.isEmpty())
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
     }
     
     @Override

@@ -50,7 +50,16 @@
 		</dependency>
 		<dependency>
 			<groupId>org.openrdf.sesame</groupId>
+			<artifactId>sesame-rio-rdfjson</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.openrdf.sesame</groupId>
+			<artifactId>sesame-queryresultio-api</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.openrdf.sesame</groupId>
 			<artifactId>sesame-queryparser-sparql</artifactId>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.openrdf.sesame</groupId>
@@ -59,10 +68,12 @@
 		<dependency>
 			<groupId>org.openrdf.sesame</groupId>
 			<artifactId>sesame-repository-sail</artifactId>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.openrdf.sesame</groupId>
 			<artifactId>sesame-sail-memory</artifactId>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.github.ansell.owlapi</groupId>
@@ -101,8 +112,6 @@
 			<groupId>com.github.ansell.restlet-utils</groupId>
 			<artifactId>restlet-utils</artifactId>
 		</dependency>
-		<!-- <dependency> <groupId>org.kohsuke.metainf-services</groupId> <artifactId>metainf-services</artifactId> 
-			<optional>true</optional> </dependency> -->
 	</dependencies>
 	<build>
 		<plugins>
