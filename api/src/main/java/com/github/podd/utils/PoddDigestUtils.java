@@ -30,34 +30,68 @@ import java.util.concurrent.ConcurrentMap;
 
 public class PoddDigestUtils
 {
-    public static ConcurrentMap<Path, ConcurrentMap<String, String>> getDigests(List<Path> pathsToDigest)
+    /**
+     * An enumeration linking the MessageDigest algorithm identifier to the file extension used to
+     * store it.
+     * 
+     * @author Peter Ansell p_ansell@yahoo.com
+     */
+    public static enum Algorithm
+    {
+        SHA1("SHA-1", ".sha1"),
+        
+        MD5("MD5", ".md5");
+        
+        private final String name;
+        private final String extension;
+        
+        Algorithm(final String name, final String extension)
+        {
+            this.name = name;
+            this.extension = extension;
+        }
+        
+        public String getExtension()
+        {
+            return this.extension;
+        }
+        
+        public String getName()
+        {
+            return this.name;
+        }
+    }
+    
+    public static ConcurrentMap<Path, ConcurrentMap<Algorithm, String>> getDigests(final List<Path> pathsToDigest)
         throws IOException, NoSuchAlgorithmException
     {
-        ConcurrentMap<Path, ConcurrentMap<String, String>> result = new ConcurrentHashMap<>();
+        final ConcurrentMap<Path, ConcurrentMap<Algorithm, String>> result = new ConcurrentHashMap<>();
         
-        for(Path nextPath : pathsToDigest)
+        for(final Path nextPath : pathsToDigest)
         {
             try (final InputStream inputStream = Files.newInputStream(nextPath))
             {
-                DigestInputStream shaStream = new DigestInputStream(inputStream, MessageDigest.getInstance("SHA-1"));
-                DigestInputStream md5Stream = new DigestInputStream(shaStream, MessageDigest.getInstance("MD5"));
+                final DigestInputStream shaStream =
+                        new DigestInputStream(inputStream, MessageDigest.getInstance(Algorithm.SHA1.getName()));
+                final DigestInputStream md5Stream =
+                        new DigestInputStream(shaStream, MessageDigest.getInstance(Algorithm.MD5.getName()));
                 int b;
                 while((b = md5Stream.read()) != -1)
                 {
                     // No processing needed
                 }
-                byte[] shaDigest = shaStream.getMessageDigest().digest();
-                byte[] md5Digest = md5Stream.getMessageDigest().digest();
-                String shaDigestString = new BigInteger(1, shaDigest).toString(16);
-                String md5DigestString = new BigInteger(1, md5Digest).toString(16);
-                ConcurrentMap<String, String> nextMap = new ConcurrentHashMap<String, String>();
-                ConcurrentMap<String, String> putIfAbsent = result.putIfAbsent(nextPath, nextMap);
+                final byte[] shaDigest = shaStream.getMessageDigest().digest();
+                final byte[] md5Digest = md5Stream.getMessageDigest().digest();
+                final String shaDigestString = new BigInteger(1, shaDigest).toString(16);
+                final String md5DigestString = new BigInteger(1, md5Digest).toString(16);
+                ConcurrentMap<Algorithm, String> nextMap = new ConcurrentHashMap<Algorithm, String>();
+                final ConcurrentMap<Algorithm, String> putIfAbsent = result.putIfAbsent(nextPath, nextMap);
                 if(putIfAbsent != null)
                 {
                     nextMap = putIfAbsent;
                 }
-                nextMap.putIfAbsent("MD5", md5DigestString);
-                nextMap.putIfAbsent("SHA-1", shaDigestString);
+                nextMap.putIfAbsent(Algorithm.MD5, md5DigestString);
+                nextMap.putIfAbsent(Algorithm.SHA1, shaDigestString);
             }
         }
         
