@@ -683,33 +683,17 @@ public class PoddOWLManagerImpl implements PoddOWLManager
         }
     }
     
-    /**
-     * @param owlSource
-     * @param permanentRepositoryConnection
-     * @param inferredOWLOntologyID
-     * @return
-     * @throws OWLException
-     * @throws Throwable
-     */
     @Override
     public InferredOWLOntologyID loadAndInfer(final OWLOntologyDocumentSource owlSource,
             final RepositoryConnection permanentRepositoryConnection, final OWLOntologyID replacementOntologyID,
-            final Set<? extends OWLOntologyID> ontologyIDs, final RepositoryConnection managementConnection,
-            final URI schemaManagementContext) throws OWLException, PoddException, OpenRDFException, IOException
+            final Set<? extends OWLOntologyID> dependentSchemaOntologies,
+            final RepositoryConnection managementConnection, final URI schemaManagementContext) throws OWLException,
+        PoddException, OpenRDFException, IOException
     {
-        return this.loadAndInfer(permanentRepositoryConnection, replacementOntologyID, owlSource, true, ontologyIDs,
-                managementConnection, schemaManagementContext);
+        return this.loadAndInfer(permanentRepositoryConnection, replacementOntologyID, owlSource, true,
+                dependentSchemaOntologies, managementConnection, schemaManagementContext);
     }
     
-    /**
-     * @param permanentRepositoryConnection
-     * @param owlSource
-     * @param inferredOWLOntologyID
-     * @param removeFromCacheOnException
-     * @return
-     * @throws OWLException
-     * @throws Throwable
-     */
     public InferredOWLOntologyID loadAndInfer(final RepositoryConnection permanentRepositoryConnection,
             final OWLOntologyID ontologyID, final OWLOntologyDocumentSource owlSource,
             final boolean removeFromCacheOnException, final Set<? extends OWLOntologyID> dependentSchemaOntologies,
@@ -800,6 +784,8 @@ public class PoddOWLManagerImpl implements PoddOWLManager
                 // are all encapsulated
                 // in the InferredOWLOntologyID object.
                 
+                // FIXME: This should return a Future so that we can defer inferencing into the
+                // background
                 inferredOWLOntologyID = this.inferStatements(nextOntology, permanentRepositoryConnection, nextReasoner);
             }
         }
