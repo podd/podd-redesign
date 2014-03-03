@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import org.openrdf.OpenRDFException;
@@ -91,6 +92,7 @@ public class PoddDataRepositoryManagerImpl implements PoddDataRepositoryManager
     {
         try (final InputStream inputA = this.getClass().getResourceAsStream(PODD.PATH_PODD_DATA_REPOSITORY_V1);)
         {
+        	Objects.requireNonNull(inputA, "could not find data repository ontology");
             // load poddDataRepository.owl into a Model
             this.dataRepositorySchema = Rio.parse(inputA, "", RDFFormat.RDFXML);
         }
