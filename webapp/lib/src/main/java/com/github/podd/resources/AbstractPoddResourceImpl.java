@@ -27,6 +27,7 @@ import org.restlet.resource.ServerResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.github.ansell.propertyutil.PropertyUtil;
 import com.github.podd.api.PoddArtifactManager;
 import com.github.podd.api.PoddRepositoryManager;
 import com.github.podd.api.PoddSchemaManager;
@@ -186,6 +187,11 @@ public abstract class AbstractPoddResourceImpl extends ServerResource
         final PoddWebServiceApplication application = (PoddWebServiceApplication)super.getApplication();
         
         return application;
+    }
+    
+    public PropertyUtil getPropertyUtil()
+    {
+        return this.getPoddApplication().getPropertyUtil();
     }
     
     public PoddArtifactManager getPoddArtifactManager()
