@@ -613,7 +613,8 @@ public class OntologyUtilsTest
         Assert.assertTrue(imports.contains(this.testPoddDcV2));
         Assert.assertTrue(imports.contains(this.testPoddUserV2));
         Assert.assertTrue(imports.contains(this.testPoddFoafV2));
-        Assert.assertEquals(7, imports.size());
+        Assert.assertTrue(imports.contains(this.testPoddPlantV2));
+        Assert.assertEquals(8, imports.size());
     }
     
     @Test
