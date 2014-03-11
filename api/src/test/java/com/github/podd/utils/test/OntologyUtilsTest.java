@@ -509,7 +509,11 @@ public class OntologyUtilsTest
         final List<OWLOntologyID> imports = OntologyUtils.artifactImports(this.testOntologyID, model);
         
         // this.log.info("Imports: {}", imports);
-        
+        Assert.assertTrue(imports.contains(this.testPoddBaseV1));
+        Assert.assertTrue(imports.contains(this.testPoddScienceV1));
+        Assert.assertTrue(imports.contains(this.testPoddDcV1));
+        Assert.assertTrue(imports.contains(this.testPoddUserV1));
+        Assert.assertTrue(imports.contains(this.testPoddFoafV1));
         Assert.assertEquals(5, imports.size());
     }
     
@@ -528,8 +532,37 @@ public class OntologyUtilsTest
         final List<OWLOntologyID> imports = OntologyUtils.artifactImports(this.testOntologyID, model);
         
         // this.log.info("Imports: {}", imports);
-        
+        Assert.assertTrue(imports.contains(this.testPoddBaseV1));
+        Assert.assertTrue(imports.contains(this.testPoddScienceV1));
+        Assert.assertTrue(imports.contains(this.testPoddDcV1));
+        Assert.assertTrue(imports.contains(this.testPoddUserV1));
+        Assert.assertTrue(imports.contains(this.testPoddFoafV1));
         Assert.assertEquals(5, imports.size());
+    }
+    
+    @Test
+    public void testGetArtifactImportsRealisticInraV2() throws Exception
+    {
+        final Model model =
+                Rio.parse(this.getClass().getResourceAsStream("/test/artifacts/artifact-imports-test-V2.nq"), "",
+                        RDFFormat.NQUADS);
+        
+        model.addAll(Rio.parse(this.getClass().getResourceAsStream("/test/test-podd-schema-manifest-inra.ttl"), "",
+                RDFFormat.TURTLE));
+        
+        // DebugUtils.printContents(model);
+        
+        final List<OWLOntologyID> imports = OntologyUtils.artifactImports(this.testOntologyID, model);
+        
+        // this.log.info("Imports: {}", imports);
+        Assert.assertTrue(imports.contains(this.testMisteaEventV2));
+        Assert.assertTrue(imports.contains(this.testMisteaObjectV2));
+        Assert.assertTrue(imports.contains(this.testPoddBaseV2));
+        Assert.assertTrue(imports.contains(this.testPoddScienceV2));
+        Assert.assertTrue(imports.contains(this.testPoddDcV2));
+        Assert.assertTrue(imports.contains(this.testPoddUserV2));
+        Assert.assertTrue(imports.contains(this.testPoddFoafV2));
+        Assert.assertEquals(7, imports.size());
     }
     
     @Test
