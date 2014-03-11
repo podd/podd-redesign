@@ -30,12 +30,14 @@ import org.restlet.data.Protocol;
 import org.restlet.data.Reference;
 import org.restlet.representation.Representation;
 import org.restlet.routing.Router;
+import org.semanticweb.owlapi.model.OWLException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 
 import com.github.ansell.restletutils.ClassLoaderDirectory;
 import com.github.ansell.restletutils.CompositeClassLoader;
+import com.github.podd.exception.PoddException;
 import com.github.podd.restlet.ApplicationUtils;
 import com.github.podd.restlet.PoddWebServiceApplication;
 import com.github.podd.restlet.PoddWebServiceApplicationImpl;
@@ -143,7 +145,7 @@ public class DefaultPoddRestletComponent extends Component
             // not be null during the setup process
             ApplicationUtils.setupApplication(nextApplication, nextApplication.getContext());
         }
-        catch(final OpenRDFException | UnsupportedRDFormatException | IOException e)
+        catch(final OpenRDFException | UnsupportedRDFormatException | IOException | OWLException | PoddException e)
         {
             throw new RuntimeException("Could not setup application", e);
         }

@@ -110,7 +110,8 @@ public class GetMetadataResourceImpl extends AbstractPoddResourceImpl
             {
                 artifactID = this.getPoddArtifactManager().getArtifact(IRI.create(artifactUri));
             }
-            
+            this.log.info("artifactID: {}", artifactID);
+            this.log.info("objectType: {}", objectType);
             this.getPoddArtifactManager().exportObjectMetadata(PODD.VF.createURI(objectType), output, format,
                     includeDoNotDisplayProperties, containsPropertyPolicy, artifactID);
         }

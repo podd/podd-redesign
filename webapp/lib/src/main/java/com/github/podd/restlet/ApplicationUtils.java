@@ -284,7 +284,7 @@ public class ApplicationUtils
     }
     
     public static void setupApplication(final PoddWebServiceApplication application, final Context applicationContext)
-        throws OpenRDFException, UnsupportedRDFormatException, IOException
+        throws OpenRDFException, UnsupportedRDFormatException, IOException, OWLException, PoddException
     {
         final PropertyUtil props = application.getPropertyUtil();
         
@@ -450,11 +450,9 @@ public class ApplicationUtils
     /**
      * @param application
      * @param props
-     * @throws RuntimeException
-     * @throws UnsupportedRDFormatException
+     *  
      */
-    public static void setupSchemas(final PoddWebServiceApplication application) throws RuntimeException,
-        UnsupportedRDFormatException
+    public static void setupSchemas(final PoddWebServiceApplication application) throws IOException , OpenRDFException , OWLException , PoddException
     {
         final PropertyUtil props = application.getPropertyUtil();
         final PoddSchemaManager poddSchemaManager = application.getPoddSchemaManager();
@@ -633,7 +631,9 @@ public class ApplicationUtils
         catch(IOException | OpenRDFException | OWLException | PoddException e)
         {
             ApplicationUtils.log.error("Fatal Error!!! Could not load schema ontologies", e);
+            throw e;
         }
+        
     }
     
     private ApplicationUtils()

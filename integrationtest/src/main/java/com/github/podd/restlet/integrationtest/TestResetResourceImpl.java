@@ -27,9 +27,11 @@ import org.restlet.Response;
 import org.restlet.Restlet;
 import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
+import org.semanticweb.owlapi.model.OWLException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.github.podd.exception.PoddException;
 import com.github.podd.restlet.ApplicationUtils;
 import com.github.podd.restlet.PoddWebServiceApplication;
 import com.github.podd.test.TestUtils;
@@ -72,7 +74,7 @@ public class TestResetResourceImpl extends Restlet
             ApplicationUtils.setupApplication(this.application, this.application.getContext());
             TestUtils.setupTestUser(this.application);
         }
-        catch(final OpenRDFException | UnsupportedRDFormatException | IOException e)
+        catch(final OpenRDFException | UnsupportedRDFormatException | IOException | OWLException | PoddException e)
         {
             this.log.error("Could not reset application", e);
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Could not reset application", e);

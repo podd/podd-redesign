@@ -870,7 +870,7 @@ public class OntologyUtils
                 OntologyUtils.log.error("Schema ontology in manifest has owl:imports coming directly from it: {}",
                         nextOntologyUri);
                 throw new SchemaManifestException(IRI.create(nextOntologyUri),
-                        "Schema ontology in manifest has owl:imports coming directly from it");
+                        String.format("Schema ontology in manifest has owl:imports coming directly from it {}",nextOntologyUri));
             }
             
             final Model currentVersion = manifestModel.filter(nextOntologyUri, PODD.OMV_CURRENT_VERSION, null);
@@ -879,14 +879,14 @@ public class OntologyUtils
             {
                 OntologyUtils.log.error("Missing OMV current version for schema ontology: {}", nextOntologyUri);
                 throw new SchemaManifestException(IRI.create(nextOntologyUri),
-                        "Missing OMV current version for schema ontology");
+                		String.format("Missing OMV current version for schema ontology : {}",nextOntologyUri));
             }
             
             if(currentVersion.size() > 1)
             {
                 OntologyUtils.log.error("Multiple OMV current versions for schema ontology: {}", nextOntologyUri);
                 throw new SchemaManifestException(IRI.create(nextOntologyUri),
-                        "Multiple OMV current versions for schema ontology");
+                		String.format("Multiple OMV current versions for schema ontology : {}",nextOntologyUri));
             }
         }
         
@@ -903,17 +903,18 @@ public class OntologyUtils
                 if(input == null)
                 {
                     throw new SchemaManifestException(IRI.create(nextVersionUri),
-                            "Could not find schema at designated classpath location: " + nextVersionUri.stringValue());
+                    		String.format("Could not find schema at designated classpath location: {} " , nextVersionUri.stringValue()));
                 }
                 final Model model = Rio.parse(input, "", format);
                 final Set<Value> importsInOwlFile = model.filter(null, OWL.IMPORTS, null).objects();
                 
-                OntologyUtils.log.debug("Comparing: \n Manifest: {} \n Owl:      {}", importsInManifest,
-                        importsInOwlFile);
+                
                 if(!importsInManifest.equals(importsInOwlFile))
                 {
+                	OntologyUtils.log.warn("Comparing: \n Manifest: {} \n Owl:      {}", importsInManifest,
+                            importsInOwlFile);
                     throw new SchemaManifestException(IRI.create(nextVersionUri),
-                            "Schema manifest imports not consistent with actual imports");
+                    		String.format("Schema manifest imports not consistent with actual imports : {}",nextVersionUri));
                 }
             }
         }
