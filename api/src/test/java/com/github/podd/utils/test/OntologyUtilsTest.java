@@ -134,6 +134,12 @@ public class OntologyUtilsTest
     private URI testVersionUriB2;
     private URI testVersionUriC1;
     private URI testVersionUriC3;
+	private URI testMisteaEventUri;
+	private URI testMisteaEventUriV2;
+	private InferredOWLOntologyID testMisteaEventV2;
+	private URI testMisteaObjectUri;
+	private URI testMisteaObjectUriV2;
+	private InferredOWLOntologyID testMisteaObjectV2;
     
     private final InferredOWLOntologyID owlid(final IRI ontologyUri, final IRI versionUri, final IRI inferredUri)
     {
@@ -188,6 +194,15 @@ public class OntologyUtilsTest
         this.testPoddPlantUriV2 = this.uri("http://purl.org/podd/ns/version/poddPlant/2");
         this.testPoddPlantV1 = this.owlid(this.testPoddPlantUri, this.testPoddPlantUriV1);
         this.testPoddPlantV2 = this.owlid(this.testPoddPlantUri, this.testPoddPlantUriV2);
+        
+        this.testMisteaEventUri = this.uri("http://www.mistea.supagro.inra.fr/event");
+        this.testMisteaEventUriV2 = this.uri("http://www.mistea.supagro.inra.fr/event/2");
+        this.testMisteaEventV2 = this.owlid(this.testMisteaEventUri, this.testMisteaEventUriV2);
+        
+        this.testMisteaObjectUri = this.uri("http://www.mistea.supagro.inra.fr/object");
+        this.testMisteaObjectUriV2 = this.uri("http://www.mistea.supagro.inra.fr/object/2");
+        this.testMisteaObjectV2 = this.owlid(this.testMisteaObjectUri, this.testMisteaObjectUriV2);
+       
         
         this.testOntologyUri1 = this.uri("urn:test:ontology:uri:1");
         this.testVersionUri1 = this.uri("urn:test:ontology:uri:1:version:1");
@@ -496,6 +511,50 @@ public class OntologyUtilsTest
         // this.log.info("Imports: {}", imports);
         
         Assert.assertEquals(5, imports.size());
+    }
+    
+    @Test
+    public void testGetArtifactImportsRealisticInra() throws Exception
+    {
+        final Model model =
+                Rio.parse(this.getClass().getResourceAsStream("/test/artifacts/artifact-imports-test.nq"), "",
+                        RDFFormat.NQUADS);
+        
+        model.addAll(Rio.parse(this.getClass().getResourceAsStream("/test/test-podd-schema-manifest-inra.ttl"), "",
+                RDFFormat.TURTLE));
+        
+        // DebugUtils.printContents(model);
+        
+        final List<OWLOntologyID> imports = OntologyUtils.artifactImports(this.testOntologyID, model);
+        
+        // this.log.info("Imports: {}", imports);
+        
+        Assert.assertEquals(5, imports.size());
+    }
+    
+    @Test
+    public void testGetArtifactImportsRealisticInraVersion2() throws Exception
+    {
+        final Model model =
+                Rio.parse(this.getClass().getResourceAsStream("/test/artifacts/artifact-imports-test-inra.nq"), "",
+                        RDFFormat.NQUADS);
+        
+        model.addAll(Rio.parse(this.getClass().getResourceAsStream("/test/test-podd-schema-manifest-inra.ttl"), "",
+                RDFFormat.TURTLE));
+        
+        // DebugUtils.printContents(model);
+        
+        final List<OWLOntologyID> imports = OntologyUtils.artifactImports(this.testOntologyID, model);
+        
+        // this.log.info("Imports: {}", imports);
+        Assert.assertTrue(imports.contains(this.testMisteaEventV2));
+        Assert.assertTrue(imports.contains(this.testMisteaObjectV2));
+        Assert.assertTrue(imports.contains(this.testPoddBaseV2));
+        Assert.assertTrue(imports.contains(this.testPoddScienceV2));
+        Assert.assertTrue(imports.contains(this.testPoddDcV2));
+        Assert.assertTrue(imports.contains(this.testPoddUserV2));
+        Assert.assertTrue(imports.contains(this.testPoddFoafV2));
+        Assert.assertEquals(7, imports.size());
     }
     
     @Test
