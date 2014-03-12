@@ -277,7 +277,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         
         sb.append("SELECT DISTINCT ?ontologyIri ?versionIri ?inferredVersionIri WHERE { ");
         
-        sb.append(" ?ontologyIri <" + RDF.TYPE.stringValue() + "> <" + OWL.ONTOLOGY.stringValue() + "> . ");
+        sb.append(" ?ontologyIri a <" + OWL.ONTOLOGY.stringValue() + "> . ");
         sb.append(" ?ontologyIri <" + OWL.VERSIONIRI.stringValue() + "> ?versionIri . ");
         sb.append(" OPTIONAL { ?versionIri <" + PODD.PODD_BASE_INFERRED_VERSION.stringValue()
                 + "> ?inferredVersionIri . } ");
