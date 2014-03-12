@@ -53,10 +53,14 @@
 				podd.initialiseNewObject(podd.artifactDatabank, podd.getCurrentArtifactIri(), podd.getCurrentObjectUri(), podd.parentUri, podd.parentPredicateUri);
 			}
 		}
+		
+		if(podd.objectTypeUri == '...event'){
+		
+		}else{
 				
 	    // Get Metadata and invoke the callback function which will continue to update the interface
 	    podd.getObjectTypeMetadata(podd.artifactIri, podd.objectTypeUri, podd.callbackFromGetMetadata, podd.schemaDatabank, podd.artifactDatabank);
-		
+		}
 		// Cache the data repositories list
 	    podd.dataRepositoriesDatabank = podd.newDatabank();
 		podd.getDataRepositories(podd.dataRepositoriesDatabank);

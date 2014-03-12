@@ -486,7 +486,7 @@ public abstract class AbstractPoddSchemaManagerTest
     {
         TestUtils.loadDefaultSchemaOntologies(this.testSchemaManager);
         final Set<InferredOWLOntologyID> schemaOntologies = this.testSchemaManager.getSchemaOntologies();
-        Assert.assertEquals(12, schemaOntologies.size());
+        Assert.assertEquals(14, schemaOntologies.size());
     }
     
     /**
@@ -565,7 +565,7 @@ public abstract class AbstractPoddSchemaManagerTest
     }
     
     /**
-     * Test method for
+     * Test method forPoddBase
      * {@link com.github.podd.api.PoddSchemaManager#getSchemaOntology(org.semanticweb.owlapi.model.OWLOntologyID)}
      * .
      */
@@ -727,8 +727,8 @@ public abstract class AbstractPoddSchemaManagerTest
     {
         TestUtils.loadDefaultSchemaOntologies(this.testSchemaManager);
         
-        Assert.assertEquals(12, this.testSchemaManager.getSchemaOntologies().size());
-        Assert.assertEquals(6, this.testSchemaManager.getCurrentSchemaOntologies().size());
+        Assert.assertEquals(14, this.testSchemaManager.getSchemaOntologies().size());
+        Assert.assertEquals(8, this.testSchemaManager.getCurrentSchemaOntologies().size());
     }
     
     /**
@@ -743,6 +743,30 @@ public abstract class AbstractPoddSchemaManagerTest
         
         Assert.assertEquals(2, this.testSchemaManager.getSchemaOntologies().size());
         Assert.assertEquals(2, this.testSchemaManager.getCurrentSchemaOntologies().size());
+    }
+    
+    /**
+     * Test method for {@link com.github.podd.api.PoddSchemaManager#uploadSchemaOntologies(Model)} .
+     * 
+     * Loads a set of test ontologies that each have a single class.
+     */
+    @Test
+    public final void testUploadSchemaOntologiesInra() throws Exception
+    {
+        TestUtils.loadSchemaOntologies("/test/test-podd-schema-manifest-inra.ttl", 14, this.testSchemaManager);
+        
+        Assert.assertEquals(14, this.testSchemaManager.getSchemaOntologies().size());
+        Set<InferredOWLOntologyID> currentSchemaOntologies = this.testSchemaManager.getCurrentSchemaOntologies();
+		Assert.assertEquals(8, currentSchemaOntologies.size());
+		Assert.assertTrue(currentSchemaOntologies.contains(TestUtils.testMisteaEventV2));
+		Assert.assertTrue(currentSchemaOntologies.contains(TestUtils.testMisteaObjectV2));
+		Assert.assertTrue(currentSchemaOntologies.contains(TestUtils.testPoddDcV2));
+		Assert.assertTrue(currentSchemaOntologies.contains(TestUtils.testPoddFoafV2));
+		Assert.assertTrue(currentSchemaOntologies.contains(TestUtils.testPoddBaseV2));
+		Assert.assertTrue(currentSchemaOntologies.contains(TestUtils.testPoddPlantV2));
+		Assert.assertTrue(currentSchemaOntologies.contains(TestUtils.testPoddScienceV2));
+		Assert.assertTrue(currentSchemaOntologies.contains(TestUtils.testPoddUserV2));
+
     }
     
     /**

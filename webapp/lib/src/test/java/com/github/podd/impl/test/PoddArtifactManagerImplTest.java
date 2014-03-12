@@ -71,6 +71,7 @@ public class PoddArtifactManagerImplTest extends AbstractPoddArtifactManagerTest
         return new PoddArtifactManagerImpl();
     }
     
+    
     @Override
     protected PoddPurlProcessorFactory getNewDoiPurlProcessorFactory()
     {

@@ -162,6 +162,10 @@
 	    	<a id="createChildObject" value="createChildObject">Add Child Object</a>
             <a href="${baseUrl}/artifact/attachdataref?artifacturi=${artifactUri?url!"unknown-artifacturi"}&amp;objecturi=${poddObject.objectURI?url!"unknown-objecturi"}">Attach data reference</a>
         </#if>
+        <#if  true>
+	    	<a id="createEvent" value="createEvent">Add Event</a>
+            <a href="${baseUrl}/artifact/attachdataref?artifacturi=${artifactUri?url!"unknown-artifacturi"}&amp;objecturi=${poddObject.objectURI?url!"unknown-objecturi"}">Attach data reference</a>
+        </#if>
         <#if  canPublish?? && canPublish>
         <a href="${baseUrl}/artifact/publish?artifacturi=${poddObject.objectURI!"unknown-pid"}/publish?publish=true">Publish Project</a>
         </#if>

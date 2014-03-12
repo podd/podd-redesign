@@ -400,7 +400,7 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
                         }
                         else
                         {
-                            this.log.debug("Permanent repository created but not cached: {}", repositoryUri);
+                            this.log.debug("Permanent repository exists but not cached: {}", repositoryUri);
                             if(this.log.isTraceEnabled())
                             {
                                 new RuntimeException().printStackTrace();

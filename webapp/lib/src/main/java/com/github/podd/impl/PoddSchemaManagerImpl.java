@@ -158,7 +158,7 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
         try
         {
             managementConnection = this.repositoryManager.getManagementRepositoryConnection();
-            
+      
             return this.sesameManager.getAllCurrentSchemaOntologyVersions(managementConnection,
                     this.repositoryManager.getSchemaManagementGraph());
         }
@@ -426,7 +426,7 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
                     this.sesameManager.getAllSchemaOntologyVersions(managementConnection,
                             this.repositoryManager.getSchemaManagementGraph());
             
-            this.log.debug("Existing schema ontologies at this point: {}", existingSchemaOntologies);
+            this.log.info("Existing schema ontologies at this point: {}", existingSchemaOntologies);
             
             for(final OWLOntologyID nextImport : nextImportOrder)
             {
@@ -450,13 +450,13 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
             
             final List<InferredOWLOntologyID> results = new ArrayList<>();
             
-            this.log.debug("About to load ontologies in order: {}", loadingOrder);
+            this.log.info("About to load ontologies in order: {}", loadingOrder);
             for(final Entry<OWLOntologyID, Boolean> loadEntry : loadingOrder.entrySet())
             {
-                this.log.debug("Ontologies loaded so far: {}", results);
+                this.log.info("Ontologies loaded so far: {}", results);
                 if(loadEntry.getValue())
                 {
-                    this.log.debug("Not loading ontology as it was already available: {}", loadEntry.getKey());
+                    this.log.info("Not loading ontology as it was already available: {}", loadEntry.getKey());
                     if(loadEntry.getKey() instanceof InferredOWLOntologyID)
                     {
                         results.add((InferredOWLOntologyID)loadEntry.getKey());

@@ -1677,6 +1677,25 @@ public abstract class AbstractPoddArtifactManagerTest
         }
     }
     
+    @Test
+    public final void testInraLoadArtifactBasicSuccess() throws Exception
+    {
+        this.loadVersion2SchemaOntologies();
+        
+        try (final InputStream inputStream =
+                this.getClass().getResourceAsStream("/test/artifacts/artifact-new-project-test.nq");)
+        {
+            // invoke test method
+            final InferredOWLOntologyID resultArtifactId =
+                    this.testArtifactManager.loadArtifact(inputStream, RDFFormat.NQUADS);
+            
+            // verify:
+            this.verifyLoadedArtifact(resultArtifactId, 11,
+                    TestConstants.TEST_ARTIFACT_BASIC_1_INTERNAL_OBJECT_CONCRETE_TRIPLES,
+                    TestConstants.TEST_ARTIFACT_BASIC_1_INTERNAL_OBJECT_INFERRED_TRIPLES, false);
+        }
+    }
+    
     @Ignore("TODO: Enable periodically to debug concurrency issues")
     @Test
     public final void testLoadArtifactConcurrency() throws Exception
