@@ -753,9 +753,43 @@ public abstract class AbstractPoddSchemaManagerTest
     @Test
     public final void testUploadSchemaOntologiesInra() throws Exception
     {
-        TestUtils.loadSchemaOntologies("/test/test-podd-schema-manifest-inra.ttl", 14, this.testSchemaManager);
+        List<InferredOWLOntologyID> loadSchemaOntologies = TestUtils.loadSchemaOntologies("/test/test-podd-schema-manifest-inra.ttl", 14, this.testSchemaManager);
         
-        Assert.assertEquals(14, this.testSchemaManager.getSchemaOntologies().size());
+		Assert.assertEquals(14, loadSchemaOntologies.size());
+		Assert.assertTrue(loadSchemaOntologies.contains(TestUtils.testMisteaEventV2));
+		Assert.assertTrue(loadSchemaOntologies.contains(TestUtils.testMisteaObjectV2));
+		Assert.assertTrue(loadSchemaOntologies.contains(TestUtils.testPoddDcV2));
+		Assert.assertTrue(loadSchemaOntologies.contains(TestUtils.testPoddFoafV2));
+		Assert.assertTrue(loadSchemaOntologies.contains(TestUtils.testPoddBaseV2));
+		Assert.assertTrue(loadSchemaOntologies.contains(TestUtils.testPoddPlantV2));
+		Assert.assertTrue(loadSchemaOntologies.contains(TestUtils.testPoddScienceV2));
+		Assert.assertTrue(loadSchemaOntologies.contains(TestUtils.testPoddUserV2));
+		Assert.assertTrue(loadSchemaOntologies.contains(TestUtils.testPoddDcV1));
+		Assert.assertTrue(loadSchemaOntologies.contains(TestUtils.testPoddFoafV1));
+		Assert.assertTrue(loadSchemaOntologies.contains(TestUtils.testPoddBaseV1));
+		Assert.assertTrue(loadSchemaOntologies.contains(TestUtils.testPoddPlantV1));
+		Assert.assertTrue(loadSchemaOntologies.contains(TestUtils.testPoddScienceV1));
+		Assert.assertTrue(loadSchemaOntologies.contains(TestUtils.testPoddUserV1));
+        
+        Set<InferredOWLOntologyID> schemaOntologies = this.testSchemaManager.getSchemaOntologies();
+        
+		Assert.assertEquals(14, schemaOntologies.size());
+		Assert.assertTrue(schemaOntologies.contains(TestUtils.testMisteaEventV2));
+		Assert.assertTrue(schemaOntologies.contains(TestUtils.testMisteaObjectV2));
+		Assert.assertTrue(schemaOntologies.contains(TestUtils.testPoddDcV2));
+		Assert.assertTrue(schemaOntologies.contains(TestUtils.testPoddFoafV2));
+		Assert.assertTrue(schemaOntologies.contains(TestUtils.testPoddBaseV2));
+		Assert.assertTrue(schemaOntologies.contains(TestUtils.testPoddPlantV2));
+		Assert.assertTrue(schemaOntologies.contains(TestUtils.testPoddScienceV2));
+		Assert.assertTrue(schemaOntologies.contains(TestUtils.testPoddUserV2));
+		Assert.assertTrue(schemaOntologies.contains(TestUtils.testPoddDcV1));
+		Assert.assertTrue(schemaOntologies.contains(TestUtils.testPoddFoafV1));
+		Assert.assertTrue(schemaOntologies.contains(TestUtils.testPoddBaseV1));
+		Assert.assertTrue(schemaOntologies.contains(TestUtils.testPoddPlantV1));
+		Assert.assertTrue(schemaOntologies.contains(TestUtils.testPoddScienceV1));
+		Assert.assertTrue(schemaOntologies.contains(TestUtils.testPoddUserV1));
+            
+
         Set<InferredOWLOntologyID> currentSchemaOntologies = this.testSchemaManager.getCurrentSchemaOntologies();
 		Assert.assertEquals(8, currentSchemaOntologies.size());
 		Assert.assertTrue(currentSchemaOntologies.contains(TestUtils.testMisteaEventV2));
@@ -766,6 +800,9 @@ public abstract class AbstractPoddSchemaManagerTest
 		Assert.assertTrue(currentSchemaOntologies.contains(TestUtils.testPoddPlantV2));
 		Assert.assertTrue(currentSchemaOntologies.contains(TestUtils.testPoddScienceV2));
 		Assert.assertTrue(currentSchemaOntologies.contains(TestUtils.testPoddUserV2));
+		
+		
+		
 
     }
     
