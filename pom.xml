@@ -485,12 +485,14 @@
 	</dependencyManagement>
 	<build>
 		<plugins>
-			<!-- Run the license plugin once over all source files. -->
+			<!-- Run the license plugin once over all source files. 
 			<plugin>
 				<groupId>com.mycila</groupId>
 				<artifactId>license-maven-plugin</artifactId>
 			</plugin>
+			-->
 		</plugins>
+		
 		<pluginManagement>
 			<plugins>
 				<plugin>

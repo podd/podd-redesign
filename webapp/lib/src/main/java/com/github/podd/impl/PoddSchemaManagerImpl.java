@@ -425,7 +425,8 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
             final Set<InferredOWLOntologyID> existingSchemaOntologies =
                     this.sesameManager.getAllSchemaOntologyVersions(managementConnection,
                             this.repositoryManager.getSchemaManagementGraph());
-            
+            this.log.debug("currentVersionsMap : {}", currentVersionsMap);
+            this.log.debug("nextImportOrder : {}", nextImportOrder);
             this.log.info("Existing schema ontologies at this point: {}", existingSchemaOntologies);
             
             for(final OWLOntologyID nextImport : nextImportOrder)
@@ -496,13 +497,15 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
                                         new LinkedHashSet<OWLOntologyID>(results));
                         
                         boolean updateCurrent = true;
-                        if(currentVersionsMap.containsKey(nextResult.getOntologyIRI()))
+                        if(currentVersionsMap.containsKey(nextResult.getOntologyIRI().toOpenRDFURI()))
                         {
-                            if(!currentVersionsMap.get(nextResult.getOntologyIRI()).equals(nextResult.getVersionIRI()))
+                            if(!currentVersionsMap.get(nextResult.getOntologyIRI().toOpenRDFURI()).equals(nextResult.getVersionIRI().toOpenRDFURI()))
                             {
                                 updateCurrent = false;
                             }
                         }
+                        
+                        this.log.debug("Current version update required : {} {}", nextResult, updateCurrent);
                         
                         this.setUpdateManagedSchemaOntologyVersionInternal(nextResult, updateCurrent,
                                 managementConnection, this.repositoryManager.getSchemaManagementGraph());

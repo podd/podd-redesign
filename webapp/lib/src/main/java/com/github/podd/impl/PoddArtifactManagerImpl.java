@@ -386,6 +386,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
     public Model exportArtifact(final InferredOWLOntologyID ontologyId, final boolean includeInferred)
         throws OpenRDFException, PoddException, IOException
     {
+    	this.log.info("TOTO:: exportArtifact");
         if(ontologyId.getOntologyIRI() == null || ontologyId.getVersionIRI() == null)
         {
             throw new PoddRuntimeException("Ontology IRI and Version IRI cannot be null");
@@ -449,6 +450,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             final boolean includeDoNotDisplayProperties, final MetadataPolicy containsPropertyPolicy,
             final InferredOWLOntologyID artifactID) throws OpenRDFException, PoddException, IOException
     {
+    	
         RepositoryConnection permanentConnection = null;
         RepositoryConnection managementConnection = null;
         
@@ -1455,7 +1457,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             final DataReferenceVerificationPolicy dataReferenceVerificationPolicy) throws OpenRDFException,
         PoddException, IOException, OWLException
     {
-    	this.log.info("TOTO");
+    	
         if(inputStream == null)
         {
             throw new NullPointerException("Input stream must not be null");
