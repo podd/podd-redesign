@@ -1691,8 +1691,8 @@ public abstract class AbstractPoddArtifactManagerTest
             
             // verify:
             this.verifyLoadedArtifact(resultArtifactId, 11,
-                    TestConstants.TEST_ARTIFACT_BASIC_1_INTERNAL_OBJECT_CONCRETE_TRIPLES,
-                    TestConstants.TEST_ARTIFACT_BASIC_1_INTERNAL_OBJECT_INFERRED_TRIPLES, false);
+                   20,
+                    611, false);
         }
     }
     
