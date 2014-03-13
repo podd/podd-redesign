@@ -57,6 +57,16 @@ public interface PoddWebConstants
     public static final String DEFAULT_TEMPLATE_BASE = "poddBase.html.ftl";
     
     /**
+     * Property for freemarker template used as the base for rendering all HTML pages
+     */
+    public static final String PROPERTY_TEMPLATE_OBJECT_DETAILS = "podd.template.objectDetails";
+    
+    /**
+     * Default freemarker template used as the base for rendering all HTML pages
+     */
+    public static final String DEFAULT_TEMPLATE_OBJECT_DETAILS = "objectDetails.html.ftl";
+    
+    /**
      * Property for freemarker template used for rendering all login pages
      */
     public static final String PROPERTY_TEMPLATE_LOGIN = "podd.template.login";
