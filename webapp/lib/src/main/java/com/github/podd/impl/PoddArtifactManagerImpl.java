@@ -386,7 +386,6 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
     public Model exportArtifact(final InferredOWLOntologyID ontologyId, final boolean includeInferred)
         throws OpenRDFException, PoddException, IOException
     {
-    	this.log.info("TOTO:: exportArtifact");
         if(ontologyId.getOntologyIRI() == null || ontologyId.getVersionIRI() == null)
         {
             throw new PoddRuntimeException("Ontology IRI and Version IRI cannot be null");
