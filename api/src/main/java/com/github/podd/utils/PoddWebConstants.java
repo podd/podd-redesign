@@ -64,6 +64,16 @@ public interface PoddWebConstants
     /**
      * Default freemarker template used as the base for rendering all HTML pages
      */
+    public static final String DEFAULT_TEMPLATE_EVENT = "event.html.ftl";
+    
+    /**
+     * Property for freemarker template used as the base for rendering all HTML pages
+     */
+    public static final String PROPERTY_TEMPLATE_EVENT = "podd.template.event";
+    
+    /**
+     * Default freemarker template used as the base for rendering all HTML pages
+     */
     public static final String DEFAULT_TEMPLATE_OBJECT_DETAILS = "objectDetails.html.ftl";
     
     /**
@@ -213,6 +223,11 @@ public interface PoddWebConstants
      * Path to the data reference attachment service
      */
     public static final String PATH_ATTACH_DATA_REF = "artifact/attachdataref";
+    
+    /**
+     * Path to the Event attachment service
+     */
+    public static final String PATH_EVENT_REF = "artifact/addevent";
     
     /**
      * Path to the list data repositories service.

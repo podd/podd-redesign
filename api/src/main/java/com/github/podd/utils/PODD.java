@@ -372,6 +372,10 @@ public interface PODD
     /** http://purl.org/podd/ns/poddUser#roleMappedObject */
     public static final URI PODD_ROLEMAPPEDOBJECT = PODD.VF.createURI(PODD.PODD_USER, "roleMappedObject");
     
+    public static final String INRA_EVENT = "http://www.mistea.supagro.inra.fr/event#";
+    
+    public static final URI INRA_EVENT_EVENT = PODD.VF.createURI(PODD.INRA_EVENT, "Event");
+    
     public static final String PODD_SCIENCE = "http://purl.org/podd/ns/poddScience#";
     
     /** http://purl.org/podd/ns/poddScience#Project */

@@ -444,6 +444,36 @@ public class PoddSesameManagerImpl implements PoddSesameManager
     }
     
     @Override
+    public Set<URI> getPossibleEvents(final URI objectUri, final RepositoryConnection repositoryConnection,
+            final URI... contexts) throws OpenRDFException
+    {
+        final StringBuilder sb = new StringBuilder(1024);
+        
+        sb.append("SELECT DISTINCT ?event ");
+        sb.append(" WHERE { ");
+        sb.append(" ?event rdfs:subClassOf+ <"+PODD.INRA_EVENT_EVENT+"> ");
+        sb.append(" } ");
+        
+        this.log.debug("Created SPARQL {} with poddObject bound to {}", sb, objectUri);
+        
+        final TupleQuery tupleQuery = repositoryConnection.prepareTupleQuery(QueryLanguage.SPARQL, sb.toString());
+        tupleQuery.setBinding("event", objectUri);
+        final QueryResultCollector queryResults = RdfUtility.executeTupleQuery(tupleQuery, contexts);
+        
+        final Set<URI> resultSet = new HashSet<URI>();
+        for(final BindingSet next : queryResults.getBindingSets())
+        {
+            final Value event = next.getValue("event");
+            if(event instanceof URI)
+            {
+                resultSet.add((URI)event);
+            }
+        }
+        this.log.info("Result spql query {}",resultSet);
+        return resultSet;
+    }
+    
+    @Override
     public Set<URI> getChildObjects(final URI objectUri, final RepositoryConnection repositoryConnection,
             final URI... contexts) throws OpenRDFException
     {
@@ -474,6 +504,8 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         
         return resultSet;
     }
+    
+    
     
     /*
      * (non-Javadoc)
