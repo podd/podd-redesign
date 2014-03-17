@@ -21,7 +21,7 @@
  "http://java.sun.com/dtd/web-app_2_3.dtd" >
 
 <web-app>
-    <display-name>PODD INRA</display-name>
+    <display-name>PODD Example Webapp</display-name>
 
     <!-- Servlet to Restlet adapter declaration (Mandatory) -->
     <servlet>
@@ -34,13 +34,6 @@
             <param-value>com.github.podd.restlet.DefaultPoddRestletComponent</param-value> 
         </init-param>
 
-        <!-- Restlet: Application class name -->
-<!-- NOT USED
-        <init-param>
-            <param-name>org.restlet.application</param-name>
-            <param-value>com.github.podd.oas.PoddWebServiceApplicationImpl</param-value>
-        </init-param>
- --> 
         <!-- Restlet: Add the Servlet context path to routes (Optional) -->
         <init-param>
             <param-name>org.restlet.autoWire</param-name>
