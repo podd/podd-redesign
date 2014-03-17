@@ -82,7 +82,7 @@
         <poddBase:hasLeadInstitution rdf:datatype="&xsd;string">CSIRO HRPPC</poddBase:hasLeadInstitution>
         <rdfs:comment rdf:datatype="&xsd;string">Characterising normal and okra leaf shapes</rdfs:comment>
         <poddScience:hasAnalysis rdf:resource="urn:temp:uuid:artifact:1#Demo_Analysis"/>
-        <poddScience:hasInvestigation rdf:resource="urn:temp:uuid:artifact:1#Demo_Investigation"/>
+        <poddScience:hasExperiment rdf:resource="urn:temp:uuid:artifact:1#Demo_Experiment"/>
         <poddScience:hasProjectPlan rdf:resource="urn:temp:uuid:artifact:1#Demo_Plan"/>
         <poddScience:hasProcess rdf:resource="urn:temp:uuid:artifact:1#Demo_Process1"/>
         <poddScience:hasProcess rdf:resource="urn:temp:uuid:artifact:1#Demo_Process2"/>
@@ -114,11 +114,11 @@
     
 
 
-    <!-- urn:temp:uuid:artifact:1#Demo_Investigation -->
+    <!-- urn:temp:uuid:artifact:1#Demo_Experiment -->
 
-    <owl:NamedIndividual rdf:about="urn:temp:uuid:artifact:1#Demo_Investigation">
-        <rdf:type rdf:resource="&poddScience;Investigation"/>
-        <rdfs:label>Demo investigation</rdfs:label>
+    <owl:NamedIndividual rdf:about="urn:temp:uuid:artifact:1#Demo_Experiment">
+        <rdf:type rdf:resource="&poddScience;Experiment"/>
+        <rdfs:label>Demo Experiment</rdfs:label>
         <poddScience:hasMaterial rdf:resource="urn:temp:uuid:artifact:1#Demo_Material"/>
         <poddScience:hasTreatment rdf:resource="urn:temp:uuid:artifact:1#My_Treatment1"/>
         <poddScience:hasMaterial rdf:resource="urn:temp:uuid:artifact:1#SqueekeeMaterial"/>

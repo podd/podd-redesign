@@ -449,6 +449,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             final boolean includeDoNotDisplayProperties, final MetadataPolicy containsPropertyPolicy,
             final InferredOWLOntologyID artifactID) throws OpenRDFException, PoddException, IOException
     {
+    	
         RepositoryConnection permanentConnection = null;
         RepositoryConnection managementConnection = null;
         
@@ -1455,6 +1456,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             final DataReferenceVerificationPolicy dataReferenceVerificationPolicy) throws OpenRDFException,
         PoddException, IOException, OWLException
     {
+    	
         if(inputStream == null)
         {
             throw new NullPointerException("Input stream must not be null");
@@ -1489,6 +1491,11 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             else if(ontologyIDs.size() > 1)
             {
                 this.log.warn("Found multiple ontologies when we were only expecting a single ontology: {}",
+                        ontologyIDs);
+            }
+            else
+            {
+                this.log.debug("ontologyIDS : {}",
                         ontologyIDs);
             }
             

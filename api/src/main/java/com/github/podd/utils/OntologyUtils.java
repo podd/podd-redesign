@@ -914,7 +914,7 @@ public class OntologyUtils
                 	OntologyUtils.log.warn("Comparing: \n Manifest: {} \n Owl:      {}", importsInManifest,
                             importsInOwlFile);
                     throw new SchemaManifestException(IRI.create(nextVersionUri),
-                    		String.format("Schema manifest imports not consistent with actual imports : {}",nextVersionUri));
+                    		String.format("Schema manifest imports not consistent with actual imports : %s",nextVersionUri));
                 }
             }
         }

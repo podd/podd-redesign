@@ -118,7 +118,7 @@ public class GetMetadataResourceImplTest extends AbstractResourceImplTest
         
         { PODD.PODD_SCIENCE + "Project", 63, 11, 0 },
         
-        { PODD.PODD_SCIENCE + "Investigation", 89, 17, 0 },
+        { PODD.PODD_SCIENCE + "Experiment", 190, 41, 0 },
         
         };
         
@@ -244,7 +244,7 @@ public class GetMetadataResourceImplTest extends AbstractResourceImplTest
     @Test
     public void testGetWithInvestigationRdf() throws Exception
     {
-        final String objectType = PODD.PODD_SCIENCE + "Investigation";
+        final String objectType = PODD.PODD_SCIENCE + "Experiment";
         
         final ClientResource createObjectClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_GET_METADATA));

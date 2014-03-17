@@ -464,7 +464,7 @@ public class ApplicationUtils
          */
         try
         {
-            final String schemaManifest = props.get(PODD.KEY_SCHEMAS, PODD.PATH_DEFAULT_SCHEMAS);
+            final String schemaManifest = props.get(PODD.KEY_SCHEMAS, PODD.PATH_DEFAULT_SCHEMAS);            
             final RDFFormat format = Rio.getParserFormatForFileName(schemaManifest, RDFFormat.RDFXML);
             Model model = null;
             try (final InputStream schemaManifestStream = application.getClass().getResourceAsStream(schemaManifest);)
@@ -488,11 +488,11 @@ public class ApplicationUtils
             
             if(!schemaOntologies.isEmpty())
             {
-                ApplicationUtils.log.debug("Uploaded new schema ontologies: {}", schemaOntologies);
+                ApplicationUtils.log.info("Uploaded new schema ontologies: {}", schemaOntologies);
             }
             else
             {
-                ApplicationUtils.log.debug("No new schema ontologies uploaded this time");
+                ApplicationUtils.log.info("No new schema ontologies uploaded this time");
             }
             
             // NOTE: The following is not ordered at this point in time
@@ -501,11 +501,11 @@ public class ApplicationUtils
             
             if(!currentSchemaOntologies.isEmpty())
             {
-                ApplicationUtils.log.debug("Existing current schema ontologies: {}", currentSchemaOntologies);
+                ApplicationUtils.log.info("Existing current schema ontologies: {}", currentSchemaOntologies);
             }
             else
             {
-                ApplicationUtils.log.debug("Found no existing current schema ontologies");
+                ApplicationUtils.log.info("Found no existing current schema ontologies");
             }
             
             final List<InferredOWLOntologyID> updatedCurrentSchemaOntologies = new ArrayList<>();
@@ -514,6 +514,8 @@ public class ApplicationUtils
             {
                 if(currentSchemaOntologies.contains(nextSchemaOntology))
                 {
+                    ApplicationUtils.log.info("Existing schema ontologies contains next schema ontologies: {}",
+                    		nextSchemaOntology);
                     updatedCurrentSchemaOntologies.add(nextSchemaOntology);
                 }
             }

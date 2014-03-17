@@ -35,6 +35,21 @@
 
 
 
+<http://www.mistea.supagro.inra.fr/object> a owl:Ontology ;
+	owl:versionIRI <http://www.mistea.supagro.inra.fr/object/2> ;
+	omv:currentVersion <http://www.mistea.supagro.inra.fr/object/2> .
+	
+<http://www.mistea.supagro.inra.fr/object/2> a owl:Ontology ;
+    <http://purl.org/podd/ns/schema#classpath> "/ontologies/version/2/misteaObject.owl" .
+    
+<http://www.mistea.supagro.inra.fr/event> a owl:Ontology ;
+	owl:versionIRI <http://www.mistea.supagro.inra.fr/event/2> ;
+	omv:currentVersion <http://www.mistea.supagro.inra.fr/event/2> .
+	
+<http://www.mistea.supagro.inra.fr/event/2> a owl:Ontology ;
+    <http://purl.org/podd/ns/schema#classpath> "/ontologies/version/2/misteaEvent.owl" ;
+    owl:imports <http://www.mistea.supagro.inra.fr/object/2> .
+
 
 <http://purl.org/podd/ns/poddUser> a owl:Ontology ;
 	owl:versionIRI <http://purl.org/podd/ns/version/poddUser/1> , 
@@ -91,7 +106,9 @@
 	owl:imports <http://purl.org/podd/ns/version/dcTerms/2> ,
 	    <http://purl.org/podd/ns/version/foaf/2> ,
 	    <http://purl.org/podd/ns/version/poddUser/2> ,
-        <http://purl.org/podd/ns/version/poddBase/2> .
+        <http://purl.org/podd/ns/version/poddBase/2> ,
+        <http://www.mistea.supagro.inra.fr/event/2>  ,
+        <http://www.mistea.supagro.inra.fr/object/2> .
 
 
 
@@ -116,5 +133,6 @@
 	    <http://purl.org/podd/ns/version/poddUser/2> ,
 	    <http://purl.org/podd/ns/version/poddBase/2> ,
         <http://purl.org/podd/ns/version/poddScience/2> .
+
 
 

@@ -32,12 +32,12 @@ import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.RDFParseException;
 import org.openrdf.rio.Rio;
 import org.openrdf.rio.UnsupportedRDFormatException;
+import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLException;
 import org.semanticweb.owlapi.rio.RioMemoryTripleSource;
 
 import com.github.ansell.restletutils.test.RestletTestUtils;
 import com.github.podd.api.PoddSchemaManager;
-import com.github.podd.api.test.AbstractPoddOWLManagerTest;
 import com.github.podd.exception.PoddException;
 import com.github.podd.restlet.PoddSesameRealm;
 import com.github.podd.restlet.PoddWebServiceApplication;
@@ -53,7 +53,8 @@ import com.github.podd.utils.PoddUserStatus;
  */
 public class TestUtils
 {
-    /**
+		
+		/**
      * Adds a Test User to the PODD Realm.
      * 
      * @param application
@@ -131,9 +132,9 @@ public class TestUtils
     public static List<InferredOWLOntologyID> loadDefaultSchemaOntologies(final PoddSchemaManager schemaManager)
         throws Exception
     {
-        // NOTE: Update the number 12 here when updates are made to the schema manifest used by this
+        // NOTE: Update the number 14 here when updates are made to the schema manifest used by this
         // test
-        return TestUtils.loadSchemaOntologies(PODD.PATH_DEFAULT_SCHEMAS, 12, schemaManager);
+        return TestUtils.loadSchemaOntologies(PODD.PATH_DEFAULT_SCHEMAS, 14, schemaManager);
     }
     
     /**
@@ -146,7 +147,7 @@ public class TestUtils
     public static RioMemoryTripleSource getRioTripleSource(final String classpath) throws RDFParseException,
         UnsupportedRDFormatException, IOException
     {
-        final InputStream inputStream = AbstractPoddOWLManagerTest.class.getResourceAsStream(classpath);
+        final InputStream inputStream = TestUtils.class.getResourceAsStream(classpath);
         final Model statements =
                 Rio.parse(inputStream, "", Rio.getParserFormatForFileName(classpath, RDFFormat.RDFXML));
         
