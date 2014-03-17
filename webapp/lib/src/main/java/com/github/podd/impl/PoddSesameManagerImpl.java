@@ -505,8 +505,6 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         return resultSet;
     }
     
-    
-    
     /*
      * (non-Javadoc)
      * 

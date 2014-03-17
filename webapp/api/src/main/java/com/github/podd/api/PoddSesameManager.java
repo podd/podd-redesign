@@ -190,7 +190,7 @@ public interface PoddSesameManager
     
     
     Set<URI> getPossibleEvents( URI objectUri, RepositoryConnection repositoryConnection,
-             URI... contexts) throws OpenRDFException;
+            URI... contexts) throws OpenRDFException;
     /**
      * Returns current version details of an artifact ontology which has the given IRI as the
      * Ontology IRI or Version IRI.
