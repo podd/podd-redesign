@@ -75,18 +75,24 @@ public class AddObjectResourceImpl extends AbstractPoddResourceImpl
         UnmanagedSchemaIRIException, UnsupportedRDFormatException, IOException
     {
         this.log.info("@Get addObjectHtml Page");
-        
+        this.log.debug("entity : {}", entity);
         // - check mandatory parameter: Object Type
         final String objectType = this.getQuery().getFirstValue(PoddWebConstants.KEY_OBJECT_TYPE_IDENTIFIER, true);
         if(objectType == null)
         {
             throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Type of Object to create not specified");
         }
+        this.log.debug("this.getQuery() : {}", this.getQuery());
+        this.log.debug("objectType : {}", objectType);
         
         final String artifactUri = this.getQuery().getFirstValue(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, true);
         final String parentUri = this.getQuery().getFirstValue(PoddWebConstants.KEY_PARENT_IDENTIFIER, true);
         final String parentPredicateUri =
                 this.getQuery().getFirstValue(PoddWebConstants.KEY_PARENT_PREDICATE_IDENTIFIER, true);
+        
+        this.log.debug("artifactUri : {}", artifactUri);
+        this.log.debug("parentUri : {}", parentUri);
+        this.log.debug("parentPredicateUri : {}", parentPredicateUri);
         
         if(artifactUri == null)
         {
@@ -159,6 +165,7 @@ public class AddObjectResourceImpl extends AbstractPoddResourceImpl
     private PoddObjectLabel getObjectTypeLabel(final String artifactUri, final String objectType)
         throws UnsupportedRDFormatException, IOException
     {
+    	this.log.debug("getObjectTypeLabel::artifactUri : {}", artifactUri);
         PoddObjectLabel objectLabel;
         RepositoryConnection managementConnection = null;
         try
@@ -173,6 +180,7 @@ public class AddObjectResourceImpl extends AbstractPoddResourceImpl
                 if(artifactUri != null)
                 {
                     ontologyID = this.getPoddArtifactManager().getArtifact(IRI.create(artifactUri));
+                    this.log.debug("getObjectTypeLabel::ontologyID : {}", ontologyID);
                     final Set<? extends OWLOntologyID> schemaImports =
                             this.getPoddArtifactManager().getSchemaImports(ontologyID);
                     permanentConnection =
