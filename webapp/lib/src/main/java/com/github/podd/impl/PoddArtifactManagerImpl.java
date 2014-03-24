@@ -31,8 +31,13 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.Literal;
@@ -122,6 +127,8 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
     
     private PoddSesameManager sesameManager;
     
+    private final ExecutorService executor = Executors.newFixedThreadPool(8);
+    
     /**
      * 
      */
@@ -132,7 +139,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
     @Override
     public InferredOWLOntologyID attachDataReference(final InferredOWLOntologyID artifactId, final URI objectUri,
             final DataReference dataReference, final DataReferenceVerificationPolicy dataReferenceVerificationPolicy)
-        throws OpenRDFException, PoddException, IOException, OWLException
+        throws OpenRDFException, PoddException, IOException, OWLException, ExecutionException, InterruptedException
     {
         return this.attachDataReferences(artifactId, dataReference.toRDF(), dataReferenceVerificationPolicy);
     }
@@ -140,7 +147,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
     @Override
     public InferredOWLOntologyID attachDataReferences(final InferredOWLOntologyID ontologyId, final Model model,
             final DataReferenceVerificationPolicy dataReferenceVerificationPolicy) throws OpenRDFException,
-        IOException, OWLException, PoddException
+        IOException, OWLException, PoddException, ExecutionException, InterruptedException
     {
         model.removeAll(model.filter(null, PODD.PODD_BASE_INFERRED_VERSION, null));
         
@@ -449,7 +456,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             final boolean includeDoNotDisplayProperties, final MetadataPolicy containsPropertyPolicy,
             final InferredOWLOntologyID artifactID) throws OpenRDFException, PoddException, IOException
     {
-    	
+        
         RepositoryConnection permanentConnection = null;
         RepositoryConnection managementConnection = null;
         
@@ -1456,7 +1463,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             final DataReferenceVerificationPolicy dataReferenceVerificationPolicy) throws OpenRDFException,
         PoddException, IOException, OWLException
     {
-    	
+        
         if(inputStream == null)
         {
             throw new NullPointerException("Input stream must not be null");
@@ -1495,8 +1502,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             }
             else
             {
-                this.log.debug("ontologyIDS : {}",
-                        ontologyIDs);
+                this.log.debug("ontologyIDS : {}", ontologyIDs);
             }
             
             managementConnection = this.getRepositoryManager().getManagementRepositoryConnection();
@@ -1758,7 +1764,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
      * @param fileReferencePolicy
      * @param dependentSchemaOntologies
      */
-    private InferredOWLOntologyID loadInferStoreArtifact(final RepositoryConnection tempRepositoryConnection,
+    private Future<InferredOWLOntologyID> loadInferStoreArtifact(final RepositoryConnection tempRepositoryConnection,
             final RepositoryConnection permanentConnection, final RepositoryConnection managementConnection,
             final URI tempContext, final DataReferenceVerificationPolicy fileReferencePolicy,
             final boolean asynchronousInferences, final Set<? extends OWLOntologyID> dependentSchemaOntologies)
@@ -1773,15 +1779,65 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         final RioMemoryTripleSource owlSource =
                 new RioMemoryTripleSource(statements.iterator(), Namespaces.asMap(Iterations
                         .asSet(tempRepositoryConnection.getNamespaces())));
+        final PoddOWLManager nextOwlManager = this.getOWLManager();
+        final PoddRepositoryManager nextRepositoryManager = this.getRepositoryManager();
+        final Future<InferredOWLOntologyID> inferredOWLOntologyID =
+                nextOwlManager.loadAndInfer(owlSource, permanentConnection, null, dependentSchemaOntologies,
+                        managementConnection, nextRepositoryManager.getSchemaManagementGraph());
         
-        final InferredOWLOntologyID inferredOWLOntologyID =
-                this.getOWLManager().loadAndInfer(owlSource, permanentConnection, null, dependentSchemaOntologies,
-                        managementConnection, this.getRepositoryManager().getSchemaManagementGraph());
-        
-        // Check file references after inferencing to accurately identify
-        // the parent object
-        this.handleFileReferences(permanentConnection, fileReferencePolicy, inferredOWLOntologyID.getVersionIRI()
-                .toOpenRDFURI(), inferredOWLOntologyID.getInferredOntologyIRI().toOpenRDFURI());
+        if(asynchronousInferences)
+        {
+            executor.submit(new Runnable()
+                {
+                    public void run()
+                    {
+                        InferredOWLOntologyID id;
+                        try
+                        {
+                            id = inferredOWLOntologyID.get();
+                        }
+                        catch(InterruptedException | ExecutionException e)
+                        {
+                            throw new PoddRuntimeException("Inferencing failed", e);
+                        }
+                        // Check file references after inferencing to accurately identify
+                        // the parent object
+                        try
+                        {
+                            PoddArtifactManagerImpl.this.handleFileReferences(permanentConnection, fileReferencePolicy,
+                                    id.getVersionIRI().toOpenRDFURI(), id.getInferredOntologyIRI().toOpenRDFURI());
+                        }
+                        catch(OpenRDFException | PoddException e)
+                        {
+                            throw new PoddRuntimeException("Handling of file references failed", e);
+                        }
+                        
+                    };
+                });
+        }
+        else
+        {
+            InferredOWLOntologyID id;
+            try
+            {
+                id = inferredOWLOntologyID.get();
+            }
+            catch(InterruptedException | ExecutionException e)
+            {
+                throw new PoddRuntimeException("Inferencing failed", e);
+            }
+            // Check file references after inferencing to accurately identify
+            // the parent object
+            try
+            {
+                PoddArtifactManagerImpl.this.handleFileReferences(permanentConnection, fileReferencePolicy, id
+                        .getVersionIRI().toOpenRDFURI(), id.getInferredOntologyIRI().toOpenRDFURI());
+            }
+            catch(OpenRDFException | PoddException e)
+            {
+                throw new PoddRuntimeException("Handling of file references failed", e);
+            }
+        }
         
         return inferredOWLOntologyID;
     }
@@ -2064,7 +2120,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
     protected Model updateArtifact(final URI artifactUri, final URI versionUri, final Collection<URI> objectUris,
             final Model model, final UpdatePolicy updatePolicy, final DanglingObjectPolicy danglingObjectAction,
             final DataReferenceVerificationPolicy fileReferenceAction) throws OpenRDFException, IOException,
-        OWLException, PoddException
+        OWLException, PoddException, ExecutionException, InterruptedException
     {
         if(model == null)
         {
@@ -2249,9 +2305,10 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             // this.getDirectImports(managementConnection, tempRepositoryConnection,
             // tempContext);
             
-            inferredOWLOntologyID =
+            Future<InferredOWLOntologyID> future =
                     this.loadInferStoreArtifact(tempRepositoryConnection, permanentConnection, managementConnection,
                             tempContext, fileReferenceAction, false, currentSchemaImports);
+            future.get();
             
             this.getSesameManager().updateManagedPoddArtifactVersion(inferredOWLOntologyID, true, managementConnection,
                     this.getRepositoryManager().getArtifactManagementGraph());
@@ -2262,7 +2319,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             
             return OntologyUtils.ontologyIDsToModel(Arrays.asList(inferredOWLOntologyID), resultsModel);
         }
-        catch(final Exception e)
+        catch(final Throwable e)
         {
             try
             {
@@ -2357,7 +2414,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
     public InferredOWLOntologyID updateSchemaImports(final InferredOWLOntologyID artifactId,
             final Set<? extends OWLOntologyID> oldSchemaOntologyIds,
             final Set<? extends OWLOntologyID> newSchemaOntologyIds) throws OpenRDFException, PoddException,
-        IOException, OWLException
+        IOException, OWLException, ExecutionException, InterruptedException
     {
         if(artifactId == null)
         {
@@ -2455,20 +2512,22 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             
             // If the following does not succeed, then it throws an exception and we rollback
             // permanentConnection
-            final InferredOWLOntologyID inferredOWLOntologyID =
+            final Future<InferredOWLOntologyID> inferredOWLOntologyID =
                     this.loadInferStoreArtifact(tempRepositoryConnection, newPermanentConnection, managementConnection,
                             newVersionIRI.toOpenRDFURI(), DataReferenceVerificationPolicy.DO_NOT_VERIFY, false,
                             newSchemaOntologyIds);
             
             this.log.info("Completed reload of artifact to Repository: {}", artifactVersion);
             
-            this.getSesameManager().updateManagedPoddArtifactVersion(inferredOWLOntologyID, true, managementConnection,
+            InferredOWLOntologyID id = inferredOWLOntologyID.get();
+            
+            this.getSesameManager().updateManagedPoddArtifactVersion(id, true, managementConnection,
                     this.getRepositoryManager().getArtifactManagementGraph());
             
             oldPermanentConnection.commit();
             newPermanentConnection.commit();
             managementConnection.commit();
-            return inferredOWLOntologyID;
+            return id;
         }
         catch(final Throwable e)
         {

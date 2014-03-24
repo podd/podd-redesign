@@ -25,6 +25,7 @@ import java.io.OutputStream;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
 
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.Model;
@@ -62,11 +63,11 @@ public interface PoddArtifactManager
 {
     InferredOWLOntologyID attachDataReference(InferredOWLOntologyID artifactId, URI objectUri,
             DataReference dataReference, DataReferenceVerificationPolicy dataReferenceVerificationPolicy)
-        throws OpenRDFException, IOException, OWLException, PoddException;
+        throws OpenRDFException, IOException, OWLException, PoddException, ExecutionException, InterruptedException;
     
     InferredOWLOntologyID attachDataReferences(InferredOWLOntologyID artifactId, Model model,
             DataReferenceVerificationPolicy dataReferenceVerificationPolicy) throws OpenRDFException, IOException,
-        OWLException, PoddException;
+        OWLException, PoddException, ExecutionException, InterruptedException;
     
     /**
      * Deletes the given artifact if and only if it is available and it is not currently published.
@@ -714,9 +715,12 @@ public interface PoddArtifactManager
      * @throws OWLException
      *             If there are errors processing the OWL content during or after the schema imports
      *             updates.
+     * @throws InterruptedException
+     * @throws ExecutionException
      */
     InferredOWLOntologyID updateSchemaImports(InferredOWLOntologyID artifactId,
             Set<? extends OWLOntologyID> oldSchemaOntologyIds, Set<? extends OWLOntologyID> newSchemaOntologyIds)
-        throws UnmanagedSchemaException, OpenRDFException, PoddException, IOException, OWLException;
+        throws UnmanagedSchemaException, OpenRDFException, PoddException, IOException, OWLException,
+        ExecutionException, InterruptedException;
     
 }

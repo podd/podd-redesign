@@ -33,6 +33,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.ExecutionException;
 
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.Model;
@@ -284,7 +285,7 @@ public class ApplicationUtils
     }
     
     public static void setupApplication(final PoddWebServiceApplication application, final Context applicationContext)
-        throws OpenRDFException, UnsupportedRDFormatException, IOException, OWLException, PoddException
+        throws OpenRDFException, IOException, OWLException, PoddException, ExecutionException, InterruptedException
     {
         final PropertyUtil props = application.getPropertyUtil();
         
@@ -450,9 +451,10 @@ public class ApplicationUtils
     /**
      * @param application
      * @param props
-     *  
+     * 
      */
-    public static void setupSchemas(final PoddWebServiceApplication application) throws IOException , OpenRDFException , OWLException , PoddException
+    public static void setupSchemas(final PoddWebServiceApplication application) throws IOException, OpenRDFException,
+        OWLException, PoddException, ExecutionException, InterruptedException
     {
         final PropertyUtil props = application.getPropertyUtil();
         final PoddSchemaManager poddSchemaManager = application.getPoddSchemaManager();
@@ -464,7 +466,7 @@ public class ApplicationUtils
          */
         try
         {
-            final String schemaManifest = props.get(PODD.KEY_SCHEMAS, PODD.PATH_DEFAULT_SCHEMAS);            
+            final String schemaManifest = props.get(PODD.KEY_SCHEMAS, PODD.PATH_DEFAULT_SCHEMAS);
             final RDFFormat format = Rio.getParserFormatForFileName(schemaManifest, RDFFormat.RDFXML);
             Model model = null;
             try (final InputStream schemaManifestStream = application.getClass().getResourceAsStream(schemaManifest);)
@@ -515,7 +517,7 @@ public class ApplicationUtils
                 if(currentSchemaOntologies.contains(nextSchemaOntology))
                 {
                     ApplicationUtils.log.info("Existing schema ontologies contains next schema ontologies: {}",
-                    		nextSchemaOntology);
+                            nextSchemaOntology);
                     updatedCurrentSchemaOntologies.add(nextSchemaOntology);
                 }
             }
@@ -630,7 +632,7 @@ public class ApplicationUtils
             // dumpSchemaGraph(application, nextRepository);
             
         }
-        catch(IOException | OpenRDFException | OWLException | PoddException e)
+        catch(IOException | OpenRDFException | OWLException | PoddException | ExecutionException | InterruptedException e)
         {
             ApplicationUtils.log.error("Fatal Error!!! Could not load schema ontologies", e);
             throw e;

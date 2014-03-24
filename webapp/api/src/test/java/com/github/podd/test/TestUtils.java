@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.ExecutionException;
 
 import org.junit.Assert;
 import org.openrdf.OpenRDFException;
@@ -53,8 +54,8 @@ import com.github.podd.utils.PoddUserStatus;
  */
 public class TestUtils
 {
-		
-		/**
+    
+    /**
      * Adds a Test User to the PODD Realm.
      * 
      * @param application
@@ -77,7 +78,7 @@ public class TestUtils
     
     public static List<InferredOWLOntologyID> loadSchemaOntologies(final String schemaManifest,
             final int expectedSchemaOntologies, final PoddSchemaManager schemaManager) throws OpenRDFException,
-        IOException, OWLException, PoddException
+        IOException, OWLException, PoddException, ExecutionException, InterruptedException
     {
         Model model = null;
         try (final InputStream schemaManifestStream = TestUtils.class.getResourceAsStream(schemaManifest);)

@@ -17,6 +17,7 @@
 package com.github.podd.restlet.integrationtest;
 
 import java.io.IOException;
+import java.util.concurrent.ExecutionException;
 
 import org.openrdf.OpenRDFException;
 import org.openrdf.rio.UnsupportedRDFormatException;
@@ -168,7 +169,8 @@ public class PoddRestletIntegrationTestComponent extends Component
             ApplicationUtils.setupApplication(nextApplication, nextApplication.getContext());
             TestUtils.setupTestUser(nextApplication);
         }
-        catch(final OpenRDFException | UnsupportedRDFormatException | IOException | OWLException | PoddException e)
+        catch(final OpenRDFException | UnsupportedRDFormatException | IOException | OWLException | PoddException
+                | ExecutionException | InterruptedException e)
         {
             throw new RuntimeException("Could not setup application", e);
         }

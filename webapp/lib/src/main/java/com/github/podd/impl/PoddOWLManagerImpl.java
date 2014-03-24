@@ -23,8 +23,13 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 import org.mindswap.pellet.exceptions.PelletRuntimeException;
 import org.openrdf.OpenRDFException;
@@ -129,6 +134,8 @@ public class PoddOWLManagerImpl implements PoddOWLManager
     
     private final ConcurrentMap<Set<? extends OWLOntologyID>, OWLOntologyManager> managerCache =
             new ConcurrentHashMap<>();
+    
+    private final ExecutorService executor = Executors.newFixedThreadPool(8);
     
     public PoddOWLManagerImpl(final OWLOntologyManagerFactory nextManager, final OWLReasonerFactory nextReasonerFactory)
     {
@@ -630,26 +637,37 @@ public class PoddOWLManagerImpl implements PoddOWLManager
         return profiles;
     }
     
-    public InferredOWLOntologyID inferStatements(final OWLOntology nextOntology,
+    public Future<InferredOWLOntologyID> inferStatements(final OWLOntology nextOntology,
             final RepositoryConnection nextRepositoryConnection, OWLReasoner nextReasoner) throws OWLRuntimeException,
         OWLException, OpenRDFException, IOException
     {
         final InferredOWLOntologyID inferredOntologyID = this.generateInferredOntologyID(nextOntology.getOntologyID());
+        
         if(nextReasoner == null)
         {
             nextReasoner = this.createReasoner(nextOntology);
         }
-        // final OWLReasoner nextReasoner = this.createReasoner(nextOntology);
         
-        final OWLOntology nextInferredAxiomsOntology =
-                this.computeInferences(nextReasoner, nextOntology.getOntologyID(),
-                        inferredOntologyID.getInferredOWLOntologyID());
+        // Need to have a final reference, so mimic it with this method
+        // Alternatively we could throw an exception if it is null coming into the method
+        final OWLReasoner realReasoner = nextReasoner;
         
-        this.dumpOntologyToRepositoryWithoutDuplication(inferredOntologyID.getVersionIRI().toOpenRDFURI(),
-                nextInferredAxiomsOntology, nextRepositoryConnection, nextInferredAxiomsOntology.getOntologyID()
-                        .getOntologyIRI().toOpenRDFURI());
-        
-        return inferredOntologyID;
+        return executor.submit(new Callable<InferredOWLOntologyID>()
+            {
+                public InferredOWLOntologyID call() throws Exception
+                {
+                    final OWLOntology nextInferredAxiomsOntology =
+                            PoddOWLManagerImpl.this.computeInferences(realReasoner, nextOntology.getOntologyID(),
+                                    inferredOntologyID.getInferredOWLOntologyID());
+                    
+                    PoddOWLManagerImpl.this.dumpOntologyToRepositoryWithoutDuplication(inferredOntologyID
+                            .getVersionIRI().toOpenRDFURI(), nextInferredAxiomsOntology, nextRepositoryConnection,
+                            nextInferredAxiomsOntology.getOntologyID().getOntologyIRI().toOpenRDFURI());
+                    
+                    // This will delay the return of the ID until it is in sync with the database
+                    return inferredOntologyID;
+                };
+            });
     }
     
     @Override
@@ -684,7 +702,7 @@ public class PoddOWLManagerImpl implements PoddOWLManager
     }
     
     @Override
-    public InferredOWLOntologyID loadAndInfer(final OWLOntologyDocumentSource owlSource,
+    public Future<InferredOWLOntologyID> loadAndInfer(final OWLOntologyDocumentSource owlSource,
             final RepositoryConnection permanentRepositoryConnection, final OWLOntologyID replacementOntologyID,
             final Set<? extends OWLOntologyID> dependentSchemaOntologies,
             final RepositoryConnection managementConnection, final URI schemaManagementContext) throws OWLException,
@@ -694,13 +712,13 @@ public class PoddOWLManagerImpl implements PoddOWLManager
                 dependentSchemaOntologies, managementConnection, schemaManagementContext);
     }
     
-    public InferredOWLOntologyID loadAndInfer(final RepositoryConnection permanentRepositoryConnection,
+    public Future<InferredOWLOntologyID> loadAndInfer(final RepositoryConnection permanentRepositoryConnection,
             final OWLOntologyID ontologyID, final OWLOntologyDocumentSource owlSource,
             final boolean removeFromCacheOnException, final Set<? extends OWLOntologyID> dependentSchemaOntologies,
             final RepositoryConnection managementConnection, final URI schemaManagementContext) throws OWLException,
         PoddException, OpenRDFException, IOException
     {
-        InferredOWLOntologyID inferredOWLOntologyID = null;
+        Future<InferredOWLOntologyID> inferredOWLOntologyID = null;
         OWLOntology nextOntology = null;
         OWLOntologyManager cachedManager = null;
         try
@@ -809,8 +827,9 @@ public class PoddOWLManagerImpl implements PoddOWLManager
                         {
                             if(inferredOWLOntologyID != null && removeFromCacheOnException)
                             {
-                                this.removeCacheInternal(inferredOWLOntologyID.getInferredOWLOntologyID(),
-                                        dependentSchemaOntologies, cachedManager);
+                                InferredOWLOntologyID id = inferredOWLOntologyID.get(1000, TimeUnit.MILLISECONDS);
+                                this.removeCacheInternal(id.getInferredOWLOntologyID(), dependentSchemaOntologies,
+                                        cachedManager);
                             }
                         }
                     }

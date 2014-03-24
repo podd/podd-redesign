@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.Model;
@@ -85,7 +86,7 @@ public class DataReferenceAttachResourceImpl extends AbstractPoddResourceImpl
     private InferredOWLOntologyID attachDataReference(final Representation entity, final String artifactUriString,
             final String versionUriString, final DataReferenceVerificationPolicy verificationPolicy)
         throws ResourceException, RDFParseException, UnsupportedRDFormatException, IOException,
-        UnmanagedArtifactIRIException, UnmanagedSchemaIRIException
+        UnmanagedArtifactIRIException, UnmanagedSchemaIRIException, ExecutionException, InterruptedException
     {
         // get input stream containing RDF statements
         InputStream inputStream = null;
@@ -252,23 +253,35 @@ public class DataReferenceAttachResourceImpl extends AbstractPoddResourceImpl
         catch(final UnmanagedArtifactIRIException | UnmanagedSchemaIRIException e1)
         {
             this.log.error("Artifact IRI not managed");
-            throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Artifact IRI not managed");
+            throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Artifact IRI not managed", e1);
         }
         catch(final UnsupportedRDFormatException e1)
         {
             this.log.error("Unsupported format: " + entity.getMediaType().getName());
             throw new ResourceException(Status.CLIENT_ERROR_UNSUPPORTED_MEDIA_TYPE, "Cannot parse the given format: "
-                    + entity.getMediaType().getName());
+                    + entity.getMediaType().getName(), e1);
         }
         catch(final RDFParseException e1)
         {
             this.log.error("Artifact not parsed correctly");
-            throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Artifact not parsed correctly");
+            throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Artifact not parsed correctly", e1);
         }
         catch(final IOException e1)
         {
             this.log.error("Artifact not parsed due to IO exception");
-            throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Artifact not parsed due to IO exception");
+            throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Artifact not parsed due to IO exception", e1);
+        }
+        catch(ExecutionException e1)
+        {
+            this.log.error("Artifact not parsed due to Execution exception");
+            throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST,
+                    "Artifact not parsed due to Execution exception", e1);
+        }
+        catch(InterruptedException e1)
+        {
+            this.log.error("Artifact not parsed due to Interrupted exception");
+            throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST,
+                    "Artifact not parsed due to Interrupted exception", e1);
         }
         
         // prepare output: Artifact ID, object URI, file reference URI

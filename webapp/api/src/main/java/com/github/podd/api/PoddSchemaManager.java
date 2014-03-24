@@ -24,6 +24,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
 
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.Model;
@@ -224,9 +225,11 @@ public interface PoddSchemaManager
      * @throws OWLException
      * @throws IOException
      * @throws OpenRDFException
+     * @throws InterruptedException 
+     * @throws ExecutionException 
      */
     List<InferredOWLOntologyID> uploadSchemaOntologies(Model manifest) throws OpenRDFException, IOException,
-        OWLException, PoddException;
+        OWLException, PoddException, ExecutionException, InterruptedException;
     
     /**
      * Loads a Schema Ontology into the internal repository, computes inferences on the schema
@@ -249,10 +252,12 @@ public interface PoddSchemaManager
      *             way.
      * @throws PoddException
      *             If an error occurs due to a violation of the PODD constraints.
+     * @throws InterruptedException
+     * @throws ExecutionException
      */
     InferredOWLOntologyID uploadSchemaOntology(InputStream inputStream, RDFFormat fileFormat,
             Set<? extends OWLOntologyID> dependentSchemaOntologies) throws OpenRDFException, IOException, OWLException,
-        PoddException;
+        PoddException, ExecutionException, InterruptedException;
     
     /**
      * Loads a Schema Ontology into the internal repository, computes inferences on the schema
@@ -276,9 +281,11 @@ public interface PoddSchemaManager
      *             way.
      * @throws PoddException
      *             If an error occurs due to a violation of the PODD constraints.
+     * @throws InterruptedException
+     * @throws ExecutionException
      */
     InferredOWLOntologyID uploadSchemaOntology(OWLOntologyID schemaOntologyID, InputStream inputStream,
             RDFFormat fileFormat, Set<? extends OWLOntologyID> dependentSchemaOntologies) throws OpenRDFException,
-        IOException, OWLException, PoddException;
+        IOException, OWLException, PoddException, ExecutionException, InterruptedException;
     
 }

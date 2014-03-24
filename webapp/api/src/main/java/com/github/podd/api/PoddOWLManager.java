@@ -21,6 +21,7 @@ package com.github.podd.api;
 
 import java.io.IOException;
 import java.util.Set;
+import java.util.concurrent.Future;
 
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.Model;
@@ -69,7 +70,7 @@ public interface PoddOWLManager
      * @throws OpenRDFException
      * @throws IOException
      */
-    InferredOWLOntologyID loadAndInfer(OWLOntologyDocumentSource owlSource,
+    Future<InferredOWLOntologyID> loadAndInfer(OWLOntologyDocumentSource owlSource,
             RepositoryConnection permanentRepositoryConnection, OWLOntologyID replacementOntologyID,
             Set<? extends OWLOntologyID> dependentSchemaOntologies, RepositoryConnection managementConnection,
             URI schemaManagementContext) throws OWLException, PoddException, OpenRDFException, IOException;
