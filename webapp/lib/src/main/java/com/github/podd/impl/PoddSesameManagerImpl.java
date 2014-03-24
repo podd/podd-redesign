@@ -501,7 +501,37 @@ public class PoddSesameManagerImpl implements PoddSesameManager
                 resultSet.add((URI)event);
             }
         }
-        this.log.info("Result spql query {}",resultSet);
+        this.log.info("Result spql query getEventsTopConcepts {}",resultSet);
+        return resultSet;
+    }
+    
+    @Override
+    public Set<URI> getDirectSubClassOf(final URI concept,final RepositoryConnection repositoryConnection,
+            final URI... contexts) throws OpenRDFException
+    {
+        final StringBuilder sb = new StringBuilder(1024);
+        
+        sb.append("SELECT DISTINCT ?subclass ");
+        sb.append(" WHERE { ");
+        sb.append(" ?subclass rdfs:subClassOf <"+concept+"> ");
+        sb.append(" } ");
+        
+        this.log.debug("Create SPARQL {} to find direct subclass of one concept", sb);
+        
+        final TupleQuery tupleQuery = repositoryConnection.prepareTupleQuery(QueryLanguage.SPARQL, sb.toString());
+
+        final QueryResultCollector queryResults = RdfUtility.executeTupleQuery(tupleQuery, contexts);
+        
+        final Set<URI> resultSet = new HashSet<URI>();
+        for(final BindingSet next : queryResults.getBindingSets())
+        {
+            final Value event = next.getValue("subclass");
+            if(event instanceof URI)
+            {
+                resultSet.add((URI)event);
+            }
+        }
+        this.log.info("Result spql query getDirectSubClassOf ({}) {}",concept,resultSet);
         return resultSet;
     }
     

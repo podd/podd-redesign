@@ -735,6 +735,44 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         }
     }
     
+    public Set<URI> getDirectSubClassOf(final URI concept,final InferredOWLOntologyID ontologyID)
+            throws OpenRDFException, UnmanagedSchemaIRIException, SchemaManifestException, UnsupportedRDFormatException,
+            IOException, UnmanagedArtifactIRIException, UnmanagedArtifactVersionException
+        {
+            RepositoryConnection permanentConnection = null;
+            RepositoryConnection managementConnection = null;
+            try
+            {
+                final Set<? extends OWLOntologyID> schemaImports = this.getSchemaImports(ontologyID);
+                permanentConnection = this.getRepositoryManager().getPermanentRepositoryConnection(schemaImports);
+                managementConnection = this.getRepositoryManager().getManagementRepositoryConnection();
+                
+                final URI[] contexts =
+                        this.getSesameManager().versionAndInferredAndSchemaContexts(ontologyID, managementConnection,
+                                this.getRepositoryManager().getSchemaManagementGraph(),
+                                this.getRepositoryManager().getArtifactManagementGraph());
+                
+                return this.getSesameManager().getDirectSubClassOf(concept, permanentConnection, contexts);
+            }
+            finally
+            {
+                try
+                {
+                    if(managementConnection != null)
+                    {
+                        managementConnection.close();
+                    }
+                }
+                finally
+                {
+                    if(permanentConnection != null)
+                    {
+                        permanentConnection.close();
+                    }
+                }
+            }
+        }
+    
     /*
      * (non-Javadoc)
      * 

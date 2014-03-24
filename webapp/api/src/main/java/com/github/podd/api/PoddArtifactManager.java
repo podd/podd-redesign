@@ -263,13 +263,7 @@ public interface PoddArtifactManager
         UnmanagedSchemaIRIException, SchemaManifestException, UnsupportedRDFormatException, IOException,
         UnmanagedArtifactIRIException, UnmanagedArtifactVersionException;
     
-    Set<URI> getEventsType(InferredOWLOntologyID ontologyID) throws OpenRDFException,
-    UnmanagedSchemaIRIException, SchemaManifestException, UnsupportedRDFormatException, IOException,
-    UnmanagedArtifactIRIException, UnmanagedArtifactVersionException;
-    
-    Set<URI> getEventsTopConcepts(InferredOWLOntologyID ontologyID) throws OpenRDFException,
-    UnmanagedSchemaIRIException, SchemaManifestException, UnsupportedRDFormatException, IOException,
-    UnmanagedArtifactIRIException, UnmanagedArtifactVersionException;
+   
     
     /**
      * 
@@ -726,5 +720,17 @@ public interface PoddArtifactManager
     InferredOWLOntologyID updateSchemaImports(InferredOWLOntologyID artifactId,
             Set<? extends OWLOntologyID> oldSchemaOntologyIds, Set<? extends OWLOntologyID> newSchemaOntologyIds)
         throws UnmanagedSchemaException, OpenRDFException, PoddException, IOException, OWLException;
+    
+    Set<URI> getEventsType(InferredOWLOntologyID ontologyID) throws OpenRDFException,
+    UnmanagedSchemaIRIException, SchemaManifestException, UnsupportedRDFormatException, IOException,
+    UnmanagedArtifactIRIException, UnmanagedArtifactVersionException;
+    
+    Set<URI> getEventsTopConcepts(InferredOWLOntologyID ontologyID) throws OpenRDFException,
+    UnmanagedSchemaIRIException, SchemaManifestException, UnsupportedRDFormatException, IOException,
+    UnmanagedArtifactIRIException, UnmanagedArtifactVersionException;
+    
+    Set<URI> getDirectSubClassOf(URI evnet,InferredOWLOntologyID ontologyID) throws OpenRDFException,
+    UnmanagedSchemaIRIException, SchemaManifestException, UnsupportedRDFormatException, IOException,
+    UnmanagedArtifactIRIException, UnmanagedArtifactVersionException;
     
 }

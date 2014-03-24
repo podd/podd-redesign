@@ -249,6 +249,8 @@ public interface PoddWebConstants
      */
     public static final String PATH_OBJECT_DELETE = "artifact/deleteobject";
     
+    public static final String PATH_EVENT_ADD = "event/add";
+    
     /**
      * Path to get metadata about a particular object type
      */
