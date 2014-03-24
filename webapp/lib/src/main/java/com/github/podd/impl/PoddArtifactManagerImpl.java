@@ -142,7 +142,8 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
     @Override
     public InferredOWLOntologyID attachDataReference(final InferredOWLOntologyID artifactId, final URI objectUri,
             final DataReference dataReference, final DataReferenceVerificationPolicy dataReferenceVerificationPolicy)
-        throws OpenRDFException, PoddException, IOException, OWLException, ExecutionException, InterruptedException
+        throws OpenRDFException, PoddException, IOException, OWLException, ExecutionException, InterruptedException,
+        TimeoutException
     {
         return this.attachDataReferences(artifactId, dataReference.toRDF(), dataReferenceVerificationPolicy);
     }
@@ -150,7 +151,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
     @Override
     public InferredOWLOntologyID attachDataReferences(final InferredOWLOntologyID ontologyId, final Model model,
             final DataReferenceVerificationPolicy dataReferenceVerificationPolicy) throws OpenRDFException,
-        IOException, OWLException, PoddException, ExecutionException, InterruptedException
+        IOException, OWLException, PoddException, ExecutionException, InterruptedException, TimeoutException
     {
         model.removeAll(model.filter(null, PODD.PODD_BASE_INFERRED_VERSION, null));
         
@@ -328,7 +329,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
     @Override
     public InferredOWLOntologyID deleteObject(final URI artifactUri, final URI versionUri, final URI objectUri,
             final boolean cascade) throws PoddException, OpenRDFException, IOException, OWLException,
-        ExecutionException, InterruptedException
+        ExecutionException, InterruptedException, TimeoutException
     {
         // check if the specified artifact URI refers to a managed artifact
         InferredOWLOntologyID artifactID = null;
@@ -2110,7 +2111,8 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
     public Model updateArtifact(final URI artifactUri, final URI versionUri, final Collection<URI> objectUris,
             final InputStream inputStream, RDFFormat format, final UpdatePolicy updatePolicy,
             final DanglingObjectPolicy danglingObjectAction, final DataReferenceVerificationPolicy fileReferenceAction)
-        throws OpenRDFException, IOException, OWLException, PoddException, ExecutionException, InterruptedException
+        throws OpenRDFException, IOException, OWLException, PoddException, ExecutionException, InterruptedException,
+        TimeoutException
     {
         if(inputStream == null)
         {
@@ -2138,7 +2140,8 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
     protected Model updateArtifact(final URI artifactUri, final URI versionUri, final Collection<URI> objectUris,
             final Model model, final UpdatePolicy updatePolicy, final DanglingObjectPolicy danglingObjectAction,
             final DataReferenceVerificationPolicy fileReferenceAction, boolean asynchronousInferencing)
-        throws OpenRDFException, IOException, OWLException, PoddException, ExecutionException, InterruptedException
+        throws OpenRDFException, IOException, OWLException, PoddException, ExecutionException, InterruptedException,
+        TimeoutException
     {
         if(model == null)
         {
@@ -2331,7 +2334,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             
             if(!asynchronousInferencing)
             {
-                future.get(inferredOWLOntologyID);
+                future.get(inferredOWLOntologyID).get(10, TimeUnit.MINUTES);
                 
                 this.getSesameManager().updateManagedPoddArtifactVersion(inferredOWLOntologyID, true,
                         managementConnection, this.getRepositoryManager().getArtifactManagementGraph());

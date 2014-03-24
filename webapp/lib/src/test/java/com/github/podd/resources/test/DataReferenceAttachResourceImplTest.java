@@ -442,9 +442,9 @@ public class DataReferenceAttachResourceImplTest extends AbstractResourceImplTes
         }
         catch(final ResourceException e)
         {
-            Assert.assertEquals(Status.SERVER_ERROR_BAD_GATEWAY, e.getStatus());
             final Representation responseEntity = fileRefAttachClientResource.getResponseEntity();
             Assert.assertTrue(this.getText(responseEntity).contains("File Reference validation resulted in failures"));
+            Assert.assertEquals(Status.SERVER_ERROR_BAD_GATEWAY, e.getStatus());
         }
         finally
         {

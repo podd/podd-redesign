@@ -22,6 +22,7 @@ import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeoutException;
 
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.Model;
@@ -49,6 +50,7 @@ import com.github.podd.api.PoddArtifactManager;
 import com.github.podd.exception.DataReferenceVerificationException;
 import com.github.podd.exception.OntologyNotInProfileException;
 import com.github.podd.exception.PoddException;
+import com.github.podd.exception.PoddRuntimeException;
 import com.github.podd.exception.SchemaManifestException;
 import com.github.podd.exception.UnmanagedArtifactIRIException;
 import com.github.podd.exception.UnmanagedArtifactVersionException;
@@ -86,7 +88,8 @@ public class DataReferenceAttachResourceImpl extends AbstractPoddResourceImpl
     private InferredOWLOntologyID attachDataReference(final Representation entity, final String artifactUriString,
             final String versionUriString, final DataReferenceVerificationPolicy verificationPolicy)
         throws ResourceException, RDFParseException, UnsupportedRDFormatException, IOException,
-        UnmanagedArtifactIRIException, UnmanagedSchemaIRIException, ExecutionException, InterruptedException
+        UnmanagedArtifactIRIException, UnmanagedSchemaIRIException, ExecutionException, InterruptedException,
+        TimeoutException
     {
         // get input stream containing RDF statements
         InputStream inputStream = null;
@@ -121,6 +124,19 @@ public class DataReferenceAttachResourceImpl extends AbstractPoddResourceImpl
         try
         {
             artifactMap = this.getPoddArtifactManager().attachDataReferences(artifact, model, verificationPolicy);
+        }
+        catch(final PoddRuntimeException e)
+        {
+            if(e.getCause() != null && e.getCause() instanceof DataReferenceVerificationException)
+            {
+                this.log.error("File reference validation errors: {}",
+                        ((DataReferenceVerificationException)e.getCause()).getValidationFailures());
+                throw new ResourceException(Status.SERVER_ERROR_BAD_GATEWAY, "File reference(s) failed verification", e);
+            }
+            else
+            {
+                throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Could not attach file references", e);
+            }
         }
         catch(final DataReferenceVerificationException e)
         {
@@ -282,6 +298,12 @@ public class DataReferenceAttachResourceImpl extends AbstractPoddResourceImpl
             this.log.error("Artifact not parsed due to Interrupted exception");
             throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST,
                     "Artifact not parsed due to Interrupted exception", e1);
+        }
+        catch(TimeoutException e1)
+        {
+            this.log.error("Artifact not parsed due to Timeout exception");
+            throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST,
+                    "Artifact not parsed due to Timeout exception", e1);
         }
         
         // prepare output: Artifact ID, object URI, file reference URI

@@ -64,11 +64,12 @@ public interface PoddArtifactManager
 {
     InferredOWLOntologyID attachDataReference(InferredOWLOntologyID artifactId, URI objectUri,
             DataReference dataReference, DataReferenceVerificationPolicy dataReferenceVerificationPolicy)
-        throws OpenRDFException, IOException, OWLException, PoddException, ExecutionException, InterruptedException;
+        throws OpenRDFException, IOException, OWLException, PoddException, ExecutionException, InterruptedException,
+        TimeoutException;
     
     InferredOWLOntologyID attachDataReferences(InferredOWLOntologyID artifactId, Model model,
             DataReferenceVerificationPolicy dataReferenceVerificationPolicy) throws OpenRDFException, IOException,
-        OWLException, PoddException, ExecutionException, InterruptedException;
+        OWLException, PoddException, ExecutionException, InterruptedException, TimeoutException;
     
     /**
      * Deletes the given artifact if and only if it is available and it is not currently published.
@@ -107,10 +108,12 @@ public interface PoddArtifactManager
      * @throws IOException
      * @throws InterruptedException
      * @throws ExecutionException
+     * @throws TimeoutException
      * @throws RepositoryException
      */
     InferredOWLOntologyID deleteObject(URI artifactUri, URI versionUri, URI objectUri, boolean cascade)
-        throws PoddException, OpenRDFException, IOException, OWLException, ExecutionException, InterruptedException;
+        throws PoddException, OpenRDFException, IOException, OWLException, ExecutionException, InterruptedException,
+        TimeoutException;
     
     /**
      * Exports the given artifact to a @{link Model}.
@@ -518,16 +521,17 @@ public interface PoddArtifactManager
      * @throws PoddException
      * @throws OpenRDFException
      * @throws OWLException
-     * @throws TimeoutException 
-     * @throws InterruptedException 
-     * @throws ExecutionException 
+     * @throws TimeoutException
+     * @throws InterruptedException
+     * @throws ExecutionException
      */
     InferredOWLOntologyID loadArtifact(InputStream inputStream, RDFFormat format) throws OpenRDFException,
         PoddException, IOException, OWLException, ExecutionException, InterruptedException, TimeoutException;
     
     InferredOWLOntologyID loadArtifact(InputStream inputStream, RDFFormat format,
             DanglingObjectPolicy danglingObjectPolicy, DataReferenceVerificationPolicy dataReferenceVerificationPolicy)
-        throws OpenRDFException, PoddException, IOException, OWLException, ExecutionException, InterruptedException, TimeoutException;
+        throws OpenRDFException, PoddException, IOException, OWLException, ExecutionException, InterruptedException,
+        TimeoutException;
     
     /**
      * Sets the given OWLOntologyID to be published.
@@ -681,11 +685,12 @@ public interface PoddArtifactManager
      * @throws OWLException
      * @throws InterruptedException
      * @throws ExecutionException
+     * @throws TimeoutException
      */
     Model updateArtifact(URI artifactUri, URI versionUri, Collection<URI> objectUris, InputStream inputStream,
             RDFFormat format, UpdatePolicy updatePolicy, DanglingObjectPolicy danglingObjectAction,
             DataReferenceVerificationPolicy fileReferenceAction) throws OpenRDFException, IOException, OWLException,
-        PoddException, ExecutionException, InterruptedException;
+        PoddException, ExecutionException, InterruptedException, TimeoutException;
     
     /**
      * Updates the importing of the given schema ontology in the given PODD Artifact.
@@ -725,7 +730,7 @@ public interface PoddArtifactManager
      *             updates.
      * @throws InterruptedException
      * @throws ExecutionException
-     * @throws TimeoutException 
+     * @throws TimeoutException
      */
     InferredOWLOntologyID updateSchemaImports(InferredOWLOntologyID artifactId,
             Set<? extends OWLOntologyID> oldSchemaOntologyIds, Set<? extends OWLOntologyID> newSchemaOntologyIds)
