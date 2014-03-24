@@ -257,13 +257,18 @@ public class PoddSesameRealm extends Realm
             conn = this.repository.getConnection();
             final PoddUser findUser = this.findUser(identifier, conn);
             
+            if(findUser == null)
+            {
+                throw new PoddRuntimeException("No user found for the given identifier: " + identifier);
+            }
+            
             final List<Statement> hashList =
                     Iterations.asList(conn.getStatements(findUser.getUri(), PODD.PODD_USER_SECRET_HASH, null, false,
                             this.userManagerContexts));
             
             if(hashList.isEmpty() || hashList.size() > 1)
             {
-                throw new PoddRuntimeException("Could not verify user identity");
+                throw new PoddRuntimeException("Could not verify user identity: " + identifier);
             }
             
             return new PoddUserSecretHash(((Literal)hashList.get(0).getObject()).getLabel(), findUser);
