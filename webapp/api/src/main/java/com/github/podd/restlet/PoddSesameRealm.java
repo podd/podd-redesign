@@ -166,6 +166,10 @@ public class PoddSesameRealm extends Realm
                 PoddSesameRealm.this.log.error("Cannot create a user for the given identifier: {}", identifier);
                 throw new IllegalArgumentException("Cannot create a user for the given identifier");
             }
+            else if(checkUser.getUserStatus() == PoddUserStatus.INACTIVE)
+            {
+                throw new PoddRuntimeException("Could not login as user is inactive");
+            }
             
             final PoddUser result =
                     new PoddUser(identifier, (char[])null, checkUser.getFirstName(), checkUser.getLastName(),
