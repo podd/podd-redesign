@@ -258,7 +258,7 @@ public abstract class AbstractPoddClientTest
         
         // Then test append with an updated model
         
-        final URI investigationUri = GraphUtil.getUniqueSubjectURI(model, RDF.TYPE, PODD.PODD_SCIENCE_INVESTIGATION);
+        final URI investigationUri = GraphUtil.getUniqueSubjectURI(model, RDF.TYPE, PODD.PODD_SCIENCE_EXPERIMENT);
         final URI containerUri = AbstractPoddClientTest.vf.createURI("urn:temp:uuid:container:1");
         
         // Must have all of the existing triples for the investigation present or they will be
