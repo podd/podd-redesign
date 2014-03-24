@@ -23,6 +23,7 @@ import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeoutException;
 
 import org.junit.Assert;
 import org.openrdf.OpenRDFException;
@@ -78,7 +79,7 @@ public class TestUtils
     
     public static List<InferredOWLOntologyID> loadSchemaOntologies(final String schemaManifest,
             final int expectedSchemaOntologies, final PoddSchemaManager schemaManager) throws OpenRDFException,
-        IOException, OWLException, PoddException, ExecutionException, InterruptedException
+        IOException, OWLException, PoddException, ExecutionException, InterruptedException, TimeoutException
     {
         Model model = null;
         try (final InputStream schemaManifestStream = TestUtils.class.getResourceAsStream(schemaManifest);)

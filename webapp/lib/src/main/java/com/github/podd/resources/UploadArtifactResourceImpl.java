@@ -32,6 +32,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeoutException;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadException;
@@ -441,12 +443,12 @@ public class UploadArtifactResourceImpl extends AbstractPoddResourceImpl
             this.log.warn("Attempting to load duplicate artifact {}", e);
             throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Failed loading duplicate artifact to PODD", e);
         }
-        catch(OpenRDFException | PoddException | IOException | OWLException e)
+        catch(OpenRDFException | PoddException | IOException | OWLException | ExecutionException | InterruptedException
+                | TimeoutException e)
         {
             this.log.error("Failed to load artifact: {}", e.getMessage());
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Error loading artifact to PODD", e);
         }
-        
     }
     
     private InferredOWLOntologyID uploadFileAndLoadArtifactIntoPodd(final Representation entity)

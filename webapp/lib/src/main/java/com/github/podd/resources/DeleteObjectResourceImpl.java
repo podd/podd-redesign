@@ -19,6 +19,7 @@ package com.github.podd.resources;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.concurrent.ExecutionException;
 
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.Model;
@@ -132,6 +133,16 @@ public class DeleteObjectResourceImpl extends AbstractPoddResourceImpl
         {
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL,
                     "Could not delete artifact due to an internal error", e);
+        }
+        catch(ExecutionException e)
+        {
+            throw new ResourceException(Status.SERVER_ERROR_INTERNAL,
+                    "Could not delete artifact due to an execution exception", e);
+        }
+        catch(InterruptedException e)
+        {
+            throw new ResourceException(Status.SERVER_ERROR_INTERNAL,
+                    "Could not delete artifact due to an interrupted exception", e);
         }
     }
     

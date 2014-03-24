@@ -24,6 +24,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.Model;
@@ -176,6 +177,16 @@ public class EditArtifactResourceImpl extends AbstractPoddResourceImpl
         catch(final PoddException | OpenRDFException | IOException | OWLException e)
         {
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Could not create response", e);
+        }
+        catch(ExecutionException e)
+        {
+            throw new ResourceException(Status.SERVER_ERROR_INTERNAL,
+                    "Could not edit artifact due to an execution exception", e);
+        }
+        catch(InterruptedException e)
+        {
+            throw new ResourceException(Status.SERVER_ERROR_INTERNAL,
+                    "Could not edit artifact due to an interrupted exception", e);
         }
         
         return new ByteArrayRepresentation(output.toByteArray(), MediaType.valueOf(outputFormat.getDefaultMIMEType()));

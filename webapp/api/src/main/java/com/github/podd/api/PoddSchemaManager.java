@@ -25,6 +25,7 @@ import java.io.OutputStream;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeoutException;
 
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.Model;
@@ -225,11 +226,12 @@ public interface PoddSchemaManager
      * @throws OWLException
      * @throws IOException
      * @throws OpenRDFException
-     * @throws InterruptedException 
-     * @throws ExecutionException 
+     * @throws InterruptedException
+     * @throws ExecutionException
+     * @throws TimeoutException
      */
     List<InferredOWLOntologyID> uploadSchemaOntologies(Model manifest) throws OpenRDFException, IOException,
-        OWLException, PoddException, ExecutionException, InterruptedException;
+        OWLException, PoddException, ExecutionException, InterruptedException, TimeoutException;
     
     /**
      * Loads a Schema Ontology into the internal repository, computes inferences on the schema
@@ -254,10 +256,11 @@ public interface PoddSchemaManager
      *             If an error occurs due to a violation of the PODD constraints.
      * @throws InterruptedException
      * @throws ExecutionException
+     * @throws TimeoutException
      */
     InferredOWLOntologyID uploadSchemaOntology(InputStream inputStream, RDFFormat fileFormat,
             Set<? extends OWLOntologyID> dependentSchemaOntologies) throws OpenRDFException, IOException, OWLException,
-        PoddException, ExecutionException, InterruptedException;
+        PoddException, ExecutionException, InterruptedException, TimeoutException;
     
     /**
      * Loads a Schema Ontology into the internal repository, computes inferences on the schema
@@ -283,9 +286,10 @@ public interface PoddSchemaManager
      *             If an error occurs due to a violation of the PODD constraints.
      * @throws InterruptedException
      * @throws ExecutionException
+     * @throws TimeoutException
      */
     InferredOWLOntologyID uploadSchemaOntology(OWLOntologyID schemaOntologyID, InputStream inputStream,
             RDFFormat fileFormat, Set<? extends OWLOntologyID> dependentSchemaOntologies) throws OpenRDFException,
-        IOException, OWLException, PoddException, ExecutionException, InterruptedException;
+        IOException, OWLException, PoddException, ExecutionException, InterruptedException, TimeoutException;
     
 }

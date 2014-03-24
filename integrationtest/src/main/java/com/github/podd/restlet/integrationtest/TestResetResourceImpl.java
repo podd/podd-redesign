@@ -18,6 +18,7 @@ package com.github.podd.restlet.integrationtest;
 
 import java.io.IOException;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeoutException;
 
 import org.openrdf.OpenRDFException;
 import org.openrdf.rio.RDFFormat;
@@ -76,7 +77,7 @@ public class TestResetResourceImpl extends Restlet
             TestUtils.setupTestUser(this.application);
         }
         catch(final OpenRDFException | IOException | OWLException | PoddException | ExecutionException
-                | InterruptedException e)
+                | InterruptedException | TimeoutException e)
         {
             this.log.error("Could not reset application", e);
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Could not reset application", e);

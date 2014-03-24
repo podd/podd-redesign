@@ -18,7 +18,10 @@ package com.github.podd.api.test;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -201,9 +204,14 @@ public abstract class AbstractPoddOWLManagerTest
             
             final RioMemoryTripleSource owlSource = TestUtils.getRioTripleSource("/test/ontologies/version/1/a1.owl");
             managementConnection.begin();
-            final InferredOWLOntologyID ontologyID =
+            final Map<InferredOWLOntologyID, Future<InferredOWLOntologyID>> future =
                     this.testOwlManager.loadAndInfer(owlSource, managementConnection, replacementOntologyID,
                             Collections.<InferredOWLOntologyID> emptySet(), managementConnection, this.schemaGraph);
+            
+            InferredOWLOntologyID ontologyID = future.keySet().iterator().next();
+            
+            future.get(ontologyID).get(10, TimeUnit.MINUTES);
+            
             managementConnection.commit();
             
             Assert.assertNotNull(ontologyID);

@@ -34,6 +34,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeoutException;
 
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.Model;
@@ -285,7 +286,8 @@ public class ApplicationUtils
     }
     
     public static void setupApplication(final PoddWebServiceApplication application, final Context applicationContext)
-        throws OpenRDFException, IOException, OWLException, PoddException, ExecutionException, InterruptedException
+        throws OpenRDFException, IOException, OWLException, PoddException, ExecutionException, InterruptedException,
+        TimeoutException
     {
         final PropertyUtil props = application.getPropertyUtil();
         
@@ -454,7 +456,7 @@ public class ApplicationUtils
      * 
      */
     public static void setupSchemas(final PoddWebServiceApplication application) throws IOException, OpenRDFException,
-        OWLException, PoddException, ExecutionException, InterruptedException
+        OWLException, PoddException, ExecutionException, InterruptedException, TimeoutException
     {
         final PropertyUtil props = application.getPropertyUtil();
         final PoddSchemaManager poddSchemaManager = application.getPoddSchemaManager();
@@ -632,7 +634,8 @@ public class ApplicationUtils
             // dumpSchemaGraph(application, nextRepository);
             
         }
-        catch(IOException | OpenRDFException | OWLException | PoddException | ExecutionException | InterruptedException e)
+        catch(IOException | OpenRDFException | OWLException | PoddException | ExecutionException | InterruptedException
+                | TimeoutException e)
         {
             ApplicationUtils.log.error("Fatal Error!!! Could not load schema ontologies", e);
             throw e;

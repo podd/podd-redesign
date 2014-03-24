@@ -21,7 +21,10 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -191,9 +194,13 @@ public class PoddOWLManagerImplTest extends AbstractPoddOWLManagerTest
                 new StreamDocumentSource(inputStream, OWLOntologyFormatFactoryRegistry.getInstance().getByMIMEType(
                         format.getDefaultMIMEType()));
         
-        final InferredOWLOntologyID inferredOntologyID =
+        final Map<InferredOWLOntologyID, Future<InferredOWLOntologyID>> future =
                 this.testOwlManager.loadAndInfer(owlSource, managementConnection, null, dependentSchemaOntologies,
                         managementConnection, this.schemaGraph);
+        
+        InferredOWLOntologyID inferredOntologyID = future.keySet().iterator().next();
+        
+        future.get(inferredOntologyID).get(10, TimeUnit.MINUTES);
         
         this.testOwlManager.removeCache(null, dependentSchemaOntologies);
         

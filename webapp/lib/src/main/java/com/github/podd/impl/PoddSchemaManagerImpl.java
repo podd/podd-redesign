@@ -35,6 +35,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.Model;
@@ -351,7 +353,7 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
     
     @Override
     public List<InferredOWLOntologyID> uploadSchemaOntologies(final Model model) throws OpenRDFException, IOException,
-        OWLException, PoddException, ExecutionException, InterruptedException
+        OWLException, PoddException, ExecutionException, InterruptedException, TimeoutException
     {
         final Set<URI> schemaOntologyUris = new HashSet<>();
         final Set<URI> schemaVersionUris = new HashSet<>();
@@ -397,7 +399,7 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
     private List<InferredOWLOntologyID> uploadSchemaOntologiesInOrder(final Model model,
             final List<OWLOntologyID> nextImportOrder, final ConcurrentMap<URI, URI> currentVersionsMap)
         throws ModelException, OpenRDFException, IOException, OWLException, PoddException, ExecutionException,
-        InterruptedException
+        InterruptedException, TimeoutException
     {
         Objects.requireNonNull(model, "Schema Ontology model was null");
         Objects.requireNonNull(nextImportOrder, "Schema Ontology import order was null");
@@ -565,7 +567,7 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
     @Override
     public InferredOWLOntologyID uploadSchemaOntology(final InputStream inputStream, final RDFFormat fileFormat,
             final Set<? extends OWLOntologyID> dependentSchemaOntologies) throws OpenRDFException, IOException,
-        OWLException, PoddException, ExecutionException, InterruptedException
+        OWLException, PoddException, ExecutionException, InterruptedException, TimeoutException
     {
         return this.uploadSchemaOntology(null, inputStream, fileFormat, dependentSchemaOntologies);
     }
@@ -577,7 +579,7 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
     public InferredOWLOntologyID uploadSchemaOntology(final OWLOntologyID schemaOntologyID,
             final InputStream inputStream, final RDFFormat fileFormat,
             final Set<? extends OWLOntologyID> dependentSchemaOntologies) throws OpenRDFException, IOException,
-        OWLException, PoddException, ExecutionException, InterruptedException
+        OWLException, PoddException, ExecutionException, InterruptedException, TimeoutException
     {
         Objects.requireNonNull(inputStream, "Schema Ontology input stream was null");
         
@@ -648,20 +650,26 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
      * @throws OpenRDFException
      * @throws ExecutionException
      * @throws InterruptedException
+     * @throws TimeoutException
      */
     private InferredOWLOntologyID uploadSchemaOntologyInternal(final OWLOntologyID schemaOntologyID,
             final InputStream inputStream, final RDFFormat fileFormat, final RepositoryConnection managementConnection,
             final URI schemaManagementGraph, final Set<? extends OWLOntologyID> dependentSchemaOntologies)
-        throws OWLException, IOException, PoddException, OpenRDFException, InterruptedException, ExecutionException
+        throws OWLException, IOException, PoddException, OpenRDFException, InterruptedException, ExecutionException,
+        TimeoutException
     {
         this.log.debug("Dependent ontologies for next schema upload: {}", dependentSchemaOntologies);
         
         final OWLOntologyDocumentSource owlSource =
                 new StreamDocumentSource(inputStream, fileFormat.getDefaultMIMEType());
-        final Future<InferredOWLOntologyID> nextInferredOntology =
+        final Map<InferredOWLOntologyID, Future<InferredOWLOntologyID>> nextInferredOntology =
                 this.owlManager.loadAndInfer(owlSource, managementConnection, schemaOntologyID,
                         dependentSchemaOntologies, managementConnection, schemaManagementGraph);
         
-        return nextInferredOntology.get();
+        InferredOWLOntologyID result = nextInferredOntology.keySet().iterator().next();
+        
+        nextInferredOntology.get(result).get(10, TimeUnit.MINUTES);
+        
+        return result;
     }
 }

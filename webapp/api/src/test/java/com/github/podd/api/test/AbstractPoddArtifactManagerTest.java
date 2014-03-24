@@ -31,8 +31,13 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.commons.io.IOUtils;
@@ -444,9 +449,13 @@ public abstract class AbstractPoddArtifactManagerTest
                 new StreamDocumentSource(inputStream, OWLOntologyFormatFactoryRegistry.getInstance().getByMIMEType(
                         format.getDefaultMIMEType()));
         
-        final InferredOWLOntologyID inferredOntologyID =
+        final Map<InferredOWLOntologyID, Future<InferredOWLOntologyID>> future =
                 this.testArtifactManager.getOWLManager().loadAndInfer(owlSource, repositoryConnection, null,
                         dependentSchemaOntologies, repositoryConnection, this.schemaGraph);
+        
+        InferredOWLOntologyID inferredOntologyID = future.keySet().iterator().next();
+        
+        future.get(inferredOntologyID).get(10, TimeUnit.MINUTES);
         
         this.testSesameManager.updateManagedSchemaOntologyVersion(inferredOntologyID, true, repositoryConnection,
                 this.schemaGraph);
@@ -1690,9 +1699,7 @@ public abstract class AbstractPoddArtifactManagerTest
                     this.testArtifactManager.loadArtifact(inputStream, RDFFormat.NQUADS);
             
             // verify:
-            this.verifyLoadedArtifact(resultArtifactId, 11,
-                   20,
-                    611, false);
+            this.verifyLoadedArtifact(resultArtifactId, 11, 20, 611, false);
         }
     }
     
@@ -1737,14 +1744,10 @@ public abstract class AbstractPoddArtifactManagerTest
                             }
                             count.incrementAndGet();
                         }
-                        catch(OpenRDFException | PoddException | IOException | OWLException e)
+                        catch(OpenRDFException | PoddException | IOException | OWLException | ExecutionException
+                                | InterruptedException | TimeoutException e)
                         {
                             e.printStackTrace();
-                            Assert.fail("Failed in test: " + number);
-                        }
-                        catch(final InterruptedException ie)
-                        {
-                            ie.printStackTrace();
                             Assert.fail("Failed in test: " + number);
                         }
                         finally
