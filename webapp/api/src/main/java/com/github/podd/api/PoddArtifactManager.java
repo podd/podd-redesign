@@ -63,13 +63,14 @@ import com.github.podd.utils.PoddObjectLabel;
 public interface PoddArtifactManager
 {
     InferredOWLOntologyID attachDataReference(InferredOWLOntologyID artifactId, URI objectUri,
-            DataReference dataReference, DataReferenceVerificationPolicy dataReferenceVerificationPolicy)
-        throws OpenRDFException, IOException, OWLException, PoddException, ExecutionException, InterruptedException,
-        TimeoutException;
+            DataReference dataReference, DataReferenceVerificationPolicy dataReferenceVerificationPolicy,
+            boolean asynchronousInferencing) throws OpenRDFException, IOException, OWLException, PoddException,
+        ExecutionException, InterruptedException, TimeoutException;
     
     InferredOWLOntologyID attachDataReferences(InferredOWLOntologyID artifactId, Model model,
-            DataReferenceVerificationPolicy dataReferenceVerificationPolicy) throws OpenRDFException, IOException,
-        OWLException, PoddException, ExecutionException, InterruptedException, TimeoutException;
+            DataReferenceVerificationPolicy dataReferenceVerificationPolicy, boolean asynchronousInferencing)
+        throws OpenRDFException, IOException, OWLException, PoddException, ExecutionException, InterruptedException,
+        TimeoutException;
     
     /**
      * Deletes the given artifact if and only if it is available and it is not currently published.
@@ -529,9 +530,9 @@ public interface PoddArtifactManager
         PoddException, IOException, OWLException, ExecutionException, InterruptedException, TimeoutException;
     
     InferredOWLOntologyID loadArtifact(InputStream inputStream, RDFFormat format,
-            DanglingObjectPolicy danglingObjectPolicy, DataReferenceVerificationPolicy dataReferenceVerificationPolicy)
-        throws OpenRDFException, PoddException, IOException, OWLException, ExecutionException, InterruptedException,
-        TimeoutException;
+            DanglingObjectPolicy danglingObjectPolicy, DataReferenceVerificationPolicy dataReferenceVerificationPolicy,
+            boolean asynchronousInferencing) throws OpenRDFException, PoddException, IOException, OWLException,
+        ExecutionException, InterruptedException, TimeoutException;
     
     /**
      * Sets the given OWLOntologyID to be published.

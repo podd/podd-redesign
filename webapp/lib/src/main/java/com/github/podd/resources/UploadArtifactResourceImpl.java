@@ -172,6 +172,16 @@ public class UploadArtifactResourceImpl extends AbstractPoddResourceImpl
                 fileRefVerificationPolicy = DataReferenceVerificationPolicy.VERIFY;
             }
             
+            // check optional parameter: whether we can defer inferencing
+            // Defaults to false; ie, inferencing is not deferred
+            final String asynchronousInferencingString =
+                    this.getQuery().getFirstValue(PoddWebConstants.KEY_ASYNCHRONOUS_INFERENCING, true);
+            boolean asynchronousInferencing = false;
+            if(asynchronousInferencingString != null && Boolean.valueOf(asynchronousInferencingString))
+            {
+                asynchronousInferencing = true;
+            }
+
             try (final InputStream inputStream = entity.getStream();)
             {
                 if(inputStream == null)
@@ -180,7 +190,7 @@ public class UploadArtifactResourceImpl extends AbstractPoddResourceImpl
                 }
                 artifactMap =
                         this.uploadFileAndLoadArtifactIntoPodd(inputStream, format, danglingObjectPolicy,
-                                fileRefVerificationPolicy);
+                                fileRefVerificationPolicy, asynchronousInferencing);
             }
             catch(final IOException e)
             {
@@ -414,12 +424,13 @@ public class UploadArtifactResourceImpl extends AbstractPoddResourceImpl
      * @param format
      *            The determined, or at least specified, format for the serialised RDF triples in
      *            the input.
+     * @param asynchronousInferencing 
      * @return
      * @throws ResourceException
      */
     private InferredOWLOntologyID uploadFileAndLoadArtifactIntoPodd(final InputStream inputStream,
             final RDFFormat format, final DanglingObjectPolicy danglingObjectPolicy,
-            final DataReferenceVerificationPolicy dataReferenceVerificationPolicy) throws ResourceException
+            final DataReferenceVerificationPolicy dataReferenceVerificationPolicy, boolean asynchronousInferencing) throws ResourceException
     {
         final PoddArtifactManager artifactManager =
                 ((PoddWebServiceApplication)this.getApplication()).getPoddArtifactManager();
@@ -429,7 +440,7 @@ public class UploadArtifactResourceImpl extends AbstractPoddResourceImpl
             {
                 final InferredOWLOntologyID loadedArtifact =
                         artifactManager.loadArtifact(inputStream, format, danglingObjectPolicy,
-                                dataReferenceVerificationPolicy);
+                                dataReferenceVerificationPolicy, asynchronousInferencing);
                 return loadedArtifact;
             }
             else

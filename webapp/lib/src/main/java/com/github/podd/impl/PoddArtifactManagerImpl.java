@@ -130,7 +130,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
     
     private PoddSesameManager sesameManager;
     
-    private final ExecutorService executor = Executors.newFixedThreadPool(8);
+    private final ExecutorService executor = Executors.newFixedThreadPool(16);
     
     /**
      * 
@@ -141,17 +141,19 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
     
     @Override
     public InferredOWLOntologyID attachDataReference(final InferredOWLOntologyID artifactId, final URI objectUri,
-            final DataReference dataReference, final DataReferenceVerificationPolicy dataReferenceVerificationPolicy)
-        throws OpenRDFException, PoddException, IOException, OWLException, ExecutionException, InterruptedException,
-        TimeoutException
+            final DataReference dataReference, final DataReferenceVerificationPolicy dataReferenceVerificationPolicy,
+            final boolean asynchronousInferencing) throws OpenRDFException, PoddException, IOException, OWLException,
+        ExecutionException, InterruptedException, TimeoutException
     {
-        return this.attachDataReferences(artifactId, dataReference.toRDF(), dataReferenceVerificationPolicy);
+        return this.attachDataReferences(artifactId, dataReference.toRDF(), dataReferenceVerificationPolicy,
+                asynchronousInferencing);
     }
     
     @Override
     public InferredOWLOntologyID attachDataReferences(final InferredOWLOntologyID ontologyId, final Model model,
-            final DataReferenceVerificationPolicy dataReferenceVerificationPolicy) throws OpenRDFException,
-        IOException, OWLException, PoddException, ExecutionException, InterruptedException, TimeoutException
+            final DataReferenceVerificationPolicy dataReferenceVerificationPolicy, final boolean asynchronousInferencing)
+        throws OpenRDFException, IOException, OWLException, PoddException, ExecutionException, InterruptedException,
+        TimeoutException
     {
         model.removeAll(model.filter(null, PODD.PODD_BASE_INFERRED_VERSION, null));
         
@@ -1466,8 +1468,9 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
     @Override
     public InferredOWLOntologyID loadArtifact(final InputStream inputStream, RDFFormat format,
             final DanglingObjectPolicy danglingObjectPolicy,
-            final DataReferenceVerificationPolicy dataReferenceVerificationPolicy) throws OpenRDFException,
-        PoddException, IOException, OWLException, ExecutionException, InterruptedException, TimeoutException
+            final DataReferenceVerificationPolicy dataReferenceVerificationPolicy, boolean asynchronousInferencing)
+        throws OpenRDFException, PoddException, IOException, OWLException, ExecutionException, InterruptedException,
+        TimeoutException
     {
         
         if(inputStream == null)
@@ -1618,16 +1621,22 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             
             Map<InferredOWLOntologyID, Future<InferredOWLOntologyID>> future =
                     this.loadInferStoreArtifact(temporaryConnection, permanentConnection, managementConnection,
-                            randomContext, dataReferenceVerificationPolicy, false, schemaImports);
+                            randomContext, dataReferenceVerificationPolicy, asynchronousInferencing, schemaImports);
             
             inferredOWLOntologyID = future.keySet().iterator().next();
             
-            // Make sure inferencing is complete
-            future.get(inferredOWLOntologyID).get(10, TimeUnit.MINUTES);
+            if(!asynchronousInferencing)
+            {
+                // TODO: Turn the following operations into
+                // Make sure inferencing is complete
+                future.get(inferredOWLOntologyID).get(10, TimeUnit.MINUTES);
+            }
             
             this.getSesameManager().updateManagedPoddArtifactVersion(inferredOWLOntologyID, true, managementConnection,
                     this.getRepositoryManager().getArtifactManagementGraph());
             
+            // FIXME: The following should result in modified cases in the artifact being relocated
+            // to another physical repository. This needs to be allowed for explicitly here
             managementConnection.remove(inferredOWLOntologyID.getOntologyIRI().toOpenRDFURI(), OWL.IMPORTS, null, this
                     .getRepositoryManager().getArtifactManagementGraph());
             

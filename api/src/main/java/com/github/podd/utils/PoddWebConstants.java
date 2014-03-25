@@ -416,4 +416,6 @@ public interface PoddWebConstants
     
     public static final String DEF_LOGIN_FIELD_PASSWORD = "password";
     
+    public static final String KEY_ASYNCHRONOUS_INFERENCING = "asynchronousInferencing";
+    
 }

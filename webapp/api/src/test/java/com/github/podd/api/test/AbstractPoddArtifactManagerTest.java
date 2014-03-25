@@ -636,7 +636,7 @@ public abstract class AbstractPoddArtifactManagerTest
      * .
      */
     @Test
-    public final void testAttachFileReferencesWithoutVerification() throws Exception
+    public final void testAttachFileReferencesWithoutVerificationInferencingImmediate() throws Exception
     {
         this.loadVersion1SchemaOntologies();
         
@@ -654,7 +654,77 @@ public abstract class AbstractPoddArtifactManagerTest
             updatedArtifact =
                     this.testArtifactManager.attachDataReferences(artifactId,
                             Rio.parse(editInputStream, "", RDFFormat.RDFXML),
-                            DataReferenceVerificationPolicy.DO_NOT_VERIFY);
+                            DataReferenceVerificationPolicy.DO_NOT_VERIFY, false);
+        }
+        // verify:
+        RepositoryConnection managementConnection = null;
+        RepositoryConnection permanentConnection = null;
+        try
+        {
+            managementConnection = this.testRepositoryManager.getManagementRepositoryConnection();
+            managementConnection.begin();
+            
+            final Set<? extends OWLOntologyID> schemaImports =
+                    this.testArtifactManager.getSchemaImports(updatedArtifact);
+            permanentConnection = this.testRepositoryManager.getPermanentRepositoryConnection(schemaImports);
+            
+            this.verifyUpdatedArtifact(updatedArtifact, "http://purl.org/podd/basic-2-20130206/artifact:1:version:2",
+                    TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES + 8, managementConnection);
+            
+            // verify: file reference object
+            final List<Statement> fileRefList =
+                    Iterations.asList(permanentConnection.getStatements(null, PODD.PODD_BASE_HAS_DATA_REFERENCE, null,
+                            false, updatedArtifact.getVersionIRI().toOpenRDFURI()));
+            Assert.assertEquals("Graph should have 1 file reference", 1, fileRefList.size());
+            
+            Assert.assertTrue("File reference value incorrect",
+                    fileRefList.get(0).getObject().stringValue().endsWith("object-rice-scan-34343-a"));
+        }
+        finally
+        {
+            if(permanentConnection != null && permanentConnection.isOpen())
+            {
+                permanentConnection.close();
+            }
+            permanentConnection = null;
+            
+            if(managementConnection != null && managementConnection.isActive())
+            {
+                managementConnection.rollback();
+            }
+            if(managementConnection != null && managementConnection.isOpen())
+            {
+                managementConnection.close();
+            }
+            managementConnection = null;
+        }
+    }
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddArtifactManager#attachDataReferences(URI, URI, InputStream, RDFFormat, DataReferenceVerificationPolicy)}
+     * .
+     */
+    @Test
+    public final void testAttachFileReferencesWithoutVerificationInferencingDeferred() throws Exception
+    {
+        this.loadVersion1SchemaOntologies();
+        
+        final InputStream inputStream = this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_20130206);
+        
+        final InferredOWLOntologyID artifactId = this.testArtifactManager.loadArtifact(inputStream, RDFFormat.TURTLE);
+        this.verifyLoadedArtifact(artifactId, 12, TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES,
+                TestConstants.TEST_ARTIFACT_BASIC_1_20130206_INFERRED_TRIPLES, false);
+        
+        final InferredOWLOntologyID updatedArtifact;
+        try (final InputStream editInputStream =
+                this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_FRAGMENT_NEW_FILE_REF_OBJECT);)
+        {
+            
+            updatedArtifact =
+                    this.testArtifactManager.attachDataReferences(artifactId,
+                            Rio.parse(editInputStream, "", RDFFormat.RDFXML),
+                            DataReferenceVerificationPolicy.DO_NOT_VERIFY, true);
         }
         // verify:
         RepositoryConnection managementConnection = null;

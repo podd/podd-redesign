@@ -77,6 +77,7 @@ public class DataReferenceAttachResourceImpl extends AbstractPoddResourceImpl
      * @param artifactUri
      * @param versionUri
      * @param verificationPolicy
+     * @param asynchronousInferencing
      * @return
      * @throws ResourceException
      * @throws IOException
@@ -86,10 +87,10 @@ public class DataReferenceAttachResourceImpl extends AbstractPoddResourceImpl
      * @throws UnmanagedSchemaIRIException
      */
     private InferredOWLOntologyID attachDataReference(final Representation entity, final String artifactUriString,
-            final String versionUriString, final DataReferenceVerificationPolicy verificationPolicy)
-        throws ResourceException, RDFParseException, UnsupportedRDFormatException, IOException,
-        UnmanagedArtifactIRIException, UnmanagedSchemaIRIException, ExecutionException, InterruptedException,
-        TimeoutException
+            final String versionUriString, final DataReferenceVerificationPolicy verificationPolicy,
+            boolean asynchronousInferencing) throws ResourceException, RDFParseException, UnsupportedRDFormatException,
+        IOException, UnmanagedArtifactIRIException, UnmanagedSchemaIRIException, ExecutionException,
+        InterruptedException, TimeoutException
     {
         // get input stream containing RDF statements
         InputStream inputStream = null;
@@ -123,7 +124,9 @@ public class DataReferenceAttachResourceImpl extends AbstractPoddResourceImpl
         InferredOWLOntologyID artifactMap = null;
         try
         {
-            artifactMap = this.getPoddArtifactManager().attachDataReferences(artifact, model, verificationPolicy);
+            artifactMap =
+                    this.getPoddArtifactManager().attachDataReferences(artifact, model, verificationPolicy,
+                            asynchronousInferencing);
         }
         catch(final PoddRuntimeException e)
         {
@@ -259,12 +262,24 @@ public class DataReferenceAttachResourceImpl extends AbstractPoddResourceImpl
             verificationPolicy = DataReferenceVerificationPolicy.VERIFY;
         }
         
+        // check optional parameter: whether we can defer inferencing
+        // Defaults to false; ie, inferencing is not deferred
+        final String asynchronousInferencingString =
+                this.getQuery().getFirstValue(PoddWebConstants.KEY_ASYNCHRONOUS_INFERENCING, true);
+        boolean asynchronousInferencing = false;
+        if(asynchronousInferencingString != null && Boolean.valueOf(asynchronousInferencingString))
+        {
+            asynchronousInferencing = true;
+        }
+
         this.log.info("@Post attachFileReference ({})", entity.getMediaType().getName());
         
         InferredOWLOntologyID artifactMap;
         try
         {
-            artifactMap = this.attachDataReference(entity, artifactUri, versionUri, verificationPolicy);
+            artifactMap =
+                    this.attachDataReference(entity, artifactUri, versionUri, verificationPolicy,
+                            asynchronousInferencing);
         }
         catch(final UnmanagedArtifactIRIException | UnmanagedSchemaIRIException e1)
         {
