@@ -1364,6 +1364,8 @@ public class PoddSesameManagerImpl implements PoddSesameManager
             
             final String annotationQueryString = annotationQuery.toString();
             
+            this.log.debug("Created SPARQL annotationQuery {} ", annotationQuery);
+            
             final GraphQuery annotationGraphQuery =
                     repositoryConnection.prepareGraphQuery(QueryLanguage.SPARQL, annotationQueryString);
             annotationGraphQuery.setBinding("objectType", objectType);
@@ -1426,6 +1428,8 @@ public class PoddSesameManagerImpl implements PoddSesameManager
             sb2.append(" } ");
             
             final String sb2String = sb2.toString();
+            
+            this.log.debug("Created SPARQL get metaData for properties {} ", sb2);
             
             final GraphQuery graphQuery2 = repositoryConnection.prepareGraphQuery(QueryLanguage.SPARQL, sb2String);
             final Model queryResults2 = RdfUtility.executeGraphQuery(graphQuery2, contexts);
@@ -1499,6 +1503,8 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         }
         
         results.addAll(this.getInstancesOf(nextRangeTypeURIs, repositoryConnection, contexts));
+        
+        this.log.debug("Results Metadata {} ", results);
         
         return results;
     }

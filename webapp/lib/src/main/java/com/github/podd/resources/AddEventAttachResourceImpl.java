@@ -51,111 +51,7 @@ import com.github.podd.utils.PoddWebConstants;
 public class AddEventAttachResourceImpl extends AbstractPoddResourceImpl
 {
 
-	@Post("rdf|rj|json|ttl")
-    public Representation addEventLinked(final Representation entity, final Variant variant) throws ResourceException
-    {
-        // check authentication first
-        this.checkAuthentication(PoddAction.USER_CREATE);
-        
-        this.log.info("In addUserRdf");
-        
-        final PoddSesameRealm nextRealm = ((PoddWebServiceApplication)this.getApplication()).getRealm();
-        
-        URI newUserUri = null;
-        PoddUser newUser = null;
-        try
-        {
-            // - get input stream with RDF content
-            final InputStream inputStream = entity.getStream();
-            final RDFFormat inputFormat =
-                    Rio.getParserFormatForMIMEType(entity.getMediaType().getName(), RDFFormat.RDFXML);
-            final Model newUserModel = Rio.parse(inputStream, "", inputFormat);
-            
-            this.log.info("About to create user from model");
-            
-            // - create new PoddUser and add to Realm
-            newUser = PoddUser.fromModel(newUserModel, true, false, false);
-            
-            // If we didn't get a secret, then do not activate their login at
-            // this stage
-            if(newUser.getSecret() == null)
-            {
-                newUser.setUserStatus(PoddUserStatus.INACTIVE);
-            }
-            
-            this.log.info("About to check if user already exists");
-            
-            if(nextRealm.findUser(newUser.getIdentifier()) != null)
-            {
-                throw new ResourceException(Status.CLIENT_ERROR_CONFLICT, "User already exists");
-            }
-            newUserUri = nextRealm.addUser(newUser);
-            
-            this.log.info("Added new User <{}> <{}>", newUser.getIdentifier(), newUserUri);
-            
-            // - map Roles for the new User
-            
-            // - add Project Creator Role if nothing else has been specified
-            if(!newUserModel.contains(null, RDF.TYPE, SesameRealmConstants.OAS_ROLEMAPPING))
-            {
-                nextRealm.map(newUser, PoddRoles.PROJECT_CREATOR.getRole());
-            }
-            
-            for(final Resource mappingUri : newUserModel.filter(null, RDF.TYPE, SesameRealmConstants.OAS_ROLEMAPPING)
-                    .subjects())
-            {
-                final URI roleUri =
-                        newUserModel.filter(mappingUri, SesameRealmConstants.OAS_ROLEMAPPEDROLE, null).objectURI();
-                final RestletUtilRole role = PoddRoles.getRoleByUri(roleUri);
-                
-                final URI mappedObject = newUserModel.filter(mappingUri, PODD.PODD_ROLEMAPPEDOBJECT, null).objectURI();
-                
-                this.log.debug("Mapping <{}> to Role <{}> with Optional Object <{}>", newUser.getIdentifier(),
-                        role.getName(), mappedObject);
-                if(mappedObject != null)
-                {
-                    nextRealm.map(newUser, role.getRole(), mappedObject);
-                }
-                else
-                {
-                    nextRealm.map(newUser, role.getRole());
-                }
-            }
-            
-            // - check the User was successfully added to the Realm
-            final PoddUser findUser = nextRealm.findUser(newUser.getIdentifier());
-            if(findUser == null)
-            {
-                throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Failed to add user");
-            }
-            
-        }
-        catch(final IOException | OpenRDFException e)
-        {
-            this.log.error("Error creating user", e);
-            throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "There was a problem with the input", e);
-        }
-        
-        // - prepare response
-        final ByteArrayOutputStream output = new ByteArrayOutputStream(8096);
-        final RDFFormat outputFormat =
-                Rio.getWriterFormatForMIMEType(variant.getMediaType().getName(), RDFFormat.RDFXML);
-        try
-        {
-            final Model model = new LinkedHashModel();
-            model.add(newUserUri, SesameRealmConstants.OAS_USERIDENTIFIER,
-                    PODD.VF.createLiteral(newUser.getIdentifier()));
-            
-            Rio.write(model, output, outputFormat);
-        }
-        catch(final OpenRDFException e)
-        {
-            this.log.error("Error generating response entity", e);
-            throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Could not create response");
-        }
-        
-        return new ByteArrayRepresentation(output.toByteArray(), MediaType.valueOf(outputFormat.getDefaultMIMEType()));
-    }
+	
 	
 	@Get("html")
 	public Representation attachEventReferencePageHtml(final Representation entity) throws ResourceException, UnmanagedArtifactIRIException, UnmanagedSchemaIRIException
@@ -190,13 +86,6 @@ public class AddEventAttachResourceImpl extends AbstractPoddResourceImpl
 			throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Artifact IRI not recognised");
 		}
 
-
-		this.log.debug("artifactUriString :{}",artifactUriString);
-		this.log.debug("objectUri :{}",objectUri);
-		this.log.debug("artifactUri :{}",artifactUri);
-		this.log.debug("artifact :{}",artifact);
-
-
 		this.log.info("attachEvent");
 		final User user = this.getRequest().getClientInfo().getUser();
 
@@ -215,8 +104,6 @@ public class AddEventAttachResourceImpl extends AbstractPoddResourceImpl
 			this.log.error("Could not event type", e);
 			throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Could not find parent details", e);
 		}
-
-
 
 		final Map<String, Object> dataModel = RestletUtils.getBaseDataModel(this.getRequest());
 		dataModel.put("contentTemplate", this.getPoddApplication().getPropertyUtil()
@@ -313,5 +200,17 @@ public class AddEventAttachResourceImpl extends AbstractPoddResourceImpl
 
 		return Data.toString();
 	}
+	
+	
+	@Post("rdf|rj|json|ttl")
+    public Representation addEventLinked(final Representation entity, final Variant variant) throws ResourceException
+    {
+
+        this.log.info("In addEventLinked");
+        
+       
+        
+        return null;
+    }
 
 }

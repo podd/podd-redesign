@@ -59,6 +59,16 @@ public interface PoddWebConstants
     /**
      * Property for freemarker template used as the base for rendering all HTML pages
      */
+    public static final String PROPERTY_TEMPLATE_MODIFY_OBJECT = "podd.modify_object.base";
+    
+    /**
+     * Default freemarker template used as the base for rendering all HTML pages
+     */
+    public static final String DEFAULT_TEMPLATE_MODIFY_OBJECT = "modify_object.html.ftl";
+    
+    /**
+     * Property for freemarker template used as the base for rendering all HTML pages
+     */
     public static final String PROPERTY_TEMPLATE_OBJECT_DETAILS = "podd.template.objectDetails";
     
     /**
