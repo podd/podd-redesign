@@ -74,17 +74,28 @@ public interface PoddWebConstants
     /**
      * Default freemarker template used as the base for rendering all HTML pages
      */
+    public static final String DEFAULT_TEMPLATE_OBJECT_DETAILS = "objectDetails.html.ftl";
+    
+    /**
+     * Default freemarker template used as the base for rendering all HTML pages
+     */
     public static final String DEFAULT_TEMPLATE_EVENT = "event.html.ftl";
     
     /**
      * Property for freemarker template used as the base for rendering all HTML pages
      */
     public static final String PROPERTY_TEMPLATE_EVENT = "podd.template.event";
-    
+ 
     /**
      * Default freemarker template used as the base for rendering all HTML pages
      */
-    public static final String DEFAULT_TEMPLATE_OBJECT_DETAILS = "objectDetails.html.ftl";
+    public static final String DEFAULT_TEMPLATE_ADD_OBJECT = "modify_object.html.ftl";
+    
+    /**
+     * Property for freemarker template used as the base for rendering all HTML pages
+     */
+    public static final String PROPERTY_TEMPLATE_ADD_OBJECT = "podd.template.modify_object";
+   
     
     /**
      * Property for freemarker template used for rendering all login pages
@@ -237,7 +248,7 @@ public interface PoddWebConstants
     /**
      * Path to the Event attachment service
      */
-    public static final String PATH_EVENT_REF = "artifact/addevent";
+    public static final String PATH_EVENT_REF = "eventtype";
     
     /**
      * Path to the list data repositories service.
@@ -310,6 +321,11 @@ public interface PoddWebConstants
      * Key used to represent a parent-child property as part of a request
      */
     public static final String KEY_PARENT_PREDICATE_IDENTIFIER = "parentpredicateuri";
+    
+    /**
+     * Key used to indicate if the artifact is an event
+     */
+    public static final String KEY_IS_EVENT = "isEvent";
     
     /**
      * Key used to represent the file reference verification policy to use

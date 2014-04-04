@@ -582,4 +582,8 @@ public interface PoddSesameManager
 	Set<URI> getPossibleEvents(RepositoryConnection repositoryConnection,
 			URI... contexts) throws OpenRDFException;
 
+	Model getTreeHierarchy(URI objectType,
+			RepositoryConnection repositoryConnection, URI[] contexts)
+			throws OpenRDFException;
+
 }

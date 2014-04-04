@@ -219,7 +219,6 @@ public class SparqlResourceImpl extends AbstractPoddResourceImpl
             final Variant variant) throws ResourceException, OpenRDFException
     {
         final Set<InferredOWLOntologyID> artifactIds = new LinkedHashSet<>();
-        this.log.info("TOTO:: doSparqlInternal");
         // If they didn't specify any artifacts, run the query across all of the artifacts that they
         // have access to
         if(artifactUris == null || artifactUris.length == 0)

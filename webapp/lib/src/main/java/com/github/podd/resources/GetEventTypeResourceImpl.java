@@ -48,81 +48,29 @@ import com.github.podd.utils.PoddUser;
 import com.github.podd.utils.PoddUserStatus;
 import com.github.podd.utils.PoddWebConstants;
 
-public class AddEventAttachResourceImpl extends AbstractPoddResourceImpl
+public class GetEventTypeResourceImpl extends AbstractPoddResourceImpl
 {
 
 	
 	
-	@Get("html")
-	public Representation attachEventReferencePageHtml(final Representation entity) throws ResourceException, UnmanagedArtifactIRIException, UnmanagedSchemaIRIException
-	{
-		// check mandatory parameter: artifact IRI
-		final String artifactUriString = this.getQuery().getFirstValue(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, true);
-		if(artifactUriString == null)
-		{
-			this.log.error("Artifact ID not submitted");
-			throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Artifact IRI not submitted");
-		}
-
-		// check mandatory parameter: object IRI
-		final String objectUri = this.getQuery().getFirstValue(PoddWebConstants.KEY_OBJECT_IDENTIFIER, true);
-		if(objectUri == null)
-		{
-			this.log.error("Object IRI not submitted");
-			throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Object IRI not submitted");
-		}
-		final URI artifactUri = PODD.VF.createURI(artifactUriString);
-		this.checkAuthentication(PoddAction.ARTIFACT_EDIT, artifactUri);
-
-		InferredOWLOntologyID artifact;
-
-		try
-		{
-			artifact = this.getPoddArtifactManager().getArtifact(IRI.create(artifactUri));
-		}
-		catch(final UnmanagedArtifactIRIException | UnmanagedSchemaIRIException e)
-		{
-			this.log.error("Artifact IRI not recognised");
-			throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Artifact IRI not recognised");
-		}
-
-		this.log.info("attachEvent");
-		final User user = this.getRequest().getClientInfo().getUser();
-
-		this.log.info("authenticated user: {}", user);
-
-		Set<URI> eventType = new LinkedHashSet<>();
-		InferredOWLOntologyID ontologyID = this.getPoddArtifactManager().getArtifact(IRI.create(artifactUri));
-		try
-		{
-			eventType = this.getPoddArtifactManager().getEventsType(ontologyID);
-		}
-		catch(final OpenRDFException | UnmanagedSchemaIRIException | SchemaManifestException
-				| UnsupportedRDFormatException | IOException | UnmanagedArtifactIRIException
-				| UnmanagedArtifactVersionException e)
-		{
-			this.log.error("Could not event type", e);
-			throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Could not find parent details", e);
-		}
-
-		final Map<String, Object> dataModel = RestletUtils.getBaseDataModel(this.getRequest());
-		dataModel.put("contentTemplate", this.getPoddApplication().getPropertyUtil()
-				.get(PoddWebConstants.PROPERTY_TEMPLATE_EVENT, PoddWebConstants.DEFAULT_TEMPLATE_EVENT));
-		dataModel.put("pageTitle", "Add Event");
-		dataModel.put("artifactIri", artifact.getOntologyIRI().toString());
-		dataModel.put("versionIri", artifact.getVersionIRI().toString());
-		dataModel.put("eventList", eventType);
-		dataModel.put("jsonEventHierarchy", this.getJsonEventHierarchy().toString());
-		dataModel.put("objectUri", objectUri);
-
-		// Output the base template, with contentTemplate from the dataModel
-		// defining the
-		// template to use for the content in the body of the page
-		return RestletUtils.getHtmlRepresentation(
-				this.getPoddApplication().getPropertyUtil()
-				.get(PoddWebConstants.PROPERTY_TEMPLATE_BASE, PoddWebConstants.DEFAULT_TEMPLATE_BASE),
-				dataModel, MediaType.TEXT_HTML, this.getPoddApplication().getTemplateConfiguration());
-	}
+	@Get("rdf|rj|json|ttl")
+	public String getRdf(final Variant variant) throws ResourceException
+	 {
+        // - object Type (mandatory)
+        this.log.info("Get Event Type query {}",this.getQuery());
+       
+        final String result;
+        try
+        {
+            result = this.getJsonEventHierarchy().toString();
+        }
+        catch(PoddException e)
+        {
+            throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Could not generate event type", e);
+        }
+        this.log.debug("[GetEventTypeResourceImpl] result getRdf {}",result);
+        return result;
+    }
 
 
 	public StringBuffer getJsonEventHierarchy() throws ResourceException, UnmanagedArtifactIRIException, UnmanagedSchemaIRIException
@@ -135,10 +83,10 @@ public class AddEventAttachResourceImpl extends AbstractPoddResourceImpl
 		}
 		final URI artifactUri = PODD.VF.createURI(artifactUriString);
 		InferredOWLOntologyID ontologyID = this.getPoddArtifactManager().getArtifact(IRI.create(artifactUri));
-		Set<URI> eventTtopConcepts = new LinkedHashSet<>();
+		Set<URI> eventTopConcepts = new LinkedHashSet<>();
 		try
 		{
-			eventTtopConcepts = this.getPoddArtifactManager().getEventsTopConcepts(ontologyID);
+			eventTopConcepts = this.getPoddArtifactManager().getEventsTopConcepts(ontologyID);
 		}
 		catch(final OpenRDFException | UnmanagedSchemaIRIException | SchemaManifestException
 				| UnsupportedRDFormatException | IOException | UnmanagedArtifactIRIException
@@ -149,11 +97,10 @@ public class AddEventAttachResourceImpl extends AbstractPoddResourceImpl
 		}
 		StringBuffer Data = new StringBuffer();
 		StringBuffer Datas = new StringBuffer();
-		Datas.append( " [ ");
-		this.log.debug("getJsonEventHierarchy::before getSubEventof call :{}", Data.toString());
-		Datas.append(this.getSubEventof(eventTtopConcepts,ontologyID,Data,null));
-
-		Datas.append(" ] ");
+		Datas.append( "[");
+		Datas.append(this.getSubEventof(eventTopConcepts,ontologyID,Data,null));
+		Datas.setLength(Datas.length() - 1);
+		Datas.append("]");
 
 
 		return Datas;
@@ -161,8 +108,8 @@ public class AddEventAttachResourceImpl extends AbstractPoddResourceImpl
 
 	public String getSubEventof(Set<URI> topConcept,InferredOWLOntologyID ontologyID,StringBuffer Data,URI parent) throws ResourceException
 	{
-		this.log.debug("getSubEventof::{}", Data.toString());
-		this.log.debug("Current Top Concept :{}", parent);
+		//this.log.debug("getSubEventof::{}", Data.toString());
+		//this.log.debug("Current Top Concept :{}", parent);
 		Set<URI> eventSubConcepts = new LinkedHashSet<>();
 		
 		if(!topConcept.isEmpty()){
@@ -171,11 +118,10 @@ public class AddEventAttachResourceImpl extends AbstractPoddResourceImpl
 			while(it.hasNext())
 			{
 				tmp = it.next();
-				this.log.debug("Next value of the iterator :{}", tmp);
 				if(parent!=null){
-					Data.append("{ \"id\" : \""+tmp.getLocalName()+"\", \"parent\" : \""+parent.getLocalName()+"\", \"text\" : \""+tmp.getLocalName()+"\" ,\"type\":\"concept\"},");
+					Data.append("{ \"id\" : \""+tmp.getLocalName()+"\", \"parent\" : \""+parent.getLocalName()+"\", \"text\" : \""+tmp.getLocalName()+"\" ,\"type\":\"concept\",\"uri\" : \""+tmp+"\"},");
 				}else{
-					Data.append("{ \"id\" : \""+tmp.getLocalName()+"\", \"parent\" : \"#\", \"text\" : \""+tmp.getLocalName()+"\" ,\"type\":\"concept\"},");	 
+					Data.append("{ \"id\" : \""+tmp.getLocalName()+"\", \"parent\" : \"#\", \"text\" : \""+tmp.getLocalName()+"\" ,\"type\":\"concept\",\"uri\" : \""+tmp+"\"},");	 
 				}
 				try
 				{

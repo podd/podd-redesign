@@ -89,9 +89,10 @@ public class AddObjectResourceImpl extends AbstractPoddResourceImpl
         final String parentUri = this.getQuery().getFirstValue(PoddWebConstants.KEY_PARENT_IDENTIFIER, true);
         final String parentPredicateUri =
                 this.getQuery().getFirstValue(PoddWebConstants.KEY_PARENT_PREDICATE_IDENTIFIER, true);
-        
+        String isEvent =
+                this.getQuery().getFirstValue(PoddWebConstants.KEY_IS_EVENT, true);
         this.log.debug("artifactUri : {}", artifactUri);
-        this.log.debug("parentUri : {}", parentUri);
+        this.log.debug("is event : {}", isEvent);
         this.log.debug("parentPredicateUri : {}", parentPredicateUri);
         
         if(artifactUri == null)
@@ -111,7 +112,8 @@ public class AddObjectResourceImpl extends AbstractPoddResourceImpl
         final String title = "Add new " + objectTypeLabel.getLabel();
         
         final Map<String, Object> dataModel = RestletUtils.getBaseDataModel(this.getRequest());
-        dataModel.put("contentTemplate", "modify_object.html.ftl");
+        dataModel.put("contentTemplate", this.getPoddApplication().getPropertyUtil()
+				.get(PoddWebConstants.PROPERTY_TEMPLATE_ADD_OBJECT, PoddWebConstants.DEFAULT_TEMPLATE_ADD_OBJECT));
         dataModel.put("pageTitle", title);
         dataModel.put("title", title);
         dataModel.put("objectType", objectTypeLabel);
@@ -141,12 +143,18 @@ public class AddObjectResourceImpl extends AbstractPoddResourceImpl
                 throw new ResourceException(Status.CLIENT_ERROR_NOT_FOUND, "Could not find the given artifact", e);
             }
             
+            if(isEvent == null){
+            	isEvent = "false";
+            }
+            
             dataModel.put("artifactIri", ontologyID.getOntologyIRI().toString());
             dataModel.put("versionIri", ontologyID.getVersionIRI().toString());
             
             // parentUri and parentPredicate - is any validation required?
             dataModel.put("parentUri", parentUri);
             dataModel.put("parentPredicateUri", parentPredicateUri);
+            
+            dataModel.put("isEvent", isEvent);
         }
         
         return RestletUtils.getHtmlRepresentation(
