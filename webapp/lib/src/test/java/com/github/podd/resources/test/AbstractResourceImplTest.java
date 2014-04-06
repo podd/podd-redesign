@@ -106,6 +106,10 @@ public class AbstractResourceImplTest
         int result = -1;
         while(result <= 0)
         {
+            // Avoid infinite loops when the majority of legitimate ports have been tried already
+            // and the test suite is too big or broken somehow.
+            Assert.assertTrue("No free ports left for parallel tests",
+                    AbstractResourceImplTest.usedPorts.size() < 50000);
             try (ServerSocket ss = new ServerSocket(0))
             {
                 ss.setReuseAddress(true);
@@ -116,10 +120,18 @@ public class AbstractResourceImplTest
                 }
                 else
                 {
-                    AbstractResourceImplTest.usedPorts.add(result);
-                    try (DatagramSocket ds = new DatagramSocket(result);)
+                    // If the next port was already in used ports then the following will return
+                    // false and we will set result to -1
+                    if(AbstractResourceImplTest.usedPorts.add(result))
                     {
-                        ds.setReuseAddress(true);
+                        try (DatagramSocket ds = new DatagramSocket(result);)
+                        {
+                            ds.setReuseAddress(true);
+                        }
+                    }
+                    else
+                    {
+                        result = -1;
                     }
                 }
             }
