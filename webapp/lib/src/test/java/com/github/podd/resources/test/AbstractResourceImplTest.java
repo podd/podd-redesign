@@ -200,11 +200,6 @@ public class AbstractResourceImplTest
      */
     private PoddWebServiceApplication poddApplication;
     
-    public AbstractResourceImplTest()
-    {
-        super();
-    }
-    
     /**
      * Utility method to verify that freemarker has not encountered errors when generating output.
      * 
