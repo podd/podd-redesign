@@ -116,8 +116,9 @@ public abstract class AbstractPoddClientTest
      * this method.
      * 
      * @return A new instance of {@link PoddClient}.
+     * @throws Exception 
      */
-    protected abstract PoddClient getNewPoddClientInstance();
+    protected abstract PoddClient getNewPoddClientInstance() throws Exception;
     
     /**
      * Returns the URL of a running PODD Server to test the client against.
