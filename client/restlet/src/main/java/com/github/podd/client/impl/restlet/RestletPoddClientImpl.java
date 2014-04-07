@@ -23,6 +23,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -30,8 +31,11 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import org.openrdf.model.Literal;
 import org.openrdf.model.Model;
@@ -206,6 +210,44 @@ public class RestletPoddClientImpl implements PoddClient
         {
             throw new PoddClientException("Could not parse artifact details due to an IOException", e);
         }
+    }
+    
+    @Override
+    public Map<InferredOWLOntologyID, InferredOWLOntologyID> appendArtifacts(
+            final Map<InferredOWLOntologyID, Model> uploadQueue) throws PoddClientException
+    {
+        final ConcurrentMap<InferredOWLOntologyID, InferredOWLOntologyID> resultMap = new ConcurrentHashMap<>();
+        for(final Entry<InferredOWLOntologyID, Model> nextUpload : uploadQueue.entrySet())
+        {
+            try
+            {
+                final StringWriter writer = new StringWriter(4096);
+                Rio.write(nextUpload.getValue(), writer, RDFFormat.RDFJSON);
+                final InferredOWLOntologyID newID =
+                        this.appendArtifact(nextUpload.getKey(),
+                                new ByteArrayInputStream(writer.toString().getBytes(Charset.forName("UTF-8"))),
+                                RDFFormat.RDFJSON);
+                
+                if(newID == null)
+                {
+                    this.log.error("Did not find a valid result from append artifact: {}", nextUpload.getKey());
+                }
+                else if(nextUpload.getKey().equals(newID))
+                {
+                    this.log.error("Result from append artifact was not changed, as expected. {} {}",
+                            nextUpload.getKey(), newID);
+                }
+                else
+                {
+                    resultMap.putIfAbsent(nextUpload.getKey(), newID);
+                }
+            }
+            catch(final RDFHandlerException e)
+            {
+                this.log.error("Found exception generating upload body: ", e);
+            }
+        }
+        return resultMap;
     }
     
     @Override
@@ -417,11 +459,6 @@ public class RestletPoddClientImpl implements PoddClient
         return this.props;
     }
     
-    public void setProps(final PropertyUtil props)
-    {
-        this.props = props;
-    }
-    
     /**
      * Creates the URL for a given path using the current {@link #getPoddServerUrl()} result, or
      * throws an IllegalStateException if the server URL has not been set.
@@ -511,12 +548,6 @@ public class RestletPoddClientImpl implements PoddClient
         return !this.currentCookies.isEmpty();
     }
     
-    private List<InferredOWLOntologyID> listArtifactsInternal(final boolean published, final boolean unpublished)
-        throws PoddClientException
-    {
-        return OntologyUtils.modelToOntologyIDs(this.listArtifacts(published, unpublished), false, false);
-    }
-    
     @Override
     public Model listArtifacts(final boolean published, final boolean unpublished) throws PoddClientException
     {
@@ -562,6 +593,12 @@ public class RestletPoddClientImpl implements PoddClient
         {
             throw new PoddClientException("Input output exception while parsing RDF", e);
         }
+    }
+    
+    private List<InferredOWLOntologyID> listArtifactsInternal(final boolean published, final boolean unpublished)
+        throws PoddClientException
+    {
+        return OntologyUtils.modelToOntologyIDs(this.listArtifacts(published, unpublished), false, false);
     }
     
     /*
@@ -914,6 +951,11 @@ public class RestletPoddClientImpl implements PoddClient
         this.serverUrl = serverUrl;
     }
     
+    public void setProps(final PropertyUtil props)
+    {
+        this.props = props;
+    }
+    
     @Override
     public InferredOWLOntologyID unpublishArtifact(final InferredOWLOntologyID ontologyIRI) throws PoddClientException
     {
@@ -979,4 +1021,5 @@ public class RestletPoddClientImpl implements PoddClient
             throw new PoddClientException("Could not parse artifact details due to an IOException", e);
         }
     }
+    
 }

@@ -80,6 +80,19 @@ public interface PoddClient
             DataReferenceVerificationPolicy dataReferenceVerificationPolicy) throws PoddClientException;
     
     /**
+     * Appends multiple artifacts in PODD.
+     * 
+     * @param uploadQueue
+     *            A Map containing the keys for the artifacts, and Models containing the appended
+     *            content for each of the artifacts.
+     * @return A map from the original keys to the new artifact keys after the changes.
+     * @throws PoddClientException
+     *             If an error occurred.
+     */
+    Map<InferredOWLOntologyID, InferredOWLOntologyID> appendArtifacts(Map<InferredOWLOntologyID, Model> uploadQueue)
+        throws PoddClientException;
+    
+    /**
      * Submits a request to the PODD File Reference Attachment service to attach a file reference
      * from a registered repository into the artifact as a child of the given object IRI.
      * <p>
@@ -130,6 +143,19 @@ public interface PoddClient
     boolean deleteArtifact(InferredOWLOntologyID ontologyId) throws PoddClientException;
     
     /**
+     * Performs a CONSTRUCT or DESCRIBE SPARQL query on the given artifact.
+     * 
+     * @param queryString
+     *            The CONSTRUCT or DESCRIBE SPARQL query on the given artifact.
+     * @param artifact
+     *            The PODD artifact to perform the query on.
+     * @return A {@link Model} containing the results of the SPARQL query.
+     * @throws PoddClientException
+     *             If an error occurred.
+     */
+    Model doSPARQL(String queryString, InferredOWLOntologyID artifact) throws PoddClientException;
+    
+    /**
      * Submits a request to the PODD Get Artifact service to download the artifact identified by the
      * given {@link InferredOWLOntologyID}, optionally including a version IRI if it is specifically
      * known.
@@ -174,6 +200,21 @@ public interface PoddClient
      * @return True if the client was logged in after the last request, and false otherwise.
      */
     boolean isLoggedIn();
+    
+    /**
+     * Lists the artifacts that are accessible and returns the details as a {@link Model}.
+     * 
+     * @param published
+     *            If true, requests are made for published artifacts. If this is false, unpublished
+     *            must NOT be false.
+     * @param unpublished
+     *            If true, requests are made for the unpublished artifacts accessible to the current
+     *            user. If this is false, published must NOT be false.
+     * @return A Model containing RDF statements describing the artifact.
+     * @throws PoddClientException
+     *             If an error occurred.
+     */
+    Model listArtifacts(boolean published, boolean unpublished) throws PoddClientException;
     
     /**
      * 
@@ -351,33 +392,5 @@ public interface PoddClient
     InferredOWLOntologyID uploadNewArtifact(InputStream input, RDFFormat format,
             DanglingObjectPolicy danglingObjectPolicy, DataReferenceVerificationPolicy dataReferenceVerificationPolicy)
         throws PoddClientException;
-    
-    /**
-     * Performs a CONSTRUCT or DESCRIBE SPARQL query on the given artifact.
-     * 
-     * @param queryString
-     *            The CONSTRUCT or DESCRIBE SPARQL query on the given artifact.
-     * @param artifact
-     *            The PODD artifact to perform the query on.
-     * @return A {@link Model} containing the results of the SPARQL query.
-     * @throws PoddClientException
-     *             If an error occurred.
-     */
-    Model doSPARQL(String queryString, InferredOWLOntologyID artifact) throws PoddClientException;
-    
-    /**
-     * Lists the artifacts that are accessible and returns the details as a {@link Model}.
-     * 
-     * @param published
-     *            If true, requests are made for published artifacts. If this is false, unpublished
-     *            must NOT be false.
-     * @param unpublished
-     *            If true, requests are made for the unpublished artifacts accessible to the current
-     *            user. If this is false, published must NOT be false.
-     * @return A Model containing RDF statements describing the artifact.
-     * @throws PoddClientException
-     *             If an error occurred.
-     */
-    Model listArtifacts(boolean published, boolean unpublished) throws PoddClientException;
     
 }
