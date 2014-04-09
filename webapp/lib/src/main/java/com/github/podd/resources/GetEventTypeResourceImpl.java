@@ -1,8 +1,9 @@
 package com.github.podd.resources;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Map;
@@ -11,7 +12,9 @@ import java.util.Set;
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.Model;
 import org.openrdf.model.Resource;
+import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
+import org.openrdf.model.Value;
 import org.openrdf.model.impl.LinkedHashModel;
 import org.openrdf.model.vocabulary.RDF;
 import org.openrdf.rio.RDFFormat;
@@ -51,26 +54,28 @@ import com.github.podd.utils.PoddWebConstants;
 public class GetEventTypeResourceImpl extends AbstractPoddResourceImpl
 {
 
-	
-	
+
+
 	@Get("rdf|rj|json|ttl")
 	public String getRdf(final Variant variant) throws ResourceException
-	 {
-        // - object Type (mandatory)
-        this.log.info("Get Event Type query {}",this.getQuery());
-       
-        final String result;
-        try
-        {
-            result = this.getJsonEventHierarchy().toString();
-        }
-        catch(PoddException e)
-        {
-            throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Could not generate event type", e);
-        }
-        this.log.debug("[GetEventTypeResourceImpl] result getRdf {}",result);
-        return result;
-    }
+	{
+		// - object Type (mandatory)
+		this.log.info("Get Event Type query {}",this.getQuery());
+
+		final String result;
+
+		try
+		{
+			result = this.getJsonEventHierarchy().toString();
+
+		}
+		catch(PoddException e)
+		{
+			throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Could not generate event type", e);
+		}
+		this.log.debug("[GetEventTypeResourceImpl] result getRdf {}",result);
+		return result;
+	}
 
 
 	public StringBuffer getJsonEventHierarchy() throws ResourceException, UnmanagedArtifactIRIException, UnmanagedSchemaIRIException
@@ -95,68 +100,98 @@ public class GetEventTypeResourceImpl extends AbstractPoddResourceImpl
 			this.log.error("Could not find event type", e);
 			throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Could not find parent details", e);
 		}
-		StringBuffer Data = new StringBuffer();
 		StringBuffer Datas = new StringBuffer();
 		Datas.append( "[");
-		Datas.append(this.getSubEventof(eventTopConcepts,ontologyID,Data,null));
+		Datas.append(this.getChildof(eventTopConcepts, ontologyID,true));
 		Datas.setLength(Datas.length() - 1);
 		Datas.append("]");
-
+		this.log.debug("Final Datas {}", Datas.toString());
 
 		return Datas;
 	}
 
-	public String getSubEventof(Set<URI> topConcept,InferredOWLOntologyID ontologyID,StringBuffer Data,URI parent) throws ResourceException
-	{
-		//this.log.debug("getSubEventof::{}", Data.toString());
-		//this.log.debug("Current Top Concept :{}", parent);
-		Set<URI> eventSubConcepts = new LinkedHashSet<>();
-		
-		if(!topConcept.isEmpty()){
-			URI tmp;
-			Iterator<URI> it = topConcept.iterator();
-			while(it.hasNext())
-			{
-				tmp = it.next();
-				if(parent!=null){
-					Data.append("{ \"id\" : \""+tmp.getLocalName()+"\", \"parent\" : \""+parent.getLocalName()+"\", \"text\" : \""+tmp.getLocalName()+"\" ,\"type\":\"concept\",\"uri\" : \""+tmp+"\"},");
-				}else{
-					Data.append("{ \"id\" : \""+tmp.getLocalName()+"\", \"parent\" : \"#\", \"text\" : \""+tmp.getLocalName()+"\" ,\"type\":\"concept\",\"uri\" : \""+tmp+"\"},");	 
-				}
-				try
-				{
-					eventSubConcepts =  this.getPoddArtifactManager().getDirectSubClassOf(tmp,ontologyID);
-				}
-				catch(final OpenRDFException | UnmanagedSchemaIRIException | SchemaManifestException
-						| UnsupportedRDFormatException | IOException | UnmanagedArtifactIRIException
-						| UnmanagedArtifactVersionException e)
-				{
-					this.log.error("Could not event type", e);
-					throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Could not find parent details", e);
-				}
-				
-				this.log.debug("eventSubConcepts:{}", eventSubConcepts);
-				if(!eventSubConcepts.isEmpty()){
-				this.log.debug("Value for Data after a While:{}", Data.toString());
-				this.getSubEventof(eventSubConcepts,ontologyID,Data,tmp);
-				
-				}
-			}
-		}
+	/**
+	 * Request to get the direct child of a set of concepts
+	 * 
+	 * @param Concepts the set of concepts
+	 * @param ontologyID
+	 * @return
+	 * @throws ResourceException
+	 */
 
-		return Data.toString();
+	public Model getchildOfList(Set<URI> Concepts,InferredOWLOntologyID ontologyID) throws ResourceException
+	{
+
+		Model subConcepts;
+		try
+		{
+			subConcepts =  this.getPoddArtifactManager().ChildOfList(Concepts,ontologyID);
+		}
+		catch(final OpenRDFException | UnmanagedSchemaIRIException | SchemaManifestException
+				| UnsupportedRDFormatException | IOException | UnmanagedArtifactIRIException
+				| UnmanagedArtifactVersionException e)
+		{
+			this.log.error("Could not find child of list ", e);
+			throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Could not find child of list ", e);
+		}
+		this.log.debug("Result to array", subConcepts.toArray());
+
+		return subConcepts;
 	}
 	
-	
-	@Post("rdf|rj|json|ttl")
-    public Representation addEventLinked(final Representation entity, final Variant variant) throws ResourceException
-    {
+	/**
+	 * Call the function getchildOfList and construct the JSON for the jsTree plugin
+	 * 
+	 * @param Set of currant concept. Contains top concept the first time
+	 * @param ontologyID
+	 * @param TopConcept Boolean indicate if it's the first call of the function
+	 * @return
+	 * @throws ResourceException
+	 */
 
-        this.log.info("In addEventLinked");
-        
-       
-        
-        return null;
-    }
+	public StringBuffer getChildof(Set<URI> Concepts,InferredOWLOntologyID ontologyID,boolean TopConcept) throws ResourceException
+	{
+
+		Model ResultRequest;
+		StringBuffer Data = new StringBuffer();
+		ResultRequest = this.getchildOfList(Concepts, ontologyID);
+		Set<URI> SubConcepts = new LinkedHashSet<>();
+		
+		if(!ResultRequest.isEmpty()){
+
+			for(final Value object : ResultRequest.objects())
+			{
+				if(TopConcept)
+				{
+					Data.append("{ \"id\" : \""+((URI) object).getLocalName()+"\", \"parent\" : \"#\", \"text\" : \""+((URI) object).getLocalName()+"\" ,\"type\":\"concept\",\"uri\" : \""+object+"\"},");
+				}
+				Model SubConcept = ResultRequest.filter(null,PODD.VF.createURI("http://www.w3.org/2000/01/rdf-schema#subClassOf"), object);
+
+				for(final Value subject : SubConcept.subjects())
+				{
+
+					Data.append("{ \"id\" : \""+((URI) subject).getLocalName()+"\", \"parent\" : \""+((URI) object).getLocalName()+"\", \"text\" : \""+((URI) subject).getLocalName()+"\" ,\"type\":\"concept\",\"uri\" : \""+subject+"\"},");
+					SubConcepts.add((URI) subject);
+				}
+			}
+
+			return Data.append(this.getChildof(SubConcepts, ontologyID,false));
+		}else
+			return Data;
+
+
+	}
+
+
+	@Post("rdf|rj|json|ttl")
+	public Representation addEventLinked(final Representation entity, final Variant variant) throws ResourceException
+	{
+
+		this.log.info("In addEventLinked");
+
+
+
+		return null;
+	}
 
 }

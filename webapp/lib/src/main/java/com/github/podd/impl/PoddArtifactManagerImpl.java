@@ -688,52 +688,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             }
         }
     }
-    
-    /*
-     * (non-Javadoc)
-     * 
-     * Wraps PoddSesameManager.getEventsType()
-     * 
-     * 
-     */
-    @Override
-    public Set<URI> getEventsType(final InferredOWLOntologyID ontologyID)
-        throws OpenRDFException, UnmanagedSchemaIRIException, SchemaManifestException, UnsupportedRDFormatException,
-        IOException, UnmanagedArtifactIRIException, UnmanagedArtifactVersionException
-    {
-        RepositoryConnection permanentConnection = null;
-        RepositoryConnection managementConnection = null;
-        try
-        {
-            final Set<? extends OWLOntologyID> schemaImports = this.getSchemaImports(ontologyID);
-            permanentConnection = this.getRepositoryManager().getPermanentRepositoryConnection(schemaImports);
-            managementConnection = this.getRepositoryManager().getManagementRepositoryConnection();
-            
-            final URI[] contexts =
-                    this.getSesameManager().versionAndInferredAndSchemaContexts(ontologyID, managementConnection,
-                            this.getRepositoryManager().getSchemaManagementGraph(),
-                            this.getRepositoryManager().getArtifactManagementGraph());
-            
-            return this.getSesameManager().getEventsType(permanentConnection, contexts);
-        }
-        finally
-        {
-            try
-            {
-                if(managementConnection != null)
-                {
-                    managementConnection.close();
-                }
-            }
-            finally
-            {
-                if(permanentConnection != null)
-                {
-                    permanentConnection.close();
-                }
-            }
-        }
-    }
+  
     
     public Set<URI> getDirectSubClassOf(final URI concept,final InferredOWLOntologyID ontologyID)
             throws OpenRDFException, UnmanagedSchemaIRIException, SchemaManifestException, UnsupportedRDFormatException,
@@ -772,6 +727,8 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
                 }
             }
         }
+    
+
     
     /*
      * (non-Javadoc)
@@ -2705,5 +2662,45 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             }
         }
     }
+
+	@Override
+	public Model ChildOfList(Set<URI> topConcepts,
+			InferredOWLOntologyID ontologyID) throws OpenRDFException,
+			UnmanagedSchemaIRIException, SchemaManifestException,
+			UnsupportedRDFormatException, IOException,
+			UnmanagedArtifactIRIException, UnmanagedArtifactVersionException {
+		   RepositoryConnection permanentConnection = null;
+	        RepositoryConnection managementConnection = null;
+	        try
+	        {
+	            final Set<? extends OWLOntologyID> schemaImports = this.getSchemaImports(ontologyID);
+	            permanentConnection = this.getRepositoryManager().getPermanentRepositoryConnection(schemaImports);
+	            managementConnection = this.getRepositoryManager().getManagementRepositoryConnection();
+	            
+	            final URI[] contexts =
+	                    this.getSesameManager().versionAndInferredAndSchemaContexts(ontologyID, managementConnection,
+	                            this.getRepositoryManager().getSchemaManagementGraph(),
+	                            this.getRepositoryManager().getArtifactManagementGraph());
+	            
+	            return this.getSesameManager().ChildOfList(topConcepts,permanentConnection, contexts);
+	        }
+	        finally
+	        {
+	            try
+	            {
+	                if(managementConnection != null)
+	                {
+	                    managementConnection.close();
+	                }
+	            }
+	            finally
+	            {
+	                if(permanentConnection != null)
+	                {
+	                    permanentConnection.close();
+	                }
+	            }
+	        }
+	}
     
 }
