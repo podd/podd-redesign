@@ -449,7 +449,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             final boolean includeDoNotDisplayProperties, final MetadataPolicy containsPropertyPolicy,
             final InferredOWLOntologyID artifactID) throws OpenRDFException, PoddException, IOException
     {
-    	
+        
         RepositoryConnection permanentConnection = null;
         RepositoryConnection managementConnection = null;
         
@@ -688,59 +688,55 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             }
         }
     }
-  
     
-    public Set<URI> getDirectSubClassOf(final URI concept,final InferredOWLOntologyID ontologyID)
-            throws OpenRDFException, UnmanagedSchemaIRIException, SchemaManifestException, UnsupportedRDFormatException,
-            IOException, UnmanagedArtifactIRIException, UnmanagedArtifactVersionException
+    @Override
+    public Set<URI> getDirectSubClassOf(final URI concept, final InferredOWLOntologyID ontologyID)
+        throws OpenRDFException, UnmanagedSchemaIRIException, SchemaManifestException, UnsupportedRDFormatException,
+        IOException, UnmanagedArtifactIRIException, UnmanagedArtifactVersionException
+    {
+        RepositoryConnection permanentConnection = null;
+        RepositoryConnection managementConnection = null;
+        try
         {
-            RepositoryConnection permanentConnection = null;
-            RepositoryConnection managementConnection = null;
+            final Set<? extends OWLOntologyID> schemaImports = this.getSchemaImports(ontologyID);
+            permanentConnection = this.getRepositoryManager().getPermanentRepositoryConnection(schemaImports);
+            managementConnection = this.getRepositoryManager().getManagementRepositoryConnection();
+            
+            final URI[] contexts =
+                    this.getSesameManager().versionAndInferredAndSchemaContexts(ontologyID, managementConnection,
+                            this.getRepositoryManager().getSchemaManagementGraph(),
+                            this.getRepositoryManager().getArtifactManagementGraph());
+            
+            return this.getSesameManager().getDirectSubClassOf(concept, permanentConnection, contexts);
+        }
+        finally
+        {
             try
             {
-                final Set<? extends OWLOntologyID> schemaImports = this.getSchemaImports(ontologyID);
-                permanentConnection = this.getRepositoryManager().getPermanentRepositoryConnection(schemaImports);
-                managementConnection = this.getRepositoryManager().getManagementRepositoryConnection();
-                
-                final URI[] contexts =
-                        this.getSesameManager().versionAndInferredAndSchemaContexts(ontologyID, managementConnection,
-                                this.getRepositoryManager().getSchemaManagementGraph(),
-                                this.getRepositoryManager().getArtifactManagementGraph());
-                
-                return this.getSesameManager().getDirectSubClassOf(concept, permanentConnection, contexts);
+                if(managementConnection != null)
+                {
+                    managementConnection.close();
+                }
             }
             finally
             {
-                try
+                if(permanentConnection != null)
                 {
-                    if(managementConnection != null)
-                    {
-                        managementConnection.close();
-                    }
-                }
-                finally
-                {
-                    if(permanentConnection != null)
-                    {
-                        permanentConnection.close();
-                    }
+                    permanentConnection.close();
                 }
             }
         }
-    
-
+    }
     
     /*
      * (non-Javadoc)
      * 
      * Wraps PoddSesameManager.getEventsTopConcepts()
-     * 
-     * 
      */
     @Override
-    public Set<URI> getEventsTopConcepts(final InferredOWLOntologyID ontologyID)
-        throws OpenRDFException, UnmanagedSchemaIRIException, SchemaManifestException, UnsupportedRDFormatException,
-        IOException, UnmanagedArtifactIRIException, UnmanagedArtifactVersionException
+    public Set<URI> getEventsTopConcepts(final InferredOWLOntologyID ontologyID) throws OpenRDFException,
+        UnmanagedSchemaIRIException, SchemaManifestException, UnsupportedRDFormatException, IOException,
+        UnmanagedArtifactIRIException, UnmanagedArtifactVersionException
     {
         RepositoryConnection permanentConnection = null;
         RepositoryConnection managementConnection = null;
@@ -1543,7 +1539,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             final DataReferenceVerificationPolicy dataReferenceVerificationPolicy) throws OpenRDFException,
         PoddException, IOException, OWLException
     {
-    	
+        
         if(inputStream == null)
         {
             throw new NullPointerException("Input stream must not be null");
@@ -1582,8 +1578,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             }
             else
             {
-                this.log.debug("ontologyIDS : {}",
-                        ontologyIDs);
+                this.log.debug("ontologyIDS : {}", ontologyIDs);
             }
             
             managementConnection = this.getRepositoryManager().getManagementRepositoryConnection();
@@ -2662,45 +2657,44 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             }
         }
     }
-
-	@Override
-	public Model ChildOfList(Set<URI> topConcepts,
-			InferredOWLOntologyID ontologyID) throws OpenRDFException,
-			UnmanagedSchemaIRIException, SchemaManifestException,
-			UnsupportedRDFormatException, IOException,
-			UnmanagedArtifactIRIException, UnmanagedArtifactVersionException {
-		   RepositoryConnection permanentConnection = null;
-	        RepositoryConnection managementConnection = null;
-	        try
-	        {
-	            final Set<? extends OWLOntologyID> schemaImports = this.getSchemaImports(ontologyID);
-	            permanentConnection = this.getRepositoryManager().getPermanentRepositoryConnection(schemaImports);
-	            managementConnection = this.getRepositoryManager().getManagementRepositoryConnection();
-	            
-	            final URI[] contexts =
-	                    this.getSesameManager().versionAndInferredAndSchemaContexts(ontologyID, managementConnection,
-	                            this.getRepositoryManager().getSchemaManagementGraph(),
-	                            this.getRepositoryManager().getArtifactManagementGraph());
-	            
-	            return this.getSesameManager().ChildOfList(topConcepts,permanentConnection, contexts);
-	        }
-	        finally
-	        {
-	            try
-	            {
-	                if(managementConnection != null)
-	                {
-	                    managementConnection.close();
-	                }
-	            }
-	            finally
-	            {
-	                if(permanentConnection != null)
-	                {
-	                    permanentConnection.close();
-	                }
-	            }
-	        }
-	}
+    
+    @Override
+    public Model ChildOfList(final Set<URI> topConcepts, final InferredOWLOntologyID ontologyID)
+        throws OpenRDFException, UnmanagedSchemaIRIException, SchemaManifestException, UnsupportedRDFormatException,
+        IOException, UnmanagedArtifactIRIException, UnmanagedArtifactVersionException
+    {
+        RepositoryConnection permanentConnection = null;
+        RepositoryConnection managementConnection = null;
+        try
+        {
+            final Set<? extends OWLOntologyID> schemaImports = this.getSchemaImports(ontologyID);
+            permanentConnection = this.getRepositoryManager().getPermanentRepositoryConnection(schemaImports);
+            managementConnection = this.getRepositoryManager().getManagementRepositoryConnection();
+            
+            final URI[] contexts =
+                    this.getSesameManager().versionAndInferredAndSchemaContexts(ontologyID, managementConnection,
+                            this.getRepositoryManager().getSchemaManagementGraph(),
+                            this.getRepositoryManager().getArtifactManagementGraph());
+            
+            return this.getSesameManager().ChildOfList(topConcepts, permanentConnection, contexts);
+        }
+        finally
+        {
+            try
+            {
+                if(managementConnection != null)
+                {
+                    managementConnection.close();
+                }
+            }
+            finally
+            {
+                if(permanentConnection != null)
+                {
+                    permanentConnection.close();
+                }
+            }
+        }
+    }
     
 }

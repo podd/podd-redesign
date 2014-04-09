@@ -38,9 +38,6 @@ import org.slf4j.bridge.SLF4JBridgeHandler;
 import com.github.ansell.restletutils.ClassLoaderDirectory;
 import com.github.ansell.restletutils.CompositeClassLoader;
 import com.github.podd.exception.PoddException;
-import com.github.podd.restlet.ApplicationUtils;
-import com.github.podd.restlet.PoddWebServiceApplication;
-import com.github.podd.restlet.PoddWebServiceApplicationImpl;
 import com.github.podd.utils.PoddWebConstants;
 
 /**

@@ -85,7 +85,7 @@ public interface PoddWebConstants
      * Property for freemarker template used as the base for rendering all HTML pages
      */
     public static final String PROPERTY_TEMPLATE_EVENT = "podd.template.event";
- 
+    
     /**
      * Default freemarker template used as the base for rendering all HTML pages
      */
@@ -95,7 +95,6 @@ public interface PoddWebConstants
      * Property for freemarker template used as the base for rendering all HTML pages
      */
     public static final String PROPERTY_TEMPLATE_ADD_OBJECT = "podd.template.modify_object";
-   
     
     /**
      * Property for freemarker template used for rendering all login pages

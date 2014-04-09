@@ -56,7 +56,7 @@ public class InferredOWLOntologyID extends OWLOntologyID
         if(inferredOntologyIRI != null)
         {
             // super uses 37, so to be distinct we need to use a different prime number here, ie, 41
-            //this.hashCode += 41 * inferredOntologyIRI.hashCode();
+            // this.hashCode += 41 * inferredOntologyIRI.hashCode();
         }
     }
     

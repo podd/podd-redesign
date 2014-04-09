@@ -263,8 +263,6 @@ public interface PoddArtifactManager
         UnmanagedSchemaIRIException, SchemaManifestException, UnsupportedRDFormatException, IOException,
         UnmanagedArtifactIRIException, UnmanagedArtifactVersionException;
     
-   
-    
     /**
      * 
      * @return The {@link DataReferenceManager} used to create and fetch file references from
@@ -721,17 +719,16 @@ public interface PoddArtifactManager
             Set<? extends OWLOntologyID> oldSchemaOntologyIds, Set<? extends OWLOntologyID> newSchemaOntologyIds)
         throws UnmanagedSchemaException, OpenRDFException, PoddException, IOException, OWLException;
     
-  
     Set<URI> getEventsTopConcepts(InferredOWLOntologyID ontologyID) throws OpenRDFException,
-    UnmanagedSchemaIRIException, SchemaManifestException, UnsupportedRDFormatException, IOException,
-    UnmanagedArtifactIRIException, UnmanagedArtifactVersionException;
+        UnmanagedSchemaIRIException, SchemaManifestException, UnsupportedRDFormatException, IOException,
+        UnmanagedArtifactIRIException, UnmanagedArtifactVersionException;
     
-    Set<URI> getDirectSubClassOf(URI evnet,InferredOWLOntologyID ontologyID) throws OpenRDFException,
-    UnmanagedSchemaIRIException, SchemaManifestException, UnsupportedRDFormatException, IOException,
-    UnmanagedArtifactIRIException, UnmanagedArtifactVersionException;
-
-	Model ChildOfList(Set<URI> topConcept, InferredOWLOntologyID ontologyID)throws OpenRDFException,
-    UnmanagedSchemaIRIException, SchemaManifestException, UnsupportedRDFormatException, IOException,
-    UnmanagedArtifactIRIException, UnmanagedArtifactVersionException;
+    Set<URI> getDirectSubClassOf(URI evnet, InferredOWLOntologyID ontologyID) throws OpenRDFException,
+        UnmanagedSchemaIRIException, SchemaManifestException, UnsupportedRDFormatException, IOException,
+        UnmanagedArtifactIRIException, UnmanagedArtifactVersionException;
+    
+    Model ChildOfList(Set<URI> topConcept, InferredOWLOntologyID ontologyID) throws OpenRDFException,
+        UnmanagedSchemaIRIException, SchemaManifestException, UnsupportedRDFormatException, IOException,
+        UnmanagedArtifactIRIException, UnmanagedArtifactVersionException;
     
 }

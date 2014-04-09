@@ -54,8 +54,7 @@ public class GetMetadataResourceImpl extends AbstractPoddResourceImpl
     public Representation getRdf(final Variant variant) throws ResourceException
     {
         // - object Type (mandatory)
-        this.log.info("Get Methadata GET query {}",this.getQuery());
-        
+        this.log.info("Get Methadata GET query {}", this.getQuery());
         
         final String objectType = this.getQuery().getFirstValue(PoddWebConstants.KEY_OBJECT_TYPE_IDENTIFIER, true);
         if(objectType == null)

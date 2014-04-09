@@ -32,7 +32,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 import org.apache.commons.io.IOUtils;
-import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -52,7 +51,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.github.podd.exception.SchemaManifestException;
-import com.github.podd.utils.test.OntologyConstant;
 import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.OntologyUtils;
 import com.github.podd.utils.PODD;
@@ -67,15 +65,12 @@ public class OntologyUtilsTest
     private final Logger log = LoggerFactory.getLogger(this.getClass());
     private final ValueFactory vf = PODD.VF;
     
-  
-    
     @Before
     public void setUp() throws Exception
     {
-
+        
     }
     
-
     @Test
     public final void testGetArtifactImportsNoImports() throws Exception
     {
@@ -232,9 +227,12 @@ public class OntologyUtilsTest
         Assert.assertTrue(imports.contains(OntologyConstant.testImportOntologyID2));
         Assert.assertTrue(imports.contains(OntologyConstant.testImportOntologyID3));
         Assert.assertTrue(imports.contains(OntologyConstant.testImportOntologyID4));
-        Assert.assertTrue(imports.indexOf(OntologyConstant.testImportOntologyID2) > imports.indexOf(OntologyConstant.testImportOntologyID4));
-        Assert.assertTrue(imports.indexOf(OntologyConstant.testImportOntologyID1) > imports.indexOf(OntologyConstant.testImportOntologyID2));
-        Assert.assertTrue(imports.indexOf(OntologyConstant.testImportOntologyID2) > imports.indexOf(OntologyConstant.testImportOntologyID3));
+        Assert.assertTrue(imports.indexOf(OntologyConstant.testImportOntologyID2) > imports
+                .indexOf(OntologyConstant.testImportOntologyID4));
+        Assert.assertTrue(imports.indexOf(OntologyConstant.testImportOntologyID1) > imports
+                .indexOf(OntologyConstant.testImportOntologyID2));
+        Assert.assertTrue(imports.indexOf(OntologyConstant.testImportOntologyID2) > imports
+                .indexOf(OntologyConstant.testImportOntologyID3));
         // NOTE: First two positions are not consistent, so only testing the last two
         Assert.assertEquals(OntologyConstant.testImportOntologyID2, imports.get(2));
         Assert.assertEquals(OntologyConstant.testImportOntologyID1, imports.get(3));
@@ -387,7 +385,6 @@ public class OntologyUtilsTest
         Assert.assertEquals(7, imports.size());
     }
     
-
     @Test
     public void testGetArtifactImportsRealisticInraVersion2() throws Exception
     {
@@ -447,7 +444,8 @@ public class OntologyUtilsTest
         
         // DebugUtils.printContents(model);
         final List<OWLOntologyID> schemaManifestImports =
-                OntologyUtils.schemaManifestImports(model, new HashSet<OWLOntologyID>(Arrays.asList(OntologyConstant.testA1)));
+                OntologyUtils.schemaManifestImports(model,
+                        new HashSet<OWLOntologyID>(Arrays.asList(OntologyConstant.testA1)));
         
         Assert.assertNotNull(schemaManifestImports);
         Assert.assertEquals(1, schemaManifestImports.size());
@@ -464,8 +462,10 @@ public class OntologyUtilsTest
         
         // DebugUtils.printContents(model);
         final List<OWLOntologyID> schemaManifestImports =
-                OntologyUtils.schemaManifestImports(model,
-                        new HashSet<OWLOntologyID>(Arrays.asList(OntologyConstant.testA1, OntologyConstant.testB1, OntologyConstant.testC1)));
+                OntologyUtils.schemaManifestImports(
+                        model,
+                        new HashSet<OWLOntologyID>(Arrays.asList(OntologyConstant.testA1, OntologyConstant.testB1,
+                                OntologyConstant.testC1)));
         
         Assert.assertNotNull(schemaManifestImports);
         Assert.assertEquals(3, schemaManifestImports.size());
@@ -486,8 +486,10 @@ public class OntologyUtilsTest
         
         // DebugUtils.printContents(model);
         final List<OWLOntologyID> schemaManifestImports =
-                OntologyUtils.schemaManifestImports(model,
-                        new HashSet<OWLOntologyID>(Arrays.asList(OntologyConstant.testA1, OntologyConstant.testB1, OntologyConstant.testC3)));
+                OntologyUtils.schemaManifestImports(
+                        model,
+                        new HashSet<OWLOntologyID>(Arrays.asList(OntologyConstant.testA1, OntologyConstant.testB1,
+                                OntologyConstant.testC3)));
         
         Assert.assertNotNull(schemaManifestImports);
         Assert.assertEquals(4, schemaManifestImports.size());
@@ -503,7 +505,8 @@ public class OntologyUtilsTest
         // Assert.assertEquals(OntologyConstant.testB1, schemaManifestImports.get(3));
         // Check the general ordering of B2 and C3 are correct. B1 only depends on A1 so it can be
         // anywhere except the first position
-        Assert.assertTrue(schemaManifestImports.indexOf(OntologyConstant.testB2) < schemaManifestImports.indexOf(OntologyConstant.testC3));
+        Assert.assertTrue(schemaManifestImports.indexOf(OntologyConstant.testB2) < schemaManifestImports
+                .indexOf(OntologyConstant.testC3));
     }
     
     @Test
@@ -514,8 +517,10 @@ public class OntologyUtilsTest
         
         // DebugUtils.printContents(model);
         final List<OWLOntologyID> schemaManifestImports =
-                OntologyUtils.schemaManifestImports(model,
-                        new HashSet<OWLOntologyID>(Arrays.asList(OntologyConstant.testA1, OntologyConstant.testB2, OntologyConstant.testC3)));
+                OntologyUtils.schemaManifestImports(
+                        model,
+                        new HashSet<OWLOntologyID>(Arrays.asList(OntologyConstant.testA1, OntologyConstant.testB2,
+                                OntologyConstant.testC3)));
         
         Assert.assertNotNull(schemaManifestImports);
         Assert.assertEquals(3, schemaManifestImports.size());
@@ -566,8 +571,10 @@ public class OntologyUtilsTest
         
         // DebugUtils.printContents(model);
         final List<OWLOntologyID> schemaManifestImports =
-                OntologyUtils.schemaManifestImports(model,
-                        new LinkedHashSet<OWLOntologyID>(Arrays.asList(OntologyConstant.testPoddDcV1, OntologyConstant.testPoddFoafV1)));
+                OntologyUtils.schemaManifestImports(
+                        model,
+                        new LinkedHashSet<OWLOntologyID>(Arrays.asList(OntologyConstant.testPoddDcV1,
+                                OntologyConstant.testPoddFoafV1)));
         
         Assert.assertNotNull(schemaManifestImports);
         Assert.assertEquals(2, schemaManifestImports.size());
@@ -586,8 +593,10 @@ public class OntologyUtilsTest
         
         // DebugUtils.printContents(model);
         final List<OWLOntologyID> schemaManifestImports =
-                OntologyUtils.schemaManifestImports(model,
-                        new LinkedHashSet<OWLOntologyID>(Arrays.asList(OntologyConstant.testPoddDcV2, OntologyConstant.testPoddFoafV2)));
+                OntologyUtils.schemaManifestImports(
+                        model,
+                        new LinkedHashSet<OWLOntologyID>(Arrays.asList(OntologyConstant.testPoddDcV2,
+                                OntologyConstant.testPoddFoafV2)));
         
         Assert.assertNotNull(schemaManifestImports);
         Assert.assertEquals(2, schemaManifestImports.size());
@@ -635,8 +644,10 @@ public class OntologyUtilsTest
         
         // DebugUtils.printContents(model);
         final List<OWLOntologyID> schemaManifestImports =
-                OntologyUtils.schemaManifestImports(model,
-                        new HashSet<OWLOntologyID>(Arrays.asList(OntologyConstant.testPoddDcV2, OntologyConstant.testPoddPlantV2)));
+                OntologyUtils.schemaManifestImports(
+                        model,
+                        new HashSet<OWLOntologyID>(Arrays.asList(OntologyConstant.testPoddDcV2,
+                                OntologyConstant.testPoddPlantV2)));
         
         Assert.assertNotNull(schemaManifestImports);
         Assert.assertEquals(6, schemaManifestImports.size());
@@ -689,8 +700,10 @@ public class OntologyUtilsTest
         
         // DebugUtils.printContents(model);
         final List<OWLOntologyID> schemaManifestImports =
-                OntologyUtils.schemaManifestImports(model,
-                        new HashSet<OWLOntologyID>(Arrays.asList(OntologyConstant.testPoddBaseV1, OntologyConstant.testPoddBaseV2)));
+                OntologyUtils.schemaManifestImports(
+                        model,
+                        new HashSet<OWLOntologyID>(Arrays.asList(OntologyConstant.testPoddBaseV1,
+                                OntologyConstant.testPoddBaseV2)));
         
         Assert.assertNotNull(schemaManifestImports);
         Assert.assertEquals(8, schemaManifestImports.size());
@@ -741,9 +754,11 @@ public class OntologyUtilsTest
         final List<OWLOntologyID> schemaManifestImports =
                 OntologyUtils.schemaManifestImports(
                         model,
-                        new LinkedHashSet<OWLOntologyID>(Arrays.asList(OntologyConstant.testPoddDcV1, OntologyConstant.testPoddDcV2,
-                                OntologyConstant.testPoddFoafV1, OntologyConstant.testPoddFoafV2, OntologyConstant.testPoddUserV1, OntologyConstant.testPoddUserV2,
-                                OntologyConstant.testPoddBaseV1, OntologyConstant.testPoddBaseV2)));
+                        new LinkedHashSet<OWLOntologyID>(Arrays.asList(OntologyConstant.testPoddDcV1,
+                                OntologyConstant.testPoddDcV2, OntologyConstant.testPoddFoafV1,
+                                OntologyConstant.testPoddFoafV2, OntologyConstant.testPoddUserV1,
+                                OntologyConstant.testPoddUserV2, OntologyConstant.testPoddBaseV1,
+                                OntologyConstant.testPoddBaseV2)));
         
         Assert.assertNotNull(schemaManifestImports);
         Assert.assertEquals(8, schemaManifestImports.size());
@@ -794,9 +809,11 @@ public class OntologyUtilsTest
         final List<OWLOntologyID> schemaManifestImports =
                 OntologyUtils.schemaManifestImports(
                         model,
-                        new LinkedHashSet<OWLOntologyID>(Arrays.asList(OntologyConstant.testPoddBaseV1, OntologyConstant.testPoddBaseV2,
-                                OntologyConstant.testPoddUserV1, OntologyConstant.testPoddUserV2, OntologyConstant.testPoddFoafV1, OntologyConstant.testPoddFoafV2,
-                                OntologyConstant.testPoddDcV1, OntologyConstant.testPoddDcV2)));
+                        new LinkedHashSet<OWLOntologyID>(Arrays.asList(OntologyConstant.testPoddBaseV1,
+                                OntologyConstant.testPoddBaseV2, OntologyConstant.testPoddUserV1,
+                                OntologyConstant.testPoddUserV2, OntologyConstant.testPoddFoafV1,
+                                OntologyConstant.testPoddFoafV2, OntologyConstant.testPoddDcV1,
+                                OntologyConstant.testPoddDcV2)));
         
         Assert.assertNotNull(schemaManifestImports);
         Assert.assertEquals(8, schemaManifestImports.size());
@@ -849,9 +866,10 @@ public class OntologyUtilsTest
                         RDFFormat.TURTLE);
         
         final List<OWLOntologyID> imports =
-                new ArrayList<OWLOntologyID>(Arrays.asList(OntologyConstant.testPoddBaseV1, OntologyConstant.testPoddUserV1,
-                        OntologyConstant.testPoddUserV2, OntologyConstant.testPoddFoafV1, OntologyConstant.testPoddBaseV2, OntologyConstant.testPoddFoafV2,
-                        OntologyConstant.testPoddDcV1, OntologyConstant.testPoddDcV2));
+                new ArrayList<OWLOntologyID>(Arrays.asList(OntologyConstant.testPoddBaseV1,
+                        OntologyConstant.testPoddUserV1, OntologyConstant.testPoddUserV2,
+                        OntologyConstant.testPoddFoafV1, OntologyConstant.testPoddBaseV2,
+                        OntologyConstant.testPoddFoafV2, OntologyConstant.testPoddDcV1, OntologyConstant.testPoddDcV2));
         
         Collections.shuffle(imports);
         
@@ -910,9 +928,11 @@ public class OntologyUtilsTest
                         RDFFormat.TURTLE);
         
         final List<OWLOntologyID> imports =
-                new ArrayList<OWLOntologyID>(Arrays.asList(OntologyConstant.testPoddBaseV1, OntologyConstant.testPoddUserV1,
-                        OntologyConstant.testPoddUserV2, OntologyConstant.testPoddFoafV1, OntologyConstant.testPoddBaseV2, OntologyConstant.testPoddFoafV2,
-                        OntologyConstant.testPoddDcV1, OntologyConstant.testPoddDcV2, OntologyConstant.testPoddScienceV1, OntologyConstant.testPoddScienceV2));
+                new ArrayList<OWLOntologyID>(Arrays.asList(OntologyConstant.testPoddBaseV1,
+                        OntologyConstant.testPoddUserV1, OntologyConstant.testPoddUserV2,
+                        OntologyConstant.testPoddFoafV1, OntologyConstant.testPoddBaseV2,
+                        OntologyConstant.testPoddFoafV2, OntologyConstant.testPoddDcV1, OntologyConstant.testPoddDcV2,
+                        OntologyConstant.testPoddScienceV1, OntologyConstant.testPoddScienceV2));
         
         Collections.shuffle(imports);
         
@@ -989,9 +1009,11 @@ public class OntologyUtilsTest
                         RDFFormat.TURTLE);
         
         final List<OWLOntologyID> imports =
-                new ArrayList<OWLOntologyID>(Arrays.asList(OntologyConstant.testPoddBaseV1, OntologyConstant.testPoddUserV1,
-                        OntologyConstant.testPoddUserV2, OntologyConstant.testPoddFoafV1, OntologyConstant.testPoddPlantV1, OntologyConstant.testPoddPlantV2,
-                        OntologyConstant.testPoddBaseV2, OntologyConstant.testPoddFoafV2, OntologyConstant.testPoddDcV1, OntologyConstant.testPoddDcV2,
+                new ArrayList<OWLOntologyID>(Arrays.asList(OntologyConstant.testPoddBaseV1,
+                        OntologyConstant.testPoddUserV1, OntologyConstant.testPoddUserV2,
+                        OntologyConstant.testPoddFoafV1, OntologyConstant.testPoddPlantV1,
+                        OntologyConstant.testPoddPlantV2, OntologyConstant.testPoddBaseV2,
+                        OntologyConstant.testPoddFoafV2, OntologyConstant.testPoddDcV1, OntologyConstant.testPoddDcV2,
                         OntologyConstant.testPoddScienceV1, OntologyConstant.testPoddScienceV2));
         
         // Randomise the order to fuzz test the algorithm
@@ -1016,37 +1038,67 @@ public class OntologyUtilsTest
         Assert.assertTrue(result.contains(OntologyConstant.testPoddPlantV1));
         Assert.assertTrue(result.contains(OntologyConstant.testPoddPlantV2));
         
-        Assert.assertTrue(result.indexOf(OntologyConstant.testPoddDcV1) < result.indexOf(OntologyConstant.testPoddFoafV1));
-        Assert.assertTrue(result.indexOf(OntologyConstant.testPoddDcV1) < result.indexOf(OntologyConstant.testPoddUserV1));
-        Assert.assertTrue(result.indexOf(OntologyConstant.testPoddDcV1) < result.indexOf(OntologyConstant.testPoddBaseV1));
-        Assert.assertTrue(result.indexOf(OntologyConstant.testPoddDcV1) < result.indexOf(OntologyConstant.testPoddScienceV1));
-        Assert.assertTrue(result.indexOf(OntologyConstant.testPoddDcV1) < result.indexOf(OntologyConstant.testPoddPlantV1));
-        Assert.assertTrue(result.indexOf(OntologyConstant.testPoddFoafV1) < result.indexOf(OntologyConstant.testPoddUserV1));
-        Assert.assertTrue(result.indexOf(OntologyConstant.testPoddFoafV1) < result.indexOf(OntologyConstant.testPoddBaseV1));
-        Assert.assertTrue(result.indexOf(OntologyConstant.testPoddFoafV1) < result.indexOf(OntologyConstant.testPoddScienceV1));
-        Assert.assertTrue(result.indexOf(OntologyConstant.testPoddFoafV1) < result.indexOf(OntologyConstant.testPoddPlantV1));
-        Assert.assertTrue(result.indexOf(OntologyConstant.testPoddUserV1) < result.indexOf(OntologyConstant.testPoddBaseV1));
-        Assert.assertTrue(result.indexOf(OntologyConstant.testPoddUserV1) < result.indexOf(OntologyConstant.testPoddScienceV1));
-        Assert.assertTrue(result.indexOf(OntologyConstant.testPoddUserV1) < result.indexOf(OntologyConstant.testPoddPlantV1));
-        Assert.assertTrue(result.indexOf(OntologyConstant.testPoddBaseV1) < result.indexOf(OntologyConstant.testPoddScienceV1));
-        Assert.assertTrue(result.indexOf(OntologyConstant.testPoddBaseV1) < result.indexOf(OntologyConstant.testPoddPlantV1));
-        Assert.assertTrue(result.indexOf(OntologyConstant.testPoddScienceV1) < result.indexOf(OntologyConstant.testPoddPlantV1));
+        Assert.assertTrue(result.indexOf(OntologyConstant.testPoddDcV1) < result
+                .indexOf(OntologyConstant.testPoddFoafV1));
+        Assert.assertTrue(result.indexOf(OntologyConstant.testPoddDcV1) < result
+                .indexOf(OntologyConstant.testPoddUserV1));
+        Assert.assertTrue(result.indexOf(OntologyConstant.testPoddDcV1) < result
+                .indexOf(OntologyConstant.testPoddBaseV1));
+        Assert.assertTrue(result.indexOf(OntologyConstant.testPoddDcV1) < result
+                .indexOf(OntologyConstant.testPoddScienceV1));
+        Assert.assertTrue(result.indexOf(OntologyConstant.testPoddDcV1) < result
+                .indexOf(OntologyConstant.testPoddPlantV1));
+        Assert.assertTrue(result.indexOf(OntologyConstant.testPoddFoafV1) < result
+                .indexOf(OntologyConstant.testPoddUserV1));
+        Assert.assertTrue(result.indexOf(OntologyConstant.testPoddFoafV1) < result
+                .indexOf(OntologyConstant.testPoddBaseV1));
+        Assert.assertTrue(result.indexOf(OntologyConstant.testPoddFoafV1) < result
+                .indexOf(OntologyConstant.testPoddScienceV1));
+        Assert.assertTrue(result.indexOf(OntologyConstant.testPoddFoafV1) < result
+                .indexOf(OntologyConstant.testPoddPlantV1));
+        Assert.assertTrue(result.indexOf(OntologyConstant.testPoddUserV1) < result
+                .indexOf(OntologyConstant.testPoddBaseV1));
+        Assert.assertTrue(result.indexOf(OntologyConstant.testPoddUserV1) < result
+                .indexOf(OntologyConstant.testPoddScienceV1));
+        Assert.assertTrue(result.indexOf(OntologyConstant.testPoddUserV1) < result
+                .indexOf(OntologyConstant.testPoddPlantV1));
+        Assert.assertTrue(result.indexOf(OntologyConstant.testPoddBaseV1) < result
+                .indexOf(OntologyConstant.testPoddScienceV1));
+        Assert.assertTrue(result.indexOf(OntologyConstant.testPoddBaseV1) < result
+                .indexOf(OntologyConstant.testPoddPlantV1));
+        Assert.assertTrue(result.indexOf(OntologyConstant.testPoddScienceV1) < result
+                .indexOf(OntologyConstant.testPoddPlantV1));
         
-        Assert.assertTrue(result.indexOf(OntologyConstant.testPoddDcV2) < result.indexOf(OntologyConstant.testPoddFoafV2));
-        Assert.assertTrue(result.indexOf(OntologyConstant.testPoddDcV2) < result.indexOf(OntologyConstant.testPoddUserV2));
-        Assert.assertTrue(result.indexOf(OntologyConstant.testPoddDcV2) < result.indexOf(OntologyConstant.testPoddBaseV2));
-        Assert.assertTrue(result.indexOf(OntologyConstant.testPoddDcV2) < result.indexOf(OntologyConstant.testPoddScienceV2));
-        Assert.assertTrue(result.indexOf(OntologyConstant.testPoddDcV2) < result.indexOf(OntologyConstant.testPoddPlantV2));
-        Assert.assertTrue(result.indexOf(OntologyConstant.testPoddFoafV2) < result.indexOf(OntologyConstant.testPoddUserV2));
-        Assert.assertTrue(result.indexOf(OntologyConstant.testPoddFoafV2) < result.indexOf(OntologyConstant.testPoddBaseV2));
-        Assert.assertTrue(result.indexOf(OntologyConstant.testPoddFoafV2) < result.indexOf(OntologyConstant.testPoddScienceV2));
-        Assert.assertTrue(result.indexOf(OntologyConstant.testPoddFoafV2) < result.indexOf(OntologyConstant.testPoddPlantV2));
-        Assert.assertTrue(result.indexOf(OntologyConstant.testPoddUserV2) < result.indexOf(OntologyConstant.testPoddBaseV2));
-        Assert.assertTrue(result.indexOf(OntologyConstant.testPoddUserV2) < result.indexOf(OntologyConstant.testPoddScienceV2));
-        Assert.assertTrue(result.indexOf(OntologyConstant.testPoddUserV2) < result.indexOf(OntologyConstant.testPoddPlantV2));
-        Assert.assertTrue(result.indexOf(OntologyConstant.testPoddBaseV2) < result.indexOf(OntologyConstant.testPoddScienceV2));
-        Assert.assertTrue(result.indexOf(OntologyConstant.testPoddBaseV2) < result.indexOf(OntologyConstant.testPoddPlantV2));
-        Assert.assertTrue(result.indexOf(OntologyConstant.testPoddScienceV2) < result.indexOf(OntologyConstant.testPoddPlantV2));
+        Assert.assertTrue(result.indexOf(OntologyConstant.testPoddDcV2) < result
+                .indexOf(OntologyConstant.testPoddFoafV2));
+        Assert.assertTrue(result.indexOf(OntologyConstant.testPoddDcV2) < result
+                .indexOf(OntologyConstant.testPoddUserV2));
+        Assert.assertTrue(result.indexOf(OntologyConstant.testPoddDcV2) < result
+                .indexOf(OntologyConstant.testPoddBaseV2));
+        Assert.assertTrue(result.indexOf(OntologyConstant.testPoddDcV2) < result
+                .indexOf(OntologyConstant.testPoddScienceV2));
+        Assert.assertTrue(result.indexOf(OntologyConstant.testPoddDcV2) < result
+                .indexOf(OntologyConstant.testPoddPlantV2));
+        Assert.assertTrue(result.indexOf(OntologyConstant.testPoddFoafV2) < result
+                .indexOf(OntologyConstant.testPoddUserV2));
+        Assert.assertTrue(result.indexOf(OntologyConstant.testPoddFoafV2) < result
+                .indexOf(OntologyConstant.testPoddBaseV2));
+        Assert.assertTrue(result.indexOf(OntologyConstant.testPoddFoafV2) < result
+                .indexOf(OntologyConstant.testPoddScienceV2));
+        Assert.assertTrue(result.indexOf(OntologyConstant.testPoddFoafV2) < result
+                .indexOf(OntologyConstant.testPoddPlantV2));
+        Assert.assertTrue(result.indexOf(OntologyConstant.testPoddUserV2) < result
+                .indexOf(OntologyConstant.testPoddBaseV2));
+        Assert.assertTrue(result.indexOf(OntologyConstant.testPoddUserV2) < result
+                .indexOf(OntologyConstant.testPoddScienceV2));
+        Assert.assertTrue(result.indexOf(OntologyConstant.testPoddUserV2) < result
+                .indexOf(OntologyConstant.testPoddPlantV2));
+        Assert.assertTrue(result.indexOf(OntologyConstant.testPoddBaseV2) < result
+                .indexOf(OntologyConstant.testPoddScienceV2));
+        Assert.assertTrue(result.indexOf(OntologyConstant.testPoddBaseV2) < result
+                .indexOf(OntologyConstant.testPoddPlantV2));
+        Assert.assertTrue(result.indexOf(OntologyConstant.testPoddScienceV2) < result
+                .indexOf(OntologyConstant.testPoddPlantV2));
     }
     
     @Test
@@ -1058,12 +1110,12 @@ public class OntologyUtilsTest
         
         // DebugUtils.printContents(model);
         final List<OWLOntologyID> schemaManifestImports =
-                OntologyUtils
-                        .schemaManifestImports(
-                                model,
-                                new LinkedHashSet<OWLOntologyID>(Arrays.asList(OntologyConstant.testPoddDcV2, OntologyConstant.testPoddFoafV2,
-                                        OntologyConstant.testPoddUserV2, OntologyConstant.testPoddBaseV2, OntologyConstant.testPoddScienceV2,
-                                        OntologyConstant.testPoddPlantV2)));
+                OntologyUtils.schemaManifestImports(
+                        model,
+                        new LinkedHashSet<OWLOntologyID>(Arrays.asList(OntologyConstant.testPoddDcV2,
+                                OntologyConstant.testPoddFoafV2, OntologyConstant.testPoddUserV2,
+                                OntologyConstant.testPoddBaseV2, OntologyConstant.testPoddScienceV2,
+                                OntologyConstant.testPoddPlantV2)));
         
         Assert.assertNotNull(schemaManifestImports);
         Assert.assertEquals(6, schemaManifestImports.size());
@@ -1090,7 +1142,8 @@ public class OntologyUtilsTest
         
         // DebugUtils.printContents(model);
         final List<OWLOntologyID> schemaManifestImports =
-                OntologyUtils.schemaManifestImports(model, new HashSet<OWLOntologyID>(Arrays.asList(OntologyConstant.testB1)));
+                OntologyUtils.schemaManifestImports(model,
+                        new HashSet<OWLOntologyID>(Arrays.asList(OntologyConstant.testB1)));
         
         Assert.assertNotNull(schemaManifestImports);
         Assert.assertEquals(2, schemaManifestImports.size());
@@ -1109,7 +1162,8 @@ public class OntologyUtilsTest
         
         // DebugUtils.printContents(model);
         final List<OWLOntologyID> schemaManifestImports =
-                OntologyUtils.schemaManifestImports(model, new HashSet<OWLOntologyID>(Arrays.asList(OntologyConstant.testB2)));
+                OntologyUtils.schemaManifestImports(model,
+                        new HashSet<OWLOntologyID>(Arrays.asList(OntologyConstant.testB2)));
         
         Assert.assertNotNull(schemaManifestImports);
         Assert.assertEquals(2, schemaManifestImports.size());
@@ -1128,7 +1182,8 @@ public class OntologyUtilsTest
         
         // DebugUtils.printContents(model);
         final List<OWLOntologyID> schemaManifestImports =
-                OntologyUtils.schemaManifestImports(model, new HashSet<OWLOntologyID>(Arrays.asList(OntologyConstant.testC1)));
+                OntologyUtils.schemaManifestImports(model,
+                        new HashSet<OWLOntologyID>(Arrays.asList(OntologyConstant.testC1)));
         
         Assert.assertNotNull(schemaManifestImports);
         Assert.assertEquals(3, schemaManifestImports.size());
@@ -1149,7 +1204,8 @@ public class OntologyUtilsTest
         
         // DebugUtils.printContents(model);
         final List<OWLOntologyID> schemaManifestImports =
-                OntologyUtils.schemaManifestImports(model, new HashSet<OWLOntologyID>(Arrays.asList(OntologyConstant.testC3)));
+                OntologyUtils.schemaManifestImports(model,
+                        new HashSet<OWLOntologyID>(Arrays.asList(OntologyConstant.testC3)));
         
         Assert.assertNotNull(schemaManifestImports);
         Assert.assertEquals(3, schemaManifestImports.size());
@@ -1188,8 +1244,10 @@ public class OntologyUtilsTest
         // DebugUtils.printContents(model);
         
         final List<OWLOntologyID> schemaManifestImports =
-                OntologyUtils.schemaManifestImports(model,
-                        new HashSet<OWLOntologyID>(Arrays.asList(OntologyConstant.testOntologyID, OntologyConstant.testImportOntologyID1)));
+                OntologyUtils.schemaManifestImports(
+                        model,
+                        new HashSet<OWLOntologyID>(Arrays.asList(OntologyConstant.testOntologyID,
+                                OntologyConstant.testImportOntologyID1)));
         
         Assert.assertNotNull(schemaManifestImports);
         Assert.assertEquals(2, schemaManifestImports.size());
@@ -1208,15 +1266,18 @@ public class OntologyUtilsTest
         model.add(OntologyConstant.testVersionUri1, RDF.TYPE, OWL.ONTOLOGY);
         model.add(OntologyConstant.testVersionUri1, OWL.IMPORTS, OntologyConstant.testImportOntologyUri1);
         model.add(OntologyConstant.testImportOntologyUri1, RDF.TYPE, OWL.ONTOLOGY);
-        model.add(OntologyConstant.testImportOntologyUri1, PODD.OMV_CURRENT_VERSION, OntologyConstant.testImportVersionUri1);
+        model.add(OntologyConstant.testImportOntologyUri1, PODD.OMV_CURRENT_VERSION,
+                OntologyConstant.testImportVersionUri1);
         model.add(OntologyConstant.testImportOntologyUri1, OWL.VERSIONIRI, OntologyConstant.testImportVersionUri1);
         model.add(OntologyConstant.testImportVersionUri1, RDF.TYPE, OWL.ONTOLOGY);
         
         // DebugUtils.printContents(model);
         
         final List<OWLOntologyID> schemaManifestImports =
-                OntologyUtils.schemaManifestImports(model,
-                        new HashSet<OWLOntologyID>(Arrays.asList(OntologyConstant.testOntologyID, OntologyConstant.testImportOntologyID1)));
+                OntologyUtils.schemaManifestImports(
+                        model,
+                        new HashSet<OWLOntologyID>(Arrays.asList(OntologyConstant.testOntologyID,
+                                OntologyConstant.testImportOntologyID1)));
         
         Assert.assertNotNull(schemaManifestImports);
         Assert.assertEquals(2, schemaManifestImports.size());
@@ -1283,9 +1344,12 @@ public class OntologyUtilsTest
         
         final ConcurrentMap<URI, Set<URI>> importsMap = new ConcurrentHashMap<URI, Set<URI>>();
         // Expected output solution from importsMap after calling orderImports
-        // importsMap.put(testVersionUri1, Collections.singleton(OntologyConstant.testImportVersionUri1));
-        // importsMap.put(testImportVersionUri1, Collections.singleton(OntologyConstant.testImportVersionUri2));
-        // importsMap.put(testImportVersionUri2, Collections.singleton(OntologyConstant.testImportVersionUri3));
+        // importsMap.put(testVersionUri1,
+        // Collections.singleton(OntologyConstant.testImportVersionUri1));
+        // importsMap.put(testImportVersionUri1,
+        // Collections.singleton(OntologyConstant.testImportVersionUri2));
+        // importsMap.put(testImportVersionUri2,
+        // Collections.singleton(OntologyConstant.testImportVersionUri3));
         // importsMap.put(testImportVersionUri3, new
         // HashSet<URI>(Arrays.asList(OntologyConstant.testImportVersionUri4)));
         // importsMap.put(testImportVersionUri4, new HashSet<URI>());
@@ -1374,9 +1438,12 @@ public class OntologyUtilsTest
         
         final ConcurrentMap<URI, Set<URI>> importsMap = new ConcurrentHashMap<URI, Set<URI>>();
         // Expected output solution from importsMap after calling orderImports
-        // importsMap.put(testVersionUri1, Collections.singleton(OntologyConstant.testImportVersionUri1));
-        // importsMap.put(testImportVersionUri1, Collections.singleton(OntologyConstant.testImportVersionUri2));
-        // importsMap.put(testImportVersionUri2, Collections.singleton(OntologyConstant.testImportVersionUri3));
+        // importsMap.put(testVersionUri1,
+        // Collections.singleton(OntologyConstant.testImportVersionUri1));
+        // importsMap.put(testImportVersionUri1,
+        // Collections.singleton(OntologyConstant.testImportVersionUri2));
+        // importsMap.put(testImportVersionUri2,
+        // Collections.singleton(OntologyConstant.testImportVersionUri3));
         // importsMap.put(testImportVersionUri3, new
         // HashSet<URI>(Arrays.asList(OntologyConstant.testImportVersionUri4)));
         // importsMap.put(testImportVersionUri4, new HashSet<URI>());
@@ -1444,7 +1511,8 @@ public class OntologyUtilsTest
         
         final ConcurrentMap<URI, Set<URI>> importsMap = new ConcurrentHashMap<URI, Set<URI>>();
         // Expected output solution from importsMap after calling orderImports
-        // importsMap.put(testVersionUri1, Collections.singleton(OntologyConstant.testImportVersionUri1));
+        // importsMap.put(testVersionUri1,
+        // Collections.singleton(OntologyConstant.testImportVersionUri1));
         // importsMap.put(testImportVersionUri1, new HashSet<URI>());
         
         final List<URI> orderImports =
@@ -1489,7 +1557,8 @@ public class OntologyUtilsTest
         
         final ConcurrentMap<URI, Set<URI>> importsMap = new ConcurrentHashMap<URI, Set<URI>>();
         // Expected output solution from importsMap after calling orderImports
-        // importsMap.put(testVersionUri1, Collections.singleton(OntologyConstant.testImportVersionUri1));
+        // importsMap.put(testVersionUri1,
+        // Collections.singleton(OntologyConstant.testImportVersionUri1));
         // importsMap.put(testImportVersionUri1, new HashSet<URI>());
         
         final List<URI> orderImports =
@@ -1583,7 +1652,8 @@ public class OntologyUtilsTest
         final Model input = new LinkedHashModel();
         input.add(this.vf.createStatement(OntologyConstant.testOntologyUri1, RDF.TYPE, OWL.ONTOLOGY));
         input.add(this.vf.createStatement(OntologyConstant.testVersionUri1, RDF.TYPE, OWL.ONTOLOGY));
-        input.add(this.vf.createStatement(OntologyConstant.testOntologyUri1, OWL.VERSIONIRI, OntologyConstant.testVersionUri1));
+        input.add(this.vf.createStatement(OntologyConstant.testOntologyUri1, OWL.VERSIONIRI,
+                OntologyConstant.testVersionUri1));
         final Collection<InferredOWLOntologyID> modelToOntologyIDs = OntologyUtils.modelToOntologyIDs(input);
         
         // 1 ontology returned
@@ -1602,8 +1672,8 @@ public class OntologyUtilsTest
     {
         final Model input = new LinkedHashModel();
         
-        OntologyUtils.ontologyIDsToHandler(Arrays.asList(OntologyConstant.owlid((IRI)null, null, null)), new StatementCollector(
-                input));
+        OntologyUtils.ontologyIDsToHandler(Arrays.asList(OntologyConstant.owlid((IRI)null, null, null)),
+                new StatementCollector(input));
         
         Assert.assertTrue(input.isEmpty());
     }
@@ -1674,8 +1744,8 @@ public class OntologyUtilsTest
         final Model input = new LinkedHashModel();
         
         OntologyUtils.ontologyIDsToHandler(
-                Arrays.asList(OntologyConstant.owlid(IRI.create("urn:test:ontology:iri:abc"), null, null)), new StatementCollector(
-                        input));
+                Arrays.asList(OntologyConstant.owlid(IRI.create("urn:test:ontology:iri:abc"), null, null)),
+                new StatementCollector(input));
         
         Assert.assertEquals(1, input.size());
         Assert.assertTrue(input.contains(null, RDF.TYPE, OWL.ONTOLOGY));
@@ -1791,7 +1861,8 @@ public class OntologyUtilsTest
         
         final Model ontologyIDsToModel =
                 OntologyUtils.ontologyIDsToModel(
-                        Arrays.asList(OntologyConstant.owlid(IRI.create("urn:test:ontology:iri:abc"), null, null)), input);
+                        Arrays.asList(OntologyConstant.owlid(IRI.create("urn:test:ontology:iri:abc"), null, null)),
+                        input);
         
         Assert.assertNotNull(ontologyIDsToModel);
         Assert.assertEquals(input, ontologyIDsToModel);
@@ -1861,7 +1932,5 @@ public class OntologyUtilsTest
                 "http://example.org/purl/91bb7bff-acd6-4b2e-abf7-ce74d3d91061/artifact:1:version:1", ontologyIDs
                         .iterator().next().getVersionIRI().toString());
     }
-    
- 
     
 }

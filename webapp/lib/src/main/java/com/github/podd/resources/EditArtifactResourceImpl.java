@@ -219,8 +219,12 @@ public class EditArtifactResourceImpl extends AbstractPoddResourceImpl
         
         final Map<String, Object> dataModel = RestletUtils.getBaseDataModel(this.getRequest());
         
-        dataModel.put("contentTemplate", this.getPoddApplication().getPropertyUtil()
-                .get(PoddWebConstants.PROPERTY_TEMPLATE_MODIFY_OBJECT, PoddWebConstants.DEFAULT_TEMPLATE_MODIFY_OBJECT));
+        dataModel.put(
+                "contentTemplate",
+                this.getPoddApplication()
+                        .getPropertyUtil()
+                        .get(PoddWebConstants.PROPERTY_TEMPLATE_MODIFY_OBJECT,
+                                PoddWebConstants.DEFAULT_TEMPLATE_MODIFY_OBJECT));
         dataModel.put("pageTitle", "Edit Artifact");
         
         try

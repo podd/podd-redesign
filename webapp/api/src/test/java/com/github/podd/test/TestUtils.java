@@ -32,7 +32,6 @@ import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.RDFParseException;
 import org.openrdf.rio.Rio;
 import org.openrdf.rio.UnsupportedRDFormatException;
-import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLException;
 import org.semanticweb.owlapi.rio.RioMemoryTripleSource;
 
@@ -53,8 +52,8 @@ import com.github.podd.utils.PoddUserStatus;
  */
 public class TestUtils
 {
-		
-		/**
+    
+    /**
      * Adds a Test User to the PODD Realm.
      * 
      * @param application
