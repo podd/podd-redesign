@@ -381,8 +381,8 @@ public interface PODD
     /** http://purl.org/podd/ns/poddScience#Project */
     public static final URI PODD_SCIENCE_PROJECT = PODD.VF.createURI(PODD.PODD_SCIENCE, "Project");
     
-    /** http://purl.org/podd/ns/poddScience#Investigation */
-    public static final URI PODD_SCIENCE_INVESTIGATION = PODD.VF.createURI(PODD.PODD_SCIENCE, "Investigation");
+    /** http://purl.org/podd/ns/poddScience#Experiment */
+    public static final URI PODD_SCIENCE_EXPERIMENT = PODD.VF.createURI(PODD.PODD_SCIENCE, "Experiment");
     
     /** http://purl.org/podd/ns/poddScience#Container */
     public static final URI PODD_SCIENCE_CONTAINER = PODD.VF.createURI(PODD.PODD_SCIENCE, "Container");
