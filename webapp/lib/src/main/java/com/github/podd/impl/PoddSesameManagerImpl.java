@@ -837,7 +837,11 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         
         sb.append("}");
         
-        final GraphQuery graphQuery = permanentConnection.prepareGraphQuery(QueryLanguage.SPARQL, sb.toString());
+        String queryString = sb.toString();
+        
+        this.log.debug("query={}", queryString);
+        
+        final GraphQuery graphQuery = permanentConnection.prepareGraphQuery(QueryLanguage.SPARQL, queryString);
         graphQuery.setBinding("poddObject", objectUri);
         
         final Model queryResults =
