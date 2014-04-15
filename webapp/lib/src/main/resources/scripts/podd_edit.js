@@ -3737,5 +3737,4 @@ podd.addEventHandler = function(theLink) {
 
 podd.ShowlinkObject = function(targetObject,objecttypeuri){
 	$("#title_pane").append( " linked to <b>"+targetObject+"</b>" );
-	podd.debug('[ShowlinkObject] finished');
 };
