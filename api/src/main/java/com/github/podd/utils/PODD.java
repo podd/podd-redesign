@@ -119,8 +119,8 @@ public interface PODD
     /** Path to default alias file */
     public static final String PATH_DEFAULT_ALIASES_FILE = "/com/github/podd/api/file/default-file-repositories.ttl";
     
-    /** Path to default alias file */
-    public static final String PATH_DEFAULT_SCHEMAS = "/podd-schema-manifest.ttl";
+    /** Path to default schema manifest file */
+    public static final String PATH_DEFAULT_SCHEMAS = "/default-podd-schema-manifest.ttl";
     
     public static final String PATH_BASE_ONTOLOGIES_VERSION_1 = "/ontologies/version/1/";
     
