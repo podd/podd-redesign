@@ -38,6 +38,7 @@ var PODD_CREATED_AT = '<http://purl.org/podd/ns/poddBase#createdAt>';
 var PODD_LAST_MODIFIED = '<http://purl.org/podd/ns/poddBase#lastModified>';
 var DUMMY_Datetime = '1970-01-01T00:00:00';
 
+
 var PROPERTY_HAS_PI = 'http://purl.org/podd/ns/poddBase#hasPrincipalInvestigator';
 
 var TYPE_DATA_REPOSITORY = 'http://purl.org/podd/ns/dataRepository#DataRepository';
@@ -1004,7 +1005,7 @@ podd.buildTriple = function(subjectUri, propertyUri, objectValue, propertyType, 
 
         // figure out if the object is a Resource or a Literal
         if (typeof propertyType !== 'undefined' && propertyType.toString() === OBJECT_PROPERTY) {
-
+        	
             // FIXME: Some code currently relies on being able to send in
             // objectValue as the empty string, which fails, where <> apparently
             // succeeds
@@ -1082,9 +1083,10 @@ podd.callbackFromGetMetadata = function(artifactUri, objectType, nextSchemaDatab
  * @return a list item (i.e. &lt;li&gt;) containing the HTML field
  */
 podd.createEditField = function(nextField, nextSchemaDatabank, nextArtifactDatabank, isNew) {
-    // podd.debug('[' + nextField.weight + '] <' + nextField.propertyUri
-    // + '> "' + nextField.propertyLabel + '" <' +
-    // nextField.displayType + '> <' + nextField.cardinality + '>');
+	podd.debug('[createEditField]'); 
+	podd.debug('[' + nextField.weight + '] <' + nextField.propertyUri
+     + '> ' + nextField.propertyLabel + ' <' +
+     nextField.displayType + '> <' + nextField.cardinality + '>');
 
     // <li> element to which the whole field is to be attached
     var li = $("<li>");
@@ -1098,6 +1100,7 @@ podd.createEditField = function(nextField, nextSchemaDatabank, nextArtifactDatab
     // the URI as a last resort label
     if (typeof nextField.propertyLabel !== "undefined") {
         span.html(nextField.propertyLabel);
+        podd.debug('[createEditField]'+span); 
     }
     else {
         span.html(nextField.propertyUri.toString());
@@ -1163,7 +1166,9 @@ podd.createEditField = function(nextField, nextSchemaDatabank, nextArtifactDatab
 
                 li2.append(input);
             }
+            
             else if (nextField.displayType == DISPLAY_ShortText) {
+            	podd.debug('IN nextField.displayType == DISPLAY_ShortText'+nextField.displayType);
                 var input = podd.addFieldInputText(nextField, aValue, 'text');
 
                 // TODO: add support for date/time types other than xsd:date
@@ -1183,10 +1188,26 @@ podd.createEditField = function(nextField, nextSchemaDatabank, nextArtifactDatab
                             // blur handler does not work with datepicker as the
                             // blur event gets fired before
                             // the selected value is set.
+                        	
                             podd.handleDatePickerFieldChange(input, nextField.propertyUri, aValue.displayValue,
                                     nextField.propertyType, nextArtifactDatabank, isNew);
                         }
                     });
+                }
+                if (typeof nextField.propertyRange !== 'undefined'
+                    && nextField.propertyRange.toString() === XSD_DATETIME) {
+                input.attr('readonly', 'readonly');
+                input.attr('style', 'background:white');
+
+                input.datetimepicker({
+                    format : "Y-m-d H:i:00",
+                    step:30,
+                    onChangeDateTime : function() {
+
+                    	  podd.handleDatePickerFieldChange(input, nextField.propertyUri, aValue.displayValue,
+                                  nextField.propertyType, nextArtifactDatabank, isNew);
+                    }
+                });
                 }
                 else {
                     podd.addTextFieldBlurHandler(input, undefined, nextField.propertyUri, aValue.displayValue,
@@ -1559,7 +1580,7 @@ podd.getArtifact = function(artifactUri, nextSchemaDatabank, nextArtifactDataban
     $.ajax({
         url : requestUrl,
         type : 'GET',
-        dataType : 'json',
+        contentType : 'application/rdf+json', // what we're sending
         beforeSend : function(xhr) {
             xhr.setRequestHeader("Accept", "application/rdf+json");
         },
@@ -1614,7 +1635,10 @@ podd.getCreateChildMetadata = function(artifactUri, objectType, successCallback)
             includedndprops : false,
             metadatapolicy : 'containsonly'
         },
-        dataType : 'json', // what is expected back
+        contentType : 'application/rdf+json', // what we're sending
+        beforeSend : function(xhr) {
+            xhr.setRequestHeader("Accept", "application/rdf+json");
+        },
         success : function(resultData, status, xhr) {
             podd.debug('[getCreateChildMetadata] ### SUCCESS ### ');
             podd.debug(resultData);
@@ -1632,6 +1656,9 @@ podd.getCreateChildMetadata = function(artifactUri, objectType, successCallback)
         }
     });
 };
+
+
+
 
 /**
  * If artifactIri exists, it returns that, wrapped in braces to look like a URI
@@ -1699,7 +1726,10 @@ podd.getDataRepositories = function(successCallback) {
     $.ajax({
         url : requestUrl,
         type : 'GET',
-        dataType : 'json', // what is expected back
+        contentType : 'application/rdf+json', // what we're sending
+        beforeSend : function(xhr) {
+            xhr.setRequestHeader("Accept", "application/rdf+json");
+        },
         success : function(resultData, status, xhr) {
             podd.debug('[getDataRepositories] ### SUCCESS ### ');
             podd.debug(resultData);
@@ -1748,9 +1778,13 @@ podd.getObjectTypeMetadata = function(artifactUri, objectType, successCallback, 
         url : requestUrl,
         type : 'GET',
         data : {
-            objecttypeuri : objectType
+            objecttypeuri : objectType,
+            includedndprops : false
         },
-        dataType : 'json', // what is expected back
+        contentType : 'application/rdf+json', // what we're sending
+        beforeSend : function(xhr) {
+            xhr.setRequestHeader("Accept", "application/rdf+json");
+        },
         success : function(resultData, status, xhr) {
             podd.debug('[getObjectTypeMetadata] ### SUCCESS ### ');
             podd.debug(resultData);
@@ -1904,7 +1938,7 @@ podd.handleDatePickerFieldChange = function(textField, propertyUri, originalValu
 
     var nextOriginalValue = '' + originalValue;
 
-    var newValue = '' + textField.val();
+    var newValue = '' + textField.val().replace(" ","T");
     podd.debug("[dateField] triggered with new value: " + newValue);
 
     var objectUri = podd.getCurrentObjectUri();
@@ -2024,7 +2058,9 @@ podd.isValidObject = function(objectUri, nextDatabank) {
                             var myQuery = $.rdf({
                                 databank : nextDatabank
                             }).where(objectUri + ' <' + value.propertyUri + '> ?someValue');
+
                             var bindings = myQuery.select();
+                          
                             if (bindings.length === 0) {
                                 podd.updateErrorMessageList('Mandatory property ' + value.propertyLabel + ' is empty.');
                                 // TODO: display error next to the erroneous
@@ -2056,7 +2092,7 @@ podd.isValidObject = function(objectUri, nextDatabank) {
  */
 podd.loadMissingArtifactLabels = function(artifactUri, nextSchemaDatabank, nextArtifactDatabank, callbackFunction,
         callbackParam) {
-    podd.debug('[loadArtifactLabels] started')
+    podd.debug('[loadArtifactLabels] started');
 
     // go through artifact databank and identify URIs without labels
     var uriList = [];
@@ -2258,7 +2294,10 @@ podd.searchOntologyService = function(
         url : requestUrl,
         type : 'GET',
         data : queryParams,
-        dataType : 'json',
+        contentType : 'application/rdf+json', // what we're sending
+        beforeSend : function(xhr) {
+            xhr.setRequestHeader("Accept", "application/rdf+json");
+        },
         success : function(data, status, xhr) {
             podd.debug('[searchOntologyService] Response: ' + data.toString());
             var formattedData = podd.parseSearchResults(requestUrl, data);
@@ -2296,7 +2335,10 @@ podd.searchUserService = function(request, callbackFunction) {
         url : requestUrl,
         type : 'GET',
         data : queryParams,
-        dataType : 'json',
+        contentType : 'application/rdf+json', // what we're sending
+        beforeSend : function(xhr) {
+            xhr.setRequestHeader("Accept", "application/rdf+json");
+        },
         success : function(data, status, xhr) {
             podd.debug('[searchUserService] Response: ' + data.toString());
             var formattedData = podd.parseSearchResults(requestUrl, data);
@@ -2435,6 +2477,7 @@ podd.showAddChildDialog = function(objectType, nextSchemaDatabank) {
 
     podd.debug('[showAddChildDialog] finished');
 };
+
 
 /**
  * Display a Dialog to add a new Role to a PODD User.
@@ -2641,7 +2684,8 @@ podd.submitPoddObjectUpdate = function(
     podd.resetLastModifiedAt(objectUri, nextArtifactDatabank);
 
     podd.emptyErrorMessages();
-
+    podd.debug('[updatePoddObject] objectUri :: '+ objectUri);
+    podd.debug('[updatePoddObject] nextArtifactDatabank ::' + nextArtifactDatabank);
     if (!podd.isValidObject(objectUri, nextArtifactDatabank)) {
         podd.debug('[updatePoddObject] Invalid artifact. Aborting submit.');
         return; // cannot continue submission
@@ -3196,7 +3240,7 @@ podd.updateInterface = function(objectType, nextSchemaDatabank, nextArtifactData
     if (classBindings.length == 0) {
         podd.debug('WARNING: <' + objectType + '> is NOT an owl:Class');
     }
-
+    podd.debug('nextSchemaDatabank: '+ nextSchemaDatabank );
     // retrieve weighted property list
     var myQuery = $.rdf({
         databank : nextSchemaDatabank
@@ -3244,6 +3288,7 @@ podd.updateInterface = function(objectType, nextSchemaDatabank, nextArtifactData
         nextChild.propertyType;
 
         if (typeof nextBinding.propertyLabel != 'undefined') {
+        	podd.debug("label found for property: " + nextBinding.propertyLabel.value);
             nextChild.propertyLabel = nextBinding.propertyLabel.value;
         }
         else {
@@ -3286,14 +3331,16 @@ podd.updateInterface = function(objectType, nextSchemaDatabank, nextArtifactData
 
         // Avoid duplicates, which are occurring due to multiple ways of
         // specifying ranges/etc., in OWL
+
+        podd.debug("[update interface]propertyUris: " + propertyUris);
         if ($.inArray(nextChild.propertyUri, propertyUris) === -1) {
             propertyUris.push(nextChild.propertyUri);
             propertyList.push(nextChild);
-            // podd.debug("[" + nextChild.weight + "] propertyUri=<" +
-            // nextChild.propertyUri + "> label=\""
-            // + nextChild.propertyLabel + "\" displayType=<" +
-            // nextChild.displayType + "> card=<"
-            // + nextChild.cardinality + ">");
+             podd.debug("[" + nextChild.weight + "] propertyUri=<" +
+             nextChild.propertyUri + "> label=\""
+             + nextChild.propertyLabel + "\" displayType=<" +
+             nextChild.displayType + "> card=<"
+             + nextChild.cardinality + ">");
 
             // add cardinalities for use in validation at submit time. could be
             // undefined
@@ -3521,4 +3568,174 @@ podd.vTableRemovePropertyValue = function(propertyUri, value) {
     }
 
     podd.valuesTable[propertyUri] = theArray;
+};
+
+/**
+ * Get JSON data to create Jstree view
+ * @param artifactIri
+ * @param objectTypeUri
+ * @param successCallback
+ */
+podd.getEventType = function(artifactIri, objectTypeUri,successCallback) {
+
+    var requestUrl = podd.baseUrl + '/eventtype';
+
+    podd.debug('[getEventType] Request (GET)');
+
+    $.ajax({
+        url : requestUrl,
+        type : 'GET',
+        data : {
+            objecttypeuri : objectTypeUri,
+            artifacturi : artifactIri
+        },
+        contentType : 'application/rdf+json', // what we're sending
+        beforeSend : function(xhr) {
+            xhr.setRequestHeader("Accept", "application/rdf+json");
+        },
+        success : function(resultData, status, xhr) {
+            podd.debug('[getEventType] ### SUCCESS ### ');
+            podd.debug(resultData);
+
+            successCallback(resultData);
+        },
+        error : function(xhr, status, error) {
+            podd.debug('[getEventType] $$$ ERROR $$$ ' + error);
+            podd.debug(xhr.statusText);
+            podd.displaySummaryErrorMessage(xhr.responseText);
+        }
+    });
+};
+/**
+ * Create the event Dialog and the Jstree view
+ * Contains params for the jstree plugin
+ * @param data
+ */
+
+podd.showAddEventDialog = function(data) {
+    
+	 var div = $('<div>', {
+	        name : 'add_eventtype',
+	        class : 'add_eventtype'
+
+	    });
+	 var continueLink = $('<a>', {
+	        name : 'name_add_eventtype',
+	        text : 'Continue',
+	        class : 'button'
+	    });
+	 
+	
+    div.append('<p>Select Type of Event</p>');
+    div.append('<br>');
+    div.append('<li id="event_result" class="event_result"></li>');
+    div.append('<br>');
+    div.append('<input type="button" class="button" id="buttontree" value="Collapse All" onclick="$(\'#treeEvent\').jstree(\'close_all\');">');
+    div.append('<input type="button"  class="button" id="buttontree" value="Open All" onclick="$(\'#treeEvent\').jstree(\'open_all\');">');
+    div.append('<div id="treeEvent" class="DisplayTree"></div>');
+    div.append('<input type="hidden" name="jsChecked" id="jsChecked" class="jsChecked" value=""/>');
+    div.append('<br><br>');
+    div.append(continueLink);
+    
+    var dialog_event = $("#dialog_event").dialog({
+        autoOpen : false,
+        modal : true,
+        height: 400,
+        width: 500,
+        show: {
+            effect: "blind",
+            duration: 500
+          },
+          hide: {
+            effect: "explode",
+            duration: 500
+          },
+        dialogClass : "dialog_class_event",
+        close : function() {
+            div.remove();
+        }
+    });
+    
+    dialog_event.append(div);
+    dialog_event.dialog("open");
+    
+    $('#treeEvent').jstree({
+      	"core" : {
+    	    "animation" : 200,
+    	    "check_callback" : true,
+    	    "dots" : true,
+    	    "multiple": false,
+    	    'data' : data
+    	    } ,
+    	     "plugins" : [ "types","checkbox","sort","wholerow"],
+    	
+    	  	"types" : {
+    		    "concept" : {
+    		      "icon" : podd.baseUrl + "/resources/images/concept28x28.png"
+    		    },
+    		}, 
+    	}
+    );
+      
+    
+    $('#treeEvent')
+    .on('select_node.jstree', function(e, data){
+
+  	  for(i = 0, j = data.selected.length; i < j; i++) { 
+  	        if(data.instance.is_parent(data.selected[i])){ 
+  	                data.instance.deselect_node(data.selected[i]);
+  	        } 
+  	   }
+     });
+      
+    $('#treeEvent')
+      .on('changed.jstree', function (e, data) {
+   
+        var i, j, r = [];
+        for(i = 0, j = data.selected.length; i < j; i++) {
+          r.push(data.instance.get_node(data.selected[i]).text);
+        }
+        $('#event_result').html(r.join(', '));
+        document.getElementById("jsChecked").value = r.join(', ');
+      });
+    
+    
+    podd.addEventHandler(continueLink);
+    podd.debug('[showAddChildDialog] finished');
+};
+
+podd.addEventHandler = function(theLink) {
+
+    theLink.click(function(event) {
+    	
+    	eventType =  document.getElementById("jsChecked").value;
+        $('#dialog_event').dialog('close');
+    
+        var errors = [];
+        if (eventType == null || eventType == '') {
+            errors.push('<p>Event Type should be selected</p>');
+        }
+     
+
+        if (errors.length > 0) {
+            $.each(errors, function(index, value) {
+                podd.updateErrorMessageList(value);
+            });
+        }
+        else {
+            var requestUrl = podd.baseUrl + '/artifact/addobject' +
+            '?artifacturi=' + podd.uriEncode(podd.getCurrentArtifactIri()) +
+            '&objecttypeuri=http://www.mistea.supagro.inra.fr/event%23' + eventType+
+            '&parenturi=' + podd.uriEncode(podd.getCurrentObjectUri()) +
+            '&parentpredicateuri=http://purl.org/podd/ns/poddScience%23hasEvent' +
+            '&isEvent=true'	;
+         
+            window.location.href = requestUrl;
+        }
+    });
+};
+
+podd.ShowlinkObject = function(targetObject,objecttypeuri){
+	$("#title_pane").append( " linked to <b>"+targetObject+"</b>" );
+	podd.debug('[ShowlinkObject] finished');
 };
