@@ -24,6 +24,7 @@ import java.nio.file.Path;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -62,7 +63,7 @@ public class PoddDigestUtils
         }
     }
     
-    public static ConcurrentMap<Path, ConcurrentMap<Algorithm, String>> getDigests(final List<Path> pathsToDigest)
+    public static ConcurrentMap<Path, ConcurrentMap<Algorithm, String>> getDigests(final Collection<Path> pathsToDigest)
         throws IOException, NoSuchAlgorithmException
     {
         final ConcurrentMap<Path, ConcurrentMap<Algorithm, String>> result = new ConcurrentHashMap<>();
