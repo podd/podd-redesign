@@ -212,7 +212,7 @@ public class PoddStatusService extends StatusService
         
         final Model model = this.getErrorAsModel(status);
         
-        final String errorModelAsString = this.convertModelToString(model, MediaType.APPLICATION_JSON);
+        final String errorModelAsString = this.convertModelToString(model, RestletUtilMediaType.APPLICATION_RDF_JSON);
         dataModel.put("message_details", errorModelAsString);
         
         return RestletUtils.getHtmlRepresentation("poddBase.html.ftl", dataModel, MediaType.TEXT_HTML,

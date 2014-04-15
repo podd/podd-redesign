@@ -681,6 +681,29 @@ table.tablesorter tfoot .pagesize {
     *padding-left: 20px;
     text-decoration: none;
 }
+
+.DisplayTree {
+    border-width:1sx;
+	border-style:groove;
+	border-color:#59595D;
+	background:#F7FBFF url("../images/rdf-logo.png") top right no-repeat;
+}
+
+.DisplaySelected {
+    border-width:1sx;
+	border-style:dotted;
+	border-color:#59595D;
+
+}
+
+.add_eventtype #buttontree {
+	margin-right: 2px;
+	position: relative;
+	top: 0;
+	right: 0;
+	font-weight: normal;
+}
+
 /* end - IE7 hack */
 
 /* jquery treeview - end */
