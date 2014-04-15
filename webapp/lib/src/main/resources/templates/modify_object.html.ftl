@@ -7,6 +7,7 @@
 <#-- @ftlvariable name="objectUri" type="java.lang.String" -->
 <#-- @ftlvariable name="artifactIri" type="java.lang.String" -->
 <#-- @ftlvariable name="versionIri" type="java.lang.String" -->
+<#-- @ftlvariable name="isEvent" type="java.lang.String" -->
 
 <script type="text/javascript">
 	$(document).ready(function() {
@@ -17,6 +18,7 @@
 		podd.objectTypeUri = '${objectType.objectURI!"Not Found"}';
 		podd.artifactIri = '${artifactIri!"undefined"}';
 		podd.versionIri = '${versionIri!"undefined"}';
+		podd.isEvent = '${isEvent!"false"}';
 		
 		podd.parentUri = '${parentUri!"undefined"}';
 		podd.parentPredicateUri = '${parentPredicateUri!"undefined"}'; 
@@ -53,14 +55,10 @@
 				podd.initialiseNewObject(podd.artifactDatabank, podd.getCurrentArtifactIri(), podd.getCurrentObjectUri(), podd.parentUri, podd.parentPredicateUri);
 			}
 		}
-		
-		if(podd.objectTypeUri == '...event'){
-		
-		}else{
-				
+			
 	    // Get Metadata and invoke the callback function which will continue to update the interface
 	    podd.getObjectTypeMetadata(podd.artifactIri, podd.objectTypeUri, podd.callbackFromGetMetadata, podd.schemaDatabank, podd.artifactDatabank);
-		}
+		
 		// Cache the data repositories list
 	    podd.dataRepositoriesDatabank = podd.newDatabank();
 		podd.getDataRepositories(podd.dataRepositoriesDatabank);
@@ -80,6 +78,10 @@
 			podd.redirectToGetArtifact(undefined, undefined, undefined);
 			return false;
 		});
+		
+		if(podd.isEvent == "true"){
+			podd.ShowlinkObject(podd.parentUri,podd.objecttypeuri);
+		}
 	
         podd.debug('### initialization complete ###');
 	});
