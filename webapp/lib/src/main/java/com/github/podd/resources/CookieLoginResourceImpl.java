@@ -46,8 +46,10 @@ public class CookieLoginResourceImpl extends AbstractPoddResourceImpl implements
         {
             this.log.info("In getLoginPageHtml");
             final Map<String, Object> dataModel = RestletUtils.getBaseDataModel(this.getRequest());
-            dataModel.put("contentTemplate", this.getPropertyUtil()
-                    .get(PoddWebConstants.PROPERTY_TEMPLATE_LOGIN, PoddWebConstants.DEFAULT_TEMPLATE_LOGIN));
+            dataModel.put(
+                    "contentTemplate",
+                    this.getPropertyUtil().get(PoddWebConstants.PROPERTY_TEMPLATE_LOGIN,
+                            PoddWebConstants.DEFAULT_TEMPLATE_LOGIN));
             
             dataModel.put("shibbolethEnabled", Boolean.valueOf("false"));
             dataModel.put("invalidDomain", Boolean.valueOf("false"));
@@ -64,9 +66,9 @@ public class CookieLoginResourceImpl extends AbstractPoddResourceImpl implements
             // defining the
             // template to use for the content in the body of the page
             return RestletUtils.getHtmlRepresentation(
-                    this.getPropertyUtil()
-                            .get(PoddWebConstants.PROPERTY_TEMPLATE_BASE, PoddWebConstants.DEFAULT_TEMPLATE_BASE),
-                    dataModel, MediaType.TEXT_HTML, this.getPoddApplication().getTemplateConfiguration());
+                    this.getPropertyUtil().get(PoddWebConstants.PROPERTY_TEMPLATE_BASE,
+                            PoddWebConstants.DEFAULT_TEMPLATE_BASE), dataModel, MediaType.TEXT_HTML, this
+                            .getPoddApplication().getTemplateConfiguration());
         }
         else
         {

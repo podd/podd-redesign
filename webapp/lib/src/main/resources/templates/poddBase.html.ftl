@@ -36,10 +36,16 @@
     <link rel="stylesheet" href="${baseUrl}/resources/styles/podd.css" type="text/css" />
     <link rel="stylesheet" href="${baseUrl}/resources/styles/podd-colours.css" type="text/css" />
 	<link rel="stylesheet" href="${baseUrl}/resources/styles/jquery-ui-1.10.3.custom.css" type="text/css" />
+	<link rel="stylesheet" href="${baseUrl}/resources/styles/jquery.datetimepicker.css" type="text/css" />
+	<link rel="stylesheet" href="${baseUrl}/resources/styles/select2.css" type="text/css" />
+	<link rel="stylesheet" href="${baseUrl}/resources/styles/style.css" type="text/css" />
 
     	<script type="text/javascript" src="${baseUrl}/resources/scripts/jquery-1.9.1.js"></script>
     	<script type="text/javascript" src="${baseUrl}/resources/scripts/jquery-ui-1.10.3.custom.js"></script>
 	    <script type="text/javascript" src="${baseUrl}/resources/scripts/jquery.cookie-1.3.js"></script>
+	    <script type="text/javascript" src="${baseUrl}/resources/scripts/jquery.datetimepicker.js"></script>
+	    <script type="text/javascript" src="${baseUrl}/resources/scripts/select2.js"></script>
+	    <script type="text/javascript" src="${baseUrl}/resources/scripts/jstree.js"></script>
 		
 		<!-- Dependencies for rdfquery -->
 	    <script type="text/javascript" src="${baseUrl}/resources/scripts/jquery.json.js"></script>

@@ -151,7 +151,12 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
         this.log.debug("authenticated user: {}", user);
         
         final Map<String, Object> dataModel = RestletUtils.getBaseDataModel(this.getRequest());
-        dataModel.put("contentTemplate", "objectDetails.html.ftl");
+        dataModel.put(
+                "contentTemplate",
+                this.getPoddApplication()
+                        .getPropertyUtil()
+                        .get(PoddWebConstants.PROPERTY_TEMPLATE_OBJECT_DETAILS,
+                                PoddWebConstants.DEFAULT_TEMPLATE_OBJECT_DETAILS));
         dataModel.put("pageTitle", "View Artifact");
         
         try

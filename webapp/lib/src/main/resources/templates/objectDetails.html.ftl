@@ -48,6 +48,13 @@
 
 			podd.getCreateChildMetadata(podd.artifactIri, podd.objectTypeUri, podd.showAddChildDialog);
 		});
+		
+		$("#createEvent").click(function(event) {
+			event.preventDefault();
+			podd.debug("Clicked add Event");
+
+			podd.getEventType(podd.artifactIri, podd.objectTypeUri,podd.showAddEventDialog);;
+		});
 	
 		// Delete object clicked
 		$("#deleteObject").click(function(event) {
@@ -84,6 +91,7 @@
 </script>
 
 <div id="dialog" title="Add Child"></div>
+<div id="dialog_event" title="Add Event"></div>
 <div id="delete_object_dialog" title="Delete Object"></div>
 
 <div id="title_pane">
@@ -160,10 +168,7 @@
 		</#if>
         <#if  canAddChildren?? && canAddChildren>
 	    	<a id="createChildObject" value="createChildObject">Add Child Object</a>
-            <a href="${baseUrl}/artifact/attachdataref?artifacturi=${artifactUri?url!"unknown-artifacturi"}&amp;objecturi=${poddObject.objectURI?url!"unknown-objecturi"}">Attach data reference</a>
-        </#if>
-        <#if  true>
-	    	<a id="createEvent" value="createEvent">Add Event</a>
+	    	<a id="createEvent" value="createEvent">Add new Event</a>
             <a href="${baseUrl}/artifact/attachdataref?artifacturi=${artifactUri?url!"unknown-artifacturi"}&amp;objecturi=${poddObject.objectURI?url!"unknown-objecturi"}">Attach data reference</a>
         </#if>
         <#if  canPublish?? && canPublish>
@@ -172,7 +177,7 @@
         <#if  canUnpublish?? && canUnpublish>
         <a href="${baseUrl}/artifact/unpublish?artifacturi=${poddObject.objectURI!"unknown-pid"}">Unpublish Project</a>
         </#if>
-        <#if objectType?? && objectType.label == 'Investigation'>
+        <#if objectType?? && objectType.label == 'Experiment'>
         	<!-- <a href="${baseUrl}/services/getHierarchy?option=file&URI=http://www.podd.org/object%23${poddObject.objectURI!"unknown-pid"}">Download hierarchy attachments</a> -->
         </#if>        
         <#if canDelete?? && canDelete>

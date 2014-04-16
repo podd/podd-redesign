@@ -116,7 +116,7 @@ public abstract class AbstractPoddClientTest
      * this method.
      * 
      * @return A new instance of {@link PoddClient}.
-     * @throws Exception 
+     * @throws Exception
      */
     protected abstract PoddClient getNewPoddClientInstance() throws Exception;
     

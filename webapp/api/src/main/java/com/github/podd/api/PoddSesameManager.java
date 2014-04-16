@@ -567,4 +567,38 @@ public interface PoddSesameManager
     
     URI[] versionContexts(InferredOWLOntologyID ontologyID);
     
+    /**
+     * Get the direct subclasses for an concept
+     * 
+     * @param concept
+     * @param repositoryConnection
+     * @param contexts
+     * @return
+     * @throws OpenRDFException
+     */
+    Set<URI> getDirectSubClassOf(URI concept, RepositoryConnection repositoryConnection, URI... contexts)
+        throws OpenRDFException;
+    
+    /**
+     * 
+     * @param repositoryConnection
+     * @param contexts
+     * @return
+     * @throws OpenRDFException
+     */
+    Set<URI> getEventsTopConcepts(RepositoryConnection repositoryConnection, URI... contexts) throws OpenRDFException;
+    
+    /**
+     * Get All the direct child of an list of concepts
+     * 
+     * @param objectsType
+     * @param repositoryConnection
+     * @param contexts
+     * @return
+     * @throws OpenRDFException
+     */
+    
+    Model ChildOfList(Set<URI> objectsType, RepositoryConnection repositoryConnection, URI[] contexts)
+        throws OpenRDFException;
+    
 }

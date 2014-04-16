@@ -450,9 +450,10 @@ public class ApplicationUtils
     /**
      * @param application
      * @param props
-     *  
+     * 
      */
-    public static void setupSchemas(final PoddWebServiceApplication application) throws IOException , OpenRDFException , OWLException , PoddException
+    public static void setupSchemas(final PoddWebServiceApplication application) throws IOException, OpenRDFException,
+        OWLException, PoddException
     {
         final PropertyUtil props = application.getPropertyUtil();
         final PoddSchemaManager poddSchemaManager = application.getPoddSchemaManager();
@@ -464,7 +465,7 @@ public class ApplicationUtils
          */
         try
         {
-            final String schemaManifest = props.get(PODD.KEY_SCHEMAS, PODD.PATH_DEFAULT_SCHEMAS);            
+            final String schemaManifest = props.get(PODD.KEY_SCHEMAS, PODD.PATH_DEFAULT_SCHEMAS);
             final RDFFormat format = Rio.getParserFormatForFileName(schemaManifest, RDFFormat.RDFXML);
             Model model = null;
             try (final InputStream schemaManifestStream = application.getClass().getResourceAsStream(schemaManifest);)
@@ -515,7 +516,7 @@ public class ApplicationUtils
                 if(currentSchemaOntologies.contains(nextSchemaOntology))
                 {
                     ApplicationUtils.log.info("Existing schema ontologies contains next schema ontologies: {}",
-                    		nextSchemaOntology);
+                            nextSchemaOntology);
                     updatedCurrentSchemaOntologies.add(nextSchemaOntology);
                 }
             }

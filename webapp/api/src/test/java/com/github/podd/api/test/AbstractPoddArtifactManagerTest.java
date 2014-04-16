@@ -1690,9 +1690,7 @@ public abstract class AbstractPoddArtifactManagerTest
                     this.testArtifactManager.loadArtifact(inputStream, RDFFormat.NQUADS);
             
             // verify:
-            this.verifyLoadedArtifact(resultArtifactId, 11,
-                   20,
-                    611, false);
+            this.verifyLoadedArtifact(resultArtifactId, 11, 20, 611, false);
         }
     }
     

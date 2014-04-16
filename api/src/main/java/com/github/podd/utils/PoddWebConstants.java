@@ -57,6 +57,46 @@ public interface PoddWebConstants
     public static final String DEFAULT_TEMPLATE_BASE = "poddBase.html.ftl";
     
     /**
+     * Property for freemarker template used as the base for rendering all HTML pages
+     */
+    public static final String PROPERTY_TEMPLATE_MODIFY_OBJECT = "podd.modify_object.base";
+    
+    /**
+     * Default freemarker template used as the base for rendering all HTML pages
+     */
+    public static final String DEFAULT_TEMPLATE_MODIFY_OBJECT = "modify_object.html.ftl";
+    
+    /**
+     * Property for freemarker template used as the base for rendering all HTML pages
+     */
+    public static final String PROPERTY_TEMPLATE_OBJECT_DETAILS = "podd.template.objectDetails";
+    
+    /**
+     * Default freemarker template used as the base for rendering all HTML pages
+     */
+    public static final String DEFAULT_TEMPLATE_OBJECT_DETAILS = "objectDetails.html.ftl";
+    
+    /**
+     * Default freemarker template used as the base for rendering all HTML pages
+     */
+    public static final String DEFAULT_TEMPLATE_EVENT = "event.html.ftl";
+    
+    /**
+     * Property for freemarker template used as the base for rendering all HTML pages
+     */
+    public static final String PROPERTY_TEMPLATE_EVENT = "podd.template.event";
+    
+    /**
+     * Default freemarker template used as the base for rendering all HTML pages
+     */
+    public static final String DEFAULT_TEMPLATE_ADD_OBJECT = "modify_object.html.ftl";
+    
+    /**
+     * Property for freemarker template used as the base for rendering all HTML pages
+     */
+    public static final String PROPERTY_TEMPLATE_ADD_OBJECT = "podd.template.modify_object";
+    
+    /**
      * Property for freemarker template used for rendering all login pages
      */
     public static final String PROPERTY_TEMPLATE_LOGIN = "podd.template.login";
@@ -205,6 +245,11 @@ public interface PoddWebConstants
     public static final String PATH_ATTACH_DATA_REF = "artifact/attachdataref";
     
     /**
+     * Path to the Event attachment service
+     */
+    public static final String PATH_EVENT_REF = "eventtype";
+    
+    /**
      * Path to the list data repositories service.
      */
     public static final String PATH_DATA_REPOSITORY_LIST = "datarepositories/list";
@@ -223,6 +268,8 @@ public interface PoddWebConstants
      * Path to delete object service
      */
     public static final String PATH_OBJECT_DELETE = "artifact/deleteobject";
+    
+    public static final String PATH_EVENT_ADD = "event/add";
     
     /**
      * Path to get metadata about a particular object type
@@ -273,6 +320,11 @@ public interface PoddWebConstants
      * Key used to represent a parent-child property as part of a request
      */
     public static final String KEY_PARENT_PREDICATE_IDENTIFIER = "parentpredicateuri";
+    
+    /**
+     * Key used to indicate if the artifact is an event
+     */
+    public static final String KEY_IS_EVENT = "isEvent";
     
     /**
      * Key used to represent the file reference verification policy to use

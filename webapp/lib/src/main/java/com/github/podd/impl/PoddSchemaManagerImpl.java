@@ -158,7 +158,7 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
         try
         {
             managementConnection = this.repositoryManager.getManagementRepositoryConnection();
-      
+            
             return this.sesameManager.getAllCurrentSchemaOntologyVersions(managementConnection,
                     this.repositoryManager.getSchemaManagementGraph());
         }
@@ -499,7 +499,8 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
                         boolean updateCurrent = true;
                         if(currentVersionsMap.containsKey(nextResult.getOntologyIRI().toOpenRDFURI()))
                         {
-                            if(!currentVersionsMap.get(nextResult.getOntologyIRI().toOpenRDFURI()).equals(nextResult.getVersionIRI().toOpenRDFURI()))
+                            if(!currentVersionsMap.get(nextResult.getOntologyIRI().toOpenRDFURI()).equals(
+                                    nextResult.getVersionIRI().toOpenRDFURI()))
                             {
                                 updateCurrent = false;
                             }

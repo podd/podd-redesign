@@ -92,7 +92,7 @@ public class PoddDataRepositoryManagerImpl implements PoddDataRepositoryManager
     {
         try (final InputStream inputA = this.getClass().getResourceAsStream(PODD.PATH_PODD_DATA_REPOSITORY_V1);)
         {
-        	Objects.requireNonNull(inputA, "could not find data repository ontology");
+            Objects.requireNonNull(inputA, "could not find data repository ontology");
             // load poddDataRepository.owl into a Model
             this.dataRepositorySchema = Rio.parse(inputA, "", RDFFormat.RDFXML);
         }

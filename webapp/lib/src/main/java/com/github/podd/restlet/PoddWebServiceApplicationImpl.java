@@ -62,6 +62,7 @@ import com.github.podd.resources.DeleteArtifactResourceImpl;
 import com.github.podd.resources.DeleteObjectResourceImpl;
 import com.github.podd.resources.EditArtifactResourceImpl;
 import com.github.podd.resources.GetArtifactResourceImpl;
+import com.github.podd.resources.GetEventTypeResourceImpl;
 import com.github.podd.resources.GetMetadataResourceImpl;
 import com.github.podd.resources.GetSchemaResourceImpl;
 import com.github.podd.resources.HelpResourceImpl;
@@ -394,6 +395,11 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
         final String attachFileReference = PoddWebConstants.PATH_ATTACH_DATA_REF;
         this.log.debug("attaching File Reference Attach service to path={}", attachFileReference);
         router.attach(attachFileReference, DataReferenceAttachResourceImpl.class);
+        
+        // Add a route for the Event page.
+        final String eventReference = PoddWebConstants.PATH_EVENT_REF;
+        this.log.debug("attaching Event service to path={}", eventReference);
+        router.attach(eventReference, GetEventTypeResourceImpl.class);
         
         // Add a route for the List Data Repositories page.
         final String listDataRepositories = PoddWebConstants.PATH_DATA_REPOSITORY_LIST;

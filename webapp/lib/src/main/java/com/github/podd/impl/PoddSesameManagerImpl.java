@@ -444,6 +444,66 @@ public class PoddSesameManagerImpl implements PoddSesameManager
     }
     
     @Override
+    public Set<URI> getEventsTopConcepts(final RepositoryConnection repositoryConnection, final URI... contexts)
+        throws OpenRDFException
+    {
+        final StringBuilder sb = new StringBuilder(1024);
+        
+        sb.append("SELECT DISTINCT ?event ");
+        sb.append(" WHERE { ");
+        sb.append(" ?event rdfs:subClassOf <" + PODD.INRA_EVENT_EVENT + "> ");
+        sb.append(" } ");
+        
+        this.log.debug("Create SPARQL {} to find Event Type", sb);
+        
+        final TupleQuery tupleQuery = repositoryConnection.prepareTupleQuery(QueryLanguage.SPARQL, sb.toString());
+        
+        final QueryResultCollector queryResults = RdfUtility.executeTupleQuery(tupleQuery, contexts);
+        
+        final Set<URI> resultSet = new HashSet<URI>();
+        for(final BindingSet next : queryResults.getBindingSets())
+        {
+            final Value event = next.getValue("event");
+            if(event instanceof URI)
+            {
+                resultSet.add((URI)event);
+            }
+        }
+        this.log.info("Result spql query getEventsTopConcepts {}", resultSet);
+        return resultSet;
+    }
+    
+    @Override
+    public Set<URI> getDirectSubClassOf(final URI concept, final RepositoryConnection repositoryConnection,
+            final URI... contexts) throws OpenRDFException
+    {
+        final StringBuilder sb = new StringBuilder(1024);
+        
+        sb.append("SELECT DISTINCT ?subclass ");
+        sb.append(" WHERE { ");
+        sb.append(" ?subclass rdfs:subClassOf <" + concept + "> ");
+        sb.append(" } ");
+        
+        this.log.debug("Create SPARQL {} to find direct subclass of one concept", sb);
+        
+        final TupleQuery tupleQuery = repositoryConnection.prepareTupleQuery(QueryLanguage.SPARQL, sb.toString());
+        
+        final QueryResultCollector queryResults = RdfUtility.executeTupleQuery(tupleQuery, contexts);
+        
+        final Set<URI> resultSet = new HashSet<URI>();
+        for(final BindingSet next : queryResults.getBindingSets())
+        {
+            final Value event = next.getValue("subclass");
+            if(event instanceof URI)
+            {
+                resultSet.add((URI)event);
+            }
+        }
+        this.log.info("Result spql query getDirectSubClassOf ({}) {}", concept, resultSet);
+        return resultSet;
+    }
+    
+    @Override
     public Set<URI> getChildObjects(final URI objectUri, final RepositoryConnection repositoryConnection,
             final URI... contexts) throws OpenRDFException
     {
@@ -869,6 +929,16 @@ public class PoddSesameManagerImpl implements PoddSesameManager
      * @throws SchemaManifestException
      * @throws UnmanagedSchemaIRIException
      */
+    /*
+     * TODO
+     * 
+     * MANAGE DIFFERENT LANGUAGE : ONLY @en MANAGED (non-Javadoc)
+     * 
+     * @see
+     * com.github.podd.api.PoddSesameManager#getObjectLabel(com.github.podd.utils.InferredOWLOntologyID
+     * , org.openrdf.model.URI, org.openrdf.repository.RepositoryConnection,
+     * org.openrdf.repository.RepositoryConnection, org.openrdf.model.URI, org.openrdf.model.URI)
+     */
     @Override
     public PoddObjectLabel getObjectLabel(final InferredOWLOntologyID ontologyID, final URI objectUri,
             final RepositoryConnection managementConnection, final RepositoryConnection permanentConnection,
@@ -880,7 +950,12 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         sb.append(" WHERE { ");
         sb.append(" OPTIONAL { ?objectUri <" + RDFS.LABEL + "> ?label . } ");
         sb.append(" OPTIONAL { ?objectUri <" + RDFS.COMMENT + "> ?description . } ");
+        
+        sb.append(" FILTER (lang(?label) = 'en'|| lang(?label)='')");
         sb.append(" }");
+        
+        // To get lang
+        // Locale.getDefault();
         
         this.log.debug("Created SPARQL {} with objectUri bound to {}", sb, objectUri);
         
@@ -990,11 +1065,13 @@ public class PoddSesameManagerImpl implements PoddSesameManager
                 repositoryConnection.prepareGraphQuery(QueryLanguage.SPARQL, owlRestrictionQueryString);
         rdfsGraphQuery.setBinding("objectType", objectType);
         
-        this.log.debug("Created SPARQL {} \n   with objectType bound to {}", owlRestrictionQueryString, objectType);
+        this.log.debug("[getObjectTypeContainsMetadata] Created SPARQL {} \n   with objectType bound to {}",
+                owlRestrictionQueryString, objectType);
         
         final Model rdfsQueryResults = RdfUtility.executeGraphQuery(rdfsGraphQuery, contexts);
         results.addAll(rdfsQueryResults);
         
+        this.log.debug("rdfsQueryResults ", rdfsQueryResults);
         // this.log.info("{} Restrictions found", restrictions.size());
         
         /*
@@ -1054,7 +1131,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
             subRangeQuery.append(" } ");
             
             final String subRangeQueryString = subRangeQuery.toString();
-            
+            this.log.debug("[getObjectTypeContainsMetadata] Created SPARQL subRangeQueryString {}", subRangeQueryString);
             final GraphQuery subRangeGraphQuery =
                     repositoryConnection.prepareGraphQuery(QueryLanguage.SPARQL, subRangeQueryString);
             
@@ -1157,6 +1234,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         final Model restrictionQueryResults = RdfUtility.executeGraphQuery(graphQuery, contexts);
         results.addAll(restrictionQueryResults);
         
+        this.log.debug("restrictionQueryResults {}", restrictionQueryResults);
         properties.addAll(restrictionQueryResults.filter(null, OWL.ONPROPERTY, null).objects());
         
         /*
@@ -1209,6 +1287,8 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         final Model rdfsQueryResults = RdfUtility.executeGraphQuery(rdfsGraphQuery, contexts);
         results.addAll(rdfsQueryResults);
         
+        this.log.debug("rdfsQueryResults {}", rdfsQueryResults);
+        
         properties.addAll(rdfsQueryResults.filter(null, OWL.ONPROPERTY, null).objects());
         
         /*
@@ -1245,11 +1325,15 @@ public class PoddSesameManagerImpl implements PoddSesameManager
             
             final String annotationQueryString = annotationQuery.toString();
             
+            this.log.debug("Created SPARQL annotationQuery {} ", annotationQuery);
+            
             final GraphQuery annotationGraphQuery =
                     repositoryConnection.prepareGraphQuery(QueryLanguage.SPARQL, annotationQueryString);
             annotationGraphQuery.setBinding("objectType", objectType);
             
             final Model annotationQueryResults = RdfUtility.executeGraphQuery(annotationGraphQuery, contexts);
+            
+            this.log.debug("annotationQueryResults {}", annotationQueryResults);
             
             results.addAll(annotationQueryResults);
             properties.addAll(annotationQueryResults.filter(null, OWL.ONPROPERTY, null).objects());
@@ -1308,8 +1392,12 @@ public class PoddSesameManagerImpl implements PoddSesameManager
             
             final String sb2String = sb2.toString();
             
+            this.log.debug("Created SPARQL get metaData for properties {} ", sb2);
+            
             final GraphQuery graphQuery2 = repositoryConnection.prepareGraphQuery(QueryLanguage.SPARQL, sb2String);
             final Model queryResults2 = RdfUtility.executeGraphQuery(graphQuery2, contexts);
+            
+            this.log.debug("SPARQL get metaData for properties result {}", queryResults2);
             results.addAll(queryResults2);
         }
         
@@ -1380,6 +1468,8 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         }
         
         results.addAll(this.getInstancesOf(nextRangeTypeURIs, repositoryConnection, contexts));
+        
+        this.log.debug("Results Metadata {} ", results);
         
         return results;
     }
@@ -2431,6 +2521,50 @@ public class PoddSesameManagerImpl implements PoddSesameManager
     public URI[] versionContexts(final InferredOWLOntologyID ontologyID)
     {
         return new URI[] { ontologyID.getVersionIRI().toOpenRDFURI() };
+    }
+    
+    @Override
+    public Model ChildOfList(final Set<URI> objectsType, final RepositoryConnection repositoryConnection,
+            final URI... contexts) throws OpenRDFException
+    {
+        final Model results = new LinkedHashModel();
+        if(objectsType == null)
+        {
+            return results;
+        }
+        
+        final StringBuilder subChildQuery = new StringBuilder(1024);
+        
+        subChildQuery.append("CONSTRUCT {");
+        subChildQuery.append(" ?subConcept <" + RDFS.SUBCLASSOF.stringValue() + "> ?concept  ");
+        
+        subChildQuery.append(" } WHERE {");
+        
+        subChildQuery.append(" ?subConcept <" + RDFS.SUBCLASSOF.stringValue() + "> ?concept . ");
+        
+        subChildQuery.append("}");
+        subChildQuery.append(" VALUES ?concept { ");
+        
+        for(final Value subClass : objectsType)
+        {
+            if(subClass instanceof URI)
+            {
+                subChildQuery.append(" <" + subClass + "> ");
+                
+            }
+        }
+        
+        subChildQuery.append(" } ");
+        
+        final String subChildQueryString = subChildQuery.toString();
+        this.log.debug("[ChildOfList] Created SPARQL  {}", subChildQueryString);
+        final GraphQuery subChildGraphQuery =
+                repositoryConnection.prepareGraphQuery(QueryLanguage.SPARQL, subChildQueryString);
+        
+        this.log.debug("Created SPARQL {} \n   with objects types bound to {}", subChildQueryString, objectsType);
+        
+        return RdfUtility.executeGraphQuery(subChildGraphQuery, contexts);
+        
     }
     
 }
