@@ -118,7 +118,7 @@ public class GetMetadataResourceImplTest extends AbstractResourceImplTest
         
         { PODD.PODD_SCIENCE + "Project", 63, 11, 0 },
         
-        { PODD.PODD_SCIENCE + "Experiment", 190, 41, 0 },
+        { PODD.PODD_SCIENCE + "Experiment", 83, 16, 0 },
         
         };
         
