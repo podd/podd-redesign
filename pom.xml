@@ -635,10 +635,11 @@
 					<artifactId>versions-maven-plugin</artifactId>
 					<version>2.0</version>
 				</plugin>
+				<!-- Disabled due to not working with Java-8
 				<plugin>
 					<groupId>org.codehaus.mojo</groupId>
 					<artifactId>findbugs-maven-plugin</artifactId>
-					<version>2.5.3</version>
+					<version>2.5.4-SNAPSHOT</version>
 					<executions>
 						<execution>
 							<id>findbugs-check</id>
@@ -652,10 +653,11 @@
 						</execution>
 					</executions>
 				</plugin>
+				-->
 				<plugin>
 					<groupId>org.jacoco</groupId>
 					<artifactId>jacoco-maven-plugin</artifactId>
-					<version>0.6.3.201306030806</version>
+					<version>0.7.0.201403182114</version>
 				</plugin>
 				<plugin>
 					<groupId>com.mycila</groupId>
