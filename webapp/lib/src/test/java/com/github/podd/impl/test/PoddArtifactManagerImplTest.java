@@ -1,16 +1,16 @@
 /**
  * PODD is an OWL ontology database used for scientific project management
- * 
+ *
  * Copyright (C) 2009-2013 The University Of Queensland
- * 
+ *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU Affero General Public License as published by the Free Software Foundation, either version 3
  * of the License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
  * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Affero General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License along with this program.
  * If not, see <http://www.gnu.org/licenses/>.
  */
@@ -61,7 +61,7 @@ import com.github.podd.utils.PoddWebConstants;
 
 /**
  * @author Peter Ansell p_ansell@yahoo.com
- * 
+ *
  */
 public class PoddArtifactManagerImplTest extends AbstractPoddArtifactManagerTest
 {
@@ -70,58 +70,58 @@ public class PoddArtifactManagerImplTest extends AbstractPoddArtifactManagerTest
     {
         return new PoddArtifactManagerImpl();
     }
-    
+
     @Override
     protected PoddPurlProcessorFactory getNewDoiPurlProcessorFactory()
     {
         // TODO Auto-generated method stub
         return null;
     }
-    
+
     @Override
     protected DataReferenceManager getNewFileReferenceManager()
     {
         return new DataReferenceManagerImpl();
     }
-    
+
     @Override
     protected PoddPurlProcessorFactory getNewHandlePurlProcessorFactory()
     {
         // TODO Auto-generated method stub
         return null;
     }
-    
+
     @Override
     protected DataReferenceProcessorFactory getNewHttpFileReferenceProcessorFactory()
     {
         // TODO Auto-generated method stub
         return null;
     }
-    
+
     @Override
     protected PoddOWLManager getNewOWLManager(final OWLOntologyManagerFactory manager,
             final OWLReasonerFactory reasonerFactory)
     {
         return new PoddOWLManagerImpl(manager, reasonerFactory);
     }
-    
+
     @Override
     protected PoddPurlManager getNewPurlManager()
     {
         return new PoddPurlManagerImpl();
     }
-    
+
     @Override
     protected OWLReasonerFactory getNewReasonerFactory()
     {
         return OWLReasonerFactoryRegistry.getInstance().getReasonerFactory("Pellet");
     }
-    
+
     @Override
     protected PoddRepositoryManager getNewRepositoryManager(final Repository managementRepository, final Path testPath)
-        throws Exception
+            throws Exception
     {
-        
+
         final Model graph =
                 Rio.parse(this.getClass().getResourceAsStream("/memorystoreconfig.ttl"), "", RDFFormat.TURTLE);
         final Resource repositoryNode = GraphUtil.getUniqueSubject(graph, RepositoryConfigSchema.REPOSITORYTYPE, null);
@@ -131,38 +131,38 @@ public class PoddArtifactManagerImplTest extends AbstractPoddArtifactManagerTest
         return new PoddRepositoryManagerImpl(managementRepository, repositoryImplConfig, "", testPath,
                 new PropertyUtil("podd"));
     }
-    
+
     @Override
     protected PoddSchemaManager getNewSchemaManager()
     {
         return new PoddSchemaManagerImpl();
     }
-    
+
     @Override
     protected PoddSesameManager getNewSesameManager()
     {
         return new PoddSesameManagerImpl();
     }
-    
+
     @Override
     protected DataReferenceProcessorFactory getNewSSHFileReferenceProcessorFactory()
     {
         return new SSHFileReferenceProcessorFactoryImpl();
     }
-    
+
     @Override
     protected PoddPurlProcessorFactory getNewUUIDPurlProcessorFactory()
     {
         return new UUIDPurlProcessorFactoryImpl();
     }
-    
+
     /**
      * Helper method which loads version 1 for the three PODD schema ontologies (and their
      * dependencies): PODD-Base, PODD-Science and PODD-Plant.
-     * 
+     *
      * This method is not called from the setUp() method since some tests require not loading all
      * schema ontologies.
-     * 
+     *
      * @throws Exception
      */
     @Override
@@ -172,14 +172,14 @@ public class PoddArtifactManagerImplTest extends AbstractPoddArtifactManagerTest
                 Rio.parse(this.getClass().getResourceAsStream("/podd-schema-manifest-version1only.ttl"), "",
                         RDFFormat.TURTLE));
     }
-    
+
     /**
      * Helper method which loads version 1 for the three PODD schema ontologies (and their
      * dependencies): PODD-Base, PODD-Science and PODD-Plant.
-     * 
+     *
      * This method is not called from the setUp() method since some tests require not loading all
      * schema ontologies.
-     * 
+     *
      * @throws Exception
      */
     @Override
@@ -189,34 +189,34 @@ public class PoddArtifactManagerImplTest extends AbstractPoddArtifactManagerTest
                 Rio.parse(this.getClass().getResourceAsStream("/podd-schema-manifest-version2only.ttl"), "",
                         RDFFormat.TURTLE));
     }
-    
+
     @Test
     public void testIncrementVersion() throws Exception
     {
         final String artifactURI = "http://some/artifact:15";
-        
+
         final PoddArtifactManagerImpl testArtifactManager = new PoddArtifactManagerImpl();
-        
+
         // increment the version number
         final String newIncrementedVersion = testArtifactManager.incrementVersion(artifactURI + ":version:1");
         Assert.assertEquals("Version not incremented as expected", artifactURI + ":version:2", newIncrementedVersion);
-        
+
         // append a number when version number cannot be extracted
         final String newAppendedVersion = testArtifactManager.incrementVersion(artifactURI + ":v5");
         Assert.assertEquals("Version not incremented as expected", artifactURI + ":v51", newAppendedVersion);
     }
-    
+
     @Override
     protected OWLOntologyManagerFactory getNewOWLOntologyManagerFactory()
     {
         final Collection<OWLOntologyManagerFactory> ontologyManagers =
                 OWLOntologyManagerFactoryRegistry.getInstance().get(PoddWebConstants.DEFAULT_OWLAPI_MANAGER);
-        
+
         if(ontologyManagers == null || ontologyManagers.isEmpty())
         {
             this.log.error("OWLOntologyManagerFactory was not found");
         }
         return ontologyManagers.iterator().next();
     }
-    
+
 }

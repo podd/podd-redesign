@@ -1,21 +1,21 @@
 /**
  * PODD is an OWL ontology database used for scientific project management
- * 
+ *
  * Copyright (C) 2009-2013 The University Of Queensland
- * 
+ *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU Affero General Public License as published by the Free Software Foundation, either version 3
  * of the License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
  * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Affero General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License along with this program.
  * If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * 
+ *
  */
 package com.github.podd.api;
 
@@ -40,17 +40,17 @@ import com.github.podd.utils.PoddObjectLabel;
 
 /**
  * Manages interactions with Sesame Repositories for PODD.
- * 
+ *
  * @author kutila
  * @author Peter Ansell p_ansell@yahoo.com
  */
 public interface PoddSesameManager
 {
-    
+
     /**
      * Deletes the given ontologies, including removing and rearranging their links in the ontology
      * management graph as necessary.
-     * 
+     *
      * @param requestedArtifactIds
      *            A collection of InferredOWLOntologyID objects containing the ontologies to be
      *            deleted, including the inferred ontology IRIs.
@@ -66,11 +66,11 @@ public interface PoddSesameManager
     void deleteOntologies(Collection<InferredOWLOntologyID> requestedArtifactIds,
             RepositoryConnection permanentConnection, RepositoryConnection managementConnection,
             URI ontologyManagementGraph) throws OpenRDFException;
-    
+
     /**
      * This method attempts to find the labels for a given collection of URIs. If a label could not
      * be found, the statement is removed from the returned Model.
-     * 
+     *
      * @param inputModel
      *            A {@link Model} containing a collection of statements of the form {&lt;subject&gt;
      *            &lt;rdfs:label&gt; "?blank"}.
@@ -80,28 +80,28 @@ public interface PoddSesameManager
      * @throws OpenRDFException
      */
     Model fillMissingLabels(Model inputModel, RepositoryConnection repositoryConnection, URI... contexts)
-        throws OpenRDFException;
-    
+            throws OpenRDFException;
+
     /**
      * Gets all current versions of schema ontologies configured in this PODD server.
-     * 
+     *
      * @param repositoryConnection
      * @param schemaManagementGraph
      * @return
      * @throws OpenRDFException
-     * 
+     *
      * @since 14/05/2013
      */
     Set<InferredOWLOntologyID> getAllCurrentSchemaOntologyVersions(RepositoryConnection repositoryConnection,
             URI schemaManagementGraph) throws OpenRDFException;
-    
+
     /**
      * Get all versions of the ontology with the given IRI that are managed in the given context in
      * the given repository connection.
      * <p>
      * If there are multiple versions available, then the most current version must be first in the
      * list.
-     * 
+     *
      * @param ontologyIRI
      *            The Ontology IRI identifying the ontology for which versions must be accessed.
      * @param connection
@@ -112,11 +112,11 @@ public interface PoddSesameManager
      */
     List<InferredOWLOntologyID> getAllOntologyVersions(IRI ontologyIRI, RepositoryConnection connection,
             URI ontologyManagementGraph) throws OpenRDFException;
-    
+
     /**
      * Gets all schema ontologies configured in this PODD server. This includes current as well as
      * previous versions of ontologies.
-     * 
+     *
      * @param repositoryConnection
      * @param schemaManagementGraph
      * @return
@@ -124,14 +124,14 @@ public interface PoddSesameManager
      */
     Set<InferredOWLOntologyID> getAllSchemaOntologyVersions(RepositoryConnection repositoryConnection,
             URI schemaManagementGraph) throws OpenRDFException;
-    
+
     // List<URI> getAllValidMembers(InferredOWLOntologyID artifactID, URI conceptUri,
     // RepositoryConnection repositoryConnection, URI schemaManagementGraph) throws
     // OpenRDFException;
-    
+
     /**
      * Calculates the cardinality value for a given PODD object and property.
-     * 
+     *
      * Possible output URIs represent the following cardinalities:
      * <ul>
      * <li>{@link PODD.PODD_BASE_CARDINALITY_EXACTLY_ONE} (Mandatory)</li>
@@ -139,7 +139,7 @@ public interface PoddSesameManager
      * <li>{@link PODD.PODD_BASE_CARDINALITY_ZERO_OR_MANY} (Optional, can have multiple values)</li>
      * <li>{@link PODD.PODD_BASE_CARDINALITY_ZERO_OR_ONE} (Optional, the default)</li>
      * </ul>
-     * 
+     *
      * <p>
      * For example, passing in <i>PoddTopObject</i> and property <i>hasLeadInstitution</i>, will
      * return {@link PODD.PODD_BASE_CARDINALITY_EXACTLY_ONE}.
@@ -151,7 +151,7 @@ public interface PoddSesameManager
      * type is ignored, the output is incomplete if a property has more than one type of possible
      * value with different cardinalities.
      * </p>
-     * 
+     *
      * @param artifactID
      *            The artifact to which the object under consideration belongs
      * @param objectUri
@@ -170,15 +170,15 @@ public interface PoddSesameManager
     Map<URI, URI> getCardinalityValues(InferredOWLOntologyID artifactID, URI objectUri, Collection<URI> propertyUris,
             RepositoryConnection managementConnection, RepositoryConnection permanentConnection,
             URI schemaManagementGraph, URI artifactManagementGraph) throws OpenRDFException, SchemaManifestException,
-        UnmanagedSchemaIRIException;
-    
+            UnmanagedSchemaIRIException;
+
     Map<URI, URI> getCardinalityValues(URI objectUri, Collection<URI> propertyUris, boolean findFromType,
             RepositoryConnection repositoryConnection, URI... contexts) throws OpenRDFException;
-    
+
     /**
      * Returns a {@link Set} containing the Object URIs of the given object's children. An empty Set
      * is returned if the given object does not have any children.
-     * 
+     *
      * @param objectUri
      *            The object whose children are sought.
      * @param conn
@@ -187,11 +187,11 @@ public interface PoddSesameManager
      * @throws OpenRDFException
      */
     Set<URI> getChildObjects(URI objectUri, RepositoryConnection conn, URI... contexts) throws OpenRDFException;
-    
+
     /**
      * Returns current version details of an artifact ontology which has the given IRI as the
      * Ontology IRI or Version IRI.
-     * 
+     *
      * @param ontologyIRI
      *            The IRI of the ontology to get current version info.
      * @param repositoryConnection
@@ -202,17 +202,17 @@ public interface PoddSesameManager
      * @throws OpenRDFException
      * @throws UnmanagedArtifactIRIException
      *             If the given IRI does not refer to a managed artifact ontology
-     * 
+     *
      * @since 04/01/2013
      */
     InferredOWLOntologyID getCurrentArtifactVersion(final IRI ontologyIRI,
             final RepositoryConnection repositoryConnection, final URI managementGraph) throws OpenRDFException,
-        UnmanagedArtifactIRIException;
-    
+            UnmanagedArtifactIRIException;
+
     /**
      * Returns current version details of an ontology which has the given IRI as the Ontology IRI or
      * Version IRI.
-     * 
+     *
      * @param ontologyIRI
      *            The IRI of the ontology to get current version info.
      * @param repositoryConnection
@@ -223,30 +223,30 @@ public interface PoddSesameManager
      * @throws OpenRDFException
      * @throws UnmanagedSchemaIRIException
      *             If the given IRI does not refer to a managed schema ontology
-     * 
+     *
      * @since 18/12/2012
      */
     InferredOWLOntologyID getCurrentSchemaVersion(final IRI ontologyIRI,
             final RepositoryConnection repositoryConnection, final URI managementGraph) throws OpenRDFException,
-        UnmanagedSchemaIRIException;
-    
+            UnmanagedSchemaIRIException;
+
     /**
      * Retrieves the ontology IRIs for all import statements found in the given Repository
      * Connection.
-     * 
+     *
      * @param ontologyID
      * @param repositoryConnection
      * @return A Set containing ontology IRIs for all import statements.
      * @throws OpenRDFException
      */
     Set<URI> getDirectImports(final InferredOWLOntologyID ontologyID, final RepositoryConnection repositoryConnection)
-        throws OpenRDFException;
-    
+            throws OpenRDFException;
+
     Set<URI> getDirectImports(IRI ontologyIRI, RepositoryConnection repositoryConnection, URI... contexts)
-        throws OpenRDFException;
-    
+            throws OpenRDFException;
+
     Set<URI> getDirectImports(RepositoryConnection repositoryConnection, URI... contexts) throws OpenRDFException;
-    
+
     /**
      * For a given PODD Object, this method finds all property values associated with it and also
      * links from others (e.g. parent objects) to this object. For example:
@@ -258,7 +258,7 @@ public interface PoddSesameManager
      * </ul>
      * <br>
      * If the object URI is null, an empty {@link Model} is returned.
-     * 
+     *
      * @param artifactID
      *            The PODD artifact to which this object belongs
      * @param objectUri
@@ -266,27 +266,27 @@ public interface PoddSesameManager
      * @param repositoryConnection
      * @return A {@link Model} containing all statements about the object.
      * @throws OpenRDFException
-     * 
+     *
      * @since 10/05/2013
      */
     Model getObjectData(InferredOWLOntologyID artifactID, URI objectUri, RepositoryConnection repositoryConnection,
             URI... contexts) throws OpenRDFException;
-    
+
     Model getObjectDetailsForDisplay(InferredOWLOntologyID artifactID, URI objectUri,
             RepositoryConnection managementConnection, RepositoryConnection permanentConnection,
             URI schemaManagementGraph, URI artifactManagementGraph) throws OpenRDFException, SchemaManifestException,
-        UnmanagedSchemaIRIException;
-    
+            UnmanagedSchemaIRIException;
+
     PoddObjectLabel getObjectLabel(InferredOWLOntologyID ontologyID, URI objectUri,
             RepositoryConnection managementConnection, RepositoryConnection permanentConnection,
             URI schemaManagementGraph, URI artifactManagementGraph) throws OpenRDFException, SchemaManifestException,
-        UnmanagedSchemaIRIException;
-    
+            UnmanagedSchemaIRIException;
+
     /**
      * For a given PODD Object Type, this method retrieves metadata about possible objects that it
      * can <b>contain</b> and the parent-child relationships with them. Parent-child relationships
      * annotated as "Do Not Display" are excluded by this method.
-     * 
+     *
      * @param objectType
      *            The object type whose details are sought
      * @param repositoryConnection
@@ -295,18 +295,18 @@ public interface PoddSesameManager
      * @return A {@link Model} containing statements about possible children the given Object Type
      *         may have
      * @throws OpenRDFException
-     * 
+     *
      * @since 24/06/2013
      */
     Model getObjectTypeContainsMetadata(URI objectType, RepositoryConnection repositoryConnection, URI... contexts)
-        throws OpenRDFException;
-    
+            throws OpenRDFException;
+
     /**
      * <p>
      * For a given PODD Object type, this method returns meta-data about it which can be used to
      * render the object.
      * </p>
-     * 
+     *
      * @param objectType
      *            The object type whose details are sought
      * @param includeDoNotDisplayProperties
@@ -319,22 +319,22 @@ public interface PoddSesameManager
      * @return A {@link Model} containing statements which are useful for displaying this Object
      *         Type
      * @throws OpenRDFException
-     * 
+     *
      * @since 10/05/2013
      */
     Model getObjectTypeMetadata(URI objectType, boolean includeDoNotDisplayProperties,
             MetadataPolicy containsPropertyPolicy, RepositoryConnection repositoryConnection, URI... contexts)
-        throws OpenRDFException;
-    
+                    throws OpenRDFException;
+
     List<URI> getObjectTypes(InferredOWLOntologyID ontologyID, URI objectUri,
             RepositoryConnection managementConnection, RepositoryConnection permanentConnection,
             URI schemaManagementGraph, URI artifactManagementGraph) throws OpenRDFException, SchemaManifestException,
-        UnmanagedSchemaIRIException;
-    
+            UnmanagedSchemaIRIException;
+
     /**
      * Returns a collection of ontologies managed in the given graph, optionally only returning the
      * current version.
-     * 
+     *
      * @param onlyCurrentVersions
      *            If true, only the current version for each of the managed ontologies are returned.
      * @param ontologyManagementGraph
@@ -344,10 +344,10 @@ public interface PoddSesameManager
      */
     Collection<InferredOWLOntologyID> getOntologies(boolean onlyCurrentVersions,
             RepositoryConnection repositoryConnection, URI ontologyManagementGraph) throws OpenRDFException;
-    
+
     /**
      * Retrieves from the given Repository Connection, an Ontology IRI which identifies an artifact.
-     * 
+     *
      * @param repositoryConnection
      * @param context
      * @return The IRI of the ontology, or null if the Repository does not contain statements
@@ -355,11 +355,11 @@ public interface PoddSesameManager
      * @throws OpenRDFException
      */
     IRI getOntologyIRI(final RepositoryConnection repositoryConnection, final URI context) throws OpenRDFException;
-    
+
     /**
      * If the given IRI represents a version IRI of a schema ontology or an artifact, the Ontology
      * ID for this version is returned. Otherwise, null is returned.
-     * 
+     *
      * @param versionIRI
      *            The IRI of the ontology to get current version info.
      * @param repositoryConnection
@@ -368,16 +368,16 @@ public interface PoddSesameManager
      * @return An InferredOWLOntologyID containing details of the ontology, or NULL if the given IRI
      *         does not refer to the version IRI of a managed artifact/ontology
      * @throws OpenRDFException
-     * 
+     *
      * @since 19/03/2013
      */
     InferredOWLOntologyID getOntologyVersion(IRI versionIRI, RepositoryConnection repositoryConnection,
             URI managementGraph) throws OpenRDFException;
-    
+
     /**
      * This method identifies the given object's parent and the parent-child linking property. If
      * the object URI is null, an empty Model is returned.
-     * 
+     *
      * @param objectUri
      *            The Object whose parent is sought
      * @param repositoryConnection
@@ -385,17 +385,17 @@ public interface PoddSesameManager
      * @return A {@link Model} containing a single statement which links the parent with the given
      *         object
      * @throws OpenRDFException
-     * 
+     *
      * @since 18/06/2013
      */
     Model getParentDetails(URI objectUri, RepositoryConnection repositoryConnection, URI... contexts)
-        throws OpenRDFException;
-    
+            throws OpenRDFException;
+
     /**
      * This method identifies objects that refer to the given object and the referring property. If
      * the object URI is null, an empty Model is returned. A referring property is any sub-property
      * of poddBase#refersTo.
-     * 
+     *
      * @param objectUri
      *            The Object whose referrers are sought
      * @param repositoryConnection
@@ -405,14 +405,14 @@ public interface PoddSesameManager
      * @throws OpenRDFException
      */
     Model getReferringObjectDetails(URI objectUri, RepositoryConnection repositoryConnection, URI... contexts)
-        throws OpenRDFException;
-    
+            throws OpenRDFException;
+
     /**
      * If the given IRI represents a version IRI of a schema ontology, the Ontology ID for this
      * schema version is returned. If the given IRI represents an ontology IRI of a schema ontology,
      * the Ontology ID for the most current version of this schema ontology is returned.
-     * 
-     * 
+     *
+     *
      * @param schemaVersionIRI
      *            The IRI of the ontology to get current version info.
      * @param conn
@@ -422,28 +422,28 @@ public interface PoddSesameManager
      * @throws OpenRDFException
      * @throws UnmanagedSchemaIRIException
      *             If the given IRI does not refer to a managed schema ontology
-     * 
+     *
      * @since 04/03/2013
      */
     InferredOWLOntologyID getSchemaVersion(IRI schemaVersionIRI, RepositoryConnection conn, URI schemaManagementGraph)
-        throws OpenRDFException, UnmanagedSchemaIRIException;
-    
+            throws OpenRDFException, UnmanagedSchemaIRIException;
+
     URI getTopObjectIRI(InferredOWLOntologyID ontologyIRI, RepositoryConnection permanentConnection)
-        throws OpenRDFException;
-    
+            throws OpenRDFException;
+
     List<URI> getTopObjects(InferredOWLOntologyID ontologyID, RepositoryConnection permanentConnection)
-        throws OpenRDFException;
-    
+            throws OpenRDFException;
+
     /**
      * Retrieve a list of <b>asserted</b> properties about the given object. The list is ordered
      * based on property weights and secondarily based on property labels.
-     * 
+     *
      * Properties RDF:Type, RDFS:Comment and RDFS:Label as well as properties whose values are
      * generic OWL concepts (i.e. OWL:Thing, OWL:Individial, OWL:NamedIndividual, OWL:Class) are not
      * included in the results.
-     * 
+     *
      * Properties with an annotation poddBase:doNotDisplay are also not included in the results.
-     * 
+     *
      * @param objectUri
      *            The object whose properties are sought
      * @param excludeContainsProperties
@@ -451,40 +451,40 @@ public interface PoddSesameManager
      * @param repositoryConnection
      * @param contexts
      * @return A {@link List} containing URIs of sorted properties about the object
-     * 
+     *
      * @throws OpenRDFException
      */
     List<URI> getWeightedProperties(final URI objectUri, final boolean excludeContainsProperties,
             final RepositoryConnection repositoryConnection, final URI... contexts) throws OpenRDFException;
-    
+
     URI[] inferredAndSchemaContexts(InferredOWLOntologyID ontologyID, RepositoryConnection repositoryConnection,
             URI schemaManagementGraph, URI artifactManagementGraph) throws OpenRDFException, SchemaManifestException,
-        UnmanagedSchemaIRIException;
-    
+            UnmanagedSchemaIRIException;
+
     URI[] inferredContexts(InferredOWLOntologyID ontologyID) throws OpenRDFException;
-    
+
     /**
      * Returns true if the combination of the Ontology IRI and the Version IRI in the given
      * ontologyID were previously published.
-     * 
+     *
      * @param ontologyID
      * @param repositoryConnection
      * @return
      * @throws OpenRDFException
      */
     boolean isPublished(InferredOWLOntologyID ontologyID, RepositoryConnection repositoryConnection, final URI context)
-        throws OpenRDFException;
-    
+            throws OpenRDFException;
+
     URI[] schemaContexts(InferredOWLOntologyID ontologyID, RepositoryConnection repositoryConnection,
             URI schemaManagementGraph, URI artifactManagementGraph) throws OpenRDFException, SchemaManifestException,
-        UnmanagedSchemaIRIException;
-    
+            UnmanagedSchemaIRIException;
+
     /**
      * Carries out a case-insensitive search for objects whose labels match a given term. The search
      * is carried out in the specified contexts. An optional array of URIs can be used to limit the
      * RDF types of objects to match. <br>
      * NOTE: All of the types, if given, must match for the search to succeed.
-     * 
+     *
      * @param searchTerm
      *            A String term which is searched for in the RDF:Labels
      * @param limit
@@ -496,11 +496,11 @@ public interface PoddSesameManager
      */
     Model searchOntologyLabels(String searchTerm, URI[] searchTypes, int limit, int offset,
             final RepositoryConnection repositoryConnection, URI... contexts) throws OpenRDFException;
-    
+
     /**
      * Sets the given Ontology IRI to be published. This restricts the ability to publish the
      * ontology again.
-     * 
+     *
      * @param isPublished
      *            True to set the artifact as published, and false to set as unpublished.
      * @param ontologyID
@@ -516,12 +516,12 @@ public interface PoddSesameManager
      */
     InferredOWLOntologyID setPublished(boolean isPublished, InferredOWLOntologyID ontologyID,
             RepositoryConnection repositoryConnection, URI artifactManagementGraph) throws OpenRDFException,
-        UnmanagedArtifactIRIException;
-    
+            UnmanagedArtifactIRIException;
+
     /**
      * This method adds information to the Schema Ontology management graph, and updates the links
      * for the current version for both the ontology and the inferred ontology.
-     * 
+     *
      * @param nextOntologyID
      *            The ontology ID that contains the information about the ontology, including the
      *            inferred ontology IRI.
@@ -536,11 +536,11 @@ public interface PoddSesameManager
      */
     void updateManagedSchemaOntologyVersion(OWLOntologyID nextOntologyID, boolean updateCurrent,
             RepositoryConnection repositoryConnection, URI context) throws OpenRDFException;
-    
+
     /**
      * This method adds information to the PODD artifact management graph, and updates the links for
      * the current version for both the ontology and the inferred ontology.
-     * 
+     *
      * @param nextOntologyID
      *            The ontology ID that contains the information about the ontology, including the
      *            inferred ontology IRI.
@@ -554,22 +554,22 @@ public interface PoddSesameManager
      */
     void updateManagedPoddArtifactVersion(InferredOWLOntologyID nextOntologyID, boolean updateCurrentAndRemovePrevious,
             RepositoryConnection managementConnection, URI context) throws OpenRDFException;
-    
+
     URI[] versionAndInferredAndSchemaContexts(InferredOWLOntologyID ontologyID,
             RepositoryConnection managementConnection, URI schemaManagementGraph, URI artifactManagementGraph)
-        throws OpenRDFException, SchemaManifestException, UnmanagedSchemaIRIException;
-    
+                    throws OpenRDFException, SchemaManifestException, UnmanagedSchemaIRIException;
+
     URI[] versionAndInferredContexts(InferredOWLOntologyID ontologyID);
-    
+
     URI[] versionAndSchemaContexts(InferredOWLOntologyID ontologyID, RepositoryConnection managementConnection,
             URI schemaManagementGraph, URI artifactManagementGraph) throws OpenRDFException, SchemaManifestException,
-        UnmanagedSchemaIRIException;
-    
+            UnmanagedSchemaIRIException;
+
     URI[] versionContexts(InferredOWLOntologyID ontologyID);
-    
+
     /**
      * Get the direct subclasses for an concept
-     * 
+     *
      * @param concept
      * @param repositoryConnection
      * @param contexts
@@ -577,28 +577,28 @@ public interface PoddSesameManager
      * @throws OpenRDFException
      */
     Set<URI> getDirectSubClassOf(URI concept, RepositoryConnection repositoryConnection, URI... contexts)
-        throws OpenRDFException;
-    
+            throws OpenRDFException;
+
     /**
-     * 
+     *
      * @param repositoryConnection
      * @param contexts
      * @return
      * @throws OpenRDFException
      */
     Set<URI> getEventsTopConcepts(RepositoryConnection repositoryConnection, URI... contexts) throws OpenRDFException;
-    
+
     /**
      * Get All the direct child of an list of concepts
-     * 
+     *
      * @param objectsType
      * @param repositoryConnection
      * @param contexts
      * @return
      * @throws OpenRDFException
      */
-    
+
     Model ChildOfList(Set<URI> objectsType, RepositoryConnection repositoryConnection, URI[] contexts)
-        throws OpenRDFException;
-    
+            throws OpenRDFException;
+
 }

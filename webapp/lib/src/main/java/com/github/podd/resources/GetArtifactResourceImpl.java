@@ -1,16 +1,16 @@
 /**
  * PODD is an OWL ontology database used for scientific project management
- * 
+ *
  * Copyright (C) 2009-2013 The University Of Queensland
- * 
+ *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU Affero General Public License as published by the Free Software Foundation, either version 3
  * of the License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
  * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Affero General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License along with this program.
  * If not, see <http://www.gnu.org/licenses/>.
  */
@@ -51,38 +51,38 @@ import com.github.podd.utils.PoddObjectLabel;
 import com.github.podd.utils.PoddWebConstants;
 
 /**
- * 
+ *
  * Get an artifact from PODD. This resource handles requests for asserted statements as well as
  * inferred statements.
- * 
+ *
  * @author kutila
- * 
+ *
  */
 public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
 {
-    
+
     @Get(":html")
     public Representation getArtifactHtml(final Representation entity) throws ResourceException
     {
         this.log.debug("getArtifactHtml");
-        
+
         final String artifactString = this.getQuery().getFirstValue(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, true);
-        
+
         if(artifactString == null)
         {
             throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Artifact ID not submitted");
         }
-        
+
         final String versionString =
                 this.getQuery().getFirstValue(PoddWebConstants.KEY_ARTIFACT_VERSION_IDENTIFIER, true);
-        
+
         // optional parameter for inner objects
         final String objectToView = this.getQuery().getFirstValue(PoddWebConstants.KEY_OBJECT_IDENTIFIER, true);
-        
+
         this.log.debug("requesting get artifact (HTML): {}, {}, {}", artifactString, versionString, objectToView);
-        
+
         final UnmanagedArtifactIRIException foundException = null;
-        
+
         InferredOWLOntologyID ontologyID = null;
         try
         {
@@ -94,8 +94,8 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
             {
                 ontologyID =
                         this.getPoddArtifactManager()
-                                .getArtifact(IRI.create(artifactString), IRI.create(versionString));
-                
+                        .getArtifact(IRI.create(artifactString), IRI.create(versionString));
+
                 if(ontologyID == null)
                 {
                     ontologyID = this.getPoddArtifactManager().getArtifact(IRI.create(artifactString));
@@ -119,12 +119,12 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
                 throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Something went wrong");
             }
         }
-        
+
         if(ontologyID == null)
         {
             throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Could not find the given artifact");
         }
-        
+
         // FIXME: Test this after publish artifact is implemented
         boolean isPublished = false;
         try
@@ -144,21 +144,21 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
         {
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Repository exception", e);
         }
-        
+
         // completed checking authorization
-        
+
         final User user = this.getRequest().getClientInfo().getUser();
         this.log.debug("authenticated user: {}", user);
-        
+
         final Map<String, Object> dataModel = RestletUtils.getBaseDataModel(this.getRequest());
         dataModel.put(
                 "contentTemplate",
                 this.getPoddApplication()
-                        .getPropertyUtil()
-                        .get(PoddWebConstants.PROPERTY_TEMPLATE_OBJECT_DETAILS,
-                                PoddWebConstants.DEFAULT_TEMPLATE_OBJECT_DETAILS));
+                .getPropertyUtil()
+                .get(PoddWebConstants.PROPERTY_TEMPLATE_OBJECT_DETAILS,
+                        PoddWebConstants.DEFAULT_TEMPLATE_OBJECT_DETAILS));
         dataModel.put("pageTitle", "View Artifact");
-        
+
         try
         {
             this.populateDataModelWithArtifactData(ontologyID, objectToView, dataModel, isPublished);
@@ -169,13 +169,13 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
         {
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Failed to populate data model", e);
         }
-        
+
         return RestletUtils.getHtmlRepresentation(
                 this.getPoddApplication().getPropertyUtil()
-                        .get(PoddWebConstants.PROPERTY_TEMPLATE_BASE, PoddWebConstants.DEFAULT_TEMPLATE_BASE),
+                .get(PoddWebConstants.PROPERTY_TEMPLATE_BASE, PoddWebConstants.DEFAULT_TEMPLATE_BASE),
                 dataModel, MediaType.TEXT_HTML, this.getPoddApplication().getTemplateConfiguration());
     }
-    
+
     @Get(":rdf|rj|json|ttl")
     public Representation getArtifactRdf(final Representation entity, final Variant variant) throws ResourceException
     {
@@ -185,33 +185,33 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
         // To fix this we need to check whether Accept is exactly "*/*" and
         // response with HTML
         // variant instead of an RDF variant
-        
+
         this.log.debug("getArtifactRdf");
-        
+
         final ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        
+
         try
         {
             final String artifactString = this.getQuery().getFirstValue(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, true);
-            
+
             if(artifactString == null)
             {
                 this.log.error("Artifact ID not submitted");
                 throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Artifact ID not submitted");
             }
-            
+
             final String versionString =
                     this.getQuery().getFirstValue(PoddWebConstants.KEY_ARTIFACT_VERSION_IDENTIFIER, true);
-            
+
             this.log.debug("requesting get artifact ({}): {}", variant.getMediaType().getName(), artifactString);
-            
+
             // FIXME: The artifact may be published here
             this.checkAuthentication(PoddAction.UNPUBLISHED_ARTIFACT_READ, PODD.VF.createURI(artifactString));
             // completed checking authorization
-            
+
             final User user = this.getRequest().getClientInfo().getUser();
             this.log.debug("authenticated user: {}", user);
-            
+
             InferredOWLOntologyID ontologyID = null;
             if(versionString == null)
             {
@@ -221,18 +221,18 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
             {
                 ontologyID =
                         this.getPoddArtifactManager()
-                                .getArtifact(IRI.create(artifactString), IRI.create(versionString));
+                        .getArtifact(IRI.create(artifactString), IRI.create(versionString));
             }
-            
+
             final String includeInferredString =
                     this.getRequest().getResourceRef().getQueryAsForm()
-                            .getFirstValue(PoddWebConstants.KEY_INCLUDE_INFERRED, true);
+                    .getFirstValue(PoddWebConstants.KEY_INCLUDE_INFERRED, true);
             final boolean includeInferred = Boolean.valueOf(includeInferredString);
-            
+
             this.getPoddApplication()
-                    .getPoddArtifactManager()
-                    .exportArtifact(ontologyID, stream,
-                            RDFFormat.forMIMEType(variant.getMediaType().getName(), RDFFormat.RDFJSON), includeInferred);
+            .getPoddArtifactManager()
+            .exportArtifact(ontologyID, stream,
+                    RDFFormat.forMIMEType(variant.getMediaType().getName(), RDFFormat.RDFJSON), includeInferred);
         }
         catch(final UnmanagedArtifactIRIException e)
         {
@@ -242,14 +242,14 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
         {
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Failed to export artifact", e);
         }
-        
+
         return new ByteArrayRepresentation(stream.toByteArray());
     }
-    
+
     /**
      * This method retrieves necessary info about the object being viewed via SPARQL queries and
      * populates the data model.
-     * 
+     *
      * @param ontologyID
      *            The artifact to be viewed
      * @param objectToView
@@ -271,27 +271,27 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
      */
     private void populateDataModelWithArtifactData(final InferredOWLOntologyID ontologyID, final String objectToView,
             final Map<String, Object> dataModel, final boolean isPublished) throws OpenRDFException,
-        UnmanagedSchemaIRIException, SchemaManifestException, UnsupportedRDFormatException, IOException,
-        UnmanagedArtifactIRIException, UnmanagedArtifactVersionException, ResourceException
+            UnmanagedSchemaIRIException, SchemaManifestException, UnsupportedRDFormatException, IOException,
+            UnmanagedArtifactIRIException, UnmanagedArtifactVersionException, ResourceException
     {
-        
+
         final PoddObjectLabel theObject =
                 RestletUtils.getParentDetails(this.getPoddArtifactManager(), ontologyID, objectToView);
         // set title & description of object to display
         dataModel.put("poddObject", theObject);
         final URI objectUri = theObject.getObjectURI();
-        
+
         final Map<String, String> parentMap =
                 RestletUtils.populateParentDetails(this.getPoddArtifactManager(), ontologyID, objectUri);
         dataModel.put("parentObject", parentMap);
-        
+
         // find the object's type
         final List<PoddObjectLabel> objectTypes = this.getPoddArtifactManager().getObjectTypes(ontologyID, objectUri);
         if(objectTypes == null || objectTypes.isEmpty())
         {
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Could not determine type of object");
         }
-        
+
         // Get label for the object type
         final PoddObjectLabel label = objectTypes.get(0);
         dataModel.put("objectType", label);
@@ -299,22 +299,22 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
         {
             dataModel.put("isProject", true);
         }
-        
+
         // populate the properties of the object
         final List<URI> orderedProperties =
                 this.getPoddArtifactManager().getOrderedProperties(ontologyID, objectUri, false);
-        
+
         final Model allNeededStatementsForDisplay =
                 this.getPoddArtifactManager().getObjectDetailsForDisplay(ontologyID, objectUri);
-        
+
         dataModel.put("artifactUri", ontologyID.getOntologyIRI().toOpenRDFURI());
         dataModel.put("versionIri", ontologyID.getVersionIRI().toOpenRDFURI());
         dataModel.put("propertyList", orderedProperties);
         dataModel.put("completeModel", allNeededStatementsForDisplay);
-        
+
         final int childrenCount = this.getPoddArtifactManager().getChildObjects(ontologyID, objectUri).size();
         dataModel.put("childCount", childrenCount);
-        
+
         if(!isPublished
                 && this.checkAuthentication(PoddAction.ARTIFACT_EDIT, ontologyID.getOntologyIRI().toOpenRDFURI(), false))
         {
@@ -328,26 +328,26 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
             dataModel.put("canEditObject", false);
             dataModel.put("canAddChildren", false);
         }
-        
+
         if(!isPublished
                 && this.checkAuthentication(PoddAction.PROJECT_ROLE_EDIT, ontologyID.getOntologyIRI().toOpenRDFURI(),
                         false))
         {
             dataModel.put("canEditRoles", true);
         }
-        
+
         if(!isPublished
                 && this.checkAuthentication(PoddAction.UNPUBLISHED_ARTIFACT_DELETE, ontologyID.getOntologyIRI()
                         .toOpenRDFURI(), false))
         {
             dataModel.put("canDeleteProject", true);
         }
-        
+
         dataModel.put("selectedObjectCount", 0);
         dataModel.put("childHierarchyList", Collections.emptyList());
-        
+
         dataModel.put("util", new FreemarkerUtil());
-        
+
         // FIXME: No support currently for interactive editing of data
         // references, so hide the edit
         // button to avoid users clicking on it
@@ -361,7 +361,7 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
                 dataModel.put("canAddChildren", false);
             }
         }
-        
+
     }
-    
+
 }

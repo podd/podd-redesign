@@ -1,16 +1,16 @@
 /**
  * PODD is an OWL ontology database used for scientific project management
- * 
+ *
  * Copyright (C) 2009-2013 The University Of Queensland
- * 
+ *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU Affero General Public License as published by the Free Software Foundation, either version 3
  * of the License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
  * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Affero General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License along with this program.
  * If not, see <http://www.gnu.org/licenses/>.
  */
@@ -44,35 +44,35 @@ import com.github.podd.utils.PoddRdfUtils;
 
 /**
  * Concrete unit test for UUIDPurlProcessorFactoryImpl
- * 
+ *
  * @author kutila
- * 
+ *
  */
 public class UUIDPurlProcessorFactoryImplTest extends AbstractPoddRdfProcessorFactoryTest<PoddPurlProcessor>
 {
     protected final Logger log = LoggerFactory.getLogger(this.getClass());
-    
+
     @Override
     protected PoddRdfProcessorFactory<PoddPurlProcessor> getNewPoddRdfProcessorFactory()
     {
         return new UUIDPurlProcessorFactoryImpl();
     }
-    
+
     /**
      * Test that the SPARQL query which can be constructed based on the parts returned by this
      * factory can correctly execute against a test RDF graph.
-     * 
+     *
      * @throws Exception
      */
     @Test
     public void testSPARQLQueryViaExecution() throws Exception
     {
         final PoddRdfProcessorFactory<PoddPurlProcessor> rdfProcessorFactory = this.getNewPoddRdfProcessorFactory();
-        
+
         // build SPARQL query
         final String sparql = PoddRdfUtils.buildSparqlConstructQuery(rdfProcessorFactory);
         this.log.info("Generated SPARQL <{}> ", sparql);
-        
+
         final Repository repository = new SailRepository(new MemoryStore());
         RepositoryConnection repositoryConnection = null;
         try
@@ -80,18 +80,18 @@ public class UUIDPurlProcessorFactoryImplTest extends AbstractPoddRdfProcessorFa
             repository.initialize();
             repositoryConnection = repository.getConnection();
             repositoryConnection.begin();
-            
+
             // load RDF graph into Repository
             final String artifactResourcePath = TestConstants.TEST_ARTIFACT_BASIC_1_INTERNAL_OBJECT;
             final InputStream inputStream = this.getClass().getResourceAsStream(artifactResourcePath);
             Assert.assertNotNull("Could not find resource", inputStream);
-            
+
             repositoryConnection.add(inputStream, "", RDFFormat.RDFXML);
             repositoryConnection.commit();
             repositoryConnection.begin();
-            
+
             final GraphQuery query = repositoryConnection.prepareGraphQuery(QueryLanguage.SPARQL, sparql);
-            
+
             // verify SPARQL generated a graph as expected
             final GraphQueryResult result = query.evaluate();
             int count = 0;
@@ -101,13 +101,13 @@ public class UUIDPurlProcessorFactoryImplTest extends AbstractPoddRdfProcessorFa
                 count++;
                 final boolean tempUriFound =
                         statement.getSubject().stringValue()
-                                .startsWith(PoddPurlProcessorPrefixes.UUID.getTemporaryPrefix())
-                                || statement.getObject().stringValue()
-                                        .startsWith(PoddPurlProcessorPrefixes.UUID.getTemporaryPrefix());
+                        .startsWith(PoddPurlProcessorPrefixes.UUID.getTemporaryPrefix())
+                        || statement.getObject().stringValue()
+                        .startsWith(PoddPurlProcessorPrefixes.UUID.getTemporaryPrefix());
                 Assert.assertTrue("Generated graph contains statement without temporary URIs: ", tempUriFound);
             }
             Assert.assertEquals("SPARQL query did not match expected number of statements", 20, count);
-            
+
             result.close();
             repositoryConnection.rollback();
         }
@@ -120,23 +120,23 @@ public class UUIDPurlProcessorFactoryImplTest extends AbstractPoddRdfProcessorFa
             repository.shutDown();
         }
     }
-    
+
     /**
      * Test that the SPARQL query which can be constructed based on the parts returned by this
      * factory, and a user specified "subject" can correctly execute against a test RDF graph.
-     * 
+     *
      * @throws Exception
      */
     @Test
     public void testSPARQLQueryWithSubjectViaExecution() throws Exception
     {
         final PoddRdfProcessorFactory<PoddPurlProcessor> rdfProcessorFactory = this.getNewPoddRdfProcessorFactory();
-        
+
         // build SPARQL query
         final URI subject = ValueFactoryImpl.getInstance().createURI("urn:temp:uuid:object:2966");
         final String sparql = PoddRdfUtils.buildSparqlConstructQuery(rdfProcessorFactory, subject);
         this.log.info("Generated SPARQL <{}> ", sparql);
-        
+
         // verify SPARQL generated a graph as expected
         final Repository repository = new SailRepository(new MemoryStore());
         RepositoryConnection repositoryConnection = null;
@@ -145,18 +145,18 @@ public class UUIDPurlProcessorFactoryImplTest extends AbstractPoddRdfProcessorFa
             repository.initialize();
             repositoryConnection = repository.getConnection();
             repositoryConnection.begin();
-            
+
             // load RDF graph into Repository
             final String artifactResourcePath = TestConstants.TEST_ARTIFACT_BASIC_1_INTERNAL_OBJECT;
             final InputStream inputStream = this.getClass().getResourceAsStream(artifactResourcePath);
             Assert.assertNotNull("Could not find resource", inputStream);
-            
+
             repositoryConnection.add(inputStream, "", RDFFormat.RDFXML);
             repositoryConnection.commit();
             repositoryConnection.begin();
-            
+
             final GraphQuery query = repositoryConnection.prepareGraphQuery(QueryLanguage.SPARQL, sparql);
-            
+
             // verify SPARQL generated a graph as expected
             final GraphQueryResult result = query.evaluate();
             int count = 0;

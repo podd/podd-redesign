@@ -1,16 +1,16 @@
 /**
  * PODD is an OWL ontology database used for scientific project management
- * 
+ *
  * Copyright (C) 2009-2013 The University Of Queensland
- * 
+ *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU Affero General Public License as published by the Free Software Foundation, either version 3
  * of the License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
  * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Affero General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License along with this program.
  * If not, see <http://www.gnu.org/licenses/>.
  */
@@ -62,23 +62,23 @@ import com.github.podd.utils.PoddUserStatus;
  * IMPORTANT: Never run these tests against a server containing real data, such as a production
  * server. After each test, the test attempts to reset the server, to enable other tests to be
  * easily verified.
- * 
+ *
  * @author Peter Ansell p_ansell@yahoo.com
  */
 public abstract class AbstractPoddClientTest
 {
     protected final Logger log = LoggerFactory.getLogger(this.getClass());
-    
+
     protected static final String TEST_ADMIN_USER = "testAdminUser";
     protected static final String TEST_ADMIN_PASSWORD = "testAdminPassword";
-    
+
     private PoddClient testClient;
-    
+
     private static final int BASIC_PROJECT_1_EXPECTED_CONCRETE_TRIPLES = 24;
     private static final int BASIC_PROJECT_3_EXPECTED_CONCRETE_TRIPLES = 21;
-    
+
     protected static final ValueFactory vf = PODD.VF;
-    
+
     /**
      * Instruct the implementors of this test to attempt to deploy a file reference that has the
      * given label and return a partial DataReference object that contains the specific details of
@@ -95,7 +95,7 @@ public abstract class AbstractPoddClientTest
      * <p>
      * Successive calls with the same label must return a DataReference containing the same
      * essential details.
-     * 
+     *
      * @param label
      *            The label to give the file reference.
      * @return A partially populated {@link DataReference} object.
@@ -103,32 +103,32 @@ public abstract class AbstractPoddClientTest
      *             If there were any issues deploying a file reference for this label.
      */
     protected abstract DataReference deployFileReference(String label) throws Exception;
-    
+
     /**
      * Any file repositories that were made active for this test can now be shutdown.
      * <p>
      * For example, an SSH server created specifically for this test may be cleaned up and shutdown.
      */
     protected abstract void endFileRepositoryTest() throws Exception;
-    
+
     /**
      * Implementing test classes must return a new instance of {@link PoddClient} for each call to
      * this method.
-     * 
+     *
      * @return A new instance of {@link PoddClient}.
      * @throws Exception
      */
     protected abstract PoddClient getNewPoddClientInstance() throws Exception;
-    
+
     /**
      * Returns the URL of a running PODD Server to test the client against.
-     * 
+     *
      * @return The URL of the PODD Server to test using.
      */
     protected abstract String getTestPoddServerUrl();
-    
+
     protected Model parseRdf(final InputStream inputStream, final RDFFormat format, final int expectedStatements)
-        throws RDFParseException, RDFHandlerException, IOException
+            throws RDFParseException, RDFHandlerException, IOException
     {
         final Model model = Rio.parse(inputStream, "", format);
         if(model.size() != expectedStatements)
@@ -137,21 +137,21 @@ public abstract class AbstractPoddClientTest
             this.log.error("Expected: {} Actual: {}", expectedStatements, model.size());
             DebugUtils.printContents(model);
         }
-        
+
         Assert.assertEquals(expectedStatements, model.size());
         return model;
     }
-    
+
     /**
      * Resets the test PODD and TrayScanDB servers if possible. If this is not possible, it is not
      * recommended to rely on these tests for extensive verification without first manually
      * resetting each database to a fresh state.
-     * 
+     *
      * @throws Exception
      *             If there are any issues resetting the server
      */
     protected abstract void resetTestServers() throws Exception;
-    
+
     /**
      * @throws java.lang.Exception
      */
@@ -160,17 +160,17 @@ public abstract class AbstractPoddClientTest
     {
         this.testClient = this.getNewPoddClientInstance();
         Assert.assertNotNull("PODD Client implementation was null", this.testClient);
-        
+
         this.testClient.setPoddServerUrl(this.getTestPoddServerUrl());
-        
+
     }
-    
+
     /**
      * Any file repositories necessary to perform file reference attachment tests must be available
      * after this method completes.
      */
     protected abstract void startFileRepositoryTest() throws Exception;
-    
+
     /**
      * @throws java.lang.Exception
      */
@@ -180,7 +180,7 @@ public abstract class AbstractPoddClientTest
         this.resetTestServers();
         this.testClient = null;
     }
-    
+
     /**
      * Test method for
      * {@link com.github.podd.client.api.PoddClient#addRole(String, RestletUtilRole, InferredOWLOntologyID)}
@@ -190,14 +190,14 @@ public abstract class AbstractPoddClientTest
     public final void testAddRolesArtifact() throws Exception
     {
         this.testClient.login(AbstractPoddClientTest.TEST_ADMIN_USER, AbstractPoddClientTest.TEST_ADMIN_PASSWORD);
-        
+
         final InputStream input = this.getClass().getResourceAsStream("/test/artifacts/basicProject-1.rdf");
         Assert.assertNotNull("Test resource missing", input);
-        
+
         final InferredOWLOntologyID newArtifact = this.testClient.uploadNewArtifact(input, RDFFormat.RDFXML);
-        
+
         final Map<RestletUtilRole, Collection<String>> roles = this.testClient.listRoles(newArtifact);
-        
+
         Assert.assertEquals(2, roles.size());
         Assert.assertTrue(roles.containsKey(PoddRoles.PROJECT_ADMIN));
         Assert.assertEquals(1, roles.get(PoddRoles.PROJECT_ADMIN).size());
@@ -207,11 +207,11 @@ public abstract class AbstractPoddClientTest
         Assert.assertEquals(1, roles.get(PoddRoles.PROJECT_PRINCIPAL_INVESTIGATOR).size());
         Assert.assertEquals(AbstractPoddClientTest.TEST_ADMIN_USER, roles.get(PoddRoles.PROJECT_PRINCIPAL_INVESTIGATOR)
                 .iterator().next());
-        
+
         this.testClient.addRole(AbstractPoddClientTest.TEST_ADMIN_USER, PoddRoles.PROJECT_OBSERVER, newArtifact);
-        
+
         final Map<RestletUtilRole, Collection<String>> afterRoles = this.testClient.listRoles(newArtifact);
-        
+
         Assert.assertEquals(3, afterRoles.size());
         Assert.assertTrue(afterRoles.containsKey(PoddRoles.PROJECT_ADMIN));
         Assert.assertEquals(1, afterRoles.get(PoddRoles.PROJECT_ADMIN).size());
@@ -225,9 +225,9 @@ public abstract class AbstractPoddClientTest
         Assert.assertEquals(1, afterRoles.get(PoddRoles.PROJECT_OBSERVER).size());
         Assert.assertEquals(AbstractPoddClientTest.TEST_ADMIN_USER, afterRoles.get(PoddRoles.PROJECT_OBSERVER)
                 .iterator().next());
-        
+
     }
-    
+
     /**
      * Test method for
      * {@link com.github.podd.client.api.PoddClient#appendArtifact(OWLOntologyID, InputStream, RDFFormat)}
@@ -237,31 +237,31 @@ public abstract class AbstractPoddClientTest
     public final void testAppendArtifact() throws Exception
     {
         this.testClient.login(AbstractPoddClientTest.TEST_ADMIN_USER, AbstractPoddClientTest.TEST_ADMIN_PASSWORD);
-        
+
         final InputStream input = this.getClass().getResourceAsStream("/test/artifacts/basicProject-3.rdf");
         Assert.assertNotNull("Test resource missing", input);
-        
+
         final InferredOWLOntologyID newArtifact = this.testClient.uploadNewArtifact(input, RDFFormat.RDFXML);
         Assert.assertNotNull(newArtifact);
         Assert.assertNotNull(newArtifact.getOntologyIRI());
         Assert.assertNotNull(newArtifact.getVersionIRI());
         Assert.assertNull(newArtifact.getInferredOntologyIRI());
-        
+
         final ByteArrayOutputStream outputStream = new ByteArrayOutputStream(8096);
         this.testClient.downloadArtifact(newArtifact, outputStream, RDFFormat.RDFJSON);
         final Model model =
                 this.parseRdf(new ByteArrayInputStream(outputStream.toByteArray()), RDFFormat.RDFJSON,
                         AbstractPoddClientTest.BASIC_PROJECT_3_EXPECTED_CONCRETE_TRIPLES);
-        
+
         Assert.assertTrue(model.contains(newArtifact.getOntologyIRI().toOpenRDFURI(), RDF.TYPE, OWL.ONTOLOGY));
         Assert.assertTrue(model.contains(newArtifact.getOntologyIRI().toOpenRDFURI(), OWL.VERSIONIRI, newArtifact
                 .getVersionIRI().toOpenRDFURI()));
-        
+
         // Then test append with an updated model
-        
+
         final URI investigationUri = GraphUtil.getUniqueSubjectURI(model, RDF.TYPE, PODD.PODD_SCIENCE_EXPERIMENT);
         final URI containerUri = AbstractPoddClientTest.vf.createURI("urn:temp:uuid:container:1");
-        
+
         // Must have all of the existing triples for the investigation present or they will be
         // removed by the append as a partial update.
         final Model updates = new LinkedHashModel(model.filter(investigationUri, null, null));
@@ -269,12 +269,12 @@ public abstract class AbstractPoddClientTest
         updates.add(containerUri, RDF.TYPE, PODD.PODD_SCIENCE_CONTAINER);
         updates.add(containerUri, RDFS.LABEL, AbstractPoddClientTest.vf.createLiteral("Test container number 1"));
         final ByteArrayOutputStream outputStream2 = new ByteArrayOutputStream(4096);
-        
+
         Rio.write(updates, outputStream2, RDFFormat.RDFJSON);
         final InferredOWLOntologyID appendArtifact =
                 this.testClient.appendArtifact(newArtifact, new ByteArrayInputStream(outputStream2.toByteArray()),
                         RDFFormat.RDFJSON);
-        
+
         Assert.assertNotNull(appendArtifact);
         Assert.assertNotNull(appendArtifact.getOntologyIRI());
         Assert.assertEquals(appendArtifact.getOntologyIRI(), newArtifact.getOntologyIRI());
@@ -282,7 +282,7 @@ public abstract class AbstractPoddClientTest
         Assert.assertNotEquals(appendArtifact.getVersionIRI(), newArtifact.getVersionIRI());
         Assert.assertNull(appendArtifact.getInferredOntologyIRI());
     }
-    
+
     /**
      * Test method for
      * {@link com.github.podd.client.api.PoddClient#attachFileReference(OWLOntologyID, org.semanticweb.owlapi.model.IRI, String, String, String)}
@@ -292,31 +292,31 @@ public abstract class AbstractPoddClientTest
     public final void testAttachFileReference() throws Exception
     {
         this.testClient.login(AbstractPoddClientTest.TEST_ADMIN_USER, AbstractPoddClientTest.TEST_ADMIN_PASSWORD);
-        
+
         try
         {
             this.startFileRepositoryTest();
-            
+
             // TODO: Pick a project with more child objects
             final InputStream input = this.getClass().getResourceAsStream("/test/artifacts/basicProject-1.rdf");
             Assert.assertNotNull("Test resource missing", input);
-            
+
             final InferredOWLOntologyID newArtifact = this.testClient.uploadNewArtifact(input, RDFFormat.RDFXML);
             Assert.assertNotNull(newArtifact);
             Assert.assertNotNull(newArtifact.getOntologyIRI());
             Assert.assertNotNull(newArtifact.getVersionIRI());
-            
+
             final ByteArrayOutputStream outputStream = new ByteArrayOutputStream(8096);
             this.testClient.downloadArtifact(newArtifact, outputStream, RDFFormat.RDFJSON);
             final Model parseRdf =
                     this.parseRdf(new ByteArrayInputStream(outputStream.toByteArray()), RDFFormat.RDFJSON,
                             AbstractPoddClientTest.BASIC_PROJECT_1_EXPECTED_CONCRETE_TRIPLES);
-            
+
             final Model topObject =
                     parseRdf.filter(newArtifact.getOntologyIRI().toOpenRDFURI(), PODD.PODD_BASE_HAS_TOP_OBJECT, null);
-            
+
             Assert.assertEquals("Did not find unique top object in artifact", 1, topObject.size());
-            
+
             final DataReference testRef = this.deployFileReference("test-file-label");
             testRef.setArtifactID(newArtifact);
             testRef.setParentIri(IRI.create(topObject.objectURI()));
@@ -324,39 +324,39 @@ public abstract class AbstractPoddClientTest
             // TODO: If this breaks then need to attach it to a different part of an extended
             // project
             testRef.setObjectIri(IRI.create("urn:temp:uuid:dataReference:1"));
-            
+
             final InferredOWLOntologyID afterFileAttachment = this.testClient.attachDataReference(testRef);
-            
+
             Assert.assertNotNull(afterFileAttachment);
             Assert.assertNotNull(afterFileAttachment.getOntologyIRI());
             Assert.assertNotNull(afterFileAttachment.getVersionIRI());
-            
+
             Assert.assertEquals(newArtifact.getOntologyIRI(), afterFileAttachment.getOntologyIRI());
             // Version should have been updated by the operation
             Assert.assertNotEquals(newArtifact.getVersionIRI(), afterFileAttachment.getVersionIRI());
-            
+
             final ByteArrayOutputStream afterOutputStream = new ByteArrayOutputStream(8096);
             this.testClient.downloadArtifact(afterFileAttachment, afterOutputStream, RDFFormat.RDFJSON);
             final Model afterParseRdf =
                     this.parseRdf(new ByteArrayInputStream(afterOutputStream.toByteArray()), RDFFormat.RDFJSON, 32);
-            
+
             final Model afterTopObject =
                     afterParseRdf.filter(newArtifact.getOntologyIRI().toOpenRDFURI(), PODD.PODD_BASE_HAS_TOP_OBJECT,
                             null);
-            
+
             Assert.assertEquals("Did not find unique top object in artifact", 1, afterTopObject.size());
-            
+
             // If this starts to fail it is okay, as the server may reassign URIs as it desires,
             // just comment it out if this occurs
             Assert.assertEquals(afterTopObject.objectURI(), topObject.objectURI());
-            
+
             final Model afterDataReferenceURI =
                     afterParseRdf.filter(topObject.objectURI(), PODD.PODD_BASE_HAS_DATA_REFERENCE, null);
-            
+
             Assert.assertNotEquals(topObject.objectURI(), afterDataReferenceURI.objectURI());
-            
+
             final Model afterDataReferenceTriples = afterParseRdf.filter(afterDataReferenceURI.objectURI(), null, null);
-            
+
             Assert.assertEquals("Found unexpected number of triples for data reference", 7,
                     afterDataReferenceTriples.size());
         }
@@ -365,7 +365,7 @@ public abstract class AbstractPoddClientTest
             this.endFileRepositoryTest();
         }
     }
-    
+
     /**
      * Test method for {@link com.github.podd.client.api.PoddClient#createUser(PoddUser)}
      */
@@ -373,19 +373,19 @@ public abstract class AbstractPoddClientTest
     public final void testCreateUser() throws Exception
     {
         this.testClient.login(AbstractPoddClientTest.TEST_ADMIN_USER, AbstractPoddClientTest.TEST_ADMIN_PASSWORD);
-        
+
         final PoddUser testUser =
                 new PoddUser("theNextUser", "theNextPassword".toCharArray(), "The Next", "User",
                         "test@thenext.example.com", PoddUserStatus.ACTIVE,
                         PODD.VF.createURI("http://example.com/thenext/"), "UQ", null, "Dr", "0912348765", "Brisbane",
                         "Adjunct Professor");
-        
+
         final PoddUser userDetails = this.testClient.createUser(testUser);
-        
+
         Assert.assertEquals("theNextUser", userDetails.getIdentifier());
         Assert.assertNull(userDetails.getSecret());
     }
-    
+
     /**
      * Test method for {@link com.github.podd.client.api.PoddClient#deleteArtifact(OWLOntologyID)} .
      */
@@ -393,25 +393,25 @@ public abstract class AbstractPoddClientTest
     public final void testDeleteArtifact() throws Exception
     {
         this.testClient.login(AbstractPoddClientTest.TEST_ADMIN_USER, AbstractPoddClientTest.TEST_ADMIN_PASSWORD);
-        
+
         final InputStream input = this.getClass().getResourceAsStream("/test/artifacts/basicProject-1.rdf");
         Assert.assertNotNull("Test resource missing", input);
-        
+
         final InferredOWLOntologyID newArtifact = this.testClient.uploadNewArtifact(input, RDFFormat.RDFXML);
         Assert.assertNotNull(newArtifact);
         Assert.assertNotNull(newArtifact.getOntologyIRI());
         Assert.assertNotNull(newArtifact.getVersionIRI());
-        
+
         // verify that the artifact is accessible and complete
         final ByteArrayOutputStream outputStream = new ByteArrayOutputStream(8096);
         this.testClient.downloadArtifact(newArtifact, outputStream, RDFFormat.RDFJSON);
         final Model parseRdf =
                 this.parseRdf(new ByteArrayInputStream(outputStream.toByteArray()), RDFFormat.RDFJSON,
                         AbstractPoddClientTest.BASIC_PROJECT_1_EXPECTED_CONCRETE_TRIPLES);
-        
+
         Assert.assertTrue(this.testClient.deleteArtifact(newArtifact));
     }
-    
+
     /**
      * Test method for
      * {@link com.github.podd.client.api.PoddClient#downloadArtifact(InferredOWLOntologyID, java.io.OutputStream, RDFFormat)}
@@ -423,7 +423,7 @@ public abstract class AbstractPoddClientTest
     {
         Assert.fail("Not yet implemented"); // TODO
     }
-    
+
     /**
      * Test method for
      * {@link com.github.podd.client.api.PoddClient#downloadArtifact(InferredOWLOntologyID, java.io.OutputStream, RDFFormat)}
@@ -435,7 +435,7 @@ public abstract class AbstractPoddClientTest
     {
         Assert.fail("Not yet implemented"); // TODO
     }
-    
+
     /**
      * Test method for
      * {@link com.github.podd.client.api.PoddClient#downloadArtifact(InferredOWLOntologyID, java.io.OutputStream, RDFFormat)}
@@ -445,21 +445,21 @@ public abstract class AbstractPoddClientTest
     public final void testDownloadArtifactNoVersion() throws Exception
     {
         this.testClient.login(AbstractPoddClientTest.TEST_ADMIN_USER, AbstractPoddClientTest.TEST_ADMIN_PASSWORD);
-        
+
         final InputStream input = this.getClass().getResourceAsStream("/test/artifacts/basicProject-1.rdf");
         Assert.assertNotNull("Test resource missing", input);
-        
+
         final InferredOWLOntologyID newArtifact = this.testClient.uploadNewArtifact(input, RDFFormat.RDFXML);
         Assert.assertNotNull(newArtifact);
         Assert.assertNotNull(newArtifact.getOntologyIRI());
         Assert.assertNotNull(newArtifact.getVersionIRI());
-        
+
         final ByteArrayOutputStream outputStream = new ByteArrayOutputStream(8096);
         this.testClient.downloadArtifact(newArtifact, outputStream, RDFFormat.RDFJSON);
         this.parseRdf(new ByteArrayInputStream(outputStream.toByteArray()), RDFFormat.RDFJSON,
                 AbstractPoddClientTest.BASIC_PROJECT_1_EXPECTED_CONCRETE_TRIPLES);
     }
-    
+
     /**
      * Test method for
      * {@link com.github.podd.client.api.PoddClient#downloadArtifact(InferredOWLOntologyID, java.io.OutputStream, RDFFormat)}
@@ -471,7 +471,7 @@ public abstract class AbstractPoddClientTest
     {
         Assert.fail("Not yet implemented"); // TODO
     }
-    
+
     /**
      * Test method for {@link com.github.podd.client.api.PoddClient#getPoddServerUrl()}.
      */
@@ -479,14 +479,14 @@ public abstract class AbstractPoddClientTest
     public final void testGetPoddServerUrlNull() throws Exception
     {
         Assert.assertNotNull(this.testClient.getPoddServerUrl());
-        
+
         this.testClient.setPoddServerUrl(null);
-        
+
         // Implementations may use PoddClient#getProps to regenerate the URL after someone sets it
         // to null
         // Assert.assertNull(this.testClient.getPoddServerUrl());
     }
-    
+
     /**
      * Test method for {@link com.github.podd.client.api.PoddClient#getUserDetails(String)}
      */
@@ -494,13 +494,13 @@ public abstract class AbstractPoddClientTest
     public final void testGetUserDetails() throws Exception
     {
         this.testClient.login(AbstractPoddClientTest.TEST_ADMIN_USER, AbstractPoddClientTest.TEST_ADMIN_PASSWORD);
-        
+
         final PoddUser userDetails = this.testClient.getUserDetails(AbstractPoddClientTest.TEST_ADMIN_USER);
-        
+
         Assert.assertEquals(AbstractPoddClientTest.TEST_ADMIN_USER, userDetails.getIdentifier());
         Assert.assertNull(userDetails.getSecret());
     }
-    
+
     /**
      * Test method for {@link com.github.podd.client.api.PoddClient#listDataReferenceRepositories()}
      * .
@@ -509,15 +509,15 @@ public abstract class AbstractPoddClientTest
     public final void testListDataReferenceRepositories() throws Exception
     {
         this.testClient.login(AbstractPoddClientTest.TEST_ADMIN_USER, AbstractPoddClientTest.TEST_ADMIN_PASSWORD);
-        
+
         final List<String> repositories = this.testClient.listDataReferenceRepositories();
-        
+
         System.out.println(repositories);
-        
+
         Assert.assertEquals(2, repositories.size());
-        
+
     }
-    
+
     /**
      * Test method for {@link com.github.podd.client.api.PoddClient#listPublishedArtifacts()}.
      */
@@ -527,7 +527,7 @@ public abstract class AbstractPoddClientTest
         final Collection<InferredOWLOntologyID> results = this.testClient.listPublishedArtifacts();
         Assert.assertTrue(results.isEmpty());
     }
-    
+
     /**
      * Test method for {@link com.github.podd.client.api.PoddClient#listPublishedArtifacts()}.
      */
@@ -537,13 +537,13 @@ public abstract class AbstractPoddClientTest
     {
         // TODO: Create 50 artifacts
         Assert.fail("TODO: Implement me!");
-        
+
         this.testClient.login(AbstractPoddClientTest.TEST_ADMIN_USER, AbstractPoddClientTest.TEST_ADMIN_PASSWORD);
-        
+
         final Collection<InferredOWLOntologyID> results = this.testClient.listPublishedArtifacts();
         Assert.assertFalse(results.isEmpty());
     }
-    
+
     /**
      * Test method for {@link com.github.podd.client.api.PoddClient#listPublishedArtifacts()}.
      */
@@ -552,30 +552,30 @@ public abstract class AbstractPoddClientTest
     public final void testListPublishedArtifactsSingle() throws Exception
     {
         this.testClient.login(AbstractPoddClientTest.TEST_ADMIN_USER, AbstractPoddClientTest.TEST_ADMIN_PASSWORD);
-        
+
         final InputStream input = this.getClass().getResourceAsStream("/test/artifacts/basicProject-1.rdf");
         Assert.assertNotNull("Test resource missing", input);
-        
+
         final InferredOWLOntologyID newArtifact = this.testClient.uploadNewArtifact(input, RDFFormat.RDFXML);
         Assert.assertNotNull(newArtifact);
         Assert.assertNotNull(newArtifact.getOntologyIRI());
         Assert.assertNotNull(newArtifact.getVersionIRI());
-        
+
         final ByteArrayOutputStream outputStream = new ByteArrayOutputStream(8096);
         this.testClient.downloadArtifact(newArtifact, outputStream, RDFFormat.RDFJSON);
         this.parseRdf(new ByteArrayInputStream(outputStream.toByteArray()), RDFFormat.RDFJSON,
                 AbstractPoddClientTest.BASIC_PROJECT_1_EXPECTED_CONCRETE_TRIPLES);
-        
+
         // Returns a new version, as when the artifact is published it gets a new version
         final InferredOWLOntologyID publishedArtifact = this.testClient.publishArtifact(newArtifact);
-        
+
         this.testClient.logout();
-        
+
         final Collection<InferredOWLOntologyID> results = this.testClient.listPublishedArtifacts();
         Assert.assertFalse(results.isEmpty());
         Assert.assertEquals(-1, results.size());
     }
-    
+
     /**
      * Test method for {@link com.github.podd.client.api.PoddClient#listRoles(String)} .
      */
@@ -583,14 +583,14 @@ public abstract class AbstractPoddClientTest
     public final void testListRolesArtifact() throws Exception
     {
         this.testClient.login(AbstractPoddClientTest.TEST_ADMIN_USER, AbstractPoddClientTest.TEST_ADMIN_PASSWORD);
-        
+
         final InputStream input = this.getClass().getResourceAsStream("/test/artifacts/basicProject-1.rdf");
         Assert.assertNotNull("Test resource missing", input);
-        
+
         final InferredOWLOntologyID newArtifact = this.testClient.uploadNewArtifact(input, RDFFormat.RDFXML);
-        
+
         final Map<RestletUtilRole, Collection<String>> roles = this.testClient.listRoles(newArtifact);
-        
+
         Assert.assertEquals(2, roles.size());
         Assert.assertTrue(roles.containsKey(PoddRoles.PROJECT_ADMIN));
         Assert.assertEquals(1, roles.get(PoddRoles.PROJECT_ADMIN).size());
@@ -601,7 +601,7 @@ public abstract class AbstractPoddClientTest
         Assert.assertEquals(AbstractPoddClientTest.TEST_ADMIN_USER, roles.get(PoddRoles.PROJECT_PRINCIPAL_INVESTIGATOR)
                 .iterator().next());
     }
-    
+
     /**
      * Test method for {@link com.github.podd.client.api.PoddClient#listRoles(String)} .
      */
@@ -609,16 +609,16 @@ public abstract class AbstractPoddClientTest
     public final void testListRolesUser() throws Exception
     {
         this.testClient.login(AbstractPoddClientTest.TEST_ADMIN_USER, AbstractPoddClientTest.TEST_ADMIN_PASSWORD);
-        
+
         final Map<RestletUtilRole, Collection<URI>> roles =
                 this.testClient.listRoles(AbstractPoddClientTest.TEST_ADMIN_USER);
-        
+
         Assert.assertEquals(1, roles.size());
         Assert.assertTrue(roles.containsKey(PoddRoles.ADMIN));
         Assert.assertEquals(1, roles.get(PoddRoles.ADMIN).size());
         Assert.assertNull(roles.get(PoddRoles.ADMIN).iterator().next());
     }
-    
+
     /**
      * Test method for {@link com.github.podd.client.api.PoddClient#listUnpublishedArtifacts()}.
      */
@@ -626,12 +626,12 @@ public abstract class AbstractPoddClientTest
     public final void testListUnpublishedArtifactsEmpty() throws Exception
     {
         this.testClient.login(AbstractPoddClientTest.TEST_ADMIN_USER, AbstractPoddClientTest.TEST_ADMIN_PASSWORD);
-        
+
         final Collection<InferredOWLOntologyID> results = this.testClient.listUnpublishedArtifacts();
         this.log.info("unpublished artifacts which should be empty: {}", results);
         Assert.assertTrue(results.isEmpty());
     }
-    
+
     /**
      * Test method for {@link com.github.podd.client.api.PoddClient#listUnpublishedArtifacts()}.
      */
@@ -641,12 +641,12 @@ public abstract class AbstractPoddClientTest
     {
         // TODO: Create 50 artifacts
         Assert.fail("TODO: Implement me!");
-        
+
         final Collection<InferredOWLOntologyID> results = this.testClient.listUnpublishedArtifacts();
         Assert.assertFalse(results.isEmpty());
         Assert.assertEquals(50, results.size());
     }
-    
+
     /**
      * Test method for {@link com.github.podd.client.api.PoddClient#listUnpublishedArtifacts()}.
      */
@@ -654,25 +654,25 @@ public abstract class AbstractPoddClientTest
     public final void testListUnpublishedArtifactsSingle() throws Exception
     {
         this.testClient.login(AbstractPoddClientTest.TEST_ADMIN_USER, AbstractPoddClientTest.TEST_ADMIN_PASSWORD);
-        
+
         final InputStream input = this.getClass().getResourceAsStream("/test/artifacts/basicProject-1.rdf");
         Assert.assertNotNull("Test resource missing", input);
-        
+
         final InferredOWLOntologyID newArtifact = this.testClient.uploadNewArtifact(input, RDFFormat.RDFXML);
         Assert.assertNotNull(newArtifact);
         Assert.assertNotNull(newArtifact.getOntologyIRI());
         Assert.assertNotNull(newArtifact.getVersionIRI());
-        
+
         final ByteArrayOutputStream outputStream = new ByteArrayOutputStream(8096);
         this.testClient.downloadArtifact(newArtifact, outputStream, RDFFormat.RDFJSON);
         this.parseRdf(new ByteArrayInputStream(outputStream.toByteArray()), RDFFormat.RDFJSON,
                 AbstractPoddClientTest.BASIC_PROJECT_1_EXPECTED_CONCRETE_TRIPLES);
-        
+
         final Collection<InferredOWLOntologyID> results = this.testClient.listUnpublishedArtifacts();
         Assert.assertFalse(results.isEmpty());
         Assert.assertEquals(1, results.size());
     }
-    
+
     /**
      * Test method for {@link com.github.podd.client.api.PoddClient#login(java.lang.String, String)}
      * .
@@ -681,13 +681,13 @@ public abstract class AbstractPoddClientTest
     public final void testLogin() throws Exception
     {
         Assert.assertFalse(this.testClient.isLoggedIn());
-        
+
         Assert.assertTrue("Client was not successfully logged in",
                 this.testClient.login("testAdminUser", "testAdminPassword"));
-        
+
         Assert.assertTrue(this.testClient.isLoggedIn());
     }
-    
+
     /**
      * Test method for {@link com.github.podd.client.api.PoddClient#logout()}.
      */
@@ -695,19 +695,19 @@ public abstract class AbstractPoddClientTest
     public final void testLogout() throws Exception
     {
         this.testClient.setPoddServerUrl(this.getTestPoddServerUrl());
-        
+
         Assert.assertFalse(this.testClient.isLoggedIn());
-        
+
         Assert.assertTrue("Client was not successfully logged in",
                 this.testClient.login("testAdminUser", "testAdminPassword"));
-        
+
         Assert.assertTrue(this.testClient.isLoggedIn());
-        
+
         Assert.assertTrue("Client was not successfully logged out", this.testClient.logout());
-        
+
         Assert.assertFalse(this.testClient.isLoggedIn());
     }
-    
+
     /**
      * Test method for {@link com.github.podd.client.api.PoddClient#publishArtifact(OWLOntologyID)}
      * .
@@ -718,7 +718,7 @@ public abstract class AbstractPoddClientTest
     {
         Assert.fail("Not yet implemented"); // TODO
     }
-    
+
     /**
      * Test method for
      * {@link com.github.podd.client.api.PoddClient#removeRole(String, RestletUtilRole, InferredOWLOntologyID)}
@@ -728,14 +728,14 @@ public abstract class AbstractPoddClientTest
     public final void testRemoveRolesArtifact() throws Exception
     {
         this.testClient.login(AbstractPoddClientTest.TEST_ADMIN_USER, AbstractPoddClientTest.TEST_ADMIN_PASSWORD);
-        
+
         final InputStream input = this.getClass().getResourceAsStream("/test/artifacts/basicProject-1.rdf");
         Assert.assertNotNull("Test resource missing", input);
-        
+
         final InferredOWLOntologyID newArtifact = this.testClient.uploadNewArtifact(input, RDFFormat.RDFXML);
-        
+
         final Map<RestletUtilRole, Collection<String>> roles = this.testClient.listRoles(newArtifact);
-        
+
         Assert.assertEquals(2, roles.size());
         Assert.assertTrue(roles.containsKey(PoddRoles.PROJECT_ADMIN));
         Assert.assertEquals(1, roles.get(PoddRoles.PROJECT_ADMIN).size());
@@ -745,19 +745,19 @@ public abstract class AbstractPoddClientTest
         Assert.assertEquals(1, roles.get(PoddRoles.PROJECT_PRINCIPAL_INVESTIGATOR).size());
         Assert.assertEquals(AbstractPoddClientTest.TEST_ADMIN_USER, roles.get(PoddRoles.PROJECT_PRINCIPAL_INVESTIGATOR)
                 .iterator().next());
-        
+
         this.testClient.removeRole(AbstractPoddClientTest.TEST_ADMIN_USER, PoddRoles.PROJECT_ADMIN, newArtifact);
-        
+
         final Map<RestletUtilRole, Collection<String>> afterRoles = this.testClient.listRoles(newArtifact);
-        
+
         Assert.assertEquals(1, afterRoles.size());
         Assert.assertTrue(afterRoles.containsKey(PoddRoles.PROJECT_PRINCIPAL_INVESTIGATOR));
         Assert.assertEquals(1, afterRoles.get(PoddRoles.PROJECT_PRINCIPAL_INVESTIGATOR).size());
         Assert.assertEquals(AbstractPoddClientTest.TEST_ADMIN_USER,
                 afterRoles.get(PoddRoles.PROJECT_PRINCIPAL_INVESTIGATOR).iterator().next());
-        
+
     }
-    
+
     /**
      * Test method for
      * {@link com.github.podd.client.api.PoddClient#setPoddServerUrl(java.lang.String)}.
@@ -766,14 +766,14 @@ public abstract class AbstractPoddClientTest
     public final void testSetPoddServerUrl() throws Exception
     {
         Assert.assertNotNull(this.testClient.getPoddServerUrl());
-        
+
         this.testClient.setPoddServerUrl(null);
-        
+
         // Implementations may use PoddClient#getProps to regenerate the URL after someone sets it
         // to null
         // Assert.assertNull(this.testClient.getPoddServerUrl());
     }
-    
+
     /**
      * Test method for
      * {@link com.github.podd.client.api.PoddClient#unpublishArtifact(InferredOWLOntologyID)} .
@@ -784,7 +784,7 @@ public abstract class AbstractPoddClientTest
     {
         Assert.fail("Not yet implemented"); // TODO
     }
-    
+
     /**
      * Test method for
      * {@link com.github.podd.client.api.PoddClient#updateArtifact(InferredOWLOntologyID, InputStream, RDFFormat)}
@@ -796,7 +796,7 @@ public abstract class AbstractPoddClientTest
     {
         Assert.fail("Not yet implemented"); // TODO
     }
-    
+
     /**
      * Test method for
      * {@link com.github.podd.client.api.PoddClient#uploadNewArtifact(java.io.InputStream, org.openrdf.rio.RDFFormat)}
@@ -806,24 +806,24 @@ public abstract class AbstractPoddClientTest
     public final void testUploadNewArtifact() throws Exception
     {
         this.testClient.login(AbstractPoddClientTest.TEST_ADMIN_USER, AbstractPoddClientTest.TEST_ADMIN_PASSWORD);
-        
+
         final InputStream input = this.getClass().getResourceAsStream("/test/artifacts/basicProject-1.rdf");
         Assert.assertNotNull("Test resource missing", input);
-        
+
         final InferredOWLOntologyID newArtifact = this.testClient.uploadNewArtifact(input, RDFFormat.RDFXML);
         Assert.assertNotNull(newArtifact);
         Assert.assertNotNull(newArtifact.getOntologyIRI());
         Assert.assertNotNull(newArtifact.getVersionIRI());
-        
+
         final ByteArrayOutputStream outputStream = new ByteArrayOutputStream(8096);
         this.testClient.downloadArtifact(newArtifact, outputStream, RDFFormat.RDFJSON);
         final Model model =
                 this.parseRdf(new ByteArrayInputStream(outputStream.toByteArray()), RDFFormat.RDFJSON,
                         AbstractPoddClientTest.BASIC_PROJECT_1_EXPECTED_CONCRETE_TRIPLES);
-        
+
         Assert.assertTrue(model.contains(newArtifact.getOntologyIRI().toOpenRDFURI(), RDF.TYPE, OWL.ONTOLOGY));
         Assert.assertTrue(model.contains(newArtifact.getOntologyIRI().toOpenRDFURI(), OWL.VERSIONIRI, newArtifact
                 .getVersionIRI().toOpenRDFURI()));
     }
-    
+
 }

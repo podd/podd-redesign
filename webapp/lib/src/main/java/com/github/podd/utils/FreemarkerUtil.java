@@ -1,16 +1,16 @@
 /**
  * PODD is an OWL ontology database used for scientific project management
- * 
+ *
  * Copyright (C) 2009-2013 The University Of Queensland
- * 
+ *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU Affero General Public License as published by the Free Software Foundation, either version 3
  * of the License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
  * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Affero General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License along with this program.
  * If not, see <http://www.gnu.org/licenses/>.
  */
@@ -22,14 +22,14 @@ import org.openrdf.model.Value;
 
 /**
  * @author kutila
- * 
+ *
  */
 public class FreemarkerUtil
 {
-    
+
     /**
      * If the given object contains a URI with a protocol (scheme), clip it off.
-     * 
+     *
      * @param object
      * @return
      */
@@ -39,7 +39,7 @@ public class FreemarkerUtil
         {
             return null;
         }
-        
+
         // get String representation of input
         String result;
         if(object instanceof Value)
@@ -51,7 +51,7 @@ public class FreemarkerUtil
         {
             result = object.toString();
         }
-        
+
         // clip the protocol part
         if(result.startsWith("mailto:") || result.startsWith("http://"))
         {
@@ -61,14 +61,14 @@ public class FreemarkerUtil
         {
             return result.substring(8);
         }
-        
+
         return result;
     }
-    
+
     /**
      * Rather hacky attempt to retrieve the datatype of a given Value object. TODO: Incomplete and
      * needs to be fixed.
-     * 
+     *
      * @param value
      * @return
      */
@@ -83,7 +83,7 @@ public class FreemarkerUtil
                 {
                     return "xsd:" + dataType.getLocalName();
                 }
-                
+
                 return dataType.stringValue();
             }
             // Default to xsd:string datatype if any value happens to get
@@ -93,7 +93,7 @@ public class FreemarkerUtil
         }
         return "NotALiteral:" + value.getClass().getName();
     }
-    
+
     public URI getUri(final Value value)
     {
         if(this.isUri(value))
@@ -102,15 +102,15 @@ public class FreemarkerUtil
         }
         return null;
     }
-    
+
     public boolean isLiteral(final Value value)
     {
         return value instanceof Literal;
     }
-    
+
     public boolean isUri(final Value value)
     {
         return value instanceof URI;
     }
-    
+
 }

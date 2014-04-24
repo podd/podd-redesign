@@ -1,33 +1,33 @@
 /**
  * PODD is an OWL ontology database used for scientific project management
- * 
+ *
  * Copyright (C) 2009-2013 The University Of Queensland
- * 
+ *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU Affero General Public License as published by the Free Software Foundation, either version 3
  * of the License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
  * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Affero General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License along with this program.
  * If not, see <http://www.gnu.org/licenses/>.
  */
 /*
  * Password Hashing With PBKDF2 (http://crackstation.net/hashing-security.htm). Copyright (c) 2013,
  * Taylor Hornby All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without modification, are permitted
  * provided that the following conditions are met:
- * 
+ *
  * 1. Redistributions of source code must retain the above copyright notice, this list of conditions
  * and the following disclaimer.
- * 
+ *
  * 2. Redistributions in binary form must reproduce the above copyright notice, this list of
  * conditions and the following disclaimer in the documentation and/or other materials provided with
  * the distribution.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
  * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
  * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
@@ -54,19 +54,19 @@ import javax.crypto.spec.PBEKeySpec;
 public class PasswordHash
 {
     public static final String PBKDF2_ALGORITHM = "PBKDF2WithHmacSHA1";
-    
+
     // The following constants may be changed without breaking existing hashes.
     public static final int SALT_BYTE_SIZE = 128;
     public static final int HASH_BYTE_SIZE = 128;
     public static final int PBKDF2_ITERATIONS = 10000;
-    
+
     public static final int ITERATION_INDEX = 0;
     public static final int SALT_INDEX = 1;
     public static final int PBKDF2_INDEX = 2;
-    
+
     /**
      * Returns a salted PBKDF2 hash of the password.
-     * 
+     *
      * @param password
      *            the password to hash
      * @return a salted PBKDF2 hash of the password
@@ -75,10 +75,10 @@ public class PasswordHash
     {
         return PasswordHash.createHash(password.toCharArray());
     }
-    
+
     /**
      * Returns a salted PBKDF2 hash of the password.
-     * 
+     *
      * @param password
      *            the password to hash
      * @return a salted PBKDF2 hash of the password
@@ -89,17 +89,17 @@ public class PasswordHash
         final SecureRandom random = new SecureRandom();
         final byte[] salt = new byte[PasswordHash.SALT_BYTE_SIZE];
         random.nextBytes(salt);
-        
+
         // Hash the password
         final byte[] hash =
                 PasswordHash.pbkdf2(password, salt, PasswordHash.PBKDF2_ITERATIONS, PasswordHash.HASH_BYTE_SIZE);
         // format iterations:salt:hash
         return PasswordHash.PBKDF2_ITERATIONS + ":" + PasswordHash.toHex(salt) + ":" + PasswordHash.toHex(hash);
     }
-    
+
     /**
      * Validates a password using a hash.
-     * 
+     *
      * @param password
      *            the password to check
      * @param correctHash
@@ -107,14 +107,14 @@ public class PasswordHash
      * @return true if the password is correct, false if not
      */
     public static boolean validatePassword(final String password, final String correctHash)
-        throws NoSuchAlgorithmException, InvalidKeySpecException
+            throws NoSuchAlgorithmException, InvalidKeySpecException
     {
         return PasswordHash.validatePassword(password.toCharArray(), correctHash);
     }
-    
+
     /**
      * Validates a password using a hash.
-     * 
+     *
      * @param password
      *            the password to check
      * @param correctHash
@@ -122,7 +122,7 @@ public class PasswordHash
      * @return true if the password is correct, false if not
      */
     public static boolean validatePassword(final char[] password, final String correctHash)
-        throws NoSuchAlgorithmException, InvalidKeySpecException
+            throws NoSuchAlgorithmException, InvalidKeySpecException
     {
         // Decode the hash into its parameters
         final String[] params = correctHash.split(":");
@@ -136,12 +136,12 @@ public class PasswordHash
         // both hashes match.
         return PasswordHash.slowEquals(hash, testHash);
     }
-    
+
     /**
      * Compares two byte arrays in length-constant time. This comparison method is used so that
      * password hashes cannot be extracted from an on-line system using a timing attack and then
      * attacked off-line.
-     * 
+     *
      * @param a
      *            the first byte array
      * @param b
@@ -157,10 +157,10 @@ public class PasswordHash
         }
         return diff == 0;
     }
-    
+
     /**
      * Computes the PBKDF2 hash of a password.
-     * 
+     *
      * @param password
      *            the password to hash.
      * @param salt
@@ -172,16 +172,16 @@ public class PasswordHash
      * @return the PBDKF2 hash of the password
      */
     private static byte[] pbkdf2(final char[] password, final byte[] salt, final int iterations, final int bytes)
-        throws NoSuchAlgorithmException, InvalidKeySpecException
+            throws NoSuchAlgorithmException, InvalidKeySpecException
     {
         final PBEKeySpec spec = new PBEKeySpec(password, salt, iterations, bytes * 8);
         final SecretKeyFactory skf = SecretKeyFactory.getInstance(PasswordHash.PBKDF2_ALGORITHM);
         return skf.generateSecret(spec).getEncoded();
     }
-    
+
     /**
      * Converts a string of hexadecimal characters into a byte array.
-     * 
+     *
      * @param hex
      *            the hex string
      * @return the hex string decoded into a byte array
@@ -195,10 +195,10 @@ public class PasswordHash
         }
         return binary;
     }
-    
+
     /**
      * Converts a byte array into a hexadecimal string.
-     * 
+     *
      * @param array
      *            the byte array to convert
      * @return a length*2 character string encoding the byte array
@@ -217,10 +217,10 @@ public class PasswordHash
             return hex;
         }
     }
-    
+
     /**
      * Tests the basic functionality of the PasswordHash class
-     * 
+     *
      * @param args
      *            ignored
      */
@@ -233,7 +233,7 @@ public class PasswordHash
             {
                 System.out.println(PasswordHash.createHash("p\r\nassw0Rd!"));
             }
-            
+
             // Test password validation
             boolean failure = false;
             System.out.println("Running tests...");
@@ -273,5 +273,5 @@ public class PasswordHash
             System.out.println("ERROR: " + ex);
         }
     }
-    
+
 }

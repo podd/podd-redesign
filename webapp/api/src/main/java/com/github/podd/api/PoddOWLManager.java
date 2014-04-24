@@ -1,21 +1,21 @@
 /**
  * PODD is an OWL ontology database used for scientific project management
- * 
+ *
  * Copyright (C) 2009-2013 The University Of Queensland
- * 
+ *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU Affero General Public License as published by the Free Software Foundation, either version 3
  * of the License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
  * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Affero General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License along with this program.
  * If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * 
+ *
  */
 package com.github.podd.api;
 
@@ -36,26 +36,26 @@ import com.github.podd.utils.InferredOWLOntologyID;
 
 /**
  * Manages interactions with OWLAPI for PODD.
- * 
+ *
  * @author Peter Ansell p_ansell@yahoo.com
  */
 public interface PoddOWLManager
 {
     /**
      * Determing if the ontology is cached in memory.
-     * 
+     *
      * @param ontologyID
      *            The ontology IRI and version IRI to check for caching.
      * @param dependentSchemaOntologies
      * @return True if the ontology is cached in memory and false otherwise.
      */
     boolean isCached(OWLOntologyID ontologyID, Set<? extends OWLOntologyID> dependentSchemaOntologies);
-    
+
     /**
      * Loads an ontology from the given {@link OWLOntologyDocumentSource} into the given
      * {@link RepositoryConnection}, using the optional {@link OWLOntologyID} to relabel the
      * ontology IRI and version IRI.
-     * 
+     *
      * @param owlSource
      *            The source of the OWL ontology to be loaded.
      * @param permanentRepositoryConnection
@@ -73,11 +73,11 @@ public interface PoddOWLManager
             RepositoryConnection permanentRepositoryConnection, OWLOntologyID replacementOntologyID,
             Set<? extends OWLOntologyID> dependentSchemaOntologies, RepositoryConnection managementConnection,
             URI schemaManagementContext) throws OWLException, PoddException, OpenRDFException, IOException;
-    
+
     /**
      * Attempts to regain memory in the underlying OWLOntologyManager by removing the ontology from
      * the in-memory cache.
-     * 
+     *
      * @param ontologyID
      *            The full OWLOntologyID, containing both Ontology IRI and Version IRI for the
      *            ontology to remove from the cache.
@@ -89,16 +89,16 @@ public interface PoddOWLManager
      *             If there was an error while attempting to retrieve the memory.
      */
     boolean removeCache(OWLOntologyID ontologyID, Set<? extends OWLOntologyID> dependentSchemaOntologies)
-        throws OWLException;
-    
+            throws OWLException;
+
     /**
      * Helper method to verify that a given {@link Model} represents an ontology which complies with
      * the given schema OWL Ontology.
-     * 
+     *
      * @param model
      * @param schemaModel
      * @throws OntologyNotInProfileException
      */
     void verifyAgainstSchema(Model model, Model schemaModel) throws OntologyNotInProfileException;
-    
+
 }

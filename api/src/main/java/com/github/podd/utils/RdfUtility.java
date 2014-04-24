@@ -1,16 +1,16 @@
 /**
  * PODD is an OWL ontology database used for scientific project management
- * 
+ *
  * Copyright (C) 2009-2013 The University Of Queensland
- * 
+ *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU Affero General Public License as published by the Free Software Foundation, either version 3
  * of the License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
  * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Affero General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License along with this program.
  * If not, see <http://www.gnu.org/licenses/>.
  */
@@ -52,16 +52,16 @@ import org.slf4j.LoggerFactory;
 
 /**
  * @author kutila
- * 
+ *
  */
 public class RdfUtility
 {
-    
+
     private final static Logger log = LoggerFactory.getLogger(RdfUtility.class);
-    
+
     /**
      * Helper method to execute a given SPARQL Graph query.
-     * 
+     *
      * @param graphQuery
      * @param contexts
      * @return
@@ -88,20 +88,20 @@ public class RdfUtility
         {
             new Throwable().printStackTrace();
         }
-        
+
         return results;
     }
-    
+
     /**
      * Helper method to execute a given SPARQL Tuple query, which may have had bindings attached.
-     * 
+     *
      * @param tupleQuery
      * @param contexts
      * @return
      * @throws OpenRDFException
      */
     public static QueryResultCollector executeTupleQuery(final TupleQuery tupleQuery, final URI... contexts)
-        throws OpenRDFException
+            throws OpenRDFException
     {
         final DatasetImpl dataset = new DatasetImpl();
         for(final URI uri : contexts)
@@ -109,7 +109,7 @@ public class RdfUtility
             dataset.addDefaultGraph(uri);
         }
         tupleQuery.setDataset(dataset);
-        
+
         final QueryResultCollector results = new QueryResultCollector();
         final long before = System.currentTimeMillis();
         QueryResults.report(tupleQuery.evaluate(), results);
@@ -123,19 +123,19 @@ public class RdfUtility
         {
             new Throwable().printStackTrace();
         }
-        
+
         return results;
     }
-    
+
     /**
      * Given a set of RDF Statements, and a Root node, this method finds any nodes that are not
      * connected to the Root node.
-     * 
+     *
      * A <b>Node</b> is a Value that is of type URI (i.e. Literals are ignored).
-     * 
+     *
      * A direct connection between two nodes exist if there is a Statement with the two nodes as the
      * Subject and the Object.
-     * 
+     *
      * @param root
      *            The Root of the Graph, from which connectedness is calculated.
      * @param connection
@@ -147,16 +147,16 @@ public class RdfUtility
      */
     public static Set<URI> findDisconnectedNodes(final URI root, final RepositoryConnection connection,
             final URI... context) throws RepositoryException
-    {
+            {
         final List<URI> exclusions =
                 Arrays.asList(root, OWL.THING, OWL.ONTOLOGY, OWL.INDIVIDUAL,
                         ValueFactoryImpl.getInstance().createURI("http://www.w3.org/2002/07/owl#NamedIndividual"));
-        
+
         final List<URI> propertyExclusions = Arrays.asList(OWL.IMPORTS, OWL.VERSIONIRI);
-        
+
         // - identify nodes that should be connected to the root
         final Set<URI> nodesToCheck = new HashSet<URI>();
-        
+
         final List<Statement> allStatements =
                 Iterations.asList(connection.getStatements(null, null, null, false, context));
         for(final Statement s : allStatements)
@@ -166,37 +166,37 @@ public class RdfUtility
             {
                 continue;
             }
-            
+
             final Value objectValue = s.getObject();
             if(objectValue instanceof URI && !exclusions.contains(objectValue))
             {
                 nodesToCheck.add((URI)objectValue);
             }
-            
+
             final Resource subjectValue = s.getSubject();
             if(subjectValue instanceof URI && !exclusions.contains(subjectValue))
             {
                 nodesToCheck.add((URI)subjectValue);
             }
-            
+
         }
-        
+
         // RdfUtility.log.info("{} nodes to check for connectivity.", nodesToCheck.size());
         // for(final URI u : objectsToCheck)
         // {
         // System.out.println("    " + u);
         // }
-        
+
         // - check for connectivity
         final Queue<URI> queue = new LinkedList<URI>();
         final Set<URI> visitedNodes = new HashSet<URI>(); // to handle cycles
         queue.add(root);
         visitedNodes.add(root);
-        
+
         while(!queue.isEmpty())
         {
             final URI currentNode = queue.remove();
-            
+
             final List<URI> children = RdfUtility.getImmediateChildren(currentNode, connection, context);
             for(final URI child : children)
             {
@@ -219,11 +219,11 @@ public class RdfUtility
         }
         RdfUtility.log.debug("{} unconnected node(s). {}", nodesToCheck.size(), nodesToCheck);
         return nodesToCheck;
-    }
-    
+            }
+
     /**
      * Internal helper method to retrieve the direct child objects of a given object.
-     * 
+     *
      * @param node
      * @param connection
      * @param context
@@ -232,7 +232,7 @@ public class RdfUtility
      */
     private static List<URI> getImmediateChildren(final URI node, final RepositoryConnection connection,
             final URI... context) throws RepositoryException
-    {
+            {
         final List<URI> children = new ArrayList<URI>();
         final List<Statement> childStatements =
                 Iterations.asList(connection.getStatements(node, null, null, false, context));
@@ -244,22 +244,22 @@ public class RdfUtility
             }
         }
         return children;
-    }
-    
+            }
+
     /**
      * Helper method to load an {@link InputStream} into an {@link Model}.
-     * 
+     *
      * @param resourceStream
      *            The input stream with RDF statements
      * @param format
      *            Format found in the input RDF data
      * @return an {@link Model} populated with the statements from the input stream.
-     * 
+     *
      * @throws OpenRDFException
      * @throws IOException
      */
     public static Model inputStreamToModel(final InputStream resourceStream, final RDFFormat format)
-        throws OpenRDFException, IOException
+            throws OpenRDFException, IOException
     {
         if(resourceStream == null)
         {
@@ -267,5 +267,5 @@ public class RdfUtility
         }
         return Rio.parse(resourceStream, "", format);
     }
-    
+
 }

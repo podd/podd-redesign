@@ -1,16 +1,16 @@
 /**
  * PODD is an OWL ontology database used for scientific project management
- * 
+ *
  * Copyright (C) 2009-2013 The University Of Queensland
- * 
+ *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU Affero General Public License as published by the Free Software Foundation, either version 3
  * of the License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
  * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Affero General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License along with this program.
  * If not, see <http://www.gnu.org/licenses/>.
  */
@@ -38,13 +38,13 @@ import com.github.podd.utils.PoddWebConstants;
 
 /**
  * Test various forms of GetArtifact
- * 
+ *
  * @author kutila
- * 
+ *
  */
 public class GetArtifactResourceImplTest extends AbstractResourceImplTest
 {
-    
+
     /**
      * Test unauthenticated access to a managed artifact gives an UNAUTHORIZED error and not a 404.
      * <p>
@@ -57,14 +57,14 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
     {
         // prepare: add an artifact
         final String artifactUri = this.loadTestArtifact(TestConstants.TEST_ARTIFACT_BASIC_1_INTERNAL_OBJECT);
-        
+
         final ClientResource getArtifactClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_GET_BASE));
         try
         {
             getArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER,
                     "http://purl.org/podd/ns/artifact/artifact89");
-            
+
             getArtifactClientResource.get(MediaType.TEXT_HTML);
             Assert.fail("Should have thrown a ResourceException with Status Code 401");
         }
@@ -77,7 +77,7 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
             this.releaseClient(getArtifactClientResource);
         }
     }
-    
+
     /**
      * Test authenticated access attempts to an unmanaged artifact gives a 404 error.
      */
@@ -86,12 +86,12 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
     {
         final ClientResource getArtifactClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_GET_BASE));
-        
+
         try
         {
             getArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER,
                     "http://purl.org/podd/ns/artifact/artifact89");
-            
+
             this.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null, MediaType.APPLICATION_RDF_XML,
                     Status.CLIENT_ERROR_NOT_FOUND, AbstractResourceImplTest.WITH_ADMIN);
             Assert.fail("Should have thrown a ResourceException with Status Code 404");
@@ -105,7 +105,7 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
             this.releaseClient(getArtifactClientResource);
         }
     }
-    
+
     /**
      * Test authenticated access attempts to an unmanaged artifact gives a 404 error.
      */
@@ -114,12 +114,12 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
     {
         final ClientResource getArtifactClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_GET_BASE));
-        
+
         try
         {
             getArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER,
                     "http://purl.org/podd/ns/artifact/artifact89");
-            
+
             this.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null, MediaType.APPLICATION_RDF_XML,
                     Status.CLIENT_ERROR_NOT_FOUND, AbstractResourceImplTest.NO_ADMIN);
             Assert.fail("Should have thrown a ResourceException with Status Code 404");
@@ -133,7 +133,7 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
             this.releaseClient(getArtifactClientResource);
         }
     }
-    
+
     /**
      * Test unauthenticated access to an unmanaged artifact gives an UNAUTHORIZED error.
      */
@@ -146,7 +146,7 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
         {
             getArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER,
                     "http://purl.org/podd/ns/artifact/artifact89");
-            
+
             getArtifactClientResource.get(MediaType.TEXT_HTML);
             Assert.fail("Should have thrown a ResourceException with Status Code 401");
         }
@@ -159,7 +159,7 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
             this.releaseClient(getArtifactClientResource);
         }
     }
-    
+
     /**
      * Test access without artifactID parameter gives a BAD_REQUEST error.
      */
@@ -168,7 +168,7 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
     {
         final ClientResource getArtifactClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_GET_BASE));
-        
+
         try
         {
             getArtifactClientResource.get(MediaType.TEXT_HTML);
@@ -183,7 +183,7 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
             this.releaseClient(getArtifactClientResource);
         }
     }
-    
+
     /**
      * Test authenticated access to get Artifact in HTML
      */
@@ -192,28 +192,28 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
     {
         // prepare: add an artifact
         final String artifactUri = this.loadTestArtifact(TestConstants.TEST_ARTIFACT_BASIC_1_INTERNAL_OBJECT);
-        
+
         final ClientResource getArtifactClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_GET_BASE));
-        
+
         try
         {
             getArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactUri);
-            
+
             final Representation results =
                     this.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null, MediaType.TEXT_HTML,
                             Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
-            
+
             final String body = this.getText(results);
-            
+
             // verify:
             Assert.assertTrue("Page does not identify Administrator", body.contains("Administrator"));
             Assert.assertFalse("Page contained a 404 error", body.contains("ERROR: 404"));
-            
+
             Assert.assertTrue("Missing: Project Details", body.contains("Project Details"));
             Assert.assertTrue("Missng: ANZSRC FOR Code", body.contains("ANZSRC FOR Code:"));
             Assert.assertTrue("Missng: Project#2012...", body.contains("Project#2012-0006_ Cotton Leaf Morphology"));
-            
+
             this.assertFreemarker(body);
         }
         finally
@@ -221,7 +221,7 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
             this.releaseClient(getArtifactClientResource);
         }
     }
-    
+
     /**
      * Test authenticated access to get Artifact in HTML with a check on the RDFa
      */
@@ -231,38 +231,38 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
     {
         // prepare: add an artifact
         final String artifactUri = this.loadTestArtifact(TestConstants.TEST_ARTIFACT_BASIC_1_INTERNAL_OBJECT);
-        
+
         final ClientResource getArtifactClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_GET_BASE));
-        
+
         try
         {
             getArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactUri);
-            
+
             final Representation results =
                     this.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null, MediaType.TEXT_HTML,
                             Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
-            
+
             final String body = this.getText(results);
-            
+
             // verify:
             Assert.assertTrue("Page does not identify Administrator", body.contains("Administrator"));
             Assert.assertFalse("Page contained a 404 error", body.contains("ERROR: 404"));
-            
+
             Assert.assertTrue("Missing: Project Details", body.contains("Project Details"));
             Assert.assertTrue("Missng: ANZSRC FOR Code", body.contains("ANZSRC FOR Code:"));
             Assert.assertTrue("Missng: Project#2012...", body.contains("Project#2012-0006_ Cotton Leaf Morphology"));
-            
+
             this.assertFreemarker(body);
-            
+
             final Model model = this.assertRdf(new StringReader(body), RDFFormat.RDFA, 12);
-            
+
             // RDFa generates spurious triples, use at your own risk
             // Only rely on numbers from actual RDF serialisations
             Assert.assertEquals(4, model.subjects().size());
             Assert.assertEquals(9, model.predicates().size());
             Assert.assertEquals(12, model.objects().size());
-            
+
             if(this.log.isDebugEnabled())
             {
                 DebugUtils.printContents(model);
@@ -272,9 +272,9 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
         {
             this.releaseClient(getArtifactClientResource);
         }
-        
+
     }
-    
+
     /**
      * Test authenticated access to get Artifact in RDF/JSON
      */
@@ -283,35 +283,35 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
     {
         // prepare: add an artifact
         final String artifactUri = this.loadTestArtifact(TestConstants.TEST_ARTIFACT_BASIC_1_INTERNAL_OBJECT);
-        
+
         final ClientResource getArtifactClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_GET_BASE));
-        
+
         try
         {
             getArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactUri);
-            
+
             final Representation results =
                     this.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null,
                             RestletUtilMediaType.APPLICATION_RDF_JSON, Status.SUCCESS_OK,
                             AbstractResourceImplTest.WITH_ADMIN);
-            
+
             final String body = this.getText(results);
-            
+
             // verify: received contents are in RDF/JSON
             // Assert.assertTrue("Result does not have @prefix",
             // body.contains("@prefix"));
-            
+
             // verify: received contents have artifact's ontology and version
             // IRIs
             Assert.assertTrue("Result does not contain artifact URI", body.contains(artifactUri));
-            
+
             final Model model = this.assertRdf(new StringReader(body), RDFFormat.RDFJSON, 28);
-            
+
             Assert.assertEquals(6, model.subjects().size());
             Assert.assertEquals(14, model.predicates().size());
             Assert.assertEquals(23, model.objects().size());
-            
+
             if(this.log.isDebugEnabled())
             {
                 DebugUtils.printContents(model);
@@ -322,7 +322,7 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
             this.releaseClient(getArtifactClientResource);
         }
     }
-    
+
     /**
      * Test authenticated access to get Artifact in RDF/XML
      */
@@ -331,33 +331,33 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
     {
         // prepare: add an artifact
         final String artifactUri = this.loadTestArtifact(TestConstants.TEST_ARTIFACT_BASIC_1_INTERNAL_OBJECT);
-        
+
         final ClientResource getArtifactClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_GET_BASE));
-        
+
         try
         {
             getArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactUri);
-            
+
             final Representation results =
                     this.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null,
                             MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
-            
+
             final String body = this.getText(results);
-            
+
             // verify: received contents are in RDF
             Assert.assertTrue("Result does not have RDF", body.contains("<rdf:RDF"));
             Assert.assertTrue("Result does not have RDF", body.endsWith("</rdf:RDF>"));
-            
+
             // verify: received contents have artifact URI
             Assert.assertTrue("Result does not contain artifact URI", body.contains(artifactUri));
-            
+
             final Model model = this.assertRdf(new StringReader(body), RDFFormat.RDFXML, 28);
-            
+
             Assert.assertEquals(6, model.subjects().size());
             Assert.assertEquals(14, model.predicates().size());
             Assert.assertEquals(23, model.objects().size());
-            
+
             if(this.log.isDebugEnabled())
             {
                 DebugUtils.printContents(model);
@@ -368,7 +368,7 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
             this.releaseClient(getArtifactClientResource);
         }
     }
-    
+
     /**
      * Test authenticated access to get Artifact in RDF/Turtle
      */
@@ -377,36 +377,36 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
     {
         // prepare: add an artifact
         final String artifactUri = this.loadTestArtifact(TestConstants.TEST_ARTIFACT_BASIC_1_INTERNAL_OBJECT);
-        
+
         final ClientResource getArtifactClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_GET_BASE));
-        
+
         try
         {
             getArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactUri);
-            
+
             final Representation results =
                     this.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null,
                             MediaType.APPLICATION_RDF_TURTLE, Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
-            
+
             final String body = this.getText(results).trim();
-            
+
             // verify: received contents are in Turtle
             // FIXME: Artifacts are not being sent with namespaces currently, reenable this when
             // this bug is fixed
             // Assert.assertTrue("Turtle result did not have namespaces", body.contains("@prefix"));
             Assert.assertTrue("Turtle result should end with a period", body.endsWith(" ."));
-            
+
             // verify: received contents have artifact's ontology and version
             // IRIs
             Assert.assertTrue("Result does not contain artifact URI", body.contains(artifactUri));
-            
+
             final Model model = this.assertRdf(new StringReader(body), RDFFormat.TURTLE, 28);
-            
+
             Assert.assertEquals(6, model.subjects().size());
             Assert.assertEquals(14, model.predicates().size());
             Assert.assertEquals(23, model.objects().size());
-            
+
             if(this.log.isDebugEnabled())
             {
                 DebugUtils.printContents(model);
@@ -417,7 +417,7 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
             this.releaseClient(getArtifactClientResource);
         }
     }
-    
+
     /**
      * Test authenticated access to get an internal podd object in HTML
      */
@@ -426,30 +426,30 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
     {
         // prepare: add an artifact
         final String artifactUri = this.loadTestArtifact(TestConstants.TEST_ARTIFACT_BASIC_1_INTERNAL_OBJECT);
-        
+
         final String objectUri = "urn:poddinternal:7616392e-802b-4c5d-953d-bf81da5a98f4:0";
-        
+
         final ClientResource getArtifactClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_GET_BASE));
-        
+
         try
         {
             getArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactUri);
             getArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_OBJECT_IDENTIFIER, objectUri);
-            
+
             final Representation results =
                     this.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null, MediaType.TEXT_HTML,
                             Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
-            
+
             final String body = this.getText(results);
-            
+
             // verify:
             Assert.assertTrue("Page does not identify Administrator", body.contains("Administrator"));
             Assert.assertFalse("Page contained a 404 error", body.contains("ERROR: 404"));
-            
+
             Assert.assertTrue("Missing: Analysis Details", body.contains("Analysis Details"));
             Assert.assertTrue("Missng title: poddScience#Analysis 0", body.contains("poddScience#Analysis 0"));
-            
+
             this.assertFreemarker(body);
         }
         finally
@@ -457,7 +457,7 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
             this.releaseClient(getArtifactClientResource);
         }
     }
-    
+
     /**
      * Test authenticated access to get an internal podd object in HTML
      */
@@ -466,32 +466,32 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
     {
         // prepare: add an artifact
         final String artifactUri = this.loadTestArtifact("/test/artifacts/basic-2.rdf");
-        
+
         final String objectUri = "urn:hardcoded:purl:artifact:1#publication45";
         final ClientResource getArtifactClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_GET_BASE));
-        
+
         try
         {
             getArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactUri);
             getArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_OBJECT_IDENTIFIER, objectUri);
-            
+
             final Representation results =
                     this.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null, MediaType.TEXT_HTML,
                             Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
-            
+
             final String body = this.getText(results);
-            
+
             // verify:
             Assert.assertTrue("Page does not identify Administrator", body.contains("Administrator"));
             Assert.assertFalse("Page contained a 404 error", body.contains("ERROR: 404"));
-            
+
             Assert.assertTrue("Publication title is missing",
                     body.contains("Towards An Extensible, Domain-agnostic Scientific Data Management System"));
             Assert.assertTrue("#publishedIn value is missing", body.contains("Proceedings of the IEEE eScience 2010"));
             // Assert.assertTrue("Publicatin's PURL value is missing",
             // body.contains("http://dx.doi.org/10.1109/eScience.2010.44"));
-            
+
             this.assertFreemarker(body);
         }
         finally
@@ -499,7 +499,7 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
             this.releaseClient(getArtifactClientResource);
         }
     }
-    
+
     /**
      * Test authenticated access to get Artifact in RDF/XML by a non Repository Admin User.
      */
@@ -508,35 +508,35 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
     {
         // prepare: add an artifact
         final String artifactUri = this.loadTestArtifact(TestConstants.TEST_ARTIFACT_BASIC_1_INTERNAL_OBJECT);
-        
+
         this.mapUserToRole("anotherUser", PoddRoles.PROJECT_ADMIN, artifactUri);
-        
+
         final ClientResource getArtifactClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_GET_BASE));
-        
+
         try
         {
             getArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactUri);
-            
+
             final Representation results =
                     this.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null,
                             MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK, AbstractResourceImplTest.NO_ADMIN);
-            
+
             final String body = this.getText(results);
-            
+
             // verify: received contents are in RDF
             Assert.assertTrue("Result does not have RDF", body.contains("<rdf:RDF"));
             Assert.assertTrue("Result does not have RDF", body.endsWith("</rdf:RDF>"));
-            
+
             // verify: received contents have artifact URI
             Assert.assertTrue("Result does not contain artifact URI", body.contains(artifactUri));
-            
+
             final Model model = this.assertRdf(new StringReader(body), RDFFormat.RDFXML, 28);
-            
+
             Assert.assertEquals(6, model.subjects().size());
             Assert.assertEquals(14, model.predicates().size());
             Assert.assertEquals(23, model.objects().size());
-            
+
             if(this.log.isDebugEnabled())
             {
                 DebugUtils.printContents(model);
@@ -547,7 +547,7 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
             this.releaseClient(getArtifactClientResource);
         }
     }
-    
+
     /**
      * Test authenticated access to get Artifact in HTML by a non Repository Admin User
      */
@@ -556,32 +556,32 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
     {
         // prepare: add an artifact
         final String artifactUri = this.loadTestArtifact(TestConstants.TEST_ARTIFACT_BASIC_1_INTERNAL_OBJECT);
-        
+
         this.mapUserToRole("anotherUser", PoddRoles.PROJECT_ADMIN, artifactUri);
-        
+
         final ClientResource getArtifactClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_GET_BASE));
-        
+
         try
         {
             getArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactUri);
-            
+
             final Representation results =
                     this.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null, MediaType.TEXT_HTML,
                             Status.SUCCESS_OK, AbstractResourceImplTest.NO_ADMIN);
-            
+
             final String body = this.getText(results);
-            
+
             // verify:
             Assert.assertFalse("Page contained a 404 error", body.contains("ERROR: 404"));
-            
+
             Assert.assertTrue("Missing: Project Details", body.contains("Project Details"));
             Assert.assertTrue("Missng: ANZSRC FOR Code", body.contains("ANZSRC FOR Code:"));
             Assert.assertTrue("Missng: Project#2012...", body.contains("Project#2012-0006_ Cotton Leaf Morphology"));
             Assert.assertTrue("Missing: Edit Participants button", body.contains("Edit Participants"));
             Assert.assertTrue("Missing: Add Child Object button", body.contains("Add Child Object"));
             Assert.assertTrue("Missing: Delete Project button", body.contains("id=\"deleteProject\""));
-            
+
             this.assertFreemarker(body);
         }
         finally
@@ -589,7 +589,7 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
             this.releaseClient(getArtifactClientResource);
         }
     }
-    
+
     /**
      * Test authenticated access to get Artifact in HTML by a non Repository Admin User
      */
@@ -598,33 +598,33 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
     {
         // prepare: add an artifact
         final String artifactUri = this.loadTestArtifact(TestConstants.TEST_ARTIFACT_BASIC_1_INTERNAL_OBJECT);
-        
+
         this.mapUserToRole("anotherUser", PoddRoles.PROJECT_OBSERVER, artifactUri);
-        
+
         final ClientResource getArtifactClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_GET_BASE));
-        
+
         try
         {
             getArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactUri);
-            
+
             final Representation results =
                     this.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null, MediaType.TEXT_HTML,
                             Status.SUCCESS_OK, AbstractResourceImplTest.NO_ADMIN);
-            
+
             final String body = this.getText(results);
-            
+
             // verify:
             Assert.assertFalse("Page contained a 404 error", body.contains("ERROR: 404"));
-            
+
             Assert.assertTrue("Missing: Project Details", body.contains("Project Details"));
             Assert.assertTrue("Missng: ANZSRC FOR Code", body.contains("ANZSRC FOR Code:"));
             Assert.assertTrue("Missng: Project#2012...", body.contains("Project#2012-0006_ Cotton Leaf Morphology"));
-            
+
             Assert.assertFalse("Edit Participants button should NOT be present", body.contains("Edit Participants"));
             Assert.assertFalse("Add Child Object button should NOT be present", body.contains("Add Child Object"));
             Assert.assertFalse("Delete button should NOT be present", body.contains("id=\"deleteObject\""));
-            
+
             this.assertFreemarker(body);
         }
         finally
@@ -632,7 +632,7 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
             this.releaseClient(getArtifactClientResource);
         }
     }
-    
+
     /**
      * Test parsing a simple RDFa document
      */
@@ -640,7 +640,7 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
     public void testSimpleRDFaParse() throws Exception
     {
         final StringBuilder sb = new StringBuilder();
-        
+
         sb.append("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML+RDFa 1.0//EN\" \"http://www.w3.org/MarkUp/DTD/xhtml-rdfa-1.dtd\">");
         sb.append("<html xmlns=\"http://www.w3.org/1999/xhtml\"");
         sb.append(" xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\"");
@@ -653,5 +653,5 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
         sb.append("</html>");
         this.assertRdf(new StringReader(sb.toString()), RDFFormat.RDFA, 1);
     }
-    
+
 }

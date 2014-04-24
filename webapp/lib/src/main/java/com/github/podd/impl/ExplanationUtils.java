@@ -1,16 +1,16 @@
 /**
  * PODD is an OWL ontology database used for scientific project management
- * 
+ *
  * Copyright (C) 2009-2013 The University Of Queensland
- * 
+ *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU Affero General Public License as published by the Free Software Foundation, either version 3
  * of the License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
  * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Affero General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License along with this program.
  * If not, see <http://www.gnu.org/licenses/>.
  */
@@ -67,27 +67,27 @@ public class ExplanationUtils
 {
     private static class RendererExplanationProgressMonitor implements ExplanationProgressMonitor
     {
-        
+
         private OWLAxiom axiom;
         private ExplanationRenderer rend;
         private Set<Set<OWLAxiom>> setExplanations = new HashSet<Set<OWLAxiom>>();
-        
+
         private RendererExplanationProgressMonitor(final ExplanationRenderer rend, final OWLAxiom axiom)
         {
             this.axiom = axiom;
             this.rend = rend;
         }
-        
+
         @Override
         public void foundAllExplanations()
         {
             // Do nothing to support multiple uses of renderer
         }
-        
+
         @Override
         public void foundExplanation(final Set<OWLAxiom> axioms)
         {
-            
+
             if(!this.setExplanations.contains(axioms))
             {
                 this.setExplanations.add(axioms);
@@ -108,7 +108,7 @@ public class ExplanationUtils
                 }
             }
         }
-        
+
         public void foundNoExplanations()
         {
             try
@@ -127,19 +127,19 @@ public class ExplanationUtils
                 System.err.println("Error rendering explanation: " + e);
             }
         }
-        
+
         @Override
         public boolean isCancelled()
         {
             return false;
         }
     }
-    
+
     static
     {
         GlassBoxExplanation.setup();
     }
-    
+
     private boolean allowInconsistency = true;
     private SatisfiabilityConverter converter;
     private int errorExpCount = 0;
@@ -150,16 +150,16 @@ public class ExplanationUtils
      * inferences whose explanation contains more than on axiom
      */
     private int multiAxiomExpCount = 0;
-    
+
     /**
      * inferences with multiple explanations
      */
     private int multipleExpCount = 0;
     private PelletReasoner reasoner;
     private PelletReasonerFactory reasonerFactory;
-    
+
     // private ExplanationProgressMonitor explanationMonitor;
-    
+
     public ExplanationUtils(final PelletReasoner reasoner, final PelletReasonerFactory reasonerFactory,
             final ExplanationRenderer explanationRenderer, final ProgressMonitor monitor, final int maxExplanations)
     {
@@ -174,28 +174,28 @@ public class ExplanationUtils
         {
             this.monitor = monitor;
         }
-        
+
         // this.explanationMonitor = explanationMonitor;
         this.explanationRenderer = explanationRenderer;
-        
+
         this.converter = new SatisfiabilityConverter(reasoner.getManager().getOWLDataFactory());
     }
-    
+
     private Set<Set<OWLAxiom>> explainAxiom(final OWLAxiom axiom) throws OWLException
     {
         final MultipleExplanationGenerator expGen = new HSTExplanationGenerator(this.getSingleExplanationGenerator());
         final RendererExplanationProgressMonitor rendererMonitor =
                 new RendererExplanationProgressMonitor(this.explanationRenderer, axiom);
         expGen.setProgressMonitor(rendererMonitor);
-        
+
         final OWLClassExpression unsatClass = this.converter.convert(axiom);
         final Set<Set<OWLAxiom>> explanations = expGen.getExplanations(unsatClass, this.maxExplanations);
-        
+
         if(explanations.isEmpty())
         {
             rendererMonitor.foundNoExplanations();
         }
-        
+
         final int expSize = explanations.size();
         if(expSize == 0)
         {
@@ -212,63 +212,63 @@ public class ExplanationUtils
         {
             this.multipleExpCount++;
         }
-        
+
         return explanations;
     }
-    
+
     public Set<Set<OWLAxiom>> explainClassHierarchy() throws OWLException
     {
         final Set<OWLClass> visited = new HashSet<OWLClass>();
-        
+
         this.reasoner.flush();
-        
+
         this.reasoner.getKB().classify();
-        
+
         this.reasoner.getKB().realize();
-        
+
         this.monitor.setMessage("Explaining");
         this.monitor.setProgress(this.reasoner.getRootOntology().getClassesInSignature().size());
         this.monitor.setStarted();
-        
+
         final Set<Set<OWLAxiom>> result = new HashSet<Set<OWLAxiom>>();
-        
+
         final Node<OWLClass> bottoms = this.reasoner.getEquivalentClasses(OWL.Nothing);
         result.addAll(this.explainClassHierarchy(OWL.Nothing, bottoms, visited));
-        
+
         final Node<OWLClass> tops = this.reasoner.getEquivalentClasses(OWL.Thing);
         result.addAll(this.explainClassHierarchy(OWL.Thing, tops, visited));
-        
+
         this.monitor.setFinished();
-        
+
         return result;
     }
-    
+
     private Set<Set<OWLAxiom>> explainClassHierarchy(final OWLClass cls, final Node<OWLClass> eqClasses,
             final Set<OWLClass> visited) throws OWLException
-    {
+            {
         final Set<Set<OWLAxiom>> result = new HashSet<Set<OWLAxiom>>();
-        
+
         if(visited.contains(cls))
         {
             return result;
         }
-        
+
         visited.add(cls);
         visited.addAll(eqClasses.getEntities());
-        
+
         for(final OWLClass eqClass : eqClasses)
         {
             // TODO: Support this
             // this.monitor.incrementProgress();
-            
+
             result.addAll(this.explainEquivalentClass(cls, eqClass));
         }
-        
+
         for(final OWLNamedIndividual ind : this.reasoner.getInstances(cls, true).getFlattened())
         {
             result.addAll(this.explainInstance(ind, cls));
         }
-        
+
         final NodeSet<OWLClass> subClasses = this.reasoner.getSubClasses(cls, true);
         final Map<OWLClass, Node<OWLClass>> subClassEqs = new HashMap<OWLClass, Node<OWLClass>>();
         for(final Node<OWLClass> equivalenceSet : subClasses)
@@ -280,46 +280,46 @@ public class ExplanationUtils
                 result.addAll(this.explainSubClass(subClass, cls));
             }
         }
-        
+
         for(final Map.Entry<OWLClass, Node<OWLClass>> entry : subClassEqs.entrySet())
         {
             result.addAll(this.explainClassHierarchy(entry.getKey(), entry.getValue(), visited));
         }
-        
+
         return result;
-    }
-    
+            }
+
     public Set<Set<OWLAxiom>> explainEquivalentClass(final OWLClass c1, final OWLClass c2) throws OWLException
     {
         final Set<Set<OWLAxiom>> result = new HashSet<Set<OWLAxiom>>();
-        
+
         if(c1.equals(c2))
         {
             return result;
         }
-        
+
         final OWLAxiom axiom = OWL.equivalentClasses(c1, c2);
-        
+
         return this.explainAxiom(axiom);
     }
-    
+
     public Set<Set<OWLAxiom>> explainInstance(final OWLIndividual ind, final OWLClass c) throws OWLException
     {
         final Set<Set<OWLAxiom>> result = new HashSet<Set<OWLAxiom>>();
-        
+
         if(c.isOWLThing())
         {
             return result;
         }
-        
+
         final OWLAxiom axiom = OWL.classAssertion(ind, c);
-        
+
         return this.explainAxiom(axiom);
     }
-    
+
     public Set<Set<OWLAxiom>> explainPropertyValue(final OWLIndividual s,
             @SuppressWarnings("rawtypes") final OWLProperty p, final OWLObject o) throws OWLException
-    {
+            {
         if(p.isOWLObjectProperty())
         {
             return this.explainAxiom(OWL.propertyAssertion(s, (OWLObjectProperty)p, (OWLIndividual)o));
@@ -328,12 +328,12 @@ public class ExplanationUtils
         {
             return this.explainAxiom(OWL.propertyAssertion(s, (OWLDataProperty)p, (OWLLiteral)o));
         }
-    }
-    
+            }
+
     public Set<Set<OWLAxiom>> explainSubClass(final OWLClass sub, final OWLClass sup) throws OWLException
     {
         final Set<Set<OWLAxiom>> result = new HashSet<Set<OWLAxiom>>();
-        
+
         if(sub.equals(sup))
         {
             return result;
@@ -346,16 +346,16 @@ public class ExplanationUtils
         {
             return result;
         }
-        
+
         final OWLSubClassOfAxiom axiom = OWL.subClassOf(sub, sup);
         return this.explainAxiom(axiom);
     }
-    
+
     public Set<Set<OWLAxiom>> explainUnsatisfiableClass(final OWLClass cls) throws OWLException
     {
         return this.explainSubClass(cls, OWL.Nothing);
     }
-    
+
     public Set<Set<OWLAxiom>> explainUnsatisfiableClasses() throws OWLException
     {
         final Set<Set<OWLAxiom>> result = new HashSet<Set<OWLAxiom>>();
@@ -368,7 +368,7 @@ public class ExplanationUtils
         }
         return result;
     }
-    
+
     private TransactionAwareSingleExpGen getSingleExplanationGenerator()
     {
         if(this.allowInconsistency)
@@ -380,12 +380,12 @@ public class ExplanationUtils
             return new BlackBoxExplanation(this.reasoner.getRootOntology(), this.reasonerFactory, this.reasoner);
         }
     }
-    
+
     public boolean getAllowInconsistency()
     {
         return this.allowInconsistency;
     }
-    
+
     public void setAllowInconsistency(final boolean allowInconsistency)
     {
         this.allowInconsistency = allowInconsistency;

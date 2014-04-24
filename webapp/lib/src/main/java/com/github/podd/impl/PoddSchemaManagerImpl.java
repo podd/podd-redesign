@@ -1,16 +1,16 @@
 /**
  * PODD is an OWL ontology database used for scientific project management
- * 
+ *
  * Copyright (C) 2009-2013 The University Of Queensland
- * 
+ *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU Affero General Public License as published by the Free Software Foundation, either version 3
  * of the License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
  * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Affero General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License along with this program.
  * If not, see <http://www.gnu.org/licenses/>.
  */
@@ -77,7 +77,7 @@ import com.github.podd.utils.PODD;
 
 /**
  * @author Peter Ansell p_ansell@yahoo.com
- * 
+ *
  */
 public class PoddSchemaManagerImpl implements PoddSchemaManager
 {
@@ -85,34 +85,34 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
     private PoddRepositoryManager repositoryManager;
     private PoddSesameManager sesameManager;
     private PoddOWLManager owlManager;
-    
+
     /**
-     * 
+     *
      */
     public PoddSchemaManagerImpl()
     {
         // TODO Auto-generated constructor stub
     }
-    
+
     @Override
     public void downloadSchemaOntology(final InferredOWLOntologyID ontologyId, final OutputStream outputStream,
             final RDFFormat format, final boolean includeInferred) throws UnmanagedSchemaException,
-        RepositoryException, OpenRDFException
+            RepositoryException, OpenRDFException
     {
         if(ontologyId.getOntologyIRI() == null || ontologyId.getVersionIRI() == null)
         {
             throw new PoddRuntimeException("Ontology IRI and Version IRI cannot be null");
         }
-        
+
         final InferredOWLOntologyID schemaOntologyID = this.getSchemaOntologyID(ontologyId);
-        
+
         if(includeInferred && schemaOntologyID.getInferredOntologyIRI() == null)
         {
             throw new PoddRuntimeException("Inferred Ontology IRI cannot be null");
         }
-        
+
         List<URI> contexts;
-        
+
         if(includeInferred)
         {
             contexts =
@@ -123,13 +123,13 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
         {
             contexts = Arrays.asList(schemaOntologyID.getVersionIRI().toOpenRDFURI());
         }
-        
+
         RepositoryConnection managementConnection = null;
-        
+
         try
         {
             managementConnection = this.repositoryManager.getManagementRepositoryConnection();
-            
+
             final RepositoryResult<Statement> statements =
                     managementConnection.getStatements(null, null, null, includeInferred,
                             contexts.toArray(new Resource[] {}));
@@ -149,16 +149,16 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
             }
         }
     }
-    
+
     @Override
     public Set<InferredOWLOntologyID> getCurrentSchemaOntologies() throws OpenRDFException
     {
         RepositoryConnection managementConnection = null;
-        
+
         try
         {
             managementConnection = this.repositoryManager.getManagementRepositoryConnection();
-            
+
             return this.sesameManager.getAllCurrentSchemaOntologyVersions(managementConnection,
                     this.repositoryManager.getSchemaManagementGraph());
         }
@@ -170,21 +170,21 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
             }
         }
     }
-    
+
     @Override
     public InferredOWLOntologyID getCurrentSchemaOntologyVersion(final IRI schemaOntologyIRI)
-        throws UnmanagedSchemaIRIException, OpenRDFException
+            throws UnmanagedSchemaIRIException, OpenRDFException
     {
         if(schemaOntologyIRI == null)
         {
             throw new UnmanagedSchemaIRIException(null, "NULL is not a managed schema ontology");
         }
-        
+
         RepositoryConnection managementConnection = null;
         try
         {
             managementConnection = this.repositoryManager.getManagementRepositoryConnection();
-            
+
             return this.sesameManager.getCurrentSchemaVersion(schemaOntologyIRI, managementConnection,
                     this.repositoryManager.getSchemaManagementGraph());
         }
@@ -196,16 +196,16 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
             }
         }
     }
-    
+
     @Override
     public Set<InferredOWLOntologyID> getSchemaOntologies() throws OpenRDFException
     {
         RepositoryConnection managementConnection = null;
-        
+
         try
         {
             managementConnection = this.repositoryManager.getManagementRepositoryConnection();
-            
+
             return this.sesameManager.getAllSchemaOntologyVersions(managementConnection,
                     this.repositoryManager.getSchemaManagementGraph());
         }
@@ -217,38 +217,38 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
             }
         }
     }
-    
+
     @Override
     public OWLOntology getSchemaOntology(final URI schemaOntologyIRI) throws UnmanagedSchemaIRIException
     {
         throw new RuntimeException("TODO: Implement getSchemaOntology(IRI)");
     }
-    
+
     @Override
     public OWLOntology getSchemaOntology(final OWLOntologyID schemaOntologyID)
-        throws UnmanagedSchemaOntologyIDException
+            throws UnmanagedSchemaOntologyIDException
     {
         throw new RuntimeException("TODO: Implement getSchemaOntology(OWLOntologyID)");
     }
-    
+
     @Override
     public InferredOWLOntologyID getSchemaOntologyID(final OWLOntologyID owlOntologyID)
-        throws UnmanagedSchemaOntologyIDException, OpenRDFException
+            throws UnmanagedSchemaOntologyIDException, OpenRDFException
     {
         if(owlOntologyID == null)
         {
             throw new UnmanagedSchemaOntologyIDException(owlOntologyID, "NULL is not a managed schema ontology");
         }
-        
+
         RepositoryConnection managementConnection = null;
         try
         {
             managementConnection = this.repositoryManager.getManagementRepositoryConnection();
-            
+
             final InferredOWLOntologyID version =
                     this.sesameManager.getSchemaVersion(owlOntologyID.getVersionIRI(), managementConnection,
                             this.repositoryManager.getSchemaManagementGraph());
-            
+
             // Check that the ontology IRI matches or return an error
             if(version.getOntologyIRI().equals(owlOntologyID.getOntologyIRI()))
             {
@@ -273,21 +273,21 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
             }
         }
     }
-    
+
     @Override
     public InferredOWLOntologyID getSchemaOntologyVersion(final IRI schemaVersionIRI)
-        throws UnmanagedSchemaIRIException, OpenRDFException
+            throws UnmanagedSchemaIRIException, OpenRDFException
     {
         if(schemaVersionIRI == null)
         {
             throw new UnmanagedSchemaIRIException(null, "NULL is not a managed schema ontology");
         }
-        
+
         RepositoryConnection managementConnection = null;
         try
         {
             managementConnection = this.repositoryManager.getManagementRepositoryConnection();
-            
+
             return this.sesameManager.getSchemaVersion(schemaVersionIRI, managementConnection,
                     this.repositoryManager.getSchemaManagementGraph());
         }
@@ -299,16 +299,16 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
             }
         }
     }
-    
+
     @Override
     public void setCurrentSchemaOntologyVersion(final OWLOntologyID schemaOntologyID)
-        throws UnmanagedSchemaOntologyIDException, IllegalArgumentException, OpenRDFException
+            throws UnmanagedSchemaOntologyIDException, IllegalArgumentException, OpenRDFException
     {
         RepositoryConnection managementConnection = null;
         try
         {
             managementConnection = this.repositoryManager.getManagementRepositoryConnection();
-            
+
             this.setUpdateManagedSchemaOntologyVersionInternal(schemaOntologyID, true, managementConnection,
                     this.repositoryManager.getSchemaManagementGraph());
         }
@@ -320,7 +320,7 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
             }
         }
     }
-    
+
     private void setUpdateManagedSchemaOntologyVersionInternal(final OWLOntologyID schemaOntologyID,
             final boolean updateCurrent, final RepositoryConnection managementConnection,
             final URI schemaManagementContext) throws UnmanagedSchemaOntologyIDException, OpenRDFException
@@ -328,28 +328,28 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
         this.sesameManager.updateManagedSchemaOntologyVersion(schemaOntologyID, updateCurrent, managementConnection,
                 schemaManagementContext);
     }
-    
+
     @Override
     public void setOwlManager(final PoddOWLManager owlManager)
     {
         this.owlManager = owlManager;
     }
-    
+
     @Override
     public void setRepositoryManager(final PoddRepositoryManager repositoryManager)
     {
         this.repositoryManager = repositoryManager;
     }
-    
+
     @Override
     public void setSesameManager(final PoddSesameManager sesameManager)
     {
         this.sesameManager = sesameManager;
     }
-    
+
     @Override
     public List<InferredOWLOntologyID> uploadSchemaOntologies(final Model model) throws OpenRDFException, IOException,
-        OWLException, PoddException
+    OWLException, PoddException
     {
         final Set<URI> schemaOntologyUris = new HashSet<>();
         final Set<URI> schemaVersionUris = new HashSet<>();
@@ -363,21 +363,21 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
         }
         // Map<URI, Set<OWLOntologyID>> allImports =
         // OntologyUtils.schemaManifestImports(model, schemaOntologyUris, schemaVersionUris);
-        
+
         final List<InferredOWLOntologyID> dependentSchemaOntologies =
                 OntologyUtils.modelToOntologyIDs(model, false, false);
         final List<OWLOntologyID> manifestImports =
                 OntologyUtils.schemaManifestImports(model, new LinkedHashSet<>(dependentSchemaOntologies));
-        
+
         this.log.info("Uploading schema ontologies: {}", manifestImports);
-        
+
         return this.uploadSchemaOntologiesInOrder(model, manifestImports, currentVersionsMap);
     }
-    
+
     /**
      * Given the manifest {@link Model} and the overall order of imports based on ontology version
      * IRIs, import all of the ontologies which have new versions.
-     * 
+     *
      * @param model
      *            The complete schema ontology information.
      * @param nextImportOrder
@@ -394,41 +394,41 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
      */
     private List<InferredOWLOntologyID> uploadSchemaOntologiesInOrder(final Model model,
             final List<OWLOntologyID> nextImportOrder, final ConcurrentMap<URI, URI> currentVersionsMap)
-        throws ModelException, OpenRDFException, IOException, OWLException, PoddException
-    {
+                    throws ModelException, OpenRDFException, IOException, OWLException, PoddException
+                    {
         Objects.requireNonNull(model, "Schema Ontology model was null");
         Objects.requireNonNull(nextImportOrder, "Schema Ontology import order was null");
-        
+
         final Map<OWLOntologyID, Boolean> loadingOrder = new LinkedHashMap<>();
-        
+
         RepositoryConnection managementConnection = null;
-        
+
         try
         {
-            
+
             managementConnection = this.repositoryManager.getManagementRepositoryConnection();
-            
+
             // HACK: The raw schema manifest does not necessarily include the inferred ontology
             // information which breaks the workflow if the non-inferred ontology IDs are triggered
             // now
-            
+
             // final List<InferredOWLOntologyID> ontologyIDs =
             // OntologyUtils.loadSchemasFromManifest(managementConnection,
             // this.repositoryManager.getSchemaManagementGraph(), model);
             // managementConnection.add(model, this.repositoryManager.getSchemaManagementGraph());
-            
+
             if(this.log.isDebugEnabled())
             {
                 DebugUtils.printContents(managementConnection, this.repositoryManager.getSchemaManagementGraph());
             }
-            
+
             final Set<InferredOWLOntologyID> existingSchemaOntologies =
                     this.sesameManager.getAllSchemaOntologyVersions(managementConnection,
                             this.repositoryManager.getSchemaManagementGraph());
             this.log.debug("currentVersionsMap : {}", currentVersionsMap);
             this.log.debug("nextImportOrder : {}", nextImportOrder);
             this.log.info("Existing schema ontologies at this point: {}", existingSchemaOntologies);
-            
+
             for(final OWLOntologyID nextImport : nextImportOrder)
             {
                 boolean alreadyLoaded = false;
@@ -448,9 +448,9 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
                     loadingOrder.put(nextImport, alreadyLoaded);
                 }
             }
-            
+
             final List<InferredOWLOntologyID> results = new ArrayList<>();
-            
+
             this.log.info("About to load ontologies in order: {}", loadingOrder);
             for(final Entry<OWLOntologyID, Boolean> loadEntry : loadingOrder.entrySet())
             {
@@ -475,11 +475,11 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
                     this.log.debug("Need to load ontology that is not already available: {}", loadEntry.getKey());
                     // TODO: Should we store these copies in a separate repository again, to reduce
                     // bloat in the management repository??
-                    
+
                     final OWLOntologyID loadEntryID = loadEntry.getKey();
                     final String classpathLocation =
                             model.filter(loadEntryID.getVersionIRI().toOpenRDFURI(), PODD.PODD_SCHEMA_CLASSPATH, null)
-                                    .objectLiteral().stringValue();
+                            .objectLiteral().stringValue();
                     final RDFFormat fileFormat = Rio.getParserFormatForFileName(classpathLocation, RDFFormat.RDFXML);
                     try (final InputStream inputStream = ApplicationUtils.class.getResourceAsStream(classpathLocation);)
                     {
@@ -488,14 +488,14 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
                             throw new SchemaManifestException(loadEntryID.getVersionIRI(),
                                     "Could not find schema at designated classpath location: " + classpathLocation);
                         }
-                        
+
                         managementConnection.begin();
                         final OWLOntologyID schemaOntologyID = null;
                         final InferredOWLOntologyID nextResult =
                                 this.uploadSchemaOntologyInternal(schemaOntologyID, inputStream, fileFormat,
                                         managementConnection, this.repositoryManager.getSchemaManagementGraph(),
                                         new LinkedHashSet<OWLOntologyID>(results));
-                        
+
                         boolean updateCurrent = true;
                         if(currentVersionsMap.containsKey(nextResult.getOntologyIRI().toOpenRDFURI()))
                         {
@@ -505,40 +505,40 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
                                 updateCurrent = false;
                             }
                         }
-                        
+
                         this.log.debug("Current version update required : {} {}", nextResult, updateCurrent);
-                        
+
                         this.setUpdateManagedSchemaOntologyVersionInternal(nextResult, updateCurrent,
                                 managementConnection, this.repositoryManager.getSchemaManagementGraph());
-                        
+
                         final List<Statement> importStatements =
                                 Iterations.asList(managementConnection.getStatements(nextResult.getOntologyIRI()
                                         .toOpenRDFURI(), OWL.IMPORTS, null, true, nextResult.getVersionIRI()
                                         .toOpenRDFURI()));
-                        
+
                         this.log.debug("Imports to copy for ontology: {} {}", nextResult, importStatements);
-                        
+
                         for(final Statement nextImportStatement : importStatements)
                         {
                             managementConnection.add(nextResult.getVersionIRI().toOpenRDFURI(), OWL.IMPORTS,
                                     nextImportStatement.getObject(), this.repositoryManager.getSchemaManagementGraph());
                         }
-                        
+
                         // Add from the schema manifest
                         managementConnection.add(
                                 model.filter(nextResult.getVersionIRI().toOpenRDFURI(), OWL.IMPORTS, null),
                                 this.repositoryManager.getSchemaManagementGraph());
-                        
+
                         managementConnection.commit();
-                        
+
                         results.add(nextResult);
                     }
-                    
+
                 }
             }
-            
+
             this.log.info("Completed loading schema ontologies");
-            
+
             return results;
         }
         catch(final Throwable e)
@@ -547,7 +547,7 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
             {
                 managementConnection.rollback();
             }
-            
+
             throw e;
         }
         finally
@@ -557,16 +557,16 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
                 managementConnection.close();
             }
         }
-    }
-    
+                    }
+
     @Override
     public InferredOWLOntologyID uploadSchemaOntology(final InputStream inputStream, final RDFFormat fileFormat,
             final Set<? extends OWLOntologyID> dependentSchemaOntologies) throws OpenRDFException, IOException,
-        OWLException, PoddException
+            OWLException, PoddException
     {
         return this.uploadSchemaOntology(null, inputStream, fileFormat, dependentSchemaOntologies);
     }
-    
+
     /*
      * FIXME: check if the version exists in the repository before upload
      */
@@ -574,12 +574,12 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
     public InferredOWLOntologyID uploadSchemaOntology(final OWLOntologyID schemaOntologyID,
             final InputStream inputStream, final RDFFormat fileFormat,
             final Set<? extends OWLOntologyID> dependentSchemaOntologies) throws OpenRDFException, IOException,
-        OWLException, PoddException
+            OWLException, PoddException
     {
         Objects.requireNonNull(inputStream, "Schema Ontology input stream was null");
-        
+
         RepositoryConnection managementConnection = null;
-        
+
         try
         {
             // TODO: Should we store these copies in a separate repository
@@ -587,16 +587,16 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
             // the management repository??
             managementConnection = this.repositoryManager.getManagementRepositoryConnection();
             managementConnection.begin();
-            
+
             // TODO: Call this method directly from other methods so that the whole transaction can
             // be rolled back if there are any failures!
             final InferredOWLOntologyID nextResult =
                     this.uploadSchemaOntologyInternal(schemaOntologyID, inputStream, fileFormat, managementConnection,
                             this.repositoryManager.getSchemaManagementGraph(), dependentSchemaOntologies);
-            
+
             this.setUpdateManagedSchemaOntologyVersionInternal(nextResult, true, managementConnection,
                     this.repositoryManager.getSchemaManagementGraph());
-            
+
             final List<Statement> importStatements =
                     Iterations.asList(managementConnection.getStatements(nextResult.getOntologyIRI().toOpenRDFURI(),
                             OWL.IMPORTS, null, true, nextResult.getVersionIRI().toOpenRDFURI()));
@@ -605,9 +605,9 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
                 managementConnection.add(nextResult.getVersionIRI().toOpenRDFURI(), OWL.IMPORTS,
                         nextImportStatement.getObject(), this.repositoryManager.getSchemaManagementGraph());
             }
-            
+
             managementConnection.commit();
-            
+
             return nextResult;
         }
         catch(final Throwable e)
@@ -616,7 +616,7 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
             {
                 managementConnection.rollback();
             }
-            
+
             throw e;
         }
         finally
@@ -626,9 +626,9 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
                 managementConnection.close();
             }
         }
-        
+
     }
-    
+
     /**
      * @param schemaOntologyID
      * @param inputStream
@@ -647,23 +647,23 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
     private InferredOWLOntologyID uploadSchemaOntologyInternal(final OWLOntologyID schemaOntologyID,
             final InputStream inputStream, final RDFFormat fileFormat, final RepositoryConnection managementConnection,
             final URI schemaManagementGraph, final Set<? extends OWLOntologyID> dependentSchemaOntologies)
-        throws OWLException, IOException, PoddException, EmptyOntologyException, RepositoryException,
-        OWLRuntimeException, OpenRDFException
+                    throws OWLException, IOException, PoddException, EmptyOntologyException, RepositoryException,
+                    OWLRuntimeException, OpenRDFException
     {
         this.log.debug("Dependent ontologies for next schema upload: {}", dependentSchemaOntologies);
-        
+
         final OWLOntologyDocumentSource owlSource =
                 new StreamDocumentSource(inputStream, fileFormat.getDefaultMIMEType());
         final InferredOWLOntologyID nextInferredOntology =
                 this.owlManager.loadAndInfer(owlSource, managementConnection, schemaOntologyID,
                         dependentSchemaOntologies, managementConnection, schemaManagementGraph);
-        
+
         // update the link in the schema ontology management graph
         // TODO: This may not be the right method for this purpose
         // this.sesameManager.updateManagedSchemaOntologyVersion(nextInferredOntology, true,
         // managementConnection,
         // schemaManagementGraph);
-        
+
         return nextInferredOntology;
         // TODO: Why are we not able to return nextInferredOntology here
         // final InferredOWLOntologyID result =

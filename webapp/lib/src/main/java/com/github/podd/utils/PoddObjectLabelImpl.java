@@ -1,16 +1,16 @@
 /**
  * PODD is an OWL ontology database used for scientific project management
- * 
+ *
  * Copyright (C) 2009-2013 The University Of Queensland
- * 
+ *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU Affero General Public License as published by the Free Software Foundation, either version 3
  * of the License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
  * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Affero General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License along with this program.
  * If not, see <http://www.gnu.org/licenses/>.
  */
@@ -22,31 +22,31 @@ import org.semanticweb.owlapi.model.IRI;
 
 /**
  * Encapsulates the basic label and description metadata about an object into a single object.
- * 
+ *
  * This class must only ever be used to present precompiled sets of results to users. In other
  * cases, lists of {@link InferredOWLOntologyID}, {@link IRI} or {@link URI} are the correct way to
  * process information.
- * 
+ *
  * @author Peter Ansell p_ansell@yahoo.com
  */
 public class PoddObjectLabelImpl implements PoddObjectLabel
 {
     private InferredOWLOntologyID ontologyID;
-    
+
     private URI objectID;
-    
+
     // TODO: Migrate this to be Literal to preserve datatype and language where
     // necessary
     private String label;
-    
+
     // TODO: Migrate this to be Literal to preserve datatype and language where
     // necessary
     private String description;
-    
+
     /**
      * Creates a label object without a description, and without an object, meaning that the label
      * applies to the ontology itself.
-     * 
+     *
      * @param ontologyID
      *            The base artifact that this label is applied to.
      * @param label
@@ -57,11 +57,11 @@ public class PoddObjectLabelImpl implements PoddObjectLabel
         this.ontologyID = ontologyID;
         this.label = label;
     }
-    
+
     /**
      * Creates a label object without a description, and without an object, meaning that the label
      * applies to the ontology itself.
-     * 
+     *
      * @param ontologyID
      *            The base artifact that this label is applied to.
      * @param label
@@ -72,10 +72,10 @@ public class PoddObjectLabelImpl implements PoddObjectLabel
         this(ontologyID, label);
         this.description = description;
     }
-    
+
     /**
      * Creates a label object without a description
-     * 
+     *
      * @param parent
      *            The base artifact that this label is applied to.
      * @param object
@@ -88,10 +88,10 @@ public class PoddObjectLabelImpl implements PoddObjectLabel
         this(ontologyID, label);
         this.objectID = object;
     }
-    
+
     /**
      * Creates a label object with a description
-     * 
+     *
      * @param parent
      *            The base artifact that this label is applied to.
      * @param object
@@ -107,10 +107,10 @@ public class PoddObjectLabelImpl implements PoddObjectLabel
         this(parent, object, label);
         this.description = description;
     }
-    
+
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see com.github.podd.utils.PoddObjectLabel#getDescription()
      */
     @Override
@@ -118,10 +118,10 @@ public class PoddObjectLabelImpl implements PoddObjectLabel
     {
         return this.description;
     }
-    
+
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see com.github.podd.utils.PoddObjectLabel#getLabel()
      */
     @Override
@@ -129,10 +129,10 @@ public class PoddObjectLabelImpl implements PoddObjectLabel
     {
         return this.label;
     }
-    
+
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see com.github.podd.utils.PoddObjectLabel#getObjectID()
      */
     @Override
@@ -140,10 +140,10 @@ public class PoddObjectLabelImpl implements PoddObjectLabel
     {
         return this.objectID;
     }
-    
+
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see com.github.podd.utils.PoddObjectLabel#getParentArtifactID()
      */
     @Override
@@ -151,7 +151,7 @@ public class PoddObjectLabelImpl implements PoddObjectLabel
     {
         return this.ontologyID;
     }
-    
+
     @Override
     public String toString()
     {
@@ -165,13 +165,13 @@ public class PoddObjectLabelImpl implements PoddObjectLabel
         b.append("]");
         return b.toString();
     }
-    
+
     @Override
     public Literal getDescriptionLiteral()
     {
         return PODD.VF.createLiteral(this.description);
     }
-    
+
     @Override
     public Literal getLabelLiteral()
     {

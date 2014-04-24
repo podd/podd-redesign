@@ -1,16 +1,16 @@
 /**
  * PODD is an OWL ontology database used for scientific project management
- * 
+ *
  * Copyright (C) 2009-2013 The University Of Queensland
- * 
+ *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU Affero General Public License as published by the Free Software Foundation, either version 3
  * of the License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
  * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Affero General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License along with this program.
  * If not, see <http://www.gnu.org/licenses/>.
  */
@@ -29,19 +29,19 @@ import com.github.podd.utils.PODD;
 
 /**
  * An exception indicating that the OWL Ontology was not found to be in the given OWL Profile.
- * 
+ *
  * @author Peter Ansell p_ansell@yahoo.com
- * 
+ *
  */
 public class OntologyNotInProfileException extends PoddException
 {
     private static final long serialVersionUID = -7266174841631944910L;
-    
+
     private final OWLOntology ontology;
     private final OWLProfileReport profileReport;
-    
+
     /**
-     * 
+     *
      * @param ontology
      *            The OWL Ontology that was not in the given profile.
      * @param profileReport
@@ -57,7 +57,7 @@ public class OntologyNotInProfileException extends PoddException
         this.ontology = ontology;
         this.profileReport = profileReport;
     }
-    
+
     /**
      * @param ontology
      *            The OWL Ontology that was not in the given profile.
@@ -76,7 +76,7 @@ public class OntologyNotInProfileException extends PoddException
         this.ontology = ontology;
         this.profileReport = profileReport;
     }
-    
+
     /**
      * @param ontology
      *            The OWL Ontology that was not in the given profile.
@@ -93,18 +93,18 @@ public class OntologyNotInProfileException extends PoddException
         this.ontology = ontology;
         this.profileReport = profileReport;
     }
-    
+
     @Override
     public Model getDetailsAsModel(final Resource errorResource)
     {
         final Model model = super.getDetailsAsModel(errorResource);
-        
+
         if(this.getOntology() != null)
         {
             model.add(errorResource, PODD.ERR_SOURCE, this.getOntology().getOntologyID().getOntologyIRI()
                     .toOpenRDFURI());
         }
-        
+
         if(this.getProfileReport() != null)
         {
             for(final OWLProfileViolation violation : this.getProfileReport().getViolations())
@@ -116,10 +116,10 @@ public class OntologyNotInProfileException extends PoddException
                 model.add(v, RDFS.COMMENT, PODD.VF.createLiteral(violation.toString()));
             }
         }
-        
+
         return model;
     }
-    
+
     /**
      * @return The OWL Ontology that was not in the given profile.
      */
@@ -127,7 +127,7 @@ public class OntologyNotInProfileException extends PoddException
     {
         return this.ontology;
     }
-    
+
     /**
      * @return The OWL Profile report indicating what profile violations occurred.
      */
@@ -135,5 +135,5 @@ public class OntologyNotInProfileException extends PoddException
     {
         return this.profileReport;
     }
-    
+
 }

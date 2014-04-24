@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package com.github.podd.resources;
 
@@ -33,45 +33,45 @@ import com.github.podd.utils.PoddWebConstants;
 
 /**
  * Service to list Users.
- * 
+ *
  * @author kutila
  */
 public class UserListResourceImpl extends AbstractUserResourceImpl
 {
     /**
      * FIXME: incomplete implementation
-     * 
+     *
      * Display the User List HTML page
      */
     @Get(":html")
     public Representation getUsersHtml(final Representation entity, final Variant variant) throws ResourceException
     {
         this.log.info("getUsersHtml");
-        
+
         final User user = this.getRequest().getClientInfo().getUser();
         this.log.info("authenticated user: {}", user);
         this.checkAuthentication(PoddAction.OTHER_USER_READ);
-        
+
         final Map<String, Object> dataModel = RestletUtils.getBaseDataModel(this.getRequest());
         dataModel.put("contentTemplate", "admin_listUsers.html.ftl");
         dataModel.put("pageTitle", "List Users");
-        
+
         final PoddSesameRealm realm = ((PoddWebServiceApplication)this.getApplication()).getRealm();
         final List<PoddUser> users = realm.getUsers();
         dataModel.put("userObjectList", users);
-        
+
         dataModel.put("statusList", PoddUserStatus.values());
         dataModel.put("roleObjectList", PoddRoles.values());
-        
+
         // Output the base template, with contentTemplate from the dataModel
         // defining the
         // template to use for the content in the body of the page
         return RestletUtils.getHtmlRepresentation(
                 this.getPoddApplication().getPropertyUtil()
-                        .get(PoddWebConstants.PROPERTY_TEMPLATE_BASE, PoddWebConstants.DEFAULT_TEMPLATE_BASE),
+                .get(PoddWebConstants.PROPERTY_TEMPLATE_BASE, PoddWebConstants.DEFAULT_TEMPLATE_BASE),
                 dataModel, MediaType.TEXT_HTML, this.getPoddApplication().getTemplateConfiguration());
     }
-    
+
     /**
      * Get a list of PODD Users
      */
@@ -79,14 +79,14 @@ public class UserListResourceImpl extends AbstractUserResourceImpl
     public Representation getUsersRdf(final Representation entity, final Variant variant) throws ResourceException
     {
         this.log.info("getUsersRdf");
-        
+
         final User user = this.getRequest().getClientInfo().getUser();
         this.log.info("authenticated user: {}", user);
         this.checkAuthentication(PoddAction.OTHER_USER_READ);
-        
+
         final PoddSesameRealm realm = ((PoddWebServiceApplication)this.getApplication()).getRealm();
         final Model resultModel = this.userListToModel(realm.getUsers());
-        
+
         // - prepare response
         final ByteArrayOutputStream output = new ByteArrayOutputStream(8096);
         final RDFFormat outputFormat =
@@ -103,13 +103,13 @@ public class UserListResourceImpl extends AbstractUserResourceImpl
         {
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Could not parse input format", e);
         }
-        
+
         return new ByteArrayRepresentation(output.toByteArray(), MediaType.valueOf(outputFormat.getDefaultMIMEType()));
     }
-    
+
     /**
      * Convert the User Details into a Model. Role information is not included.
-     * 
+     *
      * @param users
      * @return
      */
@@ -120,8 +120,8 @@ public class UserListResourceImpl extends AbstractUserResourceImpl
         {
             user.toModel(model, false);
         }
-        
+
         return model;
     }
-    
+
 }

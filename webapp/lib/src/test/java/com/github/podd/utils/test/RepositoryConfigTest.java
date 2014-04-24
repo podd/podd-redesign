@@ -1,16 +1,16 @@
 /**
  * PODD is an OWL ontology database used for scientific project management
- * 
+ *
  * Copyright (C) 2009-2013 The University Of Queensland
- * 
+ *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU Affero General Public License as published by the Free Software Foundation, either version 3
  * of the License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
  * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Affero General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License along with this program.
  * If not, see <http://www.gnu.org/licenses/>.
  */
@@ -37,17 +37,17 @@ import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.Rio;
 
 /**
- * 
+ *
  * @author Peter Ansell p_ansell@yahoo.com
- * 
+ *
  */
 public class RepositoryConfigTest
 {
     @Rule
     public TemporaryFolder tempDir = new TemporaryFolder();
-    
+
     private File testDir;
-    
+
     /**
      * @throws java.lang.Exception
      */
@@ -56,7 +56,7 @@ public class RepositoryConfigTest
     {
         this.testDir = this.tempDir.newFolder("repositoryconfigtest");
     }
-    
+
     /**
      * @throws java.lang.Exception
      */
@@ -65,7 +65,7 @@ public class RepositoryConfigTest
     {
         this.testDir = null;
     }
-    
+
     @Test
     public final void testParsingMemoryStore() throws Exception
     {
@@ -79,13 +79,13 @@ public class RepositoryConfigTest
         Assert.assertNotNull(repositoryImplConfig.getType());
         final RepositoryFactory repositoryFactory =
                 RepositoryRegistry.getInstance().get(repositoryImplConfig.getType());
-        
+
         final Repository repository = repositoryFactory.getRepository(repositoryImplConfig);
         Assert.assertNotNull(repository);
         repository.setDataDir(this.testDir);
         repository.initialize();
     }
-    
+
     @Test
     public final void testParsingNativeStore() throws Exception
     {
@@ -97,7 +97,7 @@ public class RepositoryConfigTest
         Assert.assertNotNull(repositoryImplConfig.getType());
         final RepositoryFactory repositoryFactory =
                 RepositoryRegistry.getInstance().get(repositoryImplConfig.getType());
-        
+
         final Repository repository = repositoryFactory.getRepository(repositoryImplConfig);
         Assert.assertNotNull(repository);
         repository.setDataDir(this.testDir);

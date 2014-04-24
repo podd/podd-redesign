@@ -1,16 +1,16 @@
 /**
  * PODD is an OWL ontology database used for scientific project management
- * 
+ *
  * Copyright (C) 2009-2013 The University Of Queensland
- * 
+ *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU Affero General Public License as published by the Free Software Foundation, either version 3
  * of the License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
  * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Affero General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License along with this program.
  * If not, see <http://www.gnu.org/licenses/>.
  */
@@ -56,7 +56,7 @@ import com.github.podd.utils.PoddUser;
 import com.github.podd.utils.PoddWebConstants;
 
 /**
- * 
+ *
  * @author kutila
  */
 public class UserRolesResourceImpl extends AbstractUserResourceImpl
@@ -73,27 +73,27 @@ public class UserRolesResourceImpl extends AbstractUserResourceImpl
     public Representation editUserRolesRdf(final Representation entity, final Variant variant) throws ResourceException
     {
         this.log.debug("editUserRolesRdf");
-        
+
         final User user = this.getRequest().getClientInfo().getUser();
         this.log.debug("authenticated user: {}", user);
-        
+
         final String userIdentifier = this.getUserParameter();
-        
+
         this.log.debug("editing Roles of user: {}", userIdentifier);
-        
+
         // - validate User whose Roles are to be edited
         if(userIdentifier == null)
         {
             throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Did not specify user to edit Roles");
         }
-        
+
         final PoddSesameRealm nextRealm = ((PoddWebServiceApplication)this.getApplication()).getRealm();
         final PoddUser poddUser = nextRealm.findUser(userIdentifier);
         if(poddUser == null)
         {
             throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "User not found");
         }
-        
+
         // - retrieve 'delete' parameter
         boolean isDelete = false;
         final String deleteQueryParam = this.getQuery().getFirstValue(PoddWebConstants.KEY_DELETE, true);
@@ -102,23 +102,23 @@ public class UserRolesResourceImpl extends AbstractUserResourceImpl
             isDelete = Boolean.valueOf(deleteQueryParam);
         }
         this.log.debug(" edit Roles is a 'delete' = {}", isDelete);
-        
+
         Map<RestletUtilRole, Collection<URI>> rolesToEdit = null;
-        
+
         // parse input content to a Model
         try (final InputStream inputStream = entity.getStream();)
         {
             final RDFFormat inputFormat =
                     Rio.getParserFormatForMIMEType(entity.getMediaType().getName(), RDFFormat.RDFXML);
             final Model model = Rio.parse(inputStream, "", inputFormat);
-            
+
             rolesToEdit = PoddRoles.extractRoleMappingsUser(model);
         }
         catch(IOException | RDFParseException | UnsupportedRDFormatException e1)
         {
             throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Could not parse input");
         }
-        
+
         if(rolesToEdit.isEmpty())
         {
             throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST,
@@ -143,7 +143,7 @@ public class UserRolesResourceImpl extends AbstractUserResourceImpl
                 this.checkAuthentication(action, mappedUri);
             }
         }
-        
+
         // - do the mapping/unmapping of Roles only if all of the authorisations succeeded
         for(final Entry<RestletUtilRole, Collection<URI>> nextEntry : rolesToEdit.entrySet())
         {
@@ -163,7 +163,7 @@ public class UserRolesResourceImpl extends AbstractUserResourceImpl
                 }
             }
         }
-        
+
         // - prepare response
         final ByteArrayOutputStream output = new ByteArrayOutputStream(8096);
         final RDFFormat outputFormat =
@@ -177,10 +177,10 @@ public class UserRolesResourceImpl extends AbstractUserResourceImpl
         {
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Could not create response");
         }
-        
+
         return new ByteArrayRepresentation(output.toByteArray(), MediaType.valueOf(outputFormat.getDefaultMIMEType()));
     }
-    
+
     /**
      * Display the HTML page for User Role Management
      */
@@ -188,24 +188,24 @@ public class UserRolesResourceImpl extends AbstractUserResourceImpl
     public Representation getRoleManagementPageHtml(final Variant variant) throws ResourceException
     {
         this.log.debug("getRoleManagementHtml");
-        
+
         final String requestedUserIdentifier = this.getUserParameter();
         final PoddAction action =
                 this.getAction(requestedUserIdentifier, PoddAction.OTHER_USER_EDIT, PoddAction.CURRENT_USER_EDIT);
-        
+
         this.log.debug("requesting role management for user: {}", requestedUserIdentifier);
         this.checkAuthentication(action);
-        
+
         // completed checking authorization
-        
+
         final Map<String, Object> dataModel = RestletUtils.getBaseDataModel(this.getRequest());
         dataModel.put("contentTemplate", "editUserRoles.html.ftl");
         dataModel.put("pageTitle", "User Role Management");
         dataModel.put("authenticatedUserIdentifier", this.getRequest().getClientInfo().getUser().getIdentifier());
-        
+
         final PoddSesameRealm realm = ((PoddWebServiceApplication)this.getApplication()).getRealm();
         final PoddUser poddUser = realm.findUser(requestedUserIdentifier);
-        
+
         if(poddUser == null)
         {
             throw new ResourceException(Status.CLIENT_ERROR_NOT_FOUND, "User not found.");
@@ -213,26 +213,26 @@ public class UserRolesResourceImpl extends AbstractUserResourceImpl
         else
         {
             dataModel.put("requestedUser", poddUser);
-            
+
             // - include all available PoddRoles
             dataModel.put("repositoryRolesList", PoddRoles.getRepositoryRoles());
-            
+
             // - include user's current Roles and optional mapped objects
             final List<Entry<RestletUtilRole, PoddObjectLabel>> roleList =
                     RestletUtils.getUsersRoles(realm, poddUser, this.getPoddArtifactManager());
-            
+
             dataModel.put("userRoleList", roleList);
         }
-        
+
         // Output the base template, with contentTemplate from the dataModel
         // defining the
         // template to use for the content in the body of the page
         return RestletUtils.getHtmlRepresentation(
                 this.getPoddApplication().getPropertyUtil()
-                        .get(PoddWebConstants.PROPERTY_TEMPLATE_BASE, PoddWebConstants.DEFAULT_TEMPLATE_BASE),
+                .get(PoddWebConstants.PROPERTY_TEMPLATE_BASE, PoddWebConstants.DEFAULT_TEMPLATE_BASE),
                 dataModel, MediaType.TEXT_HTML, this.getPoddApplication().getTemplateConfiguration());
     }
-    
+
     /**
      * Display the HTML page for User Role Management
      */
@@ -240,18 +240,18 @@ public class UserRolesResourceImpl extends AbstractUserResourceImpl
     public Representation getRoleManagementRdf(final Variant variant) throws ResourceException
     {
         this.log.debug("getRoleManagementHtml");
-        
+
         final String requestedUserIdentifier = this.getUserParameter();
         final PoddAction action =
                 this.getAction(requestedUserIdentifier, PoddAction.OTHER_USER_EDIT, PoddAction.CURRENT_USER_EDIT);
-        
+
         this.log.debug("requesting role management for user: {}", requestedUserIdentifier);
         this.checkAuthentication(action);
-        
+
         // completed checking authorization
         final PoddSesameRealm realm = ((PoddWebServiceApplication)this.getApplication()).getRealm();
         final PoddUser poddUser = realm.findUser(requestedUserIdentifier);
-        
+
         if(poddUser == null)
         {
             throw new ResourceException(Status.CLIENT_ERROR_NOT_FOUND, "User not found.");
@@ -261,9 +261,9 @@ public class UserRolesResourceImpl extends AbstractUserResourceImpl
             // - include user's current Roles and optional mapped objects
             final Map<RestletUtilRole, Collection<URI>> mappings = RestletUtils.getUsersRoles(realm, poddUser);
             final Model results = new LinkedHashModel();
-            
+
             PoddRoles.dumpRoleMappingsUser(mappings, results);
-            
+
             // - prepare response
             final ByteArrayOutputStream output = new ByteArrayOutputStream(8096);
             final RDFFormat outputFormat =
@@ -276,11 +276,11 @@ public class UserRolesResourceImpl extends AbstractUserResourceImpl
             {
                 throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Could not create response");
             }
-            
+
             return new ByteArrayRepresentation(output.toByteArray(), MediaType.valueOf(outputFormat
                     .getDefaultMIMEType()));
-            
+
         }
     }
-    
+
 }

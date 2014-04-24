@@ -1,16 +1,16 @@
 /**
  * PODD is an OWL ontology database used for scientific project management
- * 
+ *
  * Copyright (C) 2009-2013 The University Of Queensland
- * 
+ *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU Affero General Public License as published by the Free Software Foundation, either version 3
  * of the License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
  * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Affero General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License along with this program.
  * If not, see <http://www.gnu.org/licenses/>.
  */
@@ -34,9 +34,9 @@ import com.github.podd.utils.PODD;
 
 /**
  * An exception indicating that the given ontology was inconsistent.
- * 
+ *
  * @author Peter Ansell p_ansell@yahoo.com
- * 
+ *
  */
 public class InconsistentOntologyException extends PoddException
 {
@@ -44,9 +44,9 @@ public class InconsistentOntologyException extends PoddException
     private final Set<Set<OWLAxiom>> explanations;
     private final OWLOntologyID ontologyID;
     private final ExplanationRenderer renderer;
-    
+
     /**
-     * 
+     *
      * @param msg
      *            The message for this exception.
      */
@@ -58,7 +58,7 @@ public class InconsistentOntologyException extends PoddException
         this.ontologyID = ontologyID;
         this.renderer = explanationRenderer;
     }
-    
+
     /**
      * @param msg
      *            The message for this exception.
@@ -74,7 +74,7 @@ public class InconsistentOntologyException extends PoddException
         this.ontologyID = ontologyID;
         this.renderer = explanationRenderer;
     }
-    
+
     /**
      * @param reasoner
      *            The OWL Reasoner instance containing the details about why the ontology was
@@ -90,33 +90,33 @@ public class InconsistentOntologyException extends PoddException
         this.ontologyID = ontologyID;
         this.renderer = explanationRenderer;
     }
-    
+
     @Override
     public Model getDetailsAsModel(final Resource errorResource)
     {
         final Model model = super.getDetailsAsModel(errorResource);
-        
+
         if(this.explanations != null)
         {
             final BNode reasonerUri = PODD.VF.createBNode();
             model.add(errorResource, PODD.ERR_IDENTIFIER, reasonerUri);
             model.add(reasonerUri, RDFS.LABEL,
                     PODD.VF.createLiteral("Explanations for inconsistencies (" + this.explanations.size() + ")"));
-            
+
             model.add(errorResource, PODD.ERR_SOURCE, this.ontologyID.getOntologyIRI().toOpenRDFURI());
-            
+
             String explanation;
-            
+
             try
             {
                 final StringWriter results = new StringWriter();
-                
+
                 this.renderer.startRendering(results);
-                
+
                 this.renderer.render((OWLAxiom)null, this.explanations);
-                
+
                 this.renderer.endRendering();
-                
+
                 explanation = results.toString();
             }
             catch(IOException | OWLException e)
@@ -129,10 +129,10 @@ public class InconsistentOntologyException extends PoddException
             model.add(v, RDFS.LABEL, PODD.VF.createLiteral(this.getMessage()));
             model.add(v, RDFS.COMMENT, PODD.VF.createLiteral(explanation));
         }
-        
+
         return model;
     }
-    
+
     public OWLOntologyID getOntologyID()
     {
         return this.ontologyID;

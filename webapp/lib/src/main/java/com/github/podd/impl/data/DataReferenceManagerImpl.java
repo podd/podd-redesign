@@ -1,16 +1,16 @@
 /**
  * PODD is an OWL ontology database used for scientific project management
- * 
+ *
  * Copyright (C) 2009-2013 The University Of Queensland
- * 
+ *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU Affero General Public License as published by the Free Software Foundation, either version 3
  * of the License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
  * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Affero General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License along with this program.
  * If not, see <http://www.gnu.org/licenses/>.
  */
@@ -44,40 +44,40 @@ import com.github.podd.utils.PoddRdfUtils;
 
 /**
  * @author Peter Ansell p_ansell@yahoo.com
- * 
+ *
  */
 public class DataReferenceManagerImpl implements DataReferenceManager
 {
     private final Logger log = LoggerFactory.getLogger(this.getClass());
-    
+
     // Initially setup the registry to the global instance
     private DataReferenceProcessorRegistry registry = DataReferenceProcessorRegistry.getInstance();
-    
+
     private final PoddProcessorStage processorStage = PoddProcessorStage.RDF_PARSING;
-    
+
     /**
      * Default constructor
      */
     public DataReferenceManagerImpl()
     {
     }
-    
+
     @Override
     public Set<DataReference> extractDataReferences(final RepositoryConnection repositoryConnection,
             final URI... contexts) throws OpenRDFException
-    {
+            {
         final Set<DataReference> internalFileRefResults =
                 Collections.newSetFromMap(new ConcurrentHashMap<DataReference, Boolean>());
-        
+
         for(final DataReferenceProcessorFactory nextProcessorFactory : this.getDataProcessorRegistry().getByStage(
                 this.processorStage))
         {
             try
             {
                 final String sparqlQuery = PoddRdfUtils.buildSparqlConstructQuery(nextProcessorFactory);
-                
+
                 final GraphQuery graphQuery = repositoryConnection.prepareGraphQuery(QueryLanguage.SPARQL, sparqlQuery);
-                
+
                 // Create a new dataset to specify contexts that the query will
                 // be allowed to access
                 final DatasetImpl dataset = new DatasetImpl();
@@ -85,17 +85,17 @@ public class DataReferenceManagerImpl implements DataReferenceManager
                 {
                     dataset.addDefaultGraph(artifactGraphUri);
                 }
-                
+
                 // set the dataset for the query to be our artificially
                 // constructed dataset
                 graphQuery.setDataset(dataset);
-                
+
                 final GraphQueryResult queryResult = graphQuery.evaluate();
-                
+
                 // following contains statements for file references from the
                 // whole artifact
                 final Model results = QueryResults.asModel(queryResult);
-                
+
                 if(!results.isEmpty())
                 {
                     // This processor factory matches the graph that we wish to use, so we create a
@@ -103,7 +103,7 @@ public class DataReferenceManagerImpl implements DataReferenceManager
                     // NOTE: This object cannot be shared as we do not specify that it needs to be
                     // threadsafe
                     final DataReferenceProcessor<DataReference> processor = nextProcessorFactory.getProcessor();
-                    
+
                     if(processor.canHandle(results))
                     {
                         internalFileRefResults.addAll(processor.createReferences(results));
@@ -116,14 +116,14 @@ public class DataReferenceManagerImpl implements DataReferenceManager
             }
         }
         return internalFileRefResults;
-    }
-    
+            }
+
     @Override
     public DataReferenceProcessorRegistry getDataProcessorRegistry()
     {
         return this.registry;
     }
-    
+
     @Override
     public void setDataProcessorRegistry(final DataReferenceProcessorRegistry registry)
     {

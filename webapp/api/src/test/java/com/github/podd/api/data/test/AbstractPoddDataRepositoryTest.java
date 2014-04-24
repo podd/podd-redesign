@@ -1,16 +1,16 @@
 /**
  * PODD is an OWL ontology database used for scientific project management
- * 
+ *
  * Copyright (C) 2009-2013 The University Of Queensland
- * 
+ *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU Affero General Public License as published by the Free Software Foundation, either version 3
  * of the License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
  * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Affero General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License along with this program.
  * If not, see <http://www.gnu.org/licenses/>.
  */
@@ -34,108 +34,108 @@ import com.github.podd.exception.DataReferenceNotSupportedException;
 import com.github.podd.exception.DataRepositoryIncompleteException;
 
 /**
- * 
+ *
  * @author kutila
  */
 public abstract class AbstractPoddDataRepositoryTest<T extends DataReference>
 {
     private final String testAliasGood = "test_alias";
     private final String testAliasBad = "no_such_alias";
-    
+
     protected PoddDataRepository<T> testDataRepository;
-    
+
     protected final String getAliasGood()
     {
         return this.testAliasGood;
     }
-    
+
     /**
      * @return A Collection of URIs representing the expected types of the test FileRepository
      *         instance
      */
     protected abstract Collection<URI> getExpectedTypes() throws Exception;
-    
+
     /**
      * @return A Collection of Models that do not contain sufficient information to create a
      *         FileRepository object
      */
     protected abstract Map<Resource, Model> getIncompleteModels();
-    
+
     /**
      * @return A new DataReference instance that must not be validated.
      */
     protected abstract T getNewNonValidatingDataReference() throws Exception;
-    
+
     /**
      * @return A new {@link PoddDataRepository} instance for use by the test
      */
     protected abstract PoddDataRepository<T> getNewPoddDataRepository(final Resource nextDataRepository,
             final Model model) throws Exception;
-    
+
     /**
      * @return A new {@link PoddDataRepository} instance for use by the test
      */
     protected abstract PoddDataRepository<T> getNewPoddDataRepository() throws Exception;
-    
+
     /**
      * @return A new DataReference instance that will be validated by this repository.
      */
     protected abstract T getNewValidatingDataReference() throws Exception;
-    
+
     @Before
     public void setUp() throws Exception
     {
         this.testDataRepository = this.getNewPoddDataRepository();
     }
-    
+
     /**
      * Start a File Repository source for test
      */
     protected abstract void startRepositorySource() throws Exception;
-    
+
     /**
      * Stop the test File Repository source
      */
     protected abstract void stopRepositorySource() throws Exception;
-    
+
     @After
     public void tearDown() throws Exception
     {
         this.testDataRepository = null;
     }
-    
+
     @Test
     public void testCanHandle() throws Exception
     {
         final T dataReference = this.getNewNonValidatingDataReference();
         dataReference.setRepositoryAlias(this.testAliasGood);
-        
+
         Assert.assertTrue("Repository should be able to handle this file reference",
                 this.testDataRepository.canHandle(dataReference));
     }
-    
+
     @Test
     public void testCanHandleWithDifferentAliases() throws Exception
     {
         final T dataReference = this.getNewNonValidatingDataReference();
         dataReference.setRepositoryAlias(this.testAliasBad);
-        
+
         Assert.assertFalse("Repository should not be able to handle this file reference",
                 this.testDataRepository.canHandle(dataReference));
     }
-    
+
     @Test
     public void testCanHandleWithNullReference() throws Exception
     {
         Assert.assertFalse("Repository should not be able to handle NULL file reference",
                 this.testDataRepository.canHandle(null));
     }
-    
+
     @Test
     public void testCreateFileRepositoryWithIncompleteModel() throws Exception
     {
         final Map<Resource, Model> incompleteModels = this.getIncompleteModels();
-        
+
         for(final Resource nextDataRepository : incompleteModels.keySet())
         {
             try
@@ -149,14 +149,14 @@ public abstract class AbstractPoddDataRepositoryTest<T extends DataReference>
             }
         }
     }
-    
+
     @Test
     public void testGetAlias() throws Exception
     {
         final String alias = this.testDataRepository.getAlias();
         Assert.assertNotNull("NULL alias", alias);
     }
-    
+
     @Test
     public void testGetTypes() throws Exception
     {
@@ -169,7 +169,7 @@ public abstract class AbstractPoddDataRepositoryTest<T extends DataReference>
             Assert.assertTrue("Expected TYPE missing", types.contains(uri));
         }
     }
-    
+
     /**
      * This test starts up an internal file repository source and therefore can be slow.
      */
@@ -188,7 +188,7 @@ public abstract class AbstractPoddDataRepositoryTest<T extends DataReference>
             this.stopRepositorySource();
         }
     }
-    
+
     /**
      * The internal file repository source is not started since this test fails before reaching a
      * stage where the remote repository is accessed.
@@ -208,7 +208,7 @@ public abstract class AbstractPoddDataRepositoryTest<T extends DataReference>
             Assert.assertEquals("cannot handle file reference for validation", e.getMessage());
         }
     }
-    
+
     /**
      * This test starts up an internal file repository source and therefore can be slow.
      */
@@ -227,5 +227,5 @@ public abstract class AbstractPoddDataRepositoryTest<T extends DataReference>
             this.stopRepositorySource();
         }
     }
-    
+
 }

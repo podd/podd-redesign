@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package com.github.podd.resources;
 
@@ -48,14 +48,14 @@ import com.github.podd.utils.PoddUser;
 import com.github.podd.utils.PoddWebConstants;
 
 /**
- * 
+ *
  * @author kutila
  */
 public class ArtifactRolesResourceImpl extends AbstractPoddResourceImpl
 {
-    
+
     private final Logger log = LoggerFactory.getLogger(this.getClass());
-    
+
     /**
      * View the Edit Project Participants page in HTML
      */
@@ -63,21 +63,21 @@ public class ArtifactRolesResourceImpl extends AbstractPoddResourceImpl
     public Representation getEditArtifactParticipantsHtml(final Representation entity) throws ResourceException
     {
         this.log.info("getArtifactRolesHtml");
-        
+
         // the artifact in which editing is requested
         final String artifactUri = this.getQuery().getFirstValue(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, true);
         if(artifactUri == null)
         {
             throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Artifact ID not submitted");
         }
-        
+
         this.log.info("requesting to edit Artifact Participants (HTML): {}", artifactUri);
-        
+
         this.checkAuthentication(PoddAction.PROJECT_ROLE_EDIT, PODD.VF.createURI(artifactUri));
-        
+
         final User user = this.getRequest().getClientInfo().getUser();
         this.log.info("authenticated user: {}", user);
-        
+
         // validate artifact exists
         InferredOWLOntologyID ontologyID;
         try
@@ -88,29 +88,29 @@ public class ArtifactRolesResourceImpl extends AbstractPoddResourceImpl
         {
             throw new ResourceException(Status.CLIENT_ERROR_NOT_FOUND, "Could not find the given artifact", e);
         }
-        
+
         final Map<String, Object> dataModel = RestletUtils.getBaseDataModel(this.getRequest());
-        
+
         dataModel.put("contentTemplate", "projectParticipants.html.ftl");
         dataModel.put("pageTitle", "Edit Project Participants");
-        
+
         try
         {
             dataModel.put("projectObject", this.getProjectDetails(ontologyID));
-            
+
             dataModel.put("piUri", PoddRoles.PROJECT_PRINCIPAL_INVESTIGATOR.getURI());
             dataModel.put("adminUri", PoddRoles.PROJECT_ADMIN.getURI());
             dataModel.put("memberUri", PoddRoles.PROJECT_MEMBER.getURI());
             dataModel.put("observerUri", PoddRoles.PROJECT_OBSERVER.getURI());
-            
+
             final Collection<RestletUtilRole> nextRoles = new LinkedHashSet<>();
             nextRoles.addAll(Arrays.asList(PoddRoles.PROJECT_PRINCIPAL_INVESTIGATOR, PoddRoles.PROJECT_ADMIN,
                     PoddRoles.PROJECT_MEMBER, PoddRoles.PROJECT_OBSERVER));
-            
+
             final Map<RestletUtilRole, Collection<PoddUser>> roleUserMap =
                     ((PoddWebServiceApplication)this.getApplication()).getRealm().getUsersForRole(nextRoles,
                             ontologyID.getOntologyIRI().toOpenRDFURI());
-            
+
             // - add PI user label and identifier
             final Collection<PoddUser> piList = roleUserMap.get(PoddRoles.PROJECT_PRINCIPAL_INVESTIGATOR);
             if(piList != null && piList.size() == 1)
@@ -123,7 +123,7 @@ public class ArtifactRolesResourceImpl extends AbstractPoddResourceImpl
             {
                 this.log.warn("Did not find Principal Investigator for artifact: {}", artifactUri);
             }
-            
+
             // - add other Project Role participants
             dataModel.put("admins", roleUserMap.get(PoddRoles.PROJECT_ADMIN));
             dataModel.put("members", roleUserMap.get(PoddRoles.PROJECT_MEMBER));
@@ -135,15 +135,15 @@ public class ArtifactRolesResourceImpl extends AbstractPoddResourceImpl
         {
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Failed to populate data model", e);
         }
-        
+
         dataModel.put("artifactUri", ontologyID.getOntologyIRI().toString());
-        
+
         return RestletUtils.getHtmlRepresentation(
                 this.getPoddApplication().getPropertyUtil()
-                        .get(PoddWebConstants.PROPERTY_TEMPLATE_BASE, PoddWebConstants.DEFAULT_TEMPLATE_BASE),
+                .get(PoddWebConstants.PROPERTY_TEMPLATE_BASE, PoddWebConstants.DEFAULT_TEMPLATE_BASE),
                 dataModel, MediaType.TEXT_HTML, this.getPoddApplication().getTemplateConfiguration());
     }
-    
+
     /**
      * View the Edit Project Participants data in RDF.
      */
@@ -151,21 +151,21 @@ public class ArtifactRolesResourceImpl extends AbstractPoddResourceImpl
     public Representation getEditArtifactParticipantsRdf(final Variant variant) throws ResourceException
     {
         this.log.info("getArtifactRolesHtml");
-        
+
         // the artifact in which editing is requested
         final String artifactUri = this.getQuery().getFirstValue(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, true);
         if(artifactUri == null)
         {
             throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Artifact ID not submitted");
         }
-        
+
         this.log.info("requesting to edit Artifact Participants (HTML): {}", artifactUri);
-        
+
         this.checkAuthentication(PoddAction.PROJECT_ROLE_EDIT, PODD.VF.createURI(artifactUri));
-        
+
         final User user = this.getRequest().getClientInfo().getUser();
         this.log.info("authenticated user: {}", user);
-        
+
         // validate artifact exists
         InferredOWLOntologyID ontologyID;
         try
@@ -176,20 +176,20 @@ public class ArtifactRolesResourceImpl extends AbstractPoddResourceImpl
         {
             throw new ResourceException(Status.CLIENT_ERROR_NOT_FOUND, "Could not find the given artifact", e);
         }
-        
+
         final Collection<RestletUtilRole> nextRoles = new LinkedHashSet<>();
         nextRoles.addAll(Arrays.asList(PoddRoles.PROJECT_PRINCIPAL_INVESTIGATOR, PoddRoles.PROJECT_ADMIN,
                 PoddRoles.PROJECT_MEMBER, PoddRoles.PROJECT_OBSERVER));
-        
+
         final Map<RestletUtilRole, Collection<PoddUser>> roleUserMap =
                 ((PoddWebServiceApplication)this.getApplication()).getRealm().getUsersForRole(nextRoles,
                         ontologyID.getOntologyIRI().toOpenRDFURI());
         final Map<RestletUtilRole, Collection<String>> mappings = this.translateMap(roleUserMap);
-        
+
         final Model model = new LinkedHashModel();
-        
+
         PoddRoles.dumpRoleMappingsArtifact(mappings, model);
-        
+
         // - prepare response
         final ByteArrayOutputStream output = new ByteArrayOutputStream(8096);
         final RDFFormat outputFormat =
@@ -202,13 +202,13 @@ public class ArtifactRolesResourceImpl extends AbstractPoddResourceImpl
         {
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Could not create response");
         }
-        
+
         return new ByteArrayRepresentation(output.toByteArray(), MediaType.valueOf(outputFormat.getDefaultMIMEType()));
     }
-    
+
     /**
      * Helper method to retrieve display details for Project Top Object.
-     * 
+     *
      * @param ontologyID
      * @return
      * @throws OpenRDFException
@@ -220,8 +220,8 @@ public class ArtifactRolesResourceImpl extends AbstractPoddResourceImpl
      * @throws UnmanagedArtifactIRIException
      */
     private PoddObjectLabel getProjectDetails(final InferredOWLOntologyID ontologyID) throws OpenRDFException,
-        UnmanagedSchemaIRIException, SchemaManifestException, UnsupportedRDFormatException, IOException,
-        UnmanagedArtifactIRIException, UnmanagedArtifactVersionException
+    UnmanagedSchemaIRIException, SchemaManifestException, UnsupportedRDFormatException, IOException,
+    UnmanagedArtifactIRIException, UnmanagedArtifactVersionException
     {
         // find and set top-object of this artifact as the object to display
         final List<PoddObjectLabel> topObjectLabels =
@@ -232,28 +232,28 @@ public class ArtifactRolesResourceImpl extends AbstractPoddResourceImpl
         }
         return topObjectLabels.get(0);
     }
-    
+
     private Map<RestletUtilRole, Collection<String>> translateMap(final Map<RestletUtilRole, Collection<PoddUser>> input)
     {
         final ConcurrentMap<RestletUtilRole, Collection<String>> userList = new ConcurrentHashMap<>();
-        
+
         for(final Entry<RestletUtilRole, Collection<PoddUser>> nextEntry : input.entrySet())
         {
             final RestletUtilRole nextRole = nextEntry.getKey();
-            
+
             Collection<String> nextRoles = new LinkedHashSet<String>();
             final Collection<String> putIfAbsent = userList.putIfAbsent(nextRole, nextRoles);
             if(putIfAbsent != null)
             {
                 nextRoles = putIfAbsent;
             }
-            
+
             for(final PoddUser nextUser : nextEntry.getValue())
             {
                 nextRoles.add(nextUser.getIdentifier());
             }
         }
-        
+
         return userList;
     }
 }

@@ -1,16 +1,16 @@
 /**
  * PODD is an OWL ontology database used for scientific project management
- * 
+ *
  * Copyright (C) 2009-2013 The University Of Queensland
- * 
+ *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU Affero General Public License as published by the Free Software Foundation, either version 3
  * of the License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
  * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Affero General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License along with this program.
  * If not, see <http://www.gnu.org/licenses/>.
  */
@@ -37,13 +37,13 @@ import com.github.podd.utils.PoddRoles;
 
 /**
  * @author Peter Ansell p_ansell@yahoo.com
- * 
+ *
  */
 public class RestletUtilsTest
 {
-    
+
     private ValueFactory vf;
-    
+
     /**
      * @throws java.lang.Exception
      */
@@ -52,7 +52,7 @@ public class RestletUtilsTest
     {
         this.vf = PODD.VF;
     }
-    
+
     /**
      * @throws java.lang.Exception
      */
@@ -60,7 +60,7 @@ public class RestletUtilsTest
     public void tearDown() throws Exception
     {
     }
-    
+
     /**
      * Test method for
      * {@link com.github.podd.restlet.RestletUtils#extractRoleMappings(org.openrdf.model.Model)} .
@@ -70,10 +70,10 @@ public class RestletUtilsTest
     {
         final Map<RestletUtilRole, Collection<URI>> roleMappings =
                 PoddRoles.extractRoleMappingsUser(new LinkedHashModel());
-        
+
         Assert.assertTrue(roleMappings.isEmpty());
     }
-    
+
     /**
      * Test method for
      * {@link com.github.podd.restlet.RestletUtils#extractRoleMappings(org.openrdf.model.Model)} .
@@ -85,16 +85,16 @@ public class RestletUtilsTest
         final BNode resource = this.vf.createBNode();
         model.add(resource, RDF.TYPE, SesameRealmConstants.OAS_ROLEMAPPING);
         model.add(resource, SesameRealmConstants.OAS_ROLEMAPPEDROLE, PoddRoles.PROJECT_ADMIN.getURI());
-        
+
         final Map<RestletUtilRole, Collection<URI>> roleMappings = PoddRoles.extractRoleMappingsUser(model);
         Assert.assertFalse(roleMappings.isEmpty());
-        
+
         Assert.assertEquals(1, roleMappings.size());
         Assert.assertTrue(roleMappings.containsKey(PoddRoles.PROJECT_ADMIN));
         Assert.assertEquals(1, roleMappings.get(PoddRoles.PROJECT_ADMIN).size());
         Assert.assertTrue(roleMappings.get(PoddRoles.PROJECT_ADMIN).contains(null));
     }
-    
+
     /**
      * Test method for
      * {@link com.github.podd.restlet.RestletUtils#extractRoleMappings(org.openrdf.model.Model)} .
@@ -108,16 +108,16 @@ public class RestletUtilsTest
         model.add(resource, RDF.TYPE, SesameRealmConstants.OAS_ROLEMAPPING);
         model.add(resource, SesameRealmConstants.OAS_ROLEMAPPEDROLE, PoddRoles.PROJECT_ADMIN.getURI());
         model.add(resource, PODD.PODD_ROLEMAPPEDOBJECT, objectUri);
-        
+
         final Map<RestletUtilRole, Collection<URI>> roleMappings = PoddRoles.extractRoleMappingsUser(model);
         Assert.assertFalse(roleMappings.isEmpty());
-        
+
         Assert.assertEquals(1, roleMappings.size());
         Assert.assertTrue(roleMappings.containsKey(PoddRoles.PROJECT_ADMIN));
         Assert.assertEquals(1, roleMappings.get(PoddRoles.PROJECT_ADMIN).size());
         Assert.assertTrue(roleMappings.get(PoddRoles.PROJECT_ADMIN).contains(objectUri));
     }
-    
+
     /**
      * Test method for
      * {@link com.github.podd.restlet.RestletUtils#extractRoleMappings(org.openrdf.model.Model)} .
@@ -129,16 +129,16 @@ public class RestletUtilsTest
         final BNode resource = this.vf.createBNode();
         model.add(resource, RDF.TYPE, SesameRealmConstants.OAS_ROLEMAPPING);
         model.add(resource, SesameRealmConstants.OAS_ROLEMAPPEDROLE, PoddRoles.ADMIN.getURI());
-        
+
         final Map<RestletUtilRole, Collection<URI>> roleMappings = PoddRoles.extractRoleMappingsUser(model);
         Assert.assertFalse(roleMappings.isEmpty());
-        
+
         Assert.assertEquals(1, roleMappings.size());
         Assert.assertTrue(roleMappings.containsKey(PoddRoles.ADMIN));
         Assert.assertEquals(1, roleMappings.get(PoddRoles.ADMIN).size());
         Assert.assertTrue(roleMappings.get(PoddRoles.ADMIN).contains(null));
     }
-    
+
     /**
      * Test method for
      * {@link com.github.podd.restlet.RestletUtils#extractRoleMappings(org.openrdf.model.Model)} .
@@ -152,16 +152,16 @@ public class RestletUtilsTest
         model.add(resource, RDF.TYPE, SesameRealmConstants.OAS_ROLEMAPPING);
         model.add(resource, SesameRealmConstants.OAS_ROLEMAPPEDROLE, PoddRoles.ADMIN.getURI());
         model.add(resource, PODD.PODD_ROLEMAPPEDOBJECT, objectUri);
-        
+
         final Map<RestletUtilRole, Collection<URI>> roleMappings = PoddRoles.extractRoleMappingsUser(model);
         Assert.assertFalse(roleMappings.isEmpty());
-        
+
         Assert.assertEquals(1, roleMappings.size());
         Assert.assertTrue(roleMappings.containsKey(PoddRoles.ADMIN));
         Assert.assertEquals(1, roleMappings.get(PoddRoles.ADMIN).size());
         Assert.assertTrue(roleMappings.get(PoddRoles.ADMIN).contains(objectUri));
     }
-    
+
     /**
      * Test method for
      * {@link com.github.podd.restlet.RestletUtils#getBaseDataModel(org.restlet.Request)} .
@@ -172,7 +172,7 @@ public class RestletUtilsTest
     {
         Assert.fail("Not yet implemented");
     }
-    
+
     /**
      * Test method for
      * {@link com.github.podd.restlet.RestletUtils#getBooleanFromParameter(org.restlet.data.Parameter)}
@@ -184,7 +184,7 @@ public class RestletUtilsTest
     {
         Assert.fail("Not yet implemented");
     }
-    
+
     /**
      * Test method for
      * {@link com.github.podd.restlet.RestletUtils#getHtmlRepresentation(java.lang.String, java.util.Map, org.restlet.data.MediaType, freemarker.template.Configuration)}
@@ -196,7 +196,7 @@ public class RestletUtilsTest
     {
         Assert.fail("Not yet implemented");
     }
-    
+
     /**
      * Test method for
      * {@link com.github.podd.restlet.RestletUtils#toRDFSerialisation(java.lang.String, org.openrdf.repository.Repository, org.openrdf.model.Resource[])}
@@ -208,5 +208,5 @@ public class RestletUtilsTest
     {
         Assert.fail("Not yet implemented");
     }
-    
+
 }

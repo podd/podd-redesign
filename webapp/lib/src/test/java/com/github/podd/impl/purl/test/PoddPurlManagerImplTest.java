@@ -1,16 +1,16 @@
 /**
  * PODD is an OWL ontology database used for scientific project management
- * 
+ *
  * Copyright (C) 2009-2013 The University Of Queensland
- * 
+ *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU Affero General Public License as published by the Free Software Foundation, either version 3
  * of the License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
  * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Affero General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License along with this program.
  * If not, see <http://www.gnu.org/licenses/>.
  */
@@ -32,62 +32,62 @@ import com.github.podd.impl.purl.UUIDPurlProcessorFactoryImpl;
 
 /**
  * @author kutila
- * 
+ *
  */
 public class PoddPurlManagerImplTest extends AbstractPoddPurlManagerTest
 {
     protected String purlPrefix = "http://purl.org/podd/";
-    
+
     @Override
     public PoddPurlManager getNewPoddPurlManager()
     {
         return new PoddPurlManagerImpl();
     }
-    
+
     @Override
     public PoddPurlProcessorFactoryRegistry getNewPoddPurlProcessorFactoryRegistry()
     {
         final PoddPurlProcessorFactoryRegistry registry = new PoddPurlProcessorFactoryRegistry();
         registry.clear();
-        
+
         // TODO: Remove the need to manually configure the following
         final UUIDPurlProcessorFactoryImpl uuidPurlProcessorFactory = new UUIDPurlProcessorFactoryImpl();
         uuidPurlProcessorFactory.setPrefix(this.purlPrefix);
         registry.add(uuidPurlProcessorFactory);
-        
+
         return registry;
     }
-    
+
     public void internalTestExtractPurlReferenceWithParentUri(final URI parentUri, final boolean useParentUri)
-        throws Exception
+            throws Exception
     {
         final URI context = this.loadTestResources();
-        
+
         final Set<PoddPurlReference> purlSet =
                 this.testPurlManager.extractPurlReferences(parentUri, this.testRepositoryConnection, context);
-        
+
         Assert.assertNotNull("Extracted Purl references were null", purlSet);
         Assert.assertFalse("Extracted Purl references were empty", purlSet.isEmpty());
         Assert.assertEquals("Incorrect number of Purl references extracted", 3, purlSet.size());
-        
+
         for(final PoddPurlReference purl : purlSet)
         {
             Assert.assertNotNull("Purl has null temporary URI", purl.getTemporaryURI());
             Assert.assertNotNull("Purl has null permanent URI", purl.getPurlURI());
-            
+
             Assert.assertFalse("Purl and Temporary URI were same", purl.getPurlURI().equals(purl.getTemporaryURI()));
-            
+
             // check temporary URI is present in the original RDF statements as
             // a subject or object
             final boolean tempUriExistsAsSubject =
                     this.testRepositoryConnection.getStatements(purl.getTemporaryURI(), null, null, false, context)
-                            .hasNext();
+                    .hasNext();
             final boolean tempUriExistsAsObject =
                     this.testRepositoryConnection.getStatements(null, null, purl.getTemporaryURI(), false, context)
-                            .hasNext();
+                    .hasNext();
             Assert.assertTrue("Temporary URI not found in original RDF statements", tempUriExistsAsSubject
                     || tempUriExistsAsObject);
-            
+
             // The following assertion checks whether the generated Purls use
             // the parent URI or not
             if(useParentUri)
@@ -102,13 +102,13 @@ public class PoddPurlManagerImplTest extends AbstractPoddPurlManagerTest
             }
         }
     }
-    
+
     /**
      * Tests extractPurlReferences(URI, RepositoryConnection, URI) passing in a parent URI different
      * to the prefix used in generated Purls.
-     * 
+     *
      * This parent URI should be ignored and Purls generated using internally generated UUIDs.
-     * 
+     *
      * @throws Exception
      */
     @Test
@@ -118,13 +118,13 @@ public class PoddPurlManagerImplTest extends AbstractPoddPurlManagerTest
                 ValueFactoryImpl.getInstance().createURI("http://purl.org/nodd/same-UUID-for-this-purl-set-11");
         this.internalTestExtractPurlReferenceWithParentUri(parentUri, false);
     }
-    
+
     /**
      * Tests extractPurlReferences(URI, RepositoryConnection, URI) passing in a parent URI with the
      * same prefix as that used in generated Purls.
-     * 
+     *
      * This parent URI should then be used in all Purls instead of generating UUIDs.
-     * 
+     *
      * @throws Exception
      */
     @Test
@@ -134,5 +134,5 @@ public class PoddPurlManagerImplTest extends AbstractPoddPurlManagerTest
                 ValueFactoryImpl.getInstance().createURI(this.purlPrefix + "same-UUID-for-this-purl-set-11");
         this.internalTestExtractPurlReferenceWithParentUri(parentUri, true);
     }
-    
+
 }

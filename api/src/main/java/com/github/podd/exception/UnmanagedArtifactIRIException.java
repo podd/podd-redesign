@@ -1,16 +1,16 @@
 /**
  * PODD is an OWL ontology database used for scientific project management
- * 
+ *
  * Copyright (C) 2009-2013 The University Of Queensland
- * 
+ *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU Affero General Public License as published by the Free Software Foundation, either version 3
  * of the License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
  * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Affero General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License along with this program.
  * If not, see <http://www.gnu.org/licenses/>.
  */
@@ -24,19 +24,19 @@ import com.github.podd.utils.PODD;
 
 /**
  * An exception indicating that the artifact denoted by the given IRI was not managed by PODD.
- * 
+ *
  * @author Kutila
  * @since 04/01/2013
- * 
+ *
  */
 public class UnmanagedArtifactIRIException extends UnmanagedSchemaException
 {
     private static final long serialVersionUID = 4395800605913179651L;
-    
+
     private final IRI artifactOntologyIRI;
-    
+
     /**
-     * 
+     *
      * @param ontology
      *            The OWL Ontology IRI that was not managed.
      * @param msg
@@ -47,7 +47,7 @@ public class UnmanagedArtifactIRIException extends UnmanagedSchemaException
         super(msg);
         this.artifactOntologyIRI = artifactOntologyIRI;
     }
-    
+
     /**
      * @param ontology
      *            The OWL Ontology IRI that was not managed.
@@ -61,7 +61,7 @@ public class UnmanagedArtifactIRIException extends UnmanagedSchemaException
         super(msg, throwable);
         this.artifactOntologyIRI = artifactOntologyIRI;
     }
-    
+
     /**
      * @param ontology
      *            The OWL Ontology IRI that was not managed.
@@ -73,20 +73,20 @@ public class UnmanagedArtifactIRIException extends UnmanagedSchemaException
         super(throwable);
         this.artifactOntologyIRI = artifactOntologyIRI;
     }
-    
+
     @Override
     public Model getDetailsAsModel(final Resource errorResource)
     {
         final Model model = super.getDetailsAsModel(errorResource);
-        
+
         if(this.getUnmanagedOntologyIRI() != null)
         {
             model.add(errorResource, PODD.ERR_SOURCE, this.getUnmanagedOntologyIRI().toOpenRDFURI());
         }
-        
+
         return model;
     }
-    
+
     /**
      * @return The OWL Ontology IRI that was not managed.
      */
@@ -94,5 +94,5 @@ public class UnmanagedArtifactIRIException extends UnmanagedSchemaException
     {
         return this.artifactOntologyIRI;
     }
-    
+
 }

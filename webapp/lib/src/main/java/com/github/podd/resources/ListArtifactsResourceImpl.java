@@ -1,16 +1,16 @@
 /**
  * PODD is an OWL ontology database used for scientific project management
- * 
+ *
  * Copyright (C) 2009-2013 The University Of Queensland
- * 
+ *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU Affero General Public License as published by the Free Software Foundation, either version 3
  * of the License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
  * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Affero General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License along with this program.
  * If not, see <http://www.gnu.org/licenses/>.
  */
@@ -57,31 +57,31 @@ import com.github.podd.utils.PoddWebConstants;
  * <p>
  * TODO: list based on authorization, group projects. list project title, description, PI and lead
  * institution
- * 
+ *
  * @author kutila
  * @author Peter Ansell p_ansell@yahoo.com
- * 
+ *
  */
 public class ListArtifactsResourceImpl extends AbstractPoddResourceImpl
 {
     public static final String LIST_PAGE_TITLE_TEXT = "PODD Artifact Listing";
-    
+
     private Map<String, List<InferredOWLOntologyID>> getArtifactsInternal() throws ResourceException
     {
         final Map<String, List<InferredOWLOntologyID>> results = new HashMap<String, List<InferredOWLOntologyID>>();
-        
+
         final String publishedString = this.getQuery().getFirstValue(PoddWebConstants.KEY_PUBLISHED, true);
         final String unpublishedString = this.getQuery().getFirstValue(PoddWebConstants.KEY_UNPUBLISHED, true);
-        
+
         // default to both published and unpublished to start with
         boolean published = true;
         boolean unpublished = false;
-        
+
         if(publishedString != null)
         {
             published = Boolean.parseBoolean(publishedString);
         }
-        
+
         // If the user is authenticated, set unpublished to true before checking
         // the query
         // parameters
@@ -90,7 +90,7 @@ public class ListArtifactsResourceImpl extends AbstractPoddResourceImpl
         // this.log.info("User was logged in");
         // unpublished = true;
         // }
-        
+
         if(unpublishedString != null)
         {
             unpublished = Boolean.parseBoolean(unpublishedString);
@@ -102,33 +102,33 @@ public class ListArtifactsResourceImpl extends AbstractPoddResourceImpl
             // specify anything in their query parameters
             unpublished = this.getRequest().getClientInfo().isAuthenticated();
         }
-        
+
         if(published)
         {
             this.log.debug("Including published artifacts");
         }
-        
+
         if(unpublished)
         {
             this.log.debug("Including unpublished artifacts");
         }
-        
+
         if(!published && !unpublished)
         {
             this.log.error("Both published and unpublished artifacts were disabled in query");
             throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST,
                     "Both published and unpublished artifacts were disabled in query");
         }
-        
+
         try
         {
             if(published)
             {
                 final List<InferredOWLOntologyID> publishedResults = new ArrayList<InferredOWLOntologyID>();
-                
+
                 final List<InferredOWLOntologyID> publishedArtifacts =
                         this.getPoddArtifactManager().listPublishedArtifacts();
-                
+
                 for(final InferredOWLOntologyID nextPublishedArtifact : publishedArtifacts)
                 {
                     if(this.checkAuthentication(PoddAction.PUBLISHED_ARTIFACT_READ, nextPublishedArtifact
@@ -138,21 +138,21 @@ public class ListArtifactsResourceImpl extends AbstractPoddResourceImpl
                         publishedResults.add(nextPublishedArtifact);
                     }
                 }
-                
+
                 results.put(PoddWebConstants.KEY_PUBLISHED, publishedArtifacts);
             }
-            
+
             if(unpublished && this.checkAuthentication(PoddAction.UNPUBLISHED_ARTIFACT_LIST, null, false))
             {
                 this.log.debug("About to check for authentication to look at unpublished artifacts");
                 this.log.debug("Is authenticated: {}", this.getRequest().getClientInfo().isAuthenticated());
                 this.log.debug("Current user: {}", this.getRequest().getClientInfo().getUser());
-                
+
                 final List<InferredOWLOntologyID> unpublishedResults = new ArrayList<InferredOWLOntologyID>();
-                
+
                 final List<InferredOWLOntologyID> unpublishedArtifacts =
                         this.getPoddArtifactManager().listUnpublishedArtifacts();
-                
+
                 for(final InferredOWLOntologyID nextUnpublishedArtifact : unpublishedArtifacts)
                 {
                     try
@@ -178,31 +178,31 @@ public class ListArtifactsResourceImpl extends AbstractPoddResourceImpl
         {
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Database exception", e);
         }
-        
+
         return results;
     }
-    
+
     /**
      * Handle http GET request to serve the list artifacts page.
-     * 
+     *
      * @throws UnmanagedSchemaIRIException
      */
     @Get(":html")
     public Representation getListArtifactsPage(final Representation entity) throws ResourceException,
-        UnmanagedSchemaIRIException
+    UnmanagedSchemaIRIException
     {
         this.log.debug("@Get listArtifacts Page");
-        
+
         final Map<String, List<InferredOWLOntologyID>> artifactsInternal = this.getArtifactsInternal();
-        
+
         final Map<String, Object> dataModel = RestletUtils.getBaseDataModel(this.getRequest());
         dataModel.put("contentTemplate", "projects.html.ftl");
         dataModel.put("pageTitle", ListArtifactsResourceImpl.LIST_PAGE_TITLE_TEXT);
-        
+
         // Disable currently unimplemented features
         dataModel.put("canFilter", Boolean.FALSE);
         dataModel.put("hasFilter", Boolean.FALSE);
-        
+
         if(this.checkAuthentication(PoddAction.ARTIFACT_CREATE, null, false))
         {
             dataModel.put("userCanCreate", Boolean.TRUE);
@@ -211,9 +211,9 @@ public class ListArtifactsResourceImpl extends AbstractPoddResourceImpl
         {
             dataModel.put("userCanCreate", Boolean.FALSE);
         }
-        
+
         this.log.trace("artifacts: {}", artifactsInternal);
-        
+
         for(final Entry<String, List<InferredOWLOntologyID>> nextEntry : artifactsInternal.entrySet())
         {
             final String nextKey = nextEntry.getKey();
@@ -230,24 +230,24 @@ public class ListArtifactsResourceImpl extends AbstractPoddResourceImpl
                         + " artifacts", e);
             }
         }
-        
+
         // Output the base template, with contentTemplate from the dataModel
         // defining the
         // template to use for the content in the body of the page
         return RestletUtils.getHtmlRepresentation(
                 this.getPoddApplication().getPropertyUtil()
-                        .get(PoddWebConstants.PROPERTY_TEMPLATE_BASE, PoddWebConstants.DEFAULT_TEMPLATE_BASE),
+                .get(PoddWebConstants.PROPERTY_TEMPLATE_BASE, PoddWebConstants.DEFAULT_TEMPLATE_BASE),
                 dataModel, MediaType.TEXT_HTML, this.getPoddApplication().getTemplateConfiguration());
     }
-    
+
     @Get(":rdf|rj|json|ttl")
     public Representation getListArtifactsRdf(final Representation entity, final Variant variant)
-        throws ResourceException
+            throws ResourceException
     {
         final Map<String, List<InferredOWLOntologyID>> artifactsInternal = this.getArtifactsInternal();
-        
+
         final RDFFormat resultFormat = Rio.getWriterFormatForMIMEType(variant.getMediaType().getName());
-        
+
         if(resultFormat == null)
         {
             this.log.error("Could not find an RDF serialiser matching the requested mime-type: "
@@ -256,26 +256,26 @@ public class ListArtifactsResourceImpl extends AbstractPoddResourceImpl
                     "Could not find an RDF serialiser matching the requested mime-type: "
                             + variant.getMediaType().getName());
         }
-        
+
         final MediaType resultMediaType = MediaType.valueOf(resultFormat.getDefaultMIMEType());
-        
+
         final ByteArrayOutputStream out = new ByteArrayOutputStream(8096);
         final Model model = new LinkedHashModel();
-        
+
         try
         {
             for(final List<InferredOWLOntologyID> nextArtifacts : artifactsInternal.values())
             {
                 OntologyUtils.ontologyIDsToModel(nextArtifacts, model);
-                
+
                 final List<PoddObjectLabel> results = this.getPoddArtifactManager().getTopObjectLabels(nextArtifacts);
-                
+
                 for(final PoddObjectLabel nextResult : results)
                 {
                     model.add(nextResult.getOntologyID().getOntologyIRI().toOpenRDFURI(),
                             PODD.PODD_BASE_HAS_TOP_OBJECT, nextResult.getObjectURI());
                     model.add(nextResult.getObjectURI(), RDFS.LABEL, nextResult.getLabelLiteral());
-                    
+
                     final List<PoddObjectLabel> typesList =
                             this.getPoddArtifactManager().getObjectTypes(nextResult.getOntologyID(),
                                     nextResult.getObjectURI());
@@ -295,11 +295,11 @@ public class ListArtifactsResourceImpl extends AbstractPoddResourceImpl
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL,
                     "Could not generate RDF output due to an exception", e);
         }
-        
+
         // this.log.info(new String(out.toByteArray(), StandardCharsets.UTF_8));
-        
+
         final ByteArrayRepresentation result = new ByteArrayRepresentation(out.toByteArray(), resultMediaType);
-        
+
         return result;
     }
 }

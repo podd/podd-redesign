@@ -1,16 +1,16 @@
 /**
  * PODD is an OWL ontology database used for scientific project management
- * 
+ *
  * Copyright (C) 2009-2013 The University Of Queensland
- * 
+ *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU Affero General Public License as published by the Free Software Foundation, either version 3
  * of the License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
  * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Affero General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License along with this program.
  * If not, see <http://www.gnu.org/licenses/>.
  */
@@ -42,7 +42,7 @@ import com.github.podd.utils.PoddWebConstants;
 
 /**
  * Resource to create new PODD object.
- * 
+ *
  * @author kutila
  */
 public class GetMetadataResourceImpl extends AbstractPoddResourceImpl
@@ -55,25 +55,25 @@ public class GetMetadataResourceImpl extends AbstractPoddResourceImpl
     {
         // - object Type (mandatory)
         this.log.info("Get Methadata GET query {}", this.getQuery());
-        
+
         final String objectType = this.getQuery().getFirstValue(PoddWebConstants.KEY_OBJECT_TYPE_IDENTIFIER, true);
         if(objectType == null)
         {
             throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Type of Object to create not specified");
         }
-        
+
         // - artifact URI (optional)
         final String artifactUri = this.getQuery().getFirstValue(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, true);
-        
+
         // - include Do-Not-Display properties (optional, defaults to false)
         final String includeDoNotDisplayPropertiesString =
                 this.getQuery().getFirstValue(PoddWebConstants.KEY_INCLUDE_DO_NOT_DISPLAY_PROPERTIES, true);
         final boolean includeDoNotDisplayProperties = Boolean.valueOf(includeDoNotDisplayPropertiesString);
-        
+
         // - metadata policy (optional, default is to exclude sub-properties of
         // poddBase:contains)
         final String metadataPolicyString = this.getQuery().getFirstValue(PoddWebConstants.KEY_METADATA_POLICY, true);
-        
+
         MetadataPolicy containsPropertyPolicy = MetadataPolicy.EXCLUDE_CONTAINS;
         if(metadataPolicyString != null)
         {
@@ -86,10 +86,10 @@ public class GetMetadataResourceImpl extends AbstractPoddResourceImpl
                 containsPropertyPolicy = MetadataPolicy.INCLUDE_ALL;
             }
         }
-        
+
         this.log.info("@Get Metadata: {}, {}, {}, {} ({})", objectType, containsPropertyPolicy,
                 includeDoNotDisplayProperties, artifactUri, variant.getMediaType().getName());
-        
+
         if(artifactUri == null)
         {
             // looks like adding a new Artifact (ie, a new Project)
@@ -99,10 +99,10 @@ public class GetMetadataResourceImpl extends AbstractPoddResourceImpl
         {
             this.checkAuthentication(PoddAction.ARTIFACT_EDIT, PODD.VF.createURI(artifactUri));
         }
-        
+
         final User user = this.getRequest().getClientInfo().getUser();
         this.log.info("authenticated user: {}", user);
-        
+
         final ByteArrayOutputStream output = new ByteArrayOutputStream();
         final RDFFormat format = Rio.getWriterFormatForMIMEType(variant.getMediaType().getName(), RDFFormat.TURTLE);
         try
@@ -125,8 +125,8 @@ public class GetMetadataResourceImpl extends AbstractPoddResourceImpl
         {
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Could not generate object metadata", e);
         }
-        
+
         return new ByteArrayRepresentation(output.toByteArray(), MediaType.valueOf(format.getDefaultMIMEType()));
     }
-    
+
 }

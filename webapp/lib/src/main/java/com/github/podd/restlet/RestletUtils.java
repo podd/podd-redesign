@@ -1,16 +1,16 @@
 /**
  * PODD is an OWL ontology database used for scientific project management
- * 
+ *
  * Copyright (C) 2009-2013 The University Of Queensland
- * 
+ *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU Affero General Public License as published by the Free Software Foundation, either version 3
  * of the License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
  * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Affero General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License along with this program.
  * If not, see <http://www.gnu.org/licenses/>.
  */
@@ -78,15 +78,15 @@ import freemarker.template.Configuration;
 
 /**
  * Wraps up calls to methods that relate to Restlet items, such as Representations.
- * 
+ *
  * @author Peter Ansell p_ansell@yahoo.com
- * 
+ *
  *         Copied from https://github.com/ansell/oas
  */
 public final class RestletUtils
 {
     private static final Logger log = LoggerFactory.getLogger(RestletUtils.class);
-    
+
     public static Map<String, Object> getBaseDataModel(final Request nextRequest)
     {
         final ClientInfo nextClientInfo = nextRequest.getClientInfo();
@@ -94,26 +94,26 @@ public final class RestletUtils
         dataModel.put("resourceRef", nextRequest.getResourceRef());
         dataModel.put("rootRef", nextRequest.getRootRef());
         dataModel.put("keywords", "podd, ontology, phenomics");
-        
+
         String baseUrl = nextRequest.getRootRef().toString();
         if(baseUrl.endsWith("/"))
         {
             baseUrl = baseUrl.substring(0, baseUrl.length() - 1);
         }
         dataModel.put("baseUrl", baseUrl);
-        
+
         dataModel.put("clientInfo", nextClientInfo);
         dataModel.put("isAuthenticated", nextClientInfo.isAuthenticated());
         final List<Role> roles = nextClientInfo.getRoles();
         final boolean isAdmin = roles.contains(PoddRoles.ADMIN.getRole());
         dataModel.put("isAdmin", isAdmin);
         dataModel.put("user", nextClientInfo.getUser());
-        
+
         final User currentUser = nextClientInfo.getUser();
         if(currentUser != null)
         {
             dataModel.put("currentUserName", currentUser.getName());
-            
+
             RestletUtils.log.debug("currentUser: {}", currentUser);
             RestletUtils.log.trace("currentUser.getFirstName: {}", currentUser.getFirstName());
             RestletUtils.log.trace("currentUser.getLastName: {}", currentUser.getLastName());
@@ -124,14 +124,14 @@ public final class RestletUtils
         {
             RestletUtils.log.info("No currentUser logged in");
         }
-        
+
         return dataModel;
     }
-    
+
     /**
      * Tests the parameter against a list of known true parameter values, before testing it against
      * a list of known false values.
-     * 
+     *
      * @param nextParameter
      *            A parameter to test for its boolean value.
      * @return True if the parameter looks like a true value and false otherwise.
@@ -142,16 +142,16 @@ public final class RestletUtils
         {
             throw new IllegalArgumentException("Cannot get a boolean from a null parameter");
         }
-        
+
         final String paramValue = nextParameter.getValue();
-        
+
         if(paramValue == null)
         {
             return false;
         }
-        
+
         boolean result = false;
-        
+
         // If that was true, return true
         if(Boolean.valueOf(paramValue))
         {
@@ -177,13 +177,13 @@ public final class RestletUtils
         {
             result = false;
         }
-        
+
         return result;
     }
-    
+
     /**
      * Returns a templated representation dedicated to HTML content.
-     * 
+     *
      * @param templateName
      *            The name of the template.
      * @param dataModel
@@ -200,11 +200,11 @@ public final class RestletUtils
         // The template representation is based on Freemarker.
         return new TemplateRepresentation(templateName, freemarkerConfiguration, dataModel, mediaType);
     }
-    
+
     /**
      * Finds the parent details given an object, which may be null, and the artifact that it
      * expected to be found in.
-     * 
+     *
      * @param artifactManager
      *            The artifact manager.
      * @param ontologyID
@@ -226,11 +226,11 @@ public final class RestletUtils
      */
     public static PoddObjectLabel getParentDetails(final PoddArtifactManager artifactManager,
             final InferredOWLOntologyID ontologyID, final String objectToView) throws OpenRDFException,
-        ResourceException, UnmanagedSchemaIRIException, SchemaManifestException, UnsupportedRDFormatException,
-        IOException, UnmanagedArtifactIRIException, UnmanagedArtifactVersionException
+            ResourceException, UnmanagedSchemaIRIException, SchemaManifestException, UnsupportedRDFormatException,
+            IOException, UnmanagedArtifactIRIException, UnmanagedArtifactVersionException
     {
         PoddObjectLabel theObject = null;
-        
+
         if(objectToView != null && !objectToView.trim().isEmpty())
         {
             theObject = artifactManager.getObjectLabel(ontologyID, PODD.VF.createURI(objectToView));
@@ -243,25 +243,25 @@ public final class RestletUtils
             {
                 throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "There should be only 1 top object");
             }
-            
+
             theObject = topObjectLabels.get(0);
         }
-        
+
         return theObject;
     }
-    
+
     public static Map<RestletUtilRole, Collection<URI>> getUsersRoles(final PoddSesameRealm realm,
             final PoddUser poddUser)
-    {
+            {
         final ConcurrentMap<RestletUtilRole, Collection<URI>> results = new ConcurrentHashMap<>();
-        
+
         // extract Role Mapping info (User details are ignored as multiple users are not supported
         final Collection<Entry<Role, URI>> rolesWithObjectMappings = realm.getRolesWithObjectMappings(poddUser);
         for(final Entry<Role, URI> entry : rolesWithObjectMappings)
         {
             final RestletUtilRole role = PoddRoles.getRoleByName(entry.getKey().getName());
             final URI artifactUri = entry.getValue();
-            
+
             Collection<URI> nextObjectUris = new HashSet<>();
             final Collection<URI> putIfAbsent = results.putIfAbsent(role, nextObjectUris);
             if(putIfAbsent != null)
@@ -270,34 +270,34 @@ public final class RestletUtils
             }
             nextObjectUris.add(artifactUri);
         }
-        
+
         return results;
-    }
-    
+            }
+
     /**
      * Retrieve the Roles that are mapped to this User, together with details of any optional mapped
      * objects.
-     * 
+     *
      * @param realm
      * @param poddUser
      *            The PODD User whose Roles are requested
      */
     public static List<Entry<RestletUtilRole, PoddObjectLabel>> getUsersRoles(final PoddSesameRealm realm,
             final PoddUser poddUser, final PoddArtifactManager artifactManager)
-    {
+            {
         final Map<RestletUtilRole, Collection<URI>> roles = RestletUtils.getUsersRoles(realm, poddUser);
-        
+
         final List<Entry<RestletUtilRole, PoddObjectLabel>> results =
                 new LinkedList<Entry<RestletUtilRole, PoddObjectLabel>>();
-        
+
         for(final Entry<RestletUtilRole, Collection<URI>> nextEntry : roles.entrySet())
         {
             final RestletUtilRole nextRole = nextEntry.getKey();
-            
+
             for(final URI artifactUri : nextEntry.getValue())
             {
                 PoddObjectLabel poddObjectLabel = null;
-                
+
                 if(artifactUri != null)
                 {
                     try
@@ -330,16 +330,16 @@ public final class RestletUtils
             }
         }
         return results;
-    }
-    
+            }
+
     /**
      * Populate the data model with info about the parent of the current object. If the given object
      * does not have a parent (i.e. is a Top Object) the data model remains unchanged.
-     * 
+     *
      * TODO: This method uses multiple API methods resulting in several SPARQL queries. Efficiency
      * could be improved by either adding a new API method or modifying getParentDetails() to supply
      * most of the required information.
-     * 
+     *
      * @param ontologyID
      * @param objectUri
      *            The object whose parent details are required
@@ -354,21 +354,21 @@ public final class RestletUtils
      */
     public static Map<String, String> populateParentDetails(final PoddArtifactManager artifactManager,
             final InferredOWLOntologyID ontologyID, final URI objectUri) throws OpenRDFException,
-        UnmanagedSchemaIRIException, SchemaManifestException, UnsupportedRDFormatException, IOException,
-        UnmanagedArtifactIRIException, UnmanagedArtifactVersionException
-    {
+            UnmanagedSchemaIRIException, SchemaManifestException, UnsupportedRDFormatException, IOException,
+            UnmanagedArtifactIRIException, UnmanagedArtifactVersionException
+            {
         final Map<String, String> parentMap = new HashMap<>();
-        
+
         final Model parentDetails = artifactManager.getParentDetails(ontologyID, objectUri);
         if(parentDetails.size() == 1)
         {
             final Statement statement = parentDetails.iterator().next();
-            
+
             final URI parentUri = (URI)statement.getSubject();
             final URI parentPredicateUri = statement.getPredicate();
-            
+
             parentMap.put("uri", parentUri.stringValue());
-            
+
             // - parent's Title
             String parentLabel = "Missing Title";
             final PoddObjectLabel objectLabel = artifactManager.getObjectLabel(ontologyID, parentUri);
@@ -377,7 +377,7 @@ public final class RestletUtils
                 parentLabel = objectLabel.getLabel();
             }
             parentMap.put("label", parentLabel);
-            
+
             // - parent's Type
             String parentType = "Unknown Type";
             final List<PoddObjectLabel> objectTypes = artifactManager.getObjectTypes(ontologyID, parentUri);
@@ -386,7 +386,7 @@ public final class RestletUtils
                 parentType = objectTypes.get(0).getLabel();
             }
             parentMap.put("type", parentType);
-            
+
             // - parent relationship Label
             String predicateLabel = "";
             final PoddObjectLabel predicateLabelModel = artifactManager.getObjectLabel(ontologyID, parentPredicateUri);
@@ -396,13 +396,13 @@ public final class RestletUtils
             }
             parentMap.put("relationship", predicateLabel);
         }
-        
+
         return parentMap;
-    }
-    
+            }
+
     /**
      * Serialises part or all of a repository into RDF, depending on which contexts are provided.
-     * 
+     *
      * @param mimeType
      *            The MIME type of the serialised RDF statements.
      * @param myRepository
@@ -420,22 +420,22 @@ public final class RestletUtils
         {
             throw new IllegalArgumentException("Repository cannot be null");
         }
-        
+
         // Attempt to find a writer format based on their requested mime type,
         // or if that fails,
         // give them RDF/XML that every RDF library can process.
         final RDFFormat outputFormat = Rio.getWriterFormatForMIMEType(mimeType, RDFFormat.RDFXML);
-        
+
         final StringWriter writer = new StringWriter();
-        
+
         RepositoryConnection conn = null;
-        
+
         conn = myRepository.getConnection();
-        
+
         final RDFHandler output = Rio.createWriter(outputFormat, writer);
-        
+
         conn.export(output, contexts);
-        
+
         // TODO: find a subclass of Representation that accepts a writer
         // directly, without having to
         // serialise it to a string, to improve performance for large results
@@ -443,16 +443,16 @@ public final class RestletUtils
         final Representation result =
                 new AppendableRepresentation(writer.toString(), MediaType.valueOf(outputFormat.getDefaultMIMEType()),
                         Language.DEFAULT, CharacterSet.UTF_8);
-        
+
         return result;
-        
+
     }
-    
+
     /**
      * Private default constructor
      */
     private RestletUtils()
     {
     }
-    
+
 }

@@ -1,16 +1,16 @@
 /**
  * PODD is an OWL ontology database used for scientific project management
- * 
+ *
  * Copyright (C) 2009-2013 The University Of Queensland
- * 
+ *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU Affero General Public License as published by the Free Software Foundation, either version 3
  * of the License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
  * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Affero General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License along with this program.
  * If not, see <http://www.gnu.org/licenses/>.
  */
@@ -25,7 +25,6 @@ import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Collection;
-import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -34,40 +33,40 @@ public class PoddDigestUtils
     /**
      * An enumeration linking the MessageDigest algorithm identifier to the file extension used to
      * store it.
-     * 
+     *
      * @author Peter Ansell p_ansell@yahoo.com
      */
     public static enum Algorithm
     {
         SHA1("SHA-1", ".sha1"),
-        
+
         MD5("MD5", ".md5");
-        
+
         private final String name;
         private final String extension;
-        
+
         Algorithm(final String name, final String extension)
         {
             this.name = name;
             this.extension = extension;
         }
-        
+
         public String getExtension()
         {
             return this.extension;
         }
-        
+
         public String getName()
         {
             return this.name;
         }
     }
-    
+
     public static ConcurrentMap<Path, ConcurrentMap<Algorithm, String>> getDigests(final Collection<Path> pathsToDigest)
-        throws IOException, NoSuchAlgorithmException
-    {
+            throws IOException, NoSuchAlgorithmException
+            {
         final ConcurrentMap<Path, ConcurrentMap<Algorithm, String>> result = new ConcurrentHashMap<>();
-        
+
         for(final Path nextPath : pathsToDigest)
         {
             try (final InputStream inputStream = Files.newInputStream(nextPath))
@@ -95,8 +94,8 @@ public class PoddDigestUtils
                 nextMap.putIfAbsent(Algorithm.SHA1, shaDigestString);
             }
         }
-        
+
         return result;
-    }
-    
+            }
+
 }

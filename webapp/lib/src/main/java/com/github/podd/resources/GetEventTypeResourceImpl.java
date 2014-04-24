@@ -28,19 +28,19 @@ import com.github.podd.utils.PoddWebConstants;
 
 public class GetEventTypeResourceImpl extends AbstractPoddResourceImpl
 {
-    
+
     @Get("rdf|rj|json|ttl")
     public String getRdf(final Variant variant) throws ResourceException
     {
         // - object Type (mandatory)
         this.log.info("Get Event Type query {}", this.getQuery());
-        
+
         final String result;
-        
+
         try
         {
             result = this.getJsonEventHierarchy().toString();
-            
+
         }
         catch(final PoddException e)
         {
@@ -49,9 +49,9 @@ public class GetEventTypeResourceImpl extends AbstractPoddResourceImpl
         this.log.debug("[GetEventTypeResourceImpl] result getRdf {}", result);
         return result;
     }
-    
+
     public StringBuffer getJsonEventHierarchy() throws ResourceException, UnmanagedArtifactIRIException,
-        UnmanagedSchemaIRIException
+    UnmanagedSchemaIRIException
     {
         final String artifactUriString = this.getQuery().getFirstValue(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, true);
         if(artifactUriString == null)
@@ -79,24 +79,24 @@ public class GetEventTypeResourceImpl extends AbstractPoddResourceImpl
         Datas.setLength(Datas.length() - 1);
         Datas.append("]");
         this.log.debug("Final Datas {}", Datas.toString());
-        
+
         return Datas;
     }
-    
+
     /**
      * Request to get the direct child of a set of concepts
-     * 
+     *
      * @param Concepts
      *            the set of concepts
      * @param ontologyID
      * @return
      * @throws ResourceException
      */
-    
+
     public Model getchildOfList(final Set<URI> Concepts, final InferredOWLOntologyID ontologyID)
-        throws ResourceException
+            throws ResourceException
     {
-        
+
         Model subConcepts;
         try
         {
@@ -110,13 +110,13 @@ public class GetEventTypeResourceImpl extends AbstractPoddResourceImpl
             throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Could not find child of list ", e);
         }
         this.log.debug("Result to array", subConcepts.toArray());
-        
+
         return subConcepts;
     }
-    
+
     /**
      * Call the function getchildOfList and construct the JSON for the jsTree plugin
-     * 
+     *
      * @param Set
      *            of currant concept. Contains top concept the first time
      * @param ontologyID
@@ -125,19 +125,19 @@ public class GetEventTypeResourceImpl extends AbstractPoddResourceImpl
      * @return
      * @throws ResourceException
      */
-    
+
     public StringBuffer getChildof(final Set<URI> Concepts, final InferredOWLOntologyID ontologyID,
             final boolean TopConcept) throws ResourceException
     {
-        
+
         Model ResultRequest;
         final StringBuffer Data = new StringBuffer();
         ResultRequest = this.getchildOfList(Concepts, ontologyID);
         final Set<URI> SubConcepts = new LinkedHashSet<>();
-        
+
         if(!ResultRequest.isEmpty())
         {
-            
+
             for(final Value object : ResultRequest.objects())
             {
                 if(TopConcept)
@@ -149,33 +149,33 @@ public class GetEventTypeResourceImpl extends AbstractPoddResourceImpl
                 final Model SubConcept =
                         ResultRequest.filter(null,
                                 PODD.VF.createURI("http://www.w3.org/2000/01/rdf-schema#subClassOf"), object);
-                
+
                 for(final Value subject : SubConcept.subjects())
                 {
-                    
+
                     Data.append("{ \"id\" : \"" + ((URI)subject).getLocalName() + "\", \"parent\" : \""
                             + ((URI)object).getLocalName() + "\", \"text\" : \"" + ((URI)subject).getLocalName()
                             + "\" ,\"type\":\"concept\",\"uri\" : \"" + subject + "\"},");
                     SubConcepts.add((URI)subject);
                 }
             }
-            
+
             return Data.append(this.getChildof(SubConcepts, ontologyID, false));
         }
         else
         {
             return Data;
         }
-        
+
     }
-    
+
     @Post("rdf|rj|json|ttl")
     public Representation addEventLinked(final Representation entity, final Variant variant) throws ResourceException
     {
-        
+
         this.log.info("In addEventLinked");
-        
+
         return null;
     }
-    
+
 }

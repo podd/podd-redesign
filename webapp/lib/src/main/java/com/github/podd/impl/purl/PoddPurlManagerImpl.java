@@ -1,16 +1,16 @@
 /**
  * PODD is an OWL ontology database used for scientific project management
- * 
+ *
  * Copyright (C) 2009-2013 The University Of Queensland
- * 
+ *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU Affero General Public License as published by the Free Software Foundation, either version 3
  * of the License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
  * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Affero General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License along with this program.
  * If not, see <http://www.gnu.org/licenses/>.
  */
@@ -46,21 +46,21 @@ import com.github.podd.utils.PoddRdfUtils;
 
 /**
  * Basic PURL Manager implementation for use in PODD.
- * 
- * 
+ *
+ *
  * @author kutila
- * 
+ *
  */
 public class PoddPurlManagerImpl implements PoddPurlManager
 {
-    
+
     protected final Logger log = LoggerFactory.getLogger(this.getClass());
-    
+
     // This manager functions only during the RDF_PARSING processor stage.
     private final PoddProcessorStage processorStage = PoddProcessorStage.RDF_PARSING;
-    
+
     private PoddPurlProcessorFactoryRegistry purlProcessorFactoryRegistry;
-    
+
     private void convertTemporaryUri(final URI inputUri, final URI outputUri,
             final RepositoryConnection repositoryConnection, final URI... contexts) throws RepositoryException
     {
@@ -80,7 +80,7 @@ public class PoddPurlManagerImpl implements PoddPurlManager
         {
             stmtsWithTempSubject.close();
         }
-        
+
         // replace occurrences as Object
         final RepositoryResult<Statement> stmtsWithTempObject =
                 repositoryConnection.getStatements(null, null, inputUri, false, contexts);
@@ -98,41 +98,41 @@ public class PoddPurlManagerImpl implements PoddPurlManager
             stmtsWithTempObject.close();
         }
     }
-    
+
     @Override
     public void convertTemporaryUris(final Set<PoddPurlReference> purlResults,
             final RepositoryConnection repositoryConnection, final URI... contexts) throws RepositoryException,
-        UpdateExecutionException
+            UpdateExecutionException
     {
         for(final PoddPurlReference purl : purlResults)
         {
             final URI inputUri = purl.getTemporaryURI();
             final URI outputUri = purl.getPurlURI();
             this.log.debug("Converting: {} to {}", inputUri, outputUri);
-            
+
             this.convertTemporaryUri(inputUri, outputUri, repositoryConnection, contexts);
         }
     }
-    
+
     @Override
     public Set<PoddPurlReference> extractPurlReferences(final RepositoryConnection repositoryConnection,
             final URI... contexts) throws PurlProcessorNotHandledException, RepositoryException
-    {
+            {
         return this.extractPurlReferences(null, repositoryConnection, contexts);
-    }
-    
+            }
+
     @Override
     public Set<PoddPurlReference> extractPurlReferences(final URI parentUri,
             final RepositoryConnection repositoryConnection, final URI... contexts)
-        throws PurlProcessorNotHandledException, RepositoryException
-    {
+                    throws PurlProcessorNotHandledException, RepositoryException
+                    {
         final Set<PoddPurlReference> internalPurlResults =
                 Collections.newSetFromMap(new ConcurrentHashMap<PoddPurlReference, Boolean>());
         // NOTE: We use a Set to avoid duplicate calls to any Purl processors
         // for any
         // temporary URI
         final Set<URI> temporaryURIs = Collections.newSetFromMap(new ConcurrentHashMap<URI, Boolean>());
-        
+
         // NOTE: a Factory may handle only a particular temporary URI format,
         // necessitating to
         // go through multiple factories to extract ALL temporary URIs in the
@@ -143,9 +143,9 @@ public class PoddPurlManagerImpl implements PoddPurlManager
             try
             {
                 final String sparqlQuery = PoddRdfUtils.buildSparqlConstructQuery(nextProcessorFactory);
-                
+
                 final GraphQuery graphQuery = repositoryConnection.prepareGraphQuery(QueryLanguage.SPARQL, sparqlQuery);
-                
+
                 // Create a new dataset to specify contexts that the query will
                 // be allowed to access
                 final DatasetImpl dataset = new DatasetImpl();
@@ -154,13 +154,13 @@ public class PoddPurlManagerImpl implements PoddPurlManager
                     dataset.addDefaultGraph(artifactGraphUri);
                     dataset.addNamedGraph(artifactGraphUri);
                 }
-                
+
                 // set the dataset for the query to be our artificially
                 // constructed dataset
                 graphQuery.setDataset(dataset);
-                
+
                 final GraphQueryResult queryResult = graphQuery.evaluate();
-                
+
                 // If the query matched anything, then for each of the temporary
                 // URIs in the
                 // resulting construct statements, we create a Purl reference
@@ -176,7 +176,7 @@ public class PoddPurlManagerImpl implements PoddPurlManager
                     // that it needs to be
                     // thread safe
                     final PoddPurlProcessor processor = nextProcessorFactory.getProcessor();
-                    
+
                     // Subject rewriting
                     if(next.getSubject() instanceof URI && !temporaryURIs.contains(next.getSubject())
                             && processor.canHandle((URI)next.getSubject()))
@@ -184,12 +184,12 @@ public class PoddPurlManagerImpl implements PoddPurlManager
                         temporaryURIs.add((URI)next.getSubject());
                         internalPurlResults.add(processor.handleTranslation((URI)next.getSubject(), parentUri));
                     }
-                    
+
                     // Predicate rewriting is not supported. Predicates in OWL
                     // Documents must
                     // be URIs from recognized vocabularies, so cannot be auto
                     // generated PURLs
-                    
+
                     // Object rewriting
                     if(next.getObject() instanceof URI && !temporaryURIs.contains(next.getObject())
                             && processor.canHandle((URI)next.getObject()))
@@ -208,19 +208,19 @@ public class PoddPurlManagerImpl implements PoddPurlManager
             }
         }
         return internalPurlResults;
-    }
-    
+                    }
+
     @Override
     public PoddPurlProcessorFactoryRegistry getPurlProcessorFactoryRegistry()
     {
         return this.purlProcessorFactoryRegistry;
     }
-    
+
     @Override
     public void setPurlProcessorFactoryRegistry(final PoddPurlProcessorFactoryRegistry purlProcessorFactoryRegistry)
     {
         this.purlProcessorFactoryRegistry = purlProcessorFactoryRegistry;
-        
+
     }
-    
+
 }
