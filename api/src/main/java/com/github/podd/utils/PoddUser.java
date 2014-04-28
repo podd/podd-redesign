@@ -51,7 +51,7 @@ public class PoddUser extends RestletUtilUser
     {
         return PoddUser.fromModel(model, false, false, false);
     }
-
+    
     /**
      * Creates a PoddUser object from statements in the given {@link Model}.
      *
@@ -69,11 +69,19 @@ public class PoddUser extends RestletUtilUser
     public static final PoddUser fromModel(final Model model, final boolean allowSecret,
             final boolean failIfSecretFound, final boolean requireSecret)
     {
-        final String identifier = model.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).objectString();
+        String identifier = model.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).objectString();
         if(identifier == null || identifier.trim().length() == 0)
         {
             // FIXME: Convert this to a PoddException
             throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "User Identifier cannot be empty");
+        }
+        identifier = identifier.trim();
+        for(char nextChar : identifier.toCharArray())
+        {
+            if(Character.isWhitespace(nextChar))
+            {
+                throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "User Identifier cannot contain a space");
+            }
         }
         char[] secret = null;
         if(allowSecret)
@@ -94,7 +102,7 @@ public class PoddUser extends RestletUtilUser
                 secret = password.toCharArray();
             }
         }
-
+        
         final String firstName = model.filter(null, SesameRealmConstants.OAS_USERFIRSTNAME, null).objectString();
         final String lastName = model.filter(null, SesameRealmConstants.OAS_USERLASTNAME, null).objectString();
         // PODD-specific requirement. First/Last names are mandatory.
@@ -103,7 +111,7 @@ public class PoddUser extends RestletUtilUser
             // FIXME: Convert this to a PoddException
             throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "User First/Last name cannot be empty");
         }
-
+        
         // PODD-specific requirement. Email has to be present and equal to the user Identifier.
         final String email = model.filter(null, SesameRealmConstants.OAS_USEREMAIL, null).objectString();
         if(email == null)
@@ -111,14 +119,14 @@ public class PoddUser extends RestletUtilUser
             // FIXME: Convert this to a PoddException
             throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "User Email cannot be empty");
         }
-
+        
         PoddUserStatus status = PoddUserStatus.INACTIVE;
         final URI statusUri = model.filter(null, PODD.PODD_USER_STATUS, null).objectURI();
         if(statusUri != null)
         {
             status = PoddUserStatus.getUserStatusByUri(statusUri);
         }
-
+        
         final URI homePage = model.filter(null, PODD.PODD_USER_HOMEPAGE, null).objectURI();
         final String organization = model.filter(null, PODD.PODD_USER_ORGANIZATION, null).objectString();
         final String orcidID = model.filter(null, PODD.PODD_USER_ORCID, null).objectString();
@@ -126,43 +134,43 @@ public class PoddUser extends RestletUtilUser
         final String phone = model.filter(null, PODD.PODD_USER_PHONE, null).objectString();
         final String address = model.filter(null, PODD.PODD_USER_ADDRESS, null).objectString();
         final String position = model.filter(null, PODD.PODD_USER_POSITION, null).objectString();
-
+        
         final PoddUser user =
                 new PoddUser(identifier, secret, firstName, lastName, email, status, homePage, organization, orcidID,
                         title, phone, address, position);
-
+        
         return user;
     }
-
+    
     /**
      * The ORCID (see {@link http://orcid.org}) identifier of the user.
      */
     private volatile String orcid;
-
+    
     /** The organization */
     private volatile String organization;
-
+    
     /** The status of this user */
     private volatile PoddUserStatus userStatus;
-
+    
     /** The Home Page of this user */
     private volatile URI homePage;
-
+    
     /** The unique URI for this user */
     private volatile URI uri;
-
+    
     /** The user's title */
     private volatile String title;
-
+    
     /** The user's telephone */
     private volatile String phone;
-
+    
     /** The user's postal address */
     private volatile String address;
-
+    
     /** The user's job position */
     private volatile String position;
-
+    
     /**
      * Constructor.
      *
@@ -185,7 +193,7 @@ public class PoddUser extends RestletUtilUser
         super(identifier, secret, firstName, lastName, email);
         this.userStatus = userStatus;
     }
-
+    
     /**
      * Constructor.
      *
@@ -218,7 +226,7 @@ public class PoddUser extends RestletUtilUser
         this.organization = organization;
         this.orcid = orcid;
     }
-
+    
     public PoddUser(final String identifier, final char[] secret, final String firstName, final String lastName,
             final String email, final PoddUserStatus userStatus, final URI homePage, final String organization,
             final String orcid, final String title, final String phone, final String address, final String position)
@@ -233,12 +241,12 @@ public class PoddUser extends RestletUtilUser
         this.address = address;
         this.position = position;
     }
-
+    
     public String getAddress()
     {
         return this.address;
     }
-
+    
     /**
      * Get the URL of a home page containing details about the User. This value is set by the user.
      *
@@ -248,32 +256,32 @@ public class PoddUser extends RestletUtilUser
     {
         return this.homePage;
     }
-
+    
     public String getOrcid()
     {
         return this.orcid;
     }
-
+    
     public String getOrganization()
     {
         return this.organization;
     }
-
+    
     public String getPhone()
     {
         return this.phone;
     }
-
+    
     public String getPosition()
     {
         return this.position;
     }
-
+    
     public String getTitle()
     {
         return this.title;
     }
-
+    
     /**
      * Get the Unique URI allocated to each user. This value is usually generated and set by PODD.
      *
@@ -283,7 +291,7 @@ public class PoddUser extends RestletUtilUser
     {
         return this.uri;
     }
-
+    
     /**
      * Get a String identifying the human User and his/her affiliation.
      *
@@ -293,17 +301,17 @@ public class PoddUser extends RestletUtilUser
     {
         return this.getFirstName() + " " + this.getLastName() + ", " + this.getOrganization();
     }
-
+    
     public PoddUserStatus getUserStatus()
     {
         return this.userStatus;
     }
-
+    
     public void setAddress(final String address)
     {
         this.address = address;
     }
-
+    
     /**
      * Set the URL of a home page containing details about the User. This value is usually set by
      * the user.
@@ -314,32 +322,32 @@ public class PoddUser extends RestletUtilUser
     {
         this.homePage = homePage;
     }
-
+    
     public void setOrcid(final String orcid)
     {
         this.orcid = orcid;
     }
-
+    
     public void setOrganization(final String organization)
     {
         this.organization = organization;
     }
-
+    
     public void setPhone(final String phone)
     {
         this.phone = phone;
     }
-
+    
     public void setPosition(final String position)
     {
         this.position = position;
     }
-
+    
     public void setTitle(final String title)
     {
         this.title = title;
     }
-
+    
     /**
      * Set the Unique URI allocated to each user. This value is usually generated and set by PODD.
      *
@@ -349,68 +357,68 @@ public class PoddUser extends RestletUtilUser
     {
         this.uri = uri;
     }
-
+    
     public void setUserStatus(final PoddUserStatus userStatus)
     {
         this.userStatus = userStatus;
     }
-
+    
     public void toModel(final Model model, final boolean includeSecret)
     {
         URI userUri = this.getUri();
-
+        
         if(userUri == null)
         {
             userUri = PODD.VF.createURI(PoddPurlProcessorPrefixes.UUID.getTemporaryPrefix() + this.getIdentifier());
         }
-
+        
         model.add(userUri, SesameRealmConstants.OAS_USERIDENTIFIER, PODD.VF.createLiteral(this.getIdentifier()));
-
+        
         // Password should not be sent back in RDF to users!
         if(includeSecret && this.getSecret() != null)
         {
             model.add(userUri, SesameRealmConstants.OAS_USERSECRET, PODD.VF.createLiteral(new String(this.getSecret())));
         }
-
+        
         model.add(userUri, SesameRealmConstants.OAS_USERFIRSTNAME, PODD.VF.createLiteral(this.getFirstName()));
         model.add(userUri, SesameRealmConstants.OAS_USERLASTNAME, PODD.VF.createLiteral(this.getLastName()));
         model.add(userUri, SesameRealmConstants.OAS_USEREMAIL, PODD.VF.createLiteral(this.getEmail()));
-
+        
         if(this.getHomePage() != null)
         {
             model.add(userUri, PODD.PODD_USER_HOMEPAGE, this.getHomePage());
         }
-
+        
         if(this.getOrganization() != null)
         {
             model.add(userUri, PODD.PODD_USER_ORGANIZATION, PODD.VF.createLiteral(this.getOrganization()));
         }
-
+        
         if(this.getOrcid() != null)
         {
             model.add(userUri, PODD.PODD_USER_ORCID, PODD.VF.createLiteral(this.getOrcid()));
         }
-
+        
         if(this.getTitle() != null)
         {
             model.add(userUri, PODD.PODD_USER_TITLE, PODD.VF.createLiteral(this.getTitle()));
         }
-
+        
         if(this.getPhone() != null)
         {
             model.add(userUri, PODD.PODD_USER_PHONE, PODD.VF.createLiteral(this.getPhone()));
         }
-
+        
         if(this.getAddress() != null)
         {
             model.add(userUri, PODD.PODD_USER_ADDRESS, PODD.VF.createLiteral(this.getAddress()));
         }
-
+        
         if(this.getPosition() != null)
         {
             model.add(userUri, PODD.PODD_USER_POSITION, PODD.VF.createLiteral(this.getPosition()));
         }
-
+        
         if(this.getUserStatus() != null)
         {
             model.add(userUri, PODD.PODD_USER_STATUS, this.getUserStatus().getURI());
@@ -420,9 +428,9 @@ public class PoddUser extends RestletUtilUser
             // INACTIVE by default
             model.add(userUri, PODD.PODD_USER_STATUS, PoddUserStatus.INACTIVE.getURI());
         }
-
+        
     }
-
+    
     @Override
     public String toString()
     {
@@ -444,7 +452,7 @@ public class PoddUser extends RestletUtilUser
         b.append(this.getAddress());
         b.append(":");
         b.append(this.getPosition());
-
+        
         return b.toString();
     }
 }

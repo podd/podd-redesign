@@ -424,4 +424,54 @@ public class UserAddResourceImplTest extends AbstractResourceImplTest
         }
     }
 
+    @Test
+    public void testErrorAddUserWithSpaceInIdentifier() throws Exception
+    {
+        final MediaType mediaType = MediaType.APPLICATION_RDF_XML;
+        final RDFFormat format = Rio.getWriterFormatForMIMEType(mediaType.getName(), RDFFormat.RDFXML);
+
+        // prepare: create a Model of user
+        final String testIdentifier = "wrong @restlet-test.org";
+        final String testPassword = "testpassword";
+        final String testFirstName = "First";
+        final String testLastName = "Last";
+
+        final Model userInfoModel = new LinkedHashModel();
+        final URI tempUserUri = PODD.VF.createURI("urn:temp:user");
+        userInfoModel.add(tempUserUri, SesameRealmConstants.OAS_USERIDENTIFIER, PODD.VF.createLiteral(testIdentifier));
+        userInfoModel.add(tempUserUri, SesameRealmConstants.OAS_USERSECRET, PODD.VF.createLiteral(testPassword));
+        userInfoModel.add(tempUserUri, SesameRealmConstants.OAS_USERFIRSTNAME, PODD.VF.createLiteral(testFirstName));
+        userInfoModel.add(tempUserUri, SesameRealmConstants.OAS_USERLASTNAME, PODD.VF.createLiteral(testLastName));
+
+        // prepare: add 'Authenticated User' Role
+        final URI authenticatedRoleMapping = PODD.VF.createURI("urn:podd:rolemapping:", UUID.randomUUID().toString());
+        userInfoModel.add(authenticatedRoleMapping, RDF.TYPE, SesameRealmConstants.OAS_ROLEMAPPING);
+        userInfoModel.add(authenticatedRoleMapping, SesameRealmConstants.OAS_ROLEMAPPEDUSER, tempUserUri);
+        userInfoModel.add(authenticatedRoleMapping, SesameRealmConstants.OAS_ROLEMAPPEDROLE, PoddRoles.ADMIN.getURI());
+
+        final ByteArrayOutputStream out = new ByteArrayOutputStream();
+        Rio.write(userInfoModel, out, format);
+        final Representation input = new StringRepresentation(out.toString(), mediaType);
+
+        final ClientResource userAddClientResource = new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_ADD));
+
+        try
+        {
+            this.doTestAuthenticatedRequest(userAddClientResource, Method.POST, input, mediaType, Status.SUCCESS_OK,
+                    AbstractResourceImplTest.WITH_ADMIN);
+            Assert.fail("Should have failed due to missing email");
+        }
+        catch(final ResourceException e)
+        {
+            // verify: the cause (simple string matching, not checking for valid
+            // RDF content)
+            Assert.assertEquals(Status.CLIENT_ERROR_BAD_REQUEST, e.getStatus());
+            final String body = this.getText(userAddClientResource.getResponseEntity());
+            Assert.assertTrue("Expected cause is missing", body.contains("User Identifier cannot contain a space"));
+        }
+        finally
+        {
+            this.releaseClient(userAddClientResource);
+        }
+    }
 }
