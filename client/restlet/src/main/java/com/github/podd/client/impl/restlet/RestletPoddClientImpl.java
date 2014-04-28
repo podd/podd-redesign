@@ -361,19 +361,22 @@ public class RestletPoddClientImpl implements PoddClient
         final ClientResource resource = new ClientResource(this.getUrl(PoddWebConstants.PATH_SPARQL));
         resource.getCookies().addAll(this.currentCookies);
 
-        resource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactId.getOntologyIRI().toString());
-
         // TODO: Parse query to make sure it is syntactically valid before sending query
         resource.addQueryParameter(PoddWebConstants.KEY_SPARQLQUERY, queryString);
 
-        if(artifactId.getVersionIRI() != null)
+        if(artifactId != null)
         {
-            // FIXME: Versions are not supported in general by PODD, but they are important for
-            // verifying the state of the client to allow for early failure in cases where the
-            // client is out of date.
-            resource.addQueryParameter("versionUri", artifactId.getVersionIRI().toString());
+            resource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactId.getOntologyIRI().toString());
+    
+            if(artifactId.getVersionIRI() != null)
+            {
+                // FIXME: Versions are not supported in general by PODD, but they are important for
+                // verifying the state of the client to allow for early failure in cases where the
+                // client is out of date.
+                resource.addQueryParameter("versionUri", artifactId.getVersionIRI().toString());
+            }
         }
-
+        
         // Pass the desired format to the get method of the ClientResource
         final Representation get = resource.get(RestletUtilMediaType.APPLICATION_RDF_JSON);
 
