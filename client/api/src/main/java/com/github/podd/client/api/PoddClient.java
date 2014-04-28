@@ -24,6 +24,7 @@ import java.util.Map;
 
 import org.openrdf.model.Model;
 import org.openrdf.model.URI;
+import org.openrdf.model.vocabulary.RDFS;
 import org.openrdf.rio.RDFFormat;
 import org.semanticweb.owlapi.model.IRI;
 
@@ -41,6 +42,13 @@ import com.github.podd.utils.PoddUser;
  */
 public interface PoddClient
 {
+    public static final String TEMPLATE_SPARQL_BY_TYPE =
+            "CONSTRUCT { ?object a ?type . ?object <http://www.w3.org/2000/01/rdf-schema#label> ?label . } WHERE { ?object a ?type . OPTIONAL { ?object <http://www.w3.org/2000/01/rdf-schema#label> ?label . } } VALUES (?type) { ( %s ) }";
+    public static final String TEMPLATE_SPARQL_BY_TYPE_ALL_PROPERTIES =
+            "CONSTRUCT { ?object a ?type . ?object ?predicate ?value . } WHERE { ?object a ?type . ?object ?predicate ?value . } VALUES (?type) { ( %s ) }";
+    public static final String TEMPLATE_SPARQL_BY_TYPE_LABEL_STRSTARTS =
+            "CONSTRUCT { ?object a ?type . ?object <http://www.w3.org/2000/01/rdf-schema#label> ?label . } WHERE { ?object a ?type . ?object <http://www.w3.org/2000/01/rdf-schema#label> ?label . FILTER(STRSTARTS(?label, \"%s\")) } VALUES (?type) { ( %s ) }";
+    
     /**
      * Adds the given role for the given user to the given artifact
      *
@@ -51,8 +59,8 @@ public interface PoddClient
      *             If there is an error setting the role for the given user.
      */
     void addRole(String userIdentifier, RestletUtilRole role, InferredOWLOntologyID artifact)
-            throws PoddClientException;
-
+        throws PoddClientException;
+    
     /**
      * Submits a request to the PODD Edit Artifact service to append to the artifact using the RDF
      * triples that are contained in the given {@link InputStream}.
@@ -74,11 +82,11 @@ public interface PoddClient
      */
     InferredOWLOntologyID appendArtifact(InferredOWLOntologyID ontologyId, InputStream partialInputStream,
             RDFFormat format) throws PoddClientException;
-
+    
     InferredOWLOntologyID appendArtifact(InferredOWLOntologyID ontologyId, InputStream partialInputStream,
             RDFFormat format, DanglingObjectPolicy danglingObjectPolicy,
             DataReferenceVerificationPolicy dataReferenceVerificationPolicy) throws PoddClientException;
-
+    
     /**
      * Appends multiple artifacts in PODD.
      *
@@ -90,8 +98,8 @@ public interface PoddClient
      *             If an error occurred.
      */
     Map<InferredOWLOntologyID, InferredOWLOntologyID> appendArtifacts(Map<InferredOWLOntologyID, Model> uploadQueue)
-            throws PoddClientException;
-
+        throws PoddClientException;
+    
     /**
      * Submits a request to the PODD File Reference Attachment service to attach a file reference
      * from a registered repository into the artifact as a child of the given object IRI.
@@ -115,7 +123,7 @@ public interface PoddClient
      *         artifact.
      */
     InferredOWLOntologyID attachDataReference(DataReference ref) throws PoddClientException;
-
+    
     /**
      * Creates a new PoddUser using the details in the given PoddUser.
      *
@@ -126,7 +134,7 @@ public interface PoddClient
      * @throws PoddClientException
      */
     PoddUser createUser(PoddUser user) throws PoddClientException;
-
+    
     /**
      * Submits a request to the PODD Delete Artifact service to delete the artifact identified by
      * the given IRI.
@@ -141,20 +149,36 @@ public interface PoddClient
      * @return True if the artifact was deleted and false otherwise.
      */
     boolean deleteArtifact(InferredOWLOntologyID ontologyId) throws PoddClientException;
-
+    
     /**
      * Performs a CONSTRUCT or DESCRIBE SPARQL query on the given artifact.
      *
      * @param queryString
      *            The CONSTRUCT or DESCRIBE SPARQL query on the given artifact.
-     * @param artifact
-     *            The PODD artifact to perform the query on.
+     * @param artifacts
+     *            The PODD artifacts to perform the query on.
      * @return A {@link Model} containing the results of the SPARQL query.
      * @throws PoddClientException
      *             If an error occurred.
      */
-    Model doSPARQL(String queryString, InferredOWLOntologyID artifact) throws PoddClientException;
-
+    Model doSPARQL(String queryString, Collection<InferredOWLOntologyID> artifacts) throws PoddClientException;
+    
+    /**
+     * Submits a request to the PODD Get Artifact service to download the artifact identified by the
+     * given {@link InferredOWLOntologyID}, optionally including a version IRI if it is specifically
+     * known.
+     * <p>
+     * If the version is not currently available, the latest version will be returned.
+     *
+     * @param artifactId
+     *            The {@link InferredOWLOntologyID} of the artifact to be downloaded, including
+     *            version as necessary to fetch old versions.
+     * @return A model containing the RDF statements
+     * @throws PoddClientException
+     *             If the artifact could not be downloaded for any reason
+     */
+    Model downloadArtifact(InferredOWLOntologyID artifactId) throws PoddClientException;
+    
     /**
      * Submits a request to the PODD Get Artifact service to download the artifact identified by the
      * given {@link InferredOWLOntologyID}, optionally including a version IRI if it is specifically
@@ -173,8 +197,43 @@ public interface PoddClient
      *             If the artifact could not be downloaded for any reason
      */
     void downloadArtifact(InferredOWLOntologyID artifactId, OutputStream outputStream, RDFFormat format)
-            throws PoddClientException;
-
+        throws PoddClientException;
+    
+    /**
+     * Returns RDF statements containing the types and labels for all objects in the given artifacts
+     * with the given types. If there are no artifacts specified then all accessible artifacts will
+     * be searched. The type is the fully inferred type for the object, not just its concrete types.
+     *
+     * @param type
+     *            The URI with the RDF Type to search for. Must not be null.
+     * @param artifacts
+     *            An optional list of artifacts which are to be searched.
+     * @return A {@link Model} containing the RDF statements which describe the matching objects.
+     * @throws PoddClientException
+     *             If there is an exception while executing the query.
+     */
+    Model getObjectsByType(URI type, Collection<InferredOWLOntologyID> artifacts) throws PoddClientException;
+    
+    /**
+     * Returns RDF statements containing the types and labels for all objects in the given artifacts
+     * with the given types, whose labels start with the given prefix. If there are no artifacts
+     * specified then all accessible artifacts will be searched. The type is the fully inferred type
+     * for the object, not just its concrete types.
+     *
+     * @param type
+     *            The URI with the RDF Type to search for. Must not be null.
+     * @param labelPrefix
+     *            The string which must start the {@link RDFS#LABEL} for the object for it to be
+     *            matched.
+     * @param artifacts
+     *            An optional list of artifacts which are to be searched.
+     * @return A {@link Model} containing the RDF statements which describe the matching objects.
+     * @throws PoddClientException
+     *             If there is an exception while executing the query.
+     */
+    Model getObjectsByTypeAndPrefix(URI type, String labelPrefix, Collection<InferredOWLOntologyID> artifacts)
+        throws PoddClientException;
+    
     /**
      * Gets the base server URL to use when submitting requests using this client.
      *
@@ -182,7 +241,7 @@ public interface PoddClient
      *         hosted locally. Returns null if a server URL has not been set.
      */
     String getPoddServerUrl();
-
+    
     /**
      *
      * @param userIdentifier
@@ -193,14 +252,14 @@ public interface PoddClient
      *             If the user is not accessible, including if the user does not exist.
      */
     PoddUser getUserDetails(String userIdentifier) throws PoddClientException;
-
+    
     /**
      * Returns the current login status.
      *
      * @return True if the client was logged in after the last request, and false otherwise.
      */
     boolean isLoggedIn();
-
+    
     /**
      * Lists the artifacts that are accessible and returns the details as a {@link Model}.
      *
@@ -215,14 +274,14 @@ public interface PoddClient
      *             If an error occurred.
      */
     Model listArtifacts(boolean published, boolean unpublished) throws PoddClientException;
-
+    
     /**
      *
      * @return A list of Strings identifying the possible values for the repository alias in calls
      *         to {@link #attachFileReference(IRI, String, String)}.
      */
     List<String> listDataReferenceRepositories() throws PoddClientException;
-
+    
     /**
      *
      * @return A list of {@link InferredOWLOntologyID}s identifying the artifacts that the user has
@@ -230,7 +289,7 @@ public interface PoddClient
      *         or fork.
      */
     List<InferredOWLOntologyID> listPublishedArtifacts() throws PoddClientException;
-
+    
     /**
      * List the roles that have been assigned to the given artifact.
      *
@@ -242,7 +301,7 @@ public interface PoddClient
      * @throws PoddClientException
      */
     Map<RestletUtilRole, Collection<String>> listRoles(InferredOWLOntologyID artifactId) throws PoddClientException;
-
+    
     /**
      * List the roles that have been assigned to the given user, or the currently logged in user if
      * the user is not specified.
@@ -255,14 +314,14 @@ public interface PoddClient
      * @throws PoddClientException
      */
     Map<RestletUtilRole, Collection<URI>> listRoles(String userIdentifier) throws PoddClientException;
-
+    
     /**
      *
      * @return A list of {@link InferredOWLOntologyID}s identifying the artifacts that the user has
      *         access to which are unpublished.
      */
     List<InferredOWLOntologyID> listUnpublishedArtifacts() throws PoddClientException;
-
+    
     /**
      *
      * @return A list of the current users registered with the system, masked by the abilities of
@@ -271,7 +330,7 @@ public interface PoddClient
      *         able to see some other users.
      */
     List<PoddUser> listUsers() throws PoddClientException;
-
+    
     /**
      * Submits a request to the PODD Login service to login the user with the given username and
      * password.
@@ -289,14 +348,14 @@ public interface PoddClient
      * @return True if the user was successfully logged in and false otherwise.
      */
     boolean login(String username, String password) throws PoddClientException;
-
+    
     /**
      * Submits a request to the PODD Logout service to logout the user and close the session.
      *
      * @return True if the user was successfully logged out and false otherwise.
      */
     boolean logout() throws PoddClientException;
-
+    
     /**
      * Submits a request to the PODD Publish Artifact service to publish an artifact that was
      * previously unpublished.
@@ -314,7 +373,7 @@ public interface PoddClient
      *         previously unpublished artifact.
      */
     InferredOWLOntologyID publishArtifact(InferredOWLOntologyID ontologyId) throws PoddClientException;
-
+    
     /**
      * Removes the given role for the given user to the given artifact.
      *
@@ -325,8 +384,8 @@ public interface PoddClient
      *             If there is an error removing the role for the given user.
      */
     void removeRole(String userIdentifier, RestletUtilRole role, InferredOWLOntologyID artifact)
-            throws PoddClientException;
-
+        throws PoddClientException;
+    
     /**
      * Sets the base server URL to use when submitting requests using this client.
      *
@@ -335,7 +394,7 @@ public interface PoddClient
      *            hosted locally.
      */
     void setPoddServerUrl(String serverUrl);
-
+    
     /**
      * Submits a request to the PODD Unpublish Artifact service to unpublish an artifact that was
      * previously published.
@@ -351,7 +410,7 @@ public interface PoddClient
      *         from the previously available artifact.
      */
     InferredOWLOntologyID unpublishArtifact(InferredOWLOntologyID ontologyId) throws PoddClientException;
-
+    
     /**
      * Submits a request to the PODD Edit Artifact service to update the entire artifact, replacing
      * the existing content with the content in the given {@link InputStream}.
@@ -372,8 +431,8 @@ public interface PoddClient
      *         artifact.
      */
     InferredOWLOntologyID updateArtifact(InferredOWLOntologyID ontologyId, InputStream fullInputStream, RDFFormat format)
-            throws PoddClientException;
-
+        throws PoddClientException;
+    
     /**
      * Submits a request to the PODD Load Artifact service.
      *
@@ -388,9 +447,9 @@ public interface PoddClient
      *         IRI to determine if there have been changes to the ontology in future.
      */
     InferredOWLOntologyID uploadNewArtifact(InputStream input, RDFFormat format) throws PoddClientException;
-
+    
     InferredOWLOntologyID uploadNewArtifact(InputStream input, RDFFormat format,
             DanglingObjectPolicy danglingObjectPolicy, DataReferenceVerificationPolicy dataReferenceVerificationPolicy)
-                    throws PoddClientException;
-
+        throws PoddClientException;
+    
 }

@@ -74,29 +74,29 @@ public class SparqlResourceImpl extends AbstractPoddResourceImpl
     {
         // TODO: Support an interactive HTML page that users can enter queries
         // on and see results
-
+        
         this.log.debug("getSparqlRdf");
-
+        
         final User user = this.getRequest().getClientInfo().getUser();
         this.log.info("authenticated user: {}", user);
-
+        
         // variables for request parameters
         String sparqlQuery = null;
         boolean includeConcrete = true;
         boolean includeInferred = true;
         boolean includeSchema = true;
         String[] artifactUris;
-
+        
         // sparql query - mandatory parameter
         sparqlQuery = this.getQuery().getFirstValue(PoddWebConstants.KEY_SPARQLQUERY, true);
         if(sparqlQuery == null)
         {
             throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "SPARQL query not submitted");
         }
-
+        
         // artifact ids to search across
         artifactUris = this.getQuery().getValuesArray(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER);
-
+        
         final String includeConcreteStatements =
                 this.getQuery().getFirstValue(PoddWebConstants.KEY_INCLUDE_CONCRETE, true);
         includeConcrete = true;
@@ -104,20 +104,20 @@ public class SparqlResourceImpl extends AbstractPoddResourceImpl
         {
             includeConcrete = Boolean.valueOf(includeConcreteStatements);
         }
-
+        
         final String includeInferredStatements =
                 this.getQuery().getFirstValue(PoddWebConstants.KEY_INCLUDE_INFERRED, true);
         if(includeInferredStatements != null)
         {
             includeInferred = Boolean.valueOf(includeInferredStatements);
         }
-
+        
         final String includeSchemaStatements = this.getQuery().getFirstValue(PoddWebConstants.KEY_INCLUDE_SCHEMA, true);
         if(includeSchemaStatements != null)
         {
             includeSchema = Boolean.valueOf(includeSchemaStatements);
         }
-
+        
         try
         {
             return this.doSparqlInternal(sparqlQuery, includeConcrete, includeInferred, includeSchema, artifactUris,
@@ -128,47 +128,47 @@ public class SparqlResourceImpl extends AbstractPoddResourceImpl
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL, e);
         }
     }
-
+    
     @Post(":rdf|rj|json|ttl")
     public Representation postSparqlRdf(final Representation entity, final Variant variant) throws ResourceException
     {
         this.log.debug("postSparqlRdf");
-
+        
         final User user = this.getRequest().getClientInfo().getUser();
         this.log.info("authenticated user: {}", user);
-
+        
         if(entity == null)
         {
             // POST request with no entity.
             throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Did not submit anything");
         }
-
+        
         this.log.info("media-type: {}", entity.getMediaType());
-
+        
         // variables for request parameters
         String sparqlQuery = null;
         boolean includeConcrete = true;
         boolean includeInferred = true;
         boolean includeSchema = true;
         String[] artifactUris;
-
+        
         if(MediaType.MULTIPART_FORM_DATA.equals(entity.getMediaType(), true))
         {
             throw new ResourceException(Status.SERVER_ERROR_NOT_IMPLEMENTED,
                     "TODO: Implement support for HTTP POST using multipart/form-data content type");
-
+            
         }
         else
         {
             final FormDataSet form = new FormDataSet(entity);
-
+            
             // sparql query - mandatory parameter
             sparqlQuery = form.getEntries().getFirstValue(PoddWebConstants.KEY_SPARQLQUERY, true);
             if(sparqlQuery == null)
             {
                 throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "SPARQL query not submitted");
             }
-
+            
             // artifact ids to search across
             artifactUris = form.getEntries().getValuesArray(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER);
             if(artifactUris == null || artifactUris.length == 0)
@@ -179,7 +179,7 @@ public class SparqlResourceImpl extends AbstractPoddResourceImpl
                 // not specify any artifacts
                 throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "No artifacts specified in request");
             }
-
+            
             final String includeConcreteStatements =
                     form.getEntries().getFirstValue(PoddWebConstants.KEY_INCLUDE_CONCRETE, true);
             includeConcrete = true;
@@ -187,14 +187,14 @@ public class SparqlResourceImpl extends AbstractPoddResourceImpl
             {
                 includeConcrete = Boolean.valueOf(includeConcreteStatements);
             }
-
+            
             final String includeInferredStatements =
                     form.getEntries().getFirstValue(PoddWebConstants.KEY_INCLUDE_INFERRED, true);
             if(includeInferredStatements != null)
             {
                 includeInferred = Boolean.valueOf(includeInferredStatements);
             }
-
+            
             final String includeSchemaStatements =
                     form.getEntries().getFirstValue(PoddWebConstants.KEY_INCLUDE_SCHEMA, true);
             if(includeSchemaStatements != null)
@@ -202,7 +202,7 @@ public class SparqlResourceImpl extends AbstractPoddResourceImpl
                 includeSchema = Boolean.valueOf(includeSchemaStatements);
             }
         }
-
+        
         try
         {
             return this.doSparqlInternal(sparqlQuery, includeConcrete, includeInferred, includeSchema, artifactUris,
@@ -213,7 +213,7 @@ public class SparqlResourceImpl extends AbstractPoddResourceImpl
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL, e);
         }
     }
-
+    
     private Representation doSparqlInternal(final String sparqlQuery, final boolean includeConcrete,
             final boolean includeInferred, final boolean includeSchema, final String[] artifactUris,
             final Variant variant) throws ResourceException, OpenRDFException
@@ -225,28 +225,28 @@ public class SparqlResourceImpl extends AbstractPoddResourceImpl
         {
             final List<InferredOWLOntologyID> unpublishedArtifacts =
                     this.getPoddArtifactManager().listUnpublishedArtifacts();
-
+            
             for(final InferredOWLOntologyID unpublishedArtifact : unpublishedArtifacts)
             {
                 final boolean checkAuthentication =
                         this.checkAuthentication(PoddAction.UNPUBLISHED_ARTIFACT_READ, unpublishedArtifact
                                 .getOntologyIRI().toOpenRDFURI(), false);
-
+                
                 if(checkAuthentication)
                 {
                     artifactIds.add(unpublishedArtifact);
                 }
             }
-
+            
             final List<InferredOWLOntologyID> publishedArtifacts =
                     this.getPoddArtifactManager().listPublishedArtifacts();
-
+            
             for(final InferredOWLOntologyID publishedArtifact : publishedArtifacts)
             {
                 final boolean checkAuthentication =
                         this.checkAuthentication(PoddAction.PUBLISHED_ARTIFACT_READ, publishedArtifact.getOntologyIRI()
                                 .toOpenRDFURI(), false);
-
+                
                 if(checkAuthentication)
                 {
                     artifactIds.add(publishedArtifact);
@@ -261,7 +261,7 @@ public class SparqlResourceImpl extends AbstractPoddResourceImpl
                 {
                     final InferredOWLOntologyID ontologyID =
                             this.getPoddArtifactManager().getArtifact(IRI.create(nextArtifactUri));
-
+                    
                     if(this.getPoddArtifactManager().isPublished(ontologyID))
                     {
                         this.checkAuthentication(PoddAction.PUBLISHED_ARTIFACT_READ, ontologyID.getOntologyIRI()
@@ -290,21 +290,27 @@ public class SparqlResourceImpl extends AbstractPoddResourceImpl
                 }
             }
         }
-
-        if(artifactIds.isEmpty())
+        
+        if(artifactIds.isEmpty() && (artifactUris == null || artifactUris.length == 0))
         {
             throw new ResourceException(Status.CLIENT_ERROR_PRECONDITION_FAILED,
                     "Server does not contain any artifacts that you can view, so no SPARQL queries able to be performed right now.");
         }
-
+        else if(artifactIds.isEmpty())
+        {
+            throw new ResourceException(
+                    Status.CLIENT_ERROR_PRECONDITION_FAILED,
+                    "You do not have permission to view one or more of those artifacts, so the SPARQL query was not able to be performed right now.");
+        }
+        
         final Model results = new LinkedHashModel();
-
+        
         RepositoryConnection managementConnection = null;
         try
         {
             final ConcurrentMap<Set<? extends OWLOntologyID>, RepositoryConnection> cache =
                     new ConcurrentHashMap<Set<? extends OWLOntologyID>, RepositoryConnection>();
-
+            
             managementConnection = this.getPoddRepositoryManager().getManagementRepositoryConnection();
             try
             {
@@ -347,17 +353,17 @@ public class SparqlResourceImpl extends AbstractPoddResourceImpl
                     {
                         final GraphQuery query =
                                 permanentConnection.prepareGraphQuery(QueryLanguage.SPARQL, sparqlQuery);
-
+                        
                         final DatasetImpl dataset = new DatasetImpl();
-
+                        
                         for(final URI nextUri : contexts)
                         {
                             dataset.addDefaultGraph(nextUri);
                             dataset.addNamedGraph(nextUri);
                         }
-
+                        
                         query.setDataset(dataset);
-
+                        
                         query.evaluate(new StatementCollector(results));
                     }
                     else
@@ -433,10 +439,10 @@ public class SparqlResourceImpl extends AbstractPoddResourceImpl
                 }
             }
         }
-
+        
         // container for results
         final ByteArrayOutputStream output = new ByteArrayOutputStream(8096);
-
+        
         final RDFFormat resultFormat =
                 Rio.getWriterFormatForMIMEType(variant.getMediaType().getName(), RDFFormat.RDFXML);
         // - prepare response
@@ -448,7 +454,7 @@ public class SparqlResourceImpl extends AbstractPoddResourceImpl
         {
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Error while preparing response", e);
         }
-
+        
         return new ByteArrayRepresentation(output.toByteArray(), MediaType.valueOf(resultFormat.getDefaultMIMEType()));
     }
 }
