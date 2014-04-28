@@ -37,7 +37,6 @@ import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactoryRegistry;
 
 import com.github.ansell.propertyutil.PropertyUtil;
-import com.github.podd.api.PoddArtifactManager;
 import com.github.podd.api.PoddOWLManager;
 import com.github.podd.api.PoddRepositoryManager;
 import com.github.podd.api.PoddSchemaManager;
@@ -66,62 +65,62 @@ import com.github.podd.utils.PoddWebConstants;
 public class PoddArtifactManagerImplTest extends AbstractPoddArtifactManagerTest
 {
     @Override
-    protected PoddArtifactManager getNewArtifactManager()
+    protected PoddArtifactManagerImpl getNewArtifactManager()
     {
         return new PoddArtifactManagerImpl();
     }
-
+    
     @Override
     protected PoddPurlProcessorFactory getNewDoiPurlProcessorFactory()
     {
         // TODO Auto-generated method stub
         return null;
     }
-
+    
     @Override
     protected DataReferenceManager getNewFileReferenceManager()
     {
         return new DataReferenceManagerImpl();
     }
-
+    
     @Override
     protected PoddPurlProcessorFactory getNewHandlePurlProcessorFactory()
     {
         // TODO Auto-generated method stub
         return null;
     }
-
+    
     @Override
     protected DataReferenceProcessorFactory getNewHttpFileReferenceProcessorFactory()
     {
         // TODO Auto-generated method stub
         return null;
     }
-
+    
     @Override
     protected PoddOWLManager getNewOWLManager(final OWLOntologyManagerFactory manager,
             final OWLReasonerFactory reasonerFactory)
     {
         return new PoddOWLManagerImpl(manager, reasonerFactory);
     }
-
+    
     @Override
     protected PoddPurlManager getNewPurlManager()
     {
         return new PoddPurlManagerImpl();
     }
-
+    
     @Override
     protected OWLReasonerFactory getNewReasonerFactory()
     {
         return OWLReasonerFactoryRegistry.getInstance().getReasonerFactory("Pellet");
     }
-
+    
     @Override
     protected PoddRepositoryManager getNewRepositoryManager(final Repository managementRepository, final Path testPath)
-            throws Exception
+        throws Exception
     {
-
+        
         final Model graph =
                 Rio.parse(this.getClass().getResourceAsStream("/memorystoreconfig.ttl"), "", RDFFormat.TURTLE);
         final Resource repositoryNode = GraphUtil.getUniqueSubject(graph, RepositoryConfigSchema.REPOSITORYTYPE, null);
@@ -131,31 +130,31 @@ public class PoddArtifactManagerImplTest extends AbstractPoddArtifactManagerTest
         return new PoddRepositoryManagerImpl(managementRepository, repositoryImplConfig, "", testPath,
                 new PropertyUtil("podd"));
     }
-
+    
     @Override
     protected PoddSchemaManager getNewSchemaManager()
     {
         return new PoddSchemaManagerImpl();
     }
-
+    
     @Override
     protected PoddSesameManager getNewSesameManager()
     {
         return new PoddSesameManagerImpl();
     }
-
+    
     @Override
     protected DataReferenceProcessorFactory getNewSSHFileReferenceProcessorFactory()
     {
         return new SSHFileReferenceProcessorFactoryImpl();
     }
-
+    
     @Override
     protected PoddPurlProcessorFactory getNewUUIDPurlProcessorFactory()
     {
         return new UUIDPurlProcessorFactoryImpl();
     }
-
+    
     /**
      * Helper method which loads version 1 for the three PODD schema ontologies (and their
      * dependencies): PODD-Base, PODD-Science and PODD-Plant.
@@ -172,7 +171,7 @@ public class PoddArtifactManagerImplTest extends AbstractPoddArtifactManagerTest
                 Rio.parse(this.getClass().getResourceAsStream("/podd-schema-manifest-version1only.ttl"), "",
                         RDFFormat.TURTLE));
     }
-
+    
     /**
      * Helper method which loads version 1 for the three PODD schema ontologies (and their
      * dependencies): PODD-Base, PODD-Science and PODD-Plant.
@@ -189,34 +188,34 @@ public class PoddArtifactManagerImplTest extends AbstractPoddArtifactManagerTest
                 Rio.parse(this.getClass().getResourceAsStream("/podd-schema-manifest-version2only.ttl"), "",
                         RDFFormat.TURTLE));
     }
-
+    
     @Test
     public void testIncrementVersion() throws Exception
     {
         final String artifactURI = "http://some/artifact:15";
-
-        final PoddArtifactManagerImpl testArtifactManager = new PoddArtifactManagerImpl();
-
+        
+        final PoddArtifactManagerImpl testArtifactManager = getNewArtifactManager();
+        
         // increment the version number
         final String newIncrementedVersion = testArtifactManager.incrementVersion(artifactURI + ":version:1");
         Assert.assertEquals("Version not incremented as expected", artifactURI + ":version:2", newIncrementedVersion);
-
+        
         // append a number when version number cannot be extracted
         final String newAppendedVersion = testArtifactManager.incrementVersion(artifactURI + ":v5");
         Assert.assertEquals("Version not incremented as expected", artifactURI + ":v51", newAppendedVersion);
     }
-
+    
     @Override
     protected OWLOntologyManagerFactory getNewOWLOntologyManagerFactory()
     {
         final Collection<OWLOntologyManagerFactory> ontologyManagers =
                 OWLOntologyManagerFactoryRegistry.getInstance().get(PoddWebConstants.DEFAULT_OWLAPI_MANAGER);
-
+        
         if(ontologyManagers == null || ontologyManagers.isEmpty())
         {
             this.log.error("OWLOntologyManagerFactory was not found");
         }
         return ontologyManagers.iterator().next();
     }
-
+    
 }
