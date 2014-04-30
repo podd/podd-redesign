@@ -77,6 +77,7 @@ import com.github.podd.api.data.DataReferenceConstants;
 import com.github.podd.client.api.PoddClient;
 import com.github.podd.client.api.PoddClientException;
 import com.github.podd.ontologies.PODDBASE;
+import com.github.podd.ontologies.PODDSCIENCE;
 import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.OntologyUtils;
 import com.github.podd.utils.PODD;
@@ -466,6 +467,15 @@ public class RestletPoddClientImpl implements PoddClient
         return this.doSPARQL(String.format(PoddClient.TEMPLATE_SPARQL_BY_TYPE_LABEL_STRSTARTS,
                 RenderUtils.escape(labelPrefix), RenderUtils.getSPARQLQueryString(PODD.PODD_SCIENCE_EXPERIMENT)),
                 artifacts);
+    }
+    
+    @Override
+    public Model getObjectsByTypeAndParent(final URI parent, final URI parentPredicate, final URI type,
+            final Collection<InferredOWLOntologyID> artifacts) throws PoddClientException
+    {
+        return this.doSPARQL(String.format(PoddClient.TEMPLATE_SPARQL_BY_TYPE_AND_PARENT,
+                RenderUtils.getSPARQLQueryString(parent), RenderUtils.getSPARQLQueryString(parentPredicate),
+                RenderUtils.getSPARQLQueryString(type)), artifacts);
     }
     
     /*

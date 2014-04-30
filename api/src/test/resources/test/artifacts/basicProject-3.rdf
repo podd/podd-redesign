@@ -29,12 +29,12 @@
 	<poddBase:hasStartDate rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2013-11-11</poddBase:hasStartDate>
 	<poddScience:hasANZSRC rdf:resource="http://purl.org/podd/ns/poddBase#NotApplicable"/>
 	
-	<poddScience:hasInvestigation rdf:resource="urn:temp:uuid:object:1981"/>
+	<poddScience:hasExperiment rdf:resource="urn:temp:uuid:object:1981"/>
 </rdf:Description>
 
 <rdf:Description rdf:about="urn:temp:uuid:object:1981">
 	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
-	<rdf:type rdf:resource="http://purl.org/podd/ns/poddScience#Investigation"/>
+	<rdf:type rdf:resource="http://purl.org/podd/ns/poddScience#Experiment"/>
 	
 	<rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Project#2012-0006_Experiment#0001 Test experiment for Excel file parsing : TrayScan</rdfs:label>
 	

@@ -42,6 +42,8 @@ import com.github.podd.utils.PoddUser;
  */
 public interface PoddClient
 {
+    public static final String TEMPLATE_SPARQL_BY_TYPE_AND_PARENT =
+            "CONSTRUCT { ?parent ?parentPredicate ?object . ?object a ?type . ?object <http://www.w3.org/2000/01/rdf-schema#label> ?label . } WHERE { ?object a ?type . OPTIONAL { ?object <http://www.w3.org/2000/01/rdf-schema#label> ?label . } } VALUES (?parent ?parentPredicate ?type ) { ( %s %s %s ) }";
     public static final String TEMPLATE_SPARQL_BY_TYPE =
             "CONSTRUCT { ?object a ?type . ?object <http://www.w3.org/2000/01/rdf-schema#label> ?label . } WHERE { ?object a ?type . OPTIONAL { ?object <http://www.w3.org/2000/01/rdf-schema#label> ?label . } } VALUES (?type) { ( %s ) }";
     public static final String TEMPLATE_SPARQL_BY_TYPE_ALL_PROPERTIES =
@@ -213,6 +215,27 @@ public interface PoddClient
      *             If there is an exception while executing the query.
      */
     Model getObjectsByType(URI type, Collection<InferredOWLOntologyID> artifacts) throws PoddClientException;
+    
+    /**
+     * Returns RDF statements containing the types and labels for all objects in the given artifacts
+     * with the given types linked to from the given parent with the given predicate. If there are
+     * no artifacts specified then all accessible artifacts will be searched. The type is the fully
+     * inferred type for the object, not just its concrete types, and the parentPredicate may be a
+     * super-property of the concrete property that was used.
+     *
+     * @param type
+     *            The URI with the RDF Type to search for. Must not be null.
+     * @param labelPrefix
+     *            The string which must start the {@link RDFS#LABEL} for the object for it to be
+     *            matched.
+     * @param artifacts
+     *            An optional list of artifacts which are to be searched.
+     * @return A {@link Model} containing the RDF statements which describe the matching objects.
+     * @throws PoddClientException
+     *             If there is an exception while executing the query.
+     */
+    Model getObjectsByTypeAndParent(URI parent, URI parentPredicate, URI type,
+            Collection<InferredOWLOntologyID> artifacts) throws PoddClientException;
     
     /**
      * Returns RDF statements containing the types and labels for all objects in the given artifacts
