@@ -45,6 +45,7 @@ import org.openrdf.model.URI;
 import org.openrdf.model.Value;
 import org.openrdf.model.ValueFactory;
 import org.openrdf.model.impl.LinkedHashModel;
+import org.openrdf.model.vocabulary.RDFS;
 import org.openrdf.queryrender.RenderUtils;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.RDFHandlerException;
@@ -75,6 +76,7 @@ import com.github.podd.api.data.DataReference;
 import com.github.podd.api.data.DataReferenceConstants;
 import com.github.podd.client.api.PoddClient;
 import com.github.podd.client.api.PoddClientException;
+import com.github.podd.ontologies.PODDBASE;
 import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.OntologyUtils;
 import com.github.podd.utils.PODD;
@@ -633,10 +635,20 @@ public class RestletPoddClientImpl implements PoddClient
         }
     }
     
-    private List<InferredOWLOntologyID> listArtifactsInternal(final boolean published, final boolean unpublished)
+    private Map<InferredOWLOntologyID, String> listArtifactsInternal(final boolean published, final boolean unpublished)
         throws PoddClientException
     {
-        return OntologyUtils.modelToOntologyIDs(this.listArtifacts(published, unpublished), false, false);
+        Map<InferredOWLOntologyID, String> results = new ConcurrentHashMap<>();
+        Model model = this.listArtifacts(published, unpublished);
+        for(InferredOWLOntologyID ontologyID : OntologyUtils.modelToOntologyIDs(model, false, false))
+        {
+            String nextLabel =
+                    model.filter(
+                            model.filter(ontologyID.getOntologyIRI().toOpenRDFURI(), PODDBASE.ARTIFACT_HAS_TOP_OBJECT,
+                                    null).objectURI(), RDFS.LABEL, null).objectLiteral().getLabel();
+            results.put(ontologyID, nextLabel);
+        }
+        return results;
     }
     
     /*
@@ -708,7 +720,7 @@ public class RestletPoddClientImpl implements PoddClient
      * @see com.github.podd.client.api.PoddClient#listPublishedArtifacts()
      */
     @Override
-    public List<InferredOWLOntologyID> listPublishedArtifacts() throws PoddClientException
+    public Map<InferredOWLOntologyID, String> listPublishedArtifacts() throws PoddClientException
     {
         this.log.info("cookies: {}", this.currentCookies);
         
@@ -769,7 +781,7 @@ public class RestletPoddClientImpl implements PoddClient
      * @see com.github.podd.client.api.PoddClient#listUnpublishedArtifacts()
      */
     @Override
-    public List<InferredOWLOntologyID> listUnpublishedArtifacts() throws PoddClientException
+    public Map<InferredOWLOntologyID, String> listUnpublishedArtifacts() throws PoddClientException
     {
         this.log.info("cookies: {}", this.currentCookies);
         

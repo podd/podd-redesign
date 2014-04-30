@@ -284,11 +284,11 @@ public interface PoddClient
     
     /**
      *
-     * @return A list of {@link InferredOWLOntologyID}s identifying the artifacts that the user has
-     *         access to which are published. This may include artifacts that the user cannot modify
-     *         or fork.
+     * @return A map of the {@link InferredOWLOntologyID}s to top object labels, identifying the
+     *         artifacts that the user has access to which are published. This may include artifacts
+     *         that the user cannot modify or fork.
      */
-    List<InferredOWLOntologyID> listPublishedArtifacts() throws PoddClientException;
+    Map<InferredOWLOntologyID, String> listPublishedArtifacts() throws PoddClientException;
     
     /**
      * List the roles that have been assigned to the given artifact.
@@ -317,10 +317,10 @@ public interface PoddClient
     
     /**
      *
-     * @return A list of {@link InferredOWLOntologyID}s identifying the artifacts that the user has
-     *         access to which are unpublished.
+     * @return A map of the {@link InferredOWLOntologyID}s to labels, identifying the artifacts that
+     *         the user has access to which are unpublished.
      */
-    List<InferredOWLOntologyID> listUnpublishedArtifacts() throws PoddClientException;
+    Map<InferredOWLOntologyID, String> listUnpublishedArtifacts() throws PoddClientException;
     
     /**
      *

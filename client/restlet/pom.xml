@@ -58,6 +58,10 @@
 			<groupId>com.github.ansell.property-util</groupId>
 			<artifactId>property-util</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>com.github.podd</groupId>
+			<artifactId>podd-ontologies</artifactId>
+		</dependency>
 	</dependencies>
 	
 	<build>
