@@ -99,7 +99,7 @@ public abstract class AbstractPoddPurlManagerTest
         this.testRepositoryConnection = this.testRepository.getConnection();
         this.testRepositoryConnection.begin(); // Transaction per each test
 
-        this.testPurlManager.setPurlProcessorFactoryRegistry(this.testRegistry);
+        this.testPurlManager.setPurlProcessorRegistry(this.testRegistry);
     }
 
     @After
@@ -294,11 +294,11 @@ public abstract class AbstractPoddPurlManagerTest
     public void testSetPurlProcessorFactoryRegistry() throws Exception
     {
         // first set the Registry to Null and verify it
-        this.testPurlManager.setPurlProcessorFactoryRegistry(null);
+        this.testPurlManager.setPurlProcessorRegistry(null);
         Assert.assertNull("Registry was not set to null", this.testPurlManager.getPurlProcessorFactoryRegistry());
 
         // set the Registry
-        this.testPurlManager.setPurlProcessorFactoryRegistry(this.testRegistry);
+        this.testPurlManager.setPurlProcessorRegistry(this.testRegistry);
 
         Assert.assertNotNull("getRegistry() returned null ", this.testPurlManager.getPurlProcessorFactoryRegistry());
     }

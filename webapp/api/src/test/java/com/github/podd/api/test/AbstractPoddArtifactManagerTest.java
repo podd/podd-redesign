@@ -571,7 +571,7 @@ public abstract class AbstractPoddArtifactManagerTest
         testFileReferenceManager.setDataProcessorRegistry(testFileRegistry);
         
         final PoddPurlManager testPurlManager = this.getNewPurlManager();
-        testPurlManager.setPurlProcessorFactoryRegistry(testPurlRegistry);
+        testPurlManager.setPurlProcessorRegistry(testPurlRegistry);
         
         final OWLOntologyManagerFactory manager = this.getNewOWLOntologyManagerFactory();
         Assert.assertNotNull("Null implementation of OWLOntologyManagerFactory", manager);

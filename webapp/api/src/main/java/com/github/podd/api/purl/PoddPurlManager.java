@@ -94,6 +94,6 @@ public interface PoddPurlManager
      *
      * @param purlProcessorFactoryRegistry
      */
-    void setPurlProcessorFactoryRegistry(PoddPurlProcessorFactoryRegistry purlProcessorFactoryRegistry);
+    void setPurlProcessorRegistry(PoddPurlProcessorFactoryRegistry purlProcessorFactoryRegistry);
 
 }

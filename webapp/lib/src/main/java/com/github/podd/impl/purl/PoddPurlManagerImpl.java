@@ -217,7 +217,7 @@ public class PoddPurlManagerImpl implements PoddPurlManager
     }
 
     @Override
-    public void setPurlProcessorFactoryRegistry(final PoddPurlProcessorFactoryRegistry purlProcessorFactoryRegistry)
+    public void setPurlProcessorRegistry(final PoddPurlProcessorFactoryRegistry purlProcessorFactoryRegistry)
     {
         this.purlProcessorFactoryRegistry = purlProcessorFactoryRegistry;
 

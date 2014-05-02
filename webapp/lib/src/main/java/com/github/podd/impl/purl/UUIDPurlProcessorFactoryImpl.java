@@ -42,15 +42,15 @@ import com.github.podd.exception.PoddRuntimeException;
 public class UUIDPurlProcessorFactoryImpl implements PoddPurlProcessorFactory
 {
     protected final Logger log = LoggerFactory.getLogger(this.getClass());
-
+    
     private String prefix;
-
+    
     private final List<String> temporaryUris = Collections.unmodifiableList(Arrays
             .asList(PoddPurlProcessorPrefixes.UUID.getTemporaryPrefix()));
-
+    
     /* The fixed set of stages supported by this Factory */
     private static final Set<PoddProcessorStage> STAGES = Collections.singleton(PoddProcessorStage.RDF_PARSING);
-
+    
     @Override
     public boolean canHandleStage(final PoddProcessorStage stage)
     {
@@ -60,13 +60,13 @@ public class UUIDPurlProcessorFactoryImpl implements PoddPurlProcessorFactory
         }
         return UUIDPurlProcessorFactoryImpl.STAGES.contains(stage);
     }
-
+    
     @Override
     public String getKey()
     {
         return this.getClass().getName();
     }
-
+    
     @Override
     public PoddPurlProcessor getProcessor()
     {
@@ -74,7 +74,7 @@ public class UUIDPurlProcessorFactoryImpl implements PoddPurlProcessorFactory
         {
             throw new PoddRuntimeException("Not enough data (temporary URIs) to create SimplePoddPurlProcessor");
         }
-
+        
         UUIDPurlProcessorImpl processor = null;
         if(this.prefix != null)
         {
@@ -84,35 +84,35 @@ public class UUIDPurlProcessorFactoryImpl implements PoddPurlProcessorFactory
         {
             processor = new UUIDPurlProcessorImpl();
         }
-
+        
         for(final String tempUri : this.temporaryUris)
         {
             processor.addTemporaryUriHandler(tempUri);
         }
-
+        
         return processor;
     }
-
+    
     @Override
     public String getSPARQLConstructBGP()
     {
         return "?subject ?predicate ?object";
     }
-
+    
     @Override
     public String getSPARQLConstructWhere()
     {
         final StringBuilder builder = new StringBuilder();
-
+        
         // match all triples
         builder.append(" ?subject ?predicate ?object ");
-
+        
         // get a focused SPARQL by checking for the temporary URI patterns
         if(!this.temporaryUris.isEmpty())
         {
             builder.append("FILTER ( ");
             final int startLength = builder.length();
-
+            
             for(final String tempUri : this.temporaryUris)
             {
                 if(builder.length() > startLength)
@@ -130,18 +130,18 @@ public class UUIDPurlProcessorFactoryImpl implements PoddPurlProcessorFactory
                 builder.append("\")");
             }
             builder.append(" ) ");
-
+            
         }
         return builder.toString();
     }
-
+    
     @Override
     public String getSPARQLGroupBy()
     {
         // an empty GROUP BY clause
         return "";
     }
-
+    
     /**
      * Returns the variable assigned to the "subject" of the SPARQL graph. This variable could then
      * be used to retrieve RDF triples containing the given Subject. Note that any occurrences of
@@ -156,21 +156,17 @@ public class UUIDPurlProcessorFactoryImpl implements PoddPurlProcessorFactory
     {
         return "subject";
     }
-
+    
     @Override
     public Set<PoddProcessorStage> getStages()
     {
         return UUIDPurlProcessorFactoryImpl.STAGES;
     }
-
-    /**
-     *
-     * @param prefix
-     *            The Prefix used by the PurlProcessor's created by this factory
-     */
+    
+    @Override
     public void setPrefix(final String prefix)
     {
         this.prefix = prefix;
     }
-
+    
 }

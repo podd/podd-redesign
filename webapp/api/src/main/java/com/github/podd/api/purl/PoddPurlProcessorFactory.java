@@ -24,5 +24,12 @@ import com.github.podd.api.PoddRdfProcessorFactory;
  */
 public interface PoddPurlProcessorFactory extends PoddRdfProcessorFactory<PoddPurlProcessor>
 {
-
+    /**
+     * Sets an optional temporary URI prefix for the purl processor to use.
+     * 
+     * @param prefix
+     *            A prefix to use when recognising temporary URIs.
+     */
+    void setPrefix(String prefix);
+    
 }
