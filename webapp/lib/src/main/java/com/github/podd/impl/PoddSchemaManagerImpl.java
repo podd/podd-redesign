@@ -370,7 +370,7 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
                 OntologyUtils.schemaManifestImports(model, new LinkedHashSet<>(dependentSchemaOntologies));
         
         this.log.info("Uploading schema ontologies: {}", manifestImports);
-        
+        OntologyUtils.recursiveFollowImports(ontologyImports, importsMap, nextURI);
         return this.uploadSchemaOntologiesInOrder(model, manifestImports, currentVersionsMap);
     }
     
