@@ -267,7 +267,7 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
         }
         catch(final OpenRDFException e)
         {
-            this.log.error("Test repository could not be shutdown", e);
+            this.log.error("Repository Manager could not be shutdown", e);
         }
     }
     
