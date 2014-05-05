@@ -770,23 +770,30 @@ public class OntologyUtils
      * This works with the format used by both the schema manifests and the schema management graph.
      *
      * @param model
-     * @param schemaVersionUris
-     * @return
+     *            The complete schema manifest as an RDF {@link Model}.
+     * @param dependentSchemaOntologies
+     *            The set of schema ontologies.
+     * @param importsMap
+     *            The map which will be populated with the mappings from ontology version IRIs to
+     *            their imports. This is necessary to determine which of the other ontology version
+     *            IRIs must be loaded first in order to load a given version.
+     * @return An ordered List of {@link OWLOntologyID}s which specify a total ordering which can be
+     *         used to load all of the ontology versions.
      * @throws SchemaManifestException
+     *             If the schema manifest is not consistent.
      */
     public static List<OWLOntologyID> schemaManifestImports(final Model model,
-            final Set<? extends OWLOntologyID> dependentSchemaOntologies) throws SchemaManifestException
+            final Set<? extends OWLOntologyID> dependentSchemaOntologies, final ConcurrentMap<URI, Set<URI>> importsMap)
+        throws SchemaManifestException
     {
         Objects.requireNonNull(dependentSchemaOntologies);
         Objects.requireNonNull(model);
+        Objects.requireNonNull(importsMap);
         
         final Set<OWLOntologyID> results = new LinkedHashSet<OWLOntologyID>();
         
         final Set<URI> schemaOntologyUris = new LinkedHashSet<>();
         final Set<URI> schemaVersionUris = new LinkedHashSet<>();
-        // FIXME: Need to return this importsMap somehow to users, likely as an argument to this
-        // function, as it is the way we need to load schema ontologies properly
-        final ConcurrentMap<URI, Set<URI>> importsMap = new ConcurrentHashMap<>(schemaOntologyUris.size());
         
         OntologyUtils.extractOntologyAndVersions(model, schemaOntologyUris, schemaVersionUris);
         

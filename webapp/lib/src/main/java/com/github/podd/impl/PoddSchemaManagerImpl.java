@@ -366,12 +366,13 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
         
         final List<InferredOWLOntologyID> dependentSchemaOntologies =
                 OntologyUtils.modelToOntologyIDs(model, false, false);
+        ConcurrentMap<URI, Set<URI>> importsMap = new ConcurrentHashMap<>();
         final List<OWLOntologyID> manifestImports =
-                OntologyUtils.schemaManifestImports(model, new LinkedHashSet<>(dependentSchemaOntologies));
+                OntologyUtils.schemaManifestImports(model, new LinkedHashSet<>(dependentSchemaOntologies), importsMap);
         
         this.log.info("Uploading schema ontologies: {}", manifestImports);
-        OntologyUtils.recursiveFollowImports(ontologyImports, importsMap, nextURI);
-        return this.uploadSchemaOntologiesInOrder(model, manifestImports, currentVersionsMap);
+        // OntologyUtils.recursiveFollowImports(ontologyImports, importsMap, nextURI);
+        return this.uploadSchemaOntologiesInOrder(model, manifestImports, currentVersionsMap, importsMap);
     }
     
     /**
@@ -385,6 +386,9 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
      * @param currentVersionsMap
      *            A map specifying what the current versions for each schema ontology are to be
      *            after the uploads complete.
+     * @param importsMap
+     *            The map from all ontology version IRIs to the set of version IRIs that they have
+     *            dependencies on. This enables loading of nextImportOrder consistently.
      * @return The IDs for the schema ontologies that were successfully uploaded.
      * @throws ModelException
      * @throws OpenRDFException
@@ -393,8 +397,9 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
      * @throws PoddException
      */
     private List<InferredOWLOntologyID> uploadSchemaOntologiesInOrder(final Model model,
-            final List<OWLOntologyID> nextImportOrder, final ConcurrentMap<URI, URI> currentVersionsMap)
-        throws ModelException, OpenRDFException, IOException, OWLException, PoddException
+            final List<OWLOntologyID> nextImportOrder, final ConcurrentMap<URI, URI> currentVersionsMap,
+            ConcurrentMap<URI, Set<URI>> importsMap) throws ModelException, OpenRDFException, IOException,
+        OWLException, PoddException
     {
         Objects.requireNonNull(model, "Schema Ontology model was null");
         Objects.requireNonNull(nextImportOrder, "Schema Ontology import order was null");
