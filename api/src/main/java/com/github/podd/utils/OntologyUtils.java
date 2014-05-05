@@ -419,6 +419,21 @@ public class OntologyUtils
         
     }
     
+    public static ConcurrentMap<URI, OWLOntologyID> mapVersions(Collection<? extends OWLOntologyID> ontologies)
+    {
+        ConcurrentMap<URI, OWLOntologyID> result = new ConcurrentHashMap<>();
+        for(OWLOntologyID nextOntology : ontologies)
+        {
+            OWLOntologyID putIfAbsent = result.putIfAbsent(nextOntology.getVersionIRI().toOpenRDFURI(), nextOntology);
+            if(putIfAbsent != null)
+            {
+                throw new RuntimeException("Found duplicated version IRI in a set of ontologies: " + nextOntology + " "
+                        + ontologies);
+            }
+        }
+        return result;
+    }
+    
     /**
      * @param model
      * @param currentVersionsMap
@@ -1001,5 +1016,21 @@ public class OntologyUtils
             }
         }
         return false;
+    }
+    
+    public static Set<OWLOntologyID> mapFromVersions(Set<URI> nextMinimalImportsSet, List<OWLOntologyID> nextImportOrder)
+    {
+        Set<OWLOntologyID> result = new LinkedHashSet<>();
+        for(OWLOntologyID nextOrderedCandidate : nextImportOrder)
+        {
+            for(URI nextMinimalURI : nextMinimalImportsSet)
+            {
+                if(nextMinimalURI.equals(nextOrderedCandidate.getVersionIRI().toOpenRDFURI()))
+                {
+                    result.add(nextOrderedCandidate);
+                }
+            }
+        }
+        return result;
     }
 }

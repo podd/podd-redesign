@@ -413,15 +413,6 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
             
             managementConnection = this.repositoryManager.getManagementRepositoryConnection();
             
-            // HACK: The raw schema manifest does not necessarily include the inferred ontology
-            // information which breaks the workflow if the non-inferred ontology IDs are triggered
-            // now
-            
-            // final List<InferredOWLOntologyID> ontologyIDs =
-            // OntologyUtils.loadSchemasFromManifest(managementConnection,
-            // this.repositoryManager.getSchemaManagementGraph(), model);
-            // managementConnection.add(model, this.repositoryManager.getSchemaManagementGraph());
-            
             if(this.log.isDebugEnabled())
             {
                 DebugUtils.printContents(managementConnection, this.repositoryManager.getSchemaManagementGraph());
@@ -441,17 +432,13 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
                 {
                     if(nextImport.equals(nextCurrentSchemaOntology))
                     {
-                        // Must do it this way to preserve inferred ontology information which may
-                        // not be present in nextImport
-                        loadingOrder.put(nextCurrentSchemaOntology, true);
+                        // FIXME: Must do it this way to preserve inferred ontology information
+                        // which may not be present in nextImport
                         alreadyLoaded = true;
                         break;
                     }
                 }
-                if(!alreadyLoaded)
-                {
-                    loadingOrder.put(nextImport, alreadyLoaded);
-                }
+                loadingOrder.put(nextImport, alreadyLoaded);
             }
             
             final List<InferredOWLOntologyID> results = new ArrayList<>();
@@ -462,7 +449,8 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
                 this.log.info("Ontologies loaded so far: {}", results);
                 if(loadEntry.getValue())
                 {
-                    this.log.info("Not loading ontology as it was already available: {}", loadEntry.getKey());
+                    this.log.info("Not loading ontology from scratch as it was already available: {}",
+                            loadEntry.getKey());
                     if(loadEntry.getKey() instanceof InferredOWLOntologyID)
                     {
                         results.add((InferredOWLOntologyID)loadEntry.getKey());
@@ -477,14 +465,13 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
                 }
                 else
                 {
-                    this.log.debug("Need to load ontology that is not already available: {}", loadEntry.getKey());
-                    // TODO: Should we store these copies in a separate repository again, to reduce
-                    // bloat in the management repository??
-                    
+                    this.log.info("Need to load ontology that is not already available in management repository: {}",
+                            loadEntry.getKey());
                     final OWLOntologyID loadEntryID = loadEntry.getKey();
                     final String classpathLocation =
                             model.filter(loadEntryID.getVersionIRI().toOpenRDFURI(), PODD.PODD_SCHEMA_CLASSPATH, null)
                                     .objectLiteral().stringValue();
+                    this.log.info("Loading from classpath: " + classpathLocation);
                     final RDFFormat fileFormat = Rio.getParserFormatForFileName(classpathLocation, RDFFormat.RDFXML);
                     try (final InputStream inputStream = ApplicationUtils.class.getResourceAsStream(classpathLocation);)
                     {
@@ -496,12 +483,17 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
                         
                         managementConnection.begin();
                         final OWLOntologyID schemaOntologyID = null;
-                        // FIXME: Cannot assume that "results" is the set of dependent schema
-                        // ontologies
+                        // Need to get the minimal set of imports for the next schema ontology and
+                        // load exactly those ontologies
+                        Set<URI> nextMinimalImportsSet = importsMap.get(loadEntryID.getVersionIRI().toOpenRDFURI());
+                        Set<? extends OWLOntologyID> nextMinimalOntologyIDs =
+                                OntologyUtils.mapFromVersions(nextMinimalImportsSet, nextImportOrder);
+                        this.log.info("nextMinimalImportsSet: {}", nextMinimalImportsSet);
+                        this.log.info("nextMinimalOntologyIDs: {}", nextMinimalOntologyIDs);
                         final InferredOWLOntologyID nextResult =
                                 this.uploadSchemaOntologyInternal(schemaOntologyID, inputStream, fileFormat,
                                         managementConnection, this.repositoryManager.getSchemaManagementGraph(),
-                                        new LinkedHashSet<OWLOntologyID>(results));
+                                        nextMinimalOntologyIDs);
                         
                         boolean updateCurrent = true;
                         if(currentVersionsMap.containsKey(nextResult.getOntologyIRI().toOpenRDFURI()))
@@ -531,11 +523,13 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
                                     nextImportStatement.getObject(), this.repositoryManager.getSchemaManagementGraph());
                         }
                         
-                        // Add from the schema manifest
-                        managementConnection.add(
-                                model.filter(nextResult.getVersionIRI().toOpenRDFURI(), OWL.IMPORTS, null),
-                                this.repositoryManager.getSchemaManagementGraph());
-                        
+                        for(URI nextMinimalImport : nextMinimalImportsSet)
+                        {
+                            // Add from the analysed schema manifest which includes the full
+                            // heirarchy
+                            managementConnection.add(nextResult.getVersionIRI().toOpenRDFURI(), OWL.IMPORTS,
+                                    nextMinimalImport, this.repositoryManager.getSchemaManagementGraph());
+                        }
                         managementConnection.commit();
                         
                         results.add(nextResult);
@@ -657,7 +651,7 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
         throws OWLException, IOException, PoddException, EmptyOntologyException, RepositoryException,
         OWLRuntimeException, OpenRDFException
     {
-        this.log.debug("Dependent ontologies for next schema upload: {}", dependentSchemaOntologies);
+        this.log.info("Dependent ontologies for next schema upload: {}", dependentSchemaOntologies);
         
         final OWLOntologyDocumentSource owlSource =
                 new StreamDocumentSource(inputStream, fileFormat.getDefaultMIMEType());

@@ -290,7 +290,7 @@ public class PoddOWLManagerImpl implements PoddOWLManager
         final Model schemaManagementTriples = new LinkedHashModel();
         managementConnection.export(new StatementCollector(schemaManagementTriples), schemaManagementContext);
         
-        if(this.log.isDebugEnabled())
+        if(this.log.isInfoEnabled())
         {
             DebugUtils.printContents(schemaManagementTriples);
         }
@@ -299,23 +299,31 @@ public class PoddOWLManagerImpl implements PoddOWLManager
         
         final List<OWLOntologyID> manifestImports =
                 OntologyUtils.schemaImports(schemaManagementTriples, ontologyIDs, importsMap);
-        
+        ConcurrentMap<URI, OWLOntologyID> mapVersions = OntologyUtils.mapVersions(ontologyIDs);
         // TODO: Check the exact imports for the given ontology and refine to exclude unrelated
         // schema ontologies?
         
         final OWLOntologyManager cachedManager = this.getCachedManager(ontologyIDs);
-        
         synchronized(cachedManager)
         {
-            this.log.debug("About to cache ontologies: {}", manifestImports);
+            this.log.info("About to cache ontologies: {}", manifestImports);
             for(final OWLOntologyID ontologyID : manifestImports)
             {
-                this.log.debug("About to cache ontology: {}", ontologyID);
-                // NOTE: if InferredOntologyIRI is null, only the base ontology is
-                // cached
+                this.log.info("next ontology ID: {}", ontologyID);
+                Set<URI> nextTransitiveImports = importsMap.get(ontologyID.getVersionIRI().toOpenRDFURI());
+                this.log.info("nextTransitiveImports: " + nextTransitiveImports);
+                for(URI nextRelevantImport : nextTransitiveImports)
+                {
+                    this.log.info("About to cache ontology: {}", mapVersions.get(nextRelevantImport));
+                    // NOTE: if InferredOntologyIRI is null, only the base ontology is
+                    // cached
+                    this.cacheSchemaOntologyInternal(managementConnection, mapVersions.get(nextRelevantImport),
+                            cachedManager);
+                }
+                // Then cache the direct import
                 this.cacheSchemaOntologyInternal(managementConnection, ontologyID, cachedManager);
             }
-            this.log.debug("Finished caching ontologies: {}", manifestImports);
+            this.log.info("Finished caching ontologies: {}", manifestImports);
         }
         return cachedManager;
     }
