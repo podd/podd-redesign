@@ -368,7 +368,7 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
                 OntologyUtils.modelToOntologyIDs(model, false, false);
         ConcurrentMap<URI, Set<URI>> importsMap = new ConcurrentHashMap<>();
         final List<OWLOntologyID> manifestImports =
-                OntologyUtils.schemaManifestImports(model, new LinkedHashSet<>(dependentSchemaOntologies), importsMap);
+                OntologyUtils.schemaImports(model, new LinkedHashSet<>(dependentSchemaOntologies), importsMap);
         
         this.log.info("Uploading schema ontologies: {}", manifestImports);
         // OntologyUtils.recursiveFollowImports(ontologyImports, importsMap, nextURI);

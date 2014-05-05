@@ -67,10 +67,270 @@ public class OntologyUtilsTest
     
     private ConcurrentMap<URI, Set<URI>> importsMap;
     
+    private void assertA1B2C3(final ConcurrentMap<URI, Set<URI>> nextImportsMap)
+    {
+        Assert.assertEquals(5, nextImportsMap.size());
+        
+        Assert.assertTrue(nextImportsMap.containsKey(OntologyConstant.testVersionUriA1));
+        Assert.assertTrue(nextImportsMap.containsKey(OntologyConstant.testVersionUriB1));
+        Assert.assertTrue(nextImportsMap.containsKey(OntologyConstant.testVersionUriB2));
+        Assert.assertTrue(nextImportsMap.containsKey(OntologyConstant.testVersionUriC1));
+        Assert.assertTrue(nextImportsMap.containsKey(OntologyConstant.testVersionUriC3));
+        
+        Assert.assertEquals(0, nextImportsMap.get(OntologyConstant.testVersionUriA1).size());
+        Assert.assertEquals(1, nextImportsMap.get(OntologyConstant.testVersionUriB1).size());
+        Assert.assertEquals(1, nextImportsMap.get(OntologyConstant.testVersionUriB2).size());
+        Assert.assertEquals(2, nextImportsMap.get(OntologyConstant.testVersionUriC1).size());
+        Assert.assertEquals(2, nextImportsMap.get(OntologyConstant.testVersionUriC3).size());
+        
+        Assert.assertTrue(nextImportsMap.get(OntologyConstant.testVersionUriB1).contains(
+                OntologyConstant.testVersionUriA1));
+        Assert.assertTrue(nextImportsMap.get(OntologyConstant.testVersionUriB2).contains(
+                OntologyConstant.testVersionUriA1));
+        Assert.assertTrue(nextImportsMap.get(OntologyConstant.testVersionUriC1).contains(
+                OntologyConstant.testVersionUriA1));
+        Assert.assertTrue(nextImportsMap.get(OntologyConstant.testVersionUriC1).contains(
+                OntologyConstant.testVersionUriB1));
+        Assert.assertTrue(nextImportsMap.get(OntologyConstant.testVersionUriC3).contains(
+                OntologyConstant.testVersionUriA1));
+        Assert.assertTrue(nextImportsMap.get(OntologyConstant.testVersionUriC3).contains(
+                OntologyConstant.testVersionUriB2));
+    }
+    
+    private void assertRealisticImportsMapV2(final ConcurrentMap<URI, Set<URI>> nextImportsMap)
+    {
+        Assert.assertEquals(12, nextImportsMap.size());
+        
+        Assert.assertTrue(nextImportsMap.containsKey(OntologyConstant.testPoddDcUriV1));
+        Assert.assertTrue(nextImportsMap.containsKey(OntologyConstant.testPoddDcUriV2));
+        Assert.assertTrue(nextImportsMap.containsKey(OntologyConstant.testPoddFoafUriV1));
+        Assert.assertTrue(nextImportsMap.containsKey(OntologyConstant.testPoddFoafUriV2));
+        Assert.assertTrue(nextImportsMap.containsKey(OntologyConstant.testPoddUserUriV1));
+        Assert.assertTrue(nextImportsMap.containsKey(OntologyConstant.testPoddUserUriV2));
+        Assert.assertTrue(nextImportsMap.containsKey(OntologyConstant.testPoddBaseUriV1));
+        Assert.assertTrue(nextImportsMap.containsKey(OntologyConstant.testPoddBaseUriV2));
+        Assert.assertTrue(nextImportsMap.containsKey(OntologyConstant.testPoddScienceUriV1));
+        Assert.assertTrue(nextImportsMap.containsKey(OntologyConstant.testPoddScienceUriV2));
+        Assert.assertTrue(nextImportsMap.containsKey(OntologyConstant.testPoddPlantUriV1));
+        Assert.assertTrue(nextImportsMap.containsKey(OntologyConstant.testPoddPlantUriV2));
+        
+        Assert.assertEquals(0, nextImportsMap.get(OntologyConstant.testPoddDcUriV1).size());
+        Assert.assertEquals(0, nextImportsMap.get(OntologyConstant.testPoddDcUriV2).size());
+        Assert.assertEquals(1, nextImportsMap.get(OntologyConstant.testPoddFoafUriV1).size());
+        Assert.assertEquals(1, nextImportsMap.get(OntologyConstant.testPoddFoafUriV2).size());
+        Assert.assertEquals(2, nextImportsMap.get(OntologyConstant.testPoddUserUriV1).size());
+        Assert.assertEquals(2, nextImportsMap.get(OntologyConstant.testPoddUserUriV2).size());
+        Assert.assertEquals(3, nextImportsMap.get(OntologyConstant.testPoddBaseUriV1).size());
+        Assert.assertEquals(3, nextImportsMap.get(OntologyConstant.testPoddBaseUriV2).size());
+        Assert.assertEquals(4, nextImportsMap.get(OntologyConstant.testPoddScienceUriV1).size());
+        Assert.assertEquals(4, nextImportsMap.get(OntologyConstant.testPoddScienceUriV2).size());
+        Assert.assertEquals(5, nextImportsMap.get(OntologyConstant.testPoddPlantUriV1).size());
+        Assert.assertEquals(5, nextImportsMap.get(OntologyConstant.testPoddPlantUriV2).size());
+        
+        Assert.assertTrue(nextImportsMap.get(OntologyConstant.testPoddFoafUriV1).contains(
+                OntologyConstant.testPoddDcUriV1));
+        Assert.assertTrue(nextImportsMap.get(OntologyConstant.testPoddFoafUriV2).contains(
+                OntologyConstant.testPoddDcUriV2));
+        Assert.assertTrue(nextImportsMap.get(OntologyConstant.testPoddUserUriV1).contains(
+                OntologyConstant.testPoddDcUriV1));
+        Assert.assertTrue(nextImportsMap.get(OntologyConstant.testPoddUserUriV2).contains(
+                OntologyConstant.testPoddDcUriV2));
+        Assert.assertTrue(nextImportsMap.get(OntologyConstant.testPoddUserUriV1).contains(
+                OntologyConstant.testPoddFoafUriV1));
+        Assert.assertTrue(nextImportsMap.get(OntologyConstant.testPoddUserUriV2).contains(
+                OntologyConstant.testPoddFoafUriV2));
+        Assert.assertTrue(nextImportsMap.get(OntologyConstant.testPoddBaseUriV1).contains(
+                OntologyConstant.testPoddDcUriV1));
+        Assert.assertTrue(nextImportsMap.get(OntologyConstant.testPoddBaseUriV2).contains(
+                OntologyConstant.testPoddDcUriV2));
+        Assert.assertTrue(nextImportsMap.get(OntologyConstant.testPoddBaseUriV1).contains(
+                OntologyConstant.testPoddFoafUriV1));
+        Assert.assertTrue(nextImportsMap.get(OntologyConstant.testPoddBaseUriV2).contains(
+                OntologyConstant.testPoddFoafUriV2));
+        Assert.assertTrue(nextImportsMap.get(OntologyConstant.testPoddBaseUriV1).contains(
+                OntologyConstant.testPoddUserUriV1));
+        Assert.assertTrue(nextImportsMap.get(OntologyConstant.testPoddBaseUriV2).contains(
+                OntologyConstant.testPoddUserUriV2));
+        Assert.assertTrue(nextImportsMap.get(OntologyConstant.testPoddScienceUriV1).contains(
+                OntologyConstant.testPoddDcUriV1));
+        Assert.assertTrue(nextImportsMap.get(OntologyConstant.testPoddScienceUriV2).contains(
+                OntologyConstant.testPoddDcUriV2));
+        Assert.assertTrue(nextImportsMap.get(OntologyConstant.testPoddScienceUriV1).contains(
+                OntologyConstant.testPoddFoafUriV1));
+        Assert.assertTrue(nextImportsMap.get(OntologyConstant.testPoddScienceUriV2).contains(
+                OntologyConstant.testPoddFoafUriV2));
+        Assert.assertTrue(nextImportsMap.get(OntologyConstant.testPoddScienceUriV1).contains(
+                OntologyConstant.testPoddUserUriV1));
+        Assert.assertTrue(nextImportsMap.get(OntologyConstant.testPoddScienceUriV2).contains(
+                OntologyConstant.testPoddUserUriV2));
+        Assert.assertTrue(nextImportsMap.get(OntologyConstant.testPoddScienceUriV1).contains(
+                OntologyConstant.testPoddBaseUriV1));
+        Assert.assertTrue(nextImportsMap.get(OntologyConstant.testPoddScienceUriV2).contains(
+                OntologyConstant.testPoddBaseUriV2));
+        Assert.assertTrue(nextImportsMap.get(OntologyConstant.testPoddPlantUriV1).contains(
+                OntologyConstant.testPoddDcUriV1));
+        Assert.assertTrue(nextImportsMap.get(OntologyConstant.testPoddPlantUriV2).contains(
+                OntologyConstant.testPoddDcUriV2));
+        Assert.assertTrue(nextImportsMap.get(OntologyConstant.testPoddPlantUriV1).contains(
+                OntologyConstant.testPoddFoafUriV1));
+        Assert.assertTrue(nextImportsMap.get(OntologyConstant.testPoddPlantUriV2).contains(
+                OntologyConstant.testPoddFoafUriV2));
+        Assert.assertTrue(nextImportsMap.get(OntologyConstant.testPoddPlantUriV1).contains(
+                OntologyConstant.testPoddUserUriV1));
+        Assert.assertTrue(nextImportsMap.get(OntologyConstant.testPoddPlantUriV2).contains(
+                OntologyConstant.testPoddUserUriV2));
+        Assert.assertTrue(nextImportsMap.get(OntologyConstant.testPoddPlantUriV1).contains(
+                OntologyConstant.testPoddBaseUriV1));
+        Assert.assertTrue(nextImportsMap.get(OntologyConstant.testPoddPlantUriV2).contains(
+                OntologyConstant.testPoddBaseUriV2));
+        Assert.assertTrue(nextImportsMap.get(OntologyConstant.testPoddPlantUriV1).contains(
+                OntologyConstant.testPoddScienceUriV1));
+        Assert.assertTrue(nextImportsMap.get(OntologyConstant.testPoddPlantUriV2).contains(
+                OntologyConstant.testPoddScienceUriV2));
+    }
+    
+    private void assertRealisticImportsMapV3(final ConcurrentMap<URI, Set<URI>> nextImportsMap)
+    {
+        Assert.assertEquals(22, nextImportsMap.size());
+        
+        Assert.assertTrue(nextImportsMap.containsKey(OntologyConstant.testPoddDcUriV1));
+        Assert.assertTrue(nextImportsMap.containsKey(OntologyConstant.testPoddDcUriV2));
+        Assert.assertTrue(nextImportsMap.containsKey(OntologyConstant.testPoddDcUriV3));
+        Assert.assertTrue(nextImportsMap.containsKey(OntologyConstant.testPoddFoafUriV1));
+        Assert.assertTrue(nextImportsMap.containsKey(OntologyConstant.testPoddFoafUriV2));
+        Assert.assertTrue(nextImportsMap.containsKey(OntologyConstant.testPoddFoafUriV3));
+        Assert.assertTrue(nextImportsMap.containsKey(OntologyConstant.testPoddUserUriV1));
+        Assert.assertTrue(nextImportsMap.containsKey(OntologyConstant.testPoddUserUriV2));
+        Assert.assertTrue(nextImportsMap.containsKey(OntologyConstant.testPoddUserUriV3));
+        Assert.assertTrue(nextImportsMap.containsKey(OntologyConstant.testPoddBaseUriV1));
+        Assert.assertTrue(nextImportsMap.containsKey(OntologyConstant.testPoddBaseUriV2));
+        Assert.assertTrue(nextImportsMap.containsKey(OntologyConstant.testPoddBaseUriV3));
+        Assert.assertTrue(nextImportsMap.containsKey(OntologyConstant.testPoddScienceUriV1));
+        Assert.assertTrue(nextImportsMap.containsKey(OntologyConstant.testPoddScienceUriV2));
+        Assert.assertTrue(nextImportsMap.containsKey(OntologyConstant.testPoddScienceUriV3));
+        Assert.assertTrue(nextImportsMap.containsKey(OntologyConstant.testPoddPlantUriV1));
+        Assert.assertTrue(nextImportsMap.containsKey(OntologyConstant.testPoddPlantUriV2));
+        Assert.assertTrue(nextImportsMap.containsKey(OntologyConstant.testPoddPlantUriV3));
+        
+        Assert.assertEquals(0, nextImportsMap.get(OntologyConstant.testPoddDcUriV1).size());
+        Assert.assertEquals(0, nextImportsMap.get(OntologyConstant.testPoddDcUriV2).size());
+        Assert.assertEquals(0, nextImportsMap.get(OntologyConstant.testPoddDcUriV3).size());
+        Assert.assertEquals(1, nextImportsMap.get(OntologyConstant.testPoddFoafUriV1).size());
+        Assert.assertEquals(1, nextImportsMap.get(OntologyConstant.testPoddFoafUriV2).size());
+        Assert.assertEquals(1, nextImportsMap.get(OntologyConstant.testPoddFoafUriV3).size());
+        Assert.assertEquals(2, nextImportsMap.get(OntologyConstant.testPoddUserUriV1).size());
+        Assert.assertEquals(2, nextImportsMap.get(OntologyConstant.testPoddUserUriV2).size());
+        Assert.assertEquals(2, nextImportsMap.get(OntologyConstant.testPoddUserUriV3).size());
+        Assert.assertEquals(3, nextImportsMap.get(OntologyConstant.testPoddBaseUriV1).size());
+        Assert.assertEquals(3, nextImportsMap.get(OntologyConstant.testPoddBaseUriV2).size());
+        Assert.assertEquals(3, nextImportsMap.get(OntologyConstant.testPoddBaseUriV3).size());
+        Assert.assertEquals(4, nextImportsMap.get(OntologyConstant.testPoddScienceUriV1).size());
+        Assert.assertEquals(6, nextImportsMap.get(OntologyConstant.testPoddScienceUriV2).size());
+        Assert.assertEquals(6, nextImportsMap.get(OntologyConstant.testPoddScienceUriV3).size());
+        Assert.assertEquals(5, nextImportsMap.get(OntologyConstant.testPoddPlantUriV1).size());
+        Assert.assertEquals(7, nextImportsMap.get(OntologyConstant.testPoddPlantUriV2).size());
+        Assert.assertEquals(7, nextImportsMap.get(OntologyConstant.testPoddPlantUriV3).size());
+        
+        Assert.assertTrue(nextImportsMap.get(OntologyConstant.testPoddFoafUriV1).contains(
+                OntologyConstant.testPoddDcUriV1));
+        Assert.assertTrue(nextImportsMap.get(OntologyConstant.testPoddFoafUriV2).contains(
+                OntologyConstant.testPoddDcUriV2));
+        Assert.assertTrue(nextImportsMap.get(OntologyConstant.testPoddFoafUriV3).contains(
+                OntologyConstant.testPoddDcUriV3));
+        
+        Assert.assertTrue(nextImportsMap.get(OntologyConstant.testPoddUserUriV1).contains(
+                OntologyConstant.testPoddDcUriV1));
+        Assert.assertTrue(nextImportsMap.get(OntologyConstant.testPoddUserUriV2).contains(
+                OntologyConstant.testPoddDcUriV2));
+        Assert.assertTrue(nextImportsMap.get(OntologyConstant.testPoddUserUriV3).contains(
+                OntologyConstant.testPoddDcUriV3));
+        Assert.assertTrue(nextImportsMap.get(OntologyConstant.testPoddUserUriV1).contains(
+                OntologyConstant.testPoddFoafUriV1));
+        Assert.assertTrue(nextImportsMap.get(OntologyConstant.testPoddUserUriV2).contains(
+                OntologyConstant.testPoddFoafUriV2));
+        Assert.assertTrue(nextImportsMap.get(OntologyConstant.testPoddUserUriV3).contains(
+                OntologyConstant.testPoddFoafUriV3));
+        
+        Assert.assertTrue(nextImportsMap.get(OntologyConstant.testPoddBaseUriV1).contains(
+                OntologyConstant.testPoddDcUriV1));
+        Assert.assertTrue(nextImportsMap.get(OntologyConstant.testPoddBaseUriV2).contains(
+                OntologyConstant.testPoddDcUriV2));
+        Assert.assertTrue(nextImportsMap.get(OntologyConstant.testPoddBaseUriV3).contains(
+                OntologyConstant.testPoddDcUriV3));
+        Assert.assertTrue(nextImportsMap.get(OntologyConstant.testPoddBaseUriV1).contains(
+                OntologyConstant.testPoddFoafUriV1));
+        Assert.assertTrue(nextImportsMap.get(OntologyConstant.testPoddBaseUriV2).contains(
+                OntologyConstant.testPoddFoafUriV2));
+        Assert.assertTrue(nextImportsMap.get(OntologyConstant.testPoddBaseUriV3).contains(
+                OntologyConstant.testPoddFoafUriV3));
+        Assert.assertTrue(nextImportsMap.get(OntologyConstant.testPoddBaseUriV1).contains(
+                OntologyConstant.testPoddUserUriV1));
+        Assert.assertTrue(nextImportsMap.get(OntologyConstant.testPoddBaseUriV2).contains(
+                OntologyConstant.testPoddUserUriV2));
+        Assert.assertTrue(nextImportsMap.get(OntologyConstant.testPoddBaseUriV3).contains(
+                OntologyConstant.testPoddUserUriV3));
+        
+        Assert.assertTrue(nextImportsMap.get(OntologyConstant.testPoddScienceUriV1).contains(
+                OntologyConstant.testPoddDcUriV1));
+        Assert.assertTrue(nextImportsMap.get(OntologyConstant.testPoddScienceUriV2).contains(
+                OntologyConstant.testPoddDcUriV2));
+        Assert.assertTrue(nextImportsMap.get(OntologyConstant.testPoddScienceUriV3).contains(
+                OntologyConstant.testPoddDcUriV3));
+        Assert.assertTrue(nextImportsMap.get(OntologyConstant.testPoddScienceUriV1).contains(
+                OntologyConstant.testPoddFoafUriV1));
+        Assert.assertTrue(nextImportsMap.get(OntologyConstant.testPoddScienceUriV2).contains(
+                OntologyConstant.testPoddFoafUriV2));
+        Assert.assertTrue(nextImportsMap.get(OntologyConstant.testPoddScienceUriV3).contains(
+                OntologyConstant.testPoddFoafUriV3));
+        Assert.assertTrue(nextImportsMap.get(OntologyConstant.testPoddScienceUriV1).contains(
+                OntologyConstant.testPoddUserUriV1));
+        Assert.assertTrue(nextImportsMap.get(OntologyConstant.testPoddScienceUriV2).contains(
+                OntologyConstant.testPoddUserUriV2));
+        Assert.assertTrue(nextImportsMap.get(OntologyConstant.testPoddScienceUriV3).contains(
+                OntologyConstant.testPoddUserUriV3));
+        Assert.assertTrue(nextImportsMap.get(OntologyConstant.testPoddScienceUriV1).contains(
+                OntologyConstant.testPoddBaseUriV1));
+        Assert.assertTrue(nextImportsMap.get(OntologyConstant.testPoddScienceUriV2).contains(
+                OntologyConstant.testPoddBaseUriV2));
+        Assert.assertTrue(nextImportsMap.get(OntologyConstant.testPoddScienceUriV3).contains(
+                OntologyConstant.testPoddBaseUriV3));
+        
+        Assert.assertTrue(nextImportsMap.get(OntologyConstant.testPoddPlantUriV1).contains(
+                OntologyConstant.testPoddDcUriV1));
+        Assert.assertTrue(nextImportsMap.get(OntologyConstant.testPoddPlantUriV2).contains(
+                OntologyConstant.testPoddDcUriV2));
+        Assert.assertTrue(nextImportsMap.get(OntologyConstant.testPoddPlantUriV3).contains(
+                OntologyConstant.testPoddDcUriV3));
+        Assert.assertTrue(nextImportsMap.get(OntologyConstant.testPoddPlantUriV1).contains(
+                OntologyConstant.testPoddFoafUriV1));
+        Assert.assertTrue(nextImportsMap.get(OntologyConstant.testPoddPlantUriV2).contains(
+                OntologyConstant.testPoddFoafUriV2));
+        Assert.assertTrue(nextImportsMap.get(OntologyConstant.testPoddPlantUriV3).contains(
+                OntologyConstant.testPoddFoafUriV3));
+        Assert.assertTrue(nextImportsMap.get(OntologyConstant.testPoddPlantUriV1).contains(
+                OntologyConstant.testPoddUserUriV1));
+        Assert.assertTrue(nextImportsMap.get(OntologyConstant.testPoddPlantUriV2).contains(
+                OntologyConstant.testPoddUserUriV2));
+        Assert.assertTrue(nextImportsMap.get(OntologyConstant.testPoddPlantUriV3).contains(
+                OntologyConstant.testPoddUserUriV3));
+        Assert.assertTrue(nextImportsMap.get(OntologyConstant.testPoddPlantUriV1).contains(
+                OntologyConstant.testPoddBaseUriV1));
+        Assert.assertTrue(nextImportsMap.get(OntologyConstant.testPoddPlantUriV2).contains(
+                OntologyConstant.testPoddBaseUriV2));
+        Assert.assertTrue(nextImportsMap.get(OntologyConstant.testPoddPlantUriV3).contains(
+                OntologyConstant.testPoddBaseUriV3));
+        Assert.assertTrue(nextImportsMap.get(OntologyConstant.testPoddPlantUriV1).contains(
+                OntologyConstant.testPoddScienceUriV1));
+        Assert.assertTrue(nextImportsMap.get(OntologyConstant.testPoddPlantUriV2).contains(
+                OntologyConstant.testPoddScienceUriV2));
+        Assert.assertTrue(nextImportsMap.get(OntologyConstant.testPoddPlantUriV3).contains(
+                OntologyConstant.testPoddScienceUriV3));
+    }
+    
     @Before
     public void setUp() throws Exception
     {
-        importsMap = new ConcurrentHashMap<>();
+        this.importsMap = new ConcurrentHashMap<>();
     }
     
     @Test
@@ -439,1046 +699,6 @@ public class OntologyUtilsTest
     }
     
     @Test
-    public void testGetSchemaManifestImportsA1() throws Exception
-    {
-        final Model model =
-                Rio.parse(this.getClass().getResourceAsStream("/test/schema-manifest-a1b2c3.ttl"), "", RDFFormat.TURTLE);
-        
-        // DebugUtils.printContents(model);
-        final List<OWLOntologyID> schemaManifestImports =
-                OntologyUtils.schemaManifestImports(model,
-                        new HashSet<OWLOntologyID>(Arrays.asList(OntologyConstant.testA1)), importsMap);
-        
-        Assert.assertNotNull(schemaManifestImports);
-        Assert.assertEquals(1, schemaManifestImports.size());
-        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testA1));
-        Assert.assertEquals(OntologyConstant.testA1, schemaManifestImports.get(0));
-        
-        assertA1B2C3(importsMap);
-    }
-    
-    private void assertA1B2C3(ConcurrentMap<URI, Set<URI>> nextImportsMap)
-    {
-        Assert.assertEquals(5, nextImportsMap.size());
-        
-        Assert.assertTrue(nextImportsMap.containsKey(OntologyConstant.testVersionUriA1));
-        Assert.assertTrue(nextImportsMap.containsKey(OntologyConstant.testVersionUriB1));
-        Assert.assertTrue(nextImportsMap.containsKey(OntologyConstant.testVersionUriB2));
-        Assert.assertTrue(nextImportsMap.containsKey(OntologyConstant.testVersionUriC1));
-        Assert.assertTrue(nextImportsMap.containsKey(OntologyConstant.testVersionUriC3));
-        
-        Assert.assertEquals(0, nextImportsMap.get(OntologyConstant.testVersionUriA1).size());
-        Assert.assertEquals(1, nextImportsMap.get(OntologyConstant.testVersionUriB1).size());
-        Assert.assertEquals(1, nextImportsMap.get(OntologyConstant.testVersionUriB2).size());
-        Assert.assertEquals(2, nextImportsMap.get(OntologyConstant.testVersionUriC1).size());
-        Assert.assertEquals(2, nextImportsMap.get(OntologyConstant.testVersionUriC3).size());
-        
-        Assert.assertTrue(nextImportsMap.get(OntologyConstant.testVersionUriB1).contains(
-                OntologyConstant.testVersionUriA1));
-        Assert.assertTrue(nextImportsMap.get(OntologyConstant.testVersionUriB2).contains(
-                OntologyConstant.testVersionUriA1));
-        Assert.assertTrue(nextImportsMap.get(OntologyConstant.testVersionUriC1).contains(
-                OntologyConstant.testVersionUriA1));
-        Assert.assertTrue(nextImportsMap.get(OntologyConstant.testVersionUriC1).contains(
-                OntologyConstant.testVersionUriB1));
-        Assert.assertTrue(nextImportsMap.get(OntologyConstant.testVersionUriC3).contains(
-                OntologyConstant.testVersionUriA1));
-        Assert.assertTrue(nextImportsMap.get(OntologyConstant.testVersionUriC3).contains(
-                OntologyConstant.testVersionUriB2));
-    }
-    
-    @Test
-    public void testGetSchemaManifestImportsA1B1C1() throws Exception
-    {
-        final Model model =
-                Rio.parse(this.getClass().getResourceAsStream("/test/schema-manifest-a1b2c3.ttl"), "", RDFFormat.TURTLE);
-        
-        // DebugUtils.printContents(model);
-        final List<OWLOntologyID> schemaManifestImports =
-                OntologyUtils.schemaManifestImports(
-                        model,
-                        new HashSet<OWLOntologyID>(Arrays.asList(OntologyConstant.testA1, OntologyConstant.testB1,
-                                OntologyConstant.testC1)), importsMap);
-        
-        Assert.assertNotNull(schemaManifestImports);
-        Assert.assertEquals(3, schemaManifestImports.size());
-        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testA1));
-        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testB1));
-        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testC1));
-        Assert.assertEquals(OntologyConstant.testA1, schemaManifestImports.get(0));
-        Assert.assertEquals(OntologyConstant.testB1, schemaManifestImports.get(1));
-        Assert.assertEquals(OntologyConstant.testC1, schemaManifestImports.get(2));
-        
-        assertA1B2C3(importsMap);
-    }
-    
-    @Test
-    public void testGetSchemaManifestImportsA1B1C3() throws Exception
-    {
-        final Model model =
-                Rio.parse(this.getClass().getResourceAsStream("/test/schema-manifest-a1b2c3.ttl"), "", RDFFormat.TURTLE);
-        
-        // DebugUtils.printContents(model);
-        final List<OWLOntologyID> schemaManifestImports =
-                OntologyUtils.schemaManifestImports(
-                        model,
-                        new HashSet<OWLOntologyID>(Arrays.asList(OntologyConstant.testA1, OntologyConstant.testB1,
-                                OntologyConstant.testC3)), importsMap);
-        
-        Assert.assertNotNull(schemaManifestImports);
-        Assert.assertEquals(4, schemaManifestImports.size());
-        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testA1));
-        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testB1));
-        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testB2));
-        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testC3));
-        Assert.assertEquals(OntologyConstant.testA1, schemaManifestImports.get(0));
-        // NOTE: The following three entries do not have a deterministic order in this case
-        // If they start to break on another JVM, then comment them out
-        // Assert.assertEquals(OntologyConstant.testB2, schemaManifestImports.get(1));
-        // Assert.assertEquals(OntologyConstant.testC3, schemaManifestImports.get(2));
-        // Assert.assertEquals(OntologyConstant.testB1, schemaManifestImports.get(3));
-        // Check the general ordering of B2 and C3 are correct. B1 only depends on A1 so it can be
-        // anywhere except the first position
-        Assert.assertTrue(schemaManifestImports.indexOf(OntologyConstant.testB2) < schemaManifestImports
-                .indexOf(OntologyConstant.testC3));
-        
-        assertA1B2C3(importsMap);
-        
-    }
-    
-    @Test
-    public void testGetSchemaManifestImportsA1B2C3() throws Exception
-    {
-        final Model model =
-                Rio.parse(this.getClass().getResourceAsStream("/test/schema-manifest-a1b2c3.ttl"), "", RDFFormat.TURTLE);
-        
-        // DebugUtils.printContents(model);
-        final List<OWLOntologyID> schemaManifestImports =
-                OntologyUtils.schemaManifestImports(
-                        model,
-                        new HashSet<OWLOntologyID>(Arrays.asList(OntologyConstant.testA1, OntologyConstant.testB2,
-                                OntologyConstant.testC3)), importsMap);
-        
-        Assert.assertNotNull(schemaManifestImports);
-        Assert.assertEquals(3, schemaManifestImports.size());
-        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testA1));
-        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testB2));
-        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testC3));
-        Assert.assertEquals(OntologyConstant.testA1, schemaManifestImports.get(0));
-        Assert.assertEquals(OntologyConstant.testB2, schemaManifestImports.get(1));
-        Assert.assertEquals(OntologyConstant.testC3, schemaManifestImports.get(2));
-        
-        assertA1B2C3(importsMap);
-    }
-    
-    @Test
-    public void testGetSchemaManifestImportsRealisticPoddV1Plant() throws Exception
-    {
-        final Model model =
-                Rio.parse(this.getClass().getResourceAsStream("/test/test-podd-schema-manifest.ttl"), "",
-                        RDFFormat.TURTLE);
-        
-        // DebugUtils.printContents(model);
-        final List<OWLOntologyID> schemaManifestImports =
-                OntologyUtils.schemaManifestImports(model,
-                        new HashSet<OWLOntologyID>(Arrays.asList(OntologyConstant.testPoddPlantV1)), importsMap);
-        
-        Assert.assertNotNull(schemaManifestImports);
-        Assert.assertEquals(6, schemaManifestImports.size());
-        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddDcV1));
-        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddFoafV1));
-        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddUserV1));
-        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddBaseV1));
-        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddScienceV1));
-        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddPlantV1));
-        Assert.assertEquals(OntologyConstant.testPoddDcV1, schemaManifestImports.get(0));
-        Assert.assertEquals(OntologyConstant.testPoddFoafV1, schemaManifestImports.get(1));
-        Assert.assertEquals(OntologyConstant.testPoddUserV1, schemaManifestImports.get(2));
-        Assert.assertEquals(OntologyConstant.testPoddBaseV1, schemaManifestImports.get(3));
-        Assert.assertEquals(OntologyConstant.testPoddScienceV1, schemaManifestImports.get(4));
-        Assert.assertEquals(OntologyConstant.testPoddPlantV1, schemaManifestImports.get(5));
-        
-        assertRealisticImportsMap(importsMap);
-    }
-    
-    @Test
-    public void testGetSchemaManifestImportsRealisticPoddV1DcFoaf() throws Exception
-    {
-        final Model model =
-                Rio.parse(this.getClass().getResourceAsStream("/test/test-podd-schema-manifest.ttl"), "",
-                        RDFFormat.TURTLE);
-        
-        // DebugUtils.printContents(model);
-        final List<OWLOntologyID> schemaManifestImports =
-                OntologyUtils.schemaManifestImports(
-                        model,
-                        new LinkedHashSet<OWLOntologyID>(Arrays.asList(OntologyConstant.testPoddDcV1,
-                                OntologyConstant.testPoddFoafV1)), importsMap);
-        
-        Assert.assertNotNull(schemaManifestImports);
-        Assert.assertEquals(2, schemaManifestImports.size());
-        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddDcV1));
-        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddFoafV1));
-        Assert.assertEquals(OntologyConstant.testPoddDcV1, schemaManifestImports.get(0));
-        Assert.assertEquals(OntologyConstant.testPoddFoafV1, schemaManifestImports.get(1));
-        
-        assertRealisticImportsMap(importsMap);
-    }
-    
-    @Test
-    public void testGetSchemaManifestImportsRealisticPoddV2DcFoaf() throws Exception
-    {
-        final Model model =
-                Rio.parse(this.getClass().getResourceAsStream("/test/test-podd-schema-manifest.ttl"), "",
-                        RDFFormat.TURTLE);
-        
-        // DebugUtils.printContents(model);
-        final List<OWLOntologyID> schemaManifestImports =
-                OntologyUtils.schemaManifestImports(
-                        model,
-                        new LinkedHashSet<OWLOntologyID>(Arrays.asList(OntologyConstant.testPoddDcV2,
-                                OntologyConstant.testPoddFoafV2)), importsMap);
-        
-        Assert.assertNotNull(schemaManifestImports);
-        Assert.assertEquals(2, schemaManifestImports.size());
-        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddDcV2));
-        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddFoafV2));
-        Assert.assertEquals(OntologyConstant.testPoddDcV2, schemaManifestImports.get(0));
-        Assert.assertEquals(OntologyConstant.testPoddFoafV2, schemaManifestImports.get(1));
-        
-        assertRealisticImportsMap(importsMap);
-    }
-    
-    private void assertRealisticImportsMap(ConcurrentMap<URI, Set<URI>> nextImportsMap)
-    {
-        Assert.assertEquals(12, nextImportsMap.size());
-        
-        Assert.assertTrue(nextImportsMap.containsKey(OntologyConstant.testPoddDcUriV1));
-        Assert.assertTrue(nextImportsMap.containsKey(OntologyConstant.testPoddDcUriV2));
-        Assert.assertTrue(nextImportsMap.containsKey(OntologyConstant.testPoddFoafUriV1));
-        Assert.assertTrue(nextImportsMap.containsKey(OntologyConstant.testPoddFoafUriV2));
-        Assert.assertTrue(nextImportsMap.containsKey(OntologyConstant.testPoddUserUriV1));
-        Assert.assertTrue(nextImportsMap.containsKey(OntologyConstant.testPoddUserUriV2));
-        Assert.assertTrue(nextImportsMap.containsKey(OntologyConstant.testPoddBaseUriV1));
-        Assert.assertTrue(nextImportsMap.containsKey(OntologyConstant.testPoddBaseUriV2));
-        Assert.assertTrue(nextImportsMap.containsKey(OntologyConstant.testPoddScienceUriV1));
-        Assert.assertTrue(nextImportsMap.containsKey(OntologyConstant.testPoddScienceUriV2));
-        Assert.assertTrue(nextImportsMap.containsKey(OntologyConstant.testPoddPlantUriV1));
-        Assert.assertTrue(nextImportsMap.containsKey(OntologyConstant.testPoddPlantUriV2));
-        
-        Assert.assertEquals(0, nextImportsMap.get(OntologyConstant.testPoddDcUriV1).size());
-        Assert.assertEquals(0, nextImportsMap.get(OntologyConstant.testPoddDcUriV2).size());
-        Assert.assertEquals(1, nextImportsMap.get(OntologyConstant.testPoddFoafUriV1).size());
-        Assert.assertEquals(1, nextImportsMap.get(OntologyConstant.testPoddFoafUriV2).size());
-        Assert.assertEquals(2, nextImportsMap.get(OntologyConstant.testPoddUserUriV1).size());
-        Assert.assertEquals(2, nextImportsMap.get(OntologyConstant.testPoddUserUriV2).size());
-        Assert.assertEquals(3, nextImportsMap.get(OntologyConstant.testPoddBaseUriV1).size());
-        Assert.assertEquals(3, nextImportsMap.get(OntologyConstant.testPoddBaseUriV2).size());
-        Assert.assertEquals(4, nextImportsMap.get(OntologyConstant.testPoddScienceUriV1).size());
-        Assert.assertEquals(4, nextImportsMap.get(OntologyConstant.testPoddScienceUriV2).size());
-        Assert.assertEquals(5, nextImportsMap.get(OntologyConstant.testPoddPlantUriV1).size());
-        Assert.assertEquals(5, nextImportsMap.get(OntologyConstant.testPoddPlantUriV2).size());
-        
-        Assert.assertTrue(nextImportsMap.get(OntologyConstant.testPoddFoafUriV1).contains(
-                OntologyConstant.testPoddDcUriV1));
-        Assert.assertTrue(nextImportsMap.get(OntologyConstant.testPoddFoafUriV2).contains(
-                OntologyConstant.testPoddDcUriV2));
-        Assert.assertTrue(nextImportsMap.get(OntologyConstant.testPoddUserUriV1).contains(
-                OntologyConstant.testPoddDcUriV1));
-        Assert.assertTrue(nextImportsMap.get(OntologyConstant.testPoddUserUriV2).contains(
-                OntologyConstant.testPoddDcUriV2));
-        Assert.assertTrue(nextImportsMap.get(OntologyConstant.testPoddUserUriV1).contains(
-                OntologyConstant.testPoddFoafUriV1));
-        Assert.assertTrue(nextImportsMap.get(OntologyConstant.testPoddUserUriV2).contains(
-                OntologyConstant.testPoddFoafUriV2));
-        Assert.assertTrue(nextImportsMap.get(OntologyConstant.testPoddBaseUriV1).contains(
-                OntologyConstant.testPoddDcUriV1));
-        Assert.assertTrue(nextImportsMap.get(OntologyConstant.testPoddBaseUriV2).contains(
-                OntologyConstant.testPoddDcUriV2));
-        Assert.assertTrue(nextImportsMap.get(OntologyConstant.testPoddBaseUriV1).contains(
-                OntologyConstant.testPoddFoafUriV1));
-        Assert.assertTrue(nextImportsMap.get(OntologyConstant.testPoddBaseUriV2).contains(
-                OntologyConstant.testPoddFoafUriV2));
-        Assert.assertTrue(nextImportsMap.get(OntologyConstant.testPoddBaseUriV1).contains(
-                OntologyConstant.testPoddUserUriV1));
-        Assert.assertTrue(nextImportsMap.get(OntologyConstant.testPoddBaseUriV2).contains(
-                OntologyConstant.testPoddUserUriV2));
-        Assert.assertTrue(nextImportsMap.get(OntologyConstant.testPoddScienceUriV1).contains(
-                OntologyConstant.testPoddDcUriV1));
-        Assert.assertTrue(nextImportsMap.get(OntologyConstant.testPoddScienceUriV2).contains(
-                OntologyConstant.testPoddDcUriV2));
-        Assert.assertTrue(nextImportsMap.get(OntologyConstant.testPoddScienceUriV1).contains(
-                OntologyConstant.testPoddFoafUriV1));
-        Assert.assertTrue(nextImportsMap.get(OntologyConstant.testPoddScienceUriV2).contains(
-                OntologyConstant.testPoddFoafUriV2));
-        Assert.assertTrue(nextImportsMap.get(OntologyConstant.testPoddScienceUriV1).contains(
-                OntologyConstant.testPoddUserUriV1));
-        Assert.assertTrue(nextImportsMap.get(OntologyConstant.testPoddScienceUriV2).contains(
-                OntologyConstant.testPoddUserUriV2));
-        Assert.assertTrue(nextImportsMap.get(OntologyConstant.testPoddScienceUriV1).contains(
-                OntologyConstant.testPoddBaseUriV1));
-        Assert.assertTrue(nextImportsMap.get(OntologyConstant.testPoddScienceUriV2).contains(
-                OntologyConstant.testPoddBaseUriV2));
-        Assert.assertTrue(nextImportsMap.get(OntologyConstant.testPoddPlantUriV1).contains(
-                OntologyConstant.testPoddDcUriV1));
-        Assert.assertTrue(nextImportsMap.get(OntologyConstant.testPoddPlantUriV2).contains(
-                OntologyConstant.testPoddDcUriV2));
-        Assert.assertTrue(nextImportsMap.get(OntologyConstant.testPoddPlantUriV1).contains(
-                OntologyConstant.testPoddFoafUriV1));
-        Assert.assertTrue(nextImportsMap.get(OntologyConstant.testPoddPlantUriV2).contains(
-                OntologyConstant.testPoddFoafUriV2));
-        Assert.assertTrue(nextImportsMap.get(OntologyConstant.testPoddPlantUriV1).contains(
-                OntologyConstant.testPoddUserUriV1));
-        Assert.assertTrue(nextImportsMap.get(OntologyConstant.testPoddPlantUriV2).contains(
-                OntologyConstant.testPoddUserUriV2));
-        Assert.assertTrue(nextImportsMap.get(OntologyConstant.testPoddPlantUriV1).contains(
-                OntologyConstant.testPoddBaseUriV1));
-        Assert.assertTrue(nextImportsMap.get(OntologyConstant.testPoddPlantUriV2).contains(
-                OntologyConstant.testPoddBaseUriV2));
-        Assert.assertTrue(nextImportsMap.get(OntologyConstant.testPoddPlantUriV1).contains(
-                OntologyConstant.testPoddScienceUriV1));
-        Assert.assertTrue(nextImportsMap.get(OntologyConstant.testPoddPlantUriV2).contains(
-                OntologyConstant.testPoddScienceUriV2));
-    }
-    
-    @Test
-    public void testGetSchemaManifestImportsRealisticPoddV2Plant() throws Exception
-    {
-        final Model model =
-                Rio.parse(this.getClass().getResourceAsStream("/test/test-podd-schema-manifest.ttl"), "",
-                        RDFFormat.TURTLE);
-        
-        // DebugUtils.printContents(model);
-        final List<OWLOntologyID> schemaManifestImports =
-                OntologyUtils.schemaManifestImports(model,
-                        new HashSet<OWLOntologyID>(Arrays.asList(OntologyConstant.testPoddPlantV2)), importsMap);
-        
-        Assert.assertNotNull(schemaManifestImports);
-        Assert.assertEquals(6, schemaManifestImports.size());
-        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddDcV2));
-        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddFoafV2));
-        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddUserV2));
-        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddBaseV2));
-        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddScienceV2));
-        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddPlantV2));
-        Assert.assertEquals(OntologyConstant.testPoddDcV2, schemaManifestImports.get(0));
-        Assert.assertEquals(OntologyConstant.testPoddFoafV2, schemaManifestImports.get(1));
-        Assert.assertEquals(OntologyConstant.testPoddUserV2, schemaManifestImports.get(2));
-        Assert.assertEquals(OntologyConstant.testPoddBaseV2, schemaManifestImports.get(3));
-        Assert.assertEquals(OntologyConstant.testPoddScienceV2, schemaManifestImports.get(4));
-        Assert.assertEquals(OntologyConstant.testPoddPlantV2, schemaManifestImports.get(5));
-        
-        assertRealisticImportsMap(importsMap);
-    }
-    
-    @Test
-    public void testGetSchemaManifestImportsRealisticPoddV2DcPlant() throws Exception
-    {
-        final Model model =
-                Rio.parse(this.getClass().getResourceAsStream("/test/test-podd-schema-manifest.ttl"), "",
-                        RDFFormat.TURTLE);
-        
-        // DebugUtils.printContents(model);
-        final List<OWLOntologyID> schemaManifestImports =
-                OntologyUtils.schemaManifestImports(
-                        model,
-                        new HashSet<OWLOntologyID>(Arrays.asList(OntologyConstant.testPoddDcV2,
-                                OntologyConstant.testPoddPlantV2)), importsMap);
-        
-        Assert.assertNotNull(schemaManifestImports);
-        Assert.assertEquals(6, schemaManifestImports.size());
-        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddDcV2));
-        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddFoafV2));
-        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddUserV2));
-        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddBaseV2));
-        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddScienceV2));
-        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddPlantV2));
-        Assert.assertEquals(OntologyConstant.testPoddDcV2, schemaManifestImports.get(0));
-        Assert.assertEquals(OntologyConstant.testPoddFoafV2, schemaManifestImports.get(1));
-        Assert.assertEquals(OntologyConstant.testPoddUserV2, schemaManifestImports.get(2));
-        Assert.assertEquals(OntologyConstant.testPoddBaseV2, schemaManifestImports.get(3));
-        Assert.assertEquals(OntologyConstant.testPoddScienceV2, schemaManifestImports.get(4));
-        Assert.assertEquals(OntologyConstant.testPoddPlantV2, schemaManifestImports.get(5));
-        
-        assertRealisticImportsMap(importsMap);
-    }
-    
-    @Test
-    public void testGetSchemaManifestImportsRealisticPoddV1Base() throws Exception
-    {
-        final Model model =
-                Rio.parse(this.getClass().getResourceAsStream("/test/test-podd-schema-manifest.ttl"), "",
-                        RDFFormat.TURTLE);
-        
-        // DebugUtils.printContents(model);
-        final List<OWLOntologyID> schemaManifestImports =
-                OntologyUtils.schemaManifestImports(model,
-                        new HashSet<OWLOntologyID>(Arrays.asList(OntologyConstant.testPoddBaseV1)), importsMap);
-        
-        Assert.assertNotNull(schemaManifestImports);
-        Assert.assertEquals(4, schemaManifestImports.size());
-        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddDcV1));
-        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddFoafV1));
-        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddUserV1));
-        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddBaseV1));
-        Assert.assertEquals(OntologyConstant.testPoddDcV1, schemaManifestImports.get(0));
-        Assert.assertEquals(OntologyConstant.testPoddFoafV1, schemaManifestImports.get(1));
-        Assert.assertEquals(OntologyConstant.testPoddUserV1, schemaManifestImports.get(2));
-        Assert.assertEquals(OntologyConstant.testPoddBaseV1, schemaManifestImports.get(3));
-        
-        assertRealisticImportsMap(importsMap);
-    }
-    
-    @Test
-    public void testGetSchemaManifestImportsRealisticPoddV1V2Base() throws Exception
-    {
-        final Model model =
-                Rio.parse(this.getClass().getResourceAsStream("/test/test-podd-schema-manifest.ttl"), "",
-                        RDFFormat.TURTLE);
-        
-        // DebugUtils.printContents(model);
-        final List<OWLOntologyID> schemaManifestImports =
-                OntologyUtils.schemaManifestImports(
-                        model,
-                        new HashSet<OWLOntologyID>(Arrays.asList(OntologyConstant.testPoddBaseV1,
-                                OntologyConstant.testPoddBaseV2)), importsMap);
-        
-        Assert.assertNotNull(schemaManifestImports);
-        Assert.assertEquals(8, schemaManifestImports.size());
-        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddDcV1));
-        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddDcV2));
-        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddFoafV1));
-        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddFoafV2));
-        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddUserV1));
-        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddUserV2));
-        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddBaseV1));
-        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddBaseV2));
-        
-        Assert.assertTrue(schemaManifestImports.indexOf(OntologyConstant.testPoddDcV1) < schemaManifestImports
-                .indexOf(OntologyConstant.testPoddFoafV1));
-        Assert.assertTrue(schemaManifestImports.indexOf(OntologyConstant.testPoddDcV1) < schemaManifestImports
-                .indexOf(OntologyConstant.testPoddUserV1));
-        Assert.assertTrue(schemaManifestImports.indexOf(OntologyConstant.testPoddDcV1) < schemaManifestImports
-                .indexOf(OntologyConstant.testPoddBaseV1));
-        Assert.assertTrue(schemaManifestImports.indexOf(OntologyConstant.testPoddFoafV1) < schemaManifestImports
-                .indexOf(OntologyConstant.testPoddUserV1));
-        Assert.assertTrue(schemaManifestImports.indexOf(OntologyConstant.testPoddFoafV1) < schemaManifestImports
-                .indexOf(OntologyConstant.testPoddBaseV1));
-        Assert.assertTrue(schemaManifestImports.indexOf(OntologyConstant.testPoddUserV1) < schemaManifestImports
-                .indexOf(OntologyConstant.testPoddBaseV1));
-        
-        Assert.assertTrue(schemaManifestImports.indexOf(OntologyConstant.testPoddDcV2) < schemaManifestImports
-                .indexOf(OntologyConstant.testPoddFoafV2));
-        Assert.assertTrue(schemaManifestImports.indexOf(OntologyConstant.testPoddDcV2) < schemaManifestImports
-                .indexOf(OntologyConstant.testPoddUserV2));
-        Assert.assertTrue(schemaManifestImports.indexOf(OntologyConstant.testPoddDcV2) < schemaManifestImports
-                .indexOf(OntologyConstant.testPoddBaseV2));
-        Assert.assertTrue(schemaManifestImports.indexOf(OntologyConstant.testPoddFoafV2) < schemaManifestImports
-                .indexOf(OntologyConstant.testPoddUserV2));
-        Assert.assertTrue(schemaManifestImports.indexOf(OntologyConstant.testPoddFoafV2) < schemaManifestImports
-                .indexOf(OntologyConstant.testPoddBaseV2));
-        Assert.assertTrue(schemaManifestImports.indexOf(OntologyConstant.testPoddUserV2) < schemaManifestImports
-                .indexOf(OntologyConstant.testPoddBaseV2));
-        
-        assertRealisticImportsMap(importsMap);
-    }
-    
-    @Test
-    public void testGetSchemaManifestImportsRealisticPoddV1V2AllToBaseInOrder() throws Exception
-    {
-        final Model model =
-                Rio.parse(this.getClass().getResourceAsStream("/test/test-podd-schema-manifest.ttl"), "",
-                        RDFFormat.TURTLE);
-        
-        // DebugUtils.printContents(model);
-        final List<OWLOntologyID> schemaManifestImports =
-                OntologyUtils.schemaManifestImports(
-                        model,
-                        new LinkedHashSet<OWLOntologyID>(Arrays.asList(OntologyConstant.testPoddDcV1,
-                                OntologyConstant.testPoddDcV2, OntologyConstant.testPoddFoafV1,
-                                OntologyConstant.testPoddFoafV2, OntologyConstant.testPoddUserV1,
-                                OntologyConstant.testPoddUserV2, OntologyConstant.testPoddBaseV1,
-                                OntologyConstant.testPoddBaseV2)), importsMap);
-        
-        Assert.assertNotNull(schemaManifestImports);
-        Assert.assertEquals(8, schemaManifestImports.size());
-        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddDcV1));
-        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddDcV2));
-        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddFoafV1));
-        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddFoafV2));
-        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddUserV1));
-        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddUserV2));
-        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddBaseV1));
-        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddBaseV2));
-        
-        Assert.assertTrue(schemaManifestImports.indexOf(OntologyConstant.testPoddDcV1) < schemaManifestImports
-                .indexOf(OntologyConstant.testPoddFoafV1));
-        Assert.assertTrue(schemaManifestImports.indexOf(OntologyConstant.testPoddDcV1) < schemaManifestImports
-                .indexOf(OntologyConstant.testPoddUserV1));
-        Assert.assertTrue(schemaManifestImports.indexOf(OntologyConstant.testPoddDcV1) < schemaManifestImports
-                .indexOf(OntologyConstant.testPoddBaseV1));
-        Assert.assertTrue(schemaManifestImports.indexOf(OntologyConstant.testPoddFoafV1) < schemaManifestImports
-                .indexOf(OntologyConstant.testPoddUserV1));
-        Assert.assertTrue(schemaManifestImports.indexOf(OntologyConstant.testPoddFoafV1) < schemaManifestImports
-                .indexOf(OntologyConstant.testPoddBaseV1));
-        Assert.assertTrue(schemaManifestImports.indexOf(OntologyConstant.testPoddUserV1) < schemaManifestImports
-                .indexOf(OntologyConstant.testPoddBaseV1));
-        
-        Assert.assertTrue(schemaManifestImports.indexOf(OntologyConstant.testPoddDcV2) < schemaManifestImports
-                .indexOf(OntologyConstant.testPoddFoafV2));
-        Assert.assertTrue(schemaManifestImports.indexOf(OntologyConstant.testPoddDcV2) < schemaManifestImports
-                .indexOf(OntologyConstant.testPoddUserV2));
-        Assert.assertTrue(schemaManifestImports.indexOf(OntologyConstant.testPoddDcV2) < schemaManifestImports
-                .indexOf(OntologyConstant.testPoddBaseV2));
-        Assert.assertTrue(schemaManifestImports.indexOf(OntologyConstant.testPoddFoafV2) < schemaManifestImports
-                .indexOf(OntologyConstant.testPoddUserV2));
-        Assert.assertTrue(schemaManifestImports.indexOf(OntologyConstant.testPoddFoafV2) < schemaManifestImports
-                .indexOf(OntologyConstant.testPoddBaseV2));
-        Assert.assertTrue(schemaManifestImports.indexOf(OntologyConstant.testPoddUserV2) < schemaManifestImports
-                .indexOf(OntologyConstant.testPoddBaseV2));
-        
-        assertRealisticImportsMap(importsMap);
-    }
-    
-    @Test
-    public void testGetSchemaManifestImportsRealisticPoddV1V2AllToBaseReverseOrder() throws Exception
-    {
-        final Model model =
-                Rio.parse(this.getClass().getResourceAsStream("/test/test-podd-schema-manifest.ttl"), "",
-                        RDFFormat.TURTLE);
-        
-        // DebugUtils.printContents(model);
-        final List<OWLOntologyID> schemaManifestImports =
-                OntologyUtils.schemaManifestImports(
-                        model,
-                        new LinkedHashSet<OWLOntologyID>(Arrays.asList(OntologyConstant.testPoddBaseV1,
-                                OntologyConstant.testPoddBaseV2, OntologyConstant.testPoddUserV1,
-                                OntologyConstant.testPoddUserV2, OntologyConstant.testPoddFoafV1,
-                                OntologyConstant.testPoddFoafV2, OntologyConstant.testPoddDcV1,
-                                OntologyConstant.testPoddDcV2)), importsMap);
-        
-        Assert.assertNotNull(schemaManifestImports);
-        Assert.assertEquals(8, schemaManifestImports.size());
-        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddDcV1));
-        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddDcV2));
-        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddFoafV1));
-        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddFoafV2));
-        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddUserV1));
-        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddUserV2));
-        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddBaseV1));
-        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddBaseV2));
-        
-        Assert.assertTrue(schemaManifestImports.indexOf(OntologyConstant.testPoddDcV1) < schemaManifestImports
-                .indexOf(OntologyConstant.testPoddFoafV1));
-        Assert.assertTrue(schemaManifestImports.indexOf(OntologyConstant.testPoddDcV1) < schemaManifestImports
-                .indexOf(OntologyConstant.testPoddUserV1));
-        Assert.assertTrue(schemaManifestImports.indexOf(OntologyConstant.testPoddDcV1) < schemaManifestImports
-                .indexOf(OntologyConstant.testPoddBaseV1));
-        Assert.assertTrue(schemaManifestImports.indexOf(OntologyConstant.testPoddFoafV1) < schemaManifestImports
-                .indexOf(OntologyConstant.testPoddUserV1));
-        Assert.assertTrue(schemaManifestImports.indexOf(OntologyConstant.testPoddFoafV1) < schemaManifestImports
-                .indexOf(OntologyConstant.testPoddBaseV1));
-        Assert.assertTrue(schemaManifestImports.indexOf(OntologyConstant.testPoddUserV1) < schemaManifestImports
-                .indexOf(OntologyConstant.testPoddBaseV1));
-        
-        Assert.assertTrue(schemaManifestImports.indexOf(OntologyConstant.testPoddDcV2) < schemaManifestImports
-                .indexOf(OntologyConstant.testPoddFoafV2));
-        Assert.assertTrue(schemaManifestImports.indexOf(OntologyConstant.testPoddDcV2) < schemaManifestImports
-                .indexOf(OntologyConstant.testPoddUserV2));
-        Assert.assertTrue(schemaManifestImports.indexOf(OntologyConstant.testPoddDcV2) < schemaManifestImports
-                .indexOf(OntologyConstant.testPoddBaseV2));
-        Assert.assertTrue(schemaManifestImports.indexOf(OntologyConstant.testPoddFoafV2) < schemaManifestImports
-                .indexOf(OntologyConstant.testPoddUserV2));
-        Assert.assertTrue(schemaManifestImports.indexOf(OntologyConstant.testPoddFoafV2) < schemaManifestImports
-                .indexOf(OntologyConstant.testPoddBaseV2));
-        Assert.assertTrue(schemaManifestImports.indexOf(OntologyConstant.testPoddUserV2) < schemaManifestImports
-                .indexOf(OntologyConstant.testPoddBaseV2));
-        
-        assertRealisticImportsMap(importsMap);
-    }
-    
-    /**
-     * Randomised test, to fuzz test the algorithm.
-     *
-     * @throws Exception
-     */
-    @Test
-    public void testGetSchemaManifestImportsRealisticPoddV1V2AllToBaseRandomOrder() throws Exception
-    {
-        final Model model =
-                Rio.parse(this.getClass().getResourceAsStream("/test/test-podd-schema-manifest.ttl"), "",
-                        RDFFormat.TURTLE);
-        
-        final List<OWLOntologyID> imports =
-                new ArrayList<OWLOntologyID>(Arrays.asList(OntologyConstant.testPoddBaseV1,
-                        OntologyConstant.testPoddUserV1, OntologyConstant.testPoddUserV2,
-                        OntologyConstant.testPoddFoafV1, OntologyConstant.testPoddBaseV2,
-                        OntologyConstant.testPoddFoafV2, OntologyConstant.testPoddDcV1, OntologyConstant.testPoddDcV2));
-        
-        Collections.shuffle(imports);
-        
-        // DebugUtils.printContents(model);
-        final List<OWLOntologyID> schemaManifestImports =
-                OntologyUtils.schemaManifestImports(model, new LinkedHashSet<OWLOntologyID>(imports), importsMap);
-        
-        Assert.assertNotNull(schemaManifestImports);
-        Assert.assertEquals(8, schemaManifestImports.size());
-        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddDcV1));
-        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddDcV2));
-        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddFoafV1));
-        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddFoafV2));
-        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddUserV1));
-        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddUserV2));
-        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddBaseV1));
-        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddBaseV2));
-        
-        Assert.assertTrue(schemaManifestImports.indexOf(OntologyConstant.testPoddDcV1) < schemaManifestImports
-                .indexOf(OntologyConstant.testPoddFoafV1));
-        Assert.assertTrue(schemaManifestImports.indexOf(OntologyConstant.testPoddDcV1) < schemaManifestImports
-                .indexOf(OntologyConstant.testPoddUserV1));
-        Assert.assertTrue(schemaManifestImports.indexOf(OntologyConstant.testPoddDcV1) < schemaManifestImports
-                .indexOf(OntologyConstant.testPoddBaseV1));
-        Assert.assertTrue(schemaManifestImports.indexOf(OntologyConstant.testPoddFoafV1) < schemaManifestImports
-                .indexOf(OntologyConstant.testPoddUserV1));
-        Assert.assertTrue(schemaManifestImports.indexOf(OntologyConstant.testPoddFoafV1) < schemaManifestImports
-                .indexOf(OntologyConstant.testPoddBaseV1));
-        Assert.assertTrue(schemaManifestImports.indexOf(OntologyConstant.testPoddUserV1) < schemaManifestImports
-                .indexOf(OntologyConstant.testPoddBaseV1));
-        
-        Assert.assertTrue(schemaManifestImports.indexOf(OntologyConstant.testPoddDcV2) < schemaManifestImports
-                .indexOf(OntologyConstant.testPoddFoafV2));
-        Assert.assertTrue(schemaManifestImports.indexOf(OntologyConstant.testPoddDcV2) < schemaManifestImports
-                .indexOf(OntologyConstant.testPoddUserV2));
-        Assert.assertTrue(schemaManifestImports.indexOf(OntologyConstant.testPoddDcV2) < schemaManifestImports
-                .indexOf(OntologyConstant.testPoddBaseV2));
-        Assert.assertTrue(schemaManifestImports.indexOf(OntologyConstant.testPoddFoafV2) < schemaManifestImports
-                .indexOf(OntologyConstant.testPoddUserV2));
-        Assert.assertTrue(schemaManifestImports.indexOf(OntologyConstant.testPoddFoafV2) < schemaManifestImports
-                .indexOf(OntologyConstant.testPoddBaseV2));
-        Assert.assertTrue(schemaManifestImports.indexOf(OntologyConstant.testPoddUserV2) < schemaManifestImports
-                .indexOf(OntologyConstant.testPoddBaseV2));
-        
-        assertRealisticImportsMap(importsMap);
-    }
-    
-    /**
-     * Randomised test, to fuzz test the algorithm.
-     *
-     * @throws Exception
-     */
-    @Test
-    public void testGetSchemaManifestImportsRealisticPoddV1V2AllToScienceRandomOrder() throws Exception
-    {
-        final Model model =
-                Rio.parse(this.getClass().getResourceAsStream("/test/test-podd-schema-manifest.ttl"), "",
-                        RDFFormat.TURTLE);
-        
-        final List<OWLOntologyID> imports =
-                new ArrayList<OWLOntologyID>(Arrays.asList(OntologyConstant.testPoddBaseV1,
-                        OntologyConstant.testPoddUserV1, OntologyConstant.testPoddUserV2,
-                        OntologyConstant.testPoddFoafV1, OntologyConstant.testPoddBaseV2,
-                        OntologyConstant.testPoddFoafV2, OntologyConstant.testPoddDcV1, OntologyConstant.testPoddDcV2,
-                        OntologyConstant.testPoddScienceV1, OntologyConstant.testPoddScienceV2));
-        
-        Collections.shuffle(imports);
-        
-        // DebugUtils.printContents(model);
-        final List<OWLOntologyID> schemaManifestImports =
-                OntologyUtils.schemaManifestImports(model, new LinkedHashSet<OWLOntologyID>(imports), importsMap);
-        
-        Assert.assertNotNull(schemaManifestImports);
-        Assert.assertEquals(10, schemaManifestImports.size());
-        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddDcV1));
-        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddDcV2));
-        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddFoafV1));
-        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddFoafV2));
-        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddUserV1));
-        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddUserV2));
-        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddBaseV1));
-        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddBaseV2));
-        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddScienceV1));
-        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddScienceV2));
-        
-        Assert.assertTrue(schemaManifestImports.indexOf(OntologyConstant.testPoddDcV1) < schemaManifestImports
-                .indexOf(OntologyConstant.testPoddFoafV1));
-        Assert.assertTrue(schemaManifestImports.indexOf(OntologyConstant.testPoddDcV1) < schemaManifestImports
-                .indexOf(OntologyConstant.testPoddUserV1));
-        Assert.assertTrue(schemaManifestImports.indexOf(OntologyConstant.testPoddDcV1) < schemaManifestImports
-                .indexOf(OntologyConstant.testPoddBaseV1));
-        Assert.assertTrue(schemaManifestImports.indexOf(OntologyConstant.testPoddDcV1) < schemaManifestImports
-                .indexOf(OntologyConstant.testPoddScienceV1));
-        Assert.assertTrue(schemaManifestImports.indexOf(OntologyConstant.testPoddFoafV1) < schemaManifestImports
-                .indexOf(OntologyConstant.testPoddUserV1));
-        Assert.assertTrue(schemaManifestImports.indexOf(OntologyConstant.testPoddFoafV1) < schemaManifestImports
-                .indexOf(OntologyConstant.testPoddBaseV1));
-        Assert.assertTrue(schemaManifestImports.indexOf(OntologyConstant.testPoddFoafV1) < schemaManifestImports
-                .indexOf(OntologyConstant.testPoddScienceV1));
-        Assert.assertTrue(schemaManifestImports.indexOf(OntologyConstant.testPoddUserV1) < schemaManifestImports
-                .indexOf(OntologyConstant.testPoddBaseV1));
-        Assert.assertTrue(schemaManifestImports.indexOf(OntologyConstant.testPoddUserV1) < schemaManifestImports
-                .indexOf(OntologyConstant.testPoddScienceV1));
-        Assert.assertTrue(schemaManifestImports.indexOf(OntologyConstant.testPoddBaseV1) < schemaManifestImports
-                .indexOf(OntologyConstant.testPoddScienceV1));
-        
-        Assert.assertTrue(schemaManifestImports.indexOf(OntologyConstant.testPoddDcV2) < schemaManifestImports
-                .indexOf(OntologyConstant.testPoddFoafV2));
-        Assert.assertTrue(schemaManifestImports.indexOf(OntologyConstant.testPoddDcV2) < schemaManifestImports
-                .indexOf(OntologyConstant.testPoddUserV2));
-        Assert.assertTrue(schemaManifestImports.indexOf(OntologyConstant.testPoddDcV2) < schemaManifestImports
-                .indexOf(OntologyConstant.testPoddBaseV2));
-        Assert.assertTrue(schemaManifestImports.indexOf(OntologyConstant.testPoddDcV2) < schemaManifestImports
-                .indexOf(OntologyConstant.testPoddScienceV2));
-        Assert.assertTrue(schemaManifestImports.indexOf(OntologyConstant.testPoddFoafV2) < schemaManifestImports
-                .indexOf(OntologyConstant.testPoddUserV2));
-        Assert.assertTrue(schemaManifestImports.indexOf(OntologyConstant.testPoddFoafV2) < schemaManifestImports
-                .indexOf(OntologyConstant.testPoddBaseV2));
-        Assert.assertTrue(schemaManifestImports.indexOf(OntologyConstant.testPoddFoafV2) < schemaManifestImports
-                .indexOf(OntologyConstant.testPoddScienceV2));
-        Assert.assertTrue(schemaManifestImports.indexOf(OntologyConstant.testPoddUserV2) < schemaManifestImports
-                .indexOf(OntologyConstant.testPoddBaseV2));
-        Assert.assertTrue(schemaManifestImports.indexOf(OntologyConstant.testPoddUserV2) < schemaManifestImports
-                .indexOf(OntologyConstant.testPoddScienceV2));
-        Assert.assertTrue(schemaManifestImports.indexOf(OntologyConstant.testPoddBaseV2) < schemaManifestImports
-                .indexOf(OntologyConstant.testPoddScienceV2));
-        
-        assertRealisticImportsMap(importsMap);
-    }
-    
-    /**
-     * Randomised test, to fuzz test the algorithm.
-     *
-     * @throws Exception
-     */
-    @Test
-    public void testGetSchemaManifestImportsRealisticPoddV1V2AllToPlantRandomOrder() throws Exception
-    {
-        final Model model =
-                Rio.parse(this.getClass().getResourceAsStream("/test/test-podd-schema-manifest.ttl"), "",
-                        RDFFormat.TURTLE);
-        
-        final List<OWLOntologyID> imports =
-                new ArrayList<OWLOntologyID>(Arrays.asList(OntologyConstant.testPoddBaseV1,
-                        OntologyConstant.testPoddUserV1, OntologyConstant.testPoddUserV2,
-                        OntologyConstant.testPoddFoafV1, OntologyConstant.testPoddPlantV1,
-                        OntologyConstant.testPoddPlantV2, OntologyConstant.testPoddBaseV2,
-                        OntologyConstant.testPoddFoafV2, OntologyConstant.testPoddDcV1, OntologyConstant.testPoddDcV2,
-                        OntologyConstant.testPoddScienceV1, OntologyConstant.testPoddScienceV2));
-        
-        // Randomise the order to fuzz test the algorithm
-        Collections.shuffle(imports);
-        
-        // DebugUtils.printContents(model);
-        final List<OWLOntologyID> result =
-                OntologyUtils.schemaManifestImports(model, new LinkedHashSet<OWLOntologyID>(imports), importsMap);
-        
-        Assert.assertNotNull(result);
-        Assert.assertEquals(12, result.size());
-        Assert.assertTrue(result.contains(OntologyConstant.testPoddDcV1));
-        Assert.assertTrue(result.contains(OntologyConstant.testPoddDcV2));
-        Assert.assertTrue(result.contains(OntologyConstant.testPoddFoafV1));
-        Assert.assertTrue(result.contains(OntologyConstant.testPoddFoafV2));
-        Assert.assertTrue(result.contains(OntologyConstant.testPoddUserV1));
-        Assert.assertTrue(result.contains(OntologyConstant.testPoddUserV2));
-        Assert.assertTrue(result.contains(OntologyConstant.testPoddBaseV1));
-        Assert.assertTrue(result.contains(OntologyConstant.testPoddBaseV2));
-        Assert.assertTrue(result.contains(OntologyConstant.testPoddScienceV1));
-        Assert.assertTrue(result.contains(OntologyConstant.testPoddScienceV2));
-        Assert.assertTrue(result.contains(OntologyConstant.testPoddPlantV1));
-        Assert.assertTrue(result.contains(OntologyConstant.testPoddPlantV2));
-        
-        Assert.assertTrue(result.indexOf(OntologyConstant.testPoddDcV1) < result
-                .indexOf(OntologyConstant.testPoddFoafV1));
-        Assert.assertTrue(result.indexOf(OntologyConstant.testPoddDcV1) < result
-                .indexOf(OntologyConstant.testPoddUserV1));
-        Assert.assertTrue(result.indexOf(OntologyConstant.testPoddDcV1) < result
-                .indexOf(OntologyConstant.testPoddBaseV1));
-        Assert.assertTrue(result.indexOf(OntologyConstant.testPoddDcV1) < result
-                .indexOf(OntologyConstant.testPoddScienceV1));
-        Assert.assertTrue(result.indexOf(OntologyConstant.testPoddDcV1) < result
-                .indexOf(OntologyConstant.testPoddPlantV1));
-        Assert.assertTrue(result.indexOf(OntologyConstant.testPoddFoafV1) < result
-                .indexOf(OntologyConstant.testPoddUserV1));
-        Assert.assertTrue(result.indexOf(OntologyConstant.testPoddFoafV1) < result
-                .indexOf(OntologyConstant.testPoddBaseV1));
-        Assert.assertTrue(result.indexOf(OntologyConstant.testPoddFoafV1) < result
-                .indexOf(OntologyConstant.testPoddScienceV1));
-        Assert.assertTrue(result.indexOf(OntologyConstant.testPoddFoafV1) < result
-                .indexOf(OntologyConstant.testPoddPlantV1));
-        Assert.assertTrue(result.indexOf(OntologyConstant.testPoddUserV1) < result
-                .indexOf(OntologyConstant.testPoddBaseV1));
-        Assert.assertTrue(result.indexOf(OntologyConstant.testPoddUserV1) < result
-                .indexOf(OntologyConstant.testPoddScienceV1));
-        Assert.assertTrue(result.indexOf(OntologyConstant.testPoddUserV1) < result
-                .indexOf(OntologyConstant.testPoddPlantV1));
-        Assert.assertTrue(result.indexOf(OntologyConstant.testPoddBaseV1) < result
-                .indexOf(OntologyConstant.testPoddScienceV1));
-        Assert.assertTrue(result.indexOf(OntologyConstant.testPoddBaseV1) < result
-                .indexOf(OntologyConstant.testPoddPlantV1));
-        Assert.assertTrue(result.indexOf(OntologyConstant.testPoddScienceV1) < result
-                .indexOf(OntologyConstant.testPoddPlantV1));
-        
-        Assert.assertTrue(result.indexOf(OntologyConstant.testPoddDcV2) < result
-                .indexOf(OntologyConstant.testPoddFoafV2));
-        Assert.assertTrue(result.indexOf(OntologyConstant.testPoddDcV2) < result
-                .indexOf(OntologyConstant.testPoddUserV2));
-        Assert.assertTrue(result.indexOf(OntologyConstant.testPoddDcV2) < result
-                .indexOf(OntologyConstant.testPoddBaseV2));
-        Assert.assertTrue(result.indexOf(OntologyConstant.testPoddDcV2) < result
-                .indexOf(OntologyConstant.testPoddScienceV2));
-        Assert.assertTrue(result.indexOf(OntologyConstant.testPoddDcV2) < result
-                .indexOf(OntologyConstant.testPoddPlantV2));
-        Assert.assertTrue(result.indexOf(OntologyConstant.testPoddFoafV2) < result
-                .indexOf(OntologyConstant.testPoddUserV2));
-        Assert.assertTrue(result.indexOf(OntologyConstant.testPoddFoafV2) < result
-                .indexOf(OntologyConstant.testPoddBaseV2));
-        Assert.assertTrue(result.indexOf(OntologyConstant.testPoddFoafV2) < result
-                .indexOf(OntologyConstant.testPoddScienceV2));
-        Assert.assertTrue(result.indexOf(OntologyConstant.testPoddFoafV2) < result
-                .indexOf(OntologyConstant.testPoddPlantV2));
-        Assert.assertTrue(result.indexOf(OntologyConstant.testPoddUserV2) < result
-                .indexOf(OntologyConstant.testPoddBaseV2));
-        Assert.assertTrue(result.indexOf(OntologyConstant.testPoddUserV2) < result
-                .indexOf(OntologyConstant.testPoddScienceV2));
-        Assert.assertTrue(result.indexOf(OntologyConstant.testPoddUserV2) < result
-                .indexOf(OntologyConstant.testPoddPlantV2));
-        Assert.assertTrue(result.indexOf(OntologyConstant.testPoddBaseV2) < result
-                .indexOf(OntologyConstant.testPoddScienceV2));
-        Assert.assertTrue(result.indexOf(OntologyConstant.testPoddBaseV2) < result
-                .indexOf(OntologyConstant.testPoddPlantV2));
-        Assert.assertTrue(result.indexOf(OntologyConstant.testPoddScienceV2) < result
-                .indexOf(OntologyConstant.testPoddPlantV2));
-        
-        assertRealisticImportsMap(importsMap);
-    }
-    
-    @Test
-    public void testGetSchemaManifestImportsRealisticPoddV2All() throws Exception
-    {
-        final Model model =
-                Rio.parse(this.getClass().getResourceAsStream("/test/test-podd-schema-manifest.ttl"), "",
-                        RDFFormat.TURTLE);
-        
-        // DebugUtils.printContents(model);
-        final List<OWLOntologyID> schemaManifestImports =
-                OntologyUtils.schemaManifestImports(
-                        model,
-                        new LinkedHashSet<OWLOntologyID>(Arrays.asList(OntologyConstant.testPoddDcV2,
-                                OntologyConstant.testPoddFoafV2, OntologyConstant.testPoddUserV2,
-                                OntologyConstant.testPoddBaseV2, OntologyConstant.testPoddScienceV2,
-                                OntologyConstant.testPoddPlantV2)), importsMap);
-        
-        Assert.assertNotNull(schemaManifestImports);
-        Assert.assertEquals(6, schemaManifestImports.size());
-        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddDcV2));
-        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddFoafV2));
-        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddUserV2));
-        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddBaseV2));
-        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddScienceV2));
-        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddPlantV2));
-        Assert.assertEquals(OntologyConstant.testPoddDcV2, schemaManifestImports.get(0));
-        Assert.assertEquals(OntologyConstant.testPoddFoafV2, schemaManifestImports.get(1));
-        Assert.assertEquals(OntologyConstant.testPoddUserV2, schemaManifestImports.get(2));
-        Assert.assertEquals(OntologyConstant.testPoddBaseV2, schemaManifestImports.get(3));
-        Assert.assertEquals(OntologyConstant.testPoddScienceV2, schemaManifestImports.get(4));
-        Assert.assertEquals(OntologyConstant.testPoddPlantV2, schemaManifestImports.get(5));
-        
-        assertRealisticImportsMap(importsMap);
-    }
-    
-    @Test
-    public void testGetSchemaManifestImportsB1() throws Exception
-    {
-        final Model model =
-                Rio.parse(this.getClass().getResourceAsStream("/test/schema-manifest-a1b2c3.ttl"), "", RDFFormat.TURTLE);
-        
-        // DebugUtils.printContents(model);
-        final List<OWLOntologyID> schemaManifestImports =
-                OntologyUtils.schemaManifestImports(model,
-                        new HashSet<OWLOntologyID>(Arrays.asList(OntologyConstant.testB1)), importsMap);
-        
-        Assert.assertNotNull(schemaManifestImports);
-        Assert.assertEquals(2, schemaManifestImports.size());
-        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testA1));
-        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testB1));
-        Assert.assertEquals(OntologyConstant.testA1, schemaManifestImports.get(0));
-        Assert.assertEquals(OntologyConstant.testB1, schemaManifestImports.get(1));
-        
-        assertA1B2C3(importsMap);
-    }
-    
-    @Test
-    public void testGetSchemaManifestImportsB2() throws Exception
-    {
-        final Model model =
-                Rio.parse(this.getClass().getResourceAsStream("/test/schema-manifest-a1b2c3.ttl"), "", RDFFormat.TURTLE);
-        
-        // DebugUtils.printContents(model);
-        final List<OWLOntologyID> schemaManifestImports =
-                OntologyUtils.schemaManifestImports(model,
-                        new HashSet<OWLOntologyID>(Arrays.asList(OntologyConstant.testB2)), importsMap);
-        
-        Assert.assertNotNull(schemaManifestImports);
-        Assert.assertEquals(2, schemaManifestImports.size());
-        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testA1));
-        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testB2));
-        Assert.assertEquals(OntologyConstant.testA1, schemaManifestImports.get(0));
-        Assert.assertEquals(OntologyConstant.testB2, schemaManifestImports.get(1));
-        
-        assertA1B2C3(importsMap);
-    }
-    
-    @Test
-    public void testGetSchemaManifestImportsC1() throws Exception
-    {
-        final Model model =
-                Rio.parse(this.getClass().getResourceAsStream("/test/schema-manifest-a1b2c3.ttl"), "", RDFFormat.TURTLE);
-        
-        // DebugUtils.printContents(model);
-        final List<OWLOntologyID> schemaManifestImports =
-                OntologyUtils.schemaManifestImports(model,
-                        new HashSet<OWLOntologyID>(Arrays.asList(OntologyConstant.testC1)), importsMap);
-        
-        Assert.assertNotNull(schemaManifestImports);
-        Assert.assertEquals(3, schemaManifestImports.size());
-        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testA1));
-        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testB1));
-        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testC1));
-        Assert.assertEquals(OntologyConstant.testA1, schemaManifestImports.get(0));
-        Assert.assertEquals(OntologyConstant.testB1, schemaManifestImports.get(1));
-        Assert.assertEquals(OntologyConstant.testC1, schemaManifestImports.get(2));
-        
-        assertA1B2C3(importsMap);
-    }
-    
-    @Test
-    public void testGetSchemaManifestImportsC3() throws Exception
-    {
-        final Model model =
-                Rio.parse(this.getClass().getResourceAsStream("/test/schema-manifest-a1b2c3.ttl"), "", RDFFormat.TURTLE);
-        
-        // DebugUtils.printContents(model);
-        final List<OWLOntologyID> schemaManifestImports =
-                OntologyUtils.schemaManifestImports(model,
-                        new HashSet<OWLOntologyID>(Arrays.asList(OntologyConstant.testC3)), importsMap);
-        
-        Assert.assertNotNull(schemaManifestImports);
-        Assert.assertEquals(3, schemaManifestImports.size());
-        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testA1));
-        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testB2));
-        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testC3));
-        Assert.assertEquals(OntologyConstant.testA1, schemaManifestImports.get(0));
-        Assert.assertEquals(OntologyConstant.testB2, schemaManifestImports.get(1));
-        Assert.assertEquals(OntologyConstant.testC3, schemaManifestImports.get(2));
-        
-        assertA1B2C3(importsMap);
-    }
-    
-    @Test
-    public void testGetSchemaManifestImportsEmpty() throws Exception
-    {
-        final Model model = new LinkedHashModel();
-        
-        final List<OWLOntologyID> schemaManifestImports =
-                OntologyUtils.schemaManifestImports(model, Collections.<OWLOntologyID> emptySet(), importsMap);
-        
-        Assert.assertNotNull(schemaManifestImports);
-        Assert.assertEquals(0, schemaManifestImports.size());
-        
-        Assert.assertEquals(0, importsMap.size());
-    }
-    
-    @Test
-    public void testGetSchemaManifestImportsOneLevel() throws Exception
-    {
-        final Model model = new LinkedHashModel();
-        OntologyUtils.ontologyIDsToModel(Arrays.asList(OntologyConstant.testOntologyID), model);
-        model.add(OntologyConstant.testVersionUri1, RDF.TYPE, OWL.ONTOLOGY);
-        model.add(OntologyConstant.testVersionUri1, OWL.IMPORTS, OntologyConstant.testImportVersionUri1);
-        model.add(OntologyConstant.testImportOntologyUri1, RDF.TYPE, OWL.ONTOLOGY);
-        model.add(OntologyConstant.testImportOntologyUri1, OWL.VERSIONIRI, OntologyConstant.testImportVersionUri1);
-        model.add(OntologyConstant.testImportVersionUri1, RDF.TYPE, OWL.ONTOLOGY);
-        
-        // DebugUtils.printContents(model);
-        
-        final List<OWLOntologyID> schemaManifestImports =
-                OntologyUtils.schemaManifestImports(
-                        model,
-                        new HashSet<OWLOntologyID>(Arrays.asList(OntologyConstant.testOntologyID,
-                                OntologyConstant.testImportOntologyID1)), importsMap);
-        
-        Assert.assertNotNull(schemaManifestImports);
-        Assert.assertEquals(2, schemaManifestImports.size());
-        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testOntologyID));
-        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testImportOntologyID1));
-        Assert.assertEquals(OntologyConstant.testImportOntologyID1, schemaManifestImports.get(0));
-        Assert.assertEquals(OntologyConstant.testOntologyID, schemaManifestImports.get(1));
-        
-        Assert.assertEquals(2, importsMap.size());
-        Assert.assertTrue(importsMap.containsKey(OntologyConstant.testImportVersionUri1));
-        Assert.assertTrue(importsMap.containsKey(OntologyConstant.testVersionUri1));
-        Assert.assertTrue(importsMap.get(OntologyConstant.testImportVersionUri1).isEmpty());
-        Assert.assertEquals(1, importsMap.get(OntologyConstant.testVersionUri1).size());
-        Assert.assertTrue(importsMap.get(OntologyConstant.testVersionUri1).contains(
-                OntologyConstant.testImportVersionUri1));
-    }
-    
-    @Test
-    public void testGetSchemaManifestImportsOneLevelCurrentVersion() throws Exception
-    {
-        final Model model = new LinkedHashModel();
-        OntologyUtils.ontologyIDsToModel(Arrays.asList(OntologyConstant.testOntologyID), model);
-        model.add(OntologyConstant.testVersionUri1, RDF.TYPE, OWL.ONTOLOGY);
-        model.add(OntologyConstant.testVersionUri1, OWL.IMPORTS, OntologyConstant.testImportOntologyUri1);
-        model.add(OntologyConstant.testImportOntologyUri1, RDF.TYPE, OWL.ONTOLOGY);
-        model.add(OntologyConstant.testImportOntologyUri1, PODD.OMV_CURRENT_VERSION,
-                OntologyConstant.testImportVersionUri1);
-        model.add(OntologyConstant.testImportOntologyUri1, OWL.VERSIONIRI, OntologyConstant.testImportVersionUri1);
-        model.add(OntologyConstant.testImportVersionUri1, RDF.TYPE, OWL.ONTOLOGY);
-        
-        // DebugUtils.printContents(model);
-        
-        final List<OWLOntologyID> schemaManifestImports =
-                OntologyUtils.schemaManifestImports(
-                        model,
-                        new HashSet<OWLOntologyID>(Arrays.asList(OntologyConstant.testOntologyID,
-                                OntologyConstant.testImportOntologyID1)), importsMap);
-        
-        Assert.assertNotNull(schemaManifestImports);
-        Assert.assertEquals(2, schemaManifestImports.size());
-        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testOntologyID));
-        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testImportOntologyID1));
-        Assert.assertEquals(OntologyConstant.testImportOntologyID1, schemaManifestImports.get(0));
-        Assert.assertEquals(OntologyConstant.testOntologyID, schemaManifestImports.get(1));
-        
-        Assert.assertEquals(2, importsMap.size());
-        Assert.assertTrue(importsMap.containsKey(OntologyConstant.testVersionUri1));
-        Assert.assertTrue(importsMap.containsKey(OntologyConstant.testImportVersionUri1));
-        Assert.assertEquals(0, importsMap.get(OntologyConstant.testImportVersionUri1).size());
-        Assert.assertEquals(1, importsMap.get(OntologyConstant.testVersionUri1).size());
-        Assert.assertTrue(importsMap.get(OntologyConstant.testVersionUri1).contains(
-                OntologyConstant.testImportVersionUri1));
-    }
-    
-    @Test
-    public void testGetSchemaManifestImportsZeroLevels() throws Exception
-    {
-        final Model model = new LinkedHashModel();
-        OntologyUtils.ontologyIDsToModel(Arrays.asList(OntologyConstant.testOntologyID), model);
-        
-        final List<OWLOntologyID> schemaManifestImports =
-                OntologyUtils.schemaManifestImports(model, Collections.singleton(OntologyConstant.testOntologyID),
-                        importsMap);
-        
-        Assert.assertNotNull(schemaManifestImports);
-        Assert.assertEquals(1, schemaManifestImports.size());
-        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testOntologyID));
-        
-        Assert.assertEquals(1, importsMap.size());
-        Assert.assertTrue(importsMap.containsKey(OntologyConstant.testVersionUri1));
-        Assert.assertEquals(0, importsMap.get(OntologyConstant.testVersionUri1).size());
-    }
-    
-    @Test
     public void testImportsOrderFourLevels() throws Exception
     {
         final Model model = new LinkedHashModel();
@@ -1554,22 +774,28 @@ public class OntologyUtilsTest
         final Set<URI> imports3 = importsMap.get(OntologyConstant.testImportVersionUri3);
         Assert.assertNotNull(imports3);
         Assert.assertEquals(1, imports3.size());
-        Assert.assertEquals(OntologyConstant.testImportVersionUri4, imports3.iterator().next());
+        Assert.assertTrue(imports3.contains(OntologyConstant.testImportVersionUri4));
         
         final Set<URI> imports2 = importsMap.get(OntologyConstant.testImportVersionUri2);
         Assert.assertNotNull(imports2);
-        Assert.assertEquals(1, imports2.size());
-        Assert.assertEquals(OntologyConstant.testImportVersionUri3, imports2.iterator().next());
+        Assert.assertEquals(2, imports2.size());
+        Assert.assertTrue(imports2.contains(OntologyConstant.testImportVersionUri3));
+        Assert.assertTrue(imports2.contains(OntologyConstant.testImportVersionUri4));
         
         final Set<URI> imports1 = importsMap.get(OntologyConstant.testImportVersionUri1);
         Assert.assertNotNull(imports1);
-        Assert.assertEquals(1, imports1.size());
-        Assert.assertEquals(OntologyConstant.testImportVersionUri2, imports1.iterator().next());
+        Assert.assertEquals(3, imports1.size());
+        Assert.assertTrue(imports1.contains(OntologyConstant.testImportVersionUri2));
+        Assert.assertTrue(imports1.contains(OntologyConstant.testImportVersionUri3));
+        Assert.assertTrue(imports1.contains(OntologyConstant.testImportVersionUri4));
         
         final Set<URI> importsRoot = importsMap.get(OntologyConstant.testVersionUri1);
         Assert.assertNotNull(importsRoot);
-        Assert.assertEquals(1, importsRoot.size());
-        Assert.assertEquals(OntologyConstant.testImportVersionUri1, importsRoot.iterator().next());
+        Assert.assertEquals(4, importsRoot.size());
+        Assert.assertTrue(importsRoot.contains(OntologyConstant.testImportVersionUri1));
+        Assert.assertTrue(importsRoot.contains(OntologyConstant.testImportVersionUri2));
+        Assert.assertTrue(importsRoot.contains(OntologyConstant.testImportVersionUri3));
+        Assert.assertTrue(importsRoot.contains(OntologyConstant.testImportVersionUri4));
     }
     
     @Test
@@ -1613,16 +839,6 @@ public class OntologyUtilsTest
         schemaVersionUris.add(OntologyConstant.testImportVersionUri1);
         
         final ConcurrentMap<URI, Set<URI>> importsMap = new ConcurrentHashMap<URI, Set<URI>>();
-        // Expected output solution from importsMap after calling orderImports
-        // importsMap.put(testVersionUri1,
-        // Collections.singleton(OntologyConstant.testImportVersionUri1));
-        // importsMap.put(testImportVersionUri1,
-        // Collections.singleton(OntologyConstant.testImportVersionUri2));
-        // importsMap.put(testImportVersionUri2,
-        // Collections.singleton(OntologyConstant.testImportVersionUri3));
-        // importsMap.put(testImportVersionUri3, new
-        // HashSet<URI>(Arrays.asList(OntologyConstant.testImportVersionUri4)));
-        // importsMap.put(testImportVersionUri4, new HashSet<URI>());
         
         final List<URI> orderImports =
                 OntologyUtils.orderImports(model, schemaOntologyUris, schemaVersionUris, importsMap, false);
@@ -1648,22 +864,28 @@ public class OntologyUtilsTest
         final Set<URI> imports3 = importsMap.get(OntologyConstant.testImportVersionUri3);
         Assert.assertNotNull(imports3);
         Assert.assertEquals(1, imports3.size());
-        Assert.assertEquals(OntologyConstant.testImportVersionUri4, imports3.iterator().next());
+        Assert.assertTrue(imports3.contains(OntologyConstant.testImportVersionUri4));
         
         final Set<URI> imports2 = importsMap.get(OntologyConstant.testImportVersionUri2);
         Assert.assertNotNull(imports2);
-        Assert.assertEquals(1, imports2.size());
-        Assert.assertEquals(OntologyConstant.testImportVersionUri3, imports2.iterator().next());
+        Assert.assertEquals(2, imports2.size());
+        Assert.assertTrue(imports2.contains(OntologyConstant.testImportVersionUri3));
+        Assert.assertTrue(imports2.contains(OntologyConstant.testImportVersionUri4));
         
         final Set<URI> imports1 = importsMap.get(OntologyConstant.testImportVersionUri1);
         Assert.assertNotNull(imports1);
-        Assert.assertEquals(1, imports1.size());
-        Assert.assertEquals(OntologyConstant.testImportVersionUri2, imports1.iterator().next());
+        Assert.assertEquals(3, imports1.size());
+        Assert.assertTrue(imports1.contains(OntologyConstant.testImportVersionUri2));
+        Assert.assertTrue(imports1.contains(OntologyConstant.testImportVersionUri3));
+        Assert.assertTrue(imports1.contains(OntologyConstant.testImportVersionUri4));
         
         final Set<URI> importsRoot = importsMap.get(OntologyConstant.testVersionUri1);
         Assert.assertNotNull(importsRoot);
-        Assert.assertEquals(1, importsRoot.size());
-        Assert.assertEquals(OntologyConstant.testImportVersionUri1, importsRoot.iterator().next());
+        Assert.assertEquals(4, importsRoot.size());
+        Assert.assertTrue(importsRoot.contains(OntologyConstant.testImportVersionUri1));
+        Assert.assertTrue(importsRoot.contains(OntologyConstant.testImportVersionUri2));
+        Assert.assertTrue(importsRoot.contains(OntologyConstant.testImportVersionUri3));
+        Assert.assertTrue(importsRoot.contains(OntologyConstant.testImportVersionUri4));
     }
     
     @Test
@@ -2069,6 +1291,948 @@ public class OntologyUtilsTest
         Assert.assertTrue(ontologyIDsToModel.contains(null, OWL.VERSIONIRI, null));
         Assert.assertTrue(ontologyIDsToModel.contains(null, PODD.PODD_BASE_INFERRED_VERSION, null));
         Assert.assertEquals(3, ontologyIDsToModel.filter(null, RDF.TYPE, OWL.ONTOLOGY).size());
+    }
+    
+    @Test
+    public void testSchemaImportsA1() throws Exception
+    {
+        final Model model =
+                Rio.parse(this.getClass().getResourceAsStream("/test/schema-manifest-a1b2c3.ttl"), "", RDFFormat.TURTLE);
+        
+        // DebugUtils.printContents(model);
+        final List<OWLOntologyID> schemaManifestImports =
+                OntologyUtils.schemaImports(model, new HashSet<OWLOntologyID>(Arrays.asList(OntologyConstant.testA1)),
+                        this.importsMap);
+        
+        Assert.assertNotNull(schemaManifestImports);
+        Assert.assertEquals(1, schemaManifestImports.size());
+        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testA1));
+        Assert.assertEquals(OntologyConstant.testA1, schemaManifestImports.get(0));
+        
+        this.assertA1B2C3(this.importsMap);
+    }
+    
+    @Test
+    public void testSchemaImportsA1B1C1() throws Exception
+    {
+        final Model model =
+                Rio.parse(this.getClass().getResourceAsStream("/test/schema-manifest-a1b2c3.ttl"), "", RDFFormat.TURTLE);
+        
+        // DebugUtils.printContents(model);
+        final List<OWLOntologyID> schemaManifestImports =
+                OntologyUtils.schemaImports(
+                        model,
+                        new HashSet<OWLOntologyID>(Arrays.asList(OntologyConstant.testA1, OntologyConstant.testB1,
+                                OntologyConstant.testC1)), this.importsMap);
+        
+        Assert.assertNotNull(schemaManifestImports);
+        Assert.assertEquals(3, schemaManifestImports.size());
+        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testA1));
+        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testB1));
+        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testC1));
+        Assert.assertEquals(OntologyConstant.testA1, schemaManifestImports.get(0));
+        Assert.assertEquals(OntologyConstant.testB1, schemaManifestImports.get(1));
+        Assert.assertEquals(OntologyConstant.testC1, schemaManifestImports.get(2));
+        
+        this.assertA1B2C3(this.importsMap);
+    }
+    
+    @Test
+    public void testSchemaImportsA1B1C3() throws Exception
+    {
+        final Model model =
+                Rio.parse(this.getClass().getResourceAsStream("/test/schema-manifest-a1b2c3.ttl"), "", RDFFormat.TURTLE);
+        
+        // DebugUtils.printContents(model);
+        final List<OWLOntologyID> schemaManifestImports =
+                OntologyUtils.schemaImports(
+                        model,
+                        new HashSet<OWLOntologyID>(Arrays.asList(OntologyConstant.testA1, OntologyConstant.testB1,
+                                OntologyConstant.testC3)), this.importsMap);
+        
+        Assert.assertNotNull(schemaManifestImports);
+        Assert.assertEquals(4, schemaManifestImports.size());
+        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testA1));
+        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testB1));
+        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testB2));
+        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testC3));
+        Assert.assertEquals(OntologyConstant.testA1, schemaManifestImports.get(0));
+        // NOTE: The following three entries do not have a deterministic order in this case
+        // If they start to break on another JVM, then comment them out
+        // Assert.assertEquals(OntologyConstant.testB2, schemaManifestImports.get(1));
+        // Assert.assertEquals(OntologyConstant.testC3, schemaManifestImports.get(2));
+        // Assert.assertEquals(OntologyConstant.testB1, schemaManifestImports.get(3));
+        // Check the general ordering of B2 and C3 are correct. B1 only depends on A1 so it can be
+        // anywhere except the first position
+        Assert.assertTrue(schemaManifestImports.indexOf(OntologyConstant.testB2) < schemaManifestImports
+                .indexOf(OntologyConstant.testC3));
+        
+        this.assertA1B2C3(this.importsMap);
+        
+    }
+    
+    @Test
+    public void testSchemaImportsA1B2C3() throws Exception
+    {
+        final Model model =
+                Rio.parse(this.getClass().getResourceAsStream("/test/schema-manifest-a1b2c3.ttl"), "", RDFFormat.TURTLE);
+        
+        // DebugUtils.printContents(model);
+        final List<OWLOntologyID> schemaManifestImports =
+                OntologyUtils.schemaImports(
+                        model,
+                        new HashSet<OWLOntologyID>(Arrays.asList(OntologyConstant.testA1, OntologyConstant.testB2,
+                                OntologyConstant.testC3)), this.importsMap);
+        
+        Assert.assertNotNull(schemaManifestImports);
+        Assert.assertEquals(3, schemaManifestImports.size());
+        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testA1));
+        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testB2));
+        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testC3));
+        Assert.assertEquals(OntologyConstant.testA1, schemaManifestImports.get(0));
+        Assert.assertEquals(OntologyConstant.testB2, schemaManifestImports.get(1));
+        Assert.assertEquals(OntologyConstant.testC3, schemaManifestImports.get(2));
+        
+        this.assertA1B2C3(this.importsMap);
+    }
+    
+    @Test
+    public void testSchemaImportsB1() throws Exception
+    {
+        final Model model =
+                Rio.parse(this.getClass().getResourceAsStream("/test/schema-manifest-a1b2c3.ttl"), "", RDFFormat.TURTLE);
+        
+        // DebugUtils.printContents(model);
+        final List<OWLOntologyID> schemaManifestImports =
+                OntologyUtils.schemaImports(model, new HashSet<OWLOntologyID>(Arrays.asList(OntologyConstant.testB1)),
+                        this.importsMap);
+        
+        Assert.assertNotNull(schemaManifestImports);
+        Assert.assertEquals(2, schemaManifestImports.size());
+        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testA1));
+        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testB1));
+        Assert.assertEquals(OntologyConstant.testA1, schemaManifestImports.get(0));
+        Assert.assertEquals(OntologyConstant.testB1, schemaManifestImports.get(1));
+        
+        this.assertA1B2C3(this.importsMap);
+    }
+    
+    @Test
+    public void testSchemaImportsB2() throws Exception
+    {
+        final Model model =
+                Rio.parse(this.getClass().getResourceAsStream("/test/schema-manifest-a1b2c3.ttl"), "", RDFFormat.TURTLE);
+        
+        // DebugUtils.printContents(model);
+        final List<OWLOntologyID> schemaManifestImports =
+                OntologyUtils.schemaImports(model, new HashSet<OWLOntologyID>(Arrays.asList(OntologyConstant.testB2)),
+                        this.importsMap);
+        
+        Assert.assertNotNull(schemaManifestImports);
+        Assert.assertEquals(2, schemaManifestImports.size());
+        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testA1));
+        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testB2));
+        Assert.assertEquals(OntologyConstant.testA1, schemaManifestImports.get(0));
+        Assert.assertEquals(OntologyConstant.testB2, schemaManifestImports.get(1));
+        
+        this.assertA1B2C3(this.importsMap);
+    }
+    
+    @Test
+    public void testSchemaImportsC1() throws Exception
+    {
+        final Model model =
+                Rio.parse(this.getClass().getResourceAsStream("/test/schema-manifest-a1b2c3.ttl"), "", RDFFormat.TURTLE);
+        
+        // DebugUtils.printContents(model);
+        final List<OWLOntologyID> schemaManifestImports =
+                OntologyUtils.schemaImports(model, new HashSet<OWLOntologyID>(Arrays.asList(OntologyConstant.testC1)),
+                        this.importsMap);
+        
+        Assert.assertNotNull(schemaManifestImports);
+        Assert.assertEquals(3, schemaManifestImports.size());
+        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testA1));
+        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testB1));
+        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testC1));
+        Assert.assertEquals(OntologyConstant.testA1, schemaManifestImports.get(0));
+        Assert.assertEquals(OntologyConstant.testB1, schemaManifestImports.get(1));
+        Assert.assertEquals(OntologyConstant.testC1, schemaManifestImports.get(2));
+        
+        this.assertA1B2C3(this.importsMap);
+    }
+    
+    @Test
+    public void testSchemaImportsC3() throws Exception
+    {
+        final Model model =
+                Rio.parse(this.getClass().getResourceAsStream("/test/schema-manifest-a1b2c3.ttl"), "", RDFFormat.TURTLE);
+        
+        // DebugUtils.printContents(model);
+        final List<OWLOntologyID> schemaManifestImports =
+                OntologyUtils.schemaImports(model, new HashSet<OWLOntologyID>(Arrays.asList(OntologyConstant.testC3)),
+                        this.importsMap);
+        
+        Assert.assertNotNull(schemaManifestImports);
+        Assert.assertEquals(3, schemaManifestImports.size());
+        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testA1));
+        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testB2));
+        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testC3));
+        Assert.assertEquals(OntologyConstant.testA1, schemaManifestImports.get(0));
+        Assert.assertEquals(OntologyConstant.testB2, schemaManifestImports.get(1));
+        Assert.assertEquals(OntologyConstant.testC3, schemaManifestImports.get(2));
+        
+        this.assertA1B2C3(this.importsMap);
+    }
+    
+    @Test
+    public void testSchemaImportsEmpty() throws Exception
+    {
+        final Model model = new LinkedHashModel();
+        
+        final List<OWLOntologyID> schemaManifestImports =
+                OntologyUtils.schemaImports(model, Collections.<OWLOntologyID> emptySet(), this.importsMap);
+        
+        Assert.assertNotNull(schemaManifestImports);
+        Assert.assertEquals(0, schemaManifestImports.size());
+        
+        Assert.assertEquals(0, this.importsMap.size());
+    }
+    
+    @Test
+    public void testSchemaImportsOneLevel() throws Exception
+    {
+        final Model model = new LinkedHashModel();
+        OntologyUtils.ontologyIDsToModel(Arrays.asList(OntologyConstant.testOntologyID), model);
+        model.add(OntologyConstant.testVersionUri1, RDF.TYPE, OWL.ONTOLOGY);
+        model.add(OntologyConstant.testVersionUri1, OWL.IMPORTS, OntologyConstant.testImportVersionUri1);
+        model.add(OntologyConstant.testImportOntologyUri1, RDF.TYPE, OWL.ONTOLOGY);
+        model.add(OntologyConstant.testImportOntologyUri1, OWL.VERSIONIRI, OntologyConstant.testImportVersionUri1);
+        model.add(OntologyConstant.testImportVersionUri1, RDF.TYPE, OWL.ONTOLOGY);
+        
+        // DebugUtils.printContents(model);
+        
+        final List<OWLOntologyID> schemaManifestImports =
+                OntologyUtils.schemaImports(
+                        model,
+                        new HashSet<OWLOntologyID>(Arrays.asList(OntologyConstant.testOntologyID,
+                                OntologyConstant.testImportOntologyID1)), this.importsMap);
+        
+        Assert.assertNotNull(schemaManifestImports);
+        Assert.assertEquals(2, schemaManifestImports.size());
+        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testOntologyID));
+        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testImportOntologyID1));
+        Assert.assertEquals(OntologyConstant.testImportOntologyID1, schemaManifestImports.get(0));
+        Assert.assertEquals(OntologyConstant.testOntologyID, schemaManifestImports.get(1));
+        
+        Assert.assertEquals(2, this.importsMap.size());
+        Assert.assertTrue(this.importsMap.containsKey(OntologyConstant.testImportVersionUri1));
+        Assert.assertTrue(this.importsMap.containsKey(OntologyConstant.testVersionUri1));
+        Assert.assertTrue(this.importsMap.get(OntologyConstant.testImportVersionUri1).isEmpty());
+        Assert.assertEquals(1, this.importsMap.get(OntologyConstant.testVersionUri1).size());
+        Assert.assertTrue(this.importsMap.get(OntologyConstant.testVersionUri1).contains(
+                OntologyConstant.testImportVersionUri1));
+    }
+    
+    @Test
+    public void testSchemaImportsOneLevelCurrentVersion() throws Exception
+    {
+        final Model model = new LinkedHashModel();
+        OntologyUtils.ontologyIDsToModel(Arrays.asList(OntologyConstant.testOntologyID), model);
+        model.add(OntologyConstant.testVersionUri1, RDF.TYPE, OWL.ONTOLOGY);
+        model.add(OntologyConstant.testVersionUri1, OWL.IMPORTS, OntologyConstant.testImportOntologyUri1);
+        model.add(OntologyConstant.testImportOntologyUri1, RDF.TYPE, OWL.ONTOLOGY);
+        model.add(OntologyConstant.testImportOntologyUri1, PODD.OMV_CURRENT_VERSION,
+                OntologyConstant.testImportVersionUri1);
+        model.add(OntologyConstant.testImportOntologyUri1, OWL.VERSIONIRI, OntologyConstant.testImportVersionUri1);
+        model.add(OntologyConstant.testImportVersionUri1, RDF.TYPE, OWL.ONTOLOGY);
+        
+        // DebugUtils.printContents(model);
+        
+        final List<OWLOntologyID> schemaManifestImports =
+                OntologyUtils.schemaImports(
+                        model,
+                        new HashSet<OWLOntologyID>(Arrays.asList(OntologyConstant.testOntologyID,
+                                OntologyConstant.testImportOntologyID1)), this.importsMap);
+        
+        Assert.assertNotNull(schemaManifestImports);
+        Assert.assertEquals(2, schemaManifestImports.size());
+        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testOntologyID));
+        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testImportOntologyID1));
+        Assert.assertEquals(OntologyConstant.testImportOntologyID1, schemaManifestImports.get(0));
+        Assert.assertEquals(OntologyConstant.testOntologyID, schemaManifestImports.get(1));
+        
+        Assert.assertEquals(2, this.importsMap.size());
+        Assert.assertTrue(this.importsMap.containsKey(OntologyConstant.testVersionUri1));
+        Assert.assertTrue(this.importsMap.containsKey(OntologyConstant.testImportVersionUri1));
+        Assert.assertEquals(0, this.importsMap.get(OntologyConstant.testImportVersionUri1).size());
+        Assert.assertEquals(1, this.importsMap.get(OntologyConstant.testVersionUri1).size());
+        Assert.assertTrue(this.importsMap.get(OntologyConstant.testVersionUri1).contains(
+                OntologyConstant.testImportVersionUri1));
+    }
+    
+    @Test
+    public void testSchemaImportsRealisticPoddV1Base() throws Exception
+    {
+        final Model model =
+                Rio.parse(this.getClass().getResourceAsStream("/test/test-podd-schema-manifest.ttl"), "",
+                        RDFFormat.TURTLE);
+        
+        // DebugUtils.printContents(model);
+        final List<OWLOntologyID> schemaManifestImports =
+                OntologyUtils.schemaImports(model,
+                        new HashSet<OWLOntologyID>(Arrays.asList(OntologyConstant.testPoddBaseV1)), this.importsMap);
+        
+        Assert.assertNotNull(schemaManifestImports);
+        Assert.assertEquals(4, schemaManifestImports.size());
+        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddDcV1));
+        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddFoafV1));
+        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddUserV1));
+        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddBaseV1));
+        Assert.assertEquals(OntologyConstant.testPoddDcV1, schemaManifestImports.get(0));
+        Assert.assertEquals(OntologyConstant.testPoddFoafV1, schemaManifestImports.get(1));
+        Assert.assertEquals(OntologyConstant.testPoddUserV1, schemaManifestImports.get(2));
+        Assert.assertEquals(OntologyConstant.testPoddBaseV1, schemaManifestImports.get(3));
+        
+        this.assertRealisticImportsMapV2(this.importsMap);
+    }
+    
+    @Test
+    public void testSchemaImportsRealisticPoddV1DcFoaf() throws Exception
+    {
+        final Model model =
+                Rio.parse(this.getClass().getResourceAsStream("/test/test-podd-schema-manifest.ttl"), "",
+                        RDFFormat.TURTLE);
+        
+        // DebugUtils.printContents(model);
+        final List<OWLOntologyID> schemaManifestImports =
+                OntologyUtils.schemaImports(
+                        model,
+                        new LinkedHashSet<OWLOntologyID>(Arrays.asList(OntologyConstant.testPoddDcV1,
+                                OntologyConstant.testPoddFoafV1)), this.importsMap);
+        
+        Assert.assertNotNull(schemaManifestImports);
+        Assert.assertEquals(2, schemaManifestImports.size());
+        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddDcV1));
+        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddFoafV1));
+        Assert.assertEquals(OntologyConstant.testPoddDcV1, schemaManifestImports.get(0));
+        Assert.assertEquals(OntologyConstant.testPoddFoafV1, schemaManifestImports.get(1));
+        
+        this.assertRealisticImportsMapV2(this.importsMap);
+    }
+    
+    @Test
+    public void testSchemaImportsRealisticPoddV1Plant() throws Exception
+    {
+        final Model model =
+                Rio.parse(this.getClass().getResourceAsStream("/test/test-podd-schema-manifest.ttl"), "",
+                        RDFFormat.TURTLE);
+        
+        // DebugUtils.printContents(model);
+        final List<OWLOntologyID> schemaManifestImports =
+                OntologyUtils.schemaImports(model,
+                        new HashSet<OWLOntologyID>(Arrays.asList(OntologyConstant.testPoddPlantV1)), this.importsMap);
+        
+        Assert.assertNotNull(schemaManifestImports);
+        Assert.assertEquals(6, schemaManifestImports.size());
+        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddDcV1));
+        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddFoafV1));
+        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddUserV1));
+        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddBaseV1));
+        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddScienceV1));
+        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddPlantV1));
+        Assert.assertEquals(OntologyConstant.testPoddDcV1, schemaManifestImports.get(0));
+        Assert.assertEquals(OntologyConstant.testPoddFoafV1, schemaManifestImports.get(1));
+        Assert.assertEquals(OntologyConstant.testPoddUserV1, schemaManifestImports.get(2));
+        Assert.assertEquals(OntologyConstant.testPoddBaseV1, schemaManifestImports.get(3));
+        Assert.assertEquals(OntologyConstant.testPoddScienceV1, schemaManifestImports.get(4));
+        Assert.assertEquals(OntologyConstant.testPoddPlantV1, schemaManifestImports.get(5));
+        
+        this.assertRealisticImportsMapV2(this.importsMap);
+    }
+    
+    @Test
+    public void testSchemaImportsRealisticPoddV1V2AllToBaseInOrder() throws Exception
+    {
+        final Model model =
+                Rio.parse(this.getClass().getResourceAsStream("/test/test-podd-schema-manifest.ttl"), "",
+                        RDFFormat.TURTLE);
+        
+        // DebugUtils.printContents(model);
+        final List<OWLOntologyID> schemaManifestImports =
+                OntologyUtils.schemaImports(
+                        model,
+                        new LinkedHashSet<OWLOntologyID>(Arrays.asList(OntologyConstant.testPoddDcV1,
+                                OntologyConstant.testPoddDcV2, OntologyConstant.testPoddFoafV1,
+                                OntologyConstant.testPoddFoafV2, OntologyConstant.testPoddUserV1,
+                                OntologyConstant.testPoddUserV2, OntologyConstant.testPoddBaseV1,
+                                OntologyConstant.testPoddBaseV2)), this.importsMap);
+        
+        Assert.assertNotNull(schemaManifestImports);
+        Assert.assertEquals(8, schemaManifestImports.size());
+        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddDcV1));
+        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddDcV2));
+        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddFoafV1));
+        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddFoafV2));
+        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddUserV1));
+        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddUserV2));
+        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddBaseV1));
+        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddBaseV2));
+        
+        Assert.assertTrue(schemaManifestImports.indexOf(OntologyConstant.testPoddDcV1) < schemaManifestImports
+                .indexOf(OntologyConstant.testPoddFoafV1));
+        Assert.assertTrue(schemaManifestImports.indexOf(OntologyConstant.testPoddDcV1) < schemaManifestImports
+                .indexOf(OntologyConstant.testPoddUserV1));
+        Assert.assertTrue(schemaManifestImports.indexOf(OntologyConstant.testPoddDcV1) < schemaManifestImports
+                .indexOf(OntologyConstant.testPoddBaseV1));
+        Assert.assertTrue(schemaManifestImports.indexOf(OntologyConstant.testPoddFoafV1) < schemaManifestImports
+                .indexOf(OntologyConstant.testPoddUserV1));
+        Assert.assertTrue(schemaManifestImports.indexOf(OntologyConstant.testPoddFoafV1) < schemaManifestImports
+                .indexOf(OntologyConstant.testPoddBaseV1));
+        Assert.assertTrue(schemaManifestImports.indexOf(OntologyConstant.testPoddUserV1) < schemaManifestImports
+                .indexOf(OntologyConstant.testPoddBaseV1));
+        
+        Assert.assertTrue(schemaManifestImports.indexOf(OntologyConstant.testPoddDcV2) < schemaManifestImports
+                .indexOf(OntologyConstant.testPoddFoafV2));
+        Assert.assertTrue(schemaManifestImports.indexOf(OntologyConstant.testPoddDcV2) < schemaManifestImports
+                .indexOf(OntologyConstant.testPoddUserV2));
+        Assert.assertTrue(schemaManifestImports.indexOf(OntologyConstant.testPoddDcV2) < schemaManifestImports
+                .indexOf(OntologyConstant.testPoddBaseV2));
+        Assert.assertTrue(schemaManifestImports.indexOf(OntologyConstant.testPoddFoafV2) < schemaManifestImports
+                .indexOf(OntologyConstant.testPoddUserV2));
+        Assert.assertTrue(schemaManifestImports.indexOf(OntologyConstant.testPoddFoafV2) < schemaManifestImports
+                .indexOf(OntologyConstant.testPoddBaseV2));
+        Assert.assertTrue(schemaManifestImports.indexOf(OntologyConstant.testPoddUserV2) < schemaManifestImports
+                .indexOf(OntologyConstant.testPoddBaseV2));
+        
+        this.assertRealisticImportsMapV2(this.importsMap);
+    }
+    
+    /**
+     * Randomised test, to fuzz test the algorithm.
+     *
+     * @throws Exception
+     */
+    @Test
+    public void testSchemaImportsRealisticPoddV1V2AllToBaseRandomOrder() throws Exception
+    {
+        final Model model =
+                Rio.parse(this.getClass().getResourceAsStream("/test/test-podd-schema-manifest.ttl"), "",
+                        RDFFormat.TURTLE);
+        
+        final List<OWLOntologyID> imports =
+                new ArrayList<OWLOntologyID>(Arrays.asList(OntologyConstant.testPoddBaseV1,
+                        OntologyConstant.testPoddUserV1, OntologyConstant.testPoddUserV2,
+                        OntologyConstant.testPoddFoafV1, OntologyConstant.testPoddBaseV2,
+                        OntologyConstant.testPoddFoafV2, OntologyConstant.testPoddDcV1, OntologyConstant.testPoddDcV2));
+        
+        Collections.shuffle(imports);
+        
+        // DebugUtils.printContents(model);
+        final List<OWLOntologyID> schemaManifestImports =
+                OntologyUtils.schemaImports(model, new LinkedHashSet<OWLOntologyID>(imports), this.importsMap);
+        
+        Assert.assertNotNull(schemaManifestImports);
+        Assert.assertEquals(8, schemaManifestImports.size());
+        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddDcV1));
+        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddDcV2));
+        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddFoafV1));
+        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddFoafV2));
+        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddUserV1));
+        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddUserV2));
+        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddBaseV1));
+        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddBaseV2));
+        
+        Assert.assertTrue(schemaManifestImports.indexOf(OntologyConstant.testPoddDcV1) < schemaManifestImports
+                .indexOf(OntologyConstant.testPoddFoafV1));
+        Assert.assertTrue(schemaManifestImports.indexOf(OntologyConstant.testPoddDcV1) < schemaManifestImports
+                .indexOf(OntologyConstant.testPoddUserV1));
+        Assert.assertTrue(schemaManifestImports.indexOf(OntologyConstant.testPoddDcV1) < schemaManifestImports
+                .indexOf(OntologyConstant.testPoddBaseV1));
+        Assert.assertTrue(schemaManifestImports.indexOf(OntologyConstant.testPoddFoafV1) < schemaManifestImports
+                .indexOf(OntologyConstant.testPoddUserV1));
+        Assert.assertTrue(schemaManifestImports.indexOf(OntologyConstant.testPoddFoafV1) < schemaManifestImports
+                .indexOf(OntologyConstant.testPoddBaseV1));
+        Assert.assertTrue(schemaManifestImports.indexOf(OntologyConstant.testPoddUserV1) < schemaManifestImports
+                .indexOf(OntologyConstant.testPoddBaseV1));
+        
+        Assert.assertTrue(schemaManifestImports.indexOf(OntologyConstant.testPoddDcV2) < schemaManifestImports
+                .indexOf(OntologyConstant.testPoddFoafV2));
+        Assert.assertTrue(schemaManifestImports.indexOf(OntologyConstant.testPoddDcV2) < schemaManifestImports
+                .indexOf(OntologyConstant.testPoddUserV2));
+        Assert.assertTrue(schemaManifestImports.indexOf(OntologyConstant.testPoddDcV2) < schemaManifestImports
+                .indexOf(OntologyConstant.testPoddBaseV2));
+        Assert.assertTrue(schemaManifestImports.indexOf(OntologyConstant.testPoddFoafV2) < schemaManifestImports
+                .indexOf(OntologyConstant.testPoddUserV2));
+        Assert.assertTrue(schemaManifestImports.indexOf(OntologyConstant.testPoddFoafV2) < schemaManifestImports
+                .indexOf(OntologyConstant.testPoddBaseV2));
+        Assert.assertTrue(schemaManifestImports.indexOf(OntologyConstant.testPoddUserV2) < schemaManifestImports
+                .indexOf(OntologyConstant.testPoddBaseV2));
+        
+        this.assertRealisticImportsMapV2(this.importsMap);
+    }
+    
+    @Test
+    public void testSchemaImportsRealisticPoddV1V2AllToBaseReverseOrder() throws Exception
+    {
+        final Model model =
+                Rio.parse(this.getClass().getResourceAsStream("/test/test-podd-schema-manifest.ttl"), "",
+                        RDFFormat.TURTLE);
+        
+        // DebugUtils.printContents(model);
+        final List<OWLOntologyID> schemaManifestImports =
+                OntologyUtils.schemaImports(
+                        model,
+                        new LinkedHashSet<OWLOntologyID>(Arrays.asList(OntologyConstant.testPoddBaseV1,
+                                OntologyConstant.testPoddBaseV2, OntologyConstant.testPoddUserV1,
+                                OntologyConstant.testPoddUserV2, OntologyConstant.testPoddFoafV1,
+                                OntologyConstant.testPoddFoafV2, OntologyConstant.testPoddDcV1,
+                                OntologyConstant.testPoddDcV2)), this.importsMap);
+        
+        Assert.assertNotNull(schemaManifestImports);
+        Assert.assertEquals(8, schemaManifestImports.size());
+        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddDcV1));
+        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddDcV2));
+        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddFoafV1));
+        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddFoafV2));
+        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddUserV1));
+        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddUserV2));
+        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddBaseV1));
+        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddBaseV2));
+        
+        Assert.assertTrue(schemaManifestImports.indexOf(OntologyConstant.testPoddDcV1) < schemaManifestImports
+                .indexOf(OntologyConstant.testPoddFoafV1));
+        Assert.assertTrue(schemaManifestImports.indexOf(OntologyConstant.testPoddDcV1) < schemaManifestImports
+                .indexOf(OntologyConstant.testPoddUserV1));
+        Assert.assertTrue(schemaManifestImports.indexOf(OntologyConstant.testPoddDcV1) < schemaManifestImports
+                .indexOf(OntologyConstant.testPoddBaseV1));
+        Assert.assertTrue(schemaManifestImports.indexOf(OntologyConstant.testPoddFoafV1) < schemaManifestImports
+                .indexOf(OntologyConstant.testPoddUserV1));
+        Assert.assertTrue(schemaManifestImports.indexOf(OntologyConstant.testPoddFoafV1) < schemaManifestImports
+                .indexOf(OntologyConstant.testPoddBaseV1));
+        Assert.assertTrue(schemaManifestImports.indexOf(OntologyConstant.testPoddUserV1) < schemaManifestImports
+                .indexOf(OntologyConstant.testPoddBaseV1));
+        
+        Assert.assertTrue(schemaManifestImports.indexOf(OntologyConstant.testPoddDcV2) < schemaManifestImports
+                .indexOf(OntologyConstant.testPoddFoafV2));
+        Assert.assertTrue(schemaManifestImports.indexOf(OntologyConstant.testPoddDcV2) < schemaManifestImports
+                .indexOf(OntologyConstant.testPoddUserV2));
+        Assert.assertTrue(schemaManifestImports.indexOf(OntologyConstant.testPoddDcV2) < schemaManifestImports
+                .indexOf(OntologyConstant.testPoddBaseV2));
+        Assert.assertTrue(schemaManifestImports.indexOf(OntologyConstant.testPoddFoafV2) < schemaManifestImports
+                .indexOf(OntologyConstant.testPoddUserV2));
+        Assert.assertTrue(schemaManifestImports.indexOf(OntologyConstant.testPoddFoafV2) < schemaManifestImports
+                .indexOf(OntologyConstant.testPoddBaseV2));
+        Assert.assertTrue(schemaManifestImports.indexOf(OntologyConstant.testPoddUserV2) < schemaManifestImports
+                .indexOf(OntologyConstant.testPoddBaseV2));
+        
+        this.assertRealisticImportsMapV2(this.importsMap);
+    }
+    
+    /**
+     * Randomised test, to fuzz test the algorithm.
+     *
+     * @throws Exception
+     */
+    @Test
+    public void testSchemaImportsRealisticPoddV1V2AllToPlantRandomOrder() throws Exception
+    {
+        final Model model =
+                Rio.parse(this.getClass().getResourceAsStream("/test/test-podd-schema-manifest.ttl"), "",
+                        RDFFormat.TURTLE);
+        
+        final List<OWLOntologyID> imports =
+                new ArrayList<OWLOntologyID>(Arrays.asList(OntologyConstant.testPoddBaseV1,
+                        OntologyConstant.testPoddUserV1, OntologyConstant.testPoddUserV2,
+                        OntologyConstant.testPoddFoafV1, OntologyConstant.testPoddPlantV1,
+                        OntologyConstant.testPoddPlantV2, OntologyConstant.testPoddBaseV2,
+                        OntologyConstant.testPoddFoafV2, OntologyConstant.testPoddDcV1, OntologyConstant.testPoddDcV2,
+                        OntologyConstant.testPoddScienceV1, OntologyConstant.testPoddScienceV2));
+        
+        // Randomise the order to fuzz test the algorithm
+        Collections.shuffle(imports);
+        
+        // DebugUtils.printContents(model);
+        final List<OWLOntologyID> result =
+                OntologyUtils.schemaImports(model, new LinkedHashSet<OWLOntologyID>(imports), this.importsMap);
+        
+        Assert.assertNotNull(result);
+        Assert.assertEquals(12, result.size());
+        Assert.assertTrue(result.contains(OntologyConstant.testPoddDcV1));
+        Assert.assertTrue(result.contains(OntologyConstant.testPoddDcV2));
+        Assert.assertTrue(result.contains(OntologyConstant.testPoddFoafV1));
+        Assert.assertTrue(result.contains(OntologyConstant.testPoddFoafV2));
+        Assert.assertTrue(result.contains(OntologyConstant.testPoddUserV1));
+        Assert.assertTrue(result.contains(OntologyConstant.testPoddUserV2));
+        Assert.assertTrue(result.contains(OntologyConstant.testPoddBaseV1));
+        Assert.assertTrue(result.contains(OntologyConstant.testPoddBaseV2));
+        Assert.assertTrue(result.contains(OntologyConstant.testPoddScienceV1));
+        Assert.assertTrue(result.contains(OntologyConstant.testPoddScienceV2));
+        Assert.assertTrue(result.contains(OntologyConstant.testPoddPlantV1));
+        Assert.assertTrue(result.contains(OntologyConstant.testPoddPlantV2));
+        
+        Assert.assertTrue(result.indexOf(OntologyConstant.testPoddDcV1) < result
+                .indexOf(OntologyConstant.testPoddFoafV1));
+        Assert.assertTrue(result.indexOf(OntologyConstant.testPoddDcV1) < result
+                .indexOf(OntologyConstant.testPoddUserV1));
+        Assert.assertTrue(result.indexOf(OntologyConstant.testPoddDcV1) < result
+                .indexOf(OntologyConstant.testPoddBaseV1));
+        Assert.assertTrue(result.indexOf(OntologyConstant.testPoddDcV1) < result
+                .indexOf(OntologyConstant.testPoddScienceV1));
+        Assert.assertTrue(result.indexOf(OntologyConstant.testPoddDcV1) < result
+                .indexOf(OntologyConstant.testPoddPlantV1));
+        Assert.assertTrue(result.indexOf(OntologyConstant.testPoddFoafV1) < result
+                .indexOf(OntologyConstant.testPoddUserV1));
+        Assert.assertTrue(result.indexOf(OntologyConstant.testPoddFoafV1) < result
+                .indexOf(OntologyConstant.testPoddBaseV1));
+        Assert.assertTrue(result.indexOf(OntologyConstant.testPoddFoafV1) < result
+                .indexOf(OntologyConstant.testPoddScienceV1));
+        Assert.assertTrue(result.indexOf(OntologyConstant.testPoddFoafV1) < result
+                .indexOf(OntologyConstant.testPoddPlantV1));
+        Assert.assertTrue(result.indexOf(OntologyConstant.testPoddUserV1) < result
+                .indexOf(OntologyConstant.testPoddBaseV1));
+        Assert.assertTrue(result.indexOf(OntologyConstant.testPoddUserV1) < result
+                .indexOf(OntologyConstant.testPoddScienceV1));
+        Assert.assertTrue(result.indexOf(OntologyConstant.testPoddUserV1) < result
+                .indexOf(OntologyConstant.testPoddPlantV1));
+        Assert.assertTrue(result.indexOf(OntologyConstant.testPoddBaseV1) < result
+                .indexOf(OntologyConstant.testPoddScienceV1));
+        Assert.assertTrue(result.indexOf(OntologyConstant.testPoddBaseV1) < result
+                .indexOf(OntologyConstant.testPoddPlantV1));
+        Assert.assertTrue(result.indexOf(OntologyConstant.testPoddScienceV1) < result
+                .indexOf(OntologyConstant.testPoddPlantV1));
+        
+        Assert.assertTrue(result.indexOf(OntologyConstant.testPoddDcV2) < result
+                .indexOf(OntologyConstant.testPoddFoafV2));
+        Assert.assertTrue(result.indexOf(OntologyConstant.testPoddDcV2) < result
+                .indexOf(OntologyConstant.testPoddUserV2));
+        Assert.assertTrue(result.indexOf(OntologyConstant.testPoddDcV2) < result
+                .indexOf(OntologyConstant.testPoddBaseV2));
+        Assert.assertTrue(result.indexOf(OntologyConstant.testPoddDcV2) < result
+                .indexOf(OntologyConstant.testPoddScienceV2));
+        Assert.assertTrue(result.indexOf(OntologyConstant.testPoddDcV2) < result
+                .indexOf(OntologyConstant.testPoddPlantV2));
+        Assert.assertTrue(result.indexOf(OntologyConstant.testPoddFoafV2) < result
+                .indexOf(OntologyConstant.testPoddUserV2));
+        Assert.assertTrue(result.indexOf(OntologyConstant.testPoddFoafV2) < result
+                .indexOf(OntologyConstant.testPoddBaseV2));
+        Assert.assertTrue(result.indexOf(OntologyConstant.testPoddFoafV2) < result
+                .indexOf(OntologyConstant.testPoddScienceV2));
+        Assert.assertTrue(result.indexOf(OntologyConstant.testPoddFoafV2) < result
+                .indexOf(OntologyConstant.testPoddPlantV2));
+        Assert.assertTrue(result.indexOf(OntologyConstant.testPoddUserV2) < result
+                .indexOf(OntologyConstant.testPoddBaseV2));
+        Assert.assertTrue(result.indexOf(OntologyConstant.testPoddUserV2) < result
+                .indexOf(OntologyConstant.testPoddScienceV2));
+        Assert.assertTrue(result.indexOf(OntologyConstant.testPoddUserV2) < result
+                .indexOf(OntologyConstant.testPoddPlantV2));
+        Assert.assertTrue(result.indexOf(OntologyConstant.testPoddBaseV2) < result
+                .indexOf(OntologyConstant.testPoddScienceV2));
+        Assert.assertTrue(result.indexOf(OntologyConstant.testPoddBaseV2) < result
+                .indexOf(OntologyConstant.testPoddPlantV2));
+        Assert.assertTrue(result.indexOf(OntologyConstant.testPoddScienceV2) < result
+                .indexOf(OntologyConstant.testPoddPlantV2));
+        
+        this.assertRealisticImportsMapV2(this.importsMap);
+    }
+    
+    /**
+     * Randomised test, to fuzz test the algorithm.
+     *
+     * @throws Exception
+     */
+    @Test
+    public void testSchemaImportsRealisticPoddV1V2AllToScienceRandomOrder() throws Exception
+    {
+        final Model model =
+                Rio.parse(this.getClass().getResourceAsStream("/test/test-podd-schema-manifest.ttl"), "",
+                        RDFFormat.TURTLE);
+        
+        final List<OWLOntologyID> imports =
+                new ArrayList<OWLOntologyID>(Arrays.asList(OntologyConstant.testPoddBaseV1,
+                        OntologyConstant.testPoddUserV1, OntologyConstant.testPoddUserV2,
+                        OntologyConstant.testPoddFoafV1, OntologyConstant.testPoddBaseV2,
+                        OntologyConstant.testPoddFoafV2, OntologyConstant.testPoddDcV1, OntologyConstant.testPoddDcV2,
+                        OntologyConstant.testPoddScienceV1, OntologyConstant.testPoddScienceV2));
+        
+        Collections.shuffle(imports);
+        
+        // DebugUtils.printContents(model);
+        final List<OWLOntologyID> schemaManifestImports =
+                OntologyUtils.schemaImports(model, new LinkedHashSet<OWLOntologyID>(imports), this.importsMap);
+        
+        Assert.assertNotNull(schemaManifestImports);
+        Assert.assertEquals(10, schemaManifestImports.size());
+        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddDcV1));
+        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddDcV2));
+        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddFoafV1));
+        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddFoafV2));
+        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddUserV1));
+        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddUserV2));
+        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddBaseV1));
+        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddBaseV2));
+        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddScienceV1));
+        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddScienceV2));
+        
+        Assert.assertTrue(schemaManifestImports.indexOf(OntologyConstant.testPoddDcV1) < schemaManifestImports
+                .indexOf(OntologyConstant.testPoddFoafV1));
+        Assert.assertTrue(schemaManifestImports.indexOf(OntologyConstant.testPoddDcV1) < schemaManifestImports
+                .indexOf(OntologyConstant.testPoddUserV1));
+        Assert.assertTrue(schemaManifestImports.indexOf(OntologyConstant.testPoddDcV1) < schemaManifestImports
+                .indexOf(OntologyConstant.testPoddBaseV1));
+        Assert.assertTrue(schemaManifestImports.indexOf(OntologyConstant.testPoddDcV1) < schemaManifestImports
+                .indexOf(OntologyConstant.testPoddScienceV1));
+        Assert.assertTrue(schemaManifestImports.indexOf(OntologyConstant.testPoddFoafV1) < schemaManifestImports
+                .indexOf(OntologyConstant.testPoddUserV1));
+        Assert.assertTrue(schemaManifestImports.indexOf(OntologyConstant.testPoddFoafV1) < schemaManifestImports
+                .indexOf(OntologyConstant.testPoddBaseV1));
+        Assert.assertTrue(schemaManifestImports.indexOf(OntologyConstant.testPoddFoafV1) < schemaManifestImports
+                .indexOf(OntologyConstant.testPoddScienceV1));
+        Assert.assertTrue(schemaManifestImports.indexOf(OntologyConstant.testPoddUserV1) < schemaManifestImports
+                .indexOf(OntologyConstant.testPoddBaseV1));
+        Assert.assertTrue(schemaManifestImports.indexOf(OntologyConstant.testPoddUserV1) < schemaManifestImports
+                .indexOf(OntologyConstant.testPoddScienceV1));
+        Assert.assertTrue(schemaManifestImports.indexOf(OntologyConstant.testPoddBaseV1) < schemaManifestImports
+                .indexOf(OntologyConstant.testPoddScienceV1));
+        
+        Assert.assertTrue(schemaManifestImports.indexOf(OntologyConstant.testPoddDcV2) < schemaManifestImports
+                .indexOf(OntologyConstant.testPoddFoafV2));
+        Assert.assertTrue(schemaManifestImports.indexOf(OntologyConstant.testPoddDcV2) < schemaManifestImports
+                .indexOf(OntologyConstant.testPoddUserV2));
+        Assert.assertTrue(schemaManifestImports.indexOf(OntologyConstant.testPoddDcV2) < schemaManifestImports
+                .indexOf(OntologyConstant.testPoddBaseV2));
+        Assert.assertTrue(schemaManifestImports.indexOf(OntologyConstant.testPoddDcV2) < schemaManifestImports
+                .indexOf(OntologyConstant.testPoddScienceV2));
+        Assert.assertTrue(schemaManifestImports.indexOf(OntologyConstant.testPoddFoafV2) < schemaManifestImports
+                .indexOf(OntologyConstant.testPoddUserV2));
+        Assert.assertTrue(schemaManifestImports.indexOf(OntologyConstant.testPoddFoafV2) < schemaManifestImports
+                .indexOf(OntologyConstant.testPoddBaseV2));
+        Assert.assertTrue(schemaManifestImports.indexOf(OntologyConstant.testPoddFoafV2) < schemaManifestImports
+                .indexOf(OntologyConstant.testPoddScienceV2));
+        Assert.assertTrue(schemaManifestImports.indexOf(OntologyConstant.testPoddUserV2) < schemaManifestImports
+                .indexOf(OntologyConstant.testPoddBaseV2));
+        Assert.assertTrue(schemaManifestImports.indexOf(OntologyConstant.testPoddUserV2) < schemaManifestImports
+                .indexOf(OntologyConstant.testPoddScienceV2));
+        Assert.assertTrue(schemaManifestImports.indexOf(OntologyConstant.testPoddBaseV2) < schemaManifestImports
+                .indexOf(OntologyConstant.testPoddScienceV2));
+        
+        this.assertRealisticImportsMapV2(this.importsMap);
+    }
+    
+    @Test
+    public void testSchemaImportsRealisticPoddV1V2Base() throws Exception
+    {
+        final Model model =
+                Rio.parse(this.getClass().getResourceAsStream("/test/test-podd-schema-manifest.ttl"), "",
+                        RDFFormat.TURTLE);
+        
+        // DebugUtils.printContents(model);
+        final List<OWLOntologyID> schemaManifestImports =
+                OntologyUtils.schemaImports(
+                        model,
+                        new HashSet<OWLOntologyID>(Arrays.asList(OntologyConstant.testPoddBaseV1,
+                                OntologyConstant.testPoddBaseV2)), this.importsMap);
+        
+        Assert.assertNotNull(schemaManifestImports);
+        Assert.assertEquals(8, schemaManifestImports.size());
+        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddDcV1));
+        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddDcV2));
+        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddFoafV1));
+        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddFoafV2));
+        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddUserV1));
+        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddUserV2));
+        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddBaseV1));
+        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddBaseV2));
+        
+        Assert.assertTrue(schemaManifestImports.indexOf(OntologyConstant.testPoddDcV1) < schemaManifestImports
+                .indexOf(OntologyConstant.testPoddFoafV1));
+        Assert.assertTrue(schemaManifestImports.indexOf(OntologyConstant.testPoddDcV1) < schemaManifestImports
+                .indexOf(OntologyConstant.testPoddUserV1));
+        Assert.assertTrue(schemaManifestImports.indexOf(OntologyConstant.testPoddDcV1) < schemaManifestImports
+                .indexOf(OntologyConstant.testPoddBaseV1));
+        Assert.assertTrue(schemaManifestImports.indexOf(OntologyConstant.testPoddFoafV1) < schemaManifestImports
+                .indexOf(OntologyConstant.testPoddUserV1));
+        Assert.assertTrue(schemaManifestImports.indexOf(OntologyConstant.testPoddFoafV1) < schemaManifestImports
+                .indexOf(OntologyConstant.testPoddBaseV1));
+        Assert.assertTrue(schemaManifestImports.indexOf(OntologyConstant.testPoddUserV1) < schemaManifestImports
+                .indexOf(OntologyConstant.testPoddBaseV1));
+        
+        Assert.assertTrue(schemaManifestImports.indexOf(OntologyConstant.testPoddDcV2) < schemaManifestImports
+                .indexOf(OntologyConstant.testPoddFoafV2));
+        Assert.assertTrue(schemaManifestImports.indexOf(OntologyConstant.testPoddDcV2) < schemaManifestImports
+                .indexOf(OntologyConstant.testPoddUserV2));
+        Assert.assertTrue(schemaManifestImports.indexOf(OntologyConstant.testPoddDcV2) < schemaManifestImports
+                .indexOf(OntologyConstant.testPoddBaseV2));
+        Assert.assertTrue(schemaManifestImports.indexOf(OntologyConstant.testPoddFoafV2) < schemaManifestImports
+                .indexOf(OntologyConstant.testPoddUserV2));
+        Assert.assertTrue(schemaManifestImports.indexOf(OntologyConstant.testPoddFoafV2) < schemaManifestImports
+                .indexOf(OntologyConstant.testPoddBaseV2));
+        Assert.assertTrue(schemaManifestImports.indexOf(OntologyConstant.testPoddUserV2) < schemaManifestImports
+                .indexOf(OntologyConstant.testPoddBaseV2));
+        
+        this.assertRealisticImportsMapV2(this.importsMap);
+    }
+    
+    @Test
+    public void testSchemaImportsRealisticPoddV2All() throws Exception
+    {
+        final Model model =
+                Rio.parse(this.getClass().getResourceAsStream("/test/test-podd-schema-manifest.ttl"), "",
+                        RDFFormat.TURTLE);
+        
+        // DebugUtils.printContents(model);
+        final List<OWLOntologyID> schemaManifestImports =
+                OntologyUtils.schemaImports(
+                        model,
+                        new LinkedHashSet<OWLOntologyID>(Arrays.asList(OntologyConstant.testPoddDcV2,
+                                OntologyConstant.testPoddFoafV2, OntologyConstant.testPoddUserV2,
+                                OntologyConstant.testPoddBaseV2, OntologyConstant.testPoddScienceV2,
+                                OntologyConstant.testPoddPlantV2)), this.importsMap);
+        
+        Assert.assertNotNull(schemaManifestImports);
+        Assert.assertEquals(6, schemaManifestImports.size());
+        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddDcV2));
+        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddFoafV2));
+        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddUserV2));
+        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddBaseV2));
+        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddScienceV2));
+        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddPlantV2));
+        Assert.assertEquals(OntologyConstant.testPoddDcV2, schemaManifestImports.get(0));
+        Assert.assertEquals(OntologyConstant.testPoddFoafV2, schemaManifestImports.get(1));
+        Assert.assertEquals(OntologyConstant.testPoddUserV2, schemaManifestImports.get(2));
+        Assert.assertEquals(OntologyConstant.testPoddBaseV2, schemaManifestImports.get(3));
+        Assert.assertEquals(OntologyConstant.testPoddScienceV2, schemaManifestImports.get(4));
+        Assert.assertEquals(OntologyConstant.testPoddPlantV2, schemaManifestImports.get(5));
+        
+        this.assertRealisticImportsMapV2(this.importsMap);
+    }
+    
+    @Test
+    public void testSchemaImportsRealisticPoddV2DcFoaf() throws Exception
+    {
+        final Model model =
+                Rio.parse(this.getClass().getResourceAsStream("/test/test-podd-schema-manifest.ttl"), "",
+                        RDFFormat.TURTLE);
+        
+        // DebugUtils.printContents(model);
+        final List<OWLOntologyID> schemaManifestImports =
+                OntologyUtils.schemaImports(
+                        model,
+                        new LinkedHashSet<OWLOntologyID>(Arrays.asList(OntologyConstant.testPoddDcV2,
+                                OntologyConstant.testPoddFoafV2)), this.importsMap);
+        
+        Assert.assertNotNull(schemaManifestImports);
+        Assert.assertEquals(2, schemaManifestImports.size());
+        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddDcV2));
+        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddFoafV2));
+        Assert.assertEquals(OntologyConstant.testPoddDcV2, schemaManifestImports.get(0));
+        Assert.assertEquals(OntologyConstant.testPoddFoafV2, schemaManifestImports.get(1));
+        
+        this.assertRealisticImportsMapV2(this.importsMap);
+    }
+    
+    @Test
+    public void testSchemaImportsRealisticPoddV2DcPlant() throws Exception
+    {
+        final Model model =
+                Rio.parse(this.getClass().getResourceAsStream("/test/test-podd-schema-manifest.ttl"), "",
+                        RDFFormat.TURTLE);
+        
+        // DebugUtils.printContents(model);
+        final List<OWLOntologyID> schemaManifestImports =
+                OntologyUtils.schemaImports(
+                        model,
+                        new HashSet<OWLOntologyID>(Arrays.asList(OntologyConstant.testPoddDcV2,
+                                OntologyConstant.testPoddPlantV2)), this.importsMap);
+        
+        Assert.assertNotNull(schemaManifestImports);
+        Assert.assertEquals(6, schemaManifestImports.size());
+        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddDcV2));
+        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddFoafV2));
+        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddUserV2));
+        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddBaseV2));
+        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddScienceV2));
+        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddPlantV2));
+        Assert.assertEquals(OntologyConstant.testPoddDcV2, schemaManifestImports.get(0));
+        Assert.assertEquals(OntologyConstant.testPoddFoafV2, schemaManifestImports.get(1));
+        Assert.assertEquals(OntologyConstant.testPoddUserV2, schemaManifestImports.get(2));
+        Assert.assertEquals(OntologyConstant.testPoddBaseV2, schemaManifestImports.get(3));
+        Assert.assertEquals(OntologyConstant.testPoddScienceV2, schemaManifestImports.get(4));
+        Assert.assertEquals(OntologyConstant.testPoddPlantV2, schemaManifestImports.get(5));
+        
+        this.assertRealisticImportsMapV2(this.importsMap);
+    }
+    
+    @Test
+    public void testSchemaImportsRealisticPoddV2Plant() throws Exception
+    {
+        final Model model =
+                Rio.parse(this.getClass().getResourceAsStream("/test/test-podd-schema-manifest.ttl"), "",
+                        RDFFormat.TURTLE);
+        
+        // DebugUtils.printContents(model);
+        final List<OWLOntologyID> schemaManifestImports =
+                OntologyUtils.schemaImports(model,
+                        new HashSet<OWLOntologyID>(Arrays.asList(OntologyConstant.testPoddPlantV2)), this.importsMap);
+        
+        Assert.assertNotNull(schemaManifestImports);
+        Assert.assertEquals(6, schemaManifestImports.size());
+        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddDcV2));
+        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddFoafV2));
+        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddUserV2));
+        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddBaseV2));
+        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddScienceV2));
+        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddPlantV2));
+        Assert.assertEquals(OntologyConstant.testPoddDcV2, schemaManifestImports.get(0));
+        Assert.assertEquals(OntologyConstant.testPoddFoafV2, schemaManifestImports.get(1));
+        Assert.assertEquals(OntologyConstant.testPoddUserV2, schemaManifestImports.get(2));
+        Assert.assertEquals(OntologyConstant.testPoddBaseV2, schemaManifestImports.get(3));
+        Assert.assertEquals(OntologyConstant.testPoddScienceV2, schemaManifestImports.get(4));
+        Assert.assertEquals(OntologyConstant.testPoddPlantV2, schemaManifestImports.get(5));
+        
+        this.assertRealisticImportsMapV2(this.importsMap);
+    }
+    
+    @Test
+    public void testSchemaImportsRealisticV3PoddV2DcFoaf() throws Exception
+    {
+        final Model model =
+                Rio.parse(this.getClass().getResourceAsStream("/default-podd-schema-manifest.ttl"), "",
+                        RDFFormat.TURTLE);
+        
+        // DebugUtils.printContents(model);
+        final List<OWLOntologyID> schemaManifestImports =
+                OntologyUtils.schemaImports(
+                        model,
+                        new LinkedHashSet<OWLOntologyID>(Arrays.asList(OntologyConstant.testPoddDcV1,
+                                OntologyConstant.testPoddFoafV1)), this.importsMap);
+        
+        Assert.assertNotNull(schemaManifestImports);
+        Assert.assertEquals(2, schemaManifestImports.size());
+        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddDcV1));
+        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testPoddFoafV1));
+        Assert.assertEquals(OntologyConstant.testPoddDcV1, schemaManifestImports.get(0));
+        Assert.assertEquals(OntologyConstant.testPoddFoafV1, schemaManifestImports.get(1));
+        
+        this.assertRealisticImportsMapV3(this.importsMap);
+    }
+    
+    @Test
+    public void testSchemaImportsZeroLevels() throws Exception
+    {
+        final Model model = new LinkedHashModel();
+        OntologyUtils.ontologyIDsToModel(Arrays.asList(OntologyConstant.testOntologyID), model);
+        
+        final List<OWLOntologyID> schemaManifestImports =
+                OntologyUtils.schemaImports(model, Collections.singleton(OntologyConstant.testOntologyID),
+                        this.importsMap);
+        
+        Assert.assertNotNull(schemaManifestImports);
+        Assert.assertEquals(1, schemaManifestImports.size());
+        Assert.assertTrue(schemaManifestImports.contains(OntologyConstant.testOntologyID));
+        
+        Assert.assertEquals(1, this.importsMap.size());
+        Assert.assertTrue(this.importsMap.containsKey(OntologyConstant.testVersionUri1));
+        Assert.assertEquals(0, this.importsMap.get(OntologyConstant.testVersionUri1).size());
     }
     
     /**

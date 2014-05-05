@@ -122,10 +122,10 @@ public class OntologyUtils
         
         OntologyUtils.postSort(orderImports, importsMap);
         
-        final Set<OWLOntologyID> finalOrderImports =
+        final List<OWLOntologyID> finalOrderImports =
                 OntologyUtils.finalOrderImports(results, ontologyIDs, orderImports, artifactImports, importsMap);
         
-        return new ArrayList<>(finalOrderImports);
+        return finalOrderImports;
     }
     
     /**
@@ -180,10 +180,12 @@ public class OntologyUtils
      * @param orderImports
      * @param artifactImports
      * @param importsMap
+     * @throws SchemaManifestException
      */
-    public static Set<OWLOntologyID> finalOrderImports(final Set<OWLOntologyID> results,
+    public static List<OWLOntologyID> finalOrderImports(final Set<OWLOntologyID> results,
             final List<? extends OWLOntologyID> ontologyIDs, final List<URI> orderImports,
             final Set<URI> artifactImports, final ConcurrentMap<URI, Set<URI>> importsMap)
+        throws SchemaManifestException
     {
         final Set<OWLOntologyID> finalResults = new LinkedHashSet<OWLOntologyID>();
         for(final URI nextImport : orderImports)
@@ -214,7 +216,7 @@ public class OntologyUtils
                 }
             }
         }
-        return finalResults;
+        return new ArrayList<>(finalResults);
     }
     
     /**
@@ -727,10 +729,45 @@ public class OntologyUtils
             }
         }
         
+        recursiveFollowSchemaMap(importsMap);
+        
         OntologyUtils.postSort(importOrder, importsMap);
         
         OntologyUtils.log.debug("importOrder: {}", importOrder);
         return importOrder;
+    }
+    
+    public static final void recursiveFollowSchemaMap(ConcurrentMap<URI, Set<URI>> importsMap)
+        throws SchemaManifestException
+    {
+        // Iterate through at least as many times as the size of the importsMap to get all
+        // dependencies
+        for(int i = 0; i < importsMap.size(); i++)
+        {
+            for(Entry<URI, Set<URI>> nextImportsMapEntry : importsMap.entrySet())
+            {
+                // Avoid ConcurrentModificationException by taking a copy and replacing it
+                // afterwards
+                Set<URI> nextSet = new LinkedHashSet<>(nextImportsMapEntry.getValue());
+                recursiveFollowSchemaMap(importsMap, nextImportsMapEntry.getKey(), nextSet);
+                importsMap.put(nextImportsMapEntry.getKey(), nextSet);
+            }
+        }
+    }
+    
+    public static final void recursiveFollowSchemaMap(ConcurrentMap<URI, Set<URI>> importsMap, URI nextUri,
+            Set<URI> nextUriImports) throws SchemaManifestException
+    {
+        for(URI nextImportedUri : importsMap.get(nextUri))
+        {
+            nextUriImports.add(nextImportedUri);
+            if(nextImportedUri.equals(nextUri))
+            {
+                throw new SchemaManifestException(IRI.create(nextUri), "Ontology recursively imported itself: "
+                        + nextUriImports);
+            }
+            recursiveFollowSchemaMap(importsMap, nextImportedUri, nextUriImports);
+        }
     }
     
     private static void postSort(final List<URI> importOrder, final ConcurrentMap<URI, Set<URI>> importsMap)
@@ -782,7 +819,7 @@ public class OntologyUtils
      * @throws SchemaManifestException
      *             If the schema manifest is not consistent.
      */
-    public static List<OWLOntologyID> schemaManifestImports(final Model model,
+    public static List<OWLOntologyID> schemaImports(final Model model,
             final Set<? extends OWLOntologyID> dependentSchemaOntologies, final ConcurrentMap<URI, Set<URI>> importsMap)
         throws SchemaManifestException
     {
@@ -825,10 +862,10 @@ public class OntologyUtils
         
         final List<InferredOWLOntologyID> ontologyIDs = OntologyUtils.modelToOntologyIDs(model, false, true);
         
-        final Set<OWLOntologyID> finalOrderImports =
+        final List<OWLOntologyID> finalOrderImports =
                 OntologyUtils.finalOrderImports(results, ontologyIDs, orderImports, artifactImports, importsMap);
         
-        return new ArrayList<>(finalOrderImports);
+        return finalOrderImports;
     }
     
     /**

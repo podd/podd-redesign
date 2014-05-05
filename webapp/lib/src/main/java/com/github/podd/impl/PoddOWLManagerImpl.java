@@ -298,7 +298,7 @@ public class PoddOWLManagerImpl implements PoddOWLManager
         ConcurrentMap<URI, Set<URI>> importsMap = new ConcurrentHashMap<>();
         
         final List<OWLOntologyID> manifestImports =
-                OntologyUtils.schemaManifestImports(schemaManagementTriples, ontologyIDs, importsMap);
+                OntologyUtils.schemaImports(schemaManagementTriples, ontologyIDs, importsMap);
         
         // TODO: Check the exact imports for the given ontology and refine to exclude unrelated
         // schema ontologies?

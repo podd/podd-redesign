@@ -112,6 +112,10 @@
 			<groupId>com.github.ansell.restlet-utils</groupId>
 			<artifactId>restlet-utils</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>com.github.podd</groupId>
+			<artifactId>podd-ontologies</artifactId>
+		</dependency>
 	</dependencies>
 	<build>
 		<plugins>

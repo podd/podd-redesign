@@ -2508,7 +2508,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         
         ConcurrentMap<URI, Set<URI>> importsMap = new ConcurrentHashMap<>();
         final List<OWLOntologyID> schemaManifestImports =
-                OntologyUtils.schemaManifestImports(model, dependentSchemaOntologies, importsMap);
+                OntologyUtils.schemaImports(model, dependentSchemaOntologies, importsMap);
         
         for(final OWLOntologyID schemaOntology : schemaManifestImports)
         {
