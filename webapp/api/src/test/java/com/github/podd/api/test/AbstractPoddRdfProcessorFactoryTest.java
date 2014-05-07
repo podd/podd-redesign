@@ -32,7 +32,7 @@ import org.openrdf.sail.memory.MemoryStore;
 import com.github.podd.api.PoddProcessorFactory;
 import com.github.podd.api.PoddRdfProcessor;
 import com.github.podd.api.PoddRdfProcessorFactory;
-import com.github.podd.utils.PoddRdfUtils;
+import com.github.podd.utils.PoddRdfProcessorUtils;
 
 /**
  * Abstract class to test PoddRdfProcessorFactory
@@ -112,7 +112,7 @@ AbstractPoddProcessorFactoryTest<T, Model>
     @Test
     public void testSPARQLQueryString() throws Exception
     {
-        final String sparqlQuery = PoddRdfUtils.buildSparqlConstructQuery(this.rdfProcessorFactory);
+        final String sparqlQuery = PoddRdfProcessorUtils.buildSparqlConstructQuery(this.rdfProcessorFactory);
 
         final Repository repository = new SailRepository(new MemoryStore());
         try
@@ -141,7 +141,7 @@ AbstractPoddProcessorFactoryTest<T, Model>
     {
         final URI subject = ValueFactoryImpl.getInstance().createURI("http://example.com/podd/user#Will");
 
-        final String sparqlQuery = PoddRdfUtils.buildSparqlConstructQuery(this.rdfProcessorFactory, subject);
+        final String sparqlQuery = PoddRdfProcessorUtils.buildSparqlConstructQuery(this.rdfProcessorFactory, subject);
 
         final Repository repository = new SailRepository(new MemoryStore());
         try

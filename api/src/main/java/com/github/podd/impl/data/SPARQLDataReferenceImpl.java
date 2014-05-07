@@ -30,7 +30,7 @@ import com.github.podd.utils.PODD;
 public class SPARQLDataReferenceImpl extends AbstractDataReferenceImpl implements SPARQLDataReference
 {
     private String graph;
-
+    
     /**
      * Constructor
      */
@@ -38,35 +38,36 @@ public class SPARQLDataReferenceImpl extends AbstractDataReferenceImpl implement
     {
         super();
     }
-
+    
     @Override
     public String getGraph()
     {
         return this.graph;
     }
-
+    
     @Override
     public void setGraph(final String filename)
     {
         this.graph = filename;
     }
-
+    
     @Override
-    public Model toRDF()
+    public Model toRDF(Model model)
     {
-        final Model result = super.toRDF();
-
-        result.add(this.getObjectIri().toOpenRDFURI(), RDF.TYPE, PODD.PODD_BASE_DATA_REFERENCE_TYPE_SPARQL);
-
+        super.toRDF(model);
+        
+        model.add(this.getObjectIri().toOpenRDFURI(), RDF.TYPE, PODD.PODD_BASE_DATA_REFERENCE_TYPE_SPARQL);
+        
         if(this.getGraph() != null)
         {
-            result.add(this.getObjectIri().toOpenRDFURI(), PODD.PODD_BASE_HAS_SPARQL_GRAPH,
+            model.add(this.getObjectIri().toOpenRDFURI(), PODD.PODD_BASE_HAS_SPARQL_GRAPH,
                     PODD.VF.createLiteral(this.getGraph()));
         }
-
-        return result;
+        
+        return model;
+        
     }
-
+    
     @Override
     public String toString()
     {
@@ -84,8 +85,8 @@ public class SPARQLDataReferenceImpl extends AbstractDataReferenceImpl implement
         b.append(" , ");
         b.append(this.getRepositoryAlias());
         b.append("]");
-
+        
         return b.toString();
     }
-
+    
 }

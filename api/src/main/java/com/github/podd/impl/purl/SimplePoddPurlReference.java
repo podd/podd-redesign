@@ -28,10 +28,9 @@ import com.github.podd.api.purl.PoddPurlReference;
  */
 public class SimplePoddPurlReference implements PoddPurlReference
 {
-
-    private URI temporaryURI;
-    private URI purlURI;
-
+    private final URI temporaryURI;
+    private final URI purlURI;
+    
     /**
      *
      * @param temporaryURI
@@ -44,17 +43,17 @@ public class SimplePoddPurlReference implements PoddPurlReference
         this.temporaryURI = temporaryURI;
         this.purlURI = purlURI;
     }
-
+    
     @Override
     public URI getPurlURI()
     {
         return this.purlURI;
     }
-
+    
     @Override
     public URI getTemporaryURI()
     {
         return this.temporaryURI;
     }
-
+    
 }

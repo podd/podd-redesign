@@ -43,7 +43,7 @@ import com.github.podd.api.test.AbstractPoddRdfProcessorFactoryTest;
 import com.github.podd.api.test.TestConstants;
 import com.github.podd.impl.data.SSHFileReferenceProcessorFactoryImpl;
 import com.github.podd.utils.PODD;
-import com.github.podd.utils.PoddRdfUtils;
+import com.github.podd.utils.PoddRdfProcessorUtils;
 
 /**
  * Concrete class to test SSHFileReferenceProcessorFactoryImpl. In addition to the abstract
@@ -77,7 +77,7 @@ AbstractPoddRdfProcessorFactoryTest<DataReferenceProcessor<SSHFileReference>>
                 this.getNewPoddRdfProcessorFactory();
 
         // build SPARQL query
-        final String sparql = PoddRdfUtils.buildSparqlConstructQuery(rdfProcessorFactory);
+        final String sparql = PoddRdfProcessorUtils.buildSparqlConstructQuery(rdfProcessorFactory);
         this.log.info("Generated SPARQL <{}> ", sparql);
 
         final Repository repository = new SailRepository(new MemoryStore());
@@ -135,7 +135,7 @@ AbstractPoddRdfProcessorFactoryTest<DataReferenceProcessor<SSHFileReference>>
 
         // build SPARQL query
         final URI subject = ValueFactoryImpl.getInstance().createURI(fileReference);
-        final String sparql = PoddRdfUtils.buildSparqlConstructQuery(rdfProcessorFactory, subject);
+        final String sparql = PoddRdfProcessorUtils.buildSparqlConstructQuery(rdfProcessorFactory, subject);
         this.log.info("Generated SPARQL <{}> ", sparql);
 
         // verify SPARQL generated a graph as expected

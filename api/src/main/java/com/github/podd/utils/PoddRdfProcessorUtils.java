@@ -27,7 +27,7 @@ import com.github.podd.api.PoddRdfProcessorFactory;
  * @author kutila
  *
  */
-public class PoddRdfUtils
+public class PoddRdfProcessorUtils
 {
     /**
      * Builds a SPARQL "construct" query using the given <code>PoddRdfProcessorFactory</code>.
@@ -39,9 +39,9 @@ public class PoddRdfUtils
     public static String buildSparqlConstructQuery(
             final PoddRdfProcessorFactory<? extends PoddRdfProcessor> rdfProcessorFactory)
     {
-        return PoddRdfUtils.buildSparqlConstructQuery(rdfProcessorFactory, null);
+        return PoddRdfProcessorUtils.buildSparqlConstructQuery(rdfProcessorFactory, null);
     }
-
+    
     /**
      * Builds a SPARQL "construct" query using the given <code>PoddRdfProcessorFactory</code> and
      * Subject URI.
@@ -59,11 +59,11 @@ public class PoddRdfUtils
         sparqlBuilder.append("CONSTRUCT { ");
         sparqlBuilder.append(rdfProcessorFactory.getSPARQLConstructBGP());
         sparqlBuilder.append(" } WHERE { ");
-
+        
         sparqlBuilder.append(rdfProcessorFactory.getSPARQLConstructWhere());
-
+        
         sparqlBuilder.append(" }");
-
+        
         if(subject != null)
         {
             sparqlBuilder.append(" VALUES (?");
@@ -72,13 +72,13 @@ public class PoddRdfUtils
             sparqlBuilder.append(subject.stringValue());
             sparqlBuilder.append("> ) }");
         }
-
+        
         if(!rdfProcessorFactory.getSPARQLGroupBy().isEmpty())
         {
             sparqlBuilder.append(" GROUP BY ");
             sparqlBuilder.append(rdfProcessorFactory.getSPARQLGroupBy());
         }
-
+        
         return sparqlBuilder.toString();
     }
 }

@@ -40,7 +40,7 @@ import com.github.podd.api.data.DataReferenceManager;
 import com.github.podd.api.data.DataReferenceProcessor;
 import com.github.podd.api.data.DataReferenceProcessorFactory;
 import com.github.podd.api.data.DataReferenceProcessorRegistry;
-import com.github.podd.utils.PoddRdfUtils;
+import com.github.podd.utils.PoddRdfProcessorUtils;
 
 /**
  * @author Peter Ansell p_ansell@yahoo.com
@@ -74,7 +74,7 @@ public class DataReferenceManagerImpl implements DataReferenceManager
         {
             try
             {
-                final String sparqlQuery = PoddRdfUtils.buildSparqlConstructQuery(nextProcessorFactory);
+                final String sparqlQuery = PoddRdfProcessorUtils.buildSparqlConstructQuery(nextProcessorFactory);
 
                 final GraphQuery graphQuery = repositoryConnection.prepareGraphQuery(QueryLanguage.SPARQL, sparqlQuery);
 

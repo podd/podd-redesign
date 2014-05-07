@@ -24,7 +24,7 @@ import org.openrdf.model.impl.ValueFactoryImpl;
 
 import com.github.podd.api.PoddRdfProcessor;
 import com.github.podd.api.PoddRdfProcessorFactory;
-import com.github.podd.utils.PoddRdfUtils;
+import com.github.podd.utils.PoddRdfProcessorUtils;
 
 /**
  * @author kutila
@@ -52,7 +52,7 @@ public class PoddRdfUtilsTest
             Mockito.when(mockFactory.getSPARQLConstructWhere()).thenReturn(this.testWhereArray[i]);
             Mockito.when(mockFactory.getSPARQLGroupBy()).thenReturn(this.testGroupByArray[i]);
 
-            final String sparql = PoddRdfUtils.buildSparqlConstructQuery(mockFactory);
+            final String sparql = PoddRdfProcessorUtils.buildSparqlConstructQuery(mockFactory);
             Assert.assertNotNull(sparql);
             Assert.assertFalse(sparql.isEmpty());
 
@@ -88,7 +88,7 @@ public class PoddRdfUtilsTest
             Mockito.when(mockFactory.getSPARQLVariable()).thenReturn("s");
             Mockito.when(mockFactory.getSPARQLGroupBy()).thenReturn(this.testGroupByArray[i]);
 
-            final String sparql = PoddRdfUtils.buildSparqlConstructQuery(mockFactory, subjects[i]);
+            final String sparql = PoddRdfProcessorUtils.buildSparqlConstructQuery(mockFactory, subjects[i]);
             Assert.assertNotNull(sparql);
             Assert.assertFalse(sparql.isEmpty());
 

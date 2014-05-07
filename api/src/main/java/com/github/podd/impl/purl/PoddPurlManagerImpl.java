@@ -42,7 +42,7 @@ import com.github.podd.api.purl.PoddPurlProcessorFactory;
 import com.github.podd.api.purl.PoddPurlProcessorFactoryRegistry;
 import com.github.podd.api.purl.PoddPurlReference;
 import com.github.podd.exception.PurlProcessorNotHandledException;
-import com.github.podd.utils.PoddRdfUtils;
+import com.github.podd.utils.PoddRdfProcessorUtils;
 
 /**
  * Basic PURL Manager implementation for use in PODD.
@@ -142,7 +142,7 @@ public class PoddPurlManagerImpl implements PoddPurlManager
         {
             try
             {
-                final String sparqlQuery = PoddRdfUtils.buildSparqlConstructQuery(nextProcessorFactory);
+                final String sparqlQuery = PoddRdfProcessorUtils.buildSparqlConstructQuery(nextProcessorFactory);
 
                 final GraphQuery graphQuery = repositoryConnection.prepareGraphQuery(QueryLanguage.SPARQL, sparqlQuery);
 

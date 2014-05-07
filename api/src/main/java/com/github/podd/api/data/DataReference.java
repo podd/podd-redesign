@@ -36,7 +36,7 @@ public interface DataReference
      * @return The {@link OWLOntologyID} for the Artifact that includes this file reference.
      */
     OWLOntologyID getArtifactID();
-
+    
     /**
      * Returns the label that is assigned to this file reference.
      *
@@ -45,39 +45,39 @@ public interface DataReference
      * @return A human readable label for this file reference.
      */
     String getLabel();
-
+    
     /**
      *
      * @return The {@link IRI} of this file reference.
      */
     IRI getObjectIri();
-
+    
     /**
      *
      * @return The {@link IRI} of the object inside of the Artifact that this file reference is
      *         linked to.
      */
     IRI getParentIri();
-
+    
     /**
      *
      * @return The {@link IRI} of the predicate used to link the file reference to its parent.
      */
     IRI getParentPredicateIRI();
-
+    
     /**
      *
      * @return The alias for the repository that is managing this file reference.
      */
     String getRepositoryAlias();
-
+    
     /**
      *
      * @param artifactId
      *            The {@link OWLOntologyID} for the Artifact that includes this file reference.
      */
     void setArtifactID(OWLOntologyID artifactId);
-
+    
     /**
      * Sets a human readable label for this file reference.
      *
@@ -87,14 +87,14 @@ public interface DataReference
      *            A human readable label for this file reference.
      */
     void setLabel(String label);
-
+    
     /**
      *
      * @param objectIri
      *            The {@link IRI} of this file reference.
      */
     void setObjectIri(IRI objectIri);
-
+    
     /**
      *
      * @param parentIri
@@ -102,14 +102,14 @@ public interface DataReference
      *            linked to.
      */
     void setParentIri(IRI parentIri);
-
+    
     /**
      *
      * @param parentPredicateIRI
      *            The {@link IRI} of the predicate used to link the file reference to its parent.
      */
     void setParentPredicateIRI(IRI parentPredicateIRI);
-
+    
     /**
      * Sets the alias used to name the repository configuration used to access this file reference.
      *
@@ -117,11 +117,21 @@ public interface DataReference
      *            Alias for the repository that is managing this file reference.
      */
     void setRepositoryAlias(String repositoryAlias);
-
+    
     /**
      * Convert this file reference to RDF and return the statements in a {@link Model}.
      *
      * @return A {@link Model} containing the RDF statements representing this file reference.
      */
     Model toRDF();
+    
+    /**
+     * Convert this file reference to RDF and add the statements to the given {@link Model}.
+     *
+     * @param model
+     *            A {@link Model} which will containing the RDF statements representing this file
+     *            reference.
+     * @return The model parameter, so it can be chained with other similar calls.
+     */
+    Model toRDF(Model model);
 }

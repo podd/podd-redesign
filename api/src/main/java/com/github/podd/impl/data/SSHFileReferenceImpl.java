@@ -29,10 +29,10 @@ import com.github.podd.utils.PODD;
  */
 public class SSHFileReferenceImpl extends AbstractDataReferenceImpl implements SSHFileReference
 {
-
+    
     private String filename;
     private String path;
-
+    
     /**
      * Constructor
      */
@@ -40,53 +40,53 @@ public class SSHFileReferenceImpl extends AbstractDataReferenceImpl implements S
     {
         super();
     }
-
+    
     @Override
     public String getFilename()
     {
         return this.filename;
     }
-
+    
     @Override
     public String getPath()
     {
         return this.path;
     }
-
+    
     @Override
     public void setFilename(final String filename)
     {
         this.filename = filename;
     }
-
+    
     @Override
     public void setPath(final String path)
     {
         this.path = path;
     }
-
+    
     @Override
-    public Model toRDF()
+    public Model toRDF(Model model)
     {
-        final Model result = super.toRDF();
-
-        result.add(this.getObjectIri().toOpenRDFURI(), RDF.TYPE, PODD.PODD_BASE_FILE_REFERENCE_TYPE_SSH);
-
+        super.toRDF(model);
+        
+        model.add(this.getObjectIri().toOpenRDFURI(), RDF.TYPE, PODD.PODD_BASE_FILE_REFERENCE_TYPE_SSH);
+        
         if(this.getFilename() != null)
         {
-            result.add(this.getObjectIri().toOpenRDFURI(), PODD.PODD_BASE_HAS_FILENAME,
+            model.add(this.getObjectIri().toOpenRDFURI(), PODD.PODD_BASE_HAS_FILENAME,
                     PODD.VF.createLiteral(this.getFilename()));
         }
-
+        
         if(this.getPath() != null)
         {
-            result.add(this.getObjectIri().toOpenRDFURI(), PODD.PODD_BASE_HAS_FILE_PATH,
+            model.add(this.getObjectIri().toOpenRDFURI(), PODD.PODD_BASE_HAS_FILE_PATH,
                     PODD.VF.createLiteral(this.getPath()));
         }
-
-        return result;
+        
+        return model;
     }
-
+    
     @Override
     public String toString()
     {
@@ -106,8 +106,8 @@ public class SSHFileReferenceImpl extends AbstractDataReferenceImpl implements S
         b.append(" , ");
         b.append(this.getRepositoryAlias());
         b.append("]");
-
+        
         return b.toString();
     }
-
+    
 }

@@ -40,7 +40,7 @@ import com.github.podd.api.purl.PoddPurlProcessorPrefixes;
 import com.github.podd.api.test.AbstractPoddRdfProcessorFactoryTest;
 import com.github.podd.api.test.TestConstants;
 import com.github.podd.impl.purl.UUIDPurlProcessorFactoryImpl;
-import com.github.podd.utils.PoddRdfUtils;
+import com.github.podd.utils.PoddRdfProcessorUtils;
 
 /**
  * Concrete unit test for UUIDPurlProcessorFactoryImpl
@@ -70,7 +70,7 @@ public class UUIDPurlProcessorFactoryImplTest extends AbstractPoddRdfProcessorFa
         final PoddRdfProcessorFactory<PoddPurlProcessor> rdfProcessorFactory = this.getNewPoddRdfProcessorFactory();
 
         // build SPARQL query
-        final String sparql = PoddRdfUtils.buildSparqlConstructQuery(rdfProcessorFactory);
+        final String sparql = PoddRdfProcessorUtils.buildSparqlConstructQuery(rdfProcessorFactory);
         this.log.info("Generated SPARQL <{}> ", sparql);
 
         final Repository repository = new SailRepository(new MemoryStore());
@@ -134,7 +134,7 @@ public class UUIDPurlProcessorFactoryImplTest extends AbstractPoddRdfProcessorFa
 
         // build SPARQL query
         final URI subject = ValueFactoryImpl.getInstance().createURI("urn:temp:uuid:object:2966");
-        final String sparql = PoddRdfUtils.buildSparqlConstructQuery(rdfProcessorFactory, subject);
+        final String sparql = PoddRdfProcessorUtils.buildSparqlConstructQuery(rdfProcessorFactory, subject);
         this.log.info("Generated SPARQL <{}> ", sparql);
 
         // verify SPARQL generated a graph as expected
