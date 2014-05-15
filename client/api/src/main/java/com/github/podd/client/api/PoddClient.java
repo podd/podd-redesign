@@ -55,7 +55,7 @@ public interface PoddClient
      * predicate, and the second being the original predicate.
      */
     public static final String TEMPLATE_SPARQL_BY_TYPE_LABEL_STRSTARTS_PREDICATE =
-            "CONSTRUCT { ?object a ?type . ?object <%s> ?label . } WHERE { ?object a ?type . ?object <%s> ?label . FILTER(STRSTARTS(?label, \"%s\")) } VALUES (?type) { ( %s ) }";
+            "CONSTRUCT { ?object a ?type . ?object %s ?label . } WHERE { ?object a ?type . ?object %s ?label . FILTER(STRSTARTS(?label, \"%s\")) } VALUES (?type) { ( %s ) }";
     
     /**
      * Adds the given role for the given user to the given artifact
