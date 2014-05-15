@@ -470,6 +470,20 @@ public class RestletPoddClientImpl implements PoddClient
     }
     
     @Override
+    public Model getObjectsByTypePredicateAndPrefix(final URI type, final URI predicate, final String labelPrefix,
+            final Collection<InferredOWLOntologyID> artifacts) throws PoddClientException
+    {
+        String predicateString = RenderUtils.getSPARQLQueryString(predicate);
+        // NOTE: predicateString must be both the second and third arguments sent into String.format
+        // as it is used twice, once for the Construct and once for the Where
+        // Hypothetically the second could be different to the third for mapping predicates, but
+        // that would cause confusion if not obvious
+        return this.doSPARQL(String.format(PoddClient.TEMPLATE_SPARQL_BY_TYPE_LABEL_STRSTARTS_PREDICATE,
+                predicateString, predicateString, RenderUtils.escape(labelPrefix),
+                RenderUtils.getSPARQLQueryString(PODD.PODD_SCIENCE_EXPERIMENT)), artifacts);
+    }
+    
+    @Override
     public Model getObjectsByTypeAndParent(final URI parent, final URI parentPredicate, final URI type,
             final Collection<InferredOWLOntologyID> artifacts) throws PoddClientException
     {

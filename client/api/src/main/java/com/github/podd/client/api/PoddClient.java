@@ -50,6 +50,12 @@ public interface PoddClient
             "CONSTRUCT { ?object a ?type . ?object ?predicate ?value . } WHERE { ?object a ?type . ?object ?predicate ?value . } VALUES (?type) { ( %s ) }";
     public static final String TEMPLATE_SPARQL_BY_TYPE_LABEL_STRSTARTS =
             "CONSTRUCT { ?object a ?type . ?object <http://www.w3.org/2000/01/rdf-schema#label> ?label . } WHERE { ?object a ?type . ?object <http://www.w3.org/2000/01/rdf-schema#label> ?label . FILTER(STRSTARTS(?label, \"%s\")) } VALUES (?type) { ( %s ) }";
+    /**
+     * NOTE: Both the first and second arguments are the predicate, the first being the mapped
+     * predicate, and the second being the original predicate.
+     */
+    public static final String TEMPLATE_SPARQL_BY_TYPE_LABEL_STRSTARTS_PREDICATE =
+            "CONSTRUCT { ?object a ?type . ?object <%s> ?label . } WHERE { ?object a ?type . ?object <%s> ?label . FILTER(STRSTARTS(?label, \"%s\")) } VALUES (?type) { ( %s ) }";
     
     /**
      * Adds the given role for the given user to the given artifact
@@ -474,5 +480,8 @@ public interface PoddClient
     InferredOWLOntologyID uploadNewArtifact(InputStream input, RDFFormat format,
             DanglingObjectPolicy danglingObjectPolicy, DataReferenceVerificationPolicy dataReferenceVerificationPolicy)
         throws PoddClientException;
+    
+    Model getObjectsByTypePredicateAndPrefix(URI type, URI predicate, String labelPrefix,
+            Collection<InferredOWLOntologyID> artifacts) throws PoddClientException;
     
 }
