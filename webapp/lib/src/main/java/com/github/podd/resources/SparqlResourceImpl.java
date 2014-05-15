@@ -276,16 +276,19 @@ public class SparqlResourceImpl extends AbstractPoddResourceImpl
                 }
                 catch(final UnmanagedSchemaIRIException e)
                 {
+                    this.log.error("Unmanaged schema IRI: {}", e.getMessage());
                     throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST,
                             "Could not find a requested schema ontology", e);
                 }
                 catch(final UnmanagedArtifactIRIException e)
                 {
+                    this.log.error("Unmanaged artifact IRI: {}", e.getMessage());
                     throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Could not find a requested artifact",
                             e);
                 }
                 catch(final OpenRDFException e)
                 {
+                    this.log.error("Repository exception occurred: {}", e.getMessage());
                     throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Repository exception occurred", e);
                 }
             }
@@ -396,15 +399,18 @@ public class SparqlResourceImpl extends AbstractPoddResourceImpl
         }
         catch(final UnmanagedSchemaIRIException e)
         {
+            this.log.error("Unmanaged schema iri exception: {}", e.getMessage());
             throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Could not find a requested schema ontology",
                     e);
         }
         catch(final UnmanagedArtifactIRIException e)
         {
+            this.log.error("Unmanaged artifact iri exception: {}", e.getMessage());
             throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Could not find a requested artifact", e);
         }
         catch(final UnmanagedArtifactVersionException e)
         {
+            this.log.error("Unmanaged artifact version exception: {}", e.getMessage());
             throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Could not find a requested artifact", e);
         }
         catch(final OpenRDFException e)
@@ -415,14 +421,17 @@ public class SparqlResourceImpl extends AbstractPoddResourceImpl
         }
         catch(final SchemaManifestException e)
         {
+            this.log.error("Schema manifest exception: {}", e.getMessage());
             throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Could not find a requested artifact", e);
         }
         catch(final UnsupportedRDFormatException e)
         {
+            this.log.error("Unsupported RDF exception: {}", e.getMessage());
             throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Could not find a requested artifact", e);
         }
         catch(final IOException e)
         {
+            this.log.error("IO exception: {}", e.getMessage());
             throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Could not find a requested artifact", e);
         }
         finally
@@ -435,8 +444,6 @@ public class SparqlResourceImpl extends AbstractPoddResourceImpl
                 }
                 catch(final RepositoryException e)
                 {
-                    // TODO Auto-generated catch block
-                    // e.printStackTrace();
                     this.log.error("Could not close repository connection: ", e);
                 }
             }
@@ -454,6 +461,7 @@ public class SparqlResourceImpl extends AbstractPoddResourceImpl
         }
         catch(final OpenRDFException e)
         {
+            this.log.error("Error while preparing response: {}", e.getMessage());
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Error while preparing response", e);
         }
         
