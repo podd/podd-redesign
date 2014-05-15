@@ -409,8 +409,8 @@ public class SparqlResourceImpl extends AbstractPoddResourceImpl
         }
         catch(final OpenRDFException e)
         {
-            // TODO: May want to ignore this for stability of queries in the
-            // long term
+            this.log.error("SPARQL query error: {}", e.getMessage());
+            this.log.error("SPARQL query error from: {}", sparqlQuery);
             throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Repository exception occurred", e);
         }
         catch(final SchemaManifestException e)
