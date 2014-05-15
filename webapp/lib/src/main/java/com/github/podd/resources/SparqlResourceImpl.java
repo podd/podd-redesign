@@ -293,11 +293,13 @@ public class SparqlResourceImpl extends AbstractPoddResourceImpl
         
         if(artifactIds.isEmpty() && (artifactUris == null || artifactUris.length == 0))
         {
+            this.log.error("No artifact ids and none were specified.");
             throw new ResourceException(Status.CLIENT_ERROR_PRECONDITION_FAILED,
                     "Server does not contain any artifacts that you can view, so no SPARQL queries able to be performed right now.");
         }
         else if(artifactIds.isEmpty())
         {
+            this.log.error("No permission to view any of the existing artifacts.");
             throw new ResourceException(
                     Status.CLIENT_ERROR_PRECONDITION_FAILED,
                     "You do not have permission to view one or more of those artifacts, so the SPARQL query was not able to be performed right now.");
