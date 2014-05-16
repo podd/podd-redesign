@@ -42,10 +42,19 @@ import com.github.podd.utils.PoddUser;
  */
 public interface PoddClient
 {
-    public static final String TEMPLATE_SPARQL_BY_TYPE_AND_PARENT =
-            "CONSTRUCT { ?parent ?parentPredicate ?object . ?object a ?type . ?object <http://www.w3.org/2000/01/rdf-schema#label> ?label . } WHERE { ?object a ?type . OPTIONAL { ?object <http://www.w3.org/2000/01/rdf-schema#label> ?label . } } VALUES (?parent ?parentPredicate ?type ) { ( %s %s %s ) }";
-    public static final String TEMPLATE_SPARQL_BY_TYPE =
+    /**
+     * Fetch all of the properties for the given objects under the given parent with the given type.
+     */
+    public static final String TEMPLATE_SPARQL_BY_TYPE_AND_PARENT_ALL_PROPERTIES =
+            "CONSTRUCT { ?parent ?parentPredicate ?object . ?object a ?type . ?object ?predicate ?label . } WHERE { ?object a ?type . OPTIONAL { ?object ?predicate ?label . } } VALUES (?parent ?parentPredicate ?type ) { ( %s %s %s ) }";
+    /**
+     * Fetch type and label statements for the given object type.
+     */
+    public static final String TEMPLATE_SPARQL_BY_TYPE_WITH_LABEL =
             "CONSTRUCT { ?object a ?type . ?object <http://www.w3.org/2000/01/rdf-schema#label> ?label . } WHERE { ?object a ?type . OPTIONAL { ?object <http://www.w3.org/2000/01/rdf-schema#label> ?label . } } VALUES (?type) { ( %s ) }";
+    /**
+     * Fetch all of the properties for the given objects with the given type
+     */
     public static final String TEMPLATE_SPARQL_BY_TYPE_ALL_PROPERTIES =
             "CONSTRUCT { ?object a ?type . ?object ?predicate ?value . } WHERE { ?object a ?type . ?object ?predicate ?value . } VALUES (?type) { ( %s ) }";
     public static final String TEMPLATE_SPARQL_BY_TYPE_LABEL_STRSTARTS =

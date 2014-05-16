@@ -455,7 +455,7 @@ public class RestletPoddClientImpl implements PoddClient
     public Model getObjectsByType(final URI type, final Collection<InferredOWLOntologyID> artifacts)
         throws PoddClientException
     {
-        return this.doSPARQL(String.format(PoddClient.TEMPLATE_SPARQL_BY_TYPE, RenderUtils.getSPARQLQueryString(type)),
+        return this.doSPARQL(String.format(PoddClient.TEMPLATE_SPARQL_BY_TYPE_WITH_LABEL, RenderUtils.getSPARQLQueryString(type)),
                 artifacts);
     }
     
@@ -488,10 +488,11 @@ public class RestletPoddClientImpl implements PoddClient
     public Model getObjectsByTypeAndParent(final URI parent, final URI parentPredicate, final URI type,
             final Collection<InferredOWLOntologyID> artifacts) throws PoddClientException
     {
-        return this.doSPARQL(String.format(PoddClient.TEMPLATE_SPARQL_BY_TYPE_AND_PARENT,
+        return this.doSPARQL(String.format(PoddClient.TEMPLATE_SPARQL_BY_TYPE_AND_PARENT_ALL_PROPERTIES,
                 RenderUtils.getSPARQLQueryString(parent), RenderUtils.getSPARQLQueryString(parentPredicate),
                 RenderUtils.getSPARQLQueryString(type)), artifacts);
     }
+    
     
     /*
      * (non-Javadoc)
