@@ -32,6 +32,7 @@ import com.github.podd.api.data.PoddDataRepository;
 import com.github.podd.api.data.SSHFileReference;
 import com.github.podd.exception.DataReferenceNotSupportedException;
 import com.github.podd.exception.DataRepositoryIncompleteException;
+import com.github.podd.ontologies.PODDDATAREPOSITORY;
 import com.github.podd.utils.PODD;
 
 /**
@@ -41,37 +42,39 @@ import com.github.podd.utils.PODD;
 public class SSHFileRepositoryImpl extends AbstractPoddDataRepositoryImpl<SSHFileReference>
 {
     private static final DefaultConfig DEFAULT_CONFIG = new DefaultConfig();
-
+    
     protected final Logger log = LoggerFactory.getLogger(this.getClass());
-
+    
     public SSHFileRepositoryImpl(final Resource nextDataRepository, final Model model)
-            throws DataRepositoryIncompleteException
+        throws DataRepositoryIncompleteException
     {
         super(nextDataRepository, model);
-
+        
         // check that the model contains values for protocol, host, port,
         // fingerprint, username, and
         // secret
-        final String protocol = model.filter(super.aliasUri, PODD.PODD_DATA_REPOSITORY_PROTOCOL, null).objectString();
-        final String host = model.filter(super.aliasUri, PODD.PODD_DATA_REPOSITORY_HOST, null).objectString();
-        final String port = model.filter(super.aliasUri, PODD.PODD_DATA_REPOSITORY_PORT, null).objectString();
+        final String protocol = model.filter(this.aliasUri, PODD.PODD_DATA_REPOSITORY_PROTOCOL, null).objectString();
+        final String host = model.filter(this.aliasUri, PODD.PODD_DATA_REPOSITORY_HOST, null).objectString();
+        final String port = model.filter(this.aliasUri, PODD.PODD_DATA_REPOSITORY_PORT, null).objectString();
         final String fingerprint =
-                model.filter(super.aliasUri, PODD.PODD_FILE_REPOSITORY_FINGERPRINT, null).objectString();
-        final String username = model.filter(super.aliasUri, PODD.PODD_FILE_REPOSITORY_USERNAME, null).objectString();
-        final String secret = model.filter(super.aliasUri, PODD.PODD_FILE_REPOSITORY_SECRET, null).objectString();
-
+                model.filter(this.aliasUri, PODD.PODD_FILE_REPOSITORY_FINGERPRINT, null).objectString();
+        final String username = model.filter(this.aliasUri, PODD.PODD_FILE_REPOSITORY_USERNAME, null).objectString();
+        final String secret = model.filter(this.aliasUri, PODD.PODD_FILE_REPOSITORY_SECRET, null).objectString();
+        final String privateKey =
+                model.filter(this.aliasUri, PODDDATAREPOSITORY.HAS_DATA_REPOSITORY_PRIVATE_KEY, null).objectString();
+        
         if(protocol == null || host == null || port == null || fingerprint == null || username == null
-                || secret == null)
+                || (secret == null || privateKey == null))
         {
             throw new DataRepositoryIncompleteException("SSH repository configuration incomplete");
         }
-
+        
         if(!PoddDataRepository.PROTOCOL_SSH.equalsIgnoreCase(protocol))
         {
             throw new DataRepositoryIncompleteException("Protocol needs to be SSH");
         }
     }
-
+    
     @Override
     public boolean canHandle(final SSHFileReference reference)
     {
@@ -79,40 +82,40 @@ public class SSHFileRepositoryImpl extends AbstractPoddDataRepositoryImpl<SSHFil
         {
             return false;
         }
-
+        
         // unnecessary as Generics ensure only an SSHFileReference can be passed
         // in
         if(!(reference instanceof SSHFileReference))
         {
             return false;
         }
-
+        
         final String aliasFromFileRef = reference.getRepositoryAlias();
         if(aliasFromFileRef == null || !this.alias.equalsIgnoreCase(aliasFromFileRef))
         {
             return false;
         }
-
+        
         return true;
     }
-
+    
     @Override
     public boolean validate(final SSHFileReference dataReference) throws DataReferenceNotSupportedException,
-    IOException
+        IOException
     {
         if(!this.canHandle(dataReference))
         {
             throw new DataReferenceNotSupportedException(dataReference, "cannot handle file reference for validation");
         }
-
-        final String host = this.model.filter(super.aliasUri, PODD.PODD_DATA_REPOSITORY_HOST, null).objectString();
-        final String port = this.model.filter(super.aliasUri, PODD.PODD_DATA_REPOSITORY_PORT, null).objectString();
+        
+        final String host = this.model.filter(this.aliasUri, PODD.PODD_DATA_REPOSITORY_HOST, null).objectString();
+        final String port = this.model.filter(this.aliasUri, PODD.PODD_DATA_REPOSITORY_PORT, null).objectString();
         final String fingerprint =
-                this.model.filter(super.aliasUri, PODD.PODD_FILE_REPOSITORY_FINGERPRINT, null).objectString();
+                this.model.filter(this.aliasUri, PODD.PODD_FILE_REPOSITORY_FINGERPRINT, null).objectString();
         final String username =
-                this.model.filter(super.aliasUri, PODD.PODD_FILE_REPOSITORY_USERNAME, null).objectString();
-        final String secret = this.model.filter(super.aliasUri, PODD.PODD_FILE_REPOSITORY_SECRET, null).objectString();
-
+                this.model.filter(this.aliasUri, PODD.PODD_FILE_REPOSITORY_USERNAME, null).objectString();
+        final String secret = this.model.filter(this.aliasUri, PODD.PODD_FILE_REPOSITORY_SECRET, null).objectString();
+        
         int portNo = -1;
         try
         {
@@ -122,23 +125,23 @@ public class SSHFileRepositoryImpl extends AbstractPoddDataRepositoryImpl<SSHFil
         {
             throw new IOException("Port number could not be parsed correctly: " + port);
         }
-
+        
         String fileName = dataReference.getFilename();
         final String path = dataReference.getPath();
         if(path != null && path.trim().length() > 0)
         {
             fileName = path + "/" + fileName;
         }
-
+        
         this.log.info("Validating file reference: " + host + ":" + port + " " + fileName);
-
+        
         try (SSHClient sshClient = new SSHClient(SSHFileRepositoryImpl.DEFAULT_CONFIG);)
         {
             sshClient.addHostKeyVerifier(fingerprint);
             sshClient.connect(host, portNo);
-
+            
             sshClient.authPassword(username, secret);
-
+            
             try (SFTPClient sftp = sshClient.newSFTPClient();)
             {
                 // check details of a remote file
@@ -156,5 +159,5 @@ public class SSHFileRepositoryImpl extends AbstractPoddDataRepositoryImpl<SSHFil
         }
         return true;
     }
-
+    
 }
