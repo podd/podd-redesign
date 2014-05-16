@@ -651,7 +651,7 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
         throws OWLException, IOException, PoddException, EmptyOntologyException, RepositoryException,
         OWLRuntimeException, OpenRDFException
     {
-        this.log.info("Dependent ontologies for next schema upload: {}", dependentSchemaOntologies);
+        this.log.debug("Dependent ontologies for next schema upload: {}", dependentSchemaOntologies);
         
         final OWLOntologyDocumentSource owlSource =
                 new StreamDocumentSource(inputStream, fileFormat.getDefaultMIMEType());

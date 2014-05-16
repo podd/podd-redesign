@@ -78,7 +78,7 @@ public class SparqlResourceImpl extends AbstractPoddResourceImpl
         this.log.debug("getSparqlRdf");
         
         final User user = this.getRequest().getClientInfo().getUser();
-        this.log.info("authenticated user: {}", user);
+        this.log.debug("authenticated user: {}", user);
         
         // variables for request parameters
         String sparqlQuery = null;
@@ -135,7 +135,7 @@ public class SparqlResourceImpl extends AbstractPoddResourceImpl
         this.log.debug("postSparqlRdf");
         
         final User user = this.getRequest().getClientInfo().getUser();
-        this.log.info("authenticated user: {}", user);
+        this.log.debug("authenticated user: {}", user);
         
         if(entity == null)
         {
@@ -143,7 +143,7 @@ public class SparqlResourceImpl extends AbstractPoddResourceImpl
             throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Did not submit anything");
         }
         
-        this.log.info("media-type: {}", entity.getMediaType());
+        this.log.debug("media-type: {}", entity.getMediaType());
         
         // variables for request parameters
         String sparqlQuery = null;

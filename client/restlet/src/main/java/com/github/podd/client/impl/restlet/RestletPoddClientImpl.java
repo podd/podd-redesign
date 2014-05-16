@@ -455,9 +455,8 @@ public class RestletPoddClientImpl implements PoddClient
     public Model getObjectsByType(final URI type, final Collection<InferredOWLOntologyID> artifacts)
         throws PoddClientException
     {
-        return this.doSPARQL(
-                String.format(PoddClient.TEMPLATE_SPARQL_BY_TYPE,
-                        RenderUtils.getSPARQLQueryString(PODD.PODD_SCIENCE_EXPERIMENT)), artifacts);
+        return this.doSPARQL(String.format(PoddClient.TEMPLATE_SPARQL_BY_TYPE, RenderUtils.getSPARQLQueryString(type)),
+                artifacts);
     }
     
     @Override
@@ -465,8 +464,7 @@ public class RestletPoddClientImpl implements PoddClient
             final Collection<InferredOWLOntologyID> artifacts) throws PoddClientException
     {
         return this.doSPARQL(String.format(PoddClient.TEMPLATE_SPARQL_BY_TYPE_LABEL_STRSTARTS,
-                RenderUtils.escape(labelPrefix), RenderUtils.getSPARQLQueryString(PODD.PODD_SCIENCE_EXPERIMENT)),
-                artifacts);
+                RenderUtils.escape(labelPrefix), RenderUtils.getSPARQLQueryString(type)), artifacts);
     }
     
     @Override
@@ -478,9 +476,12 @@ public class RestletPoddClientImpl implements PoddClient
         // as it is used twice, once for the Construct and once for the Where
         // Hypothetically the second could be different to the third for mapping predicates, but
         // that would cause confusion if not obvious
-        return this.doSPARQL(String.format(PoddClient.TEMPLATE_SPARQL_BY_TYPE_LABEL_STRSTARTS_PREDICATE,
-                predicateString, predicateString, RenderUtils.escape(labelPrefix),
-                RenderUtils.getSPARQLQueryString(PODD.PODD_SCIENCE_EXPERIMENT)), artifacts);
+        String queryString =
+                String.format(PoddClient.TEMPLATE_SPARQL_BY_TYPE_LABEL_STRSTARTS_PREDICATE, predicateString,
+                        predicateString, RenderUtils.escape(labelPrefix), RenderUtils.getSPARQLQueryString(type));
+        
+        System.out.println("queryString=" + queryString);
+        return this.doSPARQL(queryString, artifacts);
     }
     
     @Override

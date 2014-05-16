@@ -458,11 +458,11 @@ public class ApplicationUtils
             
             if(!schemaOntologies.isEmpty())
             {
-                ApplicationUtils.log.info("Uploaded new schema ontologies: {}", schemaOntologies);
+                ApplicationUtils.log.debug("Uploaded new schema ontologies: {}", schemaOntologies);
             }
             else
             {
-                ApplicationUtils.log.info("No new schema ontologies uploaded this time");
+                ApplicationUtils.log.debug("No new schema ontologies uploaded this time");
             }
             
             // NOTE: The following is not ordered at this point in time
