@@ -290,7 +290,7 @@ public class PoddOWLManagerImpl implements PoddOWLManager
         final Model schemaManagementTriples = new LinkedHashModel();
         managementConnection.export(new StatementCollector(schemaManagementTriples), schemaManagementContext);
         
-        if(this.log.isInfoEnabled())
+        if(this.log.isDebugEnabled())
         {
             DebugUtils.printContents(schemaManagementTriples);
         }
@@ -306,15 +306,15 @@ public class PoddOWLManagerImpl implements PoddOWLManager
         final OWLOntologyManager cachedManager = this.getCachedManager(ontologyIDs);
         synchronized(cachedManager)
         {
-            this.log.info("About to cache ontologies: {}", manifestImports);
+            this.log.debug("About to cache ontologies: {}", manifestImports);
             for(final OWLOntologyID ontologyID : manifestImports)
             {
-                this.log.info("next ontology ID: {}", ontologyID);
+                this.log.debug("next ontology ID: {}", ontologyID);
                 Set<URI> nextTransitiveImports = importsMap.get(ontologyID.getVersionIRI().toOpenRDFURI());
-                this.log.info("nextTransitiveImports: " + nextTransitiveImports);
+                this.log.debug("nextTransitiveImports: " + nextTransitiveImports);
                 for(URI nextRelevantImport : nextTransitiveImports)
                 {
-                    this.log.info("About to cache ontology: {}", mapVersions.get(nextRelevantImport));
+                    this.log.debug("About to cache ontology: {}", mapVersions.get(nextRelevantImport));
                     // NOTE: if InferredOntologyIRI is null, only the base ontology is
                     // cached
                     this.cacheSchemaOntologyInternal(managementConnection, mapVersions.get(nextRelevantImport),
@@ -323,7 +323,7 @@ public class PoddOWLManagerImpl implements PoddOWLManager
                 // Then cache the direct import
                 this.cacheSchemaOntologyInternal(managementConnection, ontologyID, cachedManager);
             }
-            this.log.info("Finished caching ontologies: {}", manifestImports);
+            this.log.debug("Finished caching ontologies: {}", manifestImports);
         }
         return cachedManager;
     }
@@ -970,7 +970,7 @@ public class PoddOWLManagerImpl implements PoddOWLManager
         // Use ontology ID == null to clear the cache
         if(ontologyID == null)
         {
-            this.log.info("Clearing manager cache: {}", dependentSchemaOntologies);
+            this.log.debug("Clearing manager cache: {}", dependentSchemaOntologies);
             for(final OWLOntology nextOntology : cachedManager.getOntologies())
             {
                 cachedManager.removeOntology(nextOntology.getOntologyID());

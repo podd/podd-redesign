@@ -370,7 +370,7 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
         final List<OWLOntologyID> manifestImports =
                 OntologyUtils.schemaImports(model, new LinkedHashSet<>(dependentSchemaOntologies), importsMap);
         
-        this.log.info("Uploading schema ontologies: {}", manifestImports);
+        this.log.debug("Uploading schema ontologies: {}", manifestImports);
         // OntologyUtils.recursiveFollowImports(ontologyImports, importsMap, nextURI);
         return this.uploadSchemaOntologiesInOrder(model, manifestImports, currentVersionsMap, importsMap);
     }
@@ -423,7 +423,7 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
                             this.repositoryManager.getSchemaManagementGraph());
             this.log.debug("currentVersionsMap : {}", currentVersionsMap);
             this.log.debug("nextImportOrder : {}", nextImportOrder);
-            this.log.info("Existing schema ontologies at this point: {}", existingSchemaOntologies);
+            this.log.debug("Existing schema ontologies at this point: {}", existingSchemaOntologies);
             
             for(final OWLOntologyID nextImport : nextImportOrder)
             {
@@ -443,13 +443,13 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
             
             final List<InferredOWLOntologyID> results = new ArrayList<>();
             
-            this.log.info("About to load ontologies in order: {}", loadingOrder);
+            this.log.debug("About to load ontologies in order: {}", loadingOrder);
             for(final Entry<OWLOntologyID, Boolean> loadEntry : loadingOrder.entrySet())
             {
-                this.log.info("Ontologies loaded so far: {}", results);
+                this.log.debug("Ontologies loaded so far: {}", results);
                 if(loadEntry.getValue())
                 {
-                    this.log.info("Not loading ontology from scratch as it was already available: {}",
+                    this.log.debug("Not loading ontology from scratch as it was already available: {}",
                             loadEntry.getKey());
                     if(loadEntry.getKey() instanceof InferredOWLOntologyID)
                     {
@@ -465,13 +465,13 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
                 }
                 else
                 {
-                    this.log.info("Need to load ontology that is not already available in management repository: {}",
+                    this.log.debug("Need to load ontology that is not already available in management repository: {}",
                             loadEntry.getKey());
                     final OWLOntologyID loadEntryID = loadEntry.getKey();
                     final String classpathLocation =
                             model.filter(loadEntryID.getVersionIRI().toOpenRDFURI(), PODD.PODD_SCHEMA_CLASSPATH, null)
                                     .objectLiteral().stringValue();
-                    this.log.info("Loading from classpath: " + classpathLocation);
+                    this.log.debug("Loading from classpath: {}", classpathLocation);
                     final RDFFormat fileFormat = Rio.getParserFormatForFileName(classpathLocation, RDFFormat.RDFXML);
                     try (final InputStream inputStream = ApplicationUtils.class.getResourceAsStream(classpathLocation);)
                     {
@@ -488,8 +488,8 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
                         Set<URI> nextMinimalImportsSet = importsMap.get(loadEntryID.getVersionIRI().toOpenRDFURI());
                         Set<? extends OWLOntologyID> nextMinimalOntologyIDs =
                                 OntologyUtils.mapFromVersions(nextMinimalImportsSet, nextImportOrder);
-                        this.log.info("nextMinimalImportsSet: {}", nextMinimalImportsSet);
-                        this.log.info("nextMinimalOntologyIDs: {}", nextMinimalOntologyIDs);
+                        this.log.debug("nextMinimalImportsSet: {}", nextMinimalImportsSet);
+                        this.log.debug("nextMinimalOntologyIDs: {}", nextMinimalOntologyIDs);
                         final InferredOWLOntologyID nextResult =
                                 this.uploadSchemaOntologyInternal(schemaOntologyID, inputStream, fileFormat,
                                         managementConnection, this.repositoryManager.getSchemaManagementGraph(),
@@ -538,7 +538,7 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
                 }
             }
             
-            this.log.info("Completed loading schema ontologies");
+            this.log.debug("Completed loading schema ontologies");
             
             return results;
         }

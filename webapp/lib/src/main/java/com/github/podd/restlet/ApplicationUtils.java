@@ -471,11 +471,11 @@ public class ApplicationUtils
             
             if(!currentSchemaOntologies.isEmpty())
             {
-                ApplicationUtils.log.info("Existing current schema ontologies: {}", currentSchemaOntologies);
+                ApplicationUtils.log.debug("Existing current schema ontologies: {}", currentSchemaOntologies);
             }
             else
             {
-                ApplicationUtils.log.info("Found no existing current schema ontologies");
+                ApplicationUtils.log.debug("Found no existing current schema ontologies");
             }
             
             final List<InferredOWLOntologyID> updatedCurrentSchemaOntologies = new ArrayList<>();
@@ -484,7 +484,7 @@ public class ApplicationUtils
             {
                 if(currentSchemaOntologies.contains(nextSchemaOntology))
                 {
-                    ApplicationUtils.log.info("Existing schema ontologies contains next schema ontologies: {}",
+                    ApplicationUtils.log.debug("Existing schema ontologies contains next schema ontologies: {}",
                             nextSchemaOntology);
                     updatedCurrentSchemaOntologies.add(nextSchemaOntology);
                 }
@@ -492,7 +492,7 @@ public class ApplicationUtils
             
             if(!updatedCurrentSchemaOntologies.isEmpty())
             {
-                ApplicationUtils.log.info("Found new versions of existing schema ontologies: {}",
+                ApplicationUtils.log.debug("Found new versions of existing schema ontologies: {}",
                         updatedCurrentSchemaOntologies);
             }
             
@@ -515,7 +515,7 @@ public class ApplicationUtils
             {
                 if(poddArtifactManager.isPublished(nextArtifact))
                 {
-                    ApplicationUtils.log.info("Not attempting to update ontologies for published artifact: {}",
+                    ApplicationUtils.log.debug("Not attempting to update ontologies for published artifact: {}",
                             nextArtifact.getOntologyIRI());
                     // Must not update the schema imports for published artifacts
                     continue;
@@ -559,7 +559,7 @@ public class ApplicationUtils
                     // schema ontologies that they wish to use for each artifact
                     if(foundNonCurrentVersion || matchingSchema == null)
                     {
-                        ApplicationUtils.log.info("Found out of date or missing schema version: {}",
+                        ApplicationUtils.log.debug("Found out of date or missing schema version: {}",
                                 nextUpdatedSchemaImport);
                         Set<InferredOWLOntologyID> set = new HashSet<>();
                         final Set<InferredOWLOntologyID> putIfAbsent = artifactsToUpdate.putIfAbsent(nextArtifact, set);
@@ -575,7 +575,7 @@ public class ApplicationUtils
                 
             }
             
-            ApplicationUtils.log.info("Unpublished artifacts requiring schema updates: \n{}", artifactsToUpdate);
+            ApplicationUtils.log.debug("Unpublished artifacts requiring schema updates: \n{}", artifactsToUpdate);
             
             for(final Entry<InferredOWLOntologyID, Set<InferredOWLOntologyID>> nextEntry : artifactsToUpdate.entrySet())
             {
@@ -586,10 +586,10 @@ public class ApplicationUtils
                 try
                 {
                     final InferredOWLOntologyID nextArtifactToUpdate = nextEntry.getKey();
-                    ApplicationUtils.log.info("About to update schema imports for: {}", nextArtifactToUpdate);
+                    ApplicationUtils.log.debug("About to update schema imports for: {}", nextArtifactToUpdate);
                     poddArtifactManager.updateSchemaImports(nextArtifactToUpdate,
                             currentArtifactImports.get(nextArtifactToUpdate), nextEntry.getValue());
-                    ApplicationUtils.log.info("Completed updating schema imports for: {}", nextArtifactToUpdate);
+                    ApplicationUtils.log.debug("Completed updating schema imports for: {}", nextArtifactToUpdate);
                 }
                 catch(final Throwable e)
                 {
