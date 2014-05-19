@@ -438,11 +438,11 @@ public class PoddOWLManagerImpl implements PoddOWLManager
             final OWLProfileReport profileReport = nextProfile.checkOntology(nextOntology);
             if(!profileReport.isInProfile())
             {
-                if(this.log.isDebugEnabled())
+                if(this.log.isInfoEnabled())
                 {
                     for(final OWLProfileViolation violation : profileReport.getViolations())
                     {
-                        this.log.debug(violation.toString());
+                        this.log.info(violation.toString());
                     }
                 }
                 throw new OntologyNotInProfileException(nextOntology, profileReport, "Ontology not in OWL-DL profile");
