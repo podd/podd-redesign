@@ -61,7 +61,8 @@ public class SSHFileRepositoryImpl extends AbstractPoddDataRepositoryImpl<SSHFil
         final String username = model.filter(this.aliasUri, PODD.PODD_FILE_REPOSITORY_USERNAME, null).objectString();
         final String secret = model.filter(this.aliasUri, PODD.PODD_FILE_REPOSITORY_SECRET, null).objectString();
         final String privateKey =
-                model.filter(this.aliasUri, PODDDATAREPOSITORY.HAS_DATA_REPOSITORY_PRIVATE_KEY, null).objectString();
+                model.filter(this.aliasUri, PODDDATAREPOSITORY.HAS_DATA_REPOSITORY_PRIVATE_KEY_PATH, null)
+                        .objectString();
         
         if(protocol == null || host == null || port == null || fingerprint == null || username == null
                 || (secret == null && privateKey == null))
