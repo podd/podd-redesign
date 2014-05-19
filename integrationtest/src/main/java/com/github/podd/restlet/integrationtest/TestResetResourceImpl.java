@@ -19,8 +19,7 @@ package com.github.podd.restlet.integrationtest;
 import java.io.IOException;
 
 import org.openrdf.OpenRDFException;
-import org.openrdf.rio.RDFFormat;
-import org.openrdf.rio.Rio;
+import org.openrdf.model.impl.LinkedHashModel;
 import org.openrdf.rio.UnsupportedRDFormatException;
 import org.restlet.Request;
 import org.restlet.Response;
@@ -69,8 +68,7 @@ public class TestResetResourceImpl extends Restlet
         try
         {
             // Reset the aliases configuration
-            this.application.setDataRepositoryConfig(Rio.parse(this.getClass().getResourceAsStream("/test-alias.ttl"),
-                    "", RDFFormat.TURTLE));
+            this.application.setDataRepositoryConfig(new LinkedHashModel());
             ApplicationUtils.setupApplication(this.application, this.application.getContext());
             TestUtils.setupTestUser(this.application);
         }
