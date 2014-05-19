@@ -9,9 +9,9 @@
 
 <http://test.example.org/filerepositoryaliases#defaultaliasfile> rdf:type owl:Ontology ;
                                                                  
-                                                                 owl:imports <http://purl.org/podd/ns/version/dataRepository/1> ;
+                                                                 owl:imports <http://purl.org/podd/ns/version/dataRepository/3> ;
                                                                  
-                                                                 owl:versionIRI <http://test.example.org/filerepositoryaliases:version:1> .
+                                                                 owl:versionIRI <http://test.example.org/filerepositoryaliases:version:3:1> .
 
 
 #################################################################

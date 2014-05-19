@@ -122,12 +122,17 @@ public interface PODD
     /** Path to default schema manifest file */
     public static final String PATH_DEFAULT_SCHEMAS = "/default-podd-schema-manifest.ttl";
 
+    @Deprecated
     public static final String PATH_BASE_ONTOLOGIES_VERSION_1 = "/ontologies/version/1/";
 
+    public static final String PATH_BASE_ONTOLOGIES_VERSION_3 = "/ontologies/version/3/";
+
     /** Path to poddAnimal.owl */
+    @Deprecated
     public static final String PATH_PODD_ANIMAL_V1 = PODD.PATH_BASE_ONTOLOGIES_VERSION_1 + "poddAnimal.owl";
 
     /** Path to poddBase.owl */
+    @Deprecated
     public static final String PATH_PODD_BASE_V1 = PODD.PATH_BASE_ONTOLOGIES_VERSION_1 + "poddBase.owl";
 
     /**
@@ -136,30 +141,48 @@ public interface PODD
      * This ontology is NOT part of the standard schema ontologies. It is a separate ontology used
      * to validate Data Repository configurations.
      */
+    @Deprecated
     public static final String PATH_PODD_DATA_REPOSITORY_V1 = PODD.PATH_BASE_ONTOLOGIES_VERSION_1
             + "poddDataRepository.owl";
 
+    /**
+     * Path to poddDataRepository.owl.
+     *
+     * This ontology is NOT part of the standard schema ontologies. It is a separate ontology used
+     * to validate Data Repository configurations.
+     */
+    public static final String PATH_PODD_DATA_REPOSITORY_V3 = PODD.PATH_BASE_ONTOLOGIES_VERSION_3
+            + "poddDataRepository.owl";
+
     /** Path to dcTerms.owl */
+    @Deprecated
     public static final String PATH_PODD_DCTERMS_V1 = PODD.PATH_BASE_ONTOLOGIES_VERSION_1 + "dcTerms.owl";
 
     /** Path to foaf.owl */
+    @Deprecated
     public static final String PATH_PODD_FOAF_V1 = PODD.PATH_BASE_ONTOLOGIES_VERSION_1 + "foaf.owl";
 
     /** Path to poddPlant.owl */
+    @Deprecated
     public static final String PATH_PODD_PLANT_V1 = PODD.PATH_BASE_ONTOLOGIES_VERSION_1 + "poddPlant.owl";
 
     /** Path to poddScience.owl */
+    @Deprecated
     public static final String PATH_PODD_SCIENCE_V1 = PODD.PATH_BASE_ONTOLOGIES_VERSION_1 + "poddScience.owl";
 
     /** Path to poddUser.owl */
+    @Deprecated
     public static final String PATH_PODD_USER_V1 = PODD.PATH_BASE_ONTOLOGIES_VERSION_1 + "poddUser.owl";
 
+    @Deprecated
     public static final String PATH_BASE_ONTOLOGIES_VERSION_2 = "/ontologies/version/2/";
 
     /** Path to poddAnimal.owl */
+    @Deprecated
     public static final String PATH_PODD_ANIMAL_V2 = PODD.PATH_BASE_ONTOLOGIES_VERSION_2 + "poddAnimal.owl";
 
     /** Path to poddBase.owl */
+    @Deprecated
     public static final String PATH_PODD_BASE_V2 = PODD.PATH_BASE_ONTOLOGIES_VERSION_2 + "poddBase.owl";
 
     /**
@@ -168,22 +191,28 @@ public interface PODD
      * This ontology is NOT part of the standard schema ontologies. It is a separate ontology used
      * to validate Data Repository configurations.
      */
+    @Deprecated
     public static final String PATH_PODD_DATA_REPOSITORY_V2 = PODD.PATH_BASE_ONTOLOGIES_VERSION_2
             + "poddDataRepository.owl";
 
     /** Path to dcTerms.owl */
+    @Deprecated
     public static final String PATH_PODD_DCTERMS_V2 = PODD.PATH_BASE_ONTOLOGIES_VERSION_2 + "dcTerms.owl";
 
     /** Path to foaf.owl */
+    @Deprecated
     public static final String PATH_PODD_FOAF_V2 = PODD.PATH_BASE_ONTOLOGIES_VERSION_2 + "foaf.owl";
 
     /** Path to poddPlant.owl */
+    @Deprecated
     public static final String PATH_PODD_PLANT_V2 = PODD.PATH_BASE_ONTOLOGIES_VERSION_2 + "poddPlant.owl";
 
     /** Path to poddScience.owl */
+    @Deprecated
     public static final String PATH_PODD_SCIENCE_V2 = PODD.PATH_BASE_ONTOLOGIES_VERSION_2 + "poddScience.owl";
 
     /** Path to poddUser.owl */
+    @Deprecated
     public static final String PATH_PODD_USER_V2 = PODD.PATH_BASE_ONTOLOGIES_VERSION_2 + "poddUser.owl";
 
     public static final String PODD_BASE = "http://purl.org/podd/ns/poddBase#";;

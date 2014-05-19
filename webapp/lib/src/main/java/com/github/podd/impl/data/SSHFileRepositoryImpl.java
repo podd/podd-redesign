@@ -64,7 +64,7 @@ public class SSHFileRepositoryImpl extends AbstractPoddDataRepositoryImpl<SSHFil
                 model.filter(this.aliasUri, PODDDATAREPOSITORY.HAS_DATA_REPOSITORY_PRIVATE_KEY, null).objectString();
         
         if(protocol == null || host == null || port == null || fingerprint == null || username == null
-                || (secret == null || privateKey == null))
+                || (secret == null && privateKey == null))
         {
             throw new DataRepositoryIncompleteException("SSH repository configuration incomplete");
         }

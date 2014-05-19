@@ -83,14 +83,14 @@ public class PoddDataRepositoryManagerImpl implements PoddDataRepositoryManager
 
     private PoddOWLManager owlManager;
 
-    private Model dataRepositorySchema;
+    private final Model dataRepositorySchema;
 
     /**
      *
      */
     public PoddDataRepositoryManagerImpl()
     {
-        try (final InputStream inputA = this.getClass().getResourceAsStream(PODD.PATH_PODD_DATA_REPOSITORY_V1);)
+        try (final InputStream inputA = this.getClass().getResourceAsStream(PODD.PATH_PODD_DATA_REPOSITORY_V3);)
         {
             Objects.requireNonNull(inputA, "could not find data repository ontology");
             // load poddDataRepository.owl into a Model
