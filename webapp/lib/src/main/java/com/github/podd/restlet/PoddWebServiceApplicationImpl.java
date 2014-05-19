@@ -466,7 +466,7 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
         if(this.aliasesConfiguration.isEmpty())
         {
             final String aliasesFile = this.propertyUtil.get(PODD.KEY_ALIASES, PODD.PATH_DEFAULT_ALIASES_FILE);
-            try (final InputStream input = ApplicationUtils.class.getResourceAsStream(aliasesFile);)
+            try (final InputStream input = this.getClass().getResourceAsStream(aliasesFile);)
             {
                 if(input != null)
                 {
@@ -479,7 +479,7 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
             }
             catch(IOException | RDFParseException | UnsupportedRDFormatException e)
             {
-                this.log.error("Could not load data repository configuration");
+                this.log.error("Could not load data repository configuration: {}", aliasesFile);
                 throw new PoddRuntimeException("Could not load data repository configuration", e);
             }
         }
