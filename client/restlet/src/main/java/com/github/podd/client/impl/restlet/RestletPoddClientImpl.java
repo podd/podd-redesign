@@ -455,16 +455,21 @@ public class RestletPoddClientImpl implements PoddClient
     public Model getObjectsByType(final URI type, final Collection<InferredOWLOntologyID> artifacts)
         throws PoddClientException
     {
-        return this.doSPARQL(String.format(PoddClient.TEMPLATE_SPARQL_BY_TYPE_WITH_LABEL, RenderUtils.getSPARQLQueryString(type)),
-                artifacts);
+        String queryString =
+                String.format(PoddClient.TEMPLATE_SPARQL_BY_TYPE_WITH_LABEL, RenderUtils.getSPARQLQueryString(type));
+        this.log.info("queryString={}", queryString);
+        return this.doSPARQL(queryString, artifacts);
     }
     
     @Override
     public Model getObjectsByTypeAndPrefix(final URI type, final String labelPrefix,
             final Collection<InferredOWLOntologyID> artifacts) throws PoddClientException
     {
-        return this.doSPARQL(String.format(PoddClient.TEMPLATE_SPARQL_BY_TYPE_LABEL_STRSTARTS,
-                RenderUtils.escape(labelPrefix), RenderUtils.getSPARQLQueryString(type)), artifacts);
+        String queryString =
+                String.format(PoddClient.TEMPLATE_SPARQL_BY_TYPE_LABEL_STRSTARTS, RenderUtils.escape(labelPrefix),
+                        RenderUtils.getSPARQLQueryString(type));
+        this.log.info("queryString={}", queryString);
+        return this.doSPARQL(queryString, artifacts);
     }
     
     @Override
@@ -479,8 +484,7 @@ public class RestletPoddClientImpl implements PoddClient
         String queryString =
                 String.format(PoddClient.TEMPLATE_SPARQL_BY_TYPE_LABEL_STRSTARTS_PREDICATE, predicateString,
                         predicateString, RenderUtils.escape(labelPrefix), RenderUtils.getSPARQLQueryString(type));
-        
-        System.out.println("queryString=" + queryString);
+        this.log.info("queryString={}", queryString);
         return this.doSPARQL(queryString, artifacts);
     }
     
@@ -488,11 +492,13 @@ public class RestletPoddClientImpl implements PoddClient
     public Model getObjectsByTypeAndParent(final URI parent, final URI parentPredicate, final URI type,
             final Collection<InferredOWLOntologyID> artifacts) throws PoddClientException
     {
-        return this.doSPARQL(String.format(PoddClient.TEMPLATE_SPARQL_BY_TYPE_AND_PARENT_ALL_PROPERTIES,
-                RenderUtils.getSPARQLQueryString(parent), RenderUtils.getSPARQLQueryString(parentPredicate),
-                RenderUtils.getSPARQLQueryString(type)), artifacts);
+        String queryString =
+                String.format(PoddClient.TEMPLATE_SPARQL_BY_TYPE_AND_PARENT_ALL_PROPERTIES,
+                        RenderUtils.getSPARQLQueryString(parent), RenderUtils.getSPARQLQueryString(parentPredicate),
+                        RenderUtils.getSPARQLQueryString(type));
+        this.log.info("queryString={}", queryString);
+        return this.doSPARQL(queryString, artifacts);
     }
-    
     
     /*
      * (non-Javadoc)

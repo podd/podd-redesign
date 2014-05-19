@@ -423,9 +423,7 @@ public class PoddOWLManagerImpl implements PoddOWLManager
             }
             catch(OWLOntologyCreationException | OWLParserException | IOException e)
             {
-                // throwing up the original Exceptions is also a possibility
-                // here.
-                throw new EmptyOntologyException(nextOntology, "Error parsing Model to create an Ontology");
+                throw new EmptyOntologyException(nextOntology, "Error parsing Model to create an Ontology", e);
             }
             
             // Repository configuration can be an empty ontology
@@ -1045,7 +1043,7 @@ public class PoddOWLManagerImpl implements PoddOWLManager
         }
         catch(final PoddException e)// | OpenRDFException | IOException e)
         {
-            final String msg = "Failed verification of the DataRepsitory against poddDataRepository.owl";
+            final String msg = "Failed verification of the DataRepository against poddDataRepository.owl";
             this.log.error(msg, e);
             throw new OntologyNotInProfileException(null, null, msg, e);
         }
