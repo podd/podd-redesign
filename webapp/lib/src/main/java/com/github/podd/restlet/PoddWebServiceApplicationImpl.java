@@ -652,7 +652,8 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
     {
         super.stop();
         this.cleanUpResources();
-        this.log.info("== Shutting down PODD Web Application ==");
+        this.log.info("\r\n" + "============================== \r\n" + "PODD Web Application \r\n"
+                + "shutting down... \r\n" + "==============================");
     }
     
 }
