@@ -2978,7 +2978,7 @@ public abstract class AbstractPoddArtifactManagerTest
                 this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_BASIC_PROJECT_4);
         final InferredOWLOntologyID artifactIDv1 =
                 this.testArtifactManager.loadArtifact(inputStream1, RDFFormat.RDFXML);
-        this.verifyLoadedArtifact(artifactIDv1, 12, TestConstants.TEST_ARTIFACT_BASIC_PROJECT_4_CONCRETE_TRIPLES,
+        this.verifyLoadedArtifact(artifactIDv1, 11, TestConstants.TEST_ARTIFACT_BASIC_PROJECT_4_CONCRETE_TRIPLES,
                 TestConstants.TEST_ARTIFACT_BASIC_PROJECT_4_INFERRED_TRIPLES, false);
         
         Set<? extends OWLOntologyID> schemaImportsV1 = this.testArtifactManager.getSchemaImports(artifactIDv1);
@@ -3028,7 +3028,7 @@ public abstract class AbstractPoddArtifactManagerTest
                 this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_BASIC_PROJECT_4);
         final InferredOWLOntologyID artifactIDv1 =
                 this.testArtifactManager.loadArtifact(inputStream1, RDFFormat.RDFXML);
-        this.verifyLoadedArtifact(artifactIDv1, 12, TestConstants.TEST_ARTIFACT_BASIC_PROJECT_4_CONCRETE_TRIPLES,
+        this.verifyLoadedArtifact(artifactIDv1, 11, TestConstants.TEST_ARTIFACT_BASIC_PROJECT_4_CONCRETE_TRIPLES,
                 TestConstants.TEST_ARTIFACT_BASIC_PROJECT_4_INFERRED_TRIPLES, false);
         
         Set<? extends OWLOntologyID> schemaImportsV1 = this.testArtifactManager.getSchemaImports(artifactIDv1);
