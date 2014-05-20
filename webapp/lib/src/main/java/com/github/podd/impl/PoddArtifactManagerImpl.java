@@ -2480,9 +2480,12 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             
             if(model.isEmpty())
             {
-                System.out.println("Debug why artifact was not found:");
-                // FIXME: Temporary debugging only
-                DebugUtils.printContents(oldPermanentConnection);
+                if(this.log.isTraceEnabled())
+                {
+                    System.out.println("Debug why artifact was not found:");
+                    // FIXME: Temporary debugging only
+                    DebugUtils.printContents(oldPermanentConnection);
+                }
                 throw new RuntimeException("Was not able to export artifact as it did not seem to exist");
             }
             
