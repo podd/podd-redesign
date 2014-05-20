@@ -155,15 +155,6 @@ public class PoddArtifactManagerImplTest extends AbstractPoddArtifactManagerTest
         return new UUIDPurlProcessorFactoryImpl();
     }
     
-    /**
-     * Helper method which loads version 1 for the three PODD schema ontologies (and their
-     * dependencies): PODD-Base, PODD-Science and PODD-Plant.
-     *
-     * This method is not called from the setUp() method since some tests require not loading all
-     * schema ontologies.
-     *
-     * @throws Exception
-     */
     @Override
     protected List<InferredOWLOntologyID> loadVersion1SchemaOntologies() throws Exception
     {
@@ -172,20 +163,19 @@ public class PoddArtifactManagerImplTest extends AbstractPoddArtifactManagerTest
                         RDFFormat.TURTLE));
     }
     
-    /**
-     * Helper method which loads version 1 for the three PODD schema ontologies (and their
-     * dependencies): PODD-Base, PODD-Science and PODD-Plant.
-     *
-     * This method is not called from the setUp() method since some tests require not loading all
-     * schema ontologies.
-     *
-     * @throws Exception
-     */
     @Override
     protected List<InferredOWLOntologyID> loadVersion2SchemaOntologies() throws Exception
     {
         return this.testArtifactManager.getSchemaManager().uploadSchemaOntologies(
                 Rio.parse(this.getClass().getResourceAsStream("/podd-schema-manifest-version2only.ttl"), "",
+                        RDFFormat.TURTLE));
+    }
+    
+    @Override
+    protected List<InferredOWLOntologyID> loadVersion3SchemaOntologies() throws Exception
+    {
+        return this.testArtifactManager.getSchemaManager().uploadSchemaOntologies(
+                Rio.parse(this.getClass().getResourceAsStream("/podd-schema-manifest-version3only.ttl"), "",
                         RDFFormat.TURTLE));
     }
     

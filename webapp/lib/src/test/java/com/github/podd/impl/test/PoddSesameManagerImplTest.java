@@ -72,7 +72,7 @@ public class PoddSesameManagerImplTest extends AbstractPoddSesameManagerTest
             final URI schemaManagementGraph) throws Exception
             {
         final Model model =
-                Rio.parse(this.getClass().getResourceAsStream("/podd-schema-manifest.ttl"), "", RDFFormat.TURTLE,
+                Rio.parse(this.getClass().getResourceAsStream("/default-podd-schema-manifest.ttl"), "", RDFFormat.TURTLE,
                         schemaManagementGraph);
 
         final List<InferredOWLOntologyID> ontologyIDs =

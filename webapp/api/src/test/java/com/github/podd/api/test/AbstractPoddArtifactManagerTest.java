@@ -42,6 +42,7 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
 import org.junit.rules.Timeout;
 import org.openrdf.OpenRDFException;
@@ -125,6 +126,9 @@ public abstract class AbstractPoddArtifactManagerTest
     
     @Rule
     public TemporaryFolder tempDir = new TemporaryFolder();
+    
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
     
     protected Logger log = LoggerFactory.getLogger(this.getClass());
     
@@ -513,7 +517,7 @@ public abstract class AbstractPoddArtifactManagerTest
     protected abstract List<InferredOWLOntologyID> loadVersion1SchemaOntologies() throws Exception;
     
     /**
-     * Helper method which loads version 1 for the three PODD schema ontologies (and their
+     * Helper method which loads version 2 for the three PODD schema ontologies (and their
      * dependencies): PODD-Base, PODD-Science and PODD-Plant.
      *
      * This method is not called from the setUp() method since some tests require not loading all
@@ -522,6 +526,17 @@ public abstract class AbstractPoddArtifactManagerTest
      * @throws Exception
      */
     protected abstract List<InferredOWLOntologyID> loadVersion2SchemaOntologies() throws Exception;
+    
+    /**
+     * Helper method which loads version 3 for the three PODD schema ontologies (and their
+     * dependencies): PODD-Base, PODD-Science and PODD-Plant.
+     *
+     * This method is not called from the setUp() method since some tests require not loading all
+     * schema ontologies.
+     *
+     * @throws Exception
+     */
+    protected abstract List<InferredOWLOntologyID> loadVersion3SchemaOntologies() throws Exception;
     
     /**
      * @throws java.lang.Exception
@@ -1793,9 +1808,43 @@ public abstract class AbstractPoddArtifactManagerTest
      * .
      */
     @Test
-    public final void testLoadArtifactWithInconsistency() throws Exception
+    public final void testLoadArtifactWithInconsistencyLeadInstitutes() throws Exception
     {
         this.loadVersion1SchemaOntologies();
+        
+        final InputStream inputStream =
+                this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_BAD_2_LEAD_INSTITUTES);
+        // MIME type should be either given by the user, detected from the content type on the
+        // request, or autodetected using the Any23 Mime Detector
+        final String mimeType = "application/rdf+xml";
+        final RDFFormat format = Rio.getParserFormatForMIMEType(mimeType, RDFFormat.RDFXML);
+        
+        try
+        {
+            // invoke test method
+            this.testArtifactManager.loadArtifact(inputStream, format);
+            Assert.fail("Should have thrown an InconsistentOntologyException");
+        }
+        catch(final InconsistentOntologyException e)
+        {
+            Assert.assertEquals("Not the expected Root Ontology", "urn:temp:inconsistentArtifact:1", e.getOntologyID()
+                    .getOntologyIRI().toString());
+            Assert.assertTrue("Not the expected error message", e.getMessage().startsWith("Ontology is inconsistent"));
+            
+            e.getDetailsAsModel(PODD.VF.createBNode());
+            
+        }
+    }
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddArtifactManager#loadArtifact(java.io.InputStream, org.openrdf.rio.RDFFormat)}
+     * .
+     */
+    @Test
+    public final void testLoadArtifactWithInconsistencyBarcode() throws Exception
+    {
+        this.loadVersion3SchemaOntologies();
         
         final InputStream inputStream =
                 this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_BAD_2_LEAD_INSTITUTES);
@@ -2883,11 +2932,20 @@ public abstract class AbstractPoddArtifactManagerTest
         final List<InferredOWLOntologyID> version1SchemaOntologies = this.loadVersion1SchemaOntologies();
         
         // upload artifact while we only have version 1 schemas loaded
-        final InputStream inputStream1 = this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_20130206);
+        final InputStream inputStream1 =
+                this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_BASIC_PROJECT_4);
         final InferredOWLOntologyID artifactIDv1 =
-                this.testArtifactManager.loadArtifact(inputStream1, RDFFormat.TURTLE);
-        this.verifyLoadedArtifact(artifactIDv1, 12, TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES,
-                TestConstants.TEST_ARTIFACT_BASIC_1_20130206_INFERRED_TRIPLES, false);
+                this.testArtifactManager.loadArtifact(inputStream1, RDFFormat.RDFXML);
+        this.verifyLoadedArtifact(artifactIDv1, 11, TestConstants.TEST_ARTIFACT_BASIC_PROJECT_4_CONCRETE_TRIPLES,
+                TestConstants.TEST_ARTIFACT_BASIC_PROJECT_4_INFERRED_TRIPLES, false);
+        
+        Set<? extends OWLOntologyID> schemaImportsV1 = this.testArtifactManager.getSchemaImports(artifactIDv1);
+        
+        System.out.println("Actual schema imports version 1:");
+        System.out.println(schemaImportsV1);
+        
+        System.out.println("All version 1 schema imports:");
+        System.out.println(version1SchemaOntologies);
         
         // Upload version 2 schemas
         final List<InferredOWLOntologyID> version2SchemaOntologies = this.loadVersion2SchemaOntologies();
@@ -2895,7 +2953,7 @@ public abstract class AbstractPoddArtifactManagerTest
         // Update from version 1 to version 2
         this.testArtifactManager.updateSchemaImports(new InferredOWLOntologyID(artifactIDv1.getOntologyIRI(),
                 artifactIDv1.getVersionIRI(), artifactIDv1.getInferredOntologyIRI()), new LinkedHashSet<OWLOntologyID>(
-                version1SchemaOntologies), new LinkedHashSet<OWLOntologyID>(version2SchemaOntologies));
+                schemaImportsV1), new LinkedHashSet<OWLOntologyID>(version2SchemaOntologies));
         
         final InferredOWLOntologyID afterUpdate = this.testArtifactManager.getArtifact(artifactIDv1.getOntologyIRI());
         
@@ -2916,11 +2974,20 @@ public abstract class AbstractPoddArtifactManagerTest
         final List<InferredOWLOntologyID> version1SchemaOntologies = this.loadVersion1SchemaOntologies();
         
         // upload artifact while we only have version 1 schemas loaded
-        final InputStream inputStream1 = this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_20130206);
+        final InputStream inputStream1 =
+                this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_BASIC_PROJECT_4);
         final InferredOWLOntologyID artifactIDv1 =
-                this.testArtifactManager.loadArtifact(inputStream1, RDFFormat.TURTLE);
-        this.verifyLoadedArtifact(artifactIDv1, 12, TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES,
-                TestConstants.TEST_ARTIFACT_BASIC_1_20130206_INFERRED_TRIPLES, false);
+                this.testArtifactManager.loadArtifact(inputStream1, RDFFormat.RDFXML);
+        this.verifyLoadedArtifact(artifactIDv1, 12, TestConstants.TEST_ARTIFACT_BASIC_PROJECT_4_CONCRETE_TRIPLES,
+                TestConstants.TEST_ARTIFACT_BASIC_PROJECT_4_INFERRED_TRIPLES, false);
+        
+        Set<? extends OWLOntologyID> schemaImportsV1 = this.testArtifactManager.getSchemaImports(artifactIDv1);
+        
+        System.out.println("Actual schema imports version 1:");
+        System.out.println(schemaImportsV1);
+        
+        System.out.println("All version 1 schema imports:");
+        System.out.println(version1SchemaOntologies);
         
         // Simulate reloading all of the application
         this.setupManagers();
@@ -2932,7 +2999,7 @@ public abstract class AbstractPoddArtifactManagerTest
         final InferredOWLOntologyID artifactIDv2 =
                 this.testArtifactManager.updateSchemaImports(new InferredOWLOntologyID(artifactIDv1.getOntologyIRI(),
                         artifactIDv1.getVersionIRI(), artifactIDv1.getInferredOntologyIRI()),
-                        new LinkedHashSet<OWLOntologyID>(version1SchemaOntologies), new LinkedHashSet<OWLOntologyID>(
+                        new LinkedHashSet<OWLOntologyID>(schemaImportsV1), new LinkedHashSet<OWLOntologyID>(
                                 version2SchemaOntologies));
         
         final InferredOWLOntologyID afterUpdate = this.testArtifactManager.getArtifact(artifactIDv1.getOntologyIRI());
@@ -2957,6 +3024,118 @@ public abstract class AbstractPoddArtifactManagerTest
         final List<InferredOWLOntologyID> version1SchemaOntologies = this.loadVersion1SchemaOntologies();
         
         // upload artifact while we only have version 1 schemas loaded
+        final InputStream inputStream1 =
+                this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_BASIC_PROJECT_4);
+        final InferredOWLOntologyID artifactIDv1 =
+                this.testArtifactManager.loadArtifact(inputStream1, RDFFormat.RDFXML);
+        this.verifyLoadedArtifact(artifactIDv1, 12, TestConstants.TEST_ARTIFACT_BASIC_PROJECT_4_CONCRETE_TRIPLES,
+                TestConstants.TEST_ARTIFACT_BASIC_PROJECT_4_INFERRED_TRIPLES, false);
+        
+        Set<? extends OWLOntologyID> schemaImportsV1 = this.testArtifactManager.getSchemaImports(artifactIDv1);
+        
+        System.out.println("Actual schema imports version 1:");
+        System.out.println(schemaImportsV1);
+        
+        System.out.println("All version 1 schema imports:");
+        System.out.println(version1SchemaOntologies);
+        
+        // Simulate reloading all of the application
+        this.setupManagers();
+        
+        // Upload version 2 schemas
+        final List<InferredOWLOntologyID> version2SchemaOntologies = this.loadVersion2SchemaOntologies();
+        
+        // Simulate reloading all of the application after loading the version 2 schema ontologies
+        this.setupManagers();
+        
+        // Update from version 1 to version 2
+        this.testArtifactManager.updateSchemaImports(new InferredOWLOntologyID(artifactIDv1.getOntologyIRI(),
+                artifactIDv1.getVersionIRI(), artifactIDv1.getInferredOntologyIRI()), new LinkedHashSet<OWLOntologyID>(
+                        schemaImportsV1), new LinkedHashSet<OWLOntologyID>(version2SchemaOntologies));
+        
+        final InferredOWLOntologyID artifactIDv2 = this.testArtifactManager.getArtifact(artifactIDv1.getOntologyIRI());
+        
+        Assert.assertEquals(artifactIDv2.getOntologyIRI(), artifactIDv1.getOntologyIRI());
+        // Verify version for artifact changed after the schema import update, to ensure that they
+        // are distinct internally
+        Assert.assertNotEquals(artifactIDv2.getVersionIRI(), artifactIDv1.getVersionIRI());
+        
+        // Simulate reloading all of the application
+        this.setupManagers();
+        
+        // Upload version 2 schemas
+        final List<InferredOWLOntologyID> version3SchemaOntologies = this.loadVersion2SchemaOntologies();
+        
+        // Simulate reloading all of the application after loading the version 2 schema ontologies
+        this.setupManagers();
+        
+        // Update from version 1 to version 2
+        InferredOWLOntologyID artifactIDv3a =
+                this.testArtifactManager.updateSchemaImports(new InferredOWLOntologyID(artifactIDv2.getOntologyIRI(),
+                        artifactIDv2.getVersionIRI(), artifactIDv2.getInferredOntologyIRI()),
+                        new LinkedHashSet<OWLOntologyID>(version2SchemaOntologies), new LinkedHashSet<OWLOntologyID>(
+                                version3SchemaOntologies));
+        
+        final InferredOWLOntologyID artifactIDv3b = this.testArtifactManager.getArtifact(artifactIDv2.getOntologyIRI());
+        
+        Assert.assertEquals(artifactIDv3a.getOntologyIRI(), artifactIDv1.getOntologyIRI());
+        Assert.assertEquals(artifactIDv3a.getOntologyIRI(), artifactIDv2.getOntologyIRI());
+        Assert.assertEquals(artifactIDv3b.getOntologyIRI(), artifactIDv1.getOntologyIRI());
+        Assert.assertEquals(artifactIDv3b.getOntologyIRI(), artifactIDv2.getOntologyIRI());
+        Assert.assertEquals(artifactIDv3b.getOntologyIRI(), artifactIDv3a.getOntologyIRI());
+        // Verify version for artifact changed after the schema import update, to ensure that they
+        // are distinct internally
+        Assert.assertNotEquals(artifactIDv3b.getVersionIRI(), artifactIDv1.getVersionIRI());
+        Assert.assertNotEquals(artifactIDv3b.getVersionIRI(), artifactIDv2.getVersionIRI());
+        // Both current versions should be the same
+        Assert.assertEquals(artifactIDv3b.getVersionIRI(), artifactIDv3a.getVersionIRI());
+        
+    }
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddArtifactManager#updateSchemaImports(InferredOWLOntologyID, Set, Set)}
+     * .
+     * 
+     * NOTE: This fails due to the replacement of Investigation with Experiment between version 1
+     * and version 2.
+     */
+    @Test
+    public final void testUpdateSchemaImportsToVersion2FailInvestigationExperiment() throws Exception
+    {
+        final List<InferredOWLOntologyID> version1SchemaOntologies = this.loadVersion1SchemaOntologies();
+        
+        // upload artifact while we only have version 1 schemas loaded
+        final InputStream inputStream1 = this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_20130206);
+        final InferredOWLOntologyID artifactIDv1 =
+                this.testArtifactManager.loadArtifact(inputStream1, RDFFormat.TURTLE);
+        this.verifyLoadedArtifact(artifactIDv1, 12, TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES,
+                TestConstants.TEST_ARTIFACT_BASIC_1_20130206_INFERRED_TRIPLES, false);
+        
+        // Upload version 2 schemas
+        final List<InferredOWLOntologyID> version2SchemaOntologies = this.loadVersion2SchemaOntologies();
+        
+        thrown.expect(OntologyNotInProfileException.class);
+        // Update from version 1 to version 2
+        this.testArtifactManager.updateSchemaImports(new InferredOWLOntologyID(artifactIDv1.getOntologyIRI(),
+                artifactIDv1.getVersionIRI(), artifactIDv1.getInferredOntologyIRI()), new LinkedHashSet<OWLOntologyID>(
+                version1SchemaOntologies), new LinkedHashSet<OWLOntologyID>(version2SchemaOntologies));
+    }
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddArtifactManager#updateSchemaImports(InferredOWLOntologyID, Set, Set)}
+     * .
+     * 
+     * NOTE: This fails due to the replacement of Investigation with Experiment between version 1
+     * and version 2.
+     */
+    @Test
+    public final void testUpdateSchemaImportsToVersion2AfterReloadFailInvestigationExperiment() throws Exception
+    {
+        final List<InferredOWLOntologyID> version1SchemaOntologies = this.loadVersion1SchemaOntologies();
+        
+        // upload artifact while we only have version 1 schemas loaded
         final InputStream inputStream1 = this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_20130206);
         final InferredOWLOntologyID artifactIDv1 =
                 this.testArtifactManager.loadArtifact(inputStream1, RDFFormat.TURTLE);
@@ -2969,20 +3148,49 @@ public abstract class AbstractPoddArtifactManagerTest
         // Upload version 2 schemas
         final List<InferredOWLOntologyID> version2SchemaOntologies = this.loadVersion2SchemaOntologies();
         
+        thrown.expect(OntologyNotInProfileException.class);
+        // Update from version 1 to version 2
+        final InferredOWLOntologyID artifactIDv2 =
+                this.testArtifactManager.updateSchemaImports(new InferredOWLOntologyID(artifactIDv1.getOntologyIRI(),
+                        artifactIDv1.getVersionIRI(), artifactIDv1.getInferredOntologyIRI()),
+                        new LinkedHashSet<OWLOntologyID>(version1SchemaOntologies), new LinkedHashSet<OWLOntologyID>(
+                                version2SchemaOntologies));
+    }
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddArtifactManager#updateSchemaImports(InferredOWLOntologyID, Set, Set)}
+     * .
+     * 
+     * NOTE: This fails due to the replacement of Investigation with Experiment between version 1
+     * and version 2.
+     */
+    @Test
+    public final void testUpdateSchemaImportsToVersion2AfterReload2FailInvestigationExperiment() throws Exception
+    {
+        final List<InferredOWLOntologyID> version1SchemaOntologies = this.loadVersion1SchemaOntologies();
+        
+        // upload artifact while we only have version 1 schemas loaded
+        final InputStream inputStream1 = this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_20130206);
+        final InferredOWLOntologyID artifactIDv1 =
+                this.testArtifactManager.loadArtifact(inputStream1, RDFFormat.TURTLE);
+        this.verifyLoadedArtifact(artifactIDv1, 12, TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES,
+                TestConstants.TEST_ARTIFACT_BASIC_1_20130206_INFERRED_TRIPLES, false);
+        
         // Simulate reloading all of the application
         this.setupManagers();
         
+        // Upload version 2 schemas
+        final List<InferredOWLOntologyID> version2SchemaOntologies = this.loadVersion2SchemaOntologies();
+        
+        // Simulate reloading all of the application after loading the version 2 schema ontologies
+        this.setupManagers();
+        
+        thrown.expect(OntologyNotInProfileException.class);
         // Update from version 1 to version 2
         this.testArtifactManager.updateSchemaImports(new InferredOWLOntologyID(artifactIDv1.getOntologyIRI(),
                 artifactIDv1.getVersionIRI(), artifactIDv1.getInferredOntologyIRI()), new LinkedHashSet<OWLOntologyID>(
                 version1SchemaOntologies), new LinkedHashSet<OWLOntologyID>(version2SchemaOntologies));
-        
-        final InferredOWLOntologyID afterUpdate = this.testArtifactManager.getArtifact(artifactIDv1.getOntologyIRI());
-        
-        Assert.assertEquals(afterUpdate.getOntologyIRI(), artifactIDv1.getOntologyIRI());
-        // Verify version for artifact changed after the schema import update, to ensure that they
-        // are distinct internally
-        Assert.assertNotEquals(afterUpdate.getVersionIRI(), artifactIDv1.getVersionIRI());
     }
     
     /**
