@@ -612,18 +612,18 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-surefire-plugin</artifactId>
-					<version>2.16</version>
+					<version>2.17</version>
 					<!-- <configuration> <argLine>-Xmx4096m</argLine> </configuration> -->
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-failsafe-plugin</artifactId>
-					<version>2.16</version>
+					<version>2.17</version>
 				</plugin>
 				<plugin>
 					<groupId>org.mortbay.jetty</groupId>
 					<artifactId>jetty-maven-plugin</artifactId>
-					<version>8.1.14.v20131031</version>
+					<version>8.1.15.v20140411</version>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
@@ -635,11 +635,15 @@
 					<artifactId>versions-maven-plugin</artifactId>
 					<version>2.1</version>
 				</plugin>
-				<!-- Disabled due to not working with Java-8
 				<plugin>
 					<groupId>org.codehaus.mojo</groupId>
 					<artifactId>findbugs-maven-plugin</artifactId>
-					<version>2.5.4-SNAPSHOT</version>
+					<version>2.5.3</version>
+					<configuration>
+						<!-- Disabled due to not working with Java-8 -->
+						<skip>true</skip>
+						<failOnError>false</failOnError>
+					</configuration>
 					<executions>
 						<execution>
 							<id>findbugs-check</id>
@@ -647,13 +651,9 @@
 							<goals>
 								<goal>check</goal>
 							</goals>
-							<configuration>
-								<failOnError>false</failOnError>
-							</configuration>
 						</execution>
 					</executions>
 				</plugin>
-				-->
 				<plugin>
 					<groupId>org.jacoco</groupId>
 					<artifactId>jacoco-maven-plugin</artifactId>
