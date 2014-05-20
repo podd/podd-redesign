@@ -59,7 +59,7 @@ public interface TestConstants
 
     /** Test resource: (in RDF/XML) artifact with published status */
     public static final String TEST_ARTIFACT_BASIC_PROJECT_PUBLISHED = "/test/artifacts/basicProject-1-published.rdf";
-    public static final int TEST_ARTIFACT_BASIC_PROJECT_PUBLISHED_CONCRETE_TRIPLES = 24;
+    public static final int TEST_ARTIFACT_BASIC_PROJECT_PUBLISHED_CONCRETE_TRIPLES = 25;
     public static final int TEST_ARTIFACT_BASIC_PROJECT_PUBLISHED_INFERRED_TRIPLES = 348;
 
     public static final String TEST_ARTIFACT_PURLS_2_FILE_REFS = "/test/artifacts/project-purls-file-ref.rdf";

@@ -1904,8 +1904,8 @@ public abstract class AbstractPoddSesameManagerTest
         final String testResourcePath = TestConstants.TEST_ARTIFACT_BASIC_PROJECT_PUBLISHED;
         final URI versionUri = ValueFactoryImpl.getInstance().createURI("urn:temp:uuid:artifact:version:55");
 
-        final boolean isPublished = this.internalTestIsPublished(true, testResourcePath, 21, versionUri, context);
-        Assert.assertEquals("Did not identify artifact as Published", true, isPublished);
+        final boolean isPublished = this.internalTestIsPublished(true, testResourcePath, 22, versionUri, context);
+        Assert.assertTrue("Did not identify artifact as Published", isPublished);
     }
 
     /**

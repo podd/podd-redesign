@@ -37,7 +37,9 @@
 	<poddBase:hasStartDate rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2012-05-22</poddBase:hasStartDate>
 	<poddScience:hasANZSRC rdf:resource="http://purl.org/podd/ns/poddBase#NotApplicable"/>
 	<poddBase:hasPrincipalInvestigator rdf:resource="mailto:xavier.sirault@csiro.au"/>
-
+	
+	<poddScience:hasBarcode rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Project#2012-0006</poddScience:hasBarcode>
+	
 	<!-- To be added by PODD, not to be submitted by user -->
 	<poddBase:createdAt rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2012-06-05T01:57:16.643Z</poddBase:createdAt>
 	<dcterms:creator rdf:resource="mailto:helen.daily@csiro.au" />
