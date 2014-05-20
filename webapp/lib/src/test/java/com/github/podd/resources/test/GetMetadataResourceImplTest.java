@@ -261,9 +261,9 @@ public class GetMetadataResourceImplTest extends AbstractResourceImplTest
                             MediaType.APPLICATION_RDF_TURTLE, Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
 
             // verify:
-            final Model model = this.assertRdf(results, RDFFormat.TURTLE, 54);
+            final Model model = this.assertRdf(results, RDFFormat.TURTLE, 63);
 
-            Assert.assertEquals("Unexpected no. of properties", 6,
+            Assert.assertEquals("Unexpected no. of properties", 7,
                     model.filter(PODD.VF.createURI(objectType), null, null).size() - 1);
             Assert.assertEquals("Expected no Do-Not-Display properties", 0,
                     model.filter(null, PODD.PODD_BASE_DO_NOT_DISPLAY, null).size());
@@ -332,9 +332,9 @@ public class GetMetadataResourceImplTest extends AbstractResourceImplTest
                             MediaType.APPLICATION_RDF_TURTLE, Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
 
             // verify:
-            final Model model = this.assertRdf(results, RDFFormat.TURTLE, 88);
+            final Model model = this.assertRdf(results, RDFFormat.TURTLE, 97);
 
-            Assert.assertEquals("Unexpected no. of properties", 9,
+            Assert.assertEquals("Unexpected no. of properties", 10,
                     model.filter(PODD.VF.createURI(objectType), null, null).size() - 1);
             Assert.assertEquals("Expected no Do-Not-Display properties", 0,
                     model.filter(null, PODD.PODD_BASE_DO_NOT_DISPLAY, null).size());
