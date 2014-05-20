@@ -49,17 +49,17 @@ public class RestletPoddClientImplIntegrationTest extends AbstractPoddClientTest
 {
     @Rule
     public TemporaryFolder tempDirectory = new TemporaryFolder();
-
+    
     private SSHService sshd;
-
+    
     private Path tempFolder;
     private Map<String, Path> tempFiles = new ConcurrentHashMap<String, Path>();
-
+    
     @Override
     protected DataReference deployFileReference(final String label) throws Exception
     {
         Path nextTempFile;
-
+        
         if(this.tempFiles.containsKey(label))
         {
             nextTempFile = this.tempFiles.get(label);
@@ -68,54 +68,55 @@ public class RestletPoddClientImplIntegrationTest extends AbstractPoddClientTest
         {
             nextTempFile = this.tempFolder.resolve("file-" + label.hashCode() + ".data");
         }
-
+        
         if(!Files.exists(nextTempFile))
         {
             // Put a file into the server for this file reference to ensure that it validates to a
             // file
             try (final InputStream testUploadedFile =
                     this.getClass().getResourceAsStream("/test/artifacts/basicProject-1.rdf");)
-                    {
+            {
                 Files.createFile(nextTempFile);
-
+                
                 this.tempFiles.put(label, nextTempFile);
                 Files.copy(testUploadedFile, nextTempFile, StandardCopyOption.REPLACE_EXISTING);
-                    }
+            }
             catch(final FileAlreadyExistsException e)
             {
                 // Ignore, the file may have been created by another thread since we entered this
                 // block.
             }
         }
-
+        
         final SSHFileReference nextFileReference = new SSHFileReferenceImpl();
-
+        
         nextFileReference.setPath(this.tempFolder.toAbsolutePath().toString());
         nextFileReference.setFilename(nextTempFile.getFileName().toString());
         nextFileReference.setRepositoryAlias("localssh");
         nextFileReference.setLabel(label);
-
+        
         return nextFileReference;
     }
-
+    
     @Override
     protected void endFileRepositoryTest() throws Exception
     {
         this.sshd.stopTestSSHServer(this.tempFolder);
     }
-
+    
     @Override
     protected PoddClient getNewPoddClientInstance()
     {
-        return new RestletPoddClientImpl();
+        this.isPoddClientTest(true);
+        return new RestletPoddClientImpl(this.getTestPoddServerUrl());
     }
-
+    
     @Override
     protected String getTestPoddServerUrl()
     {
         return "http://localhost:9090/podd-test";
     }
-
+    
     @Override
     protected void resetTestServers() throws IOException
     {
@@ -153,21 +154,21 @@ public class RestletPoddClientImplIntegrationTest extends AbstractPoddClientTest
                     this.log.error("FAILURE: Could not reset PODD server after test complete", e);
                 }
             }
-
+            
         }
     }
-
+    
     @Override
     protected void startFileRepositoryTest() throws Exception
     {
         this.tempFolder = this.tempDirectory.newFolder().toPath();
-
+        
         this.sshd = new SSHService();
         // This is setup to match the "localssh" repository alias defined in
         // src/main/resources/test-alias.ttl
         this.sshd.TEST_SSH_SERVICE_PORT = 9856;
-
+        
         this.sshd.startTestSSHServer(this.tempFolder);
     }
-
+    
 }
