@@ -122,19 +122,6 @@
 				<module>integrationtest</module>
 			</modules>
 		</profile>
-		<profile>
-			<id>prototype</id>
-			<activation>
-				<activeByDefault>false</activeByDefault>
-			</activation>
-			<properties>
-				<default-podd-home>${basedir}/target/.podd</default-podd-home>
-			</properties>
-			<modules>
-				<module>prototype</module>
-			</modules>
-		</profile>
-
 	</profiles>
 
 	<dependencyManagement>
@@ -411,7 +398,7 @@
 			<dependency>
 				<groupId>com.github.ansell.property-util</groupId>
 				<artifactId>property-util</artifactId>
-				<version>0.3-SNAPSHOT</version>
+				<version>0.3</version>
 			</dependency>
 			<dependency>
 				<groupId>com.github.ansell.restlet-utils</groupId>
