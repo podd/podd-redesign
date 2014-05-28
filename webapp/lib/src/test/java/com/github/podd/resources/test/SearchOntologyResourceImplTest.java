@@ -248,7 +248,7 @@ public class SearchOntologyResourceImplTest extends AbstractResourceImplTest
 
         final Model resultModel = this.internalTestSearchRdf("Scan", searchTypes, requestMediaType, null);
 
-        Assert.assertEquals("Not the expected number of results", 5, resultModel.size());
+        Assert.assertEquals("Not the expected number of results", 10, resultModel.size());
         System.out.println(resultModel.toString());
         Assert.assertEquals("Expected Platform CabScan not found", 1,
                 resultModel.filter(null, null, PODD.VF.createLiteral("CabScan")).size());
@@ -293,7 +293,7 @@ public class SearchOntologyResourceImplTest extends AbstractResourceImplTest
         final Model resultModel = this.internalTestSearchRdf("me", searchTypes, requestMediaType, null);
 
         // verify:
-        Assert.assertEquals("Not the expected number of results", 9, resultModel.size());
+        Assert.assertEquals("Not the expected number of results", 14, resultModel.size());
         Assert.assertEquals("Expected Platform SPAD Meter not found", 1,
                 resultModel.filter(null, null, PODD.VF.createLiteral("SPAD Meter")).size());
         Assert.assertEquals("Expected Platform Pyrometer not found", 1,
@@ -316,7 +316,7 @@ public class SearchOntologyResourceImplTest extends AbstractResourceImplTest
         final Model resultModel = this.internalTestSearchRdf("me", searchTypes, requestMediaType, null);
 
         // verify:
-        Assert.assertEquals("Not the expected number of results", 9, resultModel.size());
+        Assert.assertEquals("Not the expected number of results", 14, resultModel.size());
         Assert.assertEquals("Expected Platform SPAD Meter not found", 1,
                 resultModel.filter(null, null, PODD.VF.createLiteral("SPAD Meter")).size());
         Assert.assertEquals("Expected Platform Pyrometer not found", 1,
@@ -405,7 +405,7 @@ public class SearchOntologyResourceImplTest extends AbstractResourceImplTest
         final Model resultModel = this.internalTestSearchRdf("e", searchTypes, requestMediaType, null);
 
         // verify:
-        Assert.assertEquals("Not the expected number of results", 298, resultModel.size());
+        Assert.assertEquals("Not the expected number of results", 303, resultModel.size());
 
         Assert.assertEquals("dcTerms not found", 1,
                 resultModel.filter(null, null, PODD.VF.createLiteral("The PODD Ontology for Dublin Core Terms")).size());
@@ -426,7 +426,7 @@ public class SearchOntologyResourceImplTest extends AbstractResourceImplTest
 
         final Model resultModel = this.internalTestSearchRdf("Scan", searchTypes, requestMediaType, null);
 
-        Assert.assertEquals("Not the expected number of results", 5, resultModel.size());
+        Assert.assertEquals("Not the expected number of results", 10, resultModel.size());
         System.out.println(resultModel.toString());
         Assert.assertEquals("Expected Platform CabScan not found", 1,
                 resultModel.filter(null, null, PODD.VF.createLiteral("CabScan")).size());
