@@ -376,16 +376,28 @@ public class RestletPoddClientImpl implements PoddClient
             resource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactId.getOntologyIRI().toString());
         }
         
-        // Pass the desired format to the get method of the ClientResource
-        final Representation get = resource.get(RestletUtilMediaType.APPLICATION_RDF_JSON);
-        
-        final StringWriter writer = new StringWriter(4096);
-        
         try
         {
+            // Pass the desired format to the get method of the ClientResource
+            final Representation get = resource.get(RestletUtilMediaType.APPLICATION_RDF_JSON);
+            
+            final StringWriter writer = new StringWriter(4096);
+            
             get.write(writer);
             return Rio.parse(new StringReader(writer.toString()), "", RDFFormat.RDFJSON);
-            
+        }
+        catch(ResourceException e)
+        {
+            if(e.getStatus().equals(Status.CLIENT_ERROR_PRECONDITION_FAILED))
+            {
+                // Precondition failed indicates that they do not have access to any artifacts, so
+                // return empty results set
+                return new LinkedHashModel();
+            }
+            else
+            {
+                throw new PoddClientException("Could not execute SPARQL query", e);
+            }
         }
         catch(final IOException | RDFParseException | UnsupportedRDFormatException e)
         {
