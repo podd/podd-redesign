@@ -490,6 +490,19 @@ public interface PoddClient
             DanglingObjectPolicy danglingObjectPolicy, DataReferenceVerificationPolicy dataReferenceVerificationPolicy)
         throws PoddClientException;
     
+    /**
+     * Submits a request to the PODD Load Artifact service.
+     *
+     * @param model
+     *            The {@link Model} containing the artifact to load.
+     * @return An {@link InferredOWLOntologyID} object containing the details of the loaded
+     *         artifact. The {@link InferredOWLOntologyID#getOntologyIRI()} method can be used to
+     *         get the artifact IRI for future requests, while the
+     *         {@link InferredOWLOntologyID#getVersionIRI()} method can be used to get the version
+     *         IRI to determine if there have been changes to the ontology in future.
+     */
+    InferredOWLOntologyID uploadNewArtifact(Model model) throws PoddClientException;
+    
     Model getObjectsByTypePredicateAndPrefix(URI type, URI predicate, String labelPrefix,
             Collection<InferredOWLOntologyID> artifacts) throws PoddClientException;
     

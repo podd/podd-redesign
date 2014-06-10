@@ -1064,6 +1064,23 @@ public class RestletPoddClientImpl implements PoddClient
     }
     
     @Override
+    public InferredOWLOntologyID uploadNewArtifact(final Model model) throws PoddClientException
+    {
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        try
+        {
+            Rio.write(model, output, RDFFormat.RDFJSON);
+        }
+        catch(RDFHandlerException e)
+        {
+            throw new PoddClientException("Could not serialise artifact to RDF", e);
+        }
+        
+        return this.uploadNewArtifact(new ByteArrayInputStream(output.toByteArray()), RDFFormat.RDFJSON,
+                DanglingObjectPolicy.REPORT, DataReferenceVerificationPolicy.DO_NOT_VERIFY);
+    }
+    
+    @Override
     public InferredOWLOntologyID uploadNewArtifact(final InputStream input, final RDFFormat format)
         throws PoddClientException
     {
