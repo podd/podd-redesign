@@ -595,7 +595,7 @@ public class RestletPoddClientImpl implements PoddClient
         }
         else if(!serverUrlEndsWithSlash)
         {
-            actualPath = actualPath + "/";
+            actualPath = "/" + actualPath;
         }
         
         String result = this.serverUrl + actualPath;
