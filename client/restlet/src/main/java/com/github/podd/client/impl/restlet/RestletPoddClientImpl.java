@@ -100,9 +100,9 @@ public class RestletPoddClientImpl implements PoddClient
     
     public static final String DEFAULT_PODD_SERVER_URL = "http://localhost:8080/podd/";
     
-    public static final String PROP_PODD_USERNAME = "hrppc.podd.username";
+    public static final String PROP_PODD_USERNAME = "podd.username";
     
-    public static final String PROP_PODD_PASSWORD = "hrppc.podd.password";
+    public static final String PROP_PODD_PASSWORD = "podd.password";
     
     public final static String TEMP_UUID_PREFIX = "urn:temp:uuid:";
     
