@@ -579,19 +579,30 @@ public class RestletPoddClientImpl implements PoddClient
             throw new IllegalStateException("PODD Server URL has not been set for this client");
         }
         
-        if(path == null)
+        if(path == null || path.isEmpty())
         {
-            throw new NullPointerException("Path cannot be null");
+            throw new NullPointerException("Path cannot be null or empty");
         }
         
-        if(!path.startsWith("/"))
+        String actualPath = path;
+        
+        boolean serverUrlEndsWithSlash = this.serverUrl.endsWith("/");
+        
+        // Avoid double slashes
+        if(actualPath.startsWith("/") && serverUrlEndsWithSlash)
         {
-            return this.serverUrl + "/" + path;
+            actualPath = actualPath.substring(1);
         }
-        else
+        else if(!serverUrlEndsWithSlash)
         {
-            return this.serverUrl + path;
+            actualPath = actualPath + "/";
         }
+        
+        String result = this.serverUrl + actualPath;
+        
+        this.log.info("getURL={}", result);
+        
+        return result;
     }
     
     @Override
