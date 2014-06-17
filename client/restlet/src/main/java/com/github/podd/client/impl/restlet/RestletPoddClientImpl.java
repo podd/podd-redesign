@@ -100,6 +100,10 @@ public class RestletPoddClientImpl implements PoddClient
     
     public static final String DEFAULT_PODD_SERVER_URL = "http://localhost:8080/podd/";
     
+    public static final String PROP_PODD_USERNAME = "hrppc.podd.username";
+    
+    public static final String PROP_PODD_PASSWORD = "hrppc.podd.password";
+    
     public final static String TEMP_UUID_PREFIX = "urn:temp:uuid:";
     
     private Series<CookieSetting> currentCookies = new Series<CookieSetting>(CookieSetting.class);
@@ -291,6 +295,20 @@ public class RestletPoddClientImpl implements PoddClient
         {
             throw new PoddClientException("Could not parse artifact details due to an IOException", e);
         }
+    }
+    
+    @Override
+    public boolean autologin() throws PoddClientException
+    {
+        String username = this.getProps().get(PROP_PODD_USERNAME, null);
+        String password = this.getProps().get(PROP_PODD_PASSWORD, null);
+        
+        Objects.requireNonNull(username,
+                "Cannot automatically login as username was not defined in poddclient.properties");
+        Objects.requireNonNull(password,
+                "Cannot automatically login as password was not defined in poddclient.properties");
+        
+        return this.login(username, password);
     }
     
     @Override
@@ -860,10 +878,10 @@ public class RestletPoddClientImpl implements PoddClient
         form.add("username", username);
         form.add("password", password);
         
-        final Representation rep = resource.post(form.getWebRepresentation(CharacterSet.UTF_8));
-        
         try
         {
+            final Representation rep = resource.post(form.getWebRepresentation(CharacterSet.UTF_8));
+            
             this.log.info("login result status: {}", resource.getStatus());
             if(rep != null)
             {

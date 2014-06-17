@@ -506,4 +506,12 @@ public interface PoddClient
     Model getObjectsByTypePredicateAndPrefix(URI type, URI predicate, String labelPrefix,
             Collection<InferredOWLOntologyID> artifacts) throws PoddClientException;
     
+    /**
+     * Try to automatically login using the properties defined in poddclient.properties.
+     * 
+     * @return True if the login was successful and false if it was unsuccessful.
+     * @throws PoddClientException
+     *             If there was an exception accessing PODD.
+     */
+    boolean autologin() throws PoddClientException;
 }
