@@ -556,7 +556,7 @@ public class RestletPoddClientImpl implements PoddClient
      */
     private String getUrl(final String path)
     {
-        if(this.serverUrl == null)
+        if(this.getPoddServerUrl() == null)
         {
             throw new IllegalStateException("PODD Server URL has not been set for this client");
         }
