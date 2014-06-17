@@ -98,7 +98,7 @@ public class RestletPoddClientImpl implements PoddClient
     
     public static final String PROP_PODD_SERVER_URL = "podd.serverurl";
     
-    public static final String DEFAULT_PODD_SERVER_URL = "http://localhost:8080/podd/";
+    public static final String DEFAULT_PODD_SERVER_URL = null;// "http://localhost:8080/podd/";
     
     public static final String PROP_PODD_USERNAME = "podd.username";
     
