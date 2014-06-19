@@ -32,6 +32,7 @@ import com.github.ansell.restletutils.RestletUtilRole;
 import com.github.podd.api.DanglingObjectPolicy;
 import com.github.podd.api.DataReferenceVerificationPolicy;
 import com.github.podd.api.data.DataReference;
+import com.github.podd.ontologies.PODDSCIENCE;
 import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.PoddUser;
 
@@ -45,26 +46,51 @@ public interface PoddClient
     /**
      * Fetch all of the properties for the given objects under the given parent with the given type.
      */
-    public static final String TEMPLATE_SPARQL_BY_TYPE_AND_PARENT_ALL_PROPERTIES =
-            "CONSTRUCT { ?parent ?parentPredicate ?object . ?object a ?type . ?object ?predicate ?label . } WHERE { ?object a ?type . OPTIONAL { ?object ?predicate ?label . } } VALUES (?parent ?parentPredicate ?type ) { ( %s %s %s ) }";
+    public static final String TEMPLATE_SPARQL_BY_TYPE_AND_PARENT_ALL_PROPERTIES = new StringBuilder()
+            .append("CONSTRUCT { ?parent ?parentPredicate ?object . ?object a ?type . ?object ?predicate ?label . }")
+            .append(" WHERE { ?object a ?type . OPTIONAL { ?object ?predicate ?label . } }")
+            .append(" VALUES (?parent ?parentPredicate ?type ) { ( %s %s %s ) }").toString();
+    
     /**
-     * Fetch type and label statements for the given object type.
+     * Fetch type and label and barcode statements for the given object type.
      */
-    public static final String TEMPLATE_SPARQL_BY_TYPE_WITH_LABEL =
-            "CONSTRUCT { ?object a ?type . ?object <http://www.w3.org/2000/01/rdf-schema#label> ?label . } WHERE { ?object a ?type . OPTIONAL { ?object <http://www.w3.org/2000/01/rdf-schema#label> ?label . } } VALUES (?type) { ( %s ) }";
+    public static final String TEMPLATE_SPARQL_BY_TYPE_WITH_LABEL = new StringBuilder()
+            .append("CONSTRUCT { ?object a ?type . ")
+            .append(" ?object <http://www.w3.org/2000/01/rdf-schema#label> ?label . ")
+            .append(" ?object <http://purl.org/podd/ns/poddScience#hasBarcode> ?barcode . } ")
+            .append(" WHERE { ?object a ?type . ")
+            .append(" OPTIONAL { ?object <http://www.w3.org/2000/01/rdf-schema#label> ?label . }")
+            .append(" OPTIONAL { ?object <http://purl.org/podd/ns/poddScience#hasBarcode> ?barcode . } }")
+            .append(" VALUES (?type) { ( %s ) }").toString();
+    
     /**
      * Fetch all of the properties for the given objects with the given type
      */
-    public static final String TEMPLATE_SPARQL_BY_TYPE_ALL_PROPERTIES =
-            "CONSTRUCT { ?object a ?type . ?object ?predicate ?value . } WHERE { ?object a ?type . ?object ?predicate ?value . } VALUES (?type) { ( %s ) }";
+    public static final String TEMPLATE_SPARQL_BY_TYPE_ALL_PROPERTIES = new StringBuilder()
+            .append("CONSTRUCT { ?object a ?type . ?object ?predicate ?value . }")
+            .append(" WHERE { ?object a ?type . ?object ?predicate ?value . }").append(" VALUES (?type) { ( %s ) }")
+            .toString();
+    
     public static final String TEMPLATE_SPARQL_BY_TYPE_LABEL_STRSTARTS =
-            "CONSTRUCT { ?object a ?type . ?object <http://www.w3.org/2000/01/rdf-schema#label> ?label . } WHERE { ?object a ?type . ?object <http://www.w3.org/2000/01/rdf-schema#label> ?label . FILTER(STRSTARTS(?label, \"%s\")) } VALUES (?type) { ( %s ) }";
+            new StringBuilder()
+                    .append("CONSTRUCT { ?object a ?type . ?object <http://www.w3.org/2000/01/rdf-schema#label> ?label . }")
+                    .append(" WHERE { ?object a ?type . ?object <http://www.w3.org/2000/01/rdf-schema#label> ?label . FILTER(STRSTARTS(?label, \"%s\")) }")
+                    .append(" VALUES (?type) { ( %s ) }").toString();
+    
+    public static final String TEMPLATE_SPARQL_BY_BARCODE_STRSTARTS =
+            new StringBuilder()
+                    .append("CONSTRUCT { ?object a ?type . ?object <http://purl.org/podd/ns/poddScience#hasBarcode> ?barcode . }")
+                    .append(" WHERE { ?object a ?type . ?object <http://purl.org/podd/ns/poddScience#hasBarcode> ?barcode . FILTER(STRSTARTS(?barcode, \"%s\")) }")
+                    .append(" VALUES (?type) { ( %s ) }").toString();
+    
     /**
      * NOTE: Both the first and second arguments are the predicate, the first being the mapped
      * predicate, and the second being the original predicate.
      */
-    public static final String TEMPLATE_SPARQL_BY_TYPE_LABEL_STRSTARTS_PREDICATE =
-            "CONSTRUCT { ?object a ?type . ?object %s ?label . } WHERE { ?object a ?type . ?object %s ?label . FILTER(STRSTARTS(?label, \"%s\")) } VALUES (?type) { ( %s ) }";
+    public static final String TEMPLATE_SPARQL_BY_TYPE_LABEL_STRSTARTS_PREDICATE = new StringBuilder()
+            .append("CONSTRUCT { ?object a ?type . ?object %s ?label . }")
+            .append(" WHERE { ?object a ?type . ?object %s ?label . FILTER(STRSTARTS(?label, \"%s\")) }")
+            .append(" VALUES (?type) { ( %s ) }").toString();
     
     /**
      * Adds the given role for the given user to the given artifact
