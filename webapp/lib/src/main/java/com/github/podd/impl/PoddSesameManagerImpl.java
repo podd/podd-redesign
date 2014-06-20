@@ -70,6 +70,7 @@ import com.github.podd.api.PoddSesameManager;
 import com.github.podd.exception.SchemaManifestException;
 import com.github.podd.exception.UnmanagedArtifactIRIException;
 import com.github.podd.exception.UnmanagedSchemaIRIException;
+import com.github.podd.ontologies.PODDSCIENCE;
 import com.github.podd.utils.DebugUtils;
 import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.OntologyUtils;
@@ -946,10 +947,11 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         SchemaManifestException, UnmanagedSchemaIRIException
     {
         final StringBuilder sb = new StringBuilder(1024);
-        sb.append("SELECT ?label ?description ");
+        sb.append("SELECT ?label ?description ?barcode ");
         sb.append(" WHERE { ");
         sb.append(" OPTIONAL { ?objectUri <" + RDFS.LABEL + "> ?label . } ");
         sb.append(" OPTIONAL { ?objectUri <" + RDFS.COMMENT + "> ?description . } ");
+        sb.append(" OPTIONAL { ?objectUri <" + PODDSCIENCE.HAS_BARCODE + "> ?barcode . } ");
         
         sb.append(" FILTER (lang(?label) = 'en'|| lang(?label)='')");
         sb.append(" }");
@@ -979,6 +981,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         
         String label = null;
         String description = null;
+        String barcode = null;
         
         for(final BindingSet next : queryResults.getBindingSets())
         {
@@ -1002,9 +1005,14 @@ public class PoddSesameManagerImpl implements PoddSesameManager
             {
                 description = next.getValue("description").stringValue();
             }
+
+            if(next.getValue("barcode") != null)
+            {
+                barcode = next.getValue("barcode").stringValue();
+            }
         }
         
-        return new PoddObjectLabelImpl(ontologyID, objectUri, label, description);
+        return new PoddObjectLabelImpl(ontologyID, objectUri, label, description, barcode);
     }
     
     @Override
