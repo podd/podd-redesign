@@ -50,4 +50,8 @@ public interface PoddObjectLabel
      * @return the parentArtifactID
      */
     InferredOWLOntologyID getOntologyID();
+    
+    String getBarcode();
+    
+    Literal getBarcodeLiteral();
 }

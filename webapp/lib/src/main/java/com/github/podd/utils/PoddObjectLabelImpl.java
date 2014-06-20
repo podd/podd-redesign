@@ -32,17 +32,19 @@ import org.semanticweb.owlapi.model.IRI;
 public class PoddObjectLabelImpl implements PoddObjectLabel
 {
     private InferredOWLOntologyID ontologyID;
-
+    
     private URI objectID;
-
+    
     // TODO: Migrate this to be Literal to preserve datatype and language where
     // necessary
     private String label;
-
+    
     // TODO: Migrate this to be Literal to preserve datatype and language where
     // necessary
     private String description;
-
+    
+    private String barcode;
+    
     /**
      * Creates a label object without a description, and without an object, meaning that the label
      * applies to the ontology itself.
@@ -57,7 +59,7 @@ public class PoddObjectLabelImpl implements PoddObjectLabel
         this.ontologyID = ontologyID;
         this.label = label;
     }
-
+    
     /**
      * Creates a label object without a description, and without an object, meaning that the label
      * applies to the ontology itself.
@@ -72,7 +74,7 @@ public class PoddObjectLabelImpl implements PoddObjectLabel
         this(ontologyID, label);
         this.description = description;
     }
-
+    
     /**
      * Creates a label object without a description
      *
@@ -88,7 +90,7 @@ public class PoddObjectLabelImpl implements PoddObjectLabel
         this(ontologyID, label);
         this.objectID = object;
     }
-
+    
     /**
      * Creates a label object with a description
      *
@@ -107,10 +109,31 @@ public class PoddObjectLabelImpl implements PoddObjectLabel
         this(parent, object, label);
         this.description = description;
     }
-
+    
+    /**
+     * Creates a label object with a description
+     *
+     * @param parent
+     *            The base artifact that this label is applied to.
+     * @param object
+     *            The object inside of the given artifact that this label is for.
+     * @param label
+     *            The label for this object.
+     * @param description
+     *            The description for this object.
+     * @param barcode
+     *            The barcode for this object.
+     */
+    public PoddObjectLabelImpl(final InferredOWLOntologyID parent, final URI object, final String label,
+            final String description, final String barcode)
+    {
+        this(parent, object, label, description);
+        this.barcode = barcode;
+    }
+    
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see com.github.podd.utils.PoddObjectLabel#getDescription()
      */
     @Override
@@ -118,10 +141,10 @@ public class PoddObjectLabelImpl implements PoddObjectLabel
     {
         return this.description;
     }
-
+    
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see com.github.podd.utils.PoddObjectLabel#getLabel()
      */
     @Override
@@ -129,10 +152,10 @@ public class PoddObjectLabelImpl implements PoddObjectLabel
     {
         return this.label;
     }
-
+    
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see com.github.podd.utils.PoddObjectLabel#getObjectID()
      */
     @Override
@@ -140,10 +163,10 @@ public class PoddObjectLabelImpl implements PoddObjectLabel
     {
         return this.objectID;
     }
-
+    
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see com.github.podd.utils.PoddObjectLabel#getParentArtifactID()
      */
     @Override
@@ -151,7 +174,7 @@ public class PoddObjectLabelImpl implements PoddObjectLabel
     {
         return this.ontologyID;
     }
-
+    
     @Override
     public String toString()
     {
@@ -165,16 +188,28 @@ public class PoddObjectLabelImpl implements PoddObjectLabel
         b.append("]");
         return b.toString();
     }
-
+    
     @Override
     public Literal getDescriptionLiteral()
     {
         return PODD.VF.createLiteral(this.description);
     }
-
+    
     @Override
     public Literal getLabelLiteral()
     {
         return PODD.VF.createLiteral(this.label);
+    }
+    
+    @Override
+    public String getBarcode()
+    {
+        return barcode;
+    }
+    
+    @Override
+    public Literal getBarcodeLiteral()
+    {
+        return PODD.VF.createLiteral(this.barcode);
     }
 }
