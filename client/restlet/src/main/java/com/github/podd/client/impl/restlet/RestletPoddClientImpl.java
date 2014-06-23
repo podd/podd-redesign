@@ -715,11 +715,29 @@ public class RestletPoddClientImpl implements PoddClient
         Model model = this.listArtifacts(published, unpublished);
         for(InferredOWLOntologyID ontologyID : OntologyUtils.modelToOntologyIDs(model, false, false))
         {
-            String nextLabel =
-                    model.filter(
-                            model.filter(ontologyID.getOntologyIRI().toOpenRDFURI(), PODDBASE.ARTIFACT_HAS_TOP_OBJECT,
-                                    null).objectURI(), RDFS.LABEL, null).objectLiteral().getLabel();
-            results.put(ontologyID, nextLabel);
+            URI topObjectURI =
+                    model.filter(ontologyID.getOntologyIRI().toOpenRDFURI(), PODDBASE.ARTIFACT_HAS_TOP_OBJECT, null)
+                            .objectURI();
+            try
+            {
+                String nextBarcode =
+                        model.filter(topObjectURI, PODDSCIENCE.HAS_BARCODE, null).objectLiteral().getLabel();
+                results.put(ontologyID, nextBarcode);
+            }
+            catch(Exception e1)
+            {
+                try
+                {
+                    // Backup by using the label for identification if a unique barcode was not
+                    // found
+                    String nextLabel = model.filter(topObjectURI, RDFS.LABEL, null).objectLiteral().getLabel();
+                    results.put(ontologyID, nextLabel);
+                }
+                catch(Exception e2)
+                {
+                    results.put(ontologyID, "(No label)");
+                }
+            }
         }
         return results;
     }
