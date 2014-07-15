@@ -40,14 +40,14 @@ public class SensorGetTest
     @Test
     public void testGet() throws Exception
     {
-        final ClientResource clientResource = new ClientResource("http://152.83.198.37/TC_LOG00.CSV");
+        final ClientResource clientResource = new ClientResource("http://152.83.198.37/TCLOG_01.CSV");
         
         final Representation representation = clientResource.get();
         
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        representation.write(outputStream);
-
+        System.out.println(representation.getMediaType().toString());
+        System.out.println(clientResource.getStatus().getCode());
         
+        representation.write(System.out);
     }
     
 }
