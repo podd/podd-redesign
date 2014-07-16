@@ -1694,7 +1694,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             // this.getDirectImports(managementConnection, temporaryRepositoryConnection,
             // randomContext);
             
-            permanentConnection = this.getRepositoryManager().getPermanentRepositoryConnection(schemaImports);
+            permanentConnection = this.getRepositoryManager().getPermanentRepositoryConnection(schemaImports, true);
             permanentConnection.begin();
             
             inferredOWLOntologyID =
@@ -2549,7 +2549,9 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             
             this.log.info("Starting reload of artifact to Repository: {}", artifactVersion);
             
-            newPermanentConnection = this.repositoryManager.getPermanentRepositoryConnection(newSchemaOntologyIds);
+            // Get a new connection, creating the new repository if it doesn't already exist
+            newPermanentConnection =
+                    this.repositoryManager.getPermanentRepositoryConnection(newSchemaOntologyIds, true);
             newPermanentConnection.begin();
             
             // If the following does not succeed, then it throws an exception and we rollback
