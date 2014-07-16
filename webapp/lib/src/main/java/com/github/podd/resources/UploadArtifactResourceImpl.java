@@ -71,6 +71,7 @@ import com.github.podd.api.DataReferenceVerificationPolicy;
 import com.github.podd.api.PoddArtifactManager;
 import com.github.podd.exception.DuplicateArtifactIRIException;
 import com.github.podd.exception.PoddException;
+import com.github.podd.exception.RepositoryNotFoundException;
 import com.github.podd.exception.SchemaManifestException;
 import com.github.podd.exception.UnmanagedArtifactIRIException;
 import com.github.podd.exception.UnmanagedArtifactVersionException;
@@ -96,16 +97,16 @@ import com.github.podd.utils.PoddWebConstants;
 public class UploadArtifactResourceImpl extends AbstractPoddResourceImpl
 {
     private static final String UPLOAD_PAGE_TITLE_TEXT = "PODD Upload New Artifact";
-
+    
     private final Path tempDirectory;
-
+    
     /**
      * Constructor: prepare temp directory
      */
     public UploadArtifactResourceImpl()
     {
         super();
-
+        
         try
         {
             this.tempDirectory = Files.createTempDirectory("podd-ontologymanageruploads");
@@ -116,22 +117,22 @@ public class UploadArtifactResourceImpl extends AbstractPoddResourceImpl
             throw new RuntimeException("Could not create temporary directory", e);
         }
     }
-
+    
     private InferredOWLOntologyID doUpload(final Representation entity) throws ResourceException
     {
         final User user = this.getRequest().getClientInfo().getUser();
         this.log.info("authenticated user: {}", user);
-
+        
         if(entity == null)
         {
             // POST request with no entity.
             throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Did not submit anything");
         }
-
+        
         this.log.info("media-type: {}", entity.getMediaType());
-
+        
         InferredOWLOntologyID artifactMap;
-
+        
         if(MediaType.MULTIPART_FORM_DATA.equals(entity.getMediaType(), true))
         {
             // - extract file from incoming Representation and load artifact to
@@ -140,9 +141,9 @@ public class UploadArtifactResourceImpl extends AbstractPoddResourceImpl
         }
         else
         {
-
+            
             String formatString = this.getQuery().getFirstValue("format", true);
-
+            
             if(formatString == null)
             {
                 // Use the media type that was attached to the entity as a
@@ -150,9 +151,9 @@ public class UploadArtifactResourceImpl extends AbstractPoddResourceImpl
                 // specify it as a query parameter
                 formatString = entity.getMediaType().getName();
             }
-
+            
             final RDFFormat format = Rio.getParserFormatForMIMEType(formatString, RDFFormat.RDFXML);
-
+            
             // - optional parameter 'isforce'
             DanglingObjectPolicy danglingObjectPolicy = DanglingObjectPolicy.REPORT;
             final String forceStr = this.getQuery().getFirstValue(PoddWebConstants.KEY_EDIT_WITH_FORCE, true);
@@ -160,7 +161,7 @@ public class UploadArtifactResourceImpl extends AbstractPoddResourceImpl
             {
                 danglingObjectPolicy = DanglingObjectPolicy.FORCE_CLEAN;
             }
-
+            
             // - optional parameter 'verifyfilerefs'
             DataReferenceVerificationPolicy fileRefVerificationPolicy = DataReferenceVerificationPolicy.DO_NOT_VERIFY;
             final String fileRefVerifyStr =
@@ -169,7 +170,7 @@ public class UploadArtifactResourceImpl extends AbstractPoddResourceImpl
             {
                 fileRefVerificationPolicy = DataReferenceVerificationPolicy.VERIFY;
             }
-
+            
             try (final InputStream inputStream = entity.getStream();)
             {
                 if(inputStream == null)
@@ -184,9 +185,9 @@ public class UploadArtifactResourceImpl extends AbstractPoddResourceImpl
             {
                 throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "There was a problem with the input", e);
             }
-
+            
         }
-
+        
         // Map uploading user as Project Administrator for this artifact so that
         // they can edit it
         // and assign permissions to it in the future
@@ -195,10 +196,10 @@ public class UploadArtifactResourceImpl extends AbstractPoddResourceImpl
                 .getOntologyIRI().toOpenRDFURI());
         realm.map(this.getRequest().getClientInfo().getUser(), PoddRoles.PROJECT_PRINCIPAL_INVESTIGATOR.getRole(),
                 artifactMap.getOntologyIRI().toOpenRDFURI());
-
+        
         return artifactMap;
     }
-
+    
     /**
      * Handle http GET request to serve the new artifact upload page.
      */
@@ -209,22 +210,22 @@ public class UploadArtifactResourceImpl extends AbstractPoddResourceImpl
         // for CREATE since the
         // page is for creating a new artifact via a file upload
         this.checkAuthentication(PoddAction.ARTIFACT_CREATE);
-
+        
         this.log.info("@Get UploadArtifactFile Page");
-
+        
         final Map<String, Object> dataModel = RestletUtils.getBaseDataModel(this.getRequest());
         dataModel.put("contentTemplate", "artifact_upload.html.ftl");
         dataModel.put("pageTitle", UploadArtifactResourceImpl.UPLOAD_PAGE_TITLE_TEXT);
-
+        
         // Output the base template, with contentTemplate from the dataModel
         // defining the
         // template to use for the content in the body of the page
         return RestletUtils.getHtmlRepresentation(
                 this.getPoddApplication().getPropertyUtil()
-                .get(PoddWebConstants.PROPERTY_TEMPLATE_BASE, PoddWebConstants.DEFAULT_TEMPLATE_BASE),
+                        .get(PoddWebConstants.PROPERTY_TEMPLATE_BASE, PoddWebConstants.DEFAULT_TEMPLATE_BASE),
                 dataModel, MediaType.TEXT_HTML, this.getPoddApplication().getTemplateConfiguration());
     }
-
+    
     /**
      * Handle http POST submitting a new artifact file
      */
@@ -232,43 +233,43 @@ public class UploadArtifactResourceImpl extends AbstractPoddResourceImpl
     public Representation uploadArtifactFileHtml(final Representation entity) throws ResourceException
     {
         this.checkAuthentication(PoddAction.ARTIFACT_CREATE);
-
+        
         this.log.info("@Post UploadArtifactFile Page");
-
+        
         final InferredOWLOntologyID artifactMap = this.doUpload(entity);
-
+        
         this.log.info("Successfully loaded artifact {}", artifactMap);
-
+        
         // TODO - create and write to a template informing success
         final Map<String, Object> dataModel = RestletUtils.getBaseDataModel(this.getRequest());
         dataModel.put("contentTemplate", "artifact_upload.html.ftl");
         dataModel.put("pageTitle", UploadArtifactResourceImpl.UPLOAD_PAGE_TITLE_TEXT);
         // This is now an InferredOWLOntologyID
         dataModel.put("artifact", artifactMap);
-
+        
         // Output the base template, with contentTemplate from the dataModel
         // defining the
         // template to use for the content in the body of the page
         return RestletUtils.getHtmlRepresentation(
                 this.getPoddApplication().getPropertyUtil()
-                .get(PoddWebConstants.PROPERTY_TEMPLATE_BASE, PoddWebConstants.DEFAULT_TEMPLATE_BASE),
+                        .get(PoddWebConstants.PROPERTY_TEMPLATE_BASE, PoddWebConstants.DEFAULT_TEMPLATE_BASE),
                 dataModel, MediaType.TEXT_HTML, this.getPoddApplication().getTemplateConfiguration());
     }
-
+    
     @Post(":rdf|rj|json|ttl")
     public Representation uploadArtifactToRdf(final Representation entity, final Variant variant)
-            throws ResourceException
+        throws ResourceException
     {
         this.checkAuthentication(PoddAction.ARTIFACT_CREATE);
-
+        
         this.log.info("@Post uploadArtifactFile RDF ({})", variant.getMediaType().getName());
-
+        
         final InferredOWLOntologyID artifactId = this.doUpload(entity);
-
+        
         this.log.info("Successfully loaded artifact {}", artifactId);
-
+        
         RepositoryConnection managementConnection = null;
-
+        
         try
         {
             managementConnection = this.getPoddRepositoryManager().getManagementRepositoryConnection();
@@ -297,22 +298,22 @@ public class UploadArtifactResourceImpl extends AbstractPoddResourceImpl
             }
         }
         final ByteArrayOutputStream output = new ByteArrayOutputStream(8096);
-
+        
         final RDFWriter writer =
                 Rio.createWriter(Rio.getWriterFormatForMIMEType(variant.getMediaType().getName(), RDFFormat.RDFXML),
                         output);
-
+        
         try
         {
             writer.startRDF();
             final Model model =
                     OntologyUtils.ontologyIDsToModel(Arrays.asList(artifactId), new LinkedHashModel(), false);
             final Set<Resource> ontologies = model.filter(null, RDF.TYPE, OWL.ONTOLOGY).subjects();
-
+            
             for(final Resource nextOntology : ontologies)
             {
                 writer.handleStatement(PODD.VF.createStatement(nextOntology, RDF.TYPE, OWL.ONTOLOGY));
-
+                
                 for(final Value nextVersion : model.filter(nextOntology, OWL.VERSIONIRI, null).objects())
                 {
                     if(nextVersion instanceof URI)
@@ -325,9 +326,9 @@ public class UploadArtifactResourceImpl extends AbstractPoddResourceImpl
                     }
                 }
             }
-
+            
             RepositoryConnection permanentConnection = null;
-
+            
             try
             {
                 // FIXME: This should be a method inside of
@@ -337,14 +338,14 @@ public class UploadArtifactResourceImpl extends AbstractPoddResourceImpl
                 permanentConnection = this.getPoddRepositoryManager().getPermanentRepositoryConnection(schemaImports);
                 final URI topObjectIRI =
                         this.getPoddArtifactManager().getSesameManager()
-                        .getTopObjectIRI(artifactId, permanentConnection);
-
+                                .getTopObjectIRI(artifactId, permanentConnection);
+                
                 writer.handleStatement(PODD.VF.createStatement(artifactId.getOntologyIRI().toOpenRDFURI(),
                         PODD.PODD_BASE_HAS_TOP_OBJECT, topObjectIRI));
                 final Set<Statement> topObjectTypes =
                         Iterations.asSet(permanentConnection.getStatements(topObjectIRI, RDF.TYPE, null, true,
                                 artifactId.getVersionIRI().toOpenRDFURI()));
-
+                
                 for(final Statement nextTopObjectType : topObjectTypes)
                 {
                     writer.handleStatement(PODD.VF.createStatement(nextTopObjectType.getSubject(),
@@ -353,7 +354,7 @@ public class UploadArtifactResourceImpl extends AbstractPoddResourceImpl
             }
             catch(final OpenRDFException | UnmanagedArtifactIRIException | UnmanagedArtifactVersionException
                     | UnmanagedSchemaIRIException | SchemaManifestException | UnsupportedRDFormatException
-                    | IOException e)
+                    | IOException | RepositoryNotFoundException e)
             {
                 this.log.error("Failed to get top object URI", e);
             }
@@ -377,13 +378,13 @@ public class UploadArtifactResourceImpl extends AbstractPoddResourceImpl
         {
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Could not create response");
         }
-
+        
         this.log.info("Returning from upload artifact {}", artifactId);
-
+        
         return new ByteArrayRepresentation(output.toByteArray(), MediaType.valueOf(writer.getRDFFormat()
                 .getDefaultMIMEType()));
     }
-
+    
     /**
      * Handle http POST submitting a new artifact file Returns a text String containing the added
      * artifact's Ontology IRI.
@@ -391,19 +392,19 @@ public class UploadArtifactResourceImpl extends AbstractPoddResourceImpl
      */
     @Post(":txt")
     public Representation uploadArtifactToText(final Representation entity, final Variant variant)
-            throws ResourceException
+        throws ResourceException
     {
         this.checkAuthentication(PoddAction.ARTIFACT_CREATE);
-
+        
         this.log.info("@Post uploadArtifactFile ({})", variant.getMediaType().getName());
-
+        
         final InferredOWLOntologyID artifactMap = this.doUpload(entity);
-
+        
         this.log.info("Successfully loaded artifact {}", artifactMap.getOntologyIRI().toString());
-
+        
         return new StringRepresentation(artifactMap.getOntologyIRI().toString());
     }
-
+    
     /**
      *
      * @param inputStream
@@ -446,19 +447,19 @@ public class UploadArtifactResourceImpl extends AbstractPoddResourceImpl
             this.log.error("Failed to load artifact: {}", e.getMessage());
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Error loading artifact to PODD", e);
         }
-
+        
     }
-
+    
     private InferredOWLOntologyID uploadFileAndLoadArtifactIntoPodd(final Representation entity)
-            throws ResourceException
+        throws ResourceException
     {
         List<FileItem> items;
         Path filePath = null;
         String contentType = null;
-
+        
         // 1: Create a factory for disk-based file items
         final DiskFileItemFactory factory = new DiskFileItemFactory(1000240, this.tempDirectory.toFile());
-
+        
         // 2: Create a new file upload handler
         final RestletFileUpload upload = new RestletFileUpload(factory);
         final Map<String, String> props = new HashMap<String, String>();
@@ -467,11 +468,11 @@ public class UploadArtifactResourceImpl extends AbstractPoddResourceImpl
             // 3: Request is parsed by the handler which generates a list of
             // FileItems
             items = upload.parseRequest(this.getRequest());
-
+            
             for(final FileItem fi : items)
             {
                 final String name = fi.getName();
-
+                
                 if(name == null)
                 {
                     props.put(fi.getFieldName(), new String(fi.get(), StandardCharsets.UTF_8));
@@ -490,7 +491,7 @@ public class UploadArtifactResourceImpl extends AbstractPoddResourceImpl
                         // Note: These are Java-7 APIs
                         contentType = fi.getContentType();
                         props.put("Content-Type", fi.getContentType());
-
+                        
                         filePath = Files.createTempFile(this.tempDirectory, "ontologyupload-", name);
                         final File file = filePath.toFile();
                         file.deleteOnExit();
@@ -514,19 +515,19 @@ public class UploadArtifactResourceImpl extends AbstractPoddResourceImpl
         {
             throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, e);
         }
-
+        
         this.log.info("props={}", props.toString());
-
+        
         if(filePath == null)
         {
             throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Did not submit a valid file and filename");
         }
-
+        
         this.log.info("filename={}", filePath.toAbsolutePath().toString());
         this.log.info("contentType={}", contentType);
-
+        
         RDFFormat format = null;
-
+        
         // If the content type was application/octet-stream then use the file
         // name instead
         // Browsers attach this content type when they are not sure what the
@@ -534,7 +535,7 @@ public class UploadArtifactResourceImpl extends AbstractPoddResourceImpl
         if(MediaType.APPLICATION_OCTET_STREAM.getName().equals(contentType))
         {
             format = Rio.getParserFormatForFileName(filePath.getFileName().toString());
-
+            
             this.log.info("octet-stream contentType filename format={}", format);
         }
         // Otherwise use the content type directly in preference to using the
@@ -542,19 +543,19 @@ public class UploadArtifactResourceImpl extends AbstractPoddResourceImpl
         else if(contentType != null)
         {
             format = Rio.getParserFormatForMIMEType(contentType);
-
+            
             this.log.info("non-octet-stream contentType format={}", format);
         }
-
+        
         // If the content type choices failed to resolve the type, then try the
         // filename
         if(format == null)
         {
             format = Rio.getParserFormatForFileName(filePath.getFileName().toString());
-
+            
             this.log.info("non-content-type filename format={}", format);
         }
-
+        
         // Or fallback to RDF/XML which at minimum is able to detect when the
         // document is
         // structurally invalid
@@ -563,18 +564,18 @@ public class UploadArtifactResourceImpl extends AbstractPoddResourceImpl
             this.log.warn("Could not determine RDF format from request so falling back to RDF/XML");
             format = RDFFormat.RDFXML;
         }
-
+        
         try (final InputStream inputStream =
                 new BufferedInputStream(Files.newInputStream(filePath, StandardOpenOption.READ));)
-                {
+        {
             return this.uploadFileAndLoadArtifactIntoPodd(inputStream, format, DanglingObjectPolicy.REPORT,
                     DataReferenceVerificationPolicy.DO_NOT_VERIFY);
-                }
+        }
         catch(final IOException e)
         {
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "File IO error occurred", e);
         }
-
+        
     }
-
+    
 }

@@ -52,6 +52,7 @@ import org.restlet.security.User;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLOntologyID;
 
+import com.github.podd.exception.RepositoryNotFoundException;
 import com.github.podd.exception.SchemaManifestException;
 import com.github.podd.exception.UnmanagedArtifactIRIException;
 import com.github.podd.exception.UnmanagedArtifactVersionException;
@@ -430,6 +431,11 @@ public class SparqlResourceImpl extends AbstractPoddResourceImpl
             throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Could not find a requested artifact", e);
         }
         catch(final IOException e)
+        {
+            this.log.error("IO exception: {}", e.getMessage());
+            throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Could not find a requested artifact", e);
+        }
+        catch(final RepositoryNotFoundException e)
         {
             this.log.error("IO exception: {}", e.getMessage());
             throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Could not find a requested artifact", e);

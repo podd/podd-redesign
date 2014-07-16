@@ -102,6 +102,7 @@ import com.github.podd.exception.InconsistentOntologyException;
 import com.github.podd.exception.OntologyNotInProfileException;
 import com.github.podd.exception.PoddException;
 import com.github.podd.exception.PublishedArtifactModifyException;
+import com.github.podd.exception.RepositoryNotFoundException;
 import com.github.podd.exception.SchemaManifestException;
 import com.github.podd.exception.UnmanagedArtifactIRIException;
 import com.github.podd.exception.UnmanagedArtifactVersionException;
@@ -3051,7 +3052,7 @@ public abstract class AbstractPoddArtifactManagerTest
         // Update from version 1 to version 2
         this.testArtifactManager.updateSchemaImports(new InferredOWLOntologyID(artifactIDv1.getOntologyIRI(),
                 artifactIDv1.getVersionIRI(), artifactIDv1.getInferredOntologyIRI()), new LinkedHashSet<OWLOntologyID>(
-                        schemaImportsV1), new LinkedHashSet<OWLOntologyID>(version2SchemaOntologies));
+                schemaImportsV1), new LinkedHashSet<OWLOntologyID>(version2SchemaOntologies));
         
         final InferredOWLOntologyID artifactIDv2 = this.testArtifactManager.getArtifact(artifactIDv1.getOntologyIRI());
         
@@ -3510,7 +3511,8 @@ public abstract class AbstractPoddArtifactManagerTest
     private void verifyLoadedArtifact(final InferredOWLOntologyID inferredOntologyId, final int mgtGraphSize,
             final long assertedStatementCount, final long inferredStatementCount, final boolean isPublished)
         throws RepositoryException, OpenRDFException, UnmanagedArtifactIRIException, UnmanagedArtifactVersionException,
-        UnmanagedSchemaIRIException, SchemaManifestException, UnsupportedRDFormatException, IOException
+        UnmanagedSchemaIRIException, SchemaManifestException, UnsupportedRDFormatException, IOException,
+        RepositoryNotFoundException
     
     {
         // verify: ontology ID has all details

@@ -64,6 +64,7 @@ import org.slf4j.LoggerFactory;
 
 import com.github.ansell.propertyutil.PropertyUtil;
 import com.github.podd.api.PoddRepositoryManager;
+import com.github.podd.exception.PoddException;
 import com.github.podd.exception.RepositoryNotFoundException;
 import com.github.podd.utils.ManualShutdownRepository;
 import com.github.podd.utils.OntologyUtils;
@@ -160,14 +161,14 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
     
     @Override
     public RepositoryConnection getPermanentRepositoryConnection(final Set<? extends OWLOntologyID> schemaOntologies)
-        throws OpenRDFException, IOException
+        throws OpenRDFException, IOException, RepositoryNotFoundException
     {
         return getPermanentRepositoryConnection(schemaOntologies, false);
     }
     
     @Override
     public RepositoryConnection getPermanentRepositoryConnection(final Set<? extends OWLOntologyID> schemaOntologies,
-            final boolean createIfNotExists) throws OpenRDFException, IOException
+            final boolean createIfNotExists) throws OpenRDFException, IOException, RepositoryNotFoundException
     {
         this.log.debug("Entering get permanent repository");
         this.log.debug("Get permanent repository schemas: {}", schemaOntologies);

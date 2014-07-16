@@ -39,6 +39,7 @@ import org.restlet.resource.ResourceException;
 import org.restlet.security.User;
 import org.semanticweb.owlapi.model.IRI;
 
+import com.github.podd.exception.RepositoryNotFoundException;
 import com.github.podd.exception.SchemaManifestException;
 import com.github.podd.exception.UnmanagedArtifactIRIException;
 import com.github.podd.exception.UnmanagedArtifactVersionException;
@@ -60,16 +61,16 @@ public class SearchOntologyResourceImpl extends AbstractPoddResourceImpl
     public Representation getRdf(final Variant variant) throws ResourceException
     {
         this.log.debug("searchRdf");
-
+        
         final ByteArrayOutputStream output = new ByteArrayOutputStream(8096);
-
+        
         // search term - mandatory parameter
         final String searchTerm = this.getQuery().getFirstValue(PoddWebConstants.KEY_SEARCHTERM, true);
         if(searchTerm == null)
         {
             throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Search term not submitted");
         }
-
+        
         // artifact ID - optional parameter
         final String artifactUri = this.getQuery().getFirstValue(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, true);
         InferredOWLOntologyID ontologyID = null;
@@ -84,7 +85,7 @@ public class SearchOntologyResourceImpl extends AbstractPoddResourceImpl
                 throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Could not find the given artifact", e);
             }
         }
-
+        
         // search Types - optional parameter
         final String[] searchTypes = this.getQuery().getValuesArray(PoddWebConstants.KEY_SEARCH_TYPES);
         final Set<URI> set = new HashSet<URI>();
@@ -95,10 +96,10 @@ public class SearchOntologyResourceImpl extends AbstractPoddResourceImpl
                 set.add(PODD.VF.createURI(searchType));
             }
         }
-
+        
         this.log.debug("requesting search ({}): {}, {}, {}", variant.getMediaType().getName(), searchTerm, artifactUri,
                 searchTypes);
-
+        
         if(ontologyID == null)
         {
             // only when a Project Admin is creating a new artifact
@@ -108,10 +109,10 @@ public class SearchOntologyResourceImpl extends AbstractPoddResourceImpl
         {
             this.checkAuthentication(PoddAction.UNPUBLISHED_ARTIFACT_READ, ontologyID.getOntologyIRI().toOpenRDFURI());
         }
-
+        
         final User user = this.getRequest().getClientInfo().getUser();
         this.log.debug("authenticated user: {}", user);
-
+        
         Model results = null;
         try
         {
@@ -121,28 +122,28 @@ public class SearchOntologyResourceImpl extends AbstractPoddResourceImpl
         }
         catch(final OpenRDFException | UnmanagedSchemaIRIException | SchemaManifestException
                 | UnsupportedRDFormatException | IOException | UnmanagedArtifactIRIException
-                | UnmanagedArtifactVersionException e)
+                | UnmanagedArtifactVersionException | RepositoryNotFoundException e)
         {
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Failed searching for Ontology Labels", e);
         }
         this.log.debug("Found {} matches for this search term", results.size());
-
+        
         final RDFFormat resultFormat =
                 Rio.getWriterFormatForMIMEType(variant.getMediaType().getName(), RDFFormat.RDFXML);
         // - prepare response
         try
         {
-
+            
             Rio.write(results, output, resultFormat);
         }
         catch(final OpenRDFException e)
         {
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Error while preparing response", e);
         }
-
+        
         return new ByteArrayRepresentation(output.toByteArray(), MediaType.valueOf(resultFormat.getDefaultMIMEType()));
     }
-
+    
     /**
      * Handle an HTTP POST requesting information about the content passed in.
      */
@@ -163,7 +164,7 @@ public class SearchOntologyResourceImpl extends AbstractPoddResourceImpl
                 throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Could not find the given artifact", e);
             }
         }
-
+        
         if(ontologyID == null)
         {
             // only when a Project Admin is creating a new artifact
@@ -173,7 +174,7 @@ public class SearchOntologyResourceImpl extends AbstractPoddResourceImpl
         {
             this.checkAuthentication(PoddAction.UNPUBLISHED_ARTIFACT_READ, ontologyID.getOntologyIRI().toOpenRDFURI());
         }
-
+        
         // - get input stream with incoming content
         InputStream inputStream = null;
         try
@@ -187,16 +188,16 @@ public class SearchOntologyResourceImpl extends AbstractPoddResourceImpl
         final RDFFormat inputFormat = Rio.getParserFormatForMIMEType(entity.getMediaType().getName(), RDFFormat.RDFXML);
         final RDFFormat outputFormat =
                 Rio.getWriterFormatForMIMEType(variant.getMediaType().getName(), RDFFormat.RDFXML);
-
+        
         // - prepare response
         final ByteArrayOutputStream output = new ByteArrayOutputStream(8096);
         try
         {
             // read input content into a Model
             final Model inputModel = Rio.parse(inputStream, "", inputFormat);
-
+            
             final Model resultModel = this.getPoddArtifactManager().fillMissingData(ontologyID, inputModel);
-
+            
             // - write the result Model into response
             Rio.write(resultModel, output, outputFormat);
         }
@@ -228,8 +229,12 @@ public class SearchOntologyResourceImpl extends AbstractPoddResourceImpl
         {
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Could not find artifact version", e);
         }
-
+        catch(RepositoryNotFoundException e)
+        {
+            throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Could not find repository", e);
+        }
+        
         return new ByteArrayRepresentation(output.toByteArray(), MediaType.valueOf(outputFormat.getDefaultMIMEType()));
     }
-
+    
 }

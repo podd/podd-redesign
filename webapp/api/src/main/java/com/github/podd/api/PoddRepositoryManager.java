@@ -29,6 +29,8 @@ import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
 import org.semanticweb.owlapi.model.OWLOntologyID;
 
+import com.github.podd.exception.RepositoryNotFoundException;
+
 /**
  * Interface to manage the Sesame Repository used by PODD.
  *
@@ -79,9 +81,12 @@ public interface PoddRepositoryManager
      *             If there are any errors with the repository at this stage.
      * @throws IOException
      *             If there are errors finding the repository.
+     * @throws RepositoryNotFoundException
+     *             If the repository was not found due to it not existing for the given set of
+     *             schema ontology versions.
      */
     RepositoryConnection getPermanentRepositoryConnection(Set<? extends OWLOntologyID> schemaOntologies)
-        throws OpenRDFException, IOException;
+        throws OpenRDFException, IOException, RepositoryNotFoundException;
     
     /**
      *
@@ -96,9 +101,12 @@ public interface PoddRepositoryManager
      *             If there are any errors with the repository at this stage.
      * @throws IOException
      *             If there are errors finding the repository.
+     * @throws RepositoryNotFoundException
+     *             If the repository was not found due to it not existing for the given set of
+     *             schema ontology versions.
      */
     RepositoryConnection getPermanentRepositoryConnection(Set<? extends OWLOntologyID> schemaOntologies,
-            boolean createIfNotExists) throws OpenRDFException, IOException;
+            boolean createIfNotExists) throws OpenRDFException, IOException, RepositoryNotFoundException;
     
     /**
      * Gets a federated repository over the permanent repository for the given schema ontologies,
