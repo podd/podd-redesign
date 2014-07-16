@@ -289,6 +289,32 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
                         {
                             if(!createIfNotExists)
                             {
+                                if(log.isDebugEnabled())
+                                {
+                                    Set<Value> debugRepositories =
+                                            repositoriesInManagerModel.filter(null, RDF.TYPE, PODD.PODD_REPOSITORY,
+                                                    this.repositoryGraph).objects();
+                                    this.log.debug("Listing all {} repositories in manager:", debugRepositories.size());
+                                    for(Value nextRepositoryUri : debugRepositories)
+                                    {
+                                        if(!(nextRepositoryUri instanceof URI))
+                                        {
+                                            this.log.error("Found repository labelled with a non-URI: {}",
+                                                    nextRepositoryUri);
+                                            continue;
+                                        }
+                                        
+                                        this.log.debug("\t{}", nextRepositoryUri);
+                                        Set<Value> ontologiesInNextRepository =
+                                                repositoriesInManagerModel.filter((URI)nextRepositoryUri,
+                                                        PODD.PODD_REPOSITORY_CONTAINS_SCHEMA_VERSION, null).objects();
+                                        for(Value nextOntologyInNextRepository : ontologiesInNextRepository)
+                                        {
+                                            this.log.debug("\t\t{}", nextOntologyInNextRepository);
+                                        }
+                                    }
+                                }
+                                
                                 throw new RepositoryException(
                                         "Could not find an existing repository for the given set of schema ontolgoies: "
                                                 + schemaOntologies);
