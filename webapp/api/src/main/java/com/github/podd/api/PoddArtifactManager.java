@@ -727,7 +727,7 @@ public interface PoddArtifactManager
     UnmanagedSchemaIRIException, SchemaManifestException, UnsupportedRDFormatException, IOException,
     UnmanagedArtifactIRIException, UnmanagedArtifactVersionException;
 
-    Model ChildOfList(Set<URI> topConcept, InferredOWLOntologyID ontologyID) throws OpenRDFException,
+    Model childOfList(Set<URI> topConcept, InferredOWLOntologyID ontologyID) throws OpenRDFException,
     UnmanagedSchemaIRIException, SchemaManifestException, UnsupportedRDFormatException, IOException,
     UnmanagedArtifactIRIException, UnmanagedArtifactVersionException;
 

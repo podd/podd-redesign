@@ -2676,7 +2676,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
     }
     
     @Override
-    public Model ChildOfList(final Set<URI> topConcepts, final InferredOWLOntologyID ontologyID)
+    public Model childOfList(final Set<URI> topConcepts, final InferredOWLOntologyID ontologyID)
         throws OpenRDFException, UnmanagedSchemaIRIException, SchemaManifestException, UnsupportedRDFormatException,
         IOException, UnmanagedArtifactIRIException, UnmanagedArtifactVersionException
     {

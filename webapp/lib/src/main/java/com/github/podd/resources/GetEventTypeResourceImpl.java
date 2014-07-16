@@ -100,7 +100,7 @@ public class GetEventTypeResourceImpl extends AbstractPoddResourceImpl
         Model subConcepts;
         try
         {
-            subConcepts = this.getPoddArtifactManager().ChildOfList(Concepts, ontologyID);
+            subConcepts = this.getPoddArtifactManager().childOfList(Concepts, ontologyID);
         }
         catch(final OpenRDFException | UnmanagedSchemaIRIException | SchemaManifestException
                 | UnsupportedRDFormatException | IOException | UnmanagedArtifactIRIException
