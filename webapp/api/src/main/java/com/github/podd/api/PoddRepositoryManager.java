@@ -42,13 +42,13 @@ public interface PoddRepositoryManager
      * @return The artifact management graph URI for this repository manager.
      */
     URI getArtifactManagementGraph();
-
+    
     /**
      *
      * @return The file repository management graph URI for this repository manager.
      */
     URI getFileRepositoryManagementGraph();
-
+    
     /**
      * Gets a reference to the
      *
@@ -57,7 +57,7 @@ public interface PoddRepositoryManager
      *             If there are any errors with the repository at this stage.
      */
     RepositoryConnection getManagementRepositoryConnection() throws OpenRDFException;
-
+    
     /**
      * Get a new temporary repository.
      *
@@ -66,8 +66,10 @@ public interface PoddRepositoryManager
      * @throws OpenRDFException
      */
     Repository getNewTemporaryRepository() throws OpenRDFException;
-
+    
     /**
+     * Get a {@link RepositoryConnection} to a unique permanent repository exactly matching the
+     * given set of {@link OWLOntologyID}s given and fail otherwise.
      *
      * @param schemaOntologies
      *            A list of schema ontologies that must be supported by the permanent repository.
@@ -79,8 +81,25 @@ public interface PoddRepositoryManager
      *             If there are errors finding the repository.
      */
     RepositoryConnection getPermanentRepositoryConnection(Set<? extends OWLOntologyID> schemaOntologies)
-            throws OpenRDFException, IOException;
-
+        throws OpenRDFException, IOException;
+    
+    /**
+     *
+     * @param schemaOntologies
+     *            A list of schema ontologies that must be supported by the permanent repository.
+     * @param createIfNotExists
+     *            True to create the repository for the given list of schema ontologies and false
+     *            otherwise. Defaults to false to ensure accidental usage fails if the ontologies
+     *            are not mapped to an existing repository already.
+     * @return A link to the initialised repository managed by this manager.
+     * @throws OpenRDFException
+     *             If there are any errors with the repository at this stage.
+     * @throws IOException
+     *             If there are errors finding the repository.
+     */
+    RepositoryConnection getPermanentRepositoryConnection(Set<? extends OWLOntologyID> schemaOntologies,
+            boolean createIfNotExists) throws OpenRDFException, IOException;
+    
     /**
      * Gets a federated repository over the permanent repository for the given schema ontologies,
      * and the management repository.
@@ -95,14 +114,14 @@ public interface PoddRepositoryManager
      * @throws IOException
      */
     Repository getReadOnlyFederatedRepository(Set<? extends OWLOntologyID> schemaOntologies) throws OpenRDFException,
-    IOException;
-
+        IOException;
+    
     /**
      *
      * @return The schema management graph URI for this repository manager.
      */
     URI getSchemaManagementGraph();
-
+    
     /**
      * Verifies that the context is not null, not the default graph (sesame:nil), and is not one of
      * the management graphs.
@@ -112,21 +131,21 @@ public interface PoddRepositoryManager
      * @return True if the contexts are not on the banned or protected list.
      */
     boolean safeContexts(URI... contexts);
-
+    
     /**
      * Sets the artifact management graph URI for use with this repository manager.
      *
      * @param artifactManagementGraph
      */
     void setArtifactManagementGraph(URI artifactManagementGraph);
-
+    
     /**
      * Sets the file repository management graph URI for use with this repository manager.
      *
      * @param dataRepositoryManagementGraph
      */
     void setFileRepositoryManagementGraph(URI dataRepositoryManagementGraph);
-
+    
     /**
      * Sets the repository for this repository manager.
      *
@@ -136,14 +155,14 @@ public interface PoddRepositoryManager
      *             If there are any errors with the repository at this stage.
      */
     void setManagementRepository(Repository repository) throws OpenRDFException;
-
+    
     /**
      * Sets the schema management graph URI for use with this repository manager.
      *
      * @param schemaManagementGraph
      */
     void setSchemaManagementGraph(URI schemaManagementGraph);
-
+    
     /**
      * Shutdown the repository manager, including any active repositories.
      *
@@ -151,5 +170,5 @@ public interface PoddRepositoryManager
      *             If there were issues shutting down the active repositories.
      */
     void shutDown() throws RepositoryException;
-
+    
 }
