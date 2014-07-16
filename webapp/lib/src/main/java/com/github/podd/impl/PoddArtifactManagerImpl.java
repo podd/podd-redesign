@@ -1615,6 +1615,16 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             
             schemaImports = new LinkedHashSet<>(OntologyUtils.artifactImports(ontologyIDs.get(0), importsModel));
             
+            // Add in all of the imports that are actually imported, but the user did not include in
+            // their original list
+            // This is necessary to ensure that the repository ontology lists match the artifacts,
+            // so the artifact can be discovered accurately given the artifact ontology imports
+            for(OWLOntologyID nextArtifactSchemaImport : schemaImports)
+            {
+                temporaryConnection.add(ontologyIDs.get(0).getOntologyIRI().toOpenRDFURI(), OWL.IMPORTS,
+                        nextArtifactSchemaImport.getVersionIRI().toOpenRDFURI(), randomContext);
+            }
+            
             // Remove any assertions that the user has made about publication status, as this
             // information is a privileged operation that must be done through the designated API
             // method
