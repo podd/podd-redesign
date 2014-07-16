@@ -64,6 +64,7 @@ import org.slf4j.LoggerFactory;
 
 import com.github.ansell.propertyutil.PropertyUtil;
 import com.github.podd.api.PoddRepositoryManager;
+import com.github.podd.exception.RepositoryNotFoundException;
 import com.github.podd.utils.ManualShutdownRepository;
 import com.github.podd.utils.OntologyUtils;
 import com.github.podd.utils.PODD;
@@ -315,7 +316,7 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
                                     }
                                 }
                                 
-                                throw new RepositoryException(
+                                throw new RepositoryNotFoundException(
                                         "Could not find an existing repository for the given set of schema ontolgoies: "
                                                 + schemaOntologies);
                             }
