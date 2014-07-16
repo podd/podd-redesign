@@ -91,7 +91,7 @@ public class DeleteObjectResourceImplTest extends AbstractResourceImplTest
                     updatedArtifactDetails.contains("artifact:1:version:2"));
 
             // verify: retrieve artifact and check deleted object's not present
-            final Model retrievedArtifact = this.getArtifact(artifactID.getOntologyIRI().toString(), 80);
+            final Model retrievedArtifact = this.getArtifact(artifactID.getOntologyIRI().toString(), 81);
             final URI objectToDeleteUri = PODD.VF.createURI(objectToDelete);
             Assert.assertTrue("Object not deleted", retrievedArtifact.filter(objectToDeleteUri, null, null).isEmpty());
             Assert.assertTrue("Object not deleted", retrievedArtifact.filter(null, null, objectToDeleteUri).isEmpty());

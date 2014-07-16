@@ -49,7 +49,7 @@ public interface TestConstants
     
     /** Test resource: artifact with 1 internal object */
     public static final String TEST_ARTIFACT_BASIC_1_INTERNAL_OBJECT = "/test/artifacts/basic-1-internal-object.rdf";
-    public static final int TEST_ARTIFACT_BASIC_1_INTERNAL_OBJECT_CONCRETE_TRIPLES = 28;
+    public static final int TEST_ARTIFACT_BASIC_1_INTERNAL_OBJECT_CONCRETE_TRIPLES = 29;
     public static final int TEST_ARTIFACT_BASIC_1_INTERNAL_OBJECT_INFERRED_TRIPLES = 354;
     
     /** Test resource: artifact with 1 internal object, slightly different */
@@ -62,7 +62,7 @@ public interface TestConstants
     public static final int TEST_ARTIFACT_BASIC_PROJECT_3_INFERRED_TRIPLES = 348;
     
     public static final String TEST_ARTIFACT_BASIC_PROJECT_4 = "/test/artifacts/basicProject-4.rdf";
-    public static final int TEST_ARTIFACT_BASIC_PROJECT_4_CONCRETE_TRIPLES = 16;
+    public static final int TEST_ARTIFACT_BASIC_PROJECT_4_CONCRETE_TRIPLES = 17;
     public static final int TEST_ARTIFACT_BASIC_PROJECT_4_INFERRED_TRIPLES = 333;
     
     /** Test resource: (in RDF/XML) artifact with published status */
@@ -89,7 +89,7 @@ public interface TestConstants
     /** Test resource (in RDF/XML): artifact imports v1 of PODD Science schema ontology */
     public static final String TEST_ARTIFACT_IMPORT_PSCIENCEv1 =
             "/test/artifacts/project-imports-sciencev1-version.rdf";
-    public static final int TEST_ARTIFACT_IMPORT_PSCIENCEv1_CONCRETE_TRIPLES = 28;
+    public static final int TEST_ARTIFACT_IMPORT_PSCIENCEv1_CONCRETE_TRIPLES = 29;
     public static final int TEST_ARTIFACT_IMPORT_PSCIENCEv1_INFERRED_TRIPLES = 354;
     
     /** Test resource (in RDF/XML): artifact imports v1 of PODD Science schema ontology */
@@ -107,7 +107,7 @@ public interface TestConstants
     
     /** Test resource: artifact with PURLs and multiple internal objects in Turtle format */
     public static final String TEST_ARTIFACT_20130206 = "/test/artifacts/basic-20130206.ttl";
-    public static final int TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES = 90;
+    public static final int TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES = 91;
     public static final int TEST_ARTIFACT_BASIC_1_20130206_INFERRED_TRIPLES = 586;
     
     /** Test resource: artifact with PURLs and a refersTo link in Turtle format */
