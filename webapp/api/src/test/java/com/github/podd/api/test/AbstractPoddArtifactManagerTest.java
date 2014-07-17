@@ -2029,10 +2029,11 @@ public abstract class AbstractPoddArtifactManagerTest
                         };
                 
                 // verify: no. of import statements
+                List<Statement> asList = Iterations.asList(
+                        permanentConnection.getStatements(null, OWL.IMPORTS, null, false, artifactId
+                                .getVersionIRI().toOpenRDFURI()));
                 final int importStatementCount =
-                        Iterations.asList(
-                                permanentConnection.getStatements(null, OWL.IMPORTS, null, false, artifactId
-                                        .getVersionIRI().toOpenRDFURI())).size();
+                        asList.size();
                 Assert.assertEquals("Graph should have 4 import statements", 4, importStatementCount);
                 
                 for(final String expectedImport : expectedImports)
