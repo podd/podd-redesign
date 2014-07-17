@@ -459,22 +459,23 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         {
             Set<? extends OWLOntologyID> schemaImports;
             
+            managementConnection = this.getRepositoryManager().getManagementRepositoryConnection();
+            final URI[] contexts =
+                    this.sesameManager.versionAndInferredAndSchemaContexts(artifactID, managementConnection,
+                            this.repositoryManager.getSchemaManagementGraph(),
+                            this.repositoryManager.getArtifactManagementGraph());
             if(artifactID != null)
             {
                 schemaImports = this.getSchemaImports(artifactID);
+                permanentConnection = this.getRepositoryManager().getPermanentRepositoryConnection(schemaImports);
             }
             else
             {
                 // If they don't have an artifact yet, we return the set of current schema
                 // ontologies
                 schemaImports = this.getSchemaManager().getCurrentSchemaOntologies();
+                permanentConnection = managementConnection;
             }
-            permanentConnection = this.getRepositoryManager().getPermanentRepositoryConnection(schemaImports);
-            managementConnection = this.getRepositoryManager().getManagementRepositoryConnection();
-            final URI[] contexts =
-                    this.sesameManager.versionAndInferredAndSchemaContexts(artifactID, managementConnection,
-                            this.repositoryManager.getSchemaManagementGraph(),
-                            this.repositoryManager.getArtifactManagementGraph());
             
             Model model;
             if(containsPropertyPolicy == MetadataPolicy.ONLY_CONTAINS)
@@ -505,14 +506,14 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         {
             try
             {
-                if(managementConnection != null)
+                if(managementConnection != null && managementConnection.isOpen())
                 {
                     managementConnection.close();
                 }
             }
             finally
             {
-                if(permanentConnection != null)
+                if(permanentConnection != null && permanentConnection.isOpen())
                 {
                     permanentConnection.close();
                 }
