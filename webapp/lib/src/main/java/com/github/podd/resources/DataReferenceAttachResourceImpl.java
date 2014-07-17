@@ -48,6 +48,7 @@ import com.github.podd.api.PoddArtifactManager;
 import com.github.podd.exception.DataReferenceVerificationException;
 import com.github.podd.exception.OntologyNotInProfileException;
 import com.github.podd.exception.PoddException;
+import com.github.podd.exception.RepositoryNotFoundException;
 import com.github.podd.exception.SchemaManifestException;
 import com.github.podd.exception.UnmanagedArtifactIRIException;
 import com.github.podd.exception.UnmanagedArtifactVersionException;
@@ -84,8 +85,8 @@ public class DataReferenceAttachResourceImpl extends AbstractPoddResourceImpl
      */
     private InferredOWLOntologyID attachDataReference(final Representation entity, final String artifactUriString,
             final String versionUriString, final DataReferenceVerificationPolicy verificationPolicy)
-                    throws ResourceException, RDFParseException, UnsupportedRDFormatException, IOException,
-                    UnmanagedArtifactIRIException, UnmanagedSchemaIRIException
+        throws ResourceException, RDFParseException, UnsupportedRDFormatException, IOException,
+        UnmanagedArtifactIRIException, UnmanagedSchemaIRIException
     {
         // get input stream containing RDF statements
         InputStream inputStream = null;
@@ -98,14 +99,14 @@ public class DataReferenceAttachResourceImpl extends AbstractPoddResourceImpl
             throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "There was a problem with the input", e);
         }
         final RDFFormat inputFormat = Rio.getParserFormatForMIMEType(entity.getMediaType().getName(), RDFFormat.RDFXML);
-
+        
         final Model model = Rio.parse(inputStream, "", inputFormat);
-
+        
         final URI artifactUri = PODD.VF.createURI(artifactUriString);
         final URI versionUri = PODD.VF.createURI(versionUriString);
-
+        
         final PoddArtifactManager artifactManager = this.getPoddArtifactManager();
-
+        
         InferredOWLOntologyID artifact;
         try
         {
@@ -115,7 +116,7 @@ public class DataReferenceAttachResourceImpl extends AbstractPoddResourceImpl
         {
             artifact = artifactManager.getArtifact(IRI.create(artifactUri));
         }
-
+        
         InferredOWLOntologyID artifactMap = null;
         try
         {
@@ -138,11 +139,11 @@ public class DataReferenceAttachResourceImpl extends AbstractPoddResourceImpl
         {
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Could not attach file references", e);
         }
-
+        
         this.log.info("Successfully attached file reference to artifact {}", artifactMap);
         return artifactMap;
     }
-
+    
     @Get
     public Representation attachDataReferencePageHtml(final Representation entity) throws ResourceException
     {
@@ -153,7 +154,7 @@ public class DataReferenceAttachResourceImpl extends AbstractPoddResourceImpl
             this.log.error("Artifact ID not submitted");
             throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Artifact IRI not submitted");
         }
-
+        
         // check mandatory parameter: object IRI
         final String objectUri = this.getQuery().getFirstValue(PoddWebConstants.KEY_OBJECT_IDENTIFIER, true);
         if(objectUri == null)
@@ -163,9 +164,9 @@ public class DataReferenceAttachResourceImpl extends AbstractPoddResourceImpl
         }
         final URI artifactUri = PODD.VF.createURI(artifactUriString);
         this.checkAuthentication(PoddAction.ARTIFACT_EDIT, artifactUri);
-
+        
         InferredOWLOntologyID artifact;
-
+        
         try
         {
             artifact = this.getPoddArtifactManager().getArtifact(IRI.create(artifactUri));
@@ -173,14 +174,14 @@ public class DataReferenceAttachResourceImpl extends AbstractPoddResourceImpl
         catch(final UnmanagedArtifactIRIException | UnmanagedSchemaIRIException e)
         {
             this.log.error("Artifact IRI not recognised");
-            throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Artifact IRI not recognised");
+            throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Artifact IRI not recognised", e);
         }
-
+        
         this.log.info("attachFileRefHtml");
         final User user = this.getRequest().getClientInfo().getUser();
-
+        
         this.log.info("authenticated user: {}", user);
-
+        
         PoddObjectLabel parentDetails;
         try
         {
@@ -188,12 +189,12 @@ public class DataReferenceAttachResourceImpl extends AbstractPoddResourceImpl
         }
         catch(final OpenRDFException | UnmanagedSchemaIRIException | SchemaManifestException
                 | UnsupportedRDFormatException | IOException | UnmanagedArtifactIRIException
-                | UnmanagedArtifactVersionException e)
+                | UnmanagedArtifactVersionException | RepositoryNotFoundException e)
         {
             this.log.error("Could not find parent details", e);
             throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Could not find parent details", e);
         }
-
+        
         final Map<String, Object> dataModel = RestletUtils.getBaseDataModel(this.getRequest());
         dataModel.put("contentTemplate", "attachDataReference.html.ftl");
         dataModel.put("pageTitle", "Attach Data Reference");
@@ -201,19 +202,19 @@ public class DataReferenceAttachResourceImpl extends AbstractPoddResourceImpl
         dataModel.put("versionIri", artifact.getVersionIRI().toString());
         dataModel.put("parentObject", parentDetails);
         dataModel.put("objectUri", objectUri);
-
+        
         // Output the base template, with contentTemplate from the dataModel
         // defining the
         // template to use for the content in the body of the page
         return RestletUtils.getHtmlRepresentation(
                 this.getPoddApplication().getPropertyUtil()
-                .get(PoddWebConstants.PROPERTY_TEMPLATE_BASE, PoddWebConstants.DEFAULT_TEMPLATE_BASE),
+                        .get(PoddWebConstants.PROPERTY_TEMPLATE_BASE, PoddWebConstants.DEFAULT_TEMPLATE_BASE),
                 dataModel, MediaType.TEXT_HTML, this.getPoddApplication().getTemplateConfiguration());
     }
-
+    
     @Post(":rdf|rj|ttl")
     public Representation attachDataReferenceRdf(final Representation entity, final Variant variant)
-            throws ResourceException
+        throws ResourceException
     {
         // check mandatory parameter: artifact IRI
         final String artifactUri = this.getQuery().getFirstValue(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, true);
@@ -222,9 +223,9 @@ public class DataReferenceAttachResourceImpl extends AbstractPoddResourceImpl
             this.log.error("Artifact ID not submitted");
             throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Artifact IRI not submitted");
         }
-
+        
         this.checkAuthentication(PoddAction.ARTIFACT_EDIT, PODD.VF.createURI(artifactUri));
-
+        
         // check mandatory parameter: artifact version IRI
         final String versionUri = this.getQuery().getFirstValue(PoddWebConstants.KEY_ARTIFACT_VERSION_IDENTIFIER, true);
         if(versionUri == null)
@@ -232,7 +233,7 @@ public class DataReferenceAttachResourceImpl extends AbstractPoddResourceImpl
             this.log.error("Artifact Version IRI not submitted");
             throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Artifact Version IRI not submitted");
         }
-
+        
         // check optional parameter: whether file references should be verified.
         // Defaults to NO
         final String verifyFileRefs = this.getQuery().getFirstValue(PoddWebConstants.KEY_VERIFICATION_POLICY, true);
@@ -241,9 +242,9 @@ public class DataReferenceAttachResourceImpl extends AbstractPoddResourceImpl
         {
             verificationPolicy = DataReferenceVerificationPolicy.VERIFY;
         }
-
+        
         this.log.info("@Post attachFileReference ({})", entity.getMediaType().getName());
-
+        
         InferredOWLOntologyID artifactMap;
         try
         {
@@ -270,10 +271,10 @@ public class DataReferenceAttachResourceImpl extends AbstractPoddResourceImpl
             this.log.error("Artifact not parsed due to IO exception");
             throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Artifact not parsed due to IO exception");
         }
-
+        
         // prepare output: Artifact ID, object URI, file reference URI
         final ByteArrayOutputStream output = new ByteArrayOutputStream(8096);
-
+        
         final RDFWriter writer =
                 Rio.createWriter(Rio.getWriterFormatForMIMEType(variant.getMediaType().getName(), RDFFormat.RDFXML),
                         output);
@@ -287,9 +288,9 @@ public class DataReferenceAttachResourceImpl extends AbstractPoddResourceImpl
         {
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Could not create response");
         }
-
+        
         return new ByteArrayRepresentation(output.toByteArray(), MediaType.valueOf(writer.getRDFFormat()
                 .getDefaultMIMEType()));
     }
-
+    
 }

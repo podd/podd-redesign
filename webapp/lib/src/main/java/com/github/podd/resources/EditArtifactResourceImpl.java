@@ -48,6 +48,7 @@ import com.github.podd.api.DanglingObjectPolicy;
 import com.github.podd.api.DataReferenceVerificationPolicy;
 import com.github.podd.api.UpdatePolicy;
 import com.github.podd.exception.PoddException;
+import com.github.podd.exception.RepositoryNotFoundException;
 import com.github.podd.exception.SchemaManifestException;
 import com.github.podd.exception.UnmanagedArtifactIRIException;
 import com.github.podd.exception.UnmanagedArtifactVersionException;
@@ -281,9 +282,9 @@ public class EditArtifactResourceImpl extends AbstractPoddResourceImpl
         }
         catch(final OpenRDFException | UnmanagedSchemaIRIException | SchemaManifestException
                 | UnsupportedRDFormatException | IOException | UnmanagedArtifactIRIException
-                | UnmanagedArtifactVersionException e)
+                | UnmanagedArtifactVersionException | RepositoryNotFoundException e)
         {
-            throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Failed to populate data model");
+            throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Failed to populate data model", e);
         }
 
         dataModel.put("artifactIri", ontologyID.getOntologyIRI().toString());

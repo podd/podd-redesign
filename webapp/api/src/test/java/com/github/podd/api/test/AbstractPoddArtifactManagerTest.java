@@ -102,6 +102,7 @@ import com.github.podd.exception.InconsistentOntologyException;
 import com.github.podd.exception.OntologyNotInProfileException;
 import com.github.podd.exception.PoddException;
 import com.github.podd.exception.PublishedArtifactModifyException;
+import com.github.podd.exception.RepositoryNotFoundException;
 import com.github.podd.exception.SchemaManifestException;
 import com.github.podd.exception.UnmanagedArtifactIRIException;
 import com.github.podd.exception.UnmanagedArtifactVersionException;
@@ -893,9 +894,9 @@ public abstract class AbstractPoddArtifactManagerTest
                 TestConstants.TEST_ARTIFACT_BASIC_1_20130206_INFERRED_TRIPLES, false);
         
         final Object[][] testData =
-                { { "http://purl.org/podd/basic-2-20130206/artifact:1#My_Treatment1", 86, false },
-                        { "http://purl.org/podd/basic-2-20130206/artifact:1#publication45", 76, false },
-                        { "http://purl.org/podd/basic-2-20130206/artifact:1#SqueekeeMaterial", 64, true }, };
+                { { "http://purl.org/podd/basic-2-20130206/artifact:1#My_Treatment1", 87, false },
+                        { "http://purl.org/podd/basic-2-20130206/artifact:1#publication45", 77, false },
+                        { "http://purl.org/podd/basic-2-20130206/artifact:1#SqueekeeMaterial", 65, true }, };
         
         for(final Object[] element : testData)
         {
@@ -1024,7 +1025,7 @@ public abstract class AbstractPoddArtifactManagerTest
         
         // verify:
         final Model artifactModel = this.testArtifactManager.exportArtifact(modifiedArtifactId, false);
-        Assert.assertEquals("Reduction in artifact size incorrect", 72, artifactModel.size());
+        Assert.assertEquals("Reduction in artifact size incorrect", 73, artifactModel.size());
         Assert.assertTrue("Object still exists as an object of some statement",
                 artifactModel.filter(null, null, objectToDelete).isEmpty());
         Assert.assertTrue("Object exists as a subject of some statement",
@@ -1705,7 +1706,7 @@ public abstract class AbstractPoddArtifactManagerTest
                     this.testArtifactManager.loadArtifact(inputStream, RDFFormat.NQUADS);
             
             // verify:
-            this.verifyLoadedArtifact(resultArtifactId, 14, 20, 596, false);
+            this.verifyLoadedArtifact(resultArtifactId, 14, 22, 596, false);
         }
     }
     
@@ -2022,24 +2023,27 @@ public abstract class AbstractPoddArtifactManagerTest
                 permanentConnection = this.testRepositoryManager.getPermanentRepositoryConnection(schemaImports);
                 
                 final String[] expectedImports =
-                        { "http://purl.org/podd/ns/version/dcTerms/1", "http://purl.org/podd/ns/version/poddUser/1",
+                        { "http://purl.org/podd/ns/version/dcTerms/1", "http://purl.org/podd/ns/version/foaf/1",
+                                "http://purl.org/podd/ns/version/poddUser/1",
                                 "http://purl.org/podd/ns/version/poddBase/1",
                                 "http://purl.org/podd/ns/version/poddScience/1", // an older version
                         };
                 
                 // verify: no. of import statements
-                final int importStatementCount =
-                        Iterations.asList(
-                                permanentConnection.getStatements(null, OWL.IMPORTS, null, false, artifactId
-                                        .getVersionIRI().toOpenRDFURI())).size();
-                Assert.assertEquals("Graph should have 4 import statements", 4, importStatementCount);
+                Model asList =
+                        new LinkedHashModel(Iterations.asList(permanentConnection.getStatements(null, OWL.IMPORTS,
+                                null, false, artifactId.getVersionIRI().toOpenRDFURI())));
+                DebugUtils.printContents(asList);
+                final int importStatementCount = asList.size();
+                Assert.assertEquals("Graph should have 5 import statements", 5, importStatementCount);
                 
                 for(final String expectedImport : expectedImports)
                 {
                     final List<Statement> importStatements =
-                            Iterations.asList(permanentConnection.getStatements(null, OWL.IMPORTS, ValueFactoryImpl
-                                    .getInstance().createURI(expectedImport), false, artifactId.getVersionIRI()
-                                    .toOpenRDFURI()));
+                            Iterations
+                                    .asList(permanentConnection.getStatements(null, OWL.IMPORTS, PODD.VF
+                                            .createURI(expectedImport), false, artifactId.getVersionIRI()
+                                            .toOpenRDFURI()));
                     
                     Assert.assertEquals("Expected 1 import statement per schema", 1, importStatements.size());
                 }
@@ -3051,7 +3055,7 @@ public abstract class AbstractPoddArtifactManagerTest
         // Update from version 1 to version 2
         this.testArtifactManager.updateSchemaImports(new InferredOWLOntologyID(artifactIDv1.getOntologyIRI(),
                 artifactIDv1.getVersionIRI(), artifactIDv1.getInferredOntologyIRI()), new LinkedHashSet<OWLOntologyID>(
-                        schemaImportsV1), new LinkedHashSet<OWLOntologyID>(version2SchemaOntologies));
+                schemaImportsV1), new LinkedHashSet<OWLOntologyID>(version2SchemaOntologies));
         
         final InferredOWLOntologyID artifactIDv2 = this.testArtifactManager.getArtifact(artifactIDv1.getOntologyIRI());
         
@@ -3510,7 +3514,8 @@ public abstract class AbstractPoddArtifactManagerTest
     private void verifyLoadedArtifact(final InferredOWLOntologyID inferredOntologyId, final int mgtGraphSize,
             final long assertedStatementCount, final long inferredStatementCount, final boolean isPublished)
         throws RepositoryException, OpenRDFException, UnmanagedArtifactIRIException, UnmanagedArtifactVersionException,
-        UnmanagedSchemaIRIException, SchemaManifestException, UnsupportedRDFormatException, IOException
+        UnmanagedSchemaIRIException, SchemaManifestException, UnsupportedRDFormatException, IOException,
+        RepositoryNotFoundException
     
     {
         // verify: ontology ID has all details

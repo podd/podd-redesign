@@ -185,10 +185,10 @@ public class DataReferenceAttachResourceImplTest extends AbstractResourceImplTes
 
             // DebugUtils.printContents(artifactModel);
 
-            Assert.assertEquals(98, artifactModel.size());
+            Assert.assertEquals(99, artifactModel.size());
             Assert.assertEquals(20, artifactModel.subjects().size());
             Assert.assertEquals(33, artifactModel.predicates().size());
-            Assert.assertEquals(74, artifactModel.objects().size());
+            Assert.assertEquals(75, artifactModel.objects().size());
             Assert.assertEquals(1, artifactModel.contexts().size());
 
             // final String body = this.getText(results);

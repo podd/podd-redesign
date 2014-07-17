@@ -34,6 +34,7 @@ import org.restlet.resource.ResourceException;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLOntologyID;
 
+import com.github.podd.exception.RepositoryNotFoundException;
 import com.github.podd.exception.SchemaManifestException;
 import com.github.podd.exception.UnmanagedArtifactIRIException;
 import com.github.podd.exception.UnmanagedArtifactVersionException;
@@ -62,7 +63,7 @@ public class AddObjectResourceImpl extends AbstractPoddResourceImpl
         this.log.warn("Not implemented! POST with RDF data to UploadArtifactResource for new Projects and EditArtifactResource for others");
         return null;
     }
-
+    
     /**
      * Serve the "Add new object" HTML page
      *
@@ -72,7 +73,7 @@ public class AddObjectResourceImpl extends AbstractPoddResourceImpl
      */
     @Get("html")
     public Representation getCreateObjectHtml(final Representation entity) throws ResourceException,
-    UnmanagedSchemaIRIException, UnsupportedRDFormatException, IOException
+        UnmanagedSchemaIRIException, UnsupportedRDFormatException, IOException, RepositoryNotFoundException
     {
         this.log.info("@Get addObjectHtml Page");
         this.log.debug("entity : {}", entity);
@@ -84,7 +85,7 @@ public class AddObjectResourceImpl extends AbstractPoddResourceImpl
         }
         this.log.debug("this.getQuery() : {}", this.getQuery());
         this.log.debug("objectType : {}", objectType);
-
+        
         final String artifactUri = this.getQuery().getFirstValue(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, true);
         final String parentUri = this.getQuery().getFirstValue(PoddWebConstants.KEY_PARENT_IDENTIFIER, true);
         final String parentPredicateUri =
@@ -93,7 +94,7 @@ public class AddObjectResourceImpl extends AbstractPoddResourceImpl
         this.log.debug("artifactUri : {}", artifactUri);
         this.log.debug("is event : {}", isEvent);
         this.log.debug("parentPredicateUri : {}", parentPredicateUri);
-
+        
         if(artifactUri == null)
         {
             // looks like adding a new Artifact (ie, a new Project)
@@ -106,36 +107,36 @@ public class AddObjectResourceImpl extends AbstractPoddResourceImpl
             // if it is defined inside of the artifact.
             this.checkAuthentication(PoddAction.ARTIFACT_EDIT, PODD.VF.createURI(artifactUri));
         }
-
+        
         final PoddObjectLabel objectTypeLabel = this.getObjectTypeLabel(artifactUri, objectType);
         final String title = "Add new " + objectTypeLabel.getLabel();
-
+        
         final Map<String, Object> dataModel = RestletUtils.getBaseDataModel(this.getRequest());
         dataModel.put(
                 "contentTemplate",
                 this.getPoddApplication()
-                .getPropertyUtil()
-                .get(PoddWebConstants.PROPERTY_TEMPLATE_ADD_OBJECT,
-                        PoddWebConstants.DEFAULT_TEMPLATE_ADD_OBJECT));
+                        .getPropertyUtil()
+                        .get(PoddWebConstants.PROPERTY_TEMPLATE_ADD_OBJECT,
+                                PoddWebConstants.DEFAULT_TEMPLATE_ADD_OBJECT));
         dataModel.put("pageTitle", title);
         dataModel.put("title", title);
         dataModel.put("objectType", objectTypeLabel);
         // objectUri is unavailable as this is a new object
-
+        
         if(artifactUri != null)
         {
             // adding a child object to an existing artifact
-
+            
             if(parentUri == null)
             {
                 throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "parent URI not specified");
             }
-
+            
             if(parentPredicateUri == null)
             {
                 throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "parent predicate URI not specified");
             }
-
+            
             InferredOWLOntologyID ontologyID;
             try
             {
@@ -145,37 +146,37 @@ public class AddObjectResourceImpl extends AbstractPoddResourceImpl
             {
                 throw new ResourceException(Status.CLIENT_ERROR_NOT_FOUND, "Could not find the given artifact", e);
             }
-
+            
             if(isEvent == null)
             {
                 isEvent = "false";
             }
-
+            
             dataModel.put("artifactIri", ontologyID.getOntologyIRI().toString());
             dataModel.put("versionIri", ontologyID.getVersionIRI().toString());
-
+            
             // parentUri and parentPredicate - is any validation required?
             dataModel.put("parentUri", parentUri);
             dataModel.put("parentPredicateUri", parentPredicateUri);
-
+            
             dataModel.put("isEvent", isEvent);
         }
-
+        
         return RestletUtils.getHtmlRepresentation(
                 this.getPoddApplication().getPropertyUtil()
-                .get(PoddWebConstants.PROPERTY_TEMPLATE_BASE, PoddWebConstants.DEFAULT_TEMPLATE_BASE),
+                        .get(PoddWebConstants.PROPERTY_TEMPLATE_BASE, PoddWebConstants.DEFAULT_TEMPLATE_BASE),
                 dataModel, MediaType.TEXT_HTML, this.getPoddApplication().getTemplateConfiguration());
     }
-
+    
     /*
      * Internal helper method which encapsulates the creation of a RepositoryConnection before
      * calling the SesameManager.
-     *
+     * 
      * Can avoid dealing with RepositoryConnections here if this could be moved to somewhere in the
      * API.
      */
     private PoddObjectLabel getObjectTypeLabel(final String artifactUri, final String objectType)
-            throws UnsupportedRDFormatException, IOException
+        throws UnsupportedRDFormatException, IOException, RepositoryNotFoundException
     {
         this.log.debug("getObjectTypeLabel::artifactUri : {}", artifactUri);
         PoddObjectLabel objectLabel;
@@ -187,7 +188,7 @@ public class AddObjectResourceImpl extends AbstractPoddResourceImpl
             {
                 managementConnection = this.getPoddRepositoryManager().getManagementRepositoryConnection();
                 managementConnection.begin();
-
+                
                 InferredOWLOntologyID ontologyID = null;
                 if(artifactUri != null)
                 {
@@ -197,7 +198,7 @@ public class AddObjectResourceImpl extends AbstractPoddResourceImpl
                             this.getPoddArtifactManager().getSchemaImports(ontologyID);
                     permanentConnection =
                             this.getPoddRepositoryManager().getPermanentRepositoryConnection(schemaImports);
-
+                    
                     objectLabel =
                             this.getPoddSesameManager().getObjectLabel(ontologyID, PODD.VF.createURI(objectType),
                                     managementConnection, permanentConnection,
@@ -211,7 +212,7 @@ public class AddObjectResourceImpl extends AbstractPoddResourceImpl
                                     managementConnection, managementConnection,
                                     this.getPoddRepositoryManager().getSchemaManagementGraph(),
                                     this.getPoddRepositoryManager().getArtifactManagementGraph());
-
+                    
                 }
             }
             finally
@@ -257,5 +258,5 @@ public class AddObjectResourceImpl extends AbstractPoddResourceImpl
         }
         return objectLabel;
     }
-
+    
 }

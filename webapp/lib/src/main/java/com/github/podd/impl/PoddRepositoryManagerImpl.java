@@ -64,6 +64,8 @@ import org.slf4j.LoggerFactory;
 
 import com.github.ansell.propertyutil.PropertyUtil;
 import com.github.podd.api.PoddRepositoryManager;
+import com.github.podd.exception.PoddException;
+import com.github.podd.exception.RepositoryNotFoundException;
 import com.github.podd.utils.ManualShutdownRepository;
 import com.github.podd.utils.OntologyUtils;
 import com.github.podd.utils.PODD;
@@ -159,7 +161,14 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
     
     @Override
     public RepositoryConnection getPermanentRepositoryConnection(final Set<? extends OWLOntologyID> schemaOntologies)
-        throws OpenRDFException, IOException
+        throws OpenRDFException, IOException, RepositoryNotFoundException
+    {
+        return getPermanentRepositoryConnection(schemaOntologies, false);
+    }
+    
+    @Override
+    public RepositoryConnection getPermanentRepositoryConnection(final Set<? extends OWLOntologyID> schemaOntologies,
+            final boolean createIfNotExists) throws OpenRDFException, IOException, RepositoryNotFoundException
     {
         this.log.debug("Entering get permanent repository");
         this.log.debug("Get permanent repository schemas: {}", schemaOntologies);
@@ -280,6 +289,39 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
                         // reference to the existing repository
                         if(repositoryUri == null)
                         {
+                            if(!createIfNotExists)
+                            {
+                                if(log.isDebugEnabled())
+                                {
+                                    Set<Value> debugRepositories =
+                                            repositoriesInManagerModel.filter(null, RDF.TYPE, PODD.PODD_REPOSITORY,
+                                                    this.repositoryGraph).objects();
+                                    this.log.debug("Listing all {} repositories in manager:", debugRepositories.size());
+                                    for(Value nextRepositoryUri : debugRepositories)
+                                    {
+                                        if(!(nextRepositoryUri instanceof URI))
+                                        {
+                                            this.log.error("Found repository labelled with a non-URI: {}",
+                                                    nextRepositoryUri);
+                                            continue;
+                                        }
+                                        
+                                        this.log.debug("\t{}", nextRepositoryUri);
+                                        Set<Value> ontologiesInNextRepository =
+                                                repositoriesInManagerModel.filter((URI)nextRepositoryUri,
+                                                        PODD.PODD_REPOSITORY_CONTAINS_SCHEMA_VERSION, null).objects();
+                                        for(Value nextOntologyInNextRepository : ontologiesInNextRepository)
+                                        {
+                                            this.log.debug("\t\t{}", nextOntologyInNextRepository);
+                                        }
+                                    }
+                                }
+                                
+                                throw new RepositoryNotFoundException(
+                                        "Could not find an existing repository for the given set of schema ontolgoies: "
+                                                + schemaOntologies);
+                            }
+                            
                             this.log.debug("Permanent repository not created yet");
                             // Create a new one
                             repositoryUri =

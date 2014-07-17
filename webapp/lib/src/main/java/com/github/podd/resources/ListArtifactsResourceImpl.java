@@ -40,6 +40,7 @@ import org.restlet.representation.Variant;
 import org.restlet.resource.Get;
 import org.restlet.resource.ResourceException;
 
+import com.github.podd.exception.RepositoryNotFoundException;
 import com.github.podd.exception.SchemaManifestException;
 import com.github.podd.exception.UnmanagedArtifactIRIException;
 import com.github.podd.exception.UnmanagedArtifactVersionException;
@@ -225,7 +226,7 @@ public class ListArtifactsResourceImpl extends AbstractPoddResourceImpl
                 dataModel.put(nextKey + "ArtifactsList", results);
             }
             catch(final OpenRDFException | SchemaManifestException | UnsupportedRDFormatException | IOException
-                    | UnmanagedArtifactIRIException | UnmanagedArtifactVersionException e)
+                    | UnmanagedArtifactIRIException | UnmanagedArtifactVersionException | RepositoryNotFoundException e)
             {
                 throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Could not find labels for " + nextKey
                         + " artifacts", e);
@@ -295,7 +296,7 @@ public class ListArtifactsResourceImpl extends AbstractPoddResourceImpl
         }
         catch(final OpenRDFException | UnmanagedSchemaIRIException | SchemaManifestException
                 | UnsupportedRDFormatException | IOException | UnmanagedArtifactIRIException
-                | UnmanagedArtifactVersionException e)
+                | UnmanagedArtifactVersionException | RepositoryNotFoundException e)
         {
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL,
                     "Could not generate RDF output due to an exception", e);

@@ -60,24 +60,24 @@ public abstract class AbstractPoddOWLManagerTest
 {
     @Rule
     public TemporaryFolder tempDir = new TemporaryFolder();
-
+    
     protected Logger log = LoggerFactory.getLogger(this.getClass());
-
+    
     protected PoddOWLManager testOwlManager;
-
+    
     protected URI schemaGraph;
-
+    
     protected PoddRepositoryManager testRepositoryManager;
-
+    
     protected PoddSchemaManager testSchemaManager;
-
+    
     protected PoddSesameManager testSesameManager;
-
+    
     /**
      * @return A new OWLReasonerFactory instance for use with the PoddOWLManager
      */
     protected abstract OWLReasonerFactory getNewOWLReasonerFactoryInstance();
-
+    
     /**
      * Concrete tests must override this to provide a new, empty, instance of
      * {@link OWLOntologyManagerFactory} that can be used with the {@link PoddOWLManager}.
@@ -85,37 +85,37 @@ public abstract class AbstractPoddOWLManagerTest
      * @return A new empty instance of an implementation of {@link OWLOntologyManagerFactory}.
      */
     protected abstract OWLOntologyManagerFactory getNewOWLOntologyManagerFactory();
-
+    
     /**
      * @return A new instance of PoddOWLManager, for each call to this method
      */
     protected abstract PoddOWLManager getNewPoddOWLManagerInstance(OWLOntologyManagerFactory nextManager,
             OWLReasonerFactory nextReasonerFactory);
-
+    
     /**
      *
      * @return A new instance of {@link PoddRepositoryManager}, for each call to this method.
      * @throws Exception
      */
     protected abstract PoddRepositoryManager getNewPoddRepositoryManagerInstance() throws Exception;
-
+    
     /**
      *
      * @return A new instance of {@link PoddSchemaManager}, for each call to this method.
      */
     protected abstract PoddSchemaManager getNewPoddSchemaManagerInstance();
-
+    
     /**
      *
      * @return A new instance of {@link PoddSesameManager}, for each call to this method.
      */
     protected abstract PoddSesameManager getNewPoddSesameManagerInstance();
-
+    
     /**
      * Helper method which loads podd:dcTerms, podd:foaf and podd:User schema ontologies.
      */
     protected abstract List<InferredOWLOntologyID> loadDcFoafAndPoddUserSchemaOntologies() throws Exception;
-
+    
     /**
      * Helper method which loads, infers and stores a given ontology using the PoddOWLManager.
      *
@@ -130,7 +130,7 @@ public abstract class AbstractPoddOWLManagerTest
             final long assertedStatements, final long inferredStatements,
             final Set<? extends OWLOntologyID> dependentSchemaOntologies,
             final RepositoryConnection managementConnection) throws Exception;
-
+    
     /**
      * @throws java.lang.Exception
      */
@@ -139,25 +139,25 @@ public abstract class AbstractPoddOWLManagerTest
     {
         final OWLReasonerFactory reasonerFactory = this.getNewOWLReasonerFactoryInstance();
         Assert.assertNotNull("Null implementation of reasoner factory", reasonerFactory);
-
+        
         final OWLOntologyManagerFactory managerFactory = this.getNewOWLOntologyManagerFactory();
-
+        
         this.testOwlManager = this.getNewPoddOWLManagerInstance(managerFactory, reasonerFactory);
         Assert.assertNotNull("Null implementation of test OWLManager", this.testOwlManager);
-
+        
         this.schemaGraph = PODD.VF.createURI("urn:test:owlmanager:schemagraph");
-
+        
         this.testSchemaManager = this.getNewPoddSchemaManagerInstance();
-
+        
         this.testRepositoryManager = this.getNewPoddRepositoryManagerInstance();
         this.testSchemaManager.setRepositoryManager(this.testRepositoryManager);
-
+        
         this.testSesameManager = this.getNewPoddSesameManagerInstance();
         this.testSchemaManager.setSesameManager(this.testSesameManager);
-
+        
         this.testSchemaManager.setOwlManager(this.testOwlManager);
     }
-
+    
     /**
      * @throws java.lang.Exception
      */
@@ -170,7 +170,7 @@ public abstract class AbstractPoddOWLManagerTest
         this.testOwlManager = null;
         this.testRepositoryManager.shutDown();
     }
-
+    
     /**
      * Test method for
      * {@link com.github.podd.api.PoddOWLManager#removeCache(org.semanticweb.owlapi.model.OWLOntologyID)}
@@ -189,7 +189,7 @@ public abstract class AbstractPoddOWLManagerTest
         {
         }
     }
-
+    
     @Test
     public void testLoadAndInfer() throws Exception
     {
@@ -198,19 +198,19 @@ public abstract class AbstractPoddOWLManagerTest
         try
         {
             final OWLOntologyID replacementOntologyID = null;
-
+            
             final RioMemoryTripleSource owlSource = TestUtils.getRioTripleSource("/test/ontologies/version/1/a1.owl");
             managementConnection.begin();
             final InferredOWLOntologyID ontologyID =
                     this.testOwlManager.loadAndInfer(owlSource, managementConnection, replacementOntologyID,
                             Collections.<InferredOWLOntologyID> emptySet(), managementConnection, this.schemaGraph);
             managementConnection.commit();
-
+            
             Assert.assertNotNull(ontologyID);
             Assert.assertNotNull(ontologyID.getOntologyIRI());
             Assert.assertNotNull(ontologyID.getVersionIRI());
             Assert.assertNotNull(ontologyID.getInferredOntologyIRI());
-
+            
             final Model concreteStatements = new LinkedHashModel();
             managementConnection.export(new StatementCollector(concreteStatements), ontologyID.getVersionIRI()
                     .toOpenRDFURI());
@@ -219,16 +219,16 @@ public abstract class AbstractPoddOWLManagerTest
                     .toOpenRDFURI());
             final Model managementStatements = new LinkedHashModel();
             managementConnection.export(new StatementCollector(managementStatements), this.schemaGraph);
-
+            
             Assert.assertFalse(concreteStatements.isEmpty());
             Assert.assertFalse(inferredStatements.isEmpty());
             // loadAndInfer must not touch the management graph, or require it to contain any
             // statements, as it is necessary to use this method in the bootstrap process
             Assert.assertTrue(managementStatements.isEmpty());
-
+            
             Assert.assertFalse(ModelUtil.isSubset(concreteStatements, inferredStatements));
             Assert.assertFalse(ModelUtil.isSubset(inferredStatements, concreteStatements));
-
+            
             Assert.assertEquals(6, concreteStatements.size());
             Assert.assertEquals(3, inferredStatements.size());
             Assert.assertEquals(0, managementStatements.size());
