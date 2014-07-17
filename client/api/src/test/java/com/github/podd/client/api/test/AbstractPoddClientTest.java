@@ -74,8 +74,8 @@ public abstract class AbstractPoddClientTest
     
     private boolean isPoddTest = false;
     
-    private static final int BASIC_PROJECT_1_EXPECTED_CONCRETE_TRIPLES = 24;
-    private static final int BASIC_PROJECT_3_EXPECTED_CONCRETE_TRIPLES = 21;
+    private static final int BASIC_PROJECT_1_EXPECTED_CONCRETE_TRIPLES = 27;
+    private static final int BASIC_PROJECT_3_EXPECTED_CONCRETE_TRIPLES = 24;
     
     protected static final ValueFactory vf = PODD.VF;
     
