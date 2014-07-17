@@ -1987,23 +1987,26 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         {
             Set<? extends OWLOntologyID> schemaImports;
             
-            if(ontologyID != null)
-            {
-                schemaImports = this.getSchemaImports(ontologyID);
-            }
-            else
-            {
-                schemaImports = this.getSchemaManager().getCurrentSchemaOntologies();
-            }
-            
-            permanentConnection = this.getRepositoryManager().getPermanentRepositoryConnection(schemaImports);
             managementConnection = this.getRepositoryManager().getManagementRepositoryConnection();
             final URI[] contexts =
                     this.getSesameManager().versionAndInferredAndSchemaContexts(ontologyID, managementConnection,
                             this.getRepositoryManager().getSchemaManagementGraph(),
                             this.getRepositoryManager().getArtifactManagementGraph());
-            return this.getSesameManager().searchOntologyLabels(searchTerm, searchTypes, 1000, 0, permanentConnection,
-                    contexts);
+            // If they specified an artifact then we need to open a connection to that repository
+            if(ontologyID != null)
+            {
+                schemaImports = this.getSchemaImports(ontologyID);
+                permanentConnection = this.getRepositoryManager().getPermanentRepositoryConnection(schemaImports);
+                return this.getSesameManager().searchOntologyLabels(searchTerm, searchTypes, 1000, 0,
+                        permanentConnection, contexts);
+            }
+            else
+            {
+                // Otherwise we can use the management repository for the search
+                schemaImports = this.getSchemaManager().getCurrentSchemaOntologies();
+                return this.getSesameManager().searchOntologyLabels(searchTerm, searchTypes, 1000, 0,
+                        managementConnection, contexts);
+            }
         }
         catch(final Throwable e)
         {
@@ -2039,7 +2042,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         {
             try
             {
-                if(managementConnection != null)
+                if(managementConnection != null && managementConnection.isOpen())
                 {
                     managementConnection.close();
                 }
@@ -2052,7 +2055,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             {
                 try
                 {
-                    if(permanentConnection != null)
+                    if(permanentConnection != null && permanentConnection.isOpen())
                     {
                         permanentConnection.close();
                     }
