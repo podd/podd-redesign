@@ -1381,6 +1381,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
                         tempContext);
             }
         }
+        
     }
     
     /**
@@ -2350,6 +2351,33 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             // ontologies
             this.useVersionsForSchemaImports(artifactID.getOntologyIRI().toOpenRDFURI(), managementConnection,
                     tempRepositoryConnection, tempContext);
+            
+            final Model importsModel = new LinkedHashModel();
+            
+            // Repopulate model so it can be used by OntologyUtils in getSchemaImportsInternal
+            tempRepositoryConnection.exportStatements(null, OWL.IMPORTS, null, true, new StatementCollector(
+                    importsModel), tempContext);
+            tempRepositoryConnection.exportStatements(null, RDF.TYPE, OWL.ONTOLOGY, true, new StatementCollector(
+                    importsModel), tempContext);
+            tempRepositoryConnection.exportStatements(null, OWL.VERSIONIRI, null, true, new StatementCollector(
+                    importsModel), tempContext);
+            managementConnection.export(new StatementCollector(importsModel), this.getRepositoryManager()
+                    .getSchemaManagementGraph());
+            
+            // Rio.write(model, Rio.createWriter(RDFFormat.NQUADS, System.out));
+            
+            LinkedHashSet<OWLOntologyID> newSchemaImports =
+                    new LinkedHashSet<>(OntologyUtils.artifactImports(artifactID, importsModel));
+            
+            // Add in all of the imports that are actually imported, but the user did not include in
+            // their original list
+            // This is necessary to ensure that the repository ontology lists match the artifacts,
+            // so the artifact can be discovered accurately given the artifact ontology imports
+            for(OWLOntologyID nextArtifactSchemaImport : newSchemaImports)
+            {
+                tempRepositoryConnection.add(artifactID.getOntologyIRI().toOpenRDFURI(), OWL.IMPORTS,
+                        nextArtifactSchemaImport.getVersionIRI().toOpenRDFURI(), tempContext);
+            }
             
             // ensure schema ontologies are cached in memory before loading
             // statements into OWLAPI
