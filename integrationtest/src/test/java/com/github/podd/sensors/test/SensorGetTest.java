@@ -69,10 +69,10 @@ public class SensorGetTest
             System.out.println(dateMatcher.group(1));
         }
 
-        Matcher sizeMatcher = Pattern.compile("(.+) (.+)</li>").matcher(index);
+        Matcher sizeMatcher = Pattern.compile("(\\d+)</li>").matcher(index);
         while(sizeMatcher.find())
         {
-            System.out.println(sizeMatcher.group(2));
+            System.out.println(sizeMatcher.group(1));
         }
     }
     
