@@ -63,7 +63,7 @@ public class SensorGetTest
             System.out.println(fileMatcher.group(1));
         }
 
-        Matcher dateMatcher = Pattern.compile("</a> (.+T.+Z) ").matcher(index);
+        Matcher dateMatcher = Pattern.compile("(\\d+-\\d+-\\d+T\\d+:\\d+:\\d+Z)").matcher(index);
         while(dateMatcher.find())
         {
             System.out.println(dateMatcher.group(1));
