@@ -54,7 +54,7 @@ public interface TestConstants
     
     /** Test resource: artifact with 1 internal object, slightly different */
     public static final String TEST_ARTIFACT_BASIC_PROJECT_2 = "/test/artifacts/basicProject-2.rdf";
-    public static final int TEST_ARTIFACT_BASIC_PROJECT_2_CONCRETE_TRIPLES = 24;
+    public static final int TEST_ARTIFACT_BASIC_PROJECT_2_CONCRETE_TRIPLES = 25;
     public static final int TEST_ARTIFACT_BASIC_PROJECT_2_INFERRED_TRIPLES = 348;
     
     public static final String TEST_ARTIFACT_BASIC_PROJECT_3 = "/test/artifacts/basicProject-3.rdf";
@@ -67,7 +67,7 @@ public interface TestConstants
     
     /** Test resource: (in RDF/XML) artifact with published status */
     public static final String TEST_ARTIFACT_BASIC_PROJECT_PUBLISHED = "/test/artifacts/basicProject-1-published.rdf";
-    public static final int TEST_ARTIFACT_BASIC_PROJECT_PUBLISHED_CONCRETE_TRIPLES = 25;
+    public static final int TEST_ARTIFACT_BASIC_PROJECT_PUBLISHED_CONCRETE_TRIPLES = 26;
     public static final int TEST_ARTIFACT_BASIC_PROJECT_PUBLISHED_INFERRED_TRIPLES = 348;
     
     public static final String TEST_ARTIFACT_PURLS_2_FILE_REFS = "/test/artifacts/project-purls-file-ref.rdf";
@@ -99,7 +99,7 @@ public interface TestConstants
     
     /** Test resource (in RDF/XML): artifact imports v1 of PODD Science schema ontology */
     public static final String TEST_ARTIFACT_PURLS_v1 = "/test/artifacts/project-with-purls-v1.rdf";
-    public static final int TEST_ARTIFACT_PURLS_v1_CONCRETE_TRIPLES = 24;
+    public static final int TEST_ARTIFACT_PURLS_v1_CONCRETE_TRIPLES = 25;
     public static final int TEST_ARTIFACT_PURLS_v1_INFERRED_TRIPLES = 348;
     
     /** Test resource (in Turtle): artifact with temporary URIs and 1 internal object having a PURL */
@@ -112,7 +112,7 @@ public interface TestConstants
     
     /** Test resource: artifact with PURLs and a refersTo link in Turtle format */
     public static final String TEST_ARTIFACT_WITH_REFERSTO = "/test/artifacts/artifact-with-refers-to.ttl";
-    public static final int TEST_ARTIFACT_WITH_REFERSTO_CONCRETE_TRIPLES = 81;
+    public static final int TEST_ARTIFACT_WITH_REFERSTO_CONCRETE_TRIPLES = 82;
     public static final int TEST_ARTIFACT_WITH_REFERSTO_INFERRED_TRIPLES = 580;
     
     /** Test resource (in Turtle): inferred artifact with PURLs and multiple internal objects */
