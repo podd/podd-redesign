@@ -21,25 +21,33 @@ import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.base.RepositoryWrapper;
 
 /**
- * A wrapper for a {@link Repository} that does not get shutdown when calling shutDown. Instead,
- * realShutDown must be called to shut the repository down.
+ * A wrapper for a {@link Repository} that does not get shutdown when calling {@link #shutDown()}.
+ * Instead, {@link #realShutDown()} must be called to shut the repository down.
  *
  * @author Peter Ansell p_ansell@yahoo.com
  *
  */
 public class ManualShutdownRepository extends RepositoryWrapper
 {
+    /**
+     * Wrap the given repository to make {@link Repository#shutDown()} a no-op, and replace it with
+     * calls to {@link #realShutDown()} as necessary, to avoid user code shutting down the
+     * repository at unexpected times.
+     * 
+     * @param delegate
+     *            The Repository to wrap.
+     */
     public ManualShutdownRepository(final Repository delegate)
     {
         super(delegate);
     }
-
+    
     @Override
     public void shutDown() throws RepositoryException
     {
         // Do nothing, to avoid accidental shutdowns by shutting down the federation
     }
-
+    
     public void realShutDown() throws RepositoryException
     {
         if(this.getDelegate() instanceof ManualShutdownRepository)
