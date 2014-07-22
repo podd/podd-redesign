@@ -212,21 +212,10 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
                         managementConnection.begin();
                         URI repositoryUri = null;
                         
-                        final Map<Resource, RepositoryManager> sesameRepositoryManagerMap =
-                                this.getRepositoryManager(schemaOntologies, managementConnection, this.repositoryGraph);
-                        if(sesameRepositoryManagerMap.isEmpty())
-                        {
-                            throw new RuntimeException("Could not create repository manager");
-                        }
-                        if(sesameRepositoryManagerMap.size() > 1)
-                        {
-                            throw new RuntimeException(
-                                    "Found duplicate repository managers for the same set of schema ontologies. Failing fast to avoid further data corruption. "
-                                            + schemaOntologies.toString());
-                        }
-                        final Resource repositoryManagerURI = sesameRepositoryManagerMap.keySet().iterator().next();
-                        final RepositoryManager sesameRepositoryManager =
-                                sesameRepositoryManagerMap.values().iterator().next();
+                        final Entry<Resource, RepositoryManager> sesameRepositoryManagerMap =
+                                getRepositoryManagerEntry(schemaOntologies, managementConnection);
+                        final Resource repositoryManagerURI = sesameRepositoryManagerMap.getKey();
+                        final RepositoryManager sesameRepositoryManager = sesameRepositoryManagerMap.getValue();
                         
                         final Model repositoriesInManagerModel = new LinkedHashModel();
                         managementConnection.exportStatements(repositoryManagerURI,
@@ -279,6 +268,12 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
                                             break;
                                         }
                                     }
+                                    else
+                                    {
+                                        // If the schema was not a URI we have no hope of finding
+                                        // it, so report it as missing
+                                        missingSchema = true;
+                                    }
                                 }
                                 
                                 if(!missingSchema)
@@ -293,6 +288,8 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
                         // reference to the existing repository
                         if(repositoryUri == null)
                         {
+                            // Throw exception after debugging if we were told not to create a new
+                            // repository for this case
                             if(!createIfNotExists)
                             {
                                 if(log.isDebugEnabled())
@@ -455,6 +452,33 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
         }
         this.log.debug("Returning from get permanent repository");
         return permanentRepository.getConnection();
+    }
+    
+    /**
+     * @param schemaOntologies
+     * @param managementConnection
+     * @return
+     * @throws RepositoryException
+     * @throws RDFHandlerException
+     * @throws IOException
+     */
+    protected Entry<Resource, RepositoryManager> getRepositoryManagerEntry(
+            final Set<? extends OWLOntologyID> schemaOntologies, RepositoryConnection managementConnection)
+        throws RepositoryException, RDFHandlerException, IOException
+    {
+        final Map<Resource, RepositoryManager> sesameRepositoryManagerMap =
+                this.getRepositoryManager(schemaOntologies, managementConnection, this.repositoryGraph);
+        if(sesameRepositoryManagerMap.isEmpty())
+        {
+            throw new RuntimeException("Could not create repository manager");
+        }
+        if(sesameRepositoryManagerMap.size() > 1)
+        {
+            throw new RuntimeException(
+                    "Found duplicate repository managers for the same set of schema ontologies. Failing fast to avoid further data corruption. "
+                            + schemaOntologies.toString());
+        }
+        return sesameRepositoryManagerMap.entrySet().iterator().next();
     }
     
     /**
