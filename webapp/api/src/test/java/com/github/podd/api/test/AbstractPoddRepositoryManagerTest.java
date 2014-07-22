@@ -31,6 +31,8 @@ import org.openrdf.model.Model;
 import org.openrdf.model.URI;
 import org.openrdf.model.ValueFactory;
 import org.openrdf.model.impl.ValueFactoryImpl;
+import org.openrdf.model.vocabulary.OWL;
+import org.openrdf.model.vocabulary.RDF;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
@@ -447,6 +449,18 @@ public abstract class AbstractPoddRepositoryManagerTest
             }
         }
         
+        final RepositoryConnection managementRepositoryConnection =
+                this.testRepositoryManager.getManagementRepositoryConnection();
+        try
+        {
+            managementRepositoryConnection.add(testOntologyUri1, RDF.TYPE, OWL.ONTOLOGY, testVersionUri1);
+            managementRepositoryConnection.add(testOntologyUri1, OWL.VERSIONIRI, testVersionUri1, testVersionUri1);
+        }
+        finally
+        {
+            managementRepositoryConnection.close();
+        }
+        
         try
         {
             // Verify no exceptions when asking with createIfNotExists=true
@@ -544,6 +558,8 @@ public abstract class AbstractPoddRepositoryManagerTest
         try
         {
             Assert.assertEquals(0, managementConnection.size());
+            managementConnection.add(testOntologyUri1, RDF.TYPE, OWL.ONTOLOGY, testVersionUri1);
+            managementConnection.add(testOntologyUri1, OWL.VERSIONIRI, testVersionUri1, testVersionUri1);
         }
         finally
         {
@@ -571,7 +587,7 @@ public abstract class AbstractPoddRepositoryManagerTest
                     this.testRepositoryManager.getManagementRepositoryConnection();
             try
             {
-                Assert.assertEquals(8, managementConnection2.size());
+                Assert.assertEquals(10, managementConnection2.size());
             }
             finally
             {
@@ -582,7 +598,8 @@ public abstract class AbstractPoddRepositoryManagerTest
                     Rio.parse(this.getClass().getResourceAsStream("/test/artifacts/basic-1.ttl"), "", RDFFormat.TURTLE);
             permanentRepository1.add(model, this.testVersionUriA1);
             Assert.assertEquals(32, permanentRepository1.size(this.testVersionUriA1));
-            Assert.assertEquals(32, permanentRepository1.size());
+            Assert.assertEquals(2, permanentRepository1.size(this.testVersionUri1));
+            Assert.assertEquals(34, permanentRepository1.size());
         }
         finally
         {
@@ -641,7 +658,8 @@ public abstract class AbstractPoddRepositoryManagerTest
             // Assert.assertEquals(permanentRepository3, permanentRepository4);
             
             Assert.assertEquals(32, permanentRepository3.size(this.testVersionUriA1));
-            Assert.assertEquals(32, permanentRepository3.size());
+            Assert.assertEquals(2, permanentRepository3.size(this.testVersionUri1));
+            Assert.assertEquals(34, permanentRepository3.size());
         }
         finally
         {
