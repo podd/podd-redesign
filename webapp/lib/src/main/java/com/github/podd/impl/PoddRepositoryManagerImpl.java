@@ -332,7 +332,7 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
                             final String newRepositoryID =
                                     sesameRepositoryManager.getNewRepositoryID(repositoryUri.stringValue());
                             Date creationDate = new Date();
-                            final SimpleDateFormat iso8601Format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+                            final SimpleDateFormat iso8601Format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
                             final RepositoryConfig config =
                                     new RepositoryConfig(newRepositoryID,
                                             "PODD Redesign Repository (Automatically created at "
