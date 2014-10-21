@@ -226,10 +226,10 @@ public class OntologyUtilsTest
         Assert.assertEquals(3, nextImportsMap.get(OntologyConstant.testPoddBaseUriV3).size());
         Assert.assertEquals(4, nextImportsMap.get(OntologyConstant.testPoddScienceUriV1).size());
         Assert.assertEquals(6, nextImportsMap.get(OntologyConstant.testPoddScienceUriV2).size());
-        Assert.assertEquals(6, nextImportsMap.get(OntologyConstant.testPoddScienceUriV3).size());
+        Assert.assertEquals(4, nextImportsMap.get(OntologyConstant.testPoddScienceUriV3).size());
         Assert.assertEquals(5, nextImportsMap.get(OntologyConstant.testPoddPlantUriV1).size());
         Assert.assertEquals(7, nextImportsMap.get(OntologyConstant.testPoddPlantUriV2).size());
-        Assert.assertEquals(7, nextImportsMap.get(OntologyConstant.testPoddPlantUriV3).size());
+        Assert.assertEquals(5, nextImportsMap.get(OntologyConstant.testPoddPlantUriV3).size());
         
         Assert.assertTrue(nextImportsMap.get(OntologyConstant.testPoddFoafUriV1).contains(
                 OntologyConstant.testPoddDcUriV1));
