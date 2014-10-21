@@ -306,7 +306,7 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
             // IRIs
             Assert.assertTrue("Result does not contain artifact URI", body.contains(artifactUri));
 
-            final Model model = this.assertRdf(new StringReader(body), RDFFormat.RDFJSON, 31);
+            final Model model = this.assertRdf(new StringReader(body), RDFFormat.RDFJSON, 29);
 
             Assert.assertEquals(6, model.subjects().size());
             Assert.assertEquals(14, model.predicates().size());
@@ -352,7 +352,7 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
             // verify: received contents have artifact URI
             Assert.assertTrue("Result does not contain artifact URI", body.contains(artifactUri));
 
-            final Model model = this.assertRdf(new StringReader(body), RDFFormat.RDFXML, 31);
+            final Model model = this.assertRdf(new StringReader(body), RDFFormat.RDFXML, 29);
 
             Assert.assertEquals(6, model.subjects().size());
             Assert.assertEquals(14, model.predicates().size());
@@ -401,7 +401,7 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
             // IRIs
             Assert.assertTrue("Result does not contain artifact URI", body.contains(artifactUri));
 
-            final Model model = this.assertRdf(new StringReader(body), RDFFormat.TURTLE, 31);
+            final Model model = this.assertRdf(new StringReader(body), RDFFormat.TURTLE, 29);
 
             Assert.assertEquals(6, model.subjects().size());
             Assert.assertEquals(14, model.predicates().size());
@@ -531,7 +531,7 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
             // verify: received contents have artifact URI
             Assert.assertTrue("Result does not contain artifact URI", body.contains(artifactUri));
 
-            final Model model = this.assertRdf(new StringReader(body), RDFFormat.RDFXML, 31);
+            final Model model = this.assertRdf(new StringReader(body), RDFFormat.RDFXML, 29);
 
             Assert.assertEquals(6, model.subjects().size());
             Assert.assertEquals(14, model.predicates().size());
