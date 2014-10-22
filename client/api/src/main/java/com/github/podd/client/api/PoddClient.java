@@ -21,6 +21,7 @@ import java.io.OutputStream;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.openrdf.model.Model;
 import org.openrdf.model.URI;
@@ -47,7 +48,7 @@ public interface PoddClient
      */
     public static final String TEMPLATE_SPARQL_BY_TYPE_AND_PARENT_ALL_PROPERTIES = new StringBuilder()
             .append("CONSTRUCT { ?parent ?parentPredicate ?object . ?object a ?type . ?object ?predicate ?label . }")
-            .append(" WHERE { ?object a ?type . OPTIONAL { ?object ?predicate ?label . } }")
+            .append(" WHERE { ?parent ?parentPredicate ?object . ?object a ?type . OPTIONAL { ?object ?predicate ?label . } }")
             .append(" VALUES (?parent ?parentPredicate ?type ) { ( %s %s %s ) }").toString();
     
     /**
@@ -351,7 +352,7 @@ public interface PoddClient
      *         artifacts that the user has access to which are published. This may include artifacts
      *         that the user cannot modify or fork.
      */
-    Map<InferredOWLOntologyID, String> listPublishedArtifacts() throws PoddClientException;
+    Set<PoddArtifact> listPublishedArtifacts() throws PoddClientException;
     
     /**
      * List the roles that have been assigned to the given artifact.
@@ -383,7 +384,7 @@ public interface PoddClient
      * @return A map of the {@link InferredOWLOntologyID}s to labels, identifying the artifacts that
      *         the user has access to which are unpublished.
      */
-    Map<InferredOWLOntologyID, String> listUnpublishedArtifacts() throws PoddClientException;
+    Set<PoddArtifact> listUnpublishedArtifacts() throws PoddClientException;
     
     /**
      *
@@ -539,4 +540,7 @@ public interface PoddClient
      *             If there was an exception accessing PODD.
      */
     boolean autologin() throws PoddClientException;
+    
+    Model getObjectsByTypeAndBarcode(URI type, String barcode, Collection<InferredOWLOntologyID> artifacts)
+        throws PoddClientException;
 }

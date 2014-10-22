@@ -74,6 +74,7 @@ import com.github.podd.api.DanglingObjectPolicy;
 import com.github.podd.api.DataReferenceVerificationPolicy;
 import com.github.podd.api.data.DataReference;
 import com.github.podd.api.data.DataReferenceConstants;
+import com.github.podd.client.api.PoddArtifact;
 import com.github.podd.client.api.PoddClient;
 import com.github.podd.client.api.PoddClientException;
 import com.github.podd.ontologies.PODDBASE;
@@ -519,6 +520,17 @@ public class RestletPoddClientImpl implements PoddClient
     }
     
     @Override
+    public Model getObjectsByTypeAndBarcode(final URI type, final String barcode,
+            final Collection<InferredOWLOntologyID> artifacts) throws PoddClientException
+    {
+        String queryString =
+                String.format(PoddClient.TEMPLATE_SPARQL_BY_BARCODE_STRSTARTS, RenderUtils.escape(barcode),
+                        RenderUtils.getSPARQLQueryString(type));
+        this.log.info("queryString={}", queryString);
+        return this.doSPARQL(queryString, artifacts);
+    }
+    
+    @Override
     public Model getObjectsByTypeAndParent(final URI parent, final URI parentPredicate, final URI type,
             final Collection<InferredOWLOntologyID> artifacts) throws PoddClientException
     {
@@ -708,10 +720,10 @@ public class RestletPoddClientImpl implements PoddClient
         }
     }
     
-    private Map<InferredOWLOntologyID, String> listArtifactsInternal(final boolean published, final boolean unpublished)
+    private Set<PoddArtifact> listArtifactsInternal(final boolean published, final boolean unpublished)
         throws PoddClientException
     {
-        Map<InferredOWLOntologyID, String> results = new ConcurrentHashMap<>();
+        Set<PoddArtifact> results = ConcurrentHashMap.newKeySet();
         Model model = this.listArtifacts(published, unpublished);
         for(InferredOWLOntologyID ontologyID : OntologyUtils.modelToOntologyIDs(model, false, false))
         {
@@ -722,7 +734,7 @@ public class RestletPoddClientImpl implements PoddClient
             {
                 String nextBarcode =
                         model.filter(topObjectURI, PODDSCIENCE.HAS_BARCODE, null).objectLiteral().getLabel();
-                results.put(ontologyID, nextBarcode);
+                results.add(PoddArtifact.from(ontologyID, topObjectURI, nextBarcode));
             }
             catch(Exception e1)
             {
@@ -731,11 +743,11 @@ public class RestletPoddClientImpl implements PoddClient
                     // Backup by using the label for identification if a unique barcode was not
                     // found
                     String nextLabel = model.filter(topObjectURI, RDFS.LABEL, null).objectLiteral().getLabel();
-                    results.put(ontologyID, nextLabel);
+                    results.add(PoddArtifact.from(ontologyID, topObjectURI, nextLabel));
                 }
                 catch(Exception e2)
                 {
-                    results.put(ontologyID, "(No label)");
+                    results.add(PoddArtifact.from(ontologyID, topObjectURI, "(No label)"));
                 }
             }
         }
@@ -811,7 +823,7 @@ public class RestletPoddClientImpl implements PoddClient
      * @see com.github.podd.client.api.PoddClient#listPublishedArtifacts()
      */
     @Override
-    public Map<InferredOWLOntologyID, String> listPublishedArtifacts() throws PoddClientException
+    public Set<PoddArtifact> listPublishedArtifacts() throws PoddClientException
     {
         this.log.info("cookies: {}", this.currentCookies);
         
@@ -872,7 +884,7 @@ public class RestletPoddClientImpl implements PoddClient
      * @see com.github.podd.client.api.PoddClient#listUnpublishedArtifacts()
      */
     @Override
-    public Map<InferredOWLOntologyID, String> listUnpublishedArtifacts() throws PoddClientException
+    public Set<PoddArtifact> listUnpublishedArtifacts() throws PoddClientException
     {
         this.log.info("cookies: {}", this.currentCookies);
         

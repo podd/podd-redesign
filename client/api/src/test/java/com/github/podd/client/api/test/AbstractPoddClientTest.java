@@ -23,6 +23,7 @@ import java.io.InputStream;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -48,6 +49,7 @@ import org.slf4j.LoggerFactory;
 
 import com.github.ansell.restletutils.RestletUtilRole;
 import com.github.podd.api.data.DataReference;
+import com.github.podd.client.api.PoddArtifact;
 import com.github.podd.client.api.PoddClient;
 import com.github.podd.utils.DebugUtils;
 import com.github.podd.utils.InferredOWLOntologyID;
@@ -532,7 +534,7 @@ public abstract class AbstractPoddClientTest
     public final void testListPublishedArtifactsEmpty() throws Exception
     {
         PoddClient testClient = this.getNewPoddClientInstance();
-        final Map<InferredOWLOntologyID, String> results = testClient.listPublishedArtifacts();
+        final Set<PoddArtifact> results = testClient.listPublishedArtifacts();
         Assert.assertTrue(results.isEmpty());
     }
     
@@ -549,7 +551,7 @@ public abstract class AbstractPoddClientTest
         PoddClient testClient = this.getNewPoddClientInstance();
         testClient.login(AbstractPoddClientTest.TEST_ADMIN_USER, AbstractPoddClientTest.TEST_ADMIN_PASSWORD);
         
-        final Map<InferredOWLOntologyID, String> results = testClient.listPublishedArtifacts();
+        final Set<PoddArtifact> results = testClient.listPublishedArtifacts();
         Assert.assertFalse(results.isEmpty());
     }
     
@@ -581,7 +583,7 @@ public abstract class AbstractPoddClientTest
         
         testClient.logout();
         
-        final Map<InferredOWLOntologyID, String> results = testClient.listPublishedArtifacts();
+        final Set<PoddArtifact> results = testClient.listPublishedArtifacts();
         Assert.assertFalse(results.isEmpty());
         Assert.assertEquals(-1, results.size());
     }
@@ -640,7 +642,7 @@ public abstract class AbstractPoddClientTest
         PoddClient testClient = this.getNewPoddClientInstance();
         testClient.login(AbstractPoddClientTest.TEST_ADMIN_USER, AbstractPoddClientTest.TEST_ADMIN_PASSWORD);
         
-        final Map<InferredOWLOntologyID, String> results = testClient.listUnpublishedArtifacts();
+        final Set<PoddArtifact> results = testClient.listUnpublishedArtifacts();
         this.log.info("unpublished artifacts which should be empty: {}", results);
         Assert.assertTrue(results.isEmpty());
     }
@@ -656,7 +658,7 @@ public abstract class AbstractPoddClientTest
         Assert.fail("TODO: Implement me!");
         
         PoddClient testClient = this.getNewPoddClientInstance();
-        final Map<InferredOWLOntologyID, String> results = testClient.listUnpublishedArtifacts();
+        final Set<PoddArtifact> results = testClient.listUnpublishedArtifacts();
         Assert.assertFalse(results.isEmpty());
         Assert.assertEquals(50, results.size());
     }
@@ -683,7 +685,7 @@ public abstract class AbstractPoddClientTest
         this.parseRdf(new ByteArrayInputStream(outputStream.toByteArray()), RDFFormat.RDFJSON,
                 AbstractPoddClientTest.BASIC_PROJECT_1_EXPECTED_CONCRETE_TRIPLES);
         
-        final Map<InferredOWLOntologyID, String> results = testClient.listUnpublishedArtifacts();
+        final Set<PoddArtifact> results = testClient.listUnpublishedArtifacts();
         Assert.assertFalse(results.isEmpty());
         Assert.assertEquals(1, results.size());
     }
