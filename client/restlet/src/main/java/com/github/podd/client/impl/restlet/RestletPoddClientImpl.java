@@ -133,7 +133,7 @@ public class RestletPoddClientImpl implements PoddClient
     public void addRole(final String userIdentifier, final RestletUtilRole role, final InferredOWLOntologyID artifact)
         throws PoddClientException
     {
-        this.log.info("cookies: {}", this.currentCookies);
+        this.log.debug("cookies: {}", this.currentCookies);
         
         final ClientResource resource = new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_ROLES));
         resource.getCookies().addAll(this.currentCookies);
@@ -184,7 +184,7 @@ public class RestletPoddClientImpl implements PoddClient
         final ClientResource resource = new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_EDIT));
         resource.getCookies().addAll(this.currentCookies);
         
-        this.log.info("cookies: {}", this.currentCookies);
+        this.log.debug("cookies: {}", this.currentCookies);
         
         resource.addQueryParameter(PoddWebConstants.KEY_EDIT_WITH_REPLACE, Boolean.toString(false));
         resource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactID.getOntologyIRI().toString());
@@ -264,7 +264,7 @@ public class RestletPoddClientImpl implements PoddClient
     @Override
     public InferredOWLOntologyID attachDataReference(final DataReference ref) throws PoddClientException
     {
-        this.log.info("cookies: {}", this.currentCookies);
+        this.log.debug("cookies: {}", this.currentCookies);
         
         final ClientResource resource = new ClientResource(this.getUrl(PoddWebConstants.PATH_ATTACH_DATA_REF));
         resource.getCookies().addAll(this.currentCookies);
@@ -328,7 +328,7 @@ public class RestletPoddClientImpl implements PoddClient
             final ClientResource resource = new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_ADD));
             resource.getCookies().addAll(this.currentCookies);
             
-            this.log.info("cookies: {}", this.currentCookies);
+            this.log.debug("cookies: {}", this.currentCookies);
             
             resource.addQueryParameter("format", RDFFormat.RDFJSON.getDefaultMIMEType());
             
@@ -350,7 +350,7 @@ public class RestletPoddClientImpl implements PoddClient
     @Override
     public boolean deleteArtifact(final InferredOWLOntologyID artifactId) throws PoddClientException
     {
-        this.log.info("cookies: {}", this.currentCookies);
+        this.log.debug("cookies: {}", this.currentCookies);
         
         final ClientResource resource = new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_DELETE));
         resource.getCookies().addAll(this.currentCookies);
@@ -382,7 +382,7 @@ public class RestletPoddClientImpl implements PoddClient
     public Model doSPARQL(final String queryString, Collection<InferredOWLOntologyID> artifactIds)
         throws PoddClientException
     {
-        this.log.info("cookies: {}", this.currentCookies);
+        this.log.debug("cookies: {}", this.currentCookies);
         
         final ClientResource resource = new ClientResource(this.getUrl(PoddWebConstants.PATH_SPARQL));
         resource.getCookies().addAll(this.currentCookies);
@@ -453,7 +453,7 @@ public class RestletPoddClientImpl implements PoddClient
         Objects.requireNonNull(outputStream);
         Objects.requireNonNull(format);
         
-        this.log.info("cookies: {}", this.currentCookies);
+        this.log.debug("cookies: {}", this.currentCookies);
         
         final ClientResource resource = new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_GET_BASE));
         resource.getCookies().addAll(this.currentCookies);
@@ -488,7 +488,7 @@ public class RestletPoddClientImpl implements PoddClient
     {
         String queryString =
                 String.format(PoddClient.TEMPLATE_SPARQL_BY_TYPE_WITH_LABEL, RenderUtils.getSPARQLQueryString(type));
-        this.log.info("queryString={}", queryString);
+        this.log.debug("queryString={}", queryString);
         return this.doSPARQL(queryString, artifacts);
     }
     
@@ -499,7 +499,7 @@ public class RestletPoddClientImpl implements PoddClient
         String queryString =
                 String.format(PoddClient.TEMPLATE_SPARQL_BY_TYPE_LABEL_STRSTARTS, RenderUtils.escape(labelPrefix),
                         RenderUtils.getSPARQLQueryString(type));
-        this.log.info("queryString={}", queryString);
+        this.log.debug("queryString={}", queryString);
         return this.doSPARQL(queryString, artifacts);
     }
     
@@ -515,7 +515,7 @@ public class RestletPoddClientImpl implements PoddClient
         String queryString =
                 String.format(PoddClient.TEMPLATE_SPARQL_BY_TYPE_LABEL_STRSTARTS_PREDICATE, predicateString,
                         predicateString, RenderUtils.escape(labelPrefix), RenderUtils.getSPARQLQueryString(type));
-        this.log.info("queryString={}", queryString);
+        this.log.debug("queryString={}", queryString);
         return this.doSPARQL(queryString, artifacts);
     }
     
@@ -526,7 +526,7 @@ public class RestletPoddClientImpl implements PoddClient
         String queryString =
                 String.format(PoddClient.TEMPLATE_SPARQL_BY_BARCODE_STRSTARTS, RenderUtils.escape(barcode),
                         RenderUtils.getSPARQLQueryString(type));
-        this.log.info("queryString={}", queryString);
+        this.log.debug("queryString={}", queryString);
         return this.doSPARQL(queryString, artifacts);
     }
     
@@ -538,7 +538,7 @@ public class RestletPoddClientImpl implements PoddClient
                 String.format(PoddClient.TEMPLATE_SPARQL_BY_TYPE_AND_PARENT_ALL_PROPERTIES,
                         RenderUtils.getSPARQLQueryString(parent), RenderUtils.getSPARQLQueryString(parentPredicate),
                         RenderUtils.getSPARQLQueryString(type));
-        this.log.info("queryString={}", queryString);
+        this.log.debug("queryString={}", queryString);
         return this.doSPARQL(queryString, artifacts);
     }
     
@@ -612,7 +612,7 @@ public class RestletPoddClientImpl implements PoddClient
         
         String result = this.serverUrl + actualPath;
         
-        this.log.info("getURL={}", result);
+        this.log.debug("getURL={}", result);
         
         return result;
     }
@@ -620,7 +620,7 @@ public class RestletPoddClientImpl implements PoddClient
     @Override
     public PoddUser getUserDetails(final String userIdentifier) throws PoddClientException
     {
-        this.log.info("cookies: {}", this.currentCookies);
+        this.log.debug("cookies: {}", this.currentCookies);
         
         final ClientResource resource = new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_DETAILS));
         resource.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, userIdentifier);
@@ -676,7 +676,7 @@ public class RestletPoddClientImpl implements PoddClient
     @Override
     public Model listArtifacts(final boolean published, final boolean unpublished) throws PoddClientException
     {
-        this.log.info("cookies: {}", this.currentCookies);
+        this.log.debug("cookies: {}", this.currentCookies);
         
         final ClientResource resource = new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_LIST));
         resource.getCookies().addAll(this.currentCookies);
@@ -762,7 +762,7 @@ public class RestletPoddClientImpl implements PoddClient
     @Override
     public List<String> listDataReferenceRepositories() throws PoddClientException
     {
-        this.log.info("cookies: {}", this.currentCookies);
+        this.log.debug("cookies: {}", this.currentCookies);
         
         final ClientResource resource = new ClientResource(this.getUrl(PoddWebConstants.PATH_DATA_REPOSITORY_LIST));
         resource.getCookies().addAll(this.currentCookies);
@@ -825,7 +825,7 @@ public class RestletPoddClientImpl implements PoddClient
     @Override
     public Set<PoddArtifact> listPublishedArtifacts() throws PoddClientException
     {
-        this.log.info("cookies: {}", this.currentCookies);
+        this.log.debug("cookies: {}", this.currentCookies);
         
         return this.listArtifactsInternal(true, false);
     }
@@ -838,7 +838,7 @@ public class RestletPoddClientImpl implements PoddClient
         resource.getCookies().addAll(this.currentCookies);
         resource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactId.getOntologyIRI().toString());
         
-        this.log.info("cookies: {}", this.currentCookies);
+        this.log.debug("cookies: {}", this.currentCookies);
         
         final Representation get = resource.get(MediaType.APPLICATION_RDF_TURTLE);
         
@@ -863,7 +863,7 @@ public class RestletPoddClientImpl implements PoddClient
             resource.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, userIdentifier);
         }
         
-        this.log.info("cookies: {}", this.currentCookies);
+        this.log.debug("cookies: {}", this.currentCookies);
         
         final Representation get = resource.get(MediaType.APPLICATION_RDF_TURTLE);
         
@@ -886,7 +886,7 @@ public class RestletPoddClientImpl implements PoddClient
     @Override
     public Set<PoddArtifact> listUnpublishedArtifacts() throws PoddClientException
     {
-        this.log.info("cookies: {}", this.currentCookies);
+        this.log.debug("cookies: {}", this.currentCookies);
         
         return this.listArtifactsInternal(false, true);
     }
@@ -923,15 +923,15 @@ public class RestletPoddClientImpl implements PoddClient
         {
             final Representation rep = resource.post(form.getWebRepresentation(CharacterSet.UTF_8));
             
-            this.log.info("login result status: {}", resource.getStatus());
+            this.log.debug("login result status: {}", resource.getStatus());
             if(rep != null)
             {
                 // FIXME: Representation.getText may be implemented badly, so avoid calling it
-                // this.log.info("login result: {}", rep.getText());
+                // this.log.debug("login result: {}", rep.getText());
             }
             else
             {
-                this.log.info("login result was null");
+                this.log.debug("login result was null");
             }
             
             // HACK
@@ -960,7 +960,7 @@ public class RestletPoddClientImpl implements PoddClient
     @Override
     public boolean logout() throws PoddClientException
     {
-        this.log.info("cookies: {}", this.currentCookies);
+        this.log.debug("cookies: {}", this.currentCookies);
         
         final ClientResource resource = new ClientResource(this.getUrl(PoddWebConstants.DEF_PATH_LOGOUT));
         // add the cookie settings so that the server knows who to logout
@@ -1061,7 +1061,7 @@ public class RestletPoddClientImpl implements PoddClient
     public void removeRole(final String userIdentifier, final RestletUtilRole role, final InferredOWLOntologyID artifact)
         throws PoddClientException
     {
-        this.log.info("cookies: {}", this.currentCookies);
+        this.log.debug("cookies: {}", this.currentCookies);
         
         final ClientResource resource = new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_ROLES));
         resource.getCookies().addAll(this.currentCookies);
@@ -1157,7 +1157,7 @@ public class RestletPoddClientImpl implements PoddClient
         final ClientResource resource = new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_UPLOAD));
         resource.getCookies().addAll(this.currentCookies);
         
-        this.log.info("cookies: {}", this.currentCookies);
+        this.log.debug("cookies: {}", this.currentCookies);
         
         resource.addQueryParameter("format", format.getDefaultMIMEType());
         if(danglingObjectPolicy == DanglingObjectPolicy.FORCE_CLEAN)
