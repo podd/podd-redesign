@@ -531,6 +531,16 @@ public class RestletPoddClientImpl implements PoddClient
     }
     
     @Override
+    public Model getObjectsByBarcode(final String barcode, final Collection<InferredOWLOntologyID> artifacts)
+        throws PoddClientException
+    {
+        String queryString =
+                String.format(PoddClient.TEMPLATE_SPARQL_BY_BARCODE_MATCH_NO_TYPE, RenderUtils.escape(barcode));
+        this.log.debug("queryString={}", queryString);
+        return this.doSPARQL(queryString, artifacts);
+    }
+    
+    @Override
     public Model getObjectsByTypeAndParent(final URI parent, final URI parentPredicate, final URI type,
             final Collection<InferredOWLOntologyID> artifacts) throws PoddClientException
     {

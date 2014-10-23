@@ -46,10 +46,11 @@ public interface PoddClient
     /**
      * Fetch all of the properties for the given objects under the given parent with the given type.
      */
-    public static final String TEMPLATE_SPARQL_BY_TYPE_AND_PARENT_ALL_PROPERTIES = new StringBuilder()
-            .append("CONSTRUCT { ?parent ?parentPredicate ?object . ?object a ?type . ?object ?predicate ?label . }")
-            .append(" WHERE { ?parent ?parentPredicate ?object . ?object a ?type . OPTIONAL { ?object ?predicate ?label . } }")
-            .append(" VALUES (?parent ?parentPredicate ?type ) { ( %s %s %s ) }").toString();
+    public static final String TEMPLATE_SPARQL_BY_TYPE_AND_PARENT_ALL_PROPERTIES =
+            new StringBuilder()
+                    .append("CONSTRUCT { ?parent ?parentPredicate ?object . ?object a ?type . ?object ?predicate ?label . }")
+                    .append(" WHERE { ?parent ?parentPredicate ?object . ?object a ?type . OPTIONAL { ?object ?predicate ?label . } }")
+                    .append(" VALUES (?parent ?parentPredicate ?type ) { ( %s %s %s ) }").toString();
     
     /**
      * Fetch type and label and barcode statements for the given object type.
@@ -82,6 +83,12 @@ public interface PoddClient
                     .append("CONSTRUCT { ?object a ?type . ?object <http://purl.org/podd/ns/poddScience#hasBarcode> ?barcode . }")
                     .append(" WHERE { ?object a ?type . ?object <http://purl.org/podd/ns/poddScience#hasBarcode> ?barcode . FILTER(STRSTARTS(?barcode, \"%s\")) }")
                     .append(" VALUES (?type) { ( %s ) }").toString();
+    
+    public static final String TEMPLATE_SPARQL_BY_BARCODE_MATCH_NO_TYPE =
+            new StringBuilder()
+                    .append("CONSTRUCT { ?object a ?type . ?object <http://purl.org/podd/ns/poddScience#hasBarcode> ?barcode . }")
+                    .append(" WHERE { ?object a ?type . ?object <http://purl.org/podd/ns/poddScience#hasBarcode> ?barcode . FILTER(STR(?barcode, \"%s\")) }")
+                    .toString();
     
     /**
      * NOTE: Both the first and second arguments are the predicate, the first being the mapped
@@ -543,4 +550,6 @@ public interface PoddClient
     
     Model getObjectsByTypeAndBarcode(URI type, String barcode, Collection<InferredOWLOntologyID> artifacts)
         throws PoddClientException;
+    
+    Model getObjectsByBarcode(String barcode, Collection<InferredOWLOntologyID> artifacts) throws PoddClientException;
 }
