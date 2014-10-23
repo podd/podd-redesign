@@ -17,12 +17,12 @@
 package com.github.podd.client.api;
 
 /**
- * The base class of checked exceptions thrown by the PODD Client API.
+ * The base class of unchecked exceptions thrown by the PODD Client API.
  *
  * @author Peter Ansell p_ansell@yahoo.com
  *
  */
-public class PoddClientException extends Exception
+public class PoddClientException extends RuntimeException
 {
     private static final long serialVersionUID = -2854524362938904344L;
 
