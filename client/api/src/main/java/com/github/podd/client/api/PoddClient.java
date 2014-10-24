@@ -105,6 +105,17 @@ public interface PoddClient
             .append(" WHERE { ?object a ?type . ?object %s ?label . FILTER(STRSTARTS(?label, \"%s\")) }")
             .append(" VALUES (?type) { ( %s ) }").toString();
     
+    public static final String TEMPLATE_SPARQL_TRAY_POT_NUMBER_TO_BARCODE = new StringBuilder().append("CONSTRUCT { ")
+            .append(" ?pot <http://purl.org/podd/ns/poddScience#hasPotNumberTray> ?potNumberTray . ")
+            .append(" ?pot <http://purl.org/podd/ns/poddScience#hasPotNumber> ?potNumberOverall . ")
+            .append(" ?pot <http://purl.org/podd/ns/poddScience#hasBarcode> ?potBarcode . }")
+            .append(" WHERE { ?tray <http://purl.org/podd/ns/poddScience#hasBarcode> ?trayBarcode . ")
+            .append(" ?tray <http://purl.org/podd/ns/poddScience#hasPot> ?pot . ")
+            .append(" ?pot <http://purl.org/podd/ns/poddScience#hasPotNumberTray> ?potNumberTray . ")
+            .append(" ?pot <http://purl.org/podd/ns/poddScience#hasPotNumber> ?potNumberOverall . ")
+            .append(" ?pot <http://purl.org/podd/ns/poddScience#hasBarcode> ?potBarcode . ")
+            .append(" FILTER(STR(?trayBarcode) = \"%s\") }").toString();
+    
     /**
      * Adds the given role for the given user to the given artifact
      *
