@@ -18,6 +18,7 @@ package com.github.podd.impl.data;
 
 import org.openrdf.model.Model;
 import org.openrdf.model.vocabulary.RDF;
+import org.openrdf.model.vocabulary.XMLSchema;
 
 import com.github.podd.api.data.SPARQLDataReference;
 import com.github.podd.utils.PODD;
@@ -61,7 +62,7 @@ public class SPARQLDataReferenceImpl extends AbstractDataReferenceImpl implement
         if(this.getGraph() != null)
         {
             model.add(this.getObjectIri().toOpenRDFURI(), PODD.PODD_BASE_HAS_SPARQL_GRAPH,
-                    PODD.VF.createLiteral(this.getGraph()));
+                    PODD.VF.createLiteral(this.getGraph(), XMLSchema.STRING));
         }
         
         return model;

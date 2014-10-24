@@ -18,6 +18,7 @@ package com.github.podd.impl.data;
 
 import org.openrdf.model.Model;
 import org.openrdf.model.vocabulary.RDF;
+import org.openrdf.model.vocabulary.XMLSchema;
 
 import com.github.podd.api.data.SSHFileReference;
 import com.github.podd.utils.PODD;
@@ -75,13 +76,13 @@ public class SSHFileReferenceImpl extends AbstractDataReferenceImpl implements S
         if(this.getFilename() != null)
         {
             model.add(this.getObjectIri().toOpenRDFURI(), PODD.PODD_BASE_HAS_FILENAME,
-                    PODD.VF.createLiteral(this.getFilename()));
+                    PODD.VF.createLiteral(this.getFilename(), XMLSchema.STRING));
         }
         
         if(this.getPath() != null)
         {
             model.add(this.getObjectIri().toOpenRDFURI(), PODD.PODD_BASE_HAS_FILE_PATH,
-                    PODD.VF.createLiteral(this.getPath()));
+                    PODD.VF.createLiteral(this.getPath(), XMLSchema.STRING));
         }
         
         return model;

@@ -20,6 +20,7 @@ import org.openrdf.model.Model;
 import org.openrdf.model.impl.LinkedHashModel;
 import org.openrdf.model.vocabulary.RDF;
 import org.openrdf.model.vocabulary.RDFS;
+import org.openrdf.model.vocabulary.XMLSchema;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLOntologyID;
 
@@ -167,7 +168,7 @@ public abstract class AbstractDataReferenceImpl implements DataReference
                 .toOpenRDFURI());
         model.add(this.getObjectIri().toOpenRDFURI(), RDF.TYPE, PODD.PODD_BASE_DATA_REFERENCE_TYPE);
         model.add(this.getObjectIri().toOpenRDFURI(), PODD.PODD_BASE_HAS_ALIAS,
-                PODD.VF.createLiteral(this.getRepositoryAlias()));
+                PODD.VF.createLiteral(this.getRepositoryAlias(), XMLSchema.STRING));
         
         if(this.getArtifactID() != null)
         {

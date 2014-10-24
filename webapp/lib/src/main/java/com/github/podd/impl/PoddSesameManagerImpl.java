@@ -2104,7 +2104,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         sb.append(" ?uri <" + RDFS.LABEL.stringValue() + "> ?label . ");
         
         // filter for "searchTerm" in label
-        sb.append(" FILTER(CONTAINS( LCASE(?label) , LCASE(?searchTerm) )) ");
+        sb.append(" FILTER(CONTAINS( LCASE(STR(?label)) , LCASE(?searchTerm) )) ");
         
         sb.append(" } LIMIT ");
         sb.append(limit);
