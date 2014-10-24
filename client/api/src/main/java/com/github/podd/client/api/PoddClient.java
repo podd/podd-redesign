@@ -90,6 +90,12 @@ public interface PoddClient
                     .append(" WHERE { ?object a ?type . ?object <http://purl.org/podd/ns/poddScience#hasBarcode> ?barcode . FILTER(STR(?barcode) = \"%s\") }")
                     .toString();
     
+    public static final String TEMPLATE_SPARQL_CONTAINERS_TO_MATERIAL_AND_GENOTYPE =
+            new StringBuilder()
+                    .append("CONSTRUCT { ?container <http://purl.org/podd/ns/poddScience#hasMaterial> ?material . ?material ?materialProperty ?materialValue . ?material <http://purl.org/podd/ns/poddScience#refersToGenotype> ?genotype . ?genotype ?property ?value . }")
+                    .append(" WHERE { ?container <http://purl.org/podd/ns/poddScience#hasMaterial> ?material . ?material ?materialProperty ?materialValue . ?material <http://purl.org/podd/ns/poddScience#refersToGenotype> ?genotype . ?genotype ?property ?value . }")
+                    .append(" VALUES (?container) { %s }").toString();
+    
     /**
      * NOTE: Both the first and second arguments are the predicate, the first being the mapped
      * predicate, and the second being the original predicate.
