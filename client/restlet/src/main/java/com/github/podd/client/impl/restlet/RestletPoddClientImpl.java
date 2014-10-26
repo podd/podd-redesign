@@ -401,7 +401,9 @@ public class RestletPoddClientImpl implements PoddClient
         
         try
         {
-            final Representation get = resource.post(form.getWebRepresentation(CharacterSet.UTF_8));
+            final Representation get =
+                    resource.post(form.getWebRepresentation(CharacterSet.UTF_8),
+                            RestletUtilMediaType.APPLICATION_RDF_JSON);
             
             // Pass the desired format to the get method of the ClientResource
             // final Representation get = resource.get(RestletUtilMediaType.APPLICATION_RDF_JSON);
