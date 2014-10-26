@@ -219,7 +219,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         final GraphQuery rdfsGraphQuery =
                 repositoryConnection.prepareGraphQuery(QueryLanguage.SPARQL, graphQuery.toString());
         
-        this.log.debug("Created SPARQL {}.", graphQuery);
+        this.log.trace("Created SPARQL {}.", graphQuery);
         
         return RdfUtility.executeGraphQuery(rdfsGraphQuery, contexts);
     }
@@ -369,7 +369,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
             sb.append(" } ");
         }
         
-        // this.log.debug("Created SPARQL {} with propertyUri {} and poddObject {}",
+        // this.log.trace("Created SPARQL {} with propertyUri {} and poddObject {}",
         // sb,
         // propertyUri, objectUri);
         
@@ -517,7 +517,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         sb.append(" ?propertyUri <" + RDFS.SUBPROPERTYOF.stringValue() + "> <" + PODD.PODD_BASE_CONTAINS + "> . ");
         sb.append(" } ");
         
-        this.log.debug("Created SPARQL {} with poddObject bound to {}", sb, objectUri);
+        this.log.trace("Created SPARQL {} with poddObject bound to {}", sb, objectUri);
         
         final TupleQuery tupleQuery = repositoryConnection.prepareTupleQuery(QueryLanguage.SPARQL, sb.toString());
         tupleQuery.setBinding("poddObject", objectUri);
@@ -809,7 +809,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
                 repositoryConnection.prepareGraphQuery(QueryLanguage.SPARQL, instanceQuery.toString());
         // rdfsGraphQuery.setBinding("rangeClass", nextRangeType);
         
-        // this.log.debug("Created SPARQL {} \n   with nextRangeType bound to {}",
+        // this.log.trace("Created SPARQL {} \n   with nextRangeType bound to {}",
         // instanceQuery,
         // nextRangeType);
         
@@ -959,7 +959,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         // To get lang
         // Locale.getDefault();
         
-        this.log.debug("Created SPARQL {} with objectUri bound to {}", sb, objectUri);
+        this.log.trace("Created SPARQL {} with objectUri bound to {}", sb, objectUri);
         
         final TupleQuery tupleQuery = permanentConnection.prepareTupleQuery(QueryLanguage.SPARQL, sb.toString());
         tupleQuery.setBinding("objectUri", objectUri);
@@ -1005,7 +1005,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
             {
                 description = next.getValue("description").stringValue();
             }
-
+            
             if(next.getValue("barcode") != null)
             {
                 barcode = next.getValue("barcode").stringValue();
@@ -1143,7 +1143,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
             final GraphQuery subRangeGraphQuery =
                     repositoryConnection.prepareGraphQuery(QueryLanguage.SPARQL, subRangeQueryString);
             
-            // this.log.debug("Created SPARQL {} \n   with rangeClass bound to {}",
+            // this.log.trace("Created SPARQL {} \n   with rangeClass bound to {}",
             // subRangeQueryString, restriction);
             
             results.addAll(RdfUtility.executeGraphQuery(subRangeGraphQuery, contexts));
@@ -1237,7 +1237,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
                 repositoryConnection.prepareGraphQuery(QueryLanguage.SPARQL, owlRestrictionQueryString);
         graphQuery.setBinding("objectType", objectType);
         
-        this.log.debug("Created SPARQL {} \n   with objectType bound to {}", owlRestrictionQueryString, objectType);
+        this.log.trace("Created SPARQL {} \n   with objectType bound to {}", owlRestrictionQueryString, objectType);
         
         final Model restrictionQueryResults = RdfUtility.executeGraphQuery(graphQuery, contexts);
         results.addAll(restrictionQueryResults);
@@ -1290,7 +1290,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         final GraphQuery rdfsGraphQuery = repositoryConnection.prepareGraphQuery(QueryLanguage.SPARQL, rdfsQueryString);
         rdfsGraphQuery.setBinding("objectType", objectType);
         
-        this.log.debug("Created SPARQL {} \n   with objectType bound to {}", rdfsQueryString, objectType);
+        this.log.trace("Created SPARQL {} \n   with objectType bound to {}", rdfsQueryString, objectType);
         
         final Model rdfsQueryResults = RdfUtility.executeGraphQuery(rdfsGraphQuery, contexts);
         results.addAll(rdfsQueryResults);
@@ -1333,7 +1333,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
             
             final String annotationQueryString = annotationQuery.toString();
             
-            this.log.debug("Created SPARQL annotationQuery {} ", annotationQuery);
+            this.log.trace("Created SPARQL annotationQuery {} ", annotationQuery);
             
             final GraphQuery annotationGraphQuery =
                     repositoryConnection.prepareGraphQuery(QueryLanguage.SPARQL, annotationQueryString);
@@ -1400,7 +1400,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
             
             final String sb2String = sb2.toString();
             
-            this.log.debug("Created SPARQL get metaData for properties {} ", sb2);
+            this.log.trace("Created SPARQL get metaData for properties {} ", sb2);
             
             final GraphQuery graphQuery2 = repositoryConnection.prepareGraphQuery(QueryLanguage.SPARQL, sb2String);
             final Model queryResults2 = RdfUtility.executeGraphQuery(graphQuery2, contexts);
@@ -1440,7 +1440,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
             // weight
             // graphQuery2.setBinding("propertyUri", property);
             
-            // this.log.debug("Created SPARQL {} \n   with propertyUri bound to {}",
+            // this.log.trace("Created SPARQL {} \n   with propertyUri bound to {}",
             // sb2String,
             // property);
             
@@ -1525,7 +1525,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         
         sb.append(" }");
         
-        this.log.debug("Created SPARQL {} with objectUri bound to {}", sb, objectUri);
+        this.log.trace("Created SPARQL {} with objectUri bound to {}", sb, objectUri);
         
         final TupleQuery tupleQuery = permanentConnection.prepareTupleQuery(QueryLanguage.SPARQL, sb.toString());
         tupleQuery.setBinding("objectUri", objectUri);
@@ -1674,7 +1674,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         sb2.append(" OPTIONAL { ?versionIri <" + PODD.PODD_BASE_INFERRED_VERSION.stringValue() + "> ?inferredIri . } ");
         sb2.append(" }");
         
-        this.log.debug("Generated SPARQL {} with versionIri bound to <{}>", sb2, versionIRI);
+        this.log.trace("Generated SPARQL {} with versionIri bound to <{}>", sb2, versionIRI);
         
         final TupleQuery query = repositoryConnection.prepareTupleQuery(QueryLanguage.SPARQL, sb2.toString());
         query.setBinding("versionIri", versionIRI.toOpenRDFURI());
@@ -1730,7 +1730,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         final GraphQuery graphQuery = repositoryConnection.prepareGraphQuery(QueryLanguage.SPARQL, sb.toString());
         graphQuery.setBinding("poddObject", objectUri);
         
-        this.log.debug("Created SPARQL {} \n   with poddObject bound to {}", sb, objectUri);
+        this.log.trace("Created SPARQL {} \n   with poddObject bound to {}", sb, objectUri);
         
         return RdfUtility.executeGraphQuery(graphQuery, contexts);
     }
@@ -1763,7 +1763,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         final GraphQuery graphQuery = repositoryConnection.prepareGraphQuery(QueryLanguage.SPARQL, sb.toString());
         graphQuery.setBinding("poddObject", objectUri);
         
-        this.log.debug("Created SPARQL {} \n   with poddObject bound to {}", sb, objectUri);
+        this.log.trace("Created SPARQL {} \n   with poddObject bound to {}", sb, objectUri);
         
         return RdfUtility.executeGraphQuery(graphQuery, contexts);
     }
@@ -1896,7 +1896,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         sb.append(" } ");
         sb.append("  ORDER BY ASC(xsd:integer(?weight)) ASC(?propertyLabel) ");
         
-        this.log.debug("Created SPARQL {} with poddObject bound to {}", sb, objectUri);
+        this.log.trace("Created SPARQL {} with poddObject bound to {}", sb, objectUri);
         
         final TupleQuery tupleQuery = repositoryConnection.prepareTupleQuery(QueryLanguage.SPARQL, sb.toString());
         tupleQuery.setBinding("poddObject", objectUri);
@@ -2115,7 +2115,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         final GraphQuery graphQuery = repositoryConnection.prepareGraphQuery(QueryLanguage.SPARQL, sb.toString());
         graphQuery.setBinding("searchTerm", PODD.VF.createLiteral(searchTerm));
         
-        this.log.debug("Created SPARQL {} with searchTerm bound to '{}' ", sb, searchTerm);
+        this.log.trace("Created SPARQL {} with searchTerm bound to '{}' ", sb, searchTerm);
         
         final Model queryResults = RdfUtility.executeGraphQuery(graphQuery, contexts);
         
@@ -2570,7 +2570,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         final GraphQuery subChildGraphQuery =
                 repositoryConnection.prepareGraphQuery(QueryLanguage.SPARQL, subChildQueryString);
         
-        this.log.debug("Created SPARQL {} \n   with objects types bound to {}", subChildQueryString, objectsType);
+        this.log.trace("Created SPARQL {} \n   with objects types bound to {}", subChildQueryString, objectsType);
         
         return RdfUtility.executeGraphQuery(subChildGraphQuery, contexts);
         
