@@ -387,18 +387,24 @@ public class RestletPoddClientImpl implements PoddClient
         final ClientResource resource = new ClientResource(this.getUrl(PoddWebConstants.PATH_SPARQL));
         resource.getCookies().addAll(this.currentCookies);
         
+        final Form form = new Form();
+        form.add(PoddWebConstants.KEY_SPARQLQUERY, queryString);
         // TODO: Parse query to make sure it is syntactically valid before sending query
-        resource.addQueryParameter(PoddWebConstants.KEY_SPARQLQUERY, queryString);
+        // resource.addQueryParameter(PoddWebConstants.KEY_SPARQLQUERY, queryString);
         
         for(InferredOWLOntologyID artifactId : artifactIds)
         {
-            resource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactId.getOntologyIRI().toString());
+            form.add(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactId.getOntologyIRI().toString());
+            // resource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER,
+            // artifactId.getOntologyIRI().toString());
         }
         
         try
         {
+            final Representation get = resource.post(form.getWebRepresentation(CharacterSet.UTF_8));
+            
             // Pass the desired format to the get method of the ClientResource
-            final Representation get = resource.get(RestletUtilMediaType.APPLICATION_RDF_JSON);
+            // final Representation get = resource.get(RestletUtilMediaType.APPLICATION_RDF_JSON);
             
             final StringWriter writer = new StringWriter(4096);
             
