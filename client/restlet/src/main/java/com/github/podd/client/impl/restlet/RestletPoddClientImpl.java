@@ -428,7 +428,41 @@ public class RestletPoddClientImpl implements PoddClient
         }
         catch(final IOException | RDFParseException | UnsupportedRDFormatException e)
         {
-            throw new PoddClientException("Could not process SPARQL query results", e);
+            // Attempt to retry the request once to avoid random restlet failures stopping the
+            // entire process
+            try
+            {
+                final Representation get =
+                        resource.post(form.getWebRepresentation(CharacterSet.UTF_8),
+                                RestletUtilMediaType.APPLICATION_RDF_JSON);
+                
+                // Pass the desired format to the get method of the ClientResource
+                // final Representation get =
+                // resource.get(RestletUtilMediaType.APPLICATION_RDF_JSON);
+                
+                final StringWriter writer = new StringWriter(4096);
+                
+                get.write(writer);
+                return Rio.parse(new StringReader(writer.toString()), "", RDFFormat.RDFJSON);
+            }
+            catch(ResourceException e1)
+            {
+                if(e1.getStatus().equals(Status.CLIENT_ERROR_PRECONDITION_FAILED))
+                {
+                    // Precondition failed indicates that they do not have access to any artifacts,
+                    // so
+                    // return empty results set
+                    return new LinkedHashModel();
+                }
+                else
+                {
+                    throw new PoddClientException("Could not execute SPARQL query", e1);
+                }
+            }
+            catch(final IOException | RDFParseException | UnsupportedRDFormatException e1)
+            {
+                throw new PoddClientException("Could not process SPARQL query results", e1);
+            }
         }
     }
     
