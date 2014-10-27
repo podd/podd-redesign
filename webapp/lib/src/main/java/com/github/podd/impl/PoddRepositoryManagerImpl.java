@@ -173,7 +173,7 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
     public RepositoryConnection getPermanentRepositoryConnection(final Set<? extends OWLOntologyID> schemaOntologies,
             final boolean createIfNotExists) throws OpenRDFException, IOException, RepositoryNotFoundException
     {
-        this.log.debug("Entering get permanent repository");
+        this.log.debug("Entering get permanent repository: createIfNotExists={}", createIfNotExists);
         this.log.debug("Get permanent repository schemas: {}", schemaOntologies);
         Objects.requireNonNull(schemaOntologies, "Schema ontologies must not be null");
         
