@@ -2021,12 +2021,12 @@ podd.initialiseNewObject = function(nextDatabank, artifactUri, objectUri, parent
 podd.initialiseNewTopObject = function(nextDatabank, artifactUri, objectUri) {
     nextDatabank.add(artifactUri + ' rdf:type owl:Ontology ');
     nextDatabank.add(artifactUri + ' poddBase:artifactHasTopObject ' + objectUri);
-    nextDatabank.add(artifactUri + ' owl:imports <http://purl.org/podd/ns/version/dcTerms/2>');
-    nextDatabank.add(artifactUri + ' owl:imports <http://purl.org/podd/ns/version/foaf/2>');
-    nextDatabank.add(artifactUri + ' owl:imports <http://purl.org/podd/ns/version/poddUser/2>');
-    nextDatabank.add(artifactUri + ' owl:imports <http://purl.org/podd/ns/version/poddBase/2>');
-    nextDatabank.add(artifactUri + ' owl:imports <http://purl.org/podd/ns/version/poddScience/2>');
-    nextDatabank.add(artifactUri + ' owl:imports <http://purl.org/podd/ns/version/poddPlant/2>');
+    nextDatabank.add(artifactUri + ' owl:imports <http://purl.org/podd/ns/version/dcTerms/3>');
+    nextDatabank.add(artifactUri + ' owl:imports <http://purl.org/podd/ns/version/foaf/3>');
+    nextDatabank.add(artifactUri + ' owl:imports <http://purl.org/podd/ns/version/poddUser/3>');
+    nextDatabank.add(artifactUri + ' owl:imports <http://purl.org/podd/ns/version/poddBase/3>');
+    nextDatabank.add(artifactUri + ' owl:imports <http://purl.org/podd/ns/version/poddScience/3>');
+    nextDatabank.add(artifactUri + ' owl:imports <http://purl.org/podd/ns/version/poddPlant/3>');
 
     // add createdAt statement with default value
     nextDatabank.add(podd.buildTriple(objectUri, PODD_CREATED_AT, DUMMY_Datetime, DATATYPE_PROPERTY, XSD_DATETIME));
