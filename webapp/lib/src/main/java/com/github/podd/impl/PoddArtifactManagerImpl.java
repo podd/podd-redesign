@@ -2612,14 +2612,28 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
                             newVersionIRI.toOpenRDFURI(), DataReferenceVerificationPolicy.DO_NOT_VERIFY, false,
                             newSchemaOntologyIds);
             
-            this.log.info("Completed reload of artifact to Repository: {}", artifactVersion);
-            
             this.getSesameManager().updateManagedPoddArtifactVersion(inferredOWLOntologyID, true, managementConnection,
                     this.getRepositoryManager().getArtifactManagementGraph());
+            
+            //--------------------------------------
+            // TODO: Verify this code in this context
+            managementConnection.remove(inferredOWLOntologyID.getOntologyIRI().toOpenRDFURI(), OWL.IMPORTS, null, this
+                    .getRepositoryManager().getArtifactManagementGraph());
+            
+            for(final OWLOntologyID nextSchemaImport : newSchemaOntologyIds)
+            {
+                managementConnection.add(inferredOWLOntologyID.getOntologyIRI().toOpenRDFURI(), OWL.IMPORTS,
+                        nextSchemaImport.getVersionIRI().toOpenRDFURI(), this.getRepositoryManager()
+                                .getArtifactManagementGraph());
+            }
+            //--------------------------------------
             
             oldPermanentConnection.commit();
             newPermanentConnection.commit();
             managementConnection.commit();
+            
+            this.log.info("Completed reload of artifact to Repository: {}", artifactVersion);
+            
             return inferredOWLOntologyID;
         }
         catch(final Throwable e)
