@@ -530,12 +530,12 @@ public class ApplicationUtils
                 // the above method again if they need to be updated
                 currentArtifactImports.put(nextArtifact, schemaImports);
                 
-                for(final InferredOWLOntologyID nextUpdatedSchemaImport : currentSchemaOntologies)
+                for(final OWLOntologyID nextSchemaImport : schemaImports)
                 {
                     boolean foundNonCurrentVersion = false;
                     OWLOntologyID matchingSchema = null;
                     
-                    for(final OWLOntologyID nextSchemaImport : schemaImports)
+                    for(final InferredOWLOntologyID nextUpdatedSchemaImport : currentSchemaOntologies)
                     {
                         // If the ontology IRI of the artifacts schema import was in the updated
                         // list, then signal it for updating
@@ -558,19 +558,17 @@ public class ApplicationUtils
                     // Need to customise strategies for users here, or in the GUI to select the
                     // schema ontologies that they wish to use for each artifact
                     
-                    // FIXME: by checking for matchingSchema == null, all available schema
-                    // ontologies will be incorporated into all ontologies on restart
-                    
-                    if(foundNonCurrentVersion)// || matchingSchema == null)
+                    if(foundNonCurrentVersion || matchingSchema == null)
                     {
-                        ApplicationUtils.log.info("Found out of date or missing schema version: {}",
-                                nextUpdatedSchemaImport);
+                        ApplicationUtils.log.info("Found out of date or missing schema version: old=<{}> new=<{}>",
+                                nextSchemaImport, matchingSchema);
                         Set<InferredOWLOntologyID> set = new HashSet<>();
                         final Set<InferredOWLOntologyID> putIfAbsent = artifactsToUpdate.putIfAbsent(nextArtifact, set);
                         if(putIfAbsent != null)
                         {
                             set = putIfAbsent;
                         }
+                        // FIXME: Choose these in a way which will not automatically include everything
                         set.addAll(currentSchemaOntologies);
                         // Do not continue this loop in this naive strategy
                         break;
