@@ -515,7 +515,7 @@ public class ApplicationUtils
             {
                 if(poddArtifactManager.isPublished(nextArtifact))
                 {
-                    ApplicationUtils.log.debug("Not attempting to update ontologies for published artifact: {}",
+                    ApplicationUtils.log.debug("Not attempting to update schema ontologies for published artifact: {}",
                             nextArtifact.getOntologyIRI());
                     // Must not update the schema imports for published artifacts
                     continue;
@@ -557,9 +557,13 @@ public class ApplicationUtils
                     // users expect is to add all of the current schema ontologies here
                     // Need to customise strategies for users here, or in the GUI to select the
                     // schema ontologies that they wish to use for each artifact
-                    if(foundNonCurrentVersion || matchingSchema == null)
+                    
+                    // FIXME: by checking for matchingSchema == null, all available schema
+                    // ontologies will be incorporated into all ontologies on restart
+                    
+                    if(foundNonCurrentVersion)// || matchingSchema == null)
                     {
-                        ApplicationUtils.log.debug("Found out of date or missing schema version: {}",
+                        ApplicationUtils.log.info("Found out of date or missing schema version: {}",
                                 nextUpdatedSchemaImport);
                         Set<InferredOWLOntologyID> set = new HashSet<>();
                         final Set<InferredOWLOntologyID> putIfAbsent = artifactsToUpdate.putIfAbsent(nextArtifact, set);
