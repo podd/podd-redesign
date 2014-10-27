@@ -2499,6 +2499,15 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             throw new IllegalArgumentException("Artifact was null");
         }
         
+        if(OntologyUtils.ontologyVersionsMatch(oldSchemaOntologyIds, newSchemaOntologyIds))
+        {
+            this.log.debug(
+                    "No need to update schema imports for artifact as the old and new schema sets were equal: {}",
+                    artifactId);
+            // No change necessary
+            return artifactId;
+        }
+        
         RepositoryConnection managementConnection = null;
         RepositoryConnection oldPermanentConnection = null;
         RepositoryConnection newPermanentConnection = null;
