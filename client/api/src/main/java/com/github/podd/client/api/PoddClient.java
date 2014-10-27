@@ -86,8 +86,8 @@ public interface PoddClient
     
     public static final String TEMPLATE_SPARQL_BY_BARCODE_MATCH_NO_TYPE =
             new StringBuilder()
-                    .append("CONSTRUCT { ?object a ?type . ?object <http://purl.org/podd/ns/poddScience#hasBarcode> ?barcode . }")
-                    .append(" WHERE { ?object a ?type . ?object <http://purl.org/podd/ns/poddScience#hasBarcode> ?barcode . FILTER(STR(?barcode) = \"%s\") }")
+                    .append("CONSTRUCT { ?object <http://purl.org/podd/ns/poddScience#hasBarcode> ?barcode . }")
+                    .append(" WHERE { ?object <http://purl.org/podd/ns/poddScience#hasBarcode> ?barcode . FILTER(STR(?barcode) = \"%s\") }")
                     .toString();
     
     public static final String TEMPLATE_SPARQL_CONTAINERS_TO_MATERIAL_AND_GENOTYPE =
