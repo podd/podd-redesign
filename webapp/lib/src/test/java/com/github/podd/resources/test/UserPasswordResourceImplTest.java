@@ -45,37 +45,37 @@ import com.github.podd.utils.PoddWebConstants;
  */
 public class UserPasswordResourceImplTest extends AbstractResourceImplTest
 {
-
+    
     @Test
     public void testChangeOtherUserPasswordRdf() throws Exception
     {
         final String testIdentifier = "anotherUser";
         final String newPassword = "modifiedPassword";
         final URI tempUserUri = PODD.VF.createURI("urn:temp:user");
-
+        
         // prepare: create Model with modified password and user identifier
         final Model userInfoModel = new LinkedHashModel();
         userInfoModel.add(tempUserUri, SesameRealmConstants.OAS_USERIDENTIFIER, PODD.VF.createLiteral(testIdentifier));
         userInfoModel.add(tempUserUri, SesameRealmConstants.OAS_USERSECRET, PODD.VF.createLiteral(newPassword));
-
+        
         // submit new password to Change Password Service
         final MediaType mediaType = MediaType.APPLICATION_RDF_XML;
         final RDFFormat format = Rio.getWriterFormatForMIMEType(mediaType.getName(), RDFFormat.RDFXML);
-
+        
         final ClientResource userPasswordClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_EDIT_PWD));
         try
         {
             userPasswordClientResource.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, testIdentifier);
-
+            
             final ByteArrayOutputStream out = new ByteArrayOutputStream();
             Rio.write(userInfoModel, out, format);
             final Representation input = new StringRepresentation(out.toString(), mediaType);
-
+            
             final Representation modifiedResults =
                     this.doTestAuthenticatedRequest(userPasswordClientResource, Method.POST, input, mediaType,
                             Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
-
+            
             // verify: response has correct identifier
             final Model model = this.assertRdf(new StringReader(this.getText(modifiedResults)), RDFFormat.RDFXML, 1);
             Assert.assertEquals("Unexpected user identifier", testIdentifier,
@@ -85,7 +85,7 @@ public class UserPasswordResourceImplTest extends AbstractResourceImplTest
         {
             this.releaseClient(userPasswordClientResource);
         }
-
+        
         // verify: request with new login details should succeed
         final ClientResource userDetailsClientResource2 =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_DETAILS));
@@ -99,7 +99,7 @@ public class UserPasswordResourceImplTest extends AbstractResourceImplTest
         {
             this.releaseClient(userDetailsClientResource2);
         }
-
+        
         // verify: request with old login details should fail
         final ClientResource userDetailsClientResource3 =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_DETAILS));
@@ -119,7 +119,7 @@ public class UserPasswordResourceImplTest extends AbstractResourceImplTest
             this.releaseClient(userDetailsClientResource3);
         }
     }
-
+    
     @Test
     public void testChangeOwnPasswordRdf() throws Exception
     {
@@ -127,31 +127,31 @@ public class UserPasswordResourceImplTest extends AbstractResourceImplTest
         final String oldPassword = "testAdminPassword";
         final String newPassword = "modifiedPassword";
         final URI tempUserUri = PODD.VF.createURI("urn:temp:user");
-
+        
         // prepare: create Model with modified password and user identifier
         final Model userInfoModel = new LinkedHashModel();
         userInfoModel.add(tempUserUri, SesameRealmConstants.OAS_USERIDENTIFIER, PODD.VF.createLiteral(testIdentifier));
         userInfoModel.add(tempUserUri, PODD.PODD_USER_OLDSECRET, PODD.VF.createLiteral(oldPassword));
         userInfoModel.add(tempUserUri, SesameRealmConstants.OAS_USERSECRET, PODD.VF.createLiteral(newPassword));
-
+        
         // submit new password to Change Password Service
         final MediaType mediaType = MediaType.APPLICATION_RDF_XML;
         final RDFFormat format = Rio.getWriterFormatForMIMEType(mediaType.getName(), RDFFormat.RDFXML);
-
+        
         final ClientResource userPasswordClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_EDIT_PWD));
         try
         {
             userPasswordClientResource.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, testIdentifier);
-
+            
             final ByteArrayOutputStream out = new ByteArrayOutputStream();
             Rio.write(userInfoModel, out, format);
             final Representation input = new StringRepresentation(out.toString(), mediaType);
-
+            
             final Representation modifiedResults =
                     this.doTestAuthenticatedRequest(userPasswordClientResource, Method.POST, input, mediaType,
                             Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
-
+            
             // verify: response has correct identifier
             final Model model = this.assertRdf(modifiedResults, RDFFormat.RDFXML, 1);
             Assert.assertEquals("Unexpected user identifier", testIdentifier,
@@ -161,11 +161,11 @@ public class UserPasswordResourceImplTest extends AbstractResourceImplTest
         {
             this.releaseClient(userPasswordClientResource);
         }
-
+        
         // verify: request with new login details should succeed
         final ClientResource userDetailsClientResource2 =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_DETAILS));
-
+        
         try
         {
             userDetailsClientResource2.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, testIdentifier);
@@ -176,11 +176,11 @@ public class UserPasswordResourceImplTest extends AbstractResourceImplTest
         {
             this.releaseClient(userDetailsClientResource2);
         }
-
+        
         // verify: request with old login details should fail
         final ClientResource userDetailsClientResource3 =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_DETAILS));
-
+        
         try
         {
             userDetailsClientResource3.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, testIdentifier);
@@ -197,7 +197,7 @@ public class UserPasswordResourceImplTest extends AbstractResourceImplTest
             this.releaseClient(userDetailsClientResource3);
         }
     }
-
+    
     @Test
     public void testPasswordChangePageHtml() throws Exception
     {
@@ -207,15 +207,15 @@ public class UserPasswordResourceImplTest extends AbstractResourceImplTest
         try
         {
             userPasswordClientResource.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, testIdentifier);
-
+            
             final Representation results =
                     this.doTestAuthenticatedRequest(userPasswordClientResource, Method.GET, null, MediaType.TEXT_HTML,
                             Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
-
+            
             final String body = this.getText(results);
             // System.out.println(body);
             this.assertFreemarker(body);
-
+            
             Assert.assertTrue("Page missing User identifier", body.contains(testIdentifier));
             Assert.assertTrue("Page missing old password", body.contains("Old Password"));
             Assert.assertTrue("Page missing confirm password", body.contains("Confirm New Password"));
@@ -227,5 +227,5 @@ public class UserPasswordResourceImplTest extends AbstractResourceImplTest
             this.releaseClient(userPasswordClientResource);
         }
     }
-
+    
 }

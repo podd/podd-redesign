@@ -366,7 +366,7 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
         
         final List<InferredOWLOntologyID> dependentSchemaOntologies =
                 OntologyUtils.modelToOntologyIDs(model, false, false);
-        ConcurrentMap<URI, Set<URI>> importsMap = new ConcurrentHashMap<>();
+        final ConcurrentMap<URI, Set<URI>> importsMap = new ConcurrentHashMap<>();
         final List<OWLOntologyID> manifestImports =
                 OntologyUtils.schemaImports(model, new LinkedHashSet<>(dependentSchemaOntologies), importsMap);
         
@@ -398,7 +398,7 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
      */
     private List<InferredOWLOntologyID> uploadSchemaOntologiesInOrder(final Model model,
             final List<OWLOntologyID> nextImportOrder, final ConcurrentMap<URI, URI> currentVersionsMap,
-            ConcurrentMap<URI, Set<URI>> importsMap) throws ModelException, OpenRDFException, IOException,
+            final ConcurrentMap<URI, Set<URI>> importsMap) throws ModelException, OpenRDFException, IOException,
         OWLException, PoddException
     {
         Objects.requireNonNull(model, "Schema Ontology model was null");
@@ -485,8 +485,9 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
                         final OWLOntologyID schemaOntologyID = null;
                         // Need to get the minimal set of imports for the next schema ontology and
                         // load exactly those ontologies
-                        Set<URI> nextMinimalImportsSet = importsMap.get(loadEntryID.getVersionIRI().toOpenRDFURI());
-                        Set<? extends OWLOntologyID> nextMinimalOntologyIDs =
+                        final Set<URI> nextMinimalImportsSet =
+                                importsMap.get(loadEntryID.getVersionIRI().toOpenRDFURI());
+                        final Set<? extends OWLOntologyID> nextMinimalOntologyIDs =
                                 OntologyUtils.mapFromVersions(nextMinimalImportsSet, nextImportOrder);
                         this.log.debug("nextMinimalImportsSet: {}", nextMinimalImportsSet);
                         this.log.debug("nextMinimalOntologyIDs: {}", nextMinimalOntologyIDs);
@@ -523,7 +524,7 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
                                     nextImportStatement.getObject(), this.repositoryManager.getSchemaManagementGraph());
                         }
                         
-                        for(URI nextMinimalImport : nextMinimalImportsSet)
+                        for(final URI nextMinimalImport : nextMinimalImportsSet)
                         {
                             // Add from the analysed schema manifest which includes the full
                             // heirarchy

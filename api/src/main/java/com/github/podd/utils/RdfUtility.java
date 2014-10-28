@@ -56,9 +56,9 @@ import org.slf4j.LoggerFactory;
  */
 public class RdfUtility
 {
-
+    
     private final static Logger log = LoggerFactory.getLogger(RdfUtility.class);
-
+    
     /**
      * Helper method to execute a given SPARQL Graph query.
      *
@@ -88,10 +88,10 @@ public class RdfUtility
         {
             new Throwable().printStackTrace();
         }
-
+        
         return results;
     }
-
+    
     /**
      * Helper method to execute a given SPARQL Tuple query, which may have had bindings attached.
      *
@@ -101,7 +101,7 @@ public class RdfUtility
      * @throws OpenRDFException
      */
     public static QueryResultCollector executeTupleQuery(final TupleQuery tupleQuery, final URI... contexts)
-            throws OpenRDFException
+        throws OpenRDFException
     {
         final DatasetImpl dataset = new DatasetImpl();
         for(final URI uri : contexts)
@@ -109,7 +109,7 @@ public class RdfUtility
             dataset.addDefaultGraph(uri);
         }
         tupleQuery.setDataset(dataset);
-
+        
         final QueryResultCollector results = new QueryResultCollector();
         final long before = System.currentTimeMillis();
         QueryResults.report(tupleQuery.evaluate(), results);
@@ -123,10 +123,10 @@ public class RdfUtility
         {
             new Throwable().printStackTrace();
         }
-
+        
         return results;
     }
-
+    
     /**
      * Given a set of RDF Statements, and a Root node, this method finds any nodes that are not
      * connected to the Root node.
@@ -147,16 +147,16 @@ public class RdfUtility
      */
     public static Set<URI> findDisconnectedNodes(final URI root, final RepositoryConnection connection,
             final URI... context) throws RepositoryException
-            {
+    {
         final List<URI> exclusions =
                 Arrays.asList(root, OWL.THING, OWL.ONTOLOGY, OWL.INDIVIDUAL,
                         ValueFactoryImpl.getInstance().createURI("http://www.w3.org/2002/07/owl#NamedIndividual"));
-
+        
         final List<URI> propertyExclusions = Arrays.asList(OWL.IMPORTS, OWL.VERSIONIRI);
-
+        
         // - identify nodes that should be connected to the root
         final Set<URI> nodesToCheck = new HashSet<URI>();
-
+        
         final List<Statement> allStatements =
                 Iterations.asList(connection.getStatements(null, null, null, false, context));
         for(final Statement s : allStatements)
@@ -166,37 +166,37 @@ public class RdfUtility
             {
                 continue;
             }
-
+            
             final Value objectValue = s.getObject();
             if(objectValue instanceof URI && !exclusions.contains(objectValue))
             {
                 nodesToCheck.add((URI)objectValue);
             }
-
+            
             final Resource subjectValue = s.getSubject();
             if(subjectValue instanceof URI && !exclusions.contains(subjectValue))
             {
                 nodesToCheck.add((URI)subjectValue);
             }
-
+            
         }
-
+        
         // RdfUtility.log.info("{} nodes to check for connectivity.", nodesToCheck.size());
         // for(final URI u : objectsToCheck)
         // {
         // System.out.println("    " + u);
         // }
-
+        
         // - check for connectivity
         final Queue<URI> queue = new LinkedList<URI>();
         final Set<URI> visitedNodes = new HashSet<URI>(); // to handle cycles
         queue.add(root);
         visitedNodes.add(root);
-
+        
         while(!queue.isEmpty())
         {
             final URI currentNode = queue.remove();
-
+            
             final List<URI> children = RdfUtility.getImmediateChildren(currentNode, connection, context);
             for(final URI child : children)
             {
@@ -219,8 +219,8 @@ public class RdfUtility
         }
         RdfUtility.log.debug("{} unconnected node(s). {}", nodesToCheck.size(), nodesToCheck);
         return nodesToCheck;
-            }
-
+    }
+    
     /**
      * Internal helper method to retrieve the direct child objects of a given object.
      *
@@ -232,7 +232,7 @@ public class RdfUtility
      */
     private static List<URI> getImmediateChildren(final URI node, final RepositoryConnection connection,
             final URI... context) throws RepositoryException
-            {
+    {
         final List<URI> children = new ArrayList<URI>();
         final List<Statement> childStatements =
                 Iterations.asList(connection.getStatements(node, null, null, false, context));
@@ -244,8 +244,8 @@ public class RdfUtility
             }
         }
         return children;
-            }
-
+    }
+    
     /**
      * Helper method to load an {@link InputStream} into an {@link Model}.
      *
@@ -259,7 +259,7 @@ public class RdfUtility
      * @throws IOException
      */
     public static Model inputStreamToModel(final InputStream resourceStream, final RDFFormat format)
-            throws OpenRDFException, IOException
+        throws OpenRDFException, IOException
     {
         if(resourceStream == null)
         {
@@ -267,5 +267,5 @@ public class RdfUtility
         }
         return Rio.parse(resourceStream, "", format);
     }
-
+    
 }

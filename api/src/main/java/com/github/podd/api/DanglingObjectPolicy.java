@@ -30,16 +30,16 @@ public enum DanglingObjectPolicy
      * Remove any dangling objects found without informing user.
      */
     FORCE_CLEAN,
-
+    
     /**
      * Notify caller of any dangling objects found.
      */
     REPORT,
-
+    
     /**
      * Ignore any dangling objects without modification.
      */
     IGNORE
-
+    
     ;
 }

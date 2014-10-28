@@ -37,7 +37,7 @@ import com.github.podd.exception.DataRepositoryException;
 public class PoddDataRepositoryRegistry extends AbstractServiceLoader<String, PoddDataRepositoryFactory>
 {
     private static final PoddDataRepositoryRegistry instance = new PoddDataRepositoryRegistry();
-
+    
     /**
      * @return A static instance of this registry.
      */
@@ -45,15 +45,15 @@ public class PoddDataRepositoryRegistry extends AbstractServiceLoader<String, Po
     {
         return PoddDataRepositoryRegistry.instance;
     }
-
+    
     public PoddDataRepositoryRegistry()
     {
         super(PoddDataRepositoryFactory.class);
     }
-
+    
     public PoddDataRepository<? extends DataReference> createDataRepository(final Resource nextMatchingRepository,
             final Model model) throws DataRepositoryException
-            {
+    {
         final Set<Value> types = model.filter(nextMatchingRepository, RDF.TYPE, null).objects();
         final Set<URI> uriTypes = new HashSet<URI>();
         for(final Value nextType : types)
@@ -63,7 +63,7 @@ public class PoddDataRepositoryRegistry extends AbstractServiceLoader<String, Po
                 uriTypes.add((URI)nextType);
             }
         }
-
+        
         for(final PoddDataRepositoryFactory factory : PoddDataRepositoryRegistry.getInstance().getAll())
         {
             if(factory.canCreate(uriTypes))
@@ -71,14 +71,14 @@ public class PoddDataRepositoryRegistry extends AbstractServiceLoader<String, Po
                 return factory.createDataRepository(nextMatchingRepository, model);
             }
         }
-
+        
         throw new DataRepositoryException("Could not find any repositories in the given statements");
-            }
-
+    }
+    
     @Override
     public final String getKey(final PoddDataRepositoryFactory nextFactory)
     {
         return nextFactory.getKey();
     }
-
+    
 }

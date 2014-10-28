@@ -70,56 +70,56 @@ public class PoddDataRepositoryManagerImplTest extends AbstractPoddDataRepositor
 {
     @Rule
     public Timeout timeout = new Timeout(30000);
-
+    
     @Rule
     public TemporaryFolder tempDir = new TemporaryFolder();
-
+    
     /** SSH File Repository server for tests */
     protected SSHService sshd;
-
+    
     private Path sshDir = null;
-
+    
     @Override
     protected PoddDataRepository<?> buildDataRepositoryInstance(final String alias, final Model model)
     {
         // prepare: create a mock PoddDataRepository which can only return the
         // test alias string
         return new PoddDataRepository<DataReference>()
+            {
+                
+                @Override
+                public boolean canHandle(final DataReference reference)
                 {
-
-            @Override
-            public boolean canHandle(final DataReference reference)
-            {
-                return false;
-            }
-
-            @Override
-            public String getAlias()
-            {
-                return alias;
-            }
-
-            @Override
-            public Model getAsModel()
-            {
-                return model;
-            }
-
-            @Override
-            public Set<URI> getTypes()
-            {
-                return null;
-            }
-
-            @Override
-            public boolean validate(final DataReference reference) throws DataReferenceNotSupportedException,
-            IOException
-            {
-                return false;
-            }
-                };
+                    return false;
+                }
+                
+                @Override
+                public String getAlias()
+                {
+                    return alias;
+                }
+                
+                @Override
+                public Model getAsModel()
+                {
+                    return model;
+                }
+                
+                @Override
+                public Set<URI> getTypes()
+                {
+                    return null;
+                }
+                
+                @Override
+                public boolean validate(final DataReference reference) throws DataReferenceNotSupportedException,
+                    IOException
+                {
+                    return false;
+                }
+            };
     }
-
+    
     @Override
     protected Model buildModelForDataRepository(final URI aliasUri, final String... aliases)
     {
@@ -129,7 +129,7 @@ public class PoddDataRepositoryManagerImplTest extends AbstractPoddDataRepositor
             model.add(aliasUri, PODD.PODD_DATA_REPOSITORY_ALIAS, ValueFactoryImpl.getInstance().createLiteral(alias));
         }
         model.add(aliasUri, RDF.TYPE, PODD.PODD_DATA_REPOSITORY);
-
+        
         // SSH implementation specific configurations
         model.add(aliasUri, RDF.TYPE, PODD.PODD_SSH_FILE_REPOSITORY);
         model.add(aliasUri, PODD.PODD_DATA_REPOSITORY_PROTOCOL,
@@ -144,26 +144,26 @@ public class PoddDataRepositoryManagerImplTest extends AbstractPoddDataRepositor
                 ValueFactoryImpl.getInstance().createLiteral(SSHService.TEST_SSH_USERNAME));
         model.add(aliasUri, PODD.PODD_FILE_REPOSITORY_SECRET,
                 ValueFactoryImpl.getInstance().createLiteral(SSHService.TEST_SSH_SECRET));
-
+        
         return model;
     }
-
+    
     @Override
     protected DataReference getNewInvalidDataReference() throws Exception
     {
         return SSHService
                 .getNewInvalidFileReference("invalid-file",
                         this.tempDir.newFolder("poddfilerepositoryimpltest-resources-" + UUID.randomUUID().toString())
-                        .toPath());
+                                .toPath());
     }
-
+    
     @Override
     protected PoddDataRepositoryManager getNewPoddDataRepositoryManager() throws Exception
     {
         // create a Repository Manager with an internal memory Repository
         final Repository managementRepository = new SailRepository(new MemoryStore());
         managementRepository.initialize();
-
+        
         final Model graph =
                 Rio.parse(this.getClass().getResourceAsStream("/memorystoreconfig.ttl"), "", RDFFormat.TURTLE);
         final Resource repositoryNode = GraphUtil.getUniqueSubject(graph, RepositoryConfigSchema.REPOSITORYTYPE, null);
@@ -173,44 +173,44 @@ public class PoddDataRepositoryManagerImplTest extends AbstractPoddDataRepositor
         final PoddRepositoryManagerImpl repositoryManagerImpl =
                 new PoddRepositoryManagerImpl(managementRepository, repositoryImplConfig, "", this.tempDir.newFolder(
                         "test-podd-repository-manager").toPath(), new PropertyUtil("podd"));
-
+        
         final PoddOWLManager owlManager =
                 new PoddOWLManagerImpl(this.getNewOWLOntologyManagerFactory(), this.getNewReasonerFactory());
-
+        
         // create the PoddDataRepositoryManager for testing
         final PoddDataRepositoryManager testFileRepositoryManager = new PoddDataRepositoryManagerImpl();
         testFileRepositoryManager.setRepositoryManager(repositoryManagerImpl);
         testFileRepositoryManager.setOWLManager(owlManager);
-
+        
         return testFileRepositoryManager;
     }
-
+    
     protected OWLOntologyManagerFactory getNewOWLOntologyManagerFactory()
     {
         final Collection<OWLOntologyManagerFactory> ontologyManagers =
                 OWLOntologyManagerFactoryRegistry.getInstance().get(PoddWebConstants.DEFAULT_OWLAPI_MANAGER);
-
+        
         if(ontologyManagers == null || ontologyManagers.isEmpty())
         {
             this.log.error("OWLOntologyManagerFactory was not found");
         }
         return ontologyManagers.iterator().next();
     }
-
+    
     protected OWLReasonerFactory getNewReasonerFactory()
     {
         return OWLReasonerFactoryRegistry.getInstance().getReasonerFactory("Pellet");
     }
-
+    
     @Override
     protected DataReference getNewValidDataReference() throws Exception
     {
         return SSHService
                 .getNewValidFileReference("valid-file",
                         this.tempDir.newFolder("poddfilerepositoryimpltest-resources-" + UUID.randomUUID().toString())
-                        .toPath());
+                                .toPath());
     }
-
+    
     @Before
     @Override
     public void setUp() throws Exception
@@ -220,12 +220,12 @@ public class PoddDataRepositoryManagerImplTest extends AbstractPoddDataRepositor
         this.sshd.startTestSSHServer(this.sshDir);
         super.setUp();
     }
-
+    
     @Override
     protected void startRepositorySource() throws Exception
     {
     }
-
+    
     @Override
     protected void stopRepositorySource() throws Exception
     {
@@ -234,5 +234,5 @@ public class PoddDataRepositoryManagerImplTest extends AbstractPoddDataRepositor
             this.sshd.stopTestSSHServer(this.sshDir);
         }
     }
-
+    
 }

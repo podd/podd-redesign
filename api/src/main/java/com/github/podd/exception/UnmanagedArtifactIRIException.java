@@ -32,9 +32,9 @@ import com.github.podd.utils.PODD;
 public class UnmanagedArtifactIRIException extends UnmanagedSchemaException
 {
     private static final long serialVersionUID = 4395800605913179651L;
-
+    
     private final IRI artifactOntologyIRI;
-
+    
     /**
      *
      * @param ontology
@@ -47,7 +47,7 @@ public class UnmanagedArtifactIRIException extends UnmanagedSchemaException
         super(msg);
         this.artifactOntologyIRI = artifactOntologyIRI;
     }
-
+    
     /**
      * @param ontology
      *            The OWL Ontology IRI that was not managed.
@@ -61,7 +61,7 @@ public class UnmanagedArtifactIRIException extends UnmanagedSchemaException
         super(msg, throwable);
         this.artifactOntologyIRI = artifactOntologyIRI;
     }
-
+    
     /**
      * @param ontology
      *            The OWL Ontology IRI that was not managed.
@@ -73,20 +73,20 @@ public class UnmanagedArtifactIRIException extends UnmanagedSchemaException
         super(throwable);
         this.artifactOntologyIRI = artifactOntologyIRI;
     }
-
+    
     @Override
     public Model getDetailsAsModel(final Resource errorResource)
     {
         final Model model = super.getDetailsAsModel(errorResource);
-
+        
         if(this.getUnmanagedOntologyIRI() != null)
         {
             model.add(errorResource, PODD.ERR_SOURCE, this.getUnmanagedOntologyIRI().toOpenRDFURI());
         }
-
+        
         return model;
     }
-
+    
     /**
      * @return The OWL Ontology IRI that was not managed.
      */
@@ -94,5 +94,5 @@ public class UnmanagedArtifactIRIException extends UnmanagedSchemaException
     {
         return this.artifactOntologyIRI;
     }
-
+    
 }

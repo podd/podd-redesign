@@ -70,7 +70,7 @@ public class DeleteObjectResourceImpl extends AbstractPoddResourceImpl
             {
                 throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Artifact IRI not submitted");
             }
-
+            
             final String versionUri =
                     this.getQuery().getFirstValue(PoddWebConstants.KEY_ARTIFACT_VERSION_IDENTIFIER, true);
             if(versionUri == null)
@@ -78,33 +78,33 @@ public class DeleteObjectResourceImpl extends AbstractPoddResourceImpl
                 this.log.error("Artifact Version IRI not submitted");
                 throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Artifact Version IRI not submitted");
             }
-
+            
             final String objectUri = this.getQueryValue(PoddWebConstants.KEY_OBJECT_IDENTIFIER);
             if(objectUri == null)
             {
                 throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST,
                         "Object to delete not specified in request");
             }
-
+            
             String cascadeString = this.getQueryValue(PoddWebConstants.KEY_CASCADE);
             if(cascadeString == null)
             {
                 cascadeString = "false";
             }
             final boolean cascade = Boolean.valueOf(cascadeString);
-
+            
             this.checkAuthentication(PoddAction.ARTIFACT_EDIT, PODD.VF.createURI(artifactUri));
-
+            
             this.log.debug("requesting delete object: {}, {}, {} with cascade {}", artifactUri, versionUri, objectUri,
                     cascade);
-
+            
             final User user = this.getRequest().getClientInfo().getUser();
             this.log.debug("authenticated user: {}", user);
-
+            
             final InferredOWLOntologyID updatedOntologyID =
                     this.getPoddArtifactManager().deleteObject(PODD.VF.createURI(artifactUri),
                             PODD.VF.createURI(versionUri), PODD.VF.createURI(objectUri), cascade);
-
+            
             // - prepare response
             final ByteArrayOutputStream output = new ByteArrayOutputStream(8096);
             final RDFFormat outputFormat =
@@ -112,7 +112,7 @@ public class DeleteObjectResourceImpl extends AbstractPoddResourceImpl
             final Model model =
                     OntologyUtils.ontologyIDsToModel(Arrays.asList(updatedOntologyID), new LinkedHashModel(), false);
             Rio.write(model, output, outputFormat);
-
+            
             return new ByteArrayRepresentation(output.toByteArray(), MediaType.valueOf(outputFormat
                     .getDefaultMIMEType()));
         }
@@ -134,5 +134,5 @@ public class DeleteObjectResourceImpl extends AbstractPoddResourceImpl
                     "Could not delete artifact due to an internal error", e);
         }
     }
-
+    
 }

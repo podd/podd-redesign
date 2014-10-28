@@ -42,7 +42,7 @@ public interface PoddPurlProcessor extends PoddRdfProcessor
      *             If a null String is passed
      */
     void addTemporaryUriHandler(String temporaryUriPrefix);
-
+    
     /**
      * Decides whether the given input URI is compatible with this Purl Processor.
      *
@@ -53,14 +53,14 @@ public interface PoddPurlProcessor extends PoddRdfProcessor
      *         NULL value is passed in.
      */
     boolean canHandle(URI inputUri);
-
+    
     /**
      *
      * @return A list of temporary URI handler prefixes that have been registered for this
      *         PoddPurlProcessor.
      */
     List<String> getTemporaryUriHandlers();
-
+    
     /**
      * Handles the translation of URIs using this Purl Processor
      *
@@ -76,7 +76,7 @@ public interface PoddPurlProcessor extends PoddRdfProcessor
      *
      */
     PoddPurlReference handleTranslation(URI inputUri) throws PurlProcessorNotHandledException;
-
+    
     /**
      * Handles the translation of URIs using this Purl Processor
      *
@@ -94,7 +94,7 @@ public interface PoddPurlProcessor extends PoddRdfProcessor
      *
      */
     PoddPurlReference handleTranslation(URI inputUri, URI parentUri) throws PurlProcessorNotHandledException;
-
+    
     /**
      * Signals to this Purl Processor that it should no longer handle permanent URL generation for
      * URIs that start with the given prefix.

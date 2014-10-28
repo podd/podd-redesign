@@ -67,7 +67,6 @@ import org.slf4j.LoggerFactory;
 
 import com.github.ansell.propertyutil.PropertyUtil;
 import com.github.podd.api.PoddRepositoryManager;
-import com.github.podd.exception.PoddException;
 import com.github.podd.exception.RepositoryNotFoundException;
 import com.github.podd.utils.ManualShutdownRepository;
 import com.github.podd.utils.OntologyUtils;
@@ -166,7 +165,7 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
     public RepositoryConnection getPermanentRepositoryConnection(final Set<? extends OWLOntologyID> schemaOntologies)
         throws OpenRDFException, IOException, RepositoryNotFoundException
     {
-        return getPermanentRepositoryConnection(schemaOntologies, false);
+        return this.getPermanentRepositoryConnection(schemaOntologies, false);
     }
     
     @Override
@@ -213,7 +212,7 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
                         URI repositoryUri = null;
                         
                         final Entry<Resource, RepositoryManager> sesameRepositoryManagerMap =
-                                getRepositoryManagerEntry(schemaOntologies, managementConnection);
+                                this.getRepositoryManagerEntry(schemaOntologies, managementConnection);
                         final Resource repositoryManagerURI = sesameRepositoryManagerMap.getKey();
                         final RepositoryManager sesameRepositoryManager = sesameRepositoryManagerMap.getValue();
                         
@@ -292,13 +291,13 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
                             // repository for this case
                             if(!createIfNotExists)
                             {
-                                if(log.isDebugEnabled())
+                                if(this.log.isDebugEnabled())
                                 {
-                                    Set<Value> debugRepositories =
+                                    final Set<Value> debugRepositories =
                                             repositoriesInManagerModel.filter(null, RDF.TYPE, PODD.PODD_REPOSITORY,
                                                     this.repositoryGraph).objects();
                                     this.log.debug("Listing all {} repositories in manager:", debugRepositories.size());
-                                    for(Value nextRepositoryUri : debugRepositories)
+                                    for(final Value nextRepositoryUri : debugRepositories)
                                     {
                                         if(!(nextRepositoryUri instanceof URI))
                                         {
@@ -308,10 +307,10 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
                                         }
                                         
                                         this.log.debug("\t{}", nextRepositoryUri);
-                                        Set<Value> ontologiesInNextRepository =
+                                        final Set<Value> ontologiesInNextRepository =
                                                 repositoriesInManagerModel.filter((URI)nextRepositoryUri,
                                                         PODD.PODD_REPOSITORY_CONTAINS_SCHEMA_VERSION, null).objects();
-                                        for(Value nextOntologyInNextRepository : ontologiesInNextRepository)
+                                        for(final Value nextOntologyInNextRepository : ontologiesInNextRepository)
                                         {
                                             this.log.debug("\t\t{}", nextOntologyInNextRepository);
                                         }
@@ -331,7 +330,7 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
                             // Get a new repository ID using our base name as the starting point
                             final String newRepositoryID =
                                     sesameRepositoryManager.getNewRepositoryID(repositoryUri.stringValue());
-                            Date creationDate = new Date();
+                            final Date creationDate = new Date();
                             final SimpleDateFormat iso8601Format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
                             final RepositoryConfig config =
                                     new RepositoryConfig(newRepositoryID,
@@ -341,7 +340,7 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
                             sesameRepositoryManager.addRepositoryConfig(config);
                             
                             final ManualShutdownRepository nextRepository =
-                                    new ManualShutdownRepository(getRepositoryByID(sesameRepositoryManager,
+                                    new ManualShutdownRepository(this.getRepositoryByID(sesameRepositoryManager,
                                             newRepositoryID));
                             // If we somehow created a new repository since we entered this section,
                             // we need to remove the new repository to cleanup
@@ -366,9 +365,9 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
                                 
                                 // In this case, we need to copy the relevant schema ontologies over
                                 // to the new repository
-                                initialisePermanentRepository(schemaOntologies, managementConnection,
+                                this.initialisePermanentRepository(schemaOntologies, managementConnection,
                                         permanentRepository);
-                                addNewRepositoryID(schemaOntologies, managementConnection, repositoryUri,
+                                this.addNewRepositoryID(schemaOntologies, managementConnection, repositoryUri,
                                         repositoryManagerURI, newRepositoryID);
                             }
                         }
@@ -406,7 +405,7 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
                                             + existingRepositoryId);
                                 }
                             }
-                            catch(ModelException e)
+                            catch(final ModelException e)
                             {
                                 throw new RuntimeException("Failed to find a unique repositoryId in manager", e);
                             }
@@ -463,7 +462,7 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
      * @throws IOException
      */
     protected Entry<Resource, RepositoryManager> getRepositoryManagerEntry(
-            final Set<? extends OWLOntologyID> schemaOntologies, RepositoryConnection managementConnection)
+            final Set<? extends OWLOntologyID> schemaOntologies, final RepositoryConnection managementConnection)
         throws RepositoryException, RDFHandlerException, IOException
     {
         final Map<Resource, RepositoryManager> sesameRepositoryManagerMap =
@@ -485,16 +484,17 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
      * Initialise the given permanent repository with the given schema ontologies, which have
      * already been loaded into the management repository that has a {@link RepositoryConnection}
      * open already.
-     * 
+     *
      * @param schemaOntologies
      * @param managementConnection
      * @param permanentRepository
      * @throws RepositoryException
      */
     protected void initialisePermanentRepository(final Set<? extends OWLOntologyID> schemaOntologies,
-            RepositoryConnection managementConnection, Repository permanentRepository) throws RepositoryException
+            final RepositoryConnection managementConnection, final Repository permanentRepository)
+        throws RepositoryException
     {
-        RepositoryConnection permanentConnection = permanentRepository.getConnection();
+        final RepositoryConnection permanentConnection = permanentRepository.getConnection();
         try
         {
             permanentConnection.begin();
@@ -557,8 +557,8 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
     }
     
     protected void addNewRepositoryID(final Set<? extends OWLOntologyID> schemaOntologies,
-            RepositoryConnection managementConnection, URI repositoryUri, final Resource repositoryManagerURI,
-            final String newRepositoryID) throws RepositoryException
+            final RepositoryConnection managementConnection, final URI repositoryUri,
+            final Resource repositoryManagerURI, final String newRepositoryID) throws RepositoryException
     {
         final Literal repositoryIdInManager = managementConnection.getValueFactory().createLiteral(newRepositoryID);
         managementConnection.add(repositoryManagerURI, PODD.PODD_REPOSITORY_MANAGER_CONTAINS_REPOSITORY, repositoryUri,

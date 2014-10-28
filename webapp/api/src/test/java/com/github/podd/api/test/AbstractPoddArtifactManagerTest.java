@@ -2030,7 +2030,7 @@ public abstract class AbstractPoddArtifactManagerTest
                         };
                 
                 // verify: no. of import statements
-                Model asList =
+                final Model asList =
                         new LinkedHashModel(Iterations.asList(permanentConnection.getStatements(null, OWL.IMPORTS,
                                 null, false, artifactId.getVersionIRI().toOpenRDFURI())));
                 DebugUtils.printContents(asList);
@@ -2943,7 +2943,7 @@ public abstract class AbstractPoddArtifactManagerTest
         this.verifyLoadedArtifact(artifactIDv1, 11, TestConstants.TEST_ARTIFACT_BASIC_PROJECT_4_CONCRETE_TRIPLES,
                 TestConstants.TEST_ARTIFACT_BASIC_PROJECT_4_INFERRED_TRIPLES, false);
         
-        Set<? extends OWLOntologyID> schemaImportsV1 = this.testArtifactManager.getSchemaImports(artifactIDv1);
+        final Set<? extends OWLOntologyID> schemaImportsV1 = this.testArtifactManager.getSchemaImports(artifactIDv1);
         
         System.out.println("Actual schema imports version 1:");
         System.out.println(schemaImportsV1);
@@ -2985,7 +2985,7 @@ public abstract class AbstractPoddArtifactManagerTest
         this.verifyLoadedArtifact(artifactIDv1, 11, TestConstants.TEST_ARTIFACT_BASIC_PROJECT_4_CONCRETE_TRIPLES,
                 TestConstants.TEST_ARTIFACT_BASIC_PROJECT_4_INFERRED_TRIPLES, false);
         
-        Set<? extends OWLOntologyID> schemaImportsV1 = this.testArtifactManager.getSchemaImports(artifactIDv1);
+        final Set<? extends OWLOntologyID> schemaImportsV1 = this.testArtifactManager.getSchemaImports(artifactIDv1);
         
         System.out.println("Actual schema imports version 1:");
         System.out.println(schemaImportsV1);
@@ -3035,7 +3035,7 @@ public abstract class AbstractPoddArtifactManagerTest
         this.verifyLoadedArtifact(artifactIDv1, 11, TestConstants.TEST_ARTIFACT_BASIC_PROJECT_4_CONCRETE_TRIPLES,
                 TestConstants.TEST_ARTIFACT_BASIC_PROJECT_4_INFERRED_TRIPLES, false);
         
-        Set<? extends OWLOntologyID> schemaImportsV1 = this.testArtifactManager.getSchemaImports(artifactIDv1);
+        final Set<? extends OWLOntologyID> schemaImportsV1 = this.testArtifactManager.getSchemaImports(artifactIDv1);
         
         System.out.println("Actual schema imports version 1:");
         System.out.println(schemaImportsV1);
@@ -3074,7 +3074,7 @@ public abstract class AbstractPoddArtifactManagerTest
         this.setupManagers();
         
         // Update from version 1 to version 2
-        InferredOWLOntologyID artifactIDv3a =
+        final InferredOWLOntologyID artifactIDv3a =
                 this.testArtifactManager.updateSchemaImports(new InferredOWLOntologyID(artifactIDv2.getOntologyIRI(),
                         artifactIDv2.getVersionIRI(), artifactIDv2.getInferredOntologyIRI()),
                         new LinkedHashSet<OWLOntologyID>(version2SchemaOntologies), new LinkedHashSet<OWLOntologyID>(
@@ -3100,7 +3100,7 @@ public abstract class AbstractPoddArtifactManagerTest
      * Test method for
      * {@link com.github.podd.api.PoddArtifactManager#updateSchemaImports(InferredOWLOntologyID, Set, Set)}
      * .
-     * 
+     *
      * NOTE: This fails due to the replacement of Investigation with Experiment between version 1
      * and version 2.
      */
@@ -3119,7 +3119,7 @@ public abstract class AbstractPoddArtifactManagerTest
         // Upload version 2 schemas
         final List<InferredOWLOntologyID> version2SchemaOntologies = this.loadVersion2SchemaOntologies();
         
-        thrown.expect(OntologyNotInProfileException.class);
+        this.thrown.expect(OntologyNotInProfileException.class);
         // Update from version 1 to version 2
         this.testArtifactManager.updateSchemaImports(new InferredOWLOntologyID(artifactIDv1.getOntologyIRI(),
                 artifactIDv1.getVersionIRI(), artifactIDv1.getInferredOntologyIRI()), new LinkedHashSet<OWLOntologyID>(
@@ -3130,7 +3130,7 @@ public abstract class AbstractPoddArtifactManagerTest
      * Test method for
      * {@link com.github.podd.api.PoddArtifactManager#updateSchemaImports(InferredOWLOntologyID, Set, Set)}
      * .
-     * 
+     *
      * NOTE: This fails due to the replacement of Investigation with Experiment between version 1
      * and version 2.
      */
@@ -3152,7 +3152,7 @@ public abstract class AbstractPoddArtifactManagerTest
         // Upload version 2 schemas
         final List<InferredOWLOntologyID> version2SchemaOntologies = this.loadVersion2SchemaOntologies();
         
-        thrown.expect(OntologyNotInProfileException.class);
+        this.thrown.expect(OntologyNotInProfileException.class);
         // Update from version 1 to version 2
         final InferredOWLOntologyID artifactIDv2 =
                 this.testArtifactManager.updateSchemaImports(new InferredOWLOntologyID(artifactIDv1.getOntologyIRI(),
@@ -3165,7 +3165,7 @@ public abstract class AbstractPoddArtifactManagerTest
      * Test method for
      * {@link com.github.podd.api.PoddArtifactManager#updateSchemaImports(InferredOWLOntologyID, Set, Set)}
      * .
-     * 
+     *
      * NOTE: This fails due to the replacement of Investigation with Experiment between version 1
      * and version 2.
      */
@@ -3190,7 +3190,7 @@ public abstract class AbstractPoddArtifactManagerTest
         // Simulate reloading all of the application after loading the version 2 schema ontologies
         this.setupManagers();
         
-        thrown.expect(OntologyNotInProfileException.class);
+        this.thrown.expect(OntologyNotInProfileException.class);
         // Update from version 1 to version 2
         this.testArtifactManager.updateSchemaImports(new InferredOWLOntologyID(artifactIDv1.getOntologyIRI(),
                 artifactIDv1.getVersionIRI(), artifactIDv1.getInferredOntologyIRI()), new LinkedHashSet<OWLOntologyID>(

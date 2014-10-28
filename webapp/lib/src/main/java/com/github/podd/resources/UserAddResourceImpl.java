@@ -70,11 +70,11 @@ public class UserAddResourceImpl extends AbstractUserResourceImpl
     {
         // check authentication first
         this.checkAuthentication(PoddAction.USER_CREATE);
-
+        
         this.log.info("In addUserRdf");
-
+        
         final PoddSesameRealm nextRealm = ((PoddWebServiceApplication)this.getApplication()).getRealm();
-
+        
         URI newUserUri = null;
         PoddUser newUser = null;
         try
@@ -84,46 +84,46 @@ public class UserAddResourceImpl extends AbstractUserResourceImpl
             final RDFFormat inputFormat =
                     Rio.getParserFormatForMIMEType(entity.getMediaType().getName(), RDFFormat.RDFXML);
             final Model newUserModel = Rio.parse(inputStream, "", inputFormat);
-
+            
             this.log.info("About to create user from model");
-
+            
             // - create new PoddUser and add to Realm
             newUser = PoddUser.fromModel(newUserModel, true, false, false);
-
+            
             // If we didn't get a secret, then do not activate their login at
             // this stage
             if(newUser.getSecret() == null)
             {
                 newUser.setUserStatus(PoddUserStatus.INACTIVE);
             }
-
+            
             this.log.info("About to check if user already exists");
-
+            
             if(nextRealm.findUser(newUser.getIdentifier()) != null)
             {
                 throw new ResourceException(Status.CLIENT_ERROR_CONFLICT, "User already exists");
             }
             newUserUri = nextRealm.addUser(newUser);
-
+            
             this.log.info("Added new User <{}> <{}>", newUser.getIdentifier(), newUserUri);
-
+            
             // - map Roles for the new User
-
+            
             // - add Project Creator Role if nothing else has been specified
             if(!newUserModel.contains(null, RDF.TYPE, SesameRealmConstants.OAS_ROLEMAPPING))
             {
                 nextRealm.map(newUser, PoddRoles.PROJECT_CREATOR.getRole());
             }
-
+            
             for(final Resource mappingUri : newUserModel.filter(null, RDF.TYPE, SesameRealmConstants.OAS_ROLEMAPPING)
                     .subjects())
             {
                 final URI roleUri =
                         newUserModel.filter(mappingUri, SesameRealmConstants.OAS_ROLEMAPPEDROLE, null).objectURI();
                 final RestletUtilRole role = PoddRoles.getRoleByUri(roleUri);
-
+                
                 final URI mappedObject = newUserModel.filter(mappingUri, PODD.PODD_ROLEMAPPEDOBJECT, null).objectURI();
-
+                
                 this.log.debug("Mapping <{}> to Role <{}> with Optional Object <{}>", newUser.getIdentifier(),
                         role.getName(), mappedObject);
                 if(mappedObject != null)
@@ -135,21 +135,21 @@ public class UserAddResourceImpl extends AbstractUserResourceImpl
                     nextRealm.map(newUser, role.getRole());
                 }
             }
-
+            
             // - check the User was successfully added to the Realm
             final PoddUser findUser = nextRealm.findUser(newUser.getIdentifier());
             if(findUser == null)
             {
                 throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Failed to add user");
             }
-
+            
         }
         catch(final IOException | OpenRDFException e)
         {
             this.log.error("Error creating user", e);
             throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "There was a problem with the input", e);
         }
-
+        
         // - prepare response
         final ByteArrayOutputStream output = new ByteArrayOutputStream(8096);
         final RDFFormat outputFormat =
@@ -159,7 +159,7 @@ public class UserAddResourceImpl extends AbstractUserResourceImpl
             final Model model = new LinkedHashModel();
             model.add(newUserUri, SesameRealmConstants.OAS_USERIDENTIFIER,
                     PODD.VF.createLiteral(newUser.getIdentifier()));
-
+            
             Rio.write(model, output, outputFormat);
         }
         catch(final OpenRDFException e)
@@ -167,38 +167,38 @@ public class UserAddResourceImpl extends AbstractUserResourceImpl
             this.log.error("Error generating response entity", e);
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Could not create response");
         }
-
+        
         return new ByteArrayRepresentation(output.toByteArray(), MediaType.valueOf(outputFormat.getDefaultMIMEType()));
     }
-
+    
     @Get
     public Representation getUserAddPageHtml(final Representation entity) throws ResourceException
     {
         this.log.info("addUserHtml");
-
+        
         final User user = this.getRequest().getClientInfo().getUser();
         this.log.info("authenticated user: {}", user);
-
+        
         // identify needed Action
         this.checkAuthentication(PoddAction.USER_CREATE);
-
+        
         // completed checking authorization
-
+        
         final Map<String, Object> dataModel = RestletUtils.getBaseDataModel(this.getRequest());
         dataModel.put("contentTemplate", "admin_createUser.html.ftl");
         dataModel.put("pageTitle", "Add PODD User Page");
         dataModel.put("title", "Create User");
         dataModel.put("authenticatedUsername", user.getIdentifier());
-
+        
         final PoddUserStatus[] statuses = PoddUserStatus.values();
         dataModel.put("statusList", statuses);
-
+        
         // Output the base template, with contentTemplate from the dataModel
         // defining the
         // template to use for the content in the body of the page
         return RestletUtils.getHtmlRepresentation(
                 this.getPoddApplication().getPropertyUtil()
-                .get(PoddWebConstants.PROPERTY_TEMPLATE_BASE, PoddWebConstants.DEFAULT_TEMPLATE_BASE),
+                        .get(PoddWebConstants.PROPERTY_TEMPLATE_BASE, PoddWebConstants.DEFAULT_TEMPLATE_BASE),
                 dataModel, MediaType.TEXT_HTML, this.getPoddApplication().getTemplateConfiguration());
     }
 }

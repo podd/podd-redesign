@@ -30,9 +30,9 @@ import com.github.podd.api.PoddProcessorStage;
  */
 public class PoddPurlProcessorFactoryRegistry extends AbstractServiceLoader<String, PoddPurlProcessorFactory>
 {
-
+    
     private static final PoddPurlProcessorFactoryRegistry instance = new PoddPurlProcessorFactoryRegistry();
-
+    
     /**
      * @return A static instance of this registry.
      */
@@ -40,12 +40,12 @@ public class PoddPurlProcessorFactoryRegistry extends AbstractServiceLoader<Stri
     {
         return PoddPurlProcessorFactoryRegistry.instance;
     }
-
+    
     public PoddPurlProcessorFactoryRegistry()
     {
         super(PoddPurlProcessorFactory.class);
     }
-
+    
     /**
      * From amongst all the PODD PURL processor factories available with this registry, retrieve a
      * list of the factories that support the given <code>PoddProcessorStage</code>.
@@ -63,13 +63,13 @@ public class PoddPurlProcessorFactoryRegistry extends AbstractServiceLoader<Stri
                 result.add(nextProcessorFactory);
             }
         }
-
+        
         return result;
     }
-
+    
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see org.semanticweb.owlapi.util.AbstractServiceLoader#getKey(java.lang.Object)
      */
     @Override
@@ -77,5 +77,5 @@ public class PoddPurlProcessorFactoryRegistry extends AbstractServiceLoader<Stri
     {
         return nextFactory.getKey();
     }
-
+    
 }

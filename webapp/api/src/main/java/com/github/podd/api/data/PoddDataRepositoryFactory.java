@@ -37,7 +37,7 @@ public interface PoddDataRepositoryFactory
      * @return True if this factory can create a repository to access all of the given type URIs.
      */
     boolean canCreate(Set<URI> types);
-
+    
     /**
      *
      * @param nextMatchingRepository
@@ -50,8 +50,8 @@ public interface PoddDataRepositoryFactory
      *             If there was an error creating the repository.
      */
     PoddDataRepository<? extends DataReference> createDataRepository(Resource nextMatchingRepository, Model statements)
-            throws DataRepositoryException;
-
+        throws DataRepositoryException;
+    
     /**
      * @return A Unique identifying string for this instance of this factory.
      */

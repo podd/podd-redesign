@@ -39,9 +39,9 @@ public class CookieLoginResourceImpl extends AbstractPoddResourceImpl implements
     public Representation getLoginPageHtml(final Representation entity) throws ResourceException
     {
         final User user = this.getRequest().getClientInfo().getUser();
-
+        
         this.log.info("authenticated user: {}", user);
-
+        
         if(user == null)
         {
             this.log.info("In getLoginPageHtml");
@@ -50,18 +50,18 @@ public class CookieLoginResourceImpl extends AbstractPoddResourceImpl implements
                     "contentTemplate",
                     this.getPropertyUtil().get(PoddWebConstants.PROPERTY_TEMPLATE_LOGIN,
                             PoddWebConstants.DEFAULT_TEMPLATE_LOGIN));
-
+            
             dataModel.put("shibbolethEnabled", Boolean.valueOf("false"));
             dataModel.put("invalidDomain", Boolean.valueOf("false"));
-
+            
             dataModel.put("pageTitle", "PODD Login Page");
-
+            
             // FIXME: By default use the referrer to populate the redirectTo
             // field internally for
             // use after a successful login
             dataModel.put("referrerRef", this.getRequest().getReferrerRef());
             this.log.info("referrerRef={}", this.getRequest().getReferrerRef());
-
+            
             // Output the base template, with contentTemplate from the dataModel
             // defining the
             // template to use for the content in the body of the page
@@ -73,9 +73,9 @@ public class CookieLoginResourceImpl extends AbstractPoddResourceImpl implements
         else
         {
             final Reference referrerRef = this.getRequest().getReferrerRef();
-
+            
             this.log.info("referrerRef={}", referrerRef);
-
+            
             if(referrerRef != null && !referrerRef.equals(this.getRequest().getResourceRef()))
             {
                 this.getResponse().redirectSeeOther(referrerRef);
@@ -87,5 +87,5 @@ public class CookieLoginResourceImpl extends AbstractPoddResourceImpl implements
             return null;
         }
     }
-
+    
 }

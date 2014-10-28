@@ -131,11 +131,11 @@ public abstract class AbstractDataReferenceImpl implements DataReference
     public final Model toRDF()
     {
         final Model model = new LinkedHashModel();
-        return toRDF(model);
+        return this.toRDF(model);
     }
     
     @Override
-    public Model toRDF(Model model)
+    public Model toRDF(final Model model)
     {
         if(this.getParentIri() == null)
         {

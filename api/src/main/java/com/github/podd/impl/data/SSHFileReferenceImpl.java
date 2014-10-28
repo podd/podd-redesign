@@ -67,7 +67,7 @@ public class SSHFileReferenceImpl extends AbstractDataReferenceImpl implements S
     }
     
     @Override
-    public Model toRDF(Model model)
+    public Model toRDF(final Model model)
     {
         super.toRDF(model);
         

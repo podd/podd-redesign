@@ -26,12 +26,12 @@ import com.github.podd.impl.data.SPARQLDataReferenceImpl;
  */
 public class SPARQLDataReferenceImplTest extends AbstractSPARQLDataReferenceTest
 {
-
+    
     @Override
     protected SPARQLDataReference getNewSPARQLDataReference()
     {
         final SPARQLDataReference ref = new SPARQLDataReferenceImpl();
         return ref;
     }
-
+    
 }

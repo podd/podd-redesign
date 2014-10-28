@@ -28,7 +28,7 @@ import com.github.podd.utils.PoddWebConstants;
  */
 public class UserListResourceImplTest extends AbstractResourceImplTest
 {
-
+    
     @Test
     public void testErrorGetUsersNonAdminRdf() throws Exception
     {
@@ -48,18 +48,18 @@ public class UserListResourceImplTest extends AbstractResourceImplTest
             this.releaseClient(userListClientResource);
         }
     }
-
+    
     @Test
     public void testGetUsersHtml() throws Exception
     {
         final ClientResource userListClientResource = new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_LIST));
-
+        
         try
         {
             final Representation results =
                     this.doTestAuthenticatedRequest(userListClientResource, Method.GET, null, MediaType.TEXT_HTML,
                             Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
-
+            
             final String body = this.getText(results);
             // System.out.println(body);
             this.assertFreemarker(body);
@@ -69,45 +69,45 @@ public class UserListResourceImplTest extends AbstractResourceImplTest
             this.releaseClient(userListClientResource);
         }
     }
-
+    
     @Test
     public void testGetUsersRdf() throws Exception
     {
         final MediaType mediaType = MediaType.APPLICATION_RDF_XML;
         final RDFFormat format = Rio.getWriterFormatForMIMEType(mediaType.getName(), RDFFormat.RDFXML);
-
+        
         final ClientResource userListClientResource = new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_LIST));
         try
         {
             final Representation results =
                     this.doTestAuthenticatedRequest(userListClientResource, Method.GET, null, mediaType,
                             Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
-
+            
             final Model resultsModel = this.assertRdf(results, format, 16);
-
+            
             // verify:
             final Set<Resource> subjects =
                     resultsModel.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).subjects();
             Assert.assertEquals("Not the expected number of Users", 2, subjects.size());
-
+            
             Assert.assertEquals(
                     "Missing testAdminUser",
                     1,
                     resultsModel
-                    .filter(null, SesameRealmConstants.OAS_USERIDENTIFIER,
-                            PODD.VF.createLiteral("testAdminUser")).subjects().size());
-
+                            .filter(null, SesameRealmConstants.OAS_USERIDENTIFIER,
+                                    PODD.VF.createLiteral("testAdminUser")).subjects().size());
+            
             Assert.assertEquals(
                     "Missing anotherUser",
                     1,
                     resultsModel
-                    .filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, PODD.VF.createLiteral("anotherUser"))
-                    .subjects().size());
+                            .filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, PODD.VF.createLiteral("anotherUser"))
+                            .subjects().size());
         }
         finally
         {
             this.releaseClient(userListClientResource);
         }
     }
-
+    
 }

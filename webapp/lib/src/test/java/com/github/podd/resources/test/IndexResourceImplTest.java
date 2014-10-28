@@ -40,13 +40,13 @@ public class IndexResourceImplTest extends AbstractResourceImplTest
     public void testGetIndexWithoutAuthentication() throws Exception
     {
         final ClientResource indexClientResource = new ClientResource(this.getUrl(PoddWebConstants.PATH_INDEX));
-
+        
         try
         {
             final Representation results =
                     PoddRestletTestUtils.doTestUnauthenticatedRequest(indexClientResource, Method.GET, null,
                             MediaType.TEXT_HTML, Status.SUCCESS_OK);
-
+            
             final String body = this.getText(results);
             Assert.assertTrue(body.contains("Welcome to PODD, please"));
             this.assertFreemarker(body);
@@ -56,5 +56,5 @@ public class IndexResourceImplTest extends AbstractResourceImplTest
             this.releaseClient(indexClientResource);
         }
     }
-
+    
 }

@@ -229,7 +229,7 @@ public class SearchOntologyResourceImpl extends AbstractPoddResourceImpl
         {
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Could not find artifact version", e);
         }
-        catch(RepositoryNotFoundException e)
+        catch(final RepositoryNotFoundException e)
         {
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Could not find repository", e);
         }

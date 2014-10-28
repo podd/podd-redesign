@@ -30,15 +30,15 @@ public enum PoddUserStatus
      * An ACTIVE user has the ability to access the PODD system.
      */
     ACTIVE("Active", "http://purl.org/podd/user/status#active"),
-
+    
     /**
      * An inactive user can be referenced from within PODD artifacts. Such a user does not have the
      * ability to access the PODD system.
      */
     INACTIVE("Inactive", "http://purl.org/podd/user/status#inactive")
-
+    
     ;
-
+    
     /**
      * Retrieve the {@link PoddUserStatus} matching the given {@link URI}.
      *
@@ -57,28 +57,28 @@ public enum PoddUserStatus
                 return nextStatus;
             }
         }
-
+        
         return INACTIVE;
     }
-
+    
     private final String label;
-
+    
     private final URI uri;
-
+    
     private PoddUserStatus(final String label, final String uri)
     {
         this.label = label;
         this.uri = PODD.VF.createURI(uri);
     }
-
+    
     public String getLabel()
     {
         return this.label;
     }
-
+    
     public URI getURI()
     {
         return this.uri;
     }
-
+    
 }

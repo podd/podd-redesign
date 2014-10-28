@@ -25,9 +25,9 @@ package com.github.podd.exception;
 public class DataRepositoryMappingNotFoundException extends DataRepositoryException
 {
     private static final long serialVersionUID = -6834156313829093766L;
-
+    
     private final String alias;
-
+    
     /**
      *
      * @param alias
@@ -40,7 +40,7 @@ public class DataRepositoryMappingNotFoundException extends DataRepositoryExcept
         super(msg);
         this.alias = alias;
     }
-
+    
     /**
      * @param alias
      *            The file repository alias that was not found in the PoddFileRepositoryManager.
@@ -54,7 +54,7 @@ public class DataRepositoryMappingNotFoundException extends DataRepositoryExcept
         super(msg, throwable);
         this.alias = alias;
     }
-
+    
     /**
      * @param alias
      *            The file repository alias that was not found in the PoddFileRepositoryManager.
@@ -66,7 +66,7 @@ public class DataRepositoryMappingNotFoundException extends DataRepositoryExcept
         super(throwable);
         this.alias = alias;
     }
-
+    
     /**
      * @return The alias that was not found in the set of mappings in the PoddFileRepositoryManager.
      */
@@ -74,5 +74,5 @@ public class DataRepositoryMappingNotFoundException extends DataRepositoryExcept
     {
         return this.alias;
     }
-
+    
 }

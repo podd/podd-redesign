@@ -37,20 +37,20 @@ import org.openrdf.rio.RDFHandlerException;
  */
 public class DeduplicatingRDFInserter extends RDFInserter
 {
-
+    
     private URI contextToCompareWith = null;
-
+    
     // TODO: Remove this and use super.con once it is made protected in the
     // parent class
     private RepositoryConnection conn = null;
-
+    
     public DeduplicatingRDFInserter(final URI contextToCompareWith, final RepositoryConnection conn)
     {
         super(conn);
         this.contextToCompareWith = contextToCompareWith;
         this.conn = conn;
     }
-
+    
     @Override
     public void handleStatement(final Statement st) throws RDFHandlerException
     {
@@ -59,12 +59,12 @@ public class DeduplicatingRDFInserter extends RDFInserter
             super.handleStatement(st);
             return;
         }
-
+        
         // check if statement exists in other context and ignore if so
         final Resource subj = st.getSubject();
         final URI pred = st.getPredicate();
         final Value obj = st.getObject();
-
+        
         try
         {
             final List<Statement> duplicateStatements =

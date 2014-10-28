@@ -70,7 +70,7 @@ public interface PoddSchemaManager
      */
     void downloadSchemaOntology(InferredOWLOntologyID schemaOntologyID, OutputStream outputStream, RDFFormat format,
             boolean includeInferences) throws UnmanagedSchemaException, RepositoryException, OpenRDFException;
-
+    
     /**
      * Gets the complete set of current PODD Schema Ontologies. That is, for each schema ontology,
      * its current version is included.
@@ -79,7 +79,7 @@ public interface PoddSchemaManager
      * @throws OpenRDFException
      */
     Set<InferredOWLOntologyID> getCurrentSchemaOntologies() throws OpenRDFException;
-
+    
     /**
      * Get the most current version of a managed Schema Ontology that contains the given
      * schemaOntologyIRI as either the ontology IRI or the version IRI.
@@ -97,8 +97,8 @@ public interface PoddSchemaManager
      * @throws OpenRDFException
      */
     InferredOWLOntologyID getCurrentSchemaOntologyVersion(IRI schemaOntologyIRI) throws UnmanagedSchemaIRIException,
-    OpenRDFException;
-
+        OpenRDFException;
+    
     /**
      * Gets the complete set of PODD Schema Ontologies, including previous versions.
      *
@@ -106,7 +106,7 @@ public interface PoddSchemaManager
      * @throws OpenRDFException
      */
     Set<InferredOWLOntologyID> getSchemaOntologies() throws OpenRDFException;
-
+    
     /**
      * Gets a PODD Schema Ontology based on the given IRI. If the IRI matches a managed Schema
      * Ontology IRI then the current version of that Schema Ontology is returned. If the IRI does
@@ -126,7 +126,7 @@ public interface PoddSchemaManager
      *             If the given schemaOntologyIRI is not recognised or managed.
      */
     OWLOntology getSchemaOntology(URI schemaOntologyIRI) throws UnmanagedSchemaIRIException;
-
+    
     /**
      * Gets the PODD Schema Ontology based on the schemaOntologyID. If the schemaOntologyID does not
      * contain a version IRI, then the current version of the Schema Ontology
@@ -139,7 +139,7 @@ public interface PoddSchemaManager
      *             If the given schemaOntologyID is not managed.
      */
     OWLOntology getSchemaOntology(OWLOntologyID schemaOntologyID) throws UnmanagedSchemaOntologyIDException;
-
+    
     /**
      * Gets the exact schema ontology version specified by the parameter if it exists, or throws an
      * exception.
@@ -154,8 +154,8 @@ public interface PoddSchemaManager
      *             If there was a problem with resolving or parsing the schema.
      */
     InferredOWLOntologyID getSchemaOntologyID(OWLOntologyID owlOntologyID) throws UnmanagedSchemaOntologyIDException,
-    OpenRDFException;
-
+        OpenRDFException;
+    
     /**
      * If the given IRI is the version IRI of a managed Schema Ontology, return its Ontology ID. If
      * the given IRI is an ontology IRI of a managed Schema Ontology, return the Ontology ID of its
@@ -169,8 +169,8 @@ public interface PoddSchemaManager
      * @throws OpenRDFException
      */
     InferredOWLOntologyID getSchemaOntologyVersion(IRI schemaVersionIRI) throws UnmanagedSchemaIRIException,
-    OpenRDFException;
-
+        OpenRDFException;
+    
     /**
      * Sets the given schemaOntologyID to be the most current version for all managed Schema
      * Ontologies with the schema ontology IRI.
@@ -188,8 +188,8 @@ public interface PoddSchemaManager
      * @throws OpenRDFException
      */
     void setCurrentSchemaOntologyVersion(OWLOntologyID schemaOntologyID) throws UnmanagedSchemaOntologyIDException,
-    IllegalArgumentException, OpenRDFException;
-
+        IllegalArgumentException, OpenRDFException;
+    
     /**
      * Sets the shared PoddOWLManager to use for Schema Ontologies and Artifact Ontologies.
      *
@@ -197,21 +197,21 @@ public interface PoddSchemaManager
      *            The PoddOWLManager
      */
     void setOwlManager(PoddOWLManager owlManager);
-
+    
     /**
      *
      * @param repositoryManager
      *            The PoddRepositoryManager
      */
     void setRepositoryManager(PoddRepositoryManager repositoryManager);
-
+    
     /**
      *
      * @param sesameManager
      *            The PoddSesameManager
      */
     void setSesameManager(PoddSesameManager sesameManager);
-
+    
     /**
      * Uploads schema ontologies to the schema manager using the RDF statements in the manifest
      * {@link Model}. This method must do its best to arrange for the schema ontologies to be
@@ -226,8 +226,8 @@ public interface PoddSchemaManager
      * @throws OpenRDFException
      */
     List<InferredOWLOntologyID> uploadSchemaOntologies(Model manifest) throws OpenRDFException, IOException,
-    OWLException, PoddException;
-
+        OWLException, PoddException;
+    
     /**
      * Loads a Schema Ontology into the internal repository, computes inferences on the schema
      * ontology, and stores the original schema ontology and the inferences in separate RDF Graphs
@@ -252,8 +252,8 @@ public interface PoddSchemaManager
      */
     InferredOWLOntologyID uploadSchemaOntology(InputStream inputStream, RDFFormat fileFormat,
             Set<? extends OWLOntologyID> dependentSchemaOntologies) throws OpenRDFException, IOException, OWLException,
-            PoddException;
-
+        PoddException;
+    
     /**
      * Loads a Schema Ontology into the internal repository, computes inferences on the schema
      * ontology, and stores the original schema ontology and the inferences in separate RDF Graphs
@@ -279,6 +279,6 @@ public interface PoddSchemaManager
      */
     InferredOWLOntologyID uploadSchemaOntology(OWLOntologyID schemaOntologyID, InputStream inputStream,
             RDFFormat fileFormat, Set<? extends OWLOntologyID> dependentSchemaOntologies) throws OpenRDFException,
-            IOException, OWLException, PoddException;
-
+        IOException, OWLException, PoddException;
+    
 }

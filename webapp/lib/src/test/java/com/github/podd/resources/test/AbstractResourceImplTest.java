@@ -142,7 +142,7 @@ public class AbstractResourceImplTest
         }
         return result;
     }
-
+    
     protected static void setupThreading(final Context nextContext)
     {
         if(nextContext != null)
@@ -155,51 +155,51 @@ public class AbstractResourceImplTest
             // nextContext.getParameters().add("maxIoIdleTimeMs", "10000");
         }
     }
-
+    
     @Rule
     public TemporaryFolder tempDirectory = new TemporaryFolder();
-
+    
     /**
      * Timeout tests after 600 seconds.
      */
     @Rule
     public TimeoutWithStackTraces timeout = new TimeoutWithStackTraces(600000);
-
+    
     /**
      * The set of ports that have been used in tests so far in this virtual machine.
      */
     private static final Set<Integer> usedPorts = Collections.newSetFromMap(new ConcurrentHashMap<Integer, Boolean>());
-
+    
     /**
      * Determines the TEST_PORT number to use for the test server
      */
     protected int testPort;
-
+    
     protected final Logger log = LoggerFactory.getLogger(this.getClass());
-
+    
     protected final ValueFactory vf = PODD.VF;
-
+    
     /**
      * A constant used to make requests that require admin privileges easier to recognise inside
      * tests.
      */
     protected static final boolean WITH_ADMIN = true;
-
+    
     /**
      * A constant used to make requests that do not require admin privileges easier to recognise
      * inside tests.
      */
     protected static final boolean NO_ADMIN = false;
-
+    
     private Component component;
-
+    
     protected Path testDir;
-
+    
     /**
      * Store this for testing restarting the application for consistency and correctness.
      */
     private PoddWebServiceApplication poddApplication;
-
+    
     /**
      * Utility method to verify that freemarker has not encountered errors when generating output.
      *
@@ -212,7 +212,7 @@ public class AbstractResourceImplTest
         Assert.assertFalse("Freemarker error.", body.contains("freemarker.core."));
         Assert.assertFalse("Freemarker error.", body.contains("Could not generate page"));
     }
-
+    
     /**
      * Utility method to verify that RDF documents can be parsed and the resulting number of
      * statements is as expected.
@@ -226,11 +226,11 @@ public class AbstractResourceImplTest
      * @throws IOException
      */
     protected Model assertRdf(final InputStream inputStream, final RDFFormat format, final int expectedStatements)
-            throws RDFParseException, RDFHandlerException, IOException
+        throws RDFParseException, RDFHandlerException, IOException
     {
         return this.assertRdf(new InputStreamReader(inputStream), format, expectedStatements);
     }
-
+    
     /**
      * Utility method to verify that RDF documents can be parsed and the resulting number of
      * statements is as expected.
@@ -244,28 +244,28 @@ public class AbstractResourceImplTest
      * @throws IOException
      */
     protected Model assertRdf(final Reader reader, final RDFFormat format, final int expectedStatements)
-            throws RDFParseException, RDFHandlerException, IOException
+        throws RDFParseException, RDFHandlerException, IOException
     {
         final Model model = Rio.parse(reader, "http://test.podd.example.org/should/not/occur/in/a/real/graph/", format);
-
+        
         if(expectedStatements != model.size())
         {
             System.out.println("Number of statements was not as expected found:" + model.size() + " expected:"
                     + expectedStatements);
             DebugUtils.printContents(model);
         }
-
+        
         Assert.assertEquals("Unexpected number of statements", expectedStatements, model.size());
-
+        
         return model;
     }
-
+    
     protected Model assertRdf(final Representation representation, final RDFFormat format, final int expectedStatements)
-            throws RDFParseException, RDFHandlerException, IOException
+        throws RDFParseException, RDFHandlerException, IOException
     {
         return this.assertRdf(new StringReader(this.getText(representation)), format, expectedStatements);
     }
-
+    
     /**
      * Builds a {@link Representation} from a Resource.
      *
@@ -275,20 +275,20 @@ public class AbstractResourceImplTest
      * @throws IOException
      */
     protected FileRepresentation buildRepresentationFromResource(final String resourcePath, final MediaType mediaType)
-            throws IOException
+        throws IOException
     {
         final Path target =
                 this.testDir.resolve(UUID.randomUUID().toString() + "." + Paths.get(resourcePath).getFileName());
-
+        
         try (final InputStream input = this.getClass().getResourceAsStream(resourcePath))
         {
             Files.copy(input, target, StandardCopyOption.REPLACE_EXISTING);
         }
-
+        
         final FileRepresentation fileRep = new FileRepresentation(target.toFile(), mediaType);
         return fileRep;
     }
-
+    
     public Representation doTestAuthenticatedRequest(final ClientResource clientResource, final Method requestMethod,
             final Representation inputRepresentation, final MediaType requestMediaType,
             final Status expectedResponseStatus, final boolean requiresAdminPrivileges) throws Exception
@@ -306,24 +306,24 @@ public class AbstractResourceImplTest
                     RestletTestUtils.TEST_PASSWORD);
         }
     }
-
+    
     public Representation doTestAuthenticatedRequest(final ClientResource clientResource, final Method requestMethod,
             final Representation inputRepresentation, final MediaType requestMediaType,
             final Status expectedResponseStatus, final String username, final char[] password) throws Exception
     {
         final Series<CookieSetting> currentCookies = new Series<CookieSetting>(CookieSetting.class);
-
+        
         if(!this.login(username, password, currentCookies))
         {
             throw new ResourceException(Status.CLIENT_ERROR_UNAUTHORIZED, "Login was not successful");
         }
         try
         {
-
+            
             Representation result = null;
-
+            
             clientResource.getCookies().addAll(currentCookies);
-
+            
             if(requestMethod.equals(Method.DELETE))
             {
                 result = clientResource.delete(requestMediaType);
@@ -344,9 +344,9 @@ public class AbstractResourceImplTest
             {
                 throw new RuntimeException("Did not recognise request method: " + requestMethod.toString());
             }
-
+            
             Assert.assertEquals(expectedResponseStatus.getCode(), clientResource.getResponse().getStatus().getCode());
-
+            
             return result;
         }
         finally
@@ -354,7 +354,7 @@ public class AbstractResourceImplTest
             this.logout(currentCookies);
         }
     }
-
+    
     /**
      * Retrieves the asserted statements of a given artifact from the Server as a String.
      *
@@ -369,16 +369,16 @@ public class AbstractResourceImplTest
     {
         final ClientResource getArtifactClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_GET_BASE));
-
+        
         try
         {
             getArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactUri);
-
+            
             final Representation results =
                     this.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null,
                             RestletUtilMediaType.APPLICATION_RDF_JSON, Status.SUCCESS_OK,
                             AbstractResourceImplTest.WITH_ADMIN);
-
+            
             return this.getModel(results);
         }
         finally
@@ -386,7 +386,7 @@ public class AbstractResourceImplTest
             this.releaseClient(getArtifactClientResource);
         }
     }
-
+    
     /**
      * Retrieves the asserted statements of a given artifact from the Server as a String.
      *
@@ -401,15 +401,15 @@ public class AbstractResourceImplTest
     {
         final ClientResource getArtifactClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_GET_BASE));
-
+        
         try
         {
             getArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactUri);
-
+            
             final Representation results =
                     this.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null, mediaType,
                             Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
-
+            
             return this.getText(results);
         }
         finally
@@ -417,9 +417,9 @@ public class AbstractResourceImplTest
             this.releaseClient(getArtifactClientResource);
         }
     }
-
+    
     protected Model getModel(final Representation representation) throws OpenRDFException,
-    UnsupportedRDFormatException, IOException
+        UnsupportedRDFormatException, IOException
     {
         try
         {
@@ -438,12 +438,12 @@ public class AbstractResourceImplTest
             }
         }
     }
-
+    
     protected final PoddWebServiceApplication getPoddApplication()
     {
         return this.poddApplication;
     }
-
+    
     /**
      * Override this to change the test aliases for a given test.
      *
@@ -456,10 +456,10 @@ public class AbstractResourceImplTest
     {
         final String configuration =
                 IOUtils.toString(this.getClass().getResourceAsStream("/test/test-alias.ttl"), StandardCharsets.UTF_8);
-
+        
         return Rio.parse(new StringReader(configuration), "", RDFFormat.TURTLE);
     }
-
+    
     protected String getText(final Representation representation) throws IOException
     {
         final StringWriter result = new StringWriter();
@@ -484,7 +484,7 @@ public class AbstractResourceImplTest
         }
         return result.toString();
     }
-
+    
     /**
      * Returns the URI that can be used to access the given path.
      *
@@ -504,7 +504,7 @@ public class AbstractResourceImplTest
             return "http://localhost:" + this.testPort + "/podd" + path;
         }
     }
-
+    
     /**
      * Loads a test artifact in RDF/XML format.
      *
@@ -516,7 +516,7 @@ public class AbstractResourceImplTest
     {
         return this.loadTestArtifact(resourceName, MediaType.APPLICATION_RDF_XML).getOntologyIRI().toString();
     }
-
+    
     /**
      * Loads a test artifact in a given format.
      *
@@ -527,25 +527,25 @@ public class AbstractResourceImplTest
      * @throws Exception
      */
     protected InferredOWLOntologyID loadTestArtifact(final String resourceName, final MediaType mediaType)
-            throws Exception
+        throws Exception
     {
         final ClientResource uploadArtifactClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_UPLOAD));
-
+        
         try
         {
             final Representation input = this.buildRepresentationFromResource(resourceName, mediaType);
-
+            
             final Representation results =
                     this.doTestAuthenticatedRequest(uploadArtifactClientResource, Method.POST, input,
                             MediaType.APPLICATION_RDF_TURTLE, Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
             final String body = this.getText(results);
             // this.log.info(body);
             this.assertFreemarker(body);
-
+            
             final Collection<InferredOWLOntologyID> ontologyIDs =
                     OntologyUtils.stringToOntologyID(body, RDFFormat.TURTLE);
-
+            
             Assert.assertEquals("Should have got only 1 Ontology ID", 1, ontologyIDs.size());
             return ontologyIDs.iterator().next();
         }
@@ -554,7 +554,7 @@ public class AbstractResourceImplTest
             this.releaseClient(uploadArtifactClientResource);
         }
     }
-
+    
     /**
      * Load a new test PoddUser. Does not check for presence of mandatory attributes.
      *
@@ -581,7 +581,7 @@ public class AbstractResourceImplTest
         if(testFirstName != null)
         {
             userInfoModel
-            .add(tempUserUri, SesameRealmConstants.OAS_USERFIRSTNAME, PODD.VF.createLiteral(testFirstName));
+                    .add(tempUserUri, SesameRealmConstants.OAS_USERFIRSTNAME, PODD.VF.createLiteral(testFirstName));
         }
         if(testLastName != null)
         {
@@ -627,13 +627,13 @@ public class AbstractResourceImplTest
         {
             userInfoModel.add(tempUserUri, PODD.PODD_USER_STATUS, PoddUserStatus.INACTIVE.getURI());
         }
-
+        
         // prepare: add Role Mappings
         for(final Map.Entry<URI, URI> entry : roles)
         {
             final URI role = entry.getKey();
             final URI mappedObject = entry.getValue();
-
+            
             final URI roleMapping = PODD.VF.createURI("urn:podd:rolemapping:", UUID.randomUUID().toString());
             userInfoModel.add(roleMapping, RDF.TYPE, SesameRealmConstants.OAS_ROLEMAPPING);
             userInfoModel.add(roleMapping, SesameRealmConstants.OAS_ROLEMAPPEDUSER, tempUserUri);
@@ -643,28 +643,28 @@ public class AbstractResourceImplTest
                 userInfoModel.add(roleMapping, PODD.PODD_ROLEMAPPEDOBJECT, mappedObject);
             }
         }
-
+        
         // - request new user creation from User Add RDF Service
         final MediaType mediaType = MediaType.APPLICATION_RDF_XML;
         final RDFFormat format = Rio.getWriterFormatForMIMEType(mediaType.getName(), RDFFormat.RDFXML);
-
+        
         final ClientResource userAddClientResource = new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_ADD));
-
+        
         try
         {
             final StringWriter out = new StringWriter();
             Rio.write(userInfoModel, out, format);
             final Representation input = new StringRepresentation(out.toString(), mediaType);
-
+            
             final Representation results =
                     this.doTestAuthenticatedRequest(userAddClientResource, Method.POST, input, mediaType,
                             Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
-
+            
             // verify: response has 1 statement and identifier is correct
             final Model model = this.assertRdf(results, RDFFormat.RDFXML, 1);
             Assert.assertEquals("Unexpected user identifier", testIdentifier,
                     model.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).objectString());
-
+            
             // return the unique URI assigned to this User
             final Resource next =
                     model.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).subjects().iterator().next();
@@ -675,29 +675,29 @@ public class AbstractResourceImplTest
             this.releaseClient(userAddClientResource);
         }
     }
-
+    
     protected boolean login(final String username, final char[] testAdminPassword,
             final Series<CookieSetting> currentCookies) throws Exception
     {
         final ClientResource resource = new ClientResource(this.getUrl(PoddWebConstants.DEF_PATH_LOGIN_SUBMIT));
-
+        
         try
         {
             resource.getCookies().addAll(currentCookies);
-
+            
             // TODO: when Cookies natively supported by Client Resource, or another method remove
             // this
             // Until then, this is necessary to manually attach the cookies after login to the
             // redirected address.
             // GitHub issue for this: https://github.com/restlet/restlet-framework-java/issues/21
             resource.setFollowingRedirects(false);
-
+            
             final Form form = new Form();
             form.add("username", username);
             form.add("password", new String(testAdminPassword));
-
+            
             final Representation rep = resource.post(form.getWebRepresentation(CharacterSet.UTF_8));
-
+            
             try
             {
                 this.log.info("login result status: {}", resource.getStatus());
@@ -710,7 +710,7 @@ public class AbstractResourceImplTest
                 {
                     this.log.info("login result was null");
                 }
-
+                
                 // HACK
                 if(resource.getStatus().equals(Status.REDIRECTION_SEE_OTHER) || resource.getStatus().isSuccess())
                 {
@@ -721,13 +721,13 @@ public class AbstractResourceImplTest
                 {
                     this.log.error("Found unrecognised status after login: {}", resource.getStatus());
                 }
-
+                
                 this.log.info("cookies: {}", currentCookies);
-
+                
                 final boolean result = !currentCookies.isEmpty();
-
+                
                 this.log.info("Logged in=" + result);
-
+                
                 return result;
             }
             catch(final Throwable e)
@@ -746,32 +746,32 @@ public class AbstractResourceImplTest
             this.releaseClient(resource);
         }
     }
-
+    
     protected boolean logout(final Series<CookieSetting> currentCookies) throws Exception
     {
         this.log.info("cookies: {}", currentCookies);
-
+        
         final ClientResource resource = new ClientResource(this.getUrl(PoddWebConstants.DEF_PATH_LOGOUT));
         try
         {
             // add the cookie settings so that the server knows who to logout
             resource.getCookies().addAll(currentCookies);
-
+            
             // TODO: when Cookies natively supported by Client Resource, or another method remove
             // this
             // Until then, this is necessary to manually attach the cookies after login to the
             // redirected address.
             // GitHub issue for this: https://github.com/restlet/restlet-framework-java/issues/21
             resource.setFollowingRedirects(false);
-
+            
             final Representation rep = resource.get();
             try
             {
                 currentCookies.clear();
                 currentCookies.addAll(resource.getCookieSettings());
-
+                
                 this.log.info("logout result status: {}", resource.getStatus());
-
+                
                 if(rep != null)
                 {
                     // FIXME: Representation.getText may be implemented badly, so avoid calling it
@@ -781,11 +781,11 @@ public class AbstractResourceImplTest
                 {
                     this.log.info("logout result was null");
                 }
-
+                
                 this.log.info("cookies: {}", currentCookies);
-
+                
                 currentCookies.clear();
-
+                
                 return true;
             }
             catch(final Throwable e)
@@ -804,7 +804,7 @@ public class AbstractResourceImplTest
             this.releaseClient(resource);
         }
     }
-
+    
     /**
      * Maps the given User and Role with an optional object URI.
      *
@@ -814,13 +814,13 @@ public class AbstractResourceImplTest
      * @throws Exception
      */
     protected void mapUserToRole(final String userIdentifier, final PoddRoles poddRole, final String mappedObjectUri)
-            throws Exception
+        throws Exception
     {
         final MediaType mediaType = MediaType.APPLICATION_RDF_XML;
         final RDFFormat format = Rio.getWriterFormatForMIMEType(mediaType.getName(), RDFFormat.RDFXML);
-
+        
         final Model newModel = new LinkedHashModel();
-
+        
         // prepare Model with additional Role mapping
         final URI roleMapping1Uri = PODD.VF.createURI("urn:podd:rolemapping1:", UUID.randomUUID().toString());
         newModel.add(roleMapping1Uri, RDF.TYPE, SesameRealmConstants.OAS_ROLEMAPPING);
@@ -829,7 +829,7 @@ public class AbstractResourceImplTest
         {
             newModel.add(roleMapping1Uri, PODD.PODD_ROLEMAPPEDOBJECT, PODD.VF.createURI(mappedObjectUri));
         }
-
+        
         // submit modified details to User Roles Service
         final ClientResource userRolesClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_ROLES));
@@ -851,7 +851,7 @@ public class AbstractResourceImplTest
             this.releaseClient(userRolesClientResource);
         }
     }
-
+    
     protected void releaseClient(final ClientResource clientResource) throws Exception
     {
         if(clientResource != null && clientResource.getNext() != null && clientResource.getNext() instanceof Client)
@@ -860,7 +860,7 @@ public class AbstractResourceImplTest
             c.stop();
         }
     }
-
+    
     /**
      * Create a new server for each test.
      *
@@ -872,43 +872,43 @@ public class AbstractResourceImplTest
     public void setUp() throws Exception
     {
         this.component = new Component();
-
+        
         this.testPort = AbstractResourceImplTest.getFreePort();
-
+        
         final Server httpServer =
                 new Server(this.component.getContext().createChildContext(), Protocol.HTTP, this.testPort);
         AbstractResourceImplTest.setupThreading(httpServer.getContext());
         // Add a new HTTP server listening on the given TEST_PORT.
         this.component.getServers().add(httpServer);
-
+        
         this.component.getClients().add(Protocol.CLAP);
         this.component.getClients().add(Protocol.HTTP);
-
+        
         this.poddApplication = new PoddWebServiceApplicationImpl();
-
+        
         // Attach the sample application.
         this.component.getDefaultHost().attach("/podd/", this.poddApplication);
-
+        
         this.poddApplication.setDataRepositoryConfig(this.getTestAliases());
-
+        
         // The application cannot be setup properly until it is attached, as it
         // requires Application.getContext() to not return null
         ApplicationUtils.setupApplication(this.poddApplication, this.poddApplication.getContext());
         TestUtils.setupTestUser(this.poddApplication);
-
+        
         // Start the component.
         this.component.start();
-
+        
         AbstractResourceImplTest.setupThreading(this.poddApplication.getContext());
         AbstractResourceImplTest.setupThreading(this.component.getContext());
         for(final Client nextClient : this.component.getClients())
         {
             AbstractResourceImplTest.setupThreading(nextClient.getContext());
         }
-
+        
         this.testDir = this.tempDirectory.newFolder(this.getClass().getSimpleName()).toPath();
     }
-
+    
     /**
      * Stop and nullify the test server object after each test.
      *
@@ -924,9 +924,9 @@ public class AbstractResourceImplTest
         {
             this.component.stop();
         }
-
+        
         // nullify the reference to the component
         this.component = null;
     }
-
+    
 }

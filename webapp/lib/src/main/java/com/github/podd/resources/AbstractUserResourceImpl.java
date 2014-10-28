@@ -6,12 +6,12 @@ import com.github.podd.utils.PoddWebConstants;
 
 public abstract class AbstractUserResourceImpl extends AbstractPoddResourceImpl
 {
-
+    
     public AbstractUserResourceImpl()
     {
         super();
     }
-
+    
     /**
      *
      * @return The user parameter based primarily on the query parameters or as a backup based on
@@ -22,7 +22,7 @@ public abstract class AbstractUserResourceImpl extends AbstractPoddResourceImpl
     protected String getUserParameter() throws ResourceException
     {
         String requestedUserIdentifier = this.getQuery().getFirstValue(PoddWebConstants.KEY_USER_IDENTIFIER, true);
-
+        
         if(requestedUserIdentifier == null)
         {
             if(this.getRequest().getClientInfo().isAuthenticated())
@@ -40,5 +40,5 @@ public abstract class AbstractUserResourceImpl extends AbstractPoddResourceImpl
         }
         return requestedUserIdentifier;
     }
-
+    
 }

@@ -39,36 +39,36 @@ import com.github.podd.utils.PODD;
  */
 public class DataReferenceVerificationException extends PoddException
 {
-
+    
     private static final long serialVersionUID = 570735415625742494L;
-
+    
     private Map<DataReference, Throwable> validationFailures;
-
+    
     public DataReferenceVerificationException(final Map<DataReference, Throwable> validationFailures, final String msg)
     {
         super(msg);
         this.validationFailures = validationFailures;
     }
-
+    
     public DataReferenceVerificationException(final Map<DataReference, Throwable> validationFailures, final String msg,
             final Throwable throwable)
     {
         super(msg, throwable);
         this.validationFailures = validationFailures;
     }
-
+    
     public DataReferenceVerificationException(final Map<DataReference, Throwable> validationFailures,
             final Throwable throwable)
     {
         super(throwable);
         this.validationFailures = validationFailures;
     }
-
+    
     @Override
     public Model getDetailsAsModel(final Resource errorResource)
     {
         final Model model = super.getDetailsAsModel(errorResource);
-
+        
         // FIXME - untested and incomplete
         final Map<DataReference, Throwable> validationFailures = this.getValidationFailures();
         for(final Entry<DataReference, Throwable> nextEntry : validationFailures.entrySet())
@@ -79,23 +79,23 @@ public class DataReferenceVerificationException extends PoddException
             model.add(dataReference.getObjectIri().toOpenRDFURI(), RDFS.LABEL,
                     PODD.VF.createLiteral(throwable.getMessage()));
             dataReference.getLabel();
-
+            
             final BNode v = PODD.VF.createBNode();
             model.add(errorResource, PODD.ERR_CONTAINS, v);
             model.add(v, RDF.TYPE, PODD.ERR_TYPE_ERROR);
-
+            
             final URI dataRefUri = dataReference.getObjectIri().toOpenRDFURI();
             model.add(v, PODD.ERR_SOURCE, dataRefUri);
             model.add(dataRefUri, RDFS.LABEL, PODD.VF.createLiteral(dataReference.getLabel()));
             model.add(dataRefUri, RDFS.COMMENT, PODD.VF.createLiteral(throwable.getMessage()));
         }
-
+        
         return model;
     }
-
+    
     public Map<DataReference, Throwable> getValidationFailures()
     {
         return this.validationFailures;
     }
-
+    
 }

@@ -56,7 +56,7 @@ import com.github.podd.utils.PoddWebConstants;
  */
 public class UserRolesResourceImplTest extends AbstractResourceImplTest
 {
-
+    
     /**
      * Tests editing of a PODD User's Roles.
      */
@@ -65,7 +65,7 @@ public class UserRolesResourceImplTest extends AbstractResourceImplTest
     {
         final MediaType mediaType = MediaType.APPLICATION_RDF_XML;
         final RDFFormat format = Rio.getWriterFormatForMIMEType(mediaType.getName(), RDFFormat.RDFXML);
-
+        
         // prepare: add a Test User account
         final String testIdentifier = "testuser@podd.com";
         final List<Map.Entry<URI, URI>> roles = new LinkedList<Map.Entry<URI, URI>>();
@@ -83,10 +83,10 @@ public class UserRolesResourceImplTest extends AbstractResourceImplTest
         this.loadTestUser(testIdentifier, "testuserpassword", "John", "Doe", testIdentifier,
                 "http:///www.john.doe.com", "CSIRO", "john-orcid", "Mr", "000333434", "Some Address", "Researcher",
                 roles, PoddUserStatus.ACTIVE);
-
+        
         // prepare: modify Test User's Roles
         final Model newModel = new LinkedHashModel();
-
+        
         // prepare: additional Project Observer Role for Project
         // "cotton-leaf-23567"
         final URI testProject1Uri = PODD.VF.createURI("urn:podd:project-cotton-leaf-23567");
@@ -96,14 +96,14 @@ public class UserRolesResourceImplTest extends AbstractResourceImplTest
         newModel.add(roleMapping1Uri, PODD.PODD_ROLEMAPPEDOBJECT, testProject1Uri);
         // NOTE: no need to specify ROLE_MAPPED_USER as User is identified from
         // the request
-
+        
         // prepare: additional Project Observer Role for Project "tea-leaf-99"
         final URI testProject2Uri = PODD.VF.createURI("urn:podd:project-tea-leaf-99");
         final URI roleMapping2Uri = PODD.VF.createURI("urn:podd:rolemapping2:", UUID.randomUUID().toString());
         newModel.add(roleMapping2Uri, RDF.TYPE, SesameRealmConstants.OAS_ROLEMAPPING);
         newModel.add(roleMapping2Uri, SesameRealmConstants.OAS_ROLEMAPPEDROLE, PoddRoles.PROJECT_OBSERVER.getURI());
         newModel.add(roleMapping2Uri, PODD.PODD_ROLEMAPPEDOBJECT, testProject2Uri);
-
+        
         // submit modified details to User Roles Service
         final ClientResource userRolesClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_ROLES));
@@ -119,14 +119,14 @@ public class UserRolesResourceImplTest extends AbstractResourceImplTest
             final Model model = this.assertRdf(modifiedResults, RDFFormat.RDFXML, 1);
             Assert.assertEquals("Unexpected user identifier", testIdentifier,
                     model.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).objectString());
-
+            
             // verify: Test User Roles have been correctly updated
             final ClientResource userDetailsClientResource =
                     new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_DETAILS));
             try
             {
                 userDetailsClientResource.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, testIdentifier);
-
+                
                 final Representation updatedResults =
                         this.doTestAuthenticatedRequest(userDetailsClientResource, Method.GET, null, mediaType,
                                 Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
@@ -135,10 +135,10 @@ public class UserRolesResourceImplTest extends AbstractResourceImplTest
                         resultsModel.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).objectString());
                 Assert.assertEquals("Status was not ACTIVE", PoddUserStatus.ACTIVE.getURI(),
                         resultsModel.filter(null, PODD.PODD_USER_STATUS, null).objectURI());
-
+                
                 final Collection<Value> objects = resultsModel.filter(null, PODD.PODD_ROLEMAPPEDOBJECT, null).objects();
                 Assert.assertEquals("Incorrect no. of Project Roles", 7, objects.size());
-
+                
                 final Collection<Resource> subjects =
                         resultsModel.filter(null, SesameRealmConstants.OAS_ROLEMAPPEDROLE,
                                 PoddRoles.PROJECT_OBSERVER.getURI()).subjects();
@@ -154,7 +154,7 @@ public class UserRolesResourceImplTest extends AbstractResourceImplTest
             this.releaseClient(userRolesClientResource);
         }
     }
-
+    
     /**
      * Tests deleting a PODD User's Roles.
      */
@@ -163,7 +163,7 @@ public class UserRolesResourceImplTest extends AbstractResourceImplTest
     {
         final MediaType mediaType = MediaType.APPLICATION_RDF_XML;
         final RDFFormat format = Rio.getWriterFormatForMIMEType(mediaType.getName(), RDFFormat.RDFXML);
-
+        
         // prepare: add a Test User account
         final URI testProject1Uri = PODD.VF.createURI("urn:podd:coconut-leaf-study");
         final URI testProject2Uri = PODD.VF.createURI("urn:podd:banana-leaf-study");
@@ -181,7 +181,7 @@ public class UserRolesResourceImplTest extends AbstractResourceImplTest
         this.loadTestUser(testIdentifier, "testuserpassword", "John", "Doe", testIdentifier,
                 "http:///www.john.doe.com", "CSIRO", "john-orcid", "Mr", "000333434", "Some Address", "Researcher",
                 roles, PoddUserStatus.ACTIVE);
-
+        
         // prepare: Project Observer Role for Project
         // "urn:podd:coconut-leaf-study" is to be deleted
         final URI roleMapping1Uri = PODD.VF.createURI("urn:podd:rolemapping1:", UUID.randomUUID().toString());
@@ -191,7 +191,7 @@ public class UserRolesResourceImplTest extends AbstractResourceImplTest
         newModel.add(roleMapping1Uri, PODD.PODD_ROLEMAPPEDOBJECT, testProject1Uri);
         // NOTE: no need to specify ROLE_MAPPED_USER as User is identified from
         // the request
-
+        
         // submit details of Role to delete to User Roles Service
         final ClientResource userRolesClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_ROLES));
@@ -208,14 +208,14 @@ public class UserRolesResourceImplTest extends AbstractResourceImplTest
             final Model model = this.assertRdf(modifiedResults, RDFFormat.RDFXML, 1);
             Assert.assertEquals("Unexpected user identifier", testIdentifier,
                     model.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).objectString());
-
+            
             // verify: The Role has been correctly deleted
             final ClientResource userDetailsClientResource =
                     new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_DETAILS));
             try
             {
                 userDetailsClientResource.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, testIdentifier);
-
+                
                 final Representation updatedResults =
                         this.doTestAuthenticatedRequest(userDetailsClientResource, Method.GET, null, mediaType,
                                 Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
@@ -224,12 +224,12 @@ public class UserRolesResourceImplTest extends AbstractResourceImplTest
                         resultsModel.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).objectString());
                 Assert.assertEquals("Status was not ACTIVE", PoddUserStatus.ACTIVE.getURI(),
                         resultsModel.filter(null, PODD.PODD_USER_STATUS, null).objectURI());
-
+                
                 final Set<Resource> observerMappings =
                         resultsModel.filter(null, SesameRealmConstants.OAS_ROLEMAPPEDROLE,
                                 PoddRoles.PROJECT_OBSERVER.getURI()).subjects();
                 Assert.assertEquals("Expected only 1 Project_Observer mapping", 1, observerMappings.size());
-
+                
                 final Resource mapping = (Resource)observerMappings.toArray()[0];
                 Assert.assertEquals("Project_Observer Role is not for expected Project", testProject2Uri, resultsModel
                         .filter(mapping, PODD.PODD_ROLEMAPPEDOBJECT, null).objectURI());
@@ -244,7 +244,7 @@ public class UserRolesResourceImplTest extends AbstractResourceImplTest
             this.releaseClient(userRolesClientResource);
         }
     }
-
+    
     /**
      * Tests failure to add a PODD User's Roles.
      *
@@ -257,7 +257,7 @@ public class UserRolesResourceImplTest extends AbstractResourceImplTest
     {
         final MediaType mediaType = MediaType.APPLICATION_RDF_XML;
         final RDFFormat format = Rio.getWriterFormatForMIMEType(mediaType.getName(), RDFFormat.RDFXML);
-
+        
         // prepare: add a Test User account
         final String testIdentifier = "testuser@podd.com";
         final List<Map.Entry<URI, URI>> roles = new LinkedList<Map.Entry<URI, URI>>();
@@ -265,10 +265,10 @@ public class UserRolesResourceImplTest extends AbstractResourceImplTest
         this.loadTestUser(testIdentifier, "testuserpassword", "John", "Doe", testIdentifier,
                 "http:///www.john.doe.com", "CSIRO", "john-orcid", "Mr", "000333434", "Some Address", "Researcher",
                 roles, PoddUserStatus.ACTIVE);
-
+        
         // prepare: modify Test User's Roles
         final Model newModel = new LinkedHashModel();
-
+        
         // prepare: additional Project Observer Role for TEST_ARTIFACT Project
         final URI roleMapping1Uri = PODD.VF.createURI("urn:podd:rolemapping1:", UUID.randomUUID().toString());
         newModel.add(roleMapping1Uri, RDF.TYPE, SesameRealmConstants.OAS_ROLEMAPPING);
@@ -276,23 +276,23 @@ public class UserRolesResourceImplTest extends AbstractResourceImplTest
         newModel.add(roleMapping1Uri, PODD.PODD_ROLEMAPPEDOBJECT, PODD.TEST_ARTIFACT);
         // NOTE: no need to specify ROLE_MAPPED_USER as User is identified from
         // the request
-
+        
         // prepare: additional Repository Admin Role (which should fail)
         final URI roleMapping2Uri = PODD.VF.createURI("urn:podd:rolemapping2:", UUID.randomUUID().toString());
         newModel.add(roleMapping2Uri, RDF.TYPE, SesameRealmConstants.OAS_ROLEMAPPING);
         newModel.add(roleMapping2Uri, SesameRealmConstants.OAS_ROLEMAPPEDROLE, PoddRoles.ADMIN.getURI());
-
+        
         // submit modified details to User Roles Service
         final ClientResource userRolesClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_ROLES));
         try
         {
             userRolesClientResource.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, testIdentifier);
-
+            
             final ByteArrayOutputStream out = new ByteArrayOutputStream();
             Rio.write(newModel, out, format);
             final Representation input = new StringRepresentation(out.toString(), mediaType);
-
+            
             try
             {
                 this.doTestAuthenticatedRequest(userRolesClientResource, Method.POST, input, mediaType,
@@ -303,14 +303,14 @@ public class UserRolesResourceImplTest extends AbstractResourceImplTest
             {
                 Assert.assertEquals(Status.CLIENT_ERROR_UNAUTHORIZED, e.getStatus());
             }
-
+            
             // verify: No changes to mapped Roles
             final ClientResource userDetailsClientResource =
                     new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_DETAILS));
             try
             {
                 userDetailsClientResource.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, testIdentifier);
-
+                
                 final Representation updatedResults =
                         this.doTestAuthenticatedRequest(userDetailsClientResource, Method.GET, null, mediaType,
                                 Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
@@ -319,12 +319,12 @@ public class UserRolesResourceImplTest extends AbstractResourceImplTest
                         resultsModel.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).objectString());
                 Assert.assertEquals("Status was not ACTIVE", PoddUserStatus.ACTIVE.getURI(),
                         resultsModel.filter(null, PODD.PODD_USER_STATUS, null).objectURI());
-
+                
                 // verify: 1 Roles mapped
                 final Collection<Resource> roleMappings =
                         resultsModel.filter(null, RDF.TYPE, SesameRealmConstants.OAS_ROLEMAPPING).subjects();
                 Assert.assertEquals("Incorrect no. of Project Roles", 1, roleMappings.size());
-
+                
                 // verify: Project Creator Role still exists
                 final Collection<Resource> subjects =
                         resultsModel.filter(null, SesameRealmConstants.OAS_ROLEMAPPEDROLE,
@@ -341,7 +341,7 @@ public class UserRolesResourceImplTest extends AbstractResourceImplTest
             this.releaseClient(userRolesClientResource);
         }
     }
-
+    
     /**
      * Tests failure to remove a PODD User's Roles.
      *
@@ -353,7 +353,7 @@ public class UserRolesResourceImplTest extends AbstractResourceImplTest
     {
         final MediaType mediaType = MediaType.APPLICATION_RDF_XML;
         final RDFFormat format = Rio.getWriterFormatForMIMEType(mediaType.getName(), RDFFormat.RDFXML);
-
+        
         // prepare: add a Test User account
         final URI testProject1Uri = PODD.VF.createURI("urn:podd:coconut-leaf-study");
         final String testIdentifier = "testuser@podd.com";
@@ -363,24 +363,24 @@ public class UserRolesResourceImplTest extends AbstractResourceImplTest
         this.loadTestUser(testIdentifier, "testuserpassword", "John", "Doe", testIdentifier,
                 "http:///www.john.doe.com", "CSIRO", "john-orcid", "Mr", "000333434", "Some Address", "Researcher",
                 roles, PoddUserStatus.ACTIVE);
-
+        
         // prepare: Project Observer Role for TEST_ARTIFACT is to be deleted
         final URI roleMapping1Uri = PODD.VF.createURI("urn:podd:rolemapping1:", UUID.randomUUID().toString());
         final Model newModel = new LinkedHashModel();
         newModel.add(roleMapping1Uri, RDF.TYPE, SesameRealmConstants.OAS_ROLEMAPPING);
         newModel.add(roleMapping1Uri, SesameRealmConstants.OAS_ROLEMAPPEDROLE, PoddRoles.PROJECT_OBSERVER.getURI());
         newModel.add(roleMapping1Uri, PODD.PODD_ROLEMAPPEDOBJECT, PODD.TEST_ARTIFACT);
-
+        
         // prepare: Project Observer Role for testProject1 is to be deleted
         final URI roleMapping2Uri = PODD.VF.createURI("urn:podd:rolemapping2:", UUID.randomUUID().toString());
         newModel.add(roleMapping2Uri, RDF.TYPE, SesameRealmConstants.OAS_ROLEMAPPING);
         newModel.add(roleMapping2Uri, SesameRealmConstants.OAS_ROLEMAPPEDROLE, PoddRoles.PROJECT_OBSERVER.getURI());
         newModel.add(roleMapping2Uri, PODD.PODD_ROLEMAPPEDOBJECT, testProject1Uri);
-
+        
         final ByteArrayOutputStream out = new ByteArrayOutputStream();
         Rio.write(newModel, out, format);
         final Representation input = new StringRepresentation(out.toString(), mediaType);
-
+        
         // submit details of Role to delete to User Roles Service
         final ClientResource userRolesClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_ROLES));
@@ -388,7 +388,7 @@ public class UserRolesResourceImplTest extends AbstractResourceImplTest
         {
             userRolesClientResource.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, testIdentifier);
             userRolesClientResource.addQueryParameter(PoddWebConstants.KEY_DELETE, "true");
-
+            
             this.doTestAuthenticatedRequest(userRolesClientResource, Method.POST, input, mediaType,
                     Status.CLIENT_ERROR_UNAUTHORIZED, AbstractResourceImplTest.NO_ADMIN);
             Assert.fail("Should have failed authorization");
@@ -401,14 +401,14 @@ public class UserRolesResourceImplTest extends AbstractResourceImplTest
         {
             this.releaseClient(userRolesClientResource);
         }
-
+        
         // verify: No change to Roles
         final ClientResource userDetailsClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_DETAILS));
         try
         {
             userDetailsClientResource.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, testIdentifier);
-
+            
             final Representation updatedResults =
                     this.doTestAuthenticatedRequest(userDetailsClientResource, Method.GET, null, mediaType,
                             Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
@@ -417,7 +417,7 @@ public class UserRolesResourceImplTest extends AbstractResourceImplTest
                     resultsModel.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).objectString());
             Assert.assertEquals("Status was not ACTIVE", PoddUserStatus.ACTIVE.getURI(),
                     resultsModel.filter(null, PODD.PODD_USER_STATUS, null).objectURI());
-
+            
             final Set<Resource> observerMappings =
                     resultsModel.filter(null, SesameRealmConstants.OAS_ROLEMAPPEDROLE,
                             PoddRoles.PROJECT_OBSERVER.getURI()).subjects();
@@ -428,19 +428,19 @@ public class UserRolesResourceImplTest extends AbstractResourceImplTest
             this.releaseClient(userDetailsClientResource);
         }
     }
-
+    
     @Test
     public void testUserRolesPageHtmlNoIdentifier() throws Exception
     {
         final ClientResource userRolesClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_ROLES));
-
+        
         try
         {
             final Representation results =
                     this.doTestAuthenticatedRequest(userRolesClientResource, Method.GET, null, MediaType.TEXT_HTML,
                             Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
-
+            
             final String body = results.getText();
             // System.out.println(body);
             this.assertFreemarker(body);
@@ -450,13 +450,13 @@ public class UserRolesResourceImplTest extends AbstractResourceImplTest
             this.releaseClient(userRolesClientResource);
         }
     }
-
+    
     @Test
     public void testUserRolesPageHtmlWithIdentifier() throws Exception
     {
         final InferredOWLOntologyID artifactID =
                 this.loadTestArtifact(TestConstants.TEST_ARTIFACT_20130206, MediaType.APPLICATION_RDF_TURTLE);
-
+        
         // prepare: add a Test User account
         final String testIdentifier = "testuser@podd.com";
         final List<Map.Entry<URI, URI>> roles = new LinkedList<Map.Entry<URI, URI>>();
@@ -470,21 +470,21 @@ public class UserRolesResourceImplTest extends AbstractResourceImplTest
         this.loadTestUser(testIdentifier, "testuserpassword", "John", "Doe", testIdentifier,
                 "http:///www.john.doe.com", "CSIRO", "john-orcid", "Mr", "000333434", "Some Address", "Researcher",
                 roles, PoddUserStatus.ACTIVE);
-
+        
         final ClientResource userRolesClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_ROLES));
         try
         {
             userRolesClientResource.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, testIdentifier);
-
+            
             final Representation results =
                     this.doTestAuthenticatedRequest(userRolesClientResource, Method.GET, null, MediaType.TEXT_HTML,
                             Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
-
+            
             final String body = results.getText();
             // System.out.println(body);
             this.assertFreemarker(body);
-
+            
             // Assert.assertTrue("Page missing User identifier",
             // body.contains(testIdentifier));
             // Assert.assertTrue("Page missing old password",
@@ -501,5 +501,5 @@ public class UserRolesResourceImplTest extends AbstractResourceImplTest
             this.releaseClient(userRolesClientResource);
         }
     }
-
+    
 }

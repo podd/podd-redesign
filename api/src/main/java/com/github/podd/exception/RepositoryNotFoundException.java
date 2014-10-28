@@ -19,24 +19,24 @@ package com.github.podd.exception;
 /**
  * This is thrown when a repository could not be found because it does not currently exist, in the
  * context of the desired set of schema ontology versions.
- * 
+ *
  * @author Peter Ansell p_ansell@yahoo.com
  */
 public class RepositoryNotFoundException extends PoddException
 {
     private static final long serialVersionUID = 6232763891340384581L;
-
-    public RepositoryNotFoundException(String msg)
+    
+    public RepositoryNotFoundException(final String msg)
     {
         super(msg);
     }
     
-    public RepositoryNotFoundException(String msg, Throwable throwable)
+    public RepositoryNotFoundException(final String msg, final Throwable throwable)
     {
         super(msg, throwable);
     }
     
-    public RepositoryNotFoundException(Throwable throwable)
+    public RepositoryNotFoundException(final Throwable throwable)
     {
         super(throwable);
     }

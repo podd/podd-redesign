@@ -40,10 +40,10 @@ import org.restlet.resource.ResourceException;
 @Ignore
 public class ExampleResourceImplTest extends AbstractResourceImplTest
 {
-
+    
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see net.maenad.oas.webservice.impl.test.AbstractResourceImplTest#setUp()
      */
     @Override
@@ -52,10 +52,10 @@ public class ExampleResourceImplTest extends AbstractResourceImplTest
     {
         super.setUp();
     }
-
+    
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see net.maenad.oas.webservice.impl.test.AbstractResourceImplTest#tearDown()
      */
     @Override
@@ -64,7 +64,7 @@ public class ExampleResourceImplTest extends AbstractResourceImplTest
     {
         super.tearDown();
     }
-
+    
     /**
      * Tests that no error occurs when trying to post a valid form with authentication with all
      * fields filled.
@@ -73,7 +73,7 @@ public class ExampleResourceImplTest extends AbstractResourceImplTest
     public void testCreateUserPutValidAuthenticatedFull() throws Exception
     {
         final ClientResource creationClientResource = new ClientResource(this.getUrl("/user/create"));
-
+        
         final FormDataSet form = new FormDataSet();
         form.setMultipart(false);
         form.setMediaType(MediaType.APPLICATION_WWW_FORM);
@@ -82,13 +82,13 @@ public class ExampleResourceImplTest extends AbstractResourceImplTest
         form.getEntries().add(new FormData("email", "test@email.com"));
         form.getEntries().add(new FormData("lastName", "Usersmith"));
         form.getEntries().add(new FormData("firstName", "Mister"));
-
+        
         final Representation results =
                 this.doTestAuthenticatedRequest(creationClientResource, Method.PUT, form, MediaType.TEXT_HTML,
                         Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
-
+        
     }
-
+    
     /**
      * Tests that no error occurs when trying to post a valid form with authentication with only
      * required fields filled.
@@ -97,20 +97,20 @@ public class ExampleResourceImplTest extends AbstractResourceImplTest
     public void testCreateUserPutValidAuthenticatedMinimal() throws Exception
     {
         final ClientResource creationClientResource = new ClientResource(this.getUrl("/user/create"));
-
+        
         final FormDataSet form = new FormDataSet();
         form.setMultipart(false);
         form.setMediaType(MediaType.APPLICATION_WWW_FORM);
         form.getEntries().add(new FormData("username", "testNewUser"));
         form.getEntries().add(new FormData("password", "testNewPassword"));
         form.getEntries().add(new FormData("email", "test@email.com"));
-
+        
         final Representation results =
                 this.doTestAuthenticatedRequest(creationClientResource, Method.PUT, form, MediaType.TEXT_HTML,
                         Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
-
+        
     }
-
+    
     /**
      * Tests that an error occurs when trying to create a user without submitting a form
      */
@@ -120,11 +120,11 @@ public class ExampleResourceImplTest extends AbstractResourceImplTest
         try
         {
             final ClientResource creationClientResource = new ClientResource(this.getUrl("/user/create"));
-
+            
             final Representation results =
                     this.doTestAuthenticatedRequest(creationClientResource, Method.PUT, null,
                             MediaType.MULTIPART_FORM_DATA, Status.SUCCESS_CREATED, AbstractResourceImplTest.WITH_ADMIN);
-
+            
             Assert.fail("Did not receive expected exception");
         }
         catch(final ResourceException rex)
@@ -132,7 +132,7 @@ public class ExampleResourceImplTest extends AbstractResourceImplTest
             Assert.assertEquals(Status.CLIENT_ERROR_BAD_REQUEST, rex.getStatus());
         }
     }
-
+    
     /**
      * Tests that an error occurs when trying to get the create user resource while unauthenticated.
      */
@@ -142,15 +142,15 @@ public class ExampleResourceImplTest extends AbstractResourceImplTest
         try
         {
             final ClientResource creationClientResource = new ClientResource(this.getUrl("/user/create"));
-
+            
             final FormDataSet form = new FormDataSet();
             form.setMultipart(true);
             form.getEntries().add(new FormData("username", "testNewUser"));
             form.getEntries().add(new FormData("password", "testNewPassword"));
             form.getEntries().add(new FormData("email", "test@email.com"));
-
+            
             creationClientResource.put(form);
-
+            
             Assert.fail("Did not receive expected exception");
         }
         catch(final ResourceException rex)
@@ -158,7 +158,7 @@ public class ExampleResourceImplTest extends AbstractResourceImplTest
             Assert.assertEquals(Status.CLIENT_ERROR_UNAUTHORIZED, rex.getStatus());
         }
     }
-
+    
     /**
      * Tests that an error occurs when trying to get the create user resource while authenticated
      * but without the admin role.
@@ -169,17 +169,17 @@ public class ExampleResourceImplTest extends AbstractResourceImplTest
         try
         {
             final ClientResource creationClientResource = new ClientResource(this.getUrl("/user/create"));
-
+            
             final FormDataSet form = new FormDataSet();
             form.setMultipart(true);
             form.getEntries().add(new FormData("username", "testNewUser"));
             form.getEntries().add(new FormData("password", "testNewPassword"));
             form.getEntries().add(new FormData("email", "test@email.com"));
-
+            
             final Representation results =
                     this.doTestAuthenticatedRequest(creationClientResource, Method.PUT, null, MediaType.TEXT_HTML,
                             Status.CLIENT_ERROR_UNAUTHORIZED, AbstractResourceImplTest.NO_ADMIN);
-
+            
             Assert.fail("Did not receive expected exception");
         }
         catch(final ResourceException rex)
@@ -187,7 +187,7 @@ public class ExampleResourceImplTest extends AbstractResourceImplTest
             Assert.assertEquals(Status.CLIENT_ERROR_UNAUTHORIZED, rex.getStatus());
         }
     }
-
+    
     /**
      * Tests that no error occurs when trying to get the get user resource while authenticated with
      * the admin role.
@@ -196,13 +196,13 @@ public class ExampleResourceImplTest extends AbstractResourceImplTest
     public void testGetUserBasicAuthorised() throws Exception
     {
         final ClientResource creationClientResource = new ClientResource(this.getUrl("/user/create"));
-
+        
         final Representation results =
                 this.doTestAuthenticatedRequest(creationClientResource, Method.GET, null, MediaType.TEXT_HTML,
                         Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
-
+        
     }
-
+    
     /**
      * Tests that no error occurs when trying to get the get user resource while authenticated with
      * the admin role.
@@ -211,11 +211,11 @@ public class ExampleResourceImplTest extends AbstractResourceImplTest
     public void testGetUserBasicAuthorisedNonAdmin() throws Exception
     {
         final ClientResource creationClientResource = new ClientResource(this.getUrl("/user"));
-
+        
         final Representation results =
                 this.doTestAuthenticatedRequest(creationClientResource, Method.GET, null, MediaType.TEXT_HTML,
                         Status.SUCCESS_OK, AbstractResourceImplTest.NO_ADMIN);
-
+        
     }
-
+    
 }

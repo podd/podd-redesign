@@ -29,18 +29,18 @@ import org.slf4j.LoggerFactory;
 public final class OntologyImportsComparator implements Comparator<URI>
 {
     private static final Logger log = LoggerFactory.getLogger(OntologyImportsComparator.class);
-
+    
     private static final int BEFORE = -1;
     private static final int EQUALS = 0;
     private static final int AFTER = 1;
-
+    
     private final ConcurrentMap<URI, Set<URI>> importsMap;
-
+    
     OntologyImportsComparator(final ConcurrentMap<URI, Set<URI>> importsMap)
     {
         this.importsMap = importsMap;
     }
-
+    
     @Override
     public int compare(final URI o1, final URI o2)
     {
@@ -48,20 +48,20 @@ public final class OntologyImportsComparator implements Comparator<URI>
         {
             return OntologyImportsComparator.EQUALS;
         }
-
+        
         Set<URI> set1 = this.importsMap.get(o1);
         Set<URI> set2 = this.importsMap.get(o2);
-
+        
         if(set1 == null)
         {
             set1 = Collections.emptySet();
         }
-
+        
         if(set2 == null)
         {
             set2 = Collections.emptySet();
         }
-
+        
         if(set1.contains(o2) && set2.contains(o1))
         {
             OntologyImportsComparator.log.error("Ontologies have mutual imports: {} {}", o1, o2);
@@ -119,7 +119,7 @@ public final class OntologyImportsComparator implements Comparator<URI>
                     }
                 }
             }
-
+            
             if(tempSet1.size() > tempSet2.size())
             {
                 return OntologyImportsComparator.AFTER;
@@ -128,7 +128,7 @@ public final class OntologyImportsComparator implements Comparator<URI>
             {
                 return OntologyImportsComparator.BEFORE;
             }
-
+            
             for(final URI nextImport1 : tempSet1)
             {
                 final int compare = this.compare(nextImport1, o2);
@@ -137,7 +137,7 @@ public final class OntologyImportsComparator implements Comparator<URI>
                     return compare;
                 }
             }
-
+            
             for(final URI nextImport2 : tempSet2)
             {
                 final int compare = this.compare(o1, nextImport2);
@@ -146,7 +146,7 @@ public final class OntologyImportsComparator implements Comparator<URI>
                     return compare;
                 }
             }
-
+            
             // Default to lexical mapping, as there is no direct semantic link between
             // them
             // at this point

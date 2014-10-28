@@ -36,7 +36,7 @@ import com.github.podd.utils.PoddUser;
  */
 public interface PoddUserManager
 {
-
+    
     /**
      * Adds a new user to the PODD system.
      *
@@ -47,7 +47,7 @@ public interface PoddUserManager
      *             If a user already exists with the provided email address
      */
     void addPoddUser(PoddUser user) throws InvalidUserDetailsException, UserAlreadyExistsException;
-
+    
     /**
      * Retrieve the <code>PoddUser</code> with the given email address.
      *
@@ -55,7 +55,7 @@ public interface PoddUserManager
      * @return The <code>PoddUser</code> if such a user exists, NULL otherwise.
      */
     PoddUser getPoddUserByEmail(String email);
-
+    
     /**
      * Retrieve the <code>PoddUser</code> with the given URI.
      *
@@ -63,7 +63,7 @@ public interface PoddUserManager
      * @return The <code>PoddUser</code> if such a user exists, NULL otherwise.
      */
     PoddUser getPoddUserByURI(URI uri);
-
+    
     /**
      * Retrieves records of all current users registered with this instance of PODD.
      *
@@ -71,7 +71,7 @@ public interface PoddUserManager
      *         exist.
      */
     List<PoddUser> listAllPoddUsers();
-
+    
     /**
      * Updates details of an existing <code>PoddUser</code>.
      *
@@ -80,5 +80,5 @@ public interface PoddUserManager
      *             If the user was not found in the current set of PODD users.
      */
     void updatePoddUser(PoddUser user) throws UserNotFoundException;
-
+    
 }

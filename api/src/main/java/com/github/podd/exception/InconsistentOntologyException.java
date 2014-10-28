@@ -44,7 +44,7 @@ public class InconsistentOntologyException extends PoddException
     private final Set<Set<OWLAxiom>> explanations;
     private final OWLOntologyID ontologyID;
     private final ExplanationRenderer renderer;
-
+    
     /**
      *
      * @param msg
@@ -58,7 +58,7 @@ public class InconsistentOntologyException extends PoddException
         this.ontologyID = ontologyID;
         this.renderer = explanationRenderer;
     }
-
+    
     /**
      * @param msg
      *            The message for this exception.
@@ -74,7 +74,7 @@ public class InconsistentOntologyException extends PoddException
         this.ontologyID = ontologyID;
         this.renderer = explanationRenderer;
     }
-
+    
     /**
      * @param reasoner
      *            The OWL Reasoner instance containing the details about why the ontology was
@@ -90,33 +90,33 @@ public class InconsistentOntologyException extends PoddException
         this.ontologyID = ontologyID;
         this.renderer = explanationRenderer;
     }
-
+    
     @Override
     public Model getDetailsAsModel(final Resource errorResource)
     {
         final Model model = super.getDetailsAsModel(errorResource);
-
+        
         if(this.explanations != null)
         {
             final BNode reasonerUri = PODD.VF.createBNode();
             model.add(errorResource, PODD.ERR_IDENTIFIER, reasonerUri);
             model.add(reasonerUri, RDFS.LABEL,
                     PODD.VF.createLiteral("Explanations for inconsistencies (" + this.explanations.size() + ")"));
-
+            
             model.add(errorResource, PODD.ERR_SOURCE, this.ontologyID.getOntologyIRI().toOpenRDFURI());
-
+            
             String explanation;
-
+            
             try
             {
                 final StringWriter results = new StringWriter();
-
+                
                 this.renderer.startRendering(results);
-
+                
                 this.renderer.render((OWLAxiom)null, this.explanations);
-
+                
                 this.renderer.endRendering();
-
+                
                 explanation = results.toString();
             }
             catch(IOException | OWLException e)
@@ -129,10 +129,10 @@ public class InconsistentOntologyException extends PoddException
             model.add(v, RDFS.LABEL, PODD.VF.createLiteral(this.getMessage()));
             model.add(v, RDFS.COMMENT, PODD.VF.createLiteral(explanation));
         }
-
+        
         return model;
     }
-
+    
     public OWLOntologyID getOntologyID()
     {
         return this.ontologyID;

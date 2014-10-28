@@ -27,7 +27,7 @@ package com.github.podd.exception;
 public abstract class UnmanagedSchemaException extends PoddException
 {
     private static final long serialVersionUID = -2744644897176990922L;
-
+    
     /**
      * @param msg
      */
@@ -35,7 +35,7 @@ public abstract class UnmanagedSchemaException extends PoddException
     {
         super(msg);
     }
-
+    
     /**
      * @param msg
      * @param throwable
@@ -44,7 +44,7 @@ public abstract class UnmanagedSchemaException extends PoddException
     {
         super(msg, throwable);
     }
-
+    
     /**
      * @param throwable
      */
@@ -52,5 +52,5 @@ public abstract class UnmanagedSchemaException extends PoddException
     {
         super(throwable);
     }
-
+    
 }

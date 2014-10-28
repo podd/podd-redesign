@@ -32,7 +32,7 @@ import com.github.podd.utils.PoddWebConstants;
  */
 public class UserSearchResourceImplTest extends AbstractResourceImplTest
 {
-
+    
     @Test
     public void testSearchUsersRdf() throws Exception
     {
@@ -45,22 +45,22 @@ public class UserSearchResourceImplTest extends AbstractResourceImplTest
         this.loadTestUser(testIdentifier, "testuserpassword", "John", "Doe", testIdentifier,
                 "http:///www.john.doe.com", "CSIRO", "john-orcid", "Mr", "000333434", "Some Address", "Researcher",
                 roles, PoddUserStatus.ACTIVE);
-
+        
         final MediaType mediaType = MediaType.APPLICATION_RDF_XML;
         final RDFFormat format = Rio.getWriterFormatForMIMEType(mediaType.getName(), RDFFormat.RDFXML);
-
+        
         final ClientResource userSearchClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_SEARCH));
         try
         {
             userSearchClientResource.addQueryParameter(PoddWebConstants.KEY_SEARCHTERM, "anoth");
-
+            
             final Representation results =
                     this.doTestAuthenticatedRequest(userSearchClientResource, Method.GET, null, mediaType,
                             Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
-
+            
             final Model resultsModel = this.assertRdf(results, format, 2);
-
+            
             // verify:
             Assert.assertEquals("Not the expected User", "Test User, CSIRO", resultsModel
                     .filter(null, RDFS.LABEL, null).objectString());
@@ -70,5 +70,5 @@ public class UserSearchResourceImplTest extends AbstractResourceImplTest
             this.releaseClient(userSearchClientResource);
         }
     }
-
+    
 }

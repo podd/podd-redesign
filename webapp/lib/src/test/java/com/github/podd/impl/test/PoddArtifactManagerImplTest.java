@@ -184,7 +184,7 @@ public class PoddArtifactManagerImplTest extends AbstractPoddArtifactManagerTest
     {
         final String artifactURI = "http://some/artifact:15";
         
-        final PoddArtifactManagerImpl testArtifactManager = getNewArtifactManager();
+        final PoddArtifactManagerImpl testArtifactManager = this.getNewArtifactManager();
         
         // increment the version number
         final String newIncrementedVersion = testArtifactManager.incrementVersion(artifactURI + ":version:1");

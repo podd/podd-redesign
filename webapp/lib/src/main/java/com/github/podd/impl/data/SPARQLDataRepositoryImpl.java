@@ -36,12 +36,12 @@ import com.github.podd.utils.PODD;
 public class SPARQLDataRepositoryImpl extends AbstractPoddDataRepositoryImpl<SPARQLDataReference>
 {
     protected final Logger log = LoggerFactory.getLogger(this.getClass());
-
+    
     public SPARQLDataRepositoryImpl(final Resource nextDataRepository, final Model model)
-            throws DataRepositoryIncompleteException
+        throws DataRepositoryIncompleteException
     {
         super(nextDataRepository, model);
-
+        
         // check that the model contains values for protocol, host, port,
         // fingerprint, username, and
         // secret
@@ -49,18 +49,18 @@ public class SPARQLDataRepositoryImpl extends AbstractPoddDataRepositoryImpl<SPA
         final String host = model.filter(super.aliasUri, PODD.PODD_DATA_REPOSITORY_HOST, null).objectString();
         final String port = model.filter(super.aliasUri, PODD.PODD_DATA_REPOSITORY_PORT, null).objectString();
         final String path = model.filter(super.aliasUri, PODD.PODD_DATA_REPOSITORY_PATH, null).objectString();
-
+        
         if(protocol == null || host == null || port == null || path == null)
         {
             throw new DataRepositoryIncompleteException("SPARQL repository configuration incomplete");
         }
-
+        
         if(!PoddDataRepository.PROTOCOL_HTTP.equalsIgnoreCase(protocol))
         {
             throw new DataRepositoryIncompleteException("Protocol needs to be HTTP for SPARQL Repository");
         }
     }
-
+    
     @Override
     public boolean canHandle(final SPARQLDataReference reference)
     {
@@ -68,35 +68,35 @@ public class SPARQLDataRepositoryImpl extends AbstractPoddDataRepositoryImpl<SPA
         {
             return false;
         }
-
+        
         // unnecessary as Generics ensure only an SPARQLDataReference can be
         // passed in
         if(!(reference instanceof SPARQLDataReference))
         {
             return false;
         }
-
+        
         final String aliasFromFileRef = reference.getRepositoryAlias();
         if(aliasFromFileRef == null || !this.alias.equalsIgnoreCase(aliasFromFileRef))
         {
             return false;
         }
-
+        
         return true;
     }
-
+    
     @Override
     public boolean validate(final SPARQLDataReference dataReference) throws DataReferenceNotSupportedException,
-    IOException
+        IOException
     {
         if(!this.canHandle(dataReference))
         {
             throw new DataReferenceNotSupportedException(dataReference, "cannot handle file reference for validation");
         }
-
+        
         final String host = this.model.filter(super.aliasUri, PODD.PODD_DATA_REPOSITORY_HOST, null).objectString();
         final String port = this.model.filter(super.aliasUri, PODD.PODD_DATA_REPOSITORY_PORT, null).objectString();
-
+        
         int portNo = -1;
         try
         {
@@ -106,14 +106,14 @@ public class SPARQLDataRepositoryImpl extends AbstractPoddDataRepositoryImpl<SPA
         {
             throw new IOException("Port number could not be parsed correctly: " + port);
         }
-
+        
         final String graph = dataReference.getGraph();
-
+        
         this.log.info("Validating file reference: " + host + ":" + port + " GRAPH<" + graph + ">");
-
+        
         // FIXME: Implement validation that the graph exists
-
+        
         return true;
     }
-
+    
 }

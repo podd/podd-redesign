@@ -47,7 +47,7 @@ public interface DataReferenceProcessor<T extends DataReference> extends PoddRdf
      *         possible, or if a NULL value is passed in.
      */
     boolean canHandle(Model rdfStatements);
-
+    
     /**
      * Extracts from the given Model, file references of the types supported by this processor.
      *
@@ -56,7 +56,7 @@ public interface DataReferenceProcessor<T extends DataReference> extends PoddRdf
      * @return A Collection of File References that were extracted from the given Model.
      */
     Collection<T> createReferences(Model rdfStatements);
-
+    
     /**
      *
      * @return A Set of File Reference types that this Processor can handle.

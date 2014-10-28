@@ -29,13 +29,13 @@ import com.github.podd.api.PoddProcessorStage;
  */
 public class PoddProcessorStageTest
 {
-
+    
     @Test
     public void testPoddProcessorStage() throws Exception
     {
         final PoddProcessorStage[] allStatuses = PoddProcessorStage.values();
         Assert.assertEquals("Not the expected number of PODD Processor Stages", 7, allStatuses.length);
-
+        
         // check each of the available statuses
         Assert.assertNotNull(PoddProcessorStage.valueOf("RDF_PARSING"));
         Assert.assertNotNull(PoddProcessorStage.valueOf("OWL_AXIOM"));
@@ -44,7 +44,7 @@ public class PoddProcessorStageTest
         Assert.assertNotNull(PoddProcessorStage.valueOf("CONCRETE_AXIOM_STORAGE"));
         Assert.assertNotNull(PoddProcessorStage.valueOf("INFERENCE"));
         Assert.assertNotNull(PoddProcessorStage.valueOf("INFERRED_AXIOM_STORAGE"));
-
+        
         // check a non-existent status
         try
         {

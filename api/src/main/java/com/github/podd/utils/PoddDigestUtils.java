@@ -39,34 +39,34 @@ public class PoddDigestUtils
     public static enum Algorithm
     {
         SHA1("SHA-1", ".sha1"),
-
+        
         MD5("MD5", ".md5");
-
+        
         private final String name;
         private final String extension;
-
+        
         Algorithm(final String name, final String extension)
         {
             this.name = name;
             this.extension = extension;
         }
-
+        
         public String getExtension()
         {
             return this.extension;
         }
-
+        
         public String getName()
         {
             return this.name;
         }
     }
-
+    
     public static ConcurrentMap<Path, ConcurrentMap<Algorithm, String>> getDigests(final Collection<Path> pathsToDigest)
-            throws IOException, NoSuchAlgorithmException
-            {
+        throws IOException, NoSuchAlgorithmException
+    {
         final ConcurrentMap<Path, ConcurrentMap<Algorithm, String>> result = new ConcurrentHashMap<>();
-
+        
         for(final Path nextPath : pathsToDigest)
         {
             try (final InputStream inputStream = Files.newInputStream(nextPath))
@@ -94,8 +94,8 @@ public class PoddDigestUtils
                 nextMap.putIfAbsent(Algorithm.SHA1, shaDigestString);
             }
         }
-
+        
         return result;
-            }
-
+    }
+    
 }

@@ -24,12 +24,12 @@ import com.github.podd.utils.PoddUser;
  */
 public class InvalidUserDetailsException extends PoddException
 {
-
+    
     private static final long serialVersionUID = 6740075721656072394L;
-
+    
     private final PoddUser user;
     private final String[] errorFields;
-
+    
     /**
      *
      * @param user
@@ -45,7 +45,7 @@ public class InvalidUserDetailsException extends PoddException
         this.user = user;
         this.errorFields = errorFields;
     }
-
+    
     /**
      *
      * @param user
@@ -64,7 +64,7 @@ public class InvalidUserDetailsException extends PoddException
         this.user = user;
         this.errorFields = errorFields;
     }
-
+    
     /**
      *
      * @param user
@@ -80,7 +80,7 @@ public class InvalidUserDetailsException extends PoddException
         this.user = user;
         this.errorFields = errorFields;
     }
-
+    
     /**
      * @return The user fields that had errors
      */
@@ -88,7 +88,7 @@ public class InvalidUserDetailsException extends PoddException
     {
         return this.errorFields;
     }
-
+    
     /**
      *
      * @return The <code>PoddUser</code> object that had errors
@@ -97,5 +97,5 @@ public class InvalidUserDetailsException extends PoddException
     {
         return this.user;
     }
-
+    
 }

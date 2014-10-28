@@ -29,16 +29,16 @@ public enum UpdatePolicy
      * Replace previous statements about the subjects that are being updated
      */
     REPLACE_EXISTING,
-
+    
     /**
      * Keep previous statements about the subjects that are being updated
      */
     MERGE_WITH_EXISTING,
-
+    
     /**
      * Replace all previous statements with the given statements
      */
     REPLACE_ALL,
-
+    
     ;
 }

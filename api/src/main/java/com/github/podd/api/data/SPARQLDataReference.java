@@ -24,11 +24,11 @@ package com.github.podd.api.data;
  */
 public interface SPARQLDataReference extends DataReference
 {
-
+    
     /**
      * @return The SPARQL Graph containing the data reference.
      */
     String getGraph();
-
+    
     void setGraph(final String graph);
 }

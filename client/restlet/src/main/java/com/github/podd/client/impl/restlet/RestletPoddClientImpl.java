@@ -301,8 +301,8 @@ public class RestletPoddClientImpl implements PoddClient
     @Override
     public boolean autologin() throws PoddClientException
     {
-        String username = this.getProps().get(PROP_PODD_USERNAME, null);
-        String password = this.getProps().get(PROP_PODD_PASSWORD, null);
+        final String username = this.getProps().get(RestletPoddClientImpl.PROP_PODD_USERNAME, null);
+        final String password = this.getProps().get(RestletPoddClientImpl.PROP_PODD_PASSWORD, null);
         
         Objects.requireNonNull(username,
                 "Cannot automatically login as username was not defined in poddclient.properties");
@@ -379,7 +379,7 @@ public class RestletPoddClientImpl implements PoddClient
     }
     
     @Override
-    public Model doSPARQL(final String queryString, Collection<InferredOWLOntologyID> artifactIds)
+    public Model doSPARQL(final String queryString, final Collection<InferredOWLOntologyID> artifactIds)
         throws PoddClientException
     {
         this.log.debug("cookies: {}", this.currentCookies);
@@ -392,7 +392,7 @@ public class RestletPoddClientImpl implements PoddClient
         // TODO: Parse query to make sure it is syntactically valid before sending query
         // resource.addQueryParameter(PoddWebConstants.KEY_SPARQLQUERY, queryString);
         
-        for(InferredOWLOntologyID artifactId : artifactIds)
+        for(final InferredOWLOntologyID artifactId : artifactIds)
         {
             form.add(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactId.getOntologyIRI().toString());
             // resource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER,
@@ -413,7 +413,7 @@ public class RestletPoddClientImpl implements PoddClient
             get.write(writer);
             return Rio.parse(new StringReader(writer.toString()), "", RDFFormat.RDFJSON);
         }
-        catch(ResourceException e)
+        catch(final ResourceException e)
         {
             if(e.getStatus().equals(Status.CLIENT_ERROR_PRECONDITION_FAILED))
             {
@@ -445,7 +445,7 @@ public class RestletPoddClientImpl implements PoddClient
                 get.write(writer);
                 return Rio.parse(new StringReader(writer.toString()), "", RDFFormat.RDFJSON);
             }
-            catch(ResourceException e1)
+            catch(final ResourceException e1)
             {
                 if(e1.getStatus().equals(Status.CLIENT_ERROR_PRECONDITION_FAILED))
                 {
@@ -471,10 +471,10 @@ public class RestletPoddClientImpl implements PoddClient
     {
         try
         {
-            Path tempFile = Files.createTempFile("downloadartifact-", ".rj");
+            final Path tempFile = Files.createTempFile("downloadartifact-", ".rj");
             try (final OutputStream output = Files.newOutputStream(tempFile);)
             {
-                downloadArtifact(artifactId, output, RDFFormat.RDFJSON);
+                this.downloadArtifact(artifactId, output, RDFFormat.RDFJSON);
             }
             try (final InputStream input = Files.newInputStream(tempFile);)
             {
@@ -528,7 +528,7 @@ public class RestletPoddClientImpl implements PoddClient
     public Model getObjectsByType(final URI type, final Collection<InferredOWLOntologyID> artifacts)
         throws PoddClientException
     {
-        String queryString =
+        final String queryString =
                 String.format(PoddClient.TEMPLATE_SPARQL_BY_TYPE_WITH_LABEL, RenderUtils.getSPARQLQueryString(type));
         this.log.debug("queryString={}", queryString);
         return this.doSPARQL(queryString, artifacts);
@@ -538,7 +538,7 @@ public class RestletPoddClientImpl implements PoddClient
     public Model getObjectsByTypeAndPrefix(final URI type, final String labelPrefix,
             final Collection<InferredOWLOntologyID> artifacts) throws PoddClientException
     {
-        String queryString =
+        final String queryString =
                 String.format(PoddClient.TEMPLATE_SPARQL_BY_TYPE_LABEL_STRSTARTS, RenderUtils.escape(labelPrefix),
                         RenderUtils.getSPARQLQueryString(type));
         this.log.debug("queryString={}", queryString);
@@ -549,12 +549,12 @@ public class RestletPoddClientImpl implements PoddClient
     public Model getObjectsByTypePredicateAndPrefix(final URI type, final URI predicate, final String labelPrefix,
             final Collection<InferredOWLOntologyID> artifacts) throws PoddClientException
     {
-        String predicateString = RenderUtils.getSPARQLQueryString(predicate);
+        final String predicateString = RenderUtils.getSPARQLQueryString(predicate);
         // NOTE: predicateString must be both the second and third arguments sent into String.format
         // as it is used twice, once for the Construct and once for the Where
         // Hypothetically the second could be different to the third for mapping predicates, but
         // that would cause confusion if not obvious
-        String queryString =
+        final String queryString =
                 String.format(PoddClient.TEMPLATE_SPARQL_BY_TYPE_LABEL_STRSTARTS_PREDICATE, predicateString,
                         predicateString, RenderUtils.escape(labelPrefix), RenderUtils.getSPARQLQueryString(type));
         this.log.debug("queryString={}", queryString);
@@ -565,7 +565,7 @@ public class RestletPoddClientImpl implements PoddClient
     public Model getObjectsByTypeAndBarcode(final URI type, final String barcode,
             final Collection<InferredOWLOntologyID> artifacts) throws PoddClientException
     {
-        String queryString =
+        final String queryString =
                 String.format(PoddClient.TEMPLATE_SPARQL_BY_BARCODE_STRSTARTS, RenderUtils.escape(barcode),
                         RenderUtils.getSPARQLQueryString(type));
         this.log.debug("queryString={}", queryString);
@@ -576,7 +576,7 @@ public class RestletPoddClientImpl implements PoddClient
     public Model getObjectsByBarcode(final String barcode, final Collection<InferredOWLOntologyID> artifacts)
         throws PoddClientException
     {
-        String queryString =
+        final String queryString =
                 String.format(PoddClient.TEMPLATE_SPARQL_BY_BARCODE_MATCH_NO_TYPE, RenderUtils.escape(barcode));
         this.log.debug("queryString={}", queryString);
         return this.doSPARQL(queryString, artifacts);
@@ -586,7 +586,7 @@ public class RestletPoddClientImpl implements PoddClient
     public Model getObjectsByTypeAndParent(final URI parent, final URI parentPredicate, final URI type,
             final Collection<InferredOWLOntologyID> artifacts) throws PoddClientException
     {
-        String queryString =
+        final String queryString =
                 String.format(PoddClient.TEMPLATE_SPARQL_BY_TYPE_AND_PARENT_ALL_PROPERTIES,
                         RenderUtils.getSPARQLQueryString(parent), RenderUtils.getSPARQLQueryString(parentPredicate),
                         RenderUtils.getSPARQLQueryString(type));
@@ -650,7 +650,7 @@ public class RestletPoddClientImpl implements PoddClient
         
         String actualPath = path;
         
-        boolean serverUrlEndsWithSlash = this.serverUrl.endsWith("/");
+        final boolean serverUrlEndsWithSlash = this.serverUrl.endsWith("/");
         
         // Avoid double slashes
         if(actualPath.startsWith("/") && serverUrlEndsWithSlash)
@@ -662,7 +662,7 @@ public class RestletPoddClientImpl implements PoddClient
             actualPath = "/" + actualPath;
         }
         
-        String result = this.serverUrl + actualPath;
+        final String result = this.serverUrl + actualPath;
         
         this.log.debug("getURL={}", result);
         
@@ -775,29 +775,29 @@ public class RestletPoddClientImpl implements PoddClient
     private Set<PoddArtifact> listArtifactsInternal(final boolean published, final boolean unpublished)
         throws PoddClientException
     {
-        Set<PoddArtifact> results = ConcurrentHashMap.newKeySet();
-        Model model = this.listArtifacts(published, unpublished);
-        for(InferredOWLOntologyID ontologyID : OntologyUtils.modelToOntologyIDs(model, false, false))
+        final Set<PoddArtifact> results = ConcurrentHashMap.newKeySet();
+        final Model model = this.listArtifacts(published, unpublished);
+        for(final InferredOWLOntologyID ontologyID : OntologyUtils.modelToOntologyIDs(model, false, false))
         {
-            URI topObjectURI =
+            final URI topObjectURI =
                     model.filter(ontologyID.getOntologyIRI().toOpenRDFURI(), PODDBASE.ARTIFACT_HAS_TOP_OBJECT, null)
                             .objectURI();
             try
             {
-                String nextBarcode =
+                final String nextBarcode =
                         model.filter(topObjectURI, PODDSCIENCE.HAS_BARCODE, null).objectLiteral().getLabel();
                 results.add(PoddArtifact.from(ontologyID, topObjectURI, nextBarcode));
             }
-            catch(Exception e1)
+            catch(final Exception e1)
             {
                 try
                 {
                     // Backup by using the label for identification if a unique barcode was not
                     // found
-                    String nextLabel = model.filter(topObjectURI, RDFS.LABEL, null).objectLiteral().getLabel();
+                    final String nextLabel = model.filter(topObjectURI, RDFS.LABEL, null).objectLiteral().getLabel();
                     results.add(PoddArtifact.from(ontologyID, topObjectURI, nextLabel));
                 }
-                catch(Exception e2)
+                catch(final Exception e2)
                 {
                     results.add(PoddArtifact.from(ontologyID, topObjectURI, "(No label)"));
                 }
@@ -1177,12 +1177,12 @@ public class RestletPoddClientImpl implements PoddClient
     @Override
     public InferredOWLOntologyID uploadNewArtifact(final Model model) throws PoddClientException
     {
-        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        final ByteArrayOutputStream output = new ByteArrayOutputStream();
         try
         {
             Rio.write(model, output, RDFFormat.RDFJSON);
         }
-        catch(RDFHandlerException e)
+        catch(final RDFHandlerException e)
         {
             throw new PoddClientException("Could not serialise artifact to RDF", e);
         }

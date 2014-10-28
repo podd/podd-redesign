@@ -28,10 +28,10 @@ import com.github.podd.impl.data.DataReferenceManagerImpl;
  */
 public class DataReferenceManagerImplTest extends AbstractDataReferenceManagerTest
 {
-
+    
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see com.github.podd.api.data.test.AbstractDataReferenceManagerTest#
      * getNewFileReferenceManager()
      */
@@ -41,10 +41,10 @@ public class DataReferenceManagerImplTest extends AbstractDataReferenceManagerTe
         final DataReferenceManagerImpl dataRefManager = new DataReferenceManagerImpl();
         return dataRefManager;
     }
-
+    
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see com.github.podd.api.data.test.AbstractDataReferenceManagerTest#
      * getNewPoddFileReferenceProcessorFactoryRegistry()
      */
@@ -52,11 +52,11 @@ public class DataReferenceManagerImplTest extends AbstractDataReferenceManagerTe
     public DataReferenceProcessorRegistry getNewDataReferenceProcessorRegistry()
     {
         final DataReferenceProcessorRegistry registry = new DataReferenceProcessorRegistry();
-
+        
         // this should happen automatically
         // registry.add(new SSHFileReferenceProcessorFactoryImpl());
-
+        
         return registry;
     }
-
+    
 }

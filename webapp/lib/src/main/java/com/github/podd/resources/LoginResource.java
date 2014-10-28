@@ -39,5 +39,5 @@ public interface LoginResource
      */
     @Get("html")
     Representation getLoginPageHtml(Representation entity) throws ResourceException;
-
+    
 }

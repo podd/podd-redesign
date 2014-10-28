@@ -40,7 +40,7 @@ import com.github.podd.impl.PoddRepositoryManagerImpl;
  */
 public class PoddRepositoryManagerImplTest extends AbstractPoddRepositoryManagerTest
 {
-
+    
     @Override
     protected PoddRepositoryManager getNewPoddRepositoryManagerInstance(final Repository managementRepository,
             final Path tempDirPath) throws Exception

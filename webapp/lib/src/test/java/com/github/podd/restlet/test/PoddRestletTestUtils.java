@@ -35,13 +35,13 @@ import com.github.ansell.restletutils.test.RestletTestUtils;
 public class PoddRestletTestUtils extends RestletTestUtils
 {
     private static final Logger log = LoggerFactory.getLogger(PoddRestletTestUtils.class);
-
+    
     public static Representation doTestUnauthenticatedRequest(final ClientResource clientResource,
             final Method requestMethod, final Object inputRepresentation, final MediaType requestMediaType,
             final Status expectedResponseStatus)
     {
         Representation result = null;
-
+        
         if(requestMethod.equals(Method.DELETE))
         {
             result = clientResource.delete(requestMediaType);
@@ -62,10 +62,10 @@ public class PoddRestletTestUtils extends RestletTestUtils
         {
             throw new RuntimeException("Did not recognise request method: " + requestMethod.toString());
         }
-
+        
         Assert.assertEquals(expectedResponseStatus.getCode(), clientResource.getResponse().getStatus().getCode());
-
+        
         return result;
     }
-
+    
 }

@@ -30,7 +30,7 @@ import org.junit.runners.model.Statement;
 public class TimeoutWithStackTraces implements TestRule
 {
     private final long fMillis;
-
+    
     /**
      * @param millis
      *            the millisecond timeout
@@ -39,7 +39,7 @@ public class TimeoutWithStackTraces implements TestRule
     {
         this.fMillis = millis;
     }
-
+    
     @Override
     public Statement apply(final Statement base, final Description description)
     {

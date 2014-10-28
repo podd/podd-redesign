@@ -26,11 +26,11 @@ import com.github.podd.utils.PoddUser;
  */
 public class UserNotFoundException extends PoddException
 {
-
+    
     private static final long serialVersionUID = -2007155238930771189L;
-
+    
     private PoddUser user;
-
+    
     /**
      *
      * @param user
@@ -43,7 +43,7 @@ public class UserNotFoundException extends PoddException
         super(msg);
         this.user = user;
     }
-
+    
     /**
      *
      * @param user
@@ -58,7 +58,7 @@ public class UserNotFoundException extends PoddException
         super(msg, throwable);
         this.user = user;
     }
-
+    
     /**
      *
      * @param user
@@ -71,7 +71,7 @@ public class UserNotFoundException extends PoddException
         super(throwable);
         this.user = user;
     }
-
+    
     /**
      *
      * @return The PODD user that was not present in the system.
@@ -80,5 +80,5 @@ public class UserNotFoundException extends PoddException
     {
         return this.user;
     }
-
+    
 }

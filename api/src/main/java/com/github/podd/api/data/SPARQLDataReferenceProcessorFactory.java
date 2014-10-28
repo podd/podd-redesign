@@ -22,5 +22,5 @@ package com.github.podd.api.data;
  */
 public interface SPARQLDataReferenceProcessorFactory extends DataReferenceProcessorFactory
 {
-
+    
 }

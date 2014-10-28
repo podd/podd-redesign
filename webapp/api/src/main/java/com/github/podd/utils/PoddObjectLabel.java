@@ -31,21 +31,21 @@ public interface PoddObjectLabel
      * @return the description
      */
     String getDescription();
-
+    
     Literal getDescriptionLiteral();
-
+    
     /**
      * @return the label
      */
     String getLabel();
-
+    
     Literal getLabelLiteral();
-
+    
     /**
      * @return the objectID
      */
     URI getObjectURI();
-
+    
     /**
      * @return the parentArtifactID
      */

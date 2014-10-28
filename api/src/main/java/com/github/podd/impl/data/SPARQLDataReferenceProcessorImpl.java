@@ -44,7 +44,7 @@ import com.github.podd.utils.PODD;
 public class SPARQLDataReferenceProcessorImpl implements SPARQLDataReferenceProcessor
 {
     private final Logger log = LoggerFactory.getLogger(this.getClass());
-
+    
     @Override
     public boolean canHandle(final Model rdfStatements)
     {
@@ -52,7 +52,7 @@ public class SPARQLDataReferenceProcessorImpl implements SPARQLDataReferenceProc
         {
             return false;
         }
-
+        
         for(final URI fileType : this.getTypes())
         {
             final Model matchingModels = rdfStatements.filter((Resource)null, RDF.TYPE, fileType);
@@ -61,10 +61,10 @@ public class SPARQLDataReferenceProcessorImpl implements SPARQLDataReferenceProc
                 return true;
             }
         }
-
+        
         return false;
     }
-
+    
     @Override
     public Collection<SPARQLDataReference> createReferences(final Model rdfStatements)
     {
@@ -72,51 +72,51 @@ public class SPARQLDataReferenceProcessorImpl implements SPARQLDataReferenceProc
         {
             return null;
         }
-
+        
         final Set<SPARQLDataReference> results = new HashSet<SPARQLDataReference>();
-
+        
         for(final URI fileType : this.getTypes())
         {
             final Set<Resource> fileRefUris = rdfStatements.filter(null, RDF.TYPE, fileType).subjects();
-
+            
             for(final Resource fileRef : fileRefUris)
             {
                 final Model model = rdfStatements.filter(fileRef, null, null);
-
+                
                 if(this.log.isDebugEnabled())
                 {
                     DebugUtils.printContents(model);
                 }
-
+                
                 final SPARQLDataReference fileReference = new SPARQLDataReferenceImpl();
-
+                
                 // note: artifact ID is not available to us in here and must be added externally
-
+                
                 if(fileRef instanceof URI)
                 {
                     fileReference.setObjectIri(IRI.create((URI)fileRef));
                 }
-
+                
                 final Set<Value> label = model.filter(fileRef, RDFS.LABEL, null).objects();
                 if(!label.isEmpty())
                 {
                     fileReference.setLabel(label.iterator().next().stringValue());
                 }
-
+                
                 final Set<Value> graph = model.filter(fileRef, PODD.PODD_BASE_HAS_SPARQL_GRAPH, null).objects();
                 if(!graph.isEmpty())
                 {
                     fileReference.setGraph(graph.iterator().next().stringValue());
                 }
-
+                
                 final Set<Value> alias = model.filter(fileRef, PODD.PODD_BASE_HAS_ALIAS, null).objects();
                 if(!alias.isEmpty())
                 {
                     fileReference.setRepositoryAlias(alias.iterator().next().stringValue());
                 }
-
+                
                 final Model linksToFileReference = rdfStatements.filter(null, null, fileRef);
-
+                
                 // TODO: Need to use a SPARQL query to verify that the property is a sub-property of
                 // PODD Contains
                 if(!linksToFileReference.isEmpty())
@@ -130,19 +130,19 @@ public class SPARQLDataReferenceProcessorImpl implements SPARQLDataReferenceProc
                         }
                     }
                     fileReference
-                    .setParentPredicateIRI(IRI.create(linksToFileReference.predicates().iterator().next()));
+                            .setParentPredicateIRI(IRI.create(linksToFileReference.predicates().iterator().next()));
                 }
-
+                
                 results.add(fileReference);
             }
         }
         return results;
     }
-
+    
     @Override
     public Set<URI> getTypes()
     {
         return Collections.singleton(PODD.PODD_BASE_DATA_REFERENCE_TYPE_SPARQL);
     }
-
+    
 }

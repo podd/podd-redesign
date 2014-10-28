@@ -31,9 +31,9 @@ import com.github.podd.utils.PODD;
 public class DuplicateArtifactIRIException extends UnmanagedSchemaException
 {
     private static final long serialVersionUID = -2321179998407787564L;
-
+    
     private final IRI artifactOntologyIRI;
-
+    
     /**
      *
      * @param ontology
@@ -46,7 +46,7 @@ public class DuplicateArtifactIRIException extends UnmanagedSchemaException
         super(msg);
         this.artifactOntologyIRI = artifactOntologyIRI;
     }
-
+    
     /**
      * @param ontology
      *            The OWL Ontology IRI that is a duplicate.
@@ -60,7 +60,7 @@ public class DuplicateArtifactIRIException extends UnmanagedSchemaException
         super(msg, throwable);
         this.artifactOntologyIRI = artifactOntologyIRI;
     }
-
+    
     /**
      * @param ontology
      *            The OWL Ontology IRI that is a duplicate.
@@ -72,20 +72,20 @@ public class DuplicateArtifactIRIException extends UnmanagedSchemaException
         super(throwable);
         this.artifactOntologyIRI = artifactOntologyIRI;
     }
-
+    
     @Override
     public Model getDetailsAsModel(final Resource errorResource)
     {
         final Model model = super.getDetailsAsModel(errorResource);
-
+        
         if(this.getDuplicateOntologyIRI() != null)
         {
             model.add(errorResource, PODD.ERR_SOURCE, this.getDuplicateOntologyIRI().toOpenRDFURI());
         }
-
+        
         return model;
     }
-
+    
     /**
      * @return The OWL Ontology IRI that is a duplicate.
      */
@@ -93,5 +93,5 @@ public class DuplicateArtifactIRIException extends UnmanagedSchemaException
     {
         return this.artifactOntologyIRI;
     }
-
+    
 }

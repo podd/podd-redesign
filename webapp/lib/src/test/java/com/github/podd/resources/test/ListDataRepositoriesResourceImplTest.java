@@ -38,7 +38,7 @@ import com.github.podd.utils.PoddWebConstants;
  */
 public class ListDataRepositoriesResourceImplTest extends AbstractResourceImplTest
 {
-
+    
     /**
      * Test requesting data repositories as administrator.
      */
@@ -47,21 +47,21 @@ public class ListDataRepositoriesResourceImplTest extends AbstractResourceImplTe
     {
         final ClientResource dataRepositoriesClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_DATA_REPOSITORY_LIST));
-
+        
         try
         {
             final Representation result =
                     this.doTestAuthenticatedRequest(dataRepositoriesClientResource, Method.GET, null,
                             MediaType.TEXT_HTML, Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
             final String body = this.getText(result);
-
+            
             // System.out.println(body);
-
+            
             // verify:
             this.assertFreemarker(body);
-
+            
             Assert.assertFalse(body.contains("No data repositories currently available"));
-
+            
             Assert.assertTrue(body.contains("alias_local_ssh"));
         }
         finally
@@ -69,7 +69,7 @@ public class ListDataRepositoriesResourceImplTest extends AbstractResourceImplTe
             this.releaseClient(dataRepositoriesClientResource);
         }
     }
-
+    
     /**
      * Test requesting data repositories as administrator.
      */
@@ -78,21 +78,21 @@ public class ListDataRepositoriesResourceImplTest extends AbstractResourceImplTe
     {
         final ClientResource dataRepositoriesClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_DATA_REPOSITORY_LIST));
-
+        
         try
         {
             final Representation result =
                     this.doTestAuthenticatedRequest(dataRepositoriesClientResource, Method.GET, null,
                             MediaType.TEXT_HTML, Status.SUCCESS_OK, AbstractResourceImplTest.NO_ADMIN);
             final String body = this.getText(result);
-
+            
             // System.out.println(body);
-
+            
             // verify:
             this.assertFreemarker(body);
-
+            
             Assert.assertFalse(body.contains("No data repositories currently available"));
-
+            
             Assert.assertTrue(body.contains("alias_local_ssh"));
         }
         finally
@@ -100,7 +100,7 @@ public class ListDataRepositoriesResourceImplTest extends AbstractResourceImplTe
             this.releaseClient(dataRepositoriesClientResource);
         }
     }
-
+    
     /**
      * Test requesting data repositories as administrator.
      */
@@ -109,7 +109,7 @@ public class ListDataRepositoriesResourceImplTest extends AbstractResourceImplTe
     {
         final ClientResource dataRepositoriesClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_DATA_REPOSITORY_LIST));
-
+        
         try
         {
             dataRepositoriesClientResource.get(MediaType.TEXT_HTML);
@@ -124,7 +124,7 @@ public class ListDataRepositoriesResourceImplTest extends AbstractResourceImplTe
             this.releaseClient(dataRepositoriesClientResource);
         }
     }
-
+    
     /**
      * Test requesting data repositories as administrator.
      */
@@ -133,17 +133,17 @@ public class ListDataRepositoriesResourceImplTest extends AbstractResourceImplTe
     {
         final ClientResource dataRepositoriesClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_DATA_REPOSITORY_LIST));
-
+        
         try
         {
             final Representation results =
                     this.doTestAuthenticatedRequest(dataRepositoriesClientResource, Method.GET, null,
                             RestletUtilMediaType.APPLICATION_RDF_JSON, Status.SUCCESS_OK,
                             AbstractResourceImplTest.WITH_ADMIN);
-
+            
             // verify:
             final Model model = this.assertRdf(results, RDFFormat.RDFJSON, 4);
-
+            
             Assert.assertEquals(2, model.filter(null, RDF.TYPE, null).size());
             Assert.assertEquals(1, model.filter(null, PODD.PODD_BASE_HAS_ALIAS, null).size());
             Assert.assertEquals(1, model.filter(null, RDFS.LABEL, null).size());
@@ -154,7 +154,7 @@ public class ListDataRepositoriesResourceImplTest extends AbstractResourceImplTe
             this.releaseClient(dataRepositoriesClientResource);
         }
     }
-
+    
     /**
      * Test requesting data repositories as administrator.
      */
@@ -163,7 +163,7 @@ public class ListDataRepositoriesResourceImplTest extends AbstractResourceImplTe
     {
         final ClientResource dataRepositoriesClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_DATA_REPOSITORY_LIST));
-
+        
         try
         {
             final Representation results =
@@ -171,11 +171,11 @@ public class ListDataRepositoriesResourceImplTest extends AbstractResourceImplTe
                             RestletUtilMediaType.APPLICATION_RDF_JSON, Status.SUCCESS_OK,
                             AbstractResourceImplTest.NO_ADMIN);
             final Model model = this.assertRdf(results, RDFFormat.RDFJSON, 4);
-
+            
             Assert.assertEquals(2, model.filter(null, RDF.TYPE, null).size());
             Assert.assertEquals(1, model.filter(null, PODD.PODD_BASE_HAS_ALIAS, null).size());
             Assert.assertEquals(1, model.filter(null, RDFS.LABEL, null).size());
-
+            
             // DebugUtils.printContents(model);
         }
         finally
@@ -183,7 +183,7 @@ public class ListDataRepositoriesResourceImplTest extends AbstractResourceImplTe
             this.releaseClient(dataRepositoriesClientResource);
         }
     }
-
+    
     /**
      * Test requesting data repositories as administrator.
      */
@@ -192,7 +192,7 @@ public class ListDataRepositoriesResourceImplTest extends AbstractResourceImplTe
     {
         final ClientResource dataRepositoriesClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_DATA_REPOSITORY_LIST));
-
+        
         try
         {
             dataRepositoriesClientResource.get(RestletUtilMediaType.APPLICATION_RDF_JSON);
@@ -207,7 +207,7 @@ public class ListDataRepositoriesResourceImplTest extends AbstractResourceImplTe
             this.releaseClient(dataRepositoriesClientResource);
         }
     }
-
+    
     /**
      * Test requesting data repositories as administrator.
      */
@@ -216,20 +216,20 @@ public class ListDataRepositoriesResourceImplTest extends AbstractResourceImplTe
     {
         final ClientResource dataRepositoriesClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_DATA_REPOSITORY_LIST));
-
+        
         try
         {
             final Representation results =
                     this.doTestAuthenticatedRequest(dataRepositoriesClientResource, Method.GET, null,
                             MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
-
+            
             // verify:
             final Model model = this.assertRdf(results, RDFFormat.RDFXML, 4);
-
+            
             Assert.assertEquals(2, model.filter(null, RDF.TYPE, null).size());
             Assert.assertEquals(1, model.filter(null, PODD.PODD_BASE_HAS_ALIAS, null).size());
             Assert.assertEquals(1, model.filter(null, RDFS.LABEL, null).size());
-
+            
             // DebugUtils.printContents(model);
         }
         finally
@@ -237,7 +237,7 @@ public class ListDataRepositoriesResourceImplTest extends AbstractResourceImplTe
             this.releaseClient(dataRepositoriesClientResource);
         }
     }
-
+    
     /**
      * Test requesting data repositories as non-administrator.
      */
@@ -246,18 +246,18 @@ public class ListDataRepositoriesResourceImplTest extends AbstractResourceImplTe
     {
         final ClientResource dataRepositoriesClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_DATA_REPOSITORY_LIST));
-
+        
         try
         {
             final Representation results =
                     this.doTestAuthenticatedRequest(dataRepositoriesClientResource, Method.GET, null,
                             MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK, AbstractResourceImplTest.NO_ADMIN);
             final Model model = this.assertRdf(results, RDFFormat.RDFXML, 4);
-
+            
             Assert.assertEquals(2, model.filter(null, RDF.TYPE, null).size());
             Assert.assertEquals(1, model.filter(null, PODD.PODD_BASE_HAS_ALIAS, null).size());
             Assert.assertEquals(1, model.filter(null, RDFS.LABEL, null).size());
-
+            
             // DebugUtils.printContents(model);
         }
         finally
@@ -265,7 +265,7 @@ public class ListDataRepositoriesResourceImplTest extends AbstractResourceImplTe
             this.releaseClient(dataRepositoriesClientResource);
         }
     }
-
+    
     /**
      * Test requesting data repositories as administrator.
      */
@@ -274,7 +274,7 @@ public class ListDataRepositoriesResourceImplTest extends AbstractResourceImplTe
     {
         final ClientResource dataRepositoriesClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_DATA_REPOSITORY_LIST));
-
+        
         try
         {
             dataRepositoriesClientResource.get(MediaType.APPLICATION_RDF_XML);
@@ -289,5 +289,5 @@ public class ListDataRepositoriesResourceImplTest extends AbstractResourceImplTe
             this.releaseClient(dataRepositoriesClientResource);
         }
     }
-
+    
 }

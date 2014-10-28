@@ -40,17 +40,17 @@ public class DeleteArtifactResourceImplTest extends AbstractResourceImplTest
         // prepare: add an artifact
         final InferredOWLOntologyID artifactID =
                 this.loadTestArtifact(TestConstants.TEST_ARTIFACT_20130206, MediaType.APPLICATION_RDF_TURTLE);
-
+        
         final ClientResource deleteArtifactClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_DELETE));
-
+        
         try
         {
             deleteArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactID
                     .getOntologyIRI().toString());
             deleteArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_VERSION_IDENTIFIER, artifactID
                     .getVersionIRI().toString());
-
+            
             this.doTestAuthenticatedRequest(deleteArtifactClientResource, Method.DELETE, null,
                     MediaType.APPLICATION_RDF_XML, Status.SUCCESS_NO_CONTENT, AbstractResourceImplTest.WITH_ADMIN);
         }
@@ -58,11 +58,11 @@ public class DeleteArtifactResourceImplTest extends AbstractResourceImplTest
         {
             this.releaseClient(deleteArtifactClientResource);
         }
-
+        
         // verify: try to retrieve deleted artifact
         final ClientResource getArtifactClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_GET_BASE));
-
+        
         try
         {
             getArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactID
@@ -80,5 +80,5 @@ public class DeleteArtifactResourceImplTest extends AbstractResourceImplTest
             this.releaseClient(getArtifactClientResource);
         }
     }
-
+    
 }

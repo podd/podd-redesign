@@ -27,11 +27,11 @@ import com.github.podd.utils.PoddUser;
  */
 public class UserAlreadyExistsException extends PoddException
 {
-
+    
     private static final long serialVersionUID = -3233046860253247896L;
-
+    
     private PoddUser user;
-
+    
     /**
      *
      * @param user
@@ -44,7 +44,7 @@ public class UserAlreadyExistsException extends PoddException
         super(msg);
         this.user = user;
     }
-
+    
     /**
      *
      * @param user
@@ -59,7 +59,7 @@ public class UserAlreadyExistsException extends PoddException
         super(msg, throwable);
         this.user = user;
     }
-
+    
     /**
      *
      * @param user
@@ -72,7 +72,7 @@ public class UserAlreadyExistsException extends PoddException
         super(throwable);
         this.user = user;
     }
-
+    
     /**
      *
      * @return The PODD user that already had another entry in the system.

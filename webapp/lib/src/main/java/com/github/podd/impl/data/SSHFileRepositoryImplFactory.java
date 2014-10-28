@@ -44,19 +44,19 @@ public class SSHFileRepositoryImplFactory implements PoddDataRepositoryFactory
     {
         return types.contains(PODD.PODD_SSH_FILE_REPOSITORY);
     }
-
+    
     @Override
     public PoddDataRepository<?> createDataRepository(final Resource nextDataRepository, final Model statements)
-            throws DataRepositoryException
-            {
+        throws DataRepositoryException
+    {
         if(statements.contains(null, RDF.TYPE, PODD.PODD_SSH_FILE_REPOSITORY))
         {
             return new SSHFileRepositoryImpl(nextDataRepository, statements);
         }
-
+        
         throw new DataRepositoryIncompleteException("Could not create SSH file repository from this configuration");
-            }
-
+    }
+    
     @Override
     public String getKey()
     {

@@ -26,27 +26,27 @@ import org.semanticweb.owlapi.model.IRI;
  */
 public class SchemaManifestException extends PoddException
 {
-
+    
     private static final long serialVersionUID = -714384727722988506L;
-
+    
     private final IRI schemaOntologyIRI;
-
+    
     public SchemaManifestException(final String msg)
     {
         this(null, msg);
     }
-
+    
     public SchemaManifestException(final String msg, final Throwable throwable)
     {
         this(null, msg, throwable);
     }
-
+    
     public SchemaManifestException(final IRI schemaOntologyIRI, final String msg)
     {
         super(msg);
         this.schemaOntologyIRI = schemaOntologyIRI;
     }
-
+    
     /**
      * @param msg
      * @param throwable
@@ -56,7 +56,7 @@ public class SchemaManifestException extends PoddException
         super(msg, throwable);
         this.schemaOntologyIRI = schemaOntologyIRI;
     }
-
+    
     /**
      * @param throwable
      */
@@ -65,7 +65,7 @@ public class SchemaManifestException extends PoddException
         super(throwable);
         this.schemaOntologyIRI = schemaOntologyIRI;
     }
-
+    
     /**
      * @return The OWL Ontology IRI where the error was observed.
      */
@@ -73,5 +73,5 @@ public class SchemaManifestException extends PoddException
     {
         return this.schemaOntologyIRI;
     }
-
+    
 }

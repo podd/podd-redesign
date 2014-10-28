@@ -33,9 +33,9 @@ import com.github.podd.exception.DataReferenceNotSupportedException;
 public interface PoddDataRepository<T extends DataReference>
 {
     public final static String PROTOCOL_SSH = "SSH";
-
+    
     public final static String PROTOCOL_HTTP = "HTTP";
-
+    
     /**
      * Checks whether this {@link PoddDataRepository} instance is capable of "handling" (i.e.
      * validating) the given {@link DataReference}.
@@ -46,9 +46,9 @@ public interface PoddDataRepository<T extends DataReference>
      * @return
      */
     boolean canHandle(T reference);
-
+    
     String getAlias();
-
+    
     /**
      * Retrieve a Model representation of all this {@link PoddDataRepository}. This should contain
      * sufficient information to reconstruct this {@link PoddDataRepository} object.
@@ -56,14 +56,14 @@ public interface PoddDataRepository<T extends DataReference>
      * @return A Model representation containing all configurations of this FileRepository.
      */
     Model getAsModel();
-
+    
     /**
      *
      * @return The set of RDF Types for {@link DataReference}s that can be stored by this
      *         repository. All of the non-OWL-built-in types should be in this set.
      */
     Set<URI> getTypes();
-
+    
     /**
      * Validates the given DataReference instance.
      *
@@ -74,5 +74,5 @@ public interface PoddDataRepository<T extends DataReference>
      * @throws IOException
      */
     boolean validate(T reference) throws DataReferenceNotSupportedException, IOException;
-
+    
 }

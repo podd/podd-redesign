@@ -295,11 +295,11 @@ public class PoddOWLManagerImpl implements PoddOWLManager
             DebugUtils.printContents(schemaManagementTriples);
         }
         
-        ConcurrentMap<URI, Set<URI>> importsMap = new ConcurrentHashMap<>();
+        final ConcurrentMap<URI, Set<URI>> importsMap = new ConcurrentHashMap<>();
         
         final List<OWLOntologyID> manifestImports =
                 OntologyUtils.schemaImports(schemaManagementTriples, ontologyIDs, importsMap);
-        ConcurrentMap<URI, OWLOntologyID> mapVersions = OntologyUtils.mapVersions(ontologyIDs);
+        final ConcurrentMap<URI, OWLOntologyID> mapVersions = OntologyUtils.mapVersions(ontologyIDs);
         // TODO: Check the exact imports for the given ontology and refine to exclude unrelated
         // schema ontologies?
         
@@ -310,9 +310,9 @@ public class PoddOWLManagerImpl implements PoddOWLManager
             for(final OWLOntologyID ontologyID : manifestImports)
             {
                 this.log.debug("next ontology ID: {}", ontologyID);
-                Set<URI> nextTransitiveImports = importsMap.get(ontologyID.getVersionIRI().toOpenRDFURI());
+                final Set<URI> nextTransitiveImports = importsMap.get(ontologyID.getVersionIRI().toOpenRDFURI());
                 this.log.debug("nextTransitiveImports: " + nextTransitiveImports);
-                for(URI nextRelevantImport : nextTransitiveImports)
+                for(final URI nextRelevantImport : nextTransitiveImports)
                 {
                     this.log.debug("About to cache ontology: {}", mapVersions.get(nextRelevantImport));
                     // NOTE: if InferredOntologyIRI is null, only the base ontology is

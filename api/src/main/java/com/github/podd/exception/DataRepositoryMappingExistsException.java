@@ -24,11 +24,11 @@ package com.github.podd.exception;
  */
 public class DataRepositoryMappingExistsException extends DataRepositoryException
 {
-
+    
     private static final long serialVersionUID = 3224280634543226410L;
-
+    
     private final String alias;
-
+    
     /**
      *
      * @param alias
@@ -41,7 +41,7 @@ public class DataRepositoryMappingExistsException extends DataRepositoryExceptio
         super(msg);
         this.alias = alias;
     }
-
+    
     /**
      * @param alias
      *            The file repository alias that caused the Exception.
@@ -55,7 +55,7 @@ public class DataRepositoryMappingExistsException extends DataRepositoryExceptio
         super(msg, throwable);
         this.alias = alias;
     }
-
+    
     /**
      * @param alias
      *            The file repository alias that caused the Exception.
@@ -67,7 +67,7 @@ public class DataRepositoryMappingExistsException extends DataRepositoryExceptio
         super(throwable);
         this.alias = alias;
     }
-
+    
     /**
      * @return The file repository alias that caused the Exception.
      */
@@ -75,5 +75,5 @@ public class DataRepositoryMappingExistsException extends DataRepositoryExceptio
     {
         return this.alias;
     }
-
+    
 }

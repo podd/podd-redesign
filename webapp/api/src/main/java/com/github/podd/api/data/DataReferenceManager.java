@@ -43,16 +43,16 @@ public interface DataReferenceManager
      * @throws OpenRDFException
      */
     Set<DataReference> extractDataReferences(RepositoryConnection conn, URI... contexts) throws OpenRDFException;
-
+    
     /**
      * @return A registry instance for DataReferenceProcessorFactory
      */
     DataReferenceProcessorRegistry getDataProcessorRegistry();
-
+    
     /**
      * @param registry
      *            Set the registry for DataReferenceProcessorFactory
      */
     void setDataProcessorRegistry(DataReferenceProcessorRegistry registry);
-
+    
 }

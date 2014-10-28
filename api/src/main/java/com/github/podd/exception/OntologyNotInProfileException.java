@@ -36,10 +36,10 @@ import com.github.podd.utils.PODD;
 public class OntologyNotInProfileException extends PoddException
 {
     private static final long serialVersionUID = -7266174841631944910L;
-
+    
     private final OWLOntology ontology;
     private final OWLProfileReport profileReport;
-
+    
     /**
      *
      * @param ontology
@@ -57,7 +57,7 @@ public class OntologyNotInProfileException extends PoddException
         this.ontology = ontology;
         this.profileReport = profileReport;
     }
-
+    
     /**
      * @param ontology
      *            The OWL Ontology that was not in the given profile.
@@ -76,7 +76,7 @@ public class OntologyNotInProfileException extends PoddException
         this.ontology = ontology;
         this.profileReport = profileReport;
     }
-
+    
     /**
      * @param ontology
      *            The OWL Ontology that was not in the given profile.
@@ -93,18 +93,18 @@ public class OntologyNotInProfileException extends PoddException
         this.ontology = ontology;
         this.profileReport = profileReport;
     }
-
+    
     @Override
     public Model getDetailsAsModel(final Resource errorResource)
     {
         final Model model = super.getDetailsAsModel(errorResource);
-
+        
         if(this.getOntology() != null)
         {
             model.add(errorResource, PODD.ERR_SOURCE, this.getOntology().getOntologyID().getOntologyIRI()
                     .toOpenRDFURI());
         }
-
+        
         if(this.getProfileReport() != null)
         {
             for(final OWLProfileViolation violation : this.getProfileReport().getViolations())
@@ -116,10 +116,10 @@ public class OntologyNotInProfileException extends PoddException
                 model.add(v, RDFS.COMMENT, PODD.VF.createLiteral(violation.toString()));
             }
         }
-
+        
         return model;
     }
-
+    
     /**
      * @return The OWL Ontology that was not in the given profile.
      */
@@ -127,7 +127,7 @@ public class OntologyNotInProfileException extends PoddException
     {
         return this.ontology;
     }
-
+    
     /**
      * @return The OWL Profile report indicating what profile violations occurred.
      */
@@ -135,5 +135,5 @@ public class OntologyNotInProfileException extends PoddException
     {
         return this.profileReport;
     }
-
+    
 }

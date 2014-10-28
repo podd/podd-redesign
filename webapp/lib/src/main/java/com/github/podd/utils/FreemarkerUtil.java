@@ -26,7 +26,7 @@ import org.openrdf.model.Value;
  */
 public class FreemarkerUtil
 {
-
+    
     /**
      * If the given object contains a URI with a protocol (scheme), clip it off.
      *
@@ -39,7 +39,7 @@ public class FreemarkerUtil
         {
             return null;
         }
-
+        
         // get String representation of input
         String result;
         if(object instanceof Value)
@@ -51,7 +51,7 @@ public class FreemarkerUtil
         {
             result = object.toString();
         }
-
+        
         // clip the protocol part
         if(result.startsWith("mailto:") || result.startsWith("http://"))
         {
@@ -61,10 +61,10 @@ public class FreemarkerUtil
         {
             return result.substring(8);
         }
-
+        
         return result;
     }
-
+    
     /**
      * Rather hacky attempt to retrieve the datatype of a given Value object. TODO: Incomplete and
      * needs to be fixed.
@@ -83,7 +83,7 @@ public class FreemarkerUtil
                 {
                     return "xsd:" + dataType.getLocalName();
                 }
-
+                
                 return dataType.stringValue();
             }
             // Default to xsd:string datatype if any value happens to get
@@ -93,7 +93,7 @@ public class FreemarkerUtil
         }
         return "NotALiteral:" + value.getClass().getName();
     }
-
+    
     public URI getUri(final Value value)
     {
         if(this.isUri(value))
@@ -102,15 +102,15 @@ public class FreemarkerUtil
         }
         return null;
     }
-
+    
     public boolean isLiteral(final Value value)
     {
         return value instanceof Literal;
     }
-
+    
     public boolean isUri(final Value value)
     {
         return value instanceof URI;
     }
-
+    
 }

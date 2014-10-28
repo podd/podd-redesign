@@ -28,9 +28,9 @@ import org.semanticweb.owlapi.model.IRI;
 public class UnmanagedSchemaIRIException extends UnmanagedSchemaException
 {
     private static final long serialVersionUID = -7266174841631944910L;
-
+    
     private final IRI schemaOntologyIRI;
-
+    
     /**
      *
      * @param ontology
@@ -43,7 +43,7 @@ public class UnmanagedSchemaIRIException extends UnmanagedSchemaException
         super(msg);
         this.schemaOntologyIRI = schemaOntologyIRI;
     }
-
+    
     /**
      * @param ontology
      *            The OWL Ontology IRI that was not managed.
@@ -57,7 +57,7 @@ public class UnmanagedSchemaIRIException extends UnmanagedSchemaException
         super(msg, throwable);
         this.schemaOntologyIRI = schemaOntologyIRI;
     }
-
+    
     /**
      * @param ontology
      *            The OWL Ontology IRI that was not managed.
@@ -69,7 +69,7 @@ public class UnmanagedSchemaIRIException extends UnmanagedSchemaException
         super(throwable);
         this.schemaOntologyIRI = schemaOntologyIRI;
     }
-
+    
     /**
      * @return The OWL Ontology IRI that was not managed.
      */
@@ -77,5 +77,5 @@ public class UnmanagedSchemaIRIException extends UnmanagedSchemaException
     {
         return this.schemaOntologyIRI;
     }
-
+    
 }

@@ -39,22 +39,22 @@ import com.github.podd.utils.PODD;
 public abstract class PoddException extends Exception
 {
     private static final long serialVersionUID = -6240755031638346731L;
-
+    
     public PoddException(final String msg)
     {
         super(msg);
     }
-
+    
     public PoddException(final String msg, final Throwable throwable)
     {
         super(msg, throwable);
     }
-
+    
     public PoddException(final Throwable throwable)
     {
         super(throwable);
     }
-
+    
     /**
      * Retrieve details about this Exception instance as a {@link Model}. This method should be
      * overridden by sub-classes to provide more specific details.
@@ -66,19 +66,19 @@ public abstract class PoddException extends Exception
     public Model getDetailsAsModel(final Resource errorResource)
     {
         final Model model = new LinkedHashModel();
-
+        
         model.add(errorResource, RDF.TYPE, PODD.ERR_TYPE_ERROR);
         model.add(errorResource, PODD.ERR_EXCEPTION_CLASS, PODD.VF.createLiteral(this.getClass().getName()));
-
+        
         if(this.getMessage() != null)
         {
             model.add(errorResource, RDFS.LABEL, PODD.VF.createLiteral(this.getMessage()));
         }
-
+        
         final StringWriter sw = new StringWriter();
         this.printStackTrace(new PrintWriter(sw));
         model.add(errorResource, RDFS.COMMENT, PODD.VF.createLiteral(sw.toString()));
-
+        
         return model;
     }
 }

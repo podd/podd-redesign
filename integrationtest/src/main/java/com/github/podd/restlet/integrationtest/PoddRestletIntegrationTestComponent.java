@@ -52,67 +52,67 @@ public class PoddRestletIntegrationTestComponent extends Component
     static
     {
         System.setProperty("org.restlet.engine.loggerFacadeClass", "org.restlet.ext.slf4j.Slf4jLoggerFacade");
-
+        
         // Optionally remove existing handlers attached to j.u.l root logger
         SLF4JBridgeHandler.removeHandlersForRootLogger(); // (since SLF4J 1.6.5)
-
+        
         // add SLF4JBridgeHandler to j.u.l's root logger, should be done once during
         // the initialization phase of your application
         SLF4JBridgeHandler.install();
     }
-
+    
     private static final Logger log = LoggerFactory.getLogger(PoddRestletIntegrationTestComponent.class);
-
+    
     private String resetKey;
-
+    
     /**
      *
      */
     public PoddRestletIntegrationTestComponent()
     {
         super();
-
+        
         this.getClients().add(Protocol.CLAP);
         this.getClients().add(Protocol.HTTP);
         this.initialise();
     }
-
+    
     /**
      * @param arg0
      */
     public PoddRestletIntegrationTestComponent(final Reference arg0)
     {
         super(arg0);
-
+        
         this.getClients().add(Protocol.CLAP);
         this.getClients().add(Protocol.HTTP);
         this.initialise();
     }
-
+    
     /**
      * @param xmlConfigRepresentation
      */
     public PoddRestletIntegrationTestComponent(final Representation xmlConfigRepresentation)
     {
         super(xmlConfigRepresentation);
-
+        
         this.getClients().add(Protocol.CLAP);
         this.getClients().add(Protocol.HTTP);
         this.initialise();
     }
-
+    
     /**
      * @param xmlConfigurationRef
      */
     public PoddRestletIntegrationTestComponent(final String xmlConfigurationRef)
     {
         super(xmlConfigurationRef);
-
+        
         this.getClients().add(Protocol.CLAP);
         this.getClients().add(Protocol.HTTP);
         this.initialise();
     }
-
+    
     /**
      * @return the resetKey
      */
@@ -120,33 +120,33 @@ public class PoddRestletIntegrationTestComponent extends Component
     {
         return this.resetKey;
     }
-
+    
     public void initialise()
     {
         // FIXME: Make this configurable
         final LocalReference localReference = LocalReference.createClapReference(LocalReference.CLAP_THREAD, "static/");
-
+        
         final CompositeClassLoader customClassLoader = new CompositeClassLoader();
         customClassLoader.addClassLoader(Thread.currentThread().getContextClassLoader());
         customClassLoader.addClassLoader(Router.class.getClassLoader());
-
+        
         final ClassLoaderDirectory directory =
                 new ClassLoaderDirectory(this.getContext().createChildContext(), localReference, customClassLoader);
-
+        
         directory.setListingAllowed(true);
-
+        
         final String resourcesPath = PoddWebConstants.PATH_RESOURCES;
-
+        
         PoddRestletIntegrationTestComponent.log.info("attaching resource handler to path={}", resourcesPath);
-
+        
         // attach the resources first
         this.getDefaultHost().attach(resourcesPath, directory);
-
+        
         PoddWebServiceApplication nextApplication;
         try
         {
             nextApplication = new PoddWebServiceApplicationImpl();
-
+            
             final String resetKey =
                     nextApplication.getPropertyUtil().get(PoddWebConstants.PROPERTY_TEST_WEBSERVICE_RESET_KEY, "");
             // Add a route for the reset service.
@@ -154,15 +154,15 @@ public class PoddRestletIntegrationTestComponent extends Component
             PoddRestletIntegrationTestComponent.log.info("attaching reset service to path={}", resetPath);
             final TestResetResourceImpl reset = new TestResetResourceImpl(nextApplication);
             this.setResetKey(resetKey);
-
+            
             this.getDefaultHost().attach(resetPath, reset);
-
+            
             // attach the web services application
             this.getDefaultHost().attach("/", nextApplication);
-
+            
             // nextApplication.setAliasesConfiguration(Rio.parse(this.getClass().getResourceAsStream("/test-alias.ttl"),
             // "", RDFFormat.TURTLE));
-
+            
             // setup the application after attaching it, as it requires Application.getContext() to
             // not be null during the setup process
             ApplicationUtils.setupApplication(nextApplication, nextApplication.getContext());
@@ -172,10 +172,10 @@ public class PoddRestletIntegrationTestComponent extends Component
         {
             throw new RuntimeException("Could not setup application", e);
         }
-
+        
         PoddRestletIntegrationTestComponent.log.info("routes={}", this.getDefaultHost().getRoutes().toString());
     }
-
+    
     /**
      * This field is used in testing to enable the resetting of the internal elements of the website
      * after each test.
@@ -190,5 +190,5 @@ public class PoddRestletIntegrationTestComponent extends Component
     {
         this.resetKey = key;
     }
-
+    
 }

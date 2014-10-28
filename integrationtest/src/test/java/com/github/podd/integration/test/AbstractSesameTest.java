@@ -35,13 +35,13 @@ import org.slf4j.LoggerFactory;
 public abstract class AbstractSesameTest
 {
     protected Logger log = LoggerFactory.getLogger(this.getClass());
-
+    
     private Repository testRepository;
-
+    
     private ValueFactory testValueFactory;
-
+    
     private RepositoryConnection testRepositoryConnection;
-
+    
     /**
      * @return the testRepository
      */
@@ -49,7 +49,7 @@ public abstract class AbstractSesameTest
     {
         return this.testRepository;
     }
-
+    
     /**
      * @return the testRepositoryConnection
      */
@@ -57,7 +57,7 @@ public abstract class AbstractSesameTest
     {
         return this.testRepositoryConnection;
     }
-
+    
     /**
      * @return the testValueFactory
      */
@@ -65,7 +65,7 @@ public abstract class AbstractSesameTest
     {
         return this.testValueFactory;
     }
-
+    
     /**
      * @throws java.lang.Exception
      */
@@ -74,13 +74,13 @@ public abstract class AbstractSesameTest
     {
         this.testRepository = new SailRepository(new MemoryStore());
         this.testRepository.initialize();
-
+        
         this.testValueFactory = this.testRepository.getValueFactory();
-
+        
         this.testRepositoryConnection = this.testRepository.getConnection();
         this.testRepositoryConnection.begin();
     }
-
+    
     /**
      * @throws java.lang.Exception
      */
@@ -88,7 +88,7 @@ public abstract class AbstractSesameTest
     public void tearDown() throws Exception
     {
         boolean errorOccurred = false;
-
+        
         if(this.testRepositoryConnection != null)
         {
             try
@@ -102,11 +102,11 @@ public abstract class AbstractSesameTest
                 this.log.error("Test repository connection could not be closed", e);
             }
         }
-
+        
         this.testRepositoryConnection = null;
-
+        
         this.testValueFactory = null;
-
+        
         if(this.testRepository != null)
         {
             try
@@ -119,10 +119,10 @@ public abstract class AbstractSesameTest
                 this.log.error("Test repository could not be shutdown", e);
             }
         }
-
+        
         this.testRepository = null;
-
+        
         Assert.assertFalse("Error occurred during tearDown", errorOccurred);
     }
-
+    
 }

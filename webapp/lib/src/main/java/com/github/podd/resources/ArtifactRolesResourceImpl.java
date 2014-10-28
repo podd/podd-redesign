@@ -219,7 +219,7 @@ public class ArtifactRolesResourceImpl extends AbstractPoddResourceImpl
      * @throws SchemaManifestException
      * @throws UnmanagedArtifactVersionException
      * @throws UnmanagedArtifactIRIException
-     * @throws RepositoryNotFoundException 
+     * @throws RepositoryNotFoundException
      */
     private PoddObjectLabel getProjectDetails(final InferredOWLOntologyID ontologyID) throws OpenRDFException,
         UnmanagedSchemaIRIException, SchemaManifestException, UnsupportedRDFormatException, IOException,

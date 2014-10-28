@@ -53,7 +53,7 @@ public class SPARQLDataReferenceImpl extends AbstractDataReferenceImpl implement
     }
     
     @Override
-    public Model toRDF(Model model)
+    public Model toRDF(final Model model)
     {
         super.toRDF(model);
         

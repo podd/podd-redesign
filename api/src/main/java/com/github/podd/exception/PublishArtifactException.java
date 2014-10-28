@@ -25,9 +25,9 @@ import org.semanticweb.owlapi.model.OWLOntologyID;
 public class PublishArtifactException extends PoddException
 {
     private static final long serialVersionUID = -2281384497326519780L;
-
+    
     private OWLOntologyID artifactId;
-
+    
     /**
      * @param msg
      */
@@ -36,7 +36,7 @@ public class PublishArtifactException extends PoddException
         super(msg);
         this.artifactId = artifactId;
     }
-
+    
     /**
      * @param msg
      * @param throwable
@@ -46,7 +46,7 @@ public class PublishArtifactException extends PoddException
         super(msg, throwable);
         this.artifactId = artifactId;
     }
-
+    
     /**
      * @param throwable
      */
@@ -55,7 +55,7 @@ public class PublishArtifactException extends PoddException
         super(throwable);
         this.artifactId = artifactId;
     }
-
+    
     /**
      *
      * @return The {@link OWLOntologyID} of the artifact that was not able to be published.

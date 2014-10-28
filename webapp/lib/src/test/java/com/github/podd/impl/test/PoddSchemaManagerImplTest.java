@@ -60,30 +60,30 @@ public class PoddSchemaManagerImplTest extends AbstractPoddSchemaManagerTest
     {
         final Collection<OWLOntologyManagerFactory> ontologyManagers =
                 OWLOntologyManagerFactoryRegistry.getInstance().get(PoddWebConstants.DEFAULT_OWLAPI_MANAGER);
-
+        
         if(ontologyManagers == null || ontologyManagers.isEmpty())
         {
             this.log.error("OWLOntologyManagerFactory was not found");
         }
         return ontologyManagers.iterator().next();
     }
-
+    
     @Override
     protected PoddOWLManager getNewPoddOwlManagerInstance(final OWLOntologyManagerFactory manager,
             final OWLReasonerFactory reasonerFactory)
     {
         return new PoddOWLManagerImpl(manager, reasonerFactory);
     }
-
+    
     @Override
     protected PoddRepositoryManager getNewPoddRepositoryManagerInstance() throws Exception
     {
         final File repositoryManagerDirectory = this.tempDir.newFolder("repositorymanager");
         final File managementRepositoryDirectory = this.tempDir.newFolder("managementrepository");
-
+        
         final Repository managementRepository = new SailRepository(new MemoryStore(managementRepositoryDirectory));
         managementRepository.initialize();
-
+        
         final Model graph =
                 Rio.parse(this.getClass().getResourceAsStream("/memorystoreconfig.ttl"), "", RDFFormat.TURTLE);
         final Resource repositoryNode = GraphUtil.getUniqueSubject(graph, RepositoryConfigSchema.REPOSITORYTYPE, null);
@@ -95,19 +95,19 @@ public class PoddSchemaManagerImplTest extends AbstractPoddSchemaManagerTest
         return new PoddRepositoryManagerImpl(managementRepository, repositoryImplConfig, "",
                 repositoryManagerDirectory.toPath(), new PropertyUtil("podd"));
     }
-
+    
     @Override
     protected PoddSchemaManager getNewPoddSchemaManagerInstance()
     {
         return new PoddSchemaManagerImpl();
     }
-
+    
     @Override
     protected PoddSesameManager getNewPoddSesameManagerInstance()
     {
         return new PoddSesameManagerImpl();
     }
-
+    
     @Override
     protected OWLReasonerFactory getNewReasonerFactory()
     {

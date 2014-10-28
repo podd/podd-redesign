@@ -44,22 +44,22 @@ public class UserSearchResourceImpl extends AbstractUserResourceImpl
     public Representation searchUsersRdf(final Representation entity, final Variant variant) throws ResourceException
     {
         this.log.info("searchUsersRdf");
-
+        
         final User user = this.getRequest().getClientInfo().getUser();
         this.log.info("authenticated user: {}", user);
         this.checkAuthentication(PoddAction.OTHER_USER_SEARCH);
-
+        
         // - get input search term (mandatory)
         final String searchTerm = this.getQuery().getFirstValue(PoddWebConstants.KEY_SEARCHTERM, true);
         if(searchTerm == null)
         {
             throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Search term not submitted");
         }
-
+        
         // - search for matching users in Realm
         final PoddSesameRealm realm = ((PoddWebServiceApplication)this.getApplication()).getRealm();
         final List<PoddUser> resultList = realm.searchUser(searchTerm, null, false, -1, 0);
-
+        
         // - convert results into a Model for sending back
         final Model resultModel = new LinkedHashModel();
         for(final PoddUser resultUser : resultList)
@@ -69,7 +69,7 @@ public class UserSearchResourceImpl extends AbstractUserResourceImpl
             resultModel.add(resultUser.getUri(), SesameRealmConstants.OAS_USERIDENTIFIER,
                     PODD.VF.createLiteral(resultUser.getIdentifier()));
         }
-
+        
         // - prepare response
         final ByteArrayOutputStream output = new ByteArrayOutputStream(8096);
         final RDFFormat outputFormat =
@@ -88,5 +88,5 @@ public class UserSearchResourceImpl extends AbstractUserResourceImpl
         }
         return new ByteArrayRepresentation(output.toByteArray(), MediaType.valueOf(outputFormat.getDefaultMIMEType()));
     }
-
+    
 }

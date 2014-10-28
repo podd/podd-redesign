@@ -16,9 +16,6 @@
  */
 package com.github.podd.restlet;
 
-import freemarker.ext.beans.BeansWrapper;
-import freemarker.template.Configuration;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
@@ -92,6 +89,9 @@ import com.github.podd.utils.PoddRoles;
 import com.github.podd.utils.PoddUser;
 import com.github.podd.utils.PoddUserStatus;
 import com.github.podd.utils.PoddWebConstants;
+
+import freemarker.ext.beans.BeansWrapper;
+import freemarker.template.Configuration;
 
 /**
  * @author Peter Ansell p_ansell@yahoo.com
@@ -568,7 +568,8 @@ public class ApplicationUtils
                         {
                             set = putIfAbsent;
                         }
-                        // FIXME: Choose these in a way which will not automatically include everything
+                        // FIXME: Choose these in a way which will not automatically include
+                        // everything
                         set.addAll(currentSchemaOntologies);
                         // Do not continue this loop in this naive strategy
                         break;

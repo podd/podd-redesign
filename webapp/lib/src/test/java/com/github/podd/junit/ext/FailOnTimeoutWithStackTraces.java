@@ -54,28 +54,28 @@ public class FailOnTimeoutWithStackTraces extends Statement
             return null;
         }
     }
-
+    
     private final Statement fOriginalStatement;
     private final TimeUnit fTimeUnit;
-
+    
     private final long fTimeout;
-
+    
     public FailOnTimeoutWithStackTraces(final Statement originalStatement, final long millis)
     {
         this(originalStatement, millis, TimeUnit.MILLISECONDS);
     }
-
+    
     public FailOnTimeoutWithStackTraces(final Statement originalStatement, final long timeout, final TimeUnit unit)
     {
         this.fOriginalStatement = originalStatement;
         this.fTimeout = timeout;
         this.fTimeUnit = unit;
     }
-
+    
     private Exception createTimeoutException(final Thread thread)
     {
         final String allStackTraces = this.getStackTraces();
-
+        
         Exception exception;
         if(allStackTraces.length() == 0)
         {
@@ -98,7 +98,7 @@ public class FailOnTimeoutWithStackTraces extends Statement
         }
         return exception;
     }
-
+    
     @Override
     public void evaluate() throws Throwable
     {
@@ -112,7 +112,7 @@ public class FailOnTimeoutWithStackTraces extends Statement
             throw throwable;
         }
     }
-
+    
     /**
      * Wait for the test task, returning the exception thrown by the test if the test failed, an
      * exception indicating a timeout if the test timed out, or {@code null} if the test passed.
@@ -139,7 +139,7 @@ public class FailOnTimeoutWithStackTraces extends Statement
             return this.createTimeoutException(thread);
         }
     }
-
+    
     /**
      * Gets all thread stack traces.
      *

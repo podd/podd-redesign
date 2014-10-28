@@ -61,9 +61,9 @@ import freemarker.template.Configuration;
 public class PoddStatusService extends StatusService
 {
     private final Logger log = LoggerFactory.getLogger(this.getClass());
-
+    
     private Configuration freemarkerConfiguration;
-
+    
     /**
      *
      */
@@ -72,7 +72,7 @@ public class PoddStatusService extends StatusService
         super();
         this.freemarkerConfiguration = freemarkerConfiguration;
     }
-
+    
     /**
      * @param enabled
      */
@@ -81,7 +81,7 @@ public class PoddStatusService extends StatusService
         super(enabled);
         this.freemarkerConfiguration = freemarkerConfiguration;
     }
-
+    
     private String convertModelToString(final Model model, final MediaType preferredMediaType)
     {
         final StringWriter out = new StringWriter();
@@ -99,22 +99,22 @@ public class PoddStatusService extends StatusService
         }
         return out.toString();
     }
-
+    
     private Model getErrorAsModel(final Status status)
     {
         final Model model = new LinkedHashModel();
-
+        
         final BNode topNode = PODD.VF.createBNode("error");
         model.add(topNode, RDF.TYPE, PODD.ERR_TYPE_TOP_ERROR);
         model.add(topNode, PODD.HTTP_STATUS_CODE_VALUE, PODD.VF.createLiteral(status.getCode()));
         model.add(topNode, PODD.HTTP_REASON_PHRASE, PODD.VF.createLiteral(status.getReasonPhrase()));
-
+        
         final String errorDescription = status.getDescription();
         model.add(topNode, RDFS.COMMENT, PODD.VF.createLiteral(errorDescription));
-
+        
         final BNode errorNode = PODD.VF.createBNode("cause");
         model.add(topNode, PODD.ERR_CONTAINS, errorNode);
-
+        
         final Throwable throwable = status.getThrowable();
         if(throwable != null && throwable instanceof PoddException)
         {
@@ -123,16 +123,16 @@ public class PoddStatusService extends StatusService
         else
         {
             model.add(errorNode, RDF.TYPE, PODD.ERR_TYPE_ERROR);
-
+            
             if(throwable != null)
             {
                 model.add(errorNode, PODD.ERR_EXCEPTION_CLASS, PODD.VF.createLiteral(throwable.getClass().getName()));
-
+                
                 if(throwable.getMessage() != null)
                 {
                     model.add(errorNode, RDFS.LABEL, PODD.VF.createLiteral(throwable.getMessage()));
                 }
-
+                
                 final StringWriter sw = new StringWriter();
                 throwable.printStackTrace(new PrintWriter(sw));
                 model.add(errorNode, RDFS.COMMENT, PODD.VF.createLiteral(sw.toString()));
@@ -144,10 +144,10 @@ public class PoddStatusService extends StatusService
         }
         return model;
     }
-
+    
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see org.restlet.service.StatusService#getRepresentation(org.restlet.data. Status,
      * org.restlet.Request, org.restlet.Response)
      */
@@ -158,7 +158,7 @@ public class PoddStatusService extends StatusService
         MediaType preferredMediaType = MediaType.TEXT_PLAIN;
         float maxQuality = 0;
         final List<Preference<MediaType>> acceptedMediaTypes = request.getClientInfo().getAcceptedMediaTypes();
-
+        
         for(final Preference<MediaType> pref : acceptedMediaTypes)
         {
             final float quality = pref.getQuality();
@@ -168,7 +168,7 @@ public class PoddStatusService extends StatusService
                 maxQuality = quality;
             }
         }
-
+        
         Representation representation = null;
         if(MediaType.APPLICATION_RDF_XML.equals(preferredMediaType)
                 || RestletUtilMediaType.APPLICATION_RDF_JSON.equals(preferredMediaType)
@@ -177,14 +177,14 @@ public class PoddStatusService extends StatusService
             representation = this.getRepresentationRdf(status, request, response, preferredMediaType);
         }
         else
-            // if (MediaType.TEXT_HTML.equals(preferredMediaType))
+        // if (MediaType.TEXT_HTML.equals(preferredMediaType))
         {
             representation = this.getRepresentationHtml(status, request, response);
         }
-
+        
         return representation;
     }
-
+    
     /**
      * Returns an Error page representation in text/html.
      *
@@ -192,11 +192,11 @@ public class PoddStatusService extends StatusService
     private Representation getRepresentationHtml(final Status status, final Request request, final Response response)
     {
         final Map<String, Object> dataModel = RestletUtils.getBaseDataModel(request);
-
+        
         dataModel.put("contentTemplate", "error.html.ftl");
         dataModel.put("pageTitle", "An error occurred : HTTP " + status.getCode());
         dataModel.put("error_code", Integer.toString(status.getCode()));
-
+        
         final StringBuilder message = new StringBuilder();
         if(status.getDescription() != null)
         {
@@ -209,16 +209,16 @@ public class PoddStatusService extends StatusService
             message.append(")");
         }
         dataModel.put("message", message.toString());
-
+        
         final Model model = this.getErrorAsModel(status);
-
+        
         final String errorModelAsString = this.convertModelToString(model, RestletUtilMediaType.APPLICATION_RDF_JSON);
         dataModel.put("message_details", errorModelAsString);
-
+        
         return RestletUtils.getHtmlRepresentation("poddBase.html.ftl", dataModel, MediaType.TEXT_HTML,
                 this.freemarkerConfiguration);
     }
-
+    
     /**
      * Returns an Error page representation in RDF/XML.
      *
@@ -229,12 +229,12 @@ public class PoddStatusService extends StatusService
             final MediaType preferredMediaType)
     {
         final Model model = this.getErrorAsModel(status);
-
+        
         // get a String representation of the statements in the Model
         final String modelAsString = this.convertModelToString(model, preferredMediaType);
-
+        
         return new AppendableRepresentation(modelAsString, MediaType.APPLICATION_RDF_XML, Language.DEFAULT,
                 CharacterSet.UTF_8);
     }
-
+    
 }

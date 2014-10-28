@@ -44,40 +44,40 @@ public class PoddSesameManagerImplTest extends AbstractPoddSesameManagerTest
     {
         final Collection<OWLOntologyManagerFactory> ontologyManagers =
                 OWLOntologyManagerFactoryRegistry.getInstance().get(PoddWebConstants.DEFAULT_OWLAPI_MANAGER);
-
+        
         if(ontologyManagers == null || ontologyManagers.isEmpty())
         {
             this.log.error("OWLOntologyManagerFactory was not found");
         }
         return ontologyManagers.iterator().next();
     }
-
+    
     @Override
     public final PoddSesameManager getNewPoddSesameManagerInstance()
     {
         return new PoddSesameManagerImpl();
     }
-
+    
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see com.github.podd.api.test.AbstractPoddSesameManagerTest#loadSchemaOntologies
      * (org.openrdf. repository.RepositoryConnection)
-     *
+     * 
      * NOTE: This test implementation creates a PoddOWLManager instance in order to dynamically
      * generate inferred statements for schema ontologies.
      */
     @Override
     public final List<InferredOWLOntologyID> loadSchemaOntologies(final RepositoryConnection managementConnection,
             final URI schemaManagementGraph) throws Exception
-            {
+    {
         final Model model =
-                Rio.parse(this.getClass().getResourceAsStream("/default-podd-schema-manifest.ttl"), "", RDFFormat.TURTLE,
-                        schemaManagementGraph);
-
+                Rio.parse(this.getClass().getResourceAsStream("/default-podd-schema-manifest.ttl"), "",
+                        RDFFormat.TURTLE, schemaManagementGraph);
+        
         final List<InferredOWLOntologyID> ontologyIDs =
                 OntologyUtils.loadSchemasFromManifest(managementConnection, schemaManagementGraph, model);
-
+        
         // TODO: If any tests require inferencing, then we may need to recreate the following
         // - create a PODD OWLManager instance
         // final OWLReasonerFactory reasonerFactory =
@@ -89,8 +89,8 @@ public class PoddSesameManagerImplTest extends AbstractPoddSesameManagerTest
         // testPoddOWLManager.cacheSchemaOntologies(new LinkedHashSet<>(ontologyIDs),
         // managementConnection,
         // schemaManagementGraph);
-
+        
         return ontologyIDs;
-            }
-
+    }
+    
 }

@@ -26,12 +26,12 @@ import com.github.podd.impl.data.SSHFileReferenceImpl;
  */
 public class SSHFileReferenceImplTest extends AbstractSSHFileReferenceTest
 {
-
+    
     @Override
     protected SSHFileReference getNewSSHFileReference()
     {
         final SSHFileReference ref = new SSHFileReferenceImpl();
         return ref;
     }
-
+    
 }

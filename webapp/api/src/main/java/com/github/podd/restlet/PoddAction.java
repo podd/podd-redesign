@@ -45,170 +45,170 @@ public enum PoddAction
      */
     ARTIFACT_CREATE(true, "Could not create artifact.", new HashSet<Role>(Arrays.asList(PoddRoles.ADMIN.getRole(),
             PoddRoles.PROJECT_CREATOR.getRole())), false),
-
-            /**
-             * An action by a user asking to update an existing artifact.
-             *
-             * By default administrator, project-admin and project-member users are allowed to update
-             * artifacts.
-             */
-            ARTIFACT_EDIT(true, "Could not edit artifact.", new HashSet<Role>(Arrays.asList(PoddRoles.ADMIN.getRole(),
-                    PoddRoles.PROJECT_MEMBER.getRole(), PoddRoles.PROJECT_ADMIN.getRole())), true),
-
-                    /**
-                     * An action by a user asking to delete an unpublished artifact.
-                     *
-                     * By default only administrators and project-admin users are allowed to delete artifacts.
-                     */
-                    UNPUBLISHED_ARTIFACT_DELETE(true, "Could not delete artifact", new HashSet<Role>(Arrays.asList(
-                            PoddRoles.PROJECT_ADMIN.getRole(), PoddRoles.ADMIN.getRole())), true),
-
-                            /**
-                             * An action by a user asking to read an unpublished artifact.
-                             *
-                             * By default only project-member, project-admin, and administrator users are allowed to read
-                             * unpublished artifacts.
-                             */
-                            UNPUBLISHED_ARTIFACT_READ(true, "Failed to read unpublished artifact", new HashSet<Role>(Arrays.asList(
-                                    PoddRoles.PROJECT_OBSERVER.getRole(), PoddRoles.PROJECT_ADMIN.getRole(),
-                                    PoddRoles.PROJECT_MEMBER.getRole(), PoddRoles.ADMIN.getRole())), true),
-
-                                    /**
-                                     * An action by a user asking to request a list of unpublished artifacts that they have access
-                                     * to.
-                                     *
-                                     * By default any authenticated user with any role must be able to initiate this action. Viewing
-                                     * permissions for specific artifacts is then checked using UNPUBLISHED_ARTIFACT_READ to
-                                     * determine whether the artifact is included in the list that is returned.
-                                     */
-                                    UNPUBLISHED_ARTIFACT_LIST(true, "Failed to list unpublished artifacts", new HashSet<Role>(PoddRoles.getRoles()),
-                                            false),
-
-                                            /**
-                                             * An action by a user asking to read a published artifact.
-                                             *
-                                             * By default all unauthenticated users are allowed to read published artifacts.
-                                             */
-                                            PUBLISHED_ARTIFACT_READ(false, "Failed to read published artifact", Collections.<Role> emptySet(), true),
-
-                                            /**
-                                             * An action by a user asking to publish an artifact.
-                                             *
-                                             * By default only the administrators and project-admin users are allowed to publish projects.
-                                             */
-                                            ARTIFACT_PUBLISH(true, "Could not publish artifact", new HashSet<Role>(
-                                                    Arrays.asList(PoddRoles.PROJECT_PRINCIPAL_INVESTIGATOR.getRole())), true),
-
-                                                    /**
-                                                     * An action by an administrator asking to create a new user, or update an existing user.
-                                                     *
-                                                     * By default only the administrators are allowed to create new users.
-                                                     */
-                                                    USER_CREATE(true, "Could not create/update user.", Collections.singleton(PoddRoles.ADMIN.getRole()), false),
-
-                                                    /**
-                                                     * An action by an administrator asking to delete an existing user.
-                                                     *
-                                                     * By default only administrators are allowed to delete existing users.
-                                                     */
-                                                    USER_DELETE(true, "Could not delete user", Collections.singleton(PoddRoles.ADMIN.getRole()), true),
-
-                                                    /**
-                                                     * An action by a user asking to fetch their details
-                                                     *
-                                                     * By default all authenticated users can request their user details.
-                                                     */
-                                                    CURRENT_USER_READ(true, "Could not retrieve current user details", Collections.<Role> emptySet(), false),
-
-                                                    /**
-                                                     * An action by a user asking to fetch information about another user.
-                                                     *
-                                                     * By default if they are not administrators, they will not be able to see information about
-                                                     * other users.
-                                                     */
-                                                    OTHER_USER_READ(true, "Could not retrieve other user details", Collections.singleton(PoddRoles.ADMIN.getRole()),
-                                                            false),
-
-                                                            /**
-                                                             * An action by a user asking to list other users.
-                                                             *
-                                                             * By default administrators can perform this action while project creators and project
-                                                             * administrators can also list other users for the purpose of assigning them Roles in their
-                                                             * projects.
-                                                             */
-                                                            OTHER_USER_SEARCH(true, "Could not find other users", new HashSet<Role>(Arrays.asList(
-                                                                    PoddRoles.PROJECT_CREATOR.getRole(), PoddRoles.PROJECT_ADMIN.getRole(), PoddRoles.ADMIN.getRole())), false),
-
-                                                                    /**
-                                                                     * An action by a user asking to edit their details
-                                                                     *
-                                                                     * By default all authenticated users can edit their user details.
-                                                                     */
-                                                                    CURRENT_USER_EDIT(true, "Could not edit current user details", Collections.<Role> emptySet(), false),
-
-                                                                    /**
-                                                                     * An action by a user asking to edit information about another user.
-                                                                     *
-                                                                     * By default if they are not administrators, they will not be able to edit information about
-                                                                     * other users.
-                                                                     */
-                                                                    OTHER_USER_EDIT(true, "Could not edit other user details", Collections.singleton(PoddRoles.ADMIN.getRole()), false),
-
-                                                                    /**
-                                                                     * An action by an administrator asking to edit repository roles for a user.
-                                                                     *
-                                                                     * By default only administrators are allowed to edit repository roles.
-                                                                     */
-                                                                    REPOSITORY_ROLE_EDIT(true, "Could not assign role", Collections.singleton(PoddRoles.ADMIN.getRole()), false),
-
-                                                                    /**
-                                                                     * An action by a project administrator to assign a role on a project.
-                                                                     *
-                                                                     * By default only the administrators and project-admin users are allowed to edit project roles.
-                                                                     */
-                                                                    PROJECT_ROLE_EDIT(true, "Could not assign role", new HashSet<Role>(Arrays.asList(PoddRoles.PROJECT_ADMIN.getRole(),
-                                                                            PoddRoles.ADMIN.getRole())), true),
-
-                                                                            /**
-                                                                             * An action by a user asking to fetch information about a data repository.
-                                                                             *
-                                                                             * By default if they are not administrators, they will not be able to see specific information
-                                                                             * about data repositories.
-                                                                             */
-                                                                            DATA_REPOSITORY_READ(true, "Could not retrieve data repository details", Collections.singleton(PoddRoles.ADMIN
-                                                                                    .getRole()), false),
-
-                                                                                    /**
-                                                                                     * An action by a user asking to fetch information about a data repository.
-                                                                                     *
-                                                                                     * By default all users can list data repositories, although specific configuration information
-                                                                                     * is not provided, only labels, aliases, and types are provided.
-                                                                                     */
-                                                                                    DATA_REPOSITORY_LIST(true, "Could not list data repository details", new HashSet<Role>(Arrays.asList(
-                                                                                            PoddRoles.PROJECT_OBSERVER.getRole(), PoddRoles.PROJECT_ADMIN.getRole(),
-                                                                                            PoddRoles.PROJECT_MEMBER.getRole(), PoddRoles.ADMIN.getRole())), false),
-
-                                                                                            ;
-
+    
+    /**
+     * An action by a user asking to update an existing artifact.
+     *
+     * By default administrator, project-admin and project-member users are allowed to update
+     * artifacts.
+     */
+    ARTIFACT_EDIT(true, "Could not edit artifact.", new HashSet<Role>(Arrays.asList(PoddRoles.ADMIN.getRole(),
+            PoddRoles.PROJECT_MEMBER.getRole(), PoddRoles.PROJECT_ADMIN.getRole())), true),
+    
+    /**
+     * An action by a user asking to delete an unpublished artifact.
+     *
+     * By default only administrators and project-admin users are allowed to delete artifacts.
+     */
+    UNPUBLISHED_ARTIFACT_DELETE(true, "Could not delete artifact", new HashSet<Role>(Arrays.asList(
+            PoddRoles.PROJECT_ADMIN.getRole(), PoddRoles.ADMIN.getRole())), true),
+    
+    /**
+     * An action by a user asking to read an unpublished artifact.
+     *
+     * By default only project-member, project-admin, and administrator users are allowed to read
+     * unpublished artifacts.
+     */
+    UNPUBLISHED_ARTIFACT_READ(true, "Failed to read unpublished artifact", new HashSet<Role>(Arrays.asList(
+            PoddRoles.PROJECT_OBSERVER.getRole(), PoddRoles.PROJECT_ADMIN.getRole(),
+            PoddRoles.PROJECT_MEMBER.getRole(), PoddRoles.ADMIN.getRole())), true),
+    
+    /**
+     * An action by a user asking to request a list of unpublished artifacts that they have access
+     * to.
+     *
+     * By default any authenticated user with any role must be able to initiate this action. Viewing
+     * permissions for specific artifacts is then checked using UNPUBLISHED_ARTIFACT_READ to
+     * determine whether the artifact is included in the list that is returned.
+     */
+    UNPUBLISHED_ARTIFACT_LIST(true, "Failed to list unpublished artifacts", new HashSet<Role>(PoddRoles.getRoles()),
+            false),
+    
+    /**
+     * An action by a user asking to read a published artifact.
+     *
+     * By default all unauthenticated users are allowed to read published artifacts.
+     */
+    PUBLISHED_ARTIFACT_READ(false, "Failed to read published artifact", Collections.<Role> emptySet(), true),
+    
+    /**
+     * An action by a user asking to publish an artifact.
+     *
+     * By default only the administrators and project-admin users are allowed to publish projects.
+     */
+    ARTIFACT_PUBLISH(true, "Could not publish artifact", new HashSet<Role>(
+            Arrays.asList(PoddRoles.PROJECT_PRINCIPAL_INVESTIGATOR.getRole())), true),
+    
+    /**
+     * An action by an administrator asking to create a new user, or update an existing user.
+     *
+     * By default only the administrators are allowed to create new users.
+     */
+    USER_CREATE(true, "Could not create/update user.", Collections.singleton(PoddRoles.ADMIN.getRole()), false),
+    
+    /**
+     * An action by an administrator asking to delete an existing user.
+     *
+     * By default only administrators are allowed to delete existing users.
+     */
+    USER_DELETE(true, "Could not delete user", Collections.singleton(PoddRoles.ADMIN.getRole()), true),
+    
+    /**
+     * An action by a user asking to fetch their details
+     *
+     * By default all authenticated users can request their user details.
+     */
+    CURRENT_USER_READ(true, "Could not retrieve current user details", Collections.<Role> emptySet(), false),
+    
+    /**
+     * An action by a user asking to fetch information about another user.
+     *
+     * By default if they are not administrators, they will not be able to see information about
+     * other users.
+     */
+    OTHER_USER_READ(true, "Could not retrieve other user details", Collections.singleton(PoddRoles.ADMIN.getRole()),
+            false),
+    
+    /**
+     * An action by a user asking to list other users.
+     *
+     * By default administrators can perform this action while project creators and project
+     * administrators can also list other users for the purpose of assigning them Roles in their
+     * projects.
+     */
+    OTHER_USER_SEARCH(true, "Could not find other users", new HashSet<Role>(Arrays.asList(
+            PoddRoles.PROJECT_CREATOR.getRole(), PoddRoles.PROJECT_ADMIN.getRole(), PoddRoles.ADMIN.getRole())), false),
+    
+    /**
+     * An action by a user asking to edit their details
+     *
+     * By default all authenticated users can edit their user details.
+     */
+    CURRENT_USER_EDIT(true, "Could not edit current user details", Collections.<Role> emptySet(), false),
+    
+    /**
+     * An action by a user asking to edit information about another user.
+     *
+     * By default if they are not administrators, they will not be able to edit information about
+     * other users.
+     */
+    OTHER_USER_EDIT(true, "Could not edit other user details", Collections.singleton(PoddRoles.ADMIN.getRole()), false),
+    
+    /**
+     * An action by an administrator asking to edit repository roles for a user.
+     *
+     * By default only administrators are allowed to edit repository roles.
+     */
+    REPOSITORY_ROLE_EDIT(true, "Could not assign role", Collections.singleton(PoddRoles.ADMIN.getRole()), false),
+    
+    /**
+     * An action by a project administrator to assign a role on a project.
+     *
+     * By default only the administrators and project-admin users are allowed to edit project roles.
+     */
+    PROJECT_ROLE_EDIT(true, "Could not assign role", new HashSet<Role>(Arrays.asList(PoddRoles.PROJECT_ADMIN.getRole(),
+            PoddRoles.ADMIN.getRole())), true),
+    
+    /**
+     * An action by a user asking to fetch information about a data repository.
+     *
+     * By default if they are not administrators, they will not be able to see specific information
+     * about data repositories.
+     */
+    DATA_REPOSITORY_READ(true, "Could not retrieve data repository details", Collections.singleton(PoddRoles.ADMIN
+            .getRole()), false),
+    
+    /**
+     * An action by a user asking to fetch information about a data repository.
+     *
+     * By default all users can list data repositories, although specific configuration information
+     * is not provided, only labels, aliases, and types are provided.
+     */
+    DATA_REPOSITORY_LIST(true, "Could not list data repository details", new HashSet<Role>(Arrays.asList(
+            PoddRoles.PROJECT_OBSERVER.getRole(), PoddRoles.PROJECT_ADMIN.getRole(),
+            PoddRoles.PROJECT_MEMBER.getRole(), PoddRoles.ADMIN.getRole())), false),
+    
+    ;
+    
     private final boolean authRequired;
     private final String errorMessage;
     private final Set<Role> roles;
     private final boolean requiresObjectUris;
-
+    
     PoddAction(final boolean authenticationRequired, final String errorMessage, final Set<Role> roles,
             final boolean requiresObjectUris)
-            {
+    {
         this.authRequired = authenticationRequired;
         this.errorMessage = errorMessage;
         this.roles = roles;
         this.requiresObjectUris = requiresObjectUris;
-            }
-
+    }
+    
     public String getErrorMessage()
     {
         return this.errorMessage;
     }
-
+    
     /**
      * @return the authRequired
      */
@@ -216,12 +216,12 @@ public enum PoddAction
     {
         return this.authRequired;
     }
-
+    
     public boolean isRoleRequired()
     {
         return !this.roles.isEmpty();
     }
-
+    
     /**
      * Returns true if isRoleRequired() returns true and any of the roles in authenticatedRoles are
      * in the set of roles for this action.
@@ -237,7 +237,7 @@ public enum PoddAction
         {
             return true;
         }
-
+        
         for(final Role nextAuthenticatedRole : authenticatedRoles)
         {
             if(this.roles.contains(nextAuthenticatedRole))
@@ -245,10 +245,10 @@ public enum PoddAction
                 return true;
             }
         }
-
+        
         return false;
     }
-
+    
     public boolean requiresObjectUris(final List<Role> roles)
     {
         if(roles != null && roles.contains(PoddRoles.ADMIN.getRole()))

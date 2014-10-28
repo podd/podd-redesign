@@ -53,7 +53,7 @@ import com.github.podd.utils.PoddWebConstants;
  */
 public class UserDetailsResourceImplTest extends AbstractResourceImplTest
 {
-
+    
     /**
      * Test requesting details of a non-existent user results in a 404 response
      */
@@ -65,7 +65,7 @@ public class UserDetailsResourceImplTest extends AbstractResourceImplTest
         try
         {
             userDetailsClientResource.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, "noSuchUser");
-
+            
             this.doTestAuthenticatedRequest(userDetailsClientResource, Method.GET, null, MediaType.TEXT_HTML,
                     Status.CLIENT_ERROR_NOT_FOUND, AbstractResourceImplTest.WITH_ADMIN);
         }
@@ -78,7 +78,7 @@ public class UserDetailsResourceImplTest extends AbstractResourceImplTest
             this.releaseClient(userDetailsClientResource);
         }
     }
-
+    
     /**
      * Test authenticated user requesting details of another user is not allowed
      */
@@ -91,7 +91,7 @@ public class UserDetailsResourceImplTest extends AbstractResourceImplTest
         {
             userDetailsClientResource.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER,
                     RestletTestUtils.TEST_ADMIN_USERNAME);
-
+            
             this.doTestAuthenticatedRequest(userDetailsClientResource, Method.GET, null, MediaType.TEXT_HTML,
                     Status.CLIENT_ERROR_UNAUTHORIZED, AbstractResourceImplTest.NO_ADMIN);
             Assert.fail("Should have thrown a ResourceException with Status Code 401");
@@ -105,7 +105,7 @@ public class UserDetailsResourceImplTest extends AbstractResourceImplTest
             this.releaseClient(userDetailsClientResource);
         }
     }
-
+    
     /**
      * Test unauthenticated access gives an UNAUTHORIZED error.
      */
@@ -114,12 +114,12 @@ public class UserDetailsResourceImplTest extends AbstractResourceImplTest
     {
         final ClientResource userDetailsClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_DETAILS));
-
+        
         try
         {
             userDetailsClientResource.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER,
                     RestletTestUtils.TEST_ADMIN_USERNAME);
-
+            
             userDetailsClientResource.get(MediaType.TEXT_HTML);
             Assert.fail("Should have thrown a ResourceException with Status Code 401");
         }
@@ -132,7 +132,7 @@ public class UserDetailsResourceImplTest extends AbstractResourceImplTest
             this.releaseClient(userDetailsClientResource);
         }
     }
-
+    
     /**
      * Test authenticated Admin user requesting details of another user
      */
@@ -148,17 +148,17 @@ public class UserDetailsResourceImplTest extends AbstractResourceImplTest
         this.loadTestUser(testIdentifier, "testuserpassword", "John", "Doe", testIdentifier,
                 "http:///www.john.doe.com", "CSIRO", "john-orcid", "Mr", "000333434", "Some Address", "Researcher",
                 roles, PoddUserStatus.ACTIVE);
-
+        
         final ClientResource userDetailsClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_DETAILS));
         try
         {
             userDetailsClientResource.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, testIdentifier);
-
+            
             final Representation results =
                     this.doTestAuthenticatedRequest(userDetailsClientResource, Method.GET, null, MediaType.TEXT_HTML,
                             Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
-
+            
             final String body = this.getText(results);
             Assert.assertTrue(body.contains("User Name: "));
             Assert.assertTrue(body.contains("testuser@podd.com"));
@@ -169,7 +169,7 @@ public class UserDetailsResourceImplTest extends AbstractResourceImplTest
             this.releaseClient(userDetailsClientResource);
         }
     }
-
+    
     /**
      * Test authenticated access to user details of current user
      */
@@ -182,11 +182,11 @@ public class UserDetailsResourceImplTest extends AbstractResourceImplTest
         {
             userDetailsClientResource.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER,
                     RestletTestUtils.TEST_ADMIN_USERNAME);
-
+            
             final Representation results =
                     this.doTestAuthenticatedRequest(userDetailsClientResource, Method.GET, null, MediaType.TEXT_HTML,
                             Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
-
+            
             final String body = this.getText(results);
             Assert.assertTrue(body.contains("Personal Details"));
             Assert.assertTrue(body.contains("User Name: "));
@@ -198,7 +198,7 @@ public class UserDetailsResourceImplTest extends AbstractResourceImplTest
             this.releaseClient(userDetailsClientResource);
         }
     }
-
+    
     /**
      * Test authenticated access to user details of current user
      */
@@ -207,24 +207,24 @@ public class UserDetailsResourceImplTest extends AbstractResourceImplTest
     {
         final MediaType mediaType = MediaType.APPLICATION_RDF_XML;
         final RDFFormat format = Rio.getWriterFormatForMIMEType(mediaType.getName(), RDFFormat.RDFXML);
-
+        
         final ClientResource userDetailsClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_DETAILS));
         try
         {
             userDetailsClientResource.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER,
                     RestletTestUtils.TEST_ADMIN_USERNAME);
-
+            
             final Representation results =
                     this.doTestAuthenticatedRequest(userDetailsClientResource, Method.GET, null, mediaType,
                             Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
-
+            
             final Model resultsModel = this.assertRdf(results, format, 11);
-
+            
             // DebugUtils.printContents(resultsModel);
             Assert.assertEquals("Not the expected identifier", "testAdminUser",
                     resultsModel.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).objectString());
-
+            
             // verify: Roles are valid PoddRoles
             final Set<Value> roleSet =
                     resultsModel.filter(null, SesameRealmConstants.OAS_ROLEMAPPEDROLE, null).objects();
@@ -242,7 +242,7 @@ public class UserDetailsResourceImplTest extends AbstractResourceImplTest
             this.releaseClient(userDetailsClientResource);
         }
     }
-
+    
     @Test
     public void testGetUserRolesWithOptionalUrisRdf() throws Exception
     {
@@ -255,27 +255,27 @@ public class UserDetailsResourceImplTest extends AbstractResourceImplTest
         final String testUserUri =
                 this.loadTestUser(testIdentifier, "testuserpassword", "John", "Doe", testIdentifier, null, null, null,
                         null, null, null, null, roles, PoddUserStatus.ACTIVE);
-
+        
         // retrieve user details:
         final MediaType mediaType = MediaType.APPLICATION_RDF_XML;
         final RDFFormat format = Rio.getWriterFormatForMIMEType(mediaType.getName(), RDFFormat.RDFXML);
-
+        
         final ClientResource userDetailsClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_DETAILS));
         try
         {
             userDetailsClientResource.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, testIdentifier);
-
+            
             final Representation results =
                     this.doTestAuthenticatedRequest(userDetailsClientResource, Method.GET, null, mediaType,
                             Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
-
+            
             final Model resultsModel = this.assertRdf(results, format, 12);
-
+            
             // verify:
             Assert.assertEquals("Not the expected User URI", testUserUri,
                     resultsModel.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).subjects().iterator()
-                    .next().stringValue());
+                            .next().stringValue());
             Assert.assertEquals("Not the expected object URI", testObjectUri,
                     resultsModel.filter(null, PODD.PODD_ROLEMAPPEDOBJECT, null).objectURI());
             Assert.assertEquals("Not the expected User Status", PoddUserStatus.ACTIVE.getURI(),
@@ -286,5 +286,5 @@ public class UserDetailsResourceImplTest extends AbstractResourceImplTest
             this.releaseClient(userDetailsClientResource);
         }
     }
-
+    
 }

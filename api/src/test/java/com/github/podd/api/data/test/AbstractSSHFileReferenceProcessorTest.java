@@ -39,41 +39,41 @@ import com.github.podd.utils.PODD;
  *
  */
 public abstract class AbstractSSHFileReferenceProcessorTest extends
-AbstractDataReferenceProcessorTest<SSHFileReference>
+        AbstractDataReferenceProcessorTest<SSHFileReference>
 {
     @Override
     protected Set<URI> getExpectedDataReferenceTypes()
     {
         return Collections.singleton(PODD.PODD_BASE_FILE_REFERENCE_TYPE_SSH);
     }
-
+    
     @Override
     protected final DataReferenceProcessor<SSHFileReference> getNewDataReferenceProcessor()
     {
         return this.getNewSSHFileReferenceProcessor();
     }
-
+    
     protected abstract SSHFileReferenceProcessor getNewSSHFileReferenceProcessor();
-
+    
     @Override
     protected String getPathToResourceWith2DataReferences()
     {
         return TestConstants.TEST_ARTIFACT_PURLS_2_FILE_REFS;
     }
-
+    
     @Override
     protected void verify2DataReferences(final Collection<SSHFileReference> fileReferences)
     {
         Assert.assertNotNull("NULL collection of file references", fileReferences);
         Assert.assertEquals("Expected 2 file references to verify", 2, fileReferences.size());
-
+        
         final List<String> objectIriList =
                 Arrays.asList("http://purl.org/podd-test/130326f/object-rice-scan-34343-a",
                         "http://purl.org/podd-test/130326f/object-rice-scan-34343-b");
-
+        
         final List<String> labelList = Arrays.asList("Rice tree scan 003454-98", "Rice tree scan 003454-99");
         final List<String> filenameList = Arrays.asList("plant_003456-233445.bag.zip", "plant_003456-233446.bag.zip");
-
+        
         for(final SSHFileReference sshFileReference : fileReferences)
         {
             Assert.assertNull("Artifact ID should be NULL", sshFileReference.getArtifactID());
@@ -85,5 +85,5 @@ AbstractDataReferenceProcessorTest<SSHFileReference>
             Assert.assertTrue("File name is not an expected one", filenameList.contains(sshFileReference.getFilename()));
         }
     }
-
+    
 }

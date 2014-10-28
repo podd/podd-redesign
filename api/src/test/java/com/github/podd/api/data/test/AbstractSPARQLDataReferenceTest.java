@@ -34,19 +34,19 @@ import com.github.podd.api.data.SPARQLDataReference;
 public abstract class AbstractSPARQLDataReferenceTest extends AbstractDataReferenceTest
 {
     protected SPARQLDataReference sparqlDataReference;
-
+    
     @Override
     protected final DataReference getNewDataReference()
     {
         return this.getNewSPARQLDataReference();
     }
-
+    
     /**
      *
      * @return A new SPARQLDataReference instance for use by the test
      */
     protected abstract SPARQLDataReference getNewSPARQLDataReference();
-
+    
     @Override
     @Before
     public void setUp() throws Exception
@@ -54,7 +54,7 @@ public abstract class AbstractSPARQLDataReferenceTest extends AbstractDataRefere
         super.setUp();
         this.sparqlDataReference = this.getNewSPARQLDataReference();
     }
-
+    
     @Override
     @After
     public void tearDown() throws Exception
@@ -62,17 +62,17 @@ public abstract class AbstractSPARQLDataReferenceTest extends AbstractDataRefere
         super.tearDown();
         this.sparqlDataReference = null;
     }
-
+    
     @Test
     public void testGetGraph() throws Exception
     {
         this.sparqlDataReference.getGraph();
     }
-
+    
     @Test
     public void testSetGraph() throws Exception
     {
         this.sparqlDataReference.setGraph("urn:test:graph:1");
     }
-
+    
 }

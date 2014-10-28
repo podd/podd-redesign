@@ -416,7 +416,7 @@ public abstract class AbstractPoddRepositoryManagerTest
                             Collections.<OWLOntologyID> singleton(this.testOntologyID), false);
             Assert.fail("Did not receive expected exception");
         }
-        catch(RepositoryNotFoundException e)
+        catch(final RepositoryNotFoundException e)
         {
             // Expected
         }
@@ -436,7 +436,7 @@ public abstract class AbstractPoddRepositoryManagerTest
                             Collections.<OWLOntologyID> singleton(this.testOntologyID), false);
             Assert.fail("Did not receive expected exception");
         }
-        catch(RepositoryNotFoundException e)
+        catch(final RepositoryNotFoundException e)
         {
             // Expected
         }
@@ -453,8 +453,9 @@ public abstract class AbstractPoddRepositoryManagerTest
                 this.testRepositoryManager.getManagementRepositoryConnection();
         try
         {
-            managementRepositoryConnection.add(testOntologyUri1, RDF.TYPE, OWL.ONTOLOGY, testVersionUri1);
-            managementRepositoryConnection.add(testOntologyUri1, OWL.VERSIONIRI, testVersionUri1, testVersionUri1);
+            managementRepositoryConnection.add(this.testOntologyUri1, RDF.TYPE, OWL.ONTOLOGY, this.testVersionUri1);
+            managementRepositoryConnection.add(this.testOntologyUri1, OWL.VERSIONIRI, this.testVersionUri1,
+                    this.testVersionUri1);
         }
         finally
         {
@@ -558,8 +559,8 @@ public abstract class AbstractPoddRepositoryManagerTest
         try
         {
             Assert.assertEquals(0, managementConnection.size());
-            managementConnection.add(testOntologyUri1, RDF.TYPE, OWL.ONTOLOGY, testVersionUri1);
-            managementConnection.add(testOntologyUri1, OWL.VERSIONIRI, testVersionUri1, testVersionUri1);
+            managementConnection.add(this.testOntologyUri1, RDF.TYPE, OWL.ONTOLOGY, this.testVersionUri1);
+            managementConnection.add(this.testOntologyUri1, OWL.VERSIONIRI, this.testVersionUri1, this.testVersionUri1);
         }
         finally
         {

@@ -42,17 +42,17 @@ public class DeleteObjectResourceImplTest extends AbstractResourceImplTest
     {
         final ClientResource getArtifactClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_GET_BASE));
-
+        
         try
         {
             getArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactUri);
-
+            
             final Representation getArtifactResult =
                     this.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null,
                             MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
-
+            
             final Model model = this.assertRdf(getArtifactResult, RDFFormat.RDFXML, expectedStatementCount);
-
+            
             return model;
         }
         finally
@@ -60,7 +60,7 @@ public class DeleteObjectResourceImplTest extends AbstractResourceImplTest
             this.releaseClient(getArtifactClientResource);
         }
     }
-
+    
     @Test
     public void testDeleteObjectBasicRdf() throws Exception
     {
@@ -68,10 +68,10 @@ public class DeleteObjectResourceImplTest extends AbstractResourceImplTest
         final InferredOWLOntologyID artifactID =
                 this.loadTestArtifact(TestConstants.TEST_ARTIFACT_20130206, MediaType.APPLICATION_RDF_TURTLE);
         final String objectToDelete = "http://purl.org/podd/basic-2-20130206/artifact:1#publication45";
-
+        
         final ClientResource deleteObjectClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_OBJECT_DELETE));
-
+        
         try
         {
             deleteObjectClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactID
@@ -80,16 +80,16 @@ public class DeleteObjectResourceImplTest extends AbstractResourceImplTest
                     .getVersionIRI().toString());
             deleteObjectClientResource.addQueryParameter(PoddWebConstants.KEY_OBJECT_IDENTIFIER, objectToDelete);
             deleteObjectClientResource.addQueryParameter(PoddWebConstants.KEY_CASCADE, Boolean.toString(false));
-
+            
             final Representation results =
                     this.doTestAuthenticatedRequest(deleteObjectClientResource, Method.DELETE, null,
                             MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK, AbstractResourceImplTest.WITH_ADMIN);
-
+            
             // verify: response contains updated artifact's ID
             final String updatedArtifactDetails = this.getText(results);
             Assert.assertTrue("Artifact version has not been updated properly",
                     updatedArtifactDetails.contains("artifact:1:version:2"));
-
+            
             // verify: retrieve artifact and check deleted object's not present
             final Model retrievedArtifact = this.getArtifact(artifactID.getOntologyIRI().toString(), 81);
             final URI objectToDeleteUri = PODD.VF.createURI(objectToDelete);

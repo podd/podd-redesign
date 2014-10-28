@@ -26,11 +26,11 @@ import com.github.podd.impl.data.SSHFileReferenceProcessorImpl;
  */
 public class SPARQLDataReferenceProcessorImplTest extends AbstractSSHFileReferenceProcessorTest
 {
-
+    
     @Override
     protected SSHFileReferenceProcessor getNewSSHFileReferenceProcessor()
     {
         return new SSHFileReferenceProcessorImpl();
     }
-
+    
 }

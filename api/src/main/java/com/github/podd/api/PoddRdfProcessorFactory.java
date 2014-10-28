@@ -36,7 +36,7 @@ public interface PoddRdfProcessorFactory<T extends PoddRdfProcessor> extends Pod
      *         Graphs that are interesting in the context of this processor.
      */
     String getSPARQLConstructBGP();
-
+    
     /**
      * Creates a query that can be used to construct triples for all objects that are relevant to
      * this processor.
@@ -44,17 +44,17 @@ public interface PoddRdfProcessorFactory<T extends PoddRdfProcessor> extends Pod
      * @return
      */
     String getSPARQLConstructWhere();
-
+    
     /**
      *
      * @return Any SPARQL Group By statements needed to aggregate results inside of the query.
      */
     String getSPARQLGroupBy();
-
+    
     /**
      *
      * @return The name of the variable to be bound to
      */
     String getSPARQLVariable();
-
+    
 }

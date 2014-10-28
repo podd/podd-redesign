@@ -43,13 +43,13 @@ public interface PoddProcessorFactory<T extends PoddProcessor<I>, I>
      *             If a NULL value is passed in as the stage.
      */
     boolean canHandleStage(PoddProcessorStage stage);
-
+    
     /**
      *
      * @return A string that is unique to this processor implementation.
      */
     String getKey();
-
+    
     /**
      *
      * NOTE: If instances of the processor are not threadsafe, then new instances must be returned
@@ -61,7 +61,7 @@ public interface PoddProcessorFactory<T extends PoddProcessor<I>, I>
      *             instance.
      */
     T getProcessor();
-
+    
     /**
      *
      * @return A set of stages that this processor factory is relevant to. An empty set is returned

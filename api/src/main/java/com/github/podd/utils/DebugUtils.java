@@ -36,14 +36,14 @@ import org.openrdf.repository.RepositoryException;
  */
 public class DebugUtils
 {
-
+    
     public static void printContents(final Model model)
     {
         System.out.println("==================================================");
         System.out.println("Model Contents: ");
         System.out.println();
         final Statement[] allStatements = model.toArray(new Statement[0]);
-
+        
         for(final Statement stmt : allStatements)
         {
             if(stmt.getContext() == null)
@@ -59,7 +59,7 @@ public class DebugUtils
         }
         System.out.println("==================================================");
     }
-
+    
     /**
      * Helper method prints the contents of the given context of a Repository
      */
@@ -80,7 +80,7 @@ public class DebugUtils
             System.out.println("==================================================");
         }
     }
-
+    
     /**
      * Helper method prints the contents of the given context of a Model
      */
@@ -94,7 +94,7 @@ public class DebugUtils
         }
         System.out.println("==================================================");
     }
-
+    
     /**
      * Helper method prints the contents of the given context of a Repository
      */
@@ -108,5 +108,5 @@ public class DebugUtils
         }
         System.out.println("==================================================");
     }
-
+    
 }

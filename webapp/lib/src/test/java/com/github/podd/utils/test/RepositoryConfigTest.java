@@ -45,9 +45,9 @@ public class RepositoryConfigTest
 {
     @Rule
     public TemporaryFolder tempDir = new TemporaryFolder();
-
+    
     private File testDir;
-
+    
     /**
      * @throws java.lang.Exception
      */
@@ -56,7 +56,7 @@ public class RepositoryConfigTest
     {
         this.testDir = this.tempDir.newFolder("repositoryconfigtest");
     }
-
+    
     /**
      * @throws java.lang.Exception
      */
@@ -65,7 +65,7 @@ public class RepositoryConfigTest
     {
         this.testDir = null;
     }
-
+    
     @Test
     public final void testParsingMemoryStore() throws Exception
     {
@@ -79,13 +79,13 @@ public class RepositoryConfigTest
         Assert.assertNotNull(repositoryImplConfig.getType());
         final RepositoryFactory repositoryFactory =
                 RepositoryRegistry.getInstance().get(repositoryImplConfig.getType());
-
+        
         final Repository repository = repositoryFactory.getRepository(repositoryImplConfig);
         Assert.assertNotNull(repository);
         repository.setDataDir(this.testDir);
         repository.initialize();
     }
-
+    
     @Test
     public final void testParsingNativeStore() throws Exception
     {
@@ -97,7 +97,7 @@ public class RepositoryConfigTest
         Assert.assertNotNull(repositoryImplConfig.getType());
         final RepositoryFactory repositoryFactory =
                 RepositoryRegistry.getInstance().get(repositoryImplConfig.getType());
-
+        
         final Repository repository = repositoryFactory.getRepository(repositoryImplConfig);
         Assert.assertNotNull(repository);
         repository.setDataDir(this.testDir);

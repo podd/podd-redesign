@@ -78,13 +78,13 @@ import com.github.podd.utils.RdfUtility;
 public class PoddDataRepositoryManagerImpl implements PoddDataRepositoryManager
 {
     private final Logger log = LoggerFactory.getLogger(this.getClass());
-
+    
     private PoddRepositoryManager repositoryManager;
-
+    
     private PoddOWLManager owlManager;
-
+    
     private final Model dataRepositorySchema;
-
+    
     /**
      *
      */
@@ -102,14 +102,14 @@ public class PoddDataRepositoryManagerImpl implements PoddDataRepositoryManager
                     "Could not initialise data repository manager due to an RDF or IO exception", e);
         }
     }
-
+    
     @Override
     public void addRepositoryMapping(final String alias, final PoddDataRepository<?> repositoryConfiguration)
-            throws OpenRDFException, DataRepositoryException
+        throws OpenRDFException, DataRepositoryException
     {
         this.addRepositoryMapping(alias, repositoryConfiguration, false);
     }
-
+    
     @Override
     public void addRepositoryMapping(final String alias, final PoddDataRepository<?> repositoryConfiguration,
             final boolean overwrite) throws OpenRDFException, DataRepositoryException
@@ -118,9 +118,9 @@ public class PoddDataRepositoryManagerImpl implements PoddDataRepositoryManager
         {
             throw new NullPointerException("Cannot add NULL as a File Repository mapping");
         }
-
+        
         final String aliasInLowerCase = alias.toLowerCase();
-
+        
         // - check if a mapping with this alias already exists
         if(this.getRepository(aliasInLowerCase) != null)
         {
@@ -134,27 +134,27 @@ public class PoddDataRepositoryManagerImpl implements PoddDataRepositoryManager
                         "File Repository mapping with this alias already exists");
             }
         }
-
+        
         boolean repositoryConfigurationExistsInGraph = true;
         if(this.getRepositoryAliases(repositoryConfiguration).isEmpty())
         {
             // adding a new repository configuration
             repositoryConfigurationExistsInGraph = false;
         }
-
+        
         final URI context = this.repositoryManager.getFileRepositoryManagementGraph();
         RepositoryConnection conn = null;
         try
         {
             conn = this.repositoryManager.getManagementRepositoryConnection();
             conn.begin();
-
+            
             if(repositoryConfigurationExistsInGraph)
             {
                 final Set<Resource> subjectUris =
                         repositoryConfiguration.getAsModel().filter(null, PODD.PODD_DATA_REPOSITORY_ALIAS, null)
-                        .subjects();
-
+                                .subjects();
+                
                 this.log.debug("Found {} subject URIs", subjectUris.size()); // should
                 // be
                 // only
@@ -174,7 +174,7 @@ public class PoddDataRepositoryManagerImpl implements PoddDataRepositoryManager
                 {
                     throw new DataRepositoryIncompleteException("Incomplete File Repository since Model is empty");
                 }
-
+                
                 // check that the subject URIs used in the repository
                 // configuration are not already
                 // used in the file repository management graph
@@ -187,7 +187,7 @@ public class PoddDataRepositoryManagerImpl implements PoddDataRepositoryManager
                                 "Subject URIs used in Model already exist in Management Graph: uri=" + subjectUri);
                     }
                 }
-
+                
                 conn.add(model, context);
             }
             conn.commit();
@@ -215,38 +215,38 @@ public class PoddDataRepositoryManagerImpl implements PoddDataRepositoryManager
             }
         }
     }
-
+    
     @Override
     public void downloadFileReference(final DataReference nextFileReference, final OutputStream outputStream)
-            throws PoddException, IOException
+        throws PoddException, IOException
     {
         // TODO
         throw new RuntimeException("TODO: Implement me");
     }
-
+    
     @Override
     public List<String> getAllAliases() throws DataRepositoryException, OpenRDFException
     {
         final List<String> results = new ArrayList<String>();
-
+        
         RepositoryConnection conn = null;
         try
         {
             conn = this.repositoryManager.getManagementRepositoryConnection();
             conn.begin();
-
+            
             final URI context = this.repositoryManager.getFileRepositoryManagementGraph();
-
+            
             final StringBuilder sb = new StringBuilder();
-
+            
             sb.append("SELECT ?alias WHERE { ");
             sb.append(" ?aliasUri <" + PODD.PODD_DATA_REPOSITORY_ALIAS.stringValue() + "> ?alias .");
             sb.append(" } ");
-
+            
             this.log.debug("Created SPARQL {} ", sb);
-
+            
             final TupleQuery query = conn.prepareTupleQuery(QueryLanguage.SPARQL, sb.toString());
-
+            
             final QueryResultCollector queryResults = RdfUtility.executeTupleQuery(query, context);
             for(final BindingSet binding : queryResults.getBindingSets())
             {
@@ -265,36 +265,36 @@ public class PoddDataRepositoryManagerImpl implements PoddDataRepositoryManager
                 conn.close();
             }
         }
-
+        
         return results;
     }
-
+    
     @Override
     public List<String> getEquivalentAliases(final String alias) throws DataRepositoryException, OpenRDFException
     {
         final List<String> results = new ArrayList<String>();
         final String aliasInLowerCase = alias.toLowerCase();
-
+        
         RepositoryConnection conn = null;
         try
         {
             conn = this.repositoryManager.getManagementRepositoryConnection();
             conn.begin();
-
+            
             final URI context = this.repositoryManager.getFileRepositoryManagementGraph();
-
+            
             final StringBuilder sb = new StringBuilder();
-
+            
             sb.append("SELECT ?otherAlias WHERE { ");
             sb.append(" ?aliasUri <" + PODD.PODD_DATA_REPOSITORY_ALIAS.stringValue() + "> ?otherAlias .");
             sb.append(" ?aliasUri <" + PODD.PODD_DATA_REPOSITORY_ALIAS.stringValue() + "> ?alias .");
             sb.append(" } ");
-
+            
             this.log.debug("Created SPARQL {} with alias bound to '{}'", sb, aliasInLowerCase);
-
+            
             final TupleQuery query = conn.prepareTupleQuery(QueryLanguage.SPARQL, sb.toString());
             query.setBinding("alias", ValueFactoryImpl.getInstance().createLiteral(aliasInLowerCase));
-
+            
             final QueryResultCollector queryResults = RdfUtility.executeTupleQuery(query, context);
             for(final BindingSet binding : queryResults.getBindingSets())
             {
@@ -313,31 +313,31 @@ public class PoddDataRepositoryManagerImpl implements PoddDataRepositoryManager
                 conn.close();
             }
         }
-
+        
         return results;
     }
-
+    
     @Override
     public PoddOWLManager getOWLManager()
     {
         return this.owlManager;
     }
-
+    
     @Override
     public PoddDataRepository<? extends DataReference> getRepository(final String alias)
-            throws DataRepositoryException, OpenRDFException
-            {
+        throws DataRepositoryException, OpenRDFException
+    {
         if(alias == null)
         {
             this.log.warn("Could not find a repository with a null alias");
             throw new IllegalArgumentException("Could not find a repository with a null alias");
         }
-
+        
         RepositoryConnection conn = null;
         try
         {
             conn = this.repositoryManager.getManagementRepositoryConnection();
-
+            
             final URI context = this.repositoryManager.getFileRepositoryManagementGraph();
             final Model repositories = new LinkedHashModel();
             // Fetch the entire configuration into memory, as it should never be
@@ -359,13 +359,13 @@ public class PoddDataRepositoryManagerImpl implements PoddDataRepositoryManager
                     }
                 }
             }
-
+            
             for(final Resource nextMatchingRepository : matchingRepositories)
             {
                 final PoddDataRepository<? extends DataReference> repository =
                         PoddDataRepositoryRegistry.getInstance().createDataRepository(nextMatchingRepository,
                                 repositories);
-
+                
                 if(repository != null)
                 {
                     return repository;
@@ -379,26 +379,26 @@ public class PoddDataRepositoryManagerImpl implements PoddDataRepositoryManager
                 conn.close();
             }
         }
-
+        
         // log.warn("Could not find a repository with alias: {}", alias);
         // throw new DataRepositoryMappingNotFoundException(alias,
         // "Could not find a repository with this alias");
         return null;
-            }
-
+    }
+    
     @Override
     public List<String> getRepositoryAliases(final PoddDataRepository<?> repositoryConfiguration)
-            throws DataRepositoryException, OpenRDFException
-            {
+        throws DataRepositoryException, OpenRDFException
+    {
         return this.getEquivalentAliases(repositoryConfiguration.getAlias());
-            }
-
+    }
+    
     @Override
     public PoddRepositoryManager getRepositoryManager()
     {
         return this.repositoryManager;
     }
-
+    
     @Override
     public void initialise(final Model defaultAliasConfiguration) throws OpenRDFException, PoddException, IOException
     {
@@ -406,29 +406,29 @@ public class PoddDataRepositoryManagerImpl implements PoddDataRepositoryManager
         {
             throw new NullPointerException("A RepositoryManager should be set before calling initialise()");
         }
-
+        
         if(this.getAllAliases().size() == 0)
         {
             this.log.info("File Repository Graph is empty. Loading default configurations...");
-
+            
             // validate the default alias file against the File Repository
             // configuration schema
             this.getOWLManager().verifyAgainstSchema(defaultAliasConfiguration, this.dataRepositorySchema);
-
+            
             final Model allAliases = defaultAliasConfiguration.filter(null, PODD.PODD_DATA_REPOSITORY_ALIAS, null);
-
+            
             this.log.info("Found {} default aliases to add", allAliases.size());
-
+            
             for(final Statement stmt : allAliases)
             {
                 final String alias = stmt.getObject().stringValue();
-
+                
                 try
                 {
                     final PoddDataRepository<?> dataRepository =
                             PoddDataRepositoryRegistry.getInstance().createDataRepository(stmt.getSubject(),
                                     defaultAliasConfiguration);
-
+                    
                     if(dataRepository != null)
                     {
                         this.addRepositoryMapping(alias, dataRepository, false);
@@ -438,36 +438,36 @@ public class PoddDataRepositoryManagerImpl implements PoddDataRepositoryManager
                 {
                     this.log.error("Found error attempting to create repository for alias", dre);
                 }
-
+                
             }
         }
     }
-
+    
     @Override
     public PoddDataRepository<?> removeRepositoryMapping(final String alias) throws DataRepositoryException,
-    OpenRDFException
+        OpenRDFException
     {
         final String aliasInLowerCase = alias.toLowerCase();
-
+        
         final PoddDataRepository<?> repositoryToRemove = this.getRepository(aliasInLowerCase);
         if(repositoryToRemove == null)
         {
             throw new DataRepositoryMappingNotFoundException(aliasInLowerCase,
                     "No File Repository mapped to this alias");
         }
-
+        
         // retrieved early simply to avoid having multiple RepositoryConnections
         // open simultaneously
         final int aliasCount = this.getRepositoryAliases(repositoryToRemove).size();
-
+        
         RepositoryConnection conn = null;
         try
         {
             conn = this.repositoryManager.getManagementRepositoryConnection();
             conn.begin();
-
+            
             final URI context = this.repositoryManager.getFileRepositoryManagementGraph();
-
+            
             if(aliasCount > 1)
             {
                 // several aliases map to this repository. only remove the
@@ -482,10 +482,10 @@ public class PoddDataRepositoryManagerImpl implements PoddDataRepositoryManager
                 // only one mapping exists. delete the repository configuration
                 final Set<Resource> subjectUris =
                         repositoryToRemove
-                        .getAsModel()
-                        .filter(null, PODD.PODD_DATA_REPOSITORY_ALIAS,
-                                ValueFactoryImpl.getInstance().createLiteral(aliasInLowerCase)).subjects();
-
+                                .getAsModel()
+                                .filter(null, PODD.PODD_DATA_REPOSITORY_ALIAS,
+                                        ValueFactoryImpl.getInstance().createLiteral(aliasInLowerCase)).subjects();
+                
                 this.log.debug("Need to remove {} triples", subjectUris.size()); // DEBUG
                 // output
                 for(final Resource subjectUri : subjectUris)
@@ -494,7 +494,7 @@ public class PoddDataRepositoryManagerImpl implements PoddDataRepositoryManager
                     this.log.debug("Removed ALL triples for alias '{}' with URI <{}>", aliasInLowerCase, subjectUri);
                 }
             }
-
+            
             conn.commit();
             return repositoryToRemove;
         }
@@ -510,25 +510,25 @@ public class PoddDataRepositoryManagerImpl implements PoddDataRepositoryManager
             }
         }
     }
-
+    
     @Override
     public void setOWLManager(final PoddOWLManager owlManager)
     {
         this.owlManager = owlManager;
     }
-
+    
     @Override
     public void setRepositoryManager(final PoddRepositoryManager repositoryManager)
     {
         this.repositoryManager = repositoryManager;
     }
-
+    
     @Override
     public void verifyDataReferences(final Set<DataReference> fileReferenceResults) throws OpenRDFException,
-    DataRepositoryException, DataReferenceVerificationException
+        DataRepositoryException, DataReferenceVerificationException
     {
         final Map<DataReference, Throwable> errors = new HashMap<DataReference, Throwable>();
-
+        
         for(final DataReference dataReference : fileReferenceResults)
         {
             final String alias = dataReference.getRepositoryAlias();
@@ -555,11 +555,11 @@ public class PoddDataRepositoryManagerImpl implements PoddDataRepositoryManager
                 }
             }
         }
-
+        
         if(!errors.isEmpty())
         {
             throw new DataReferenceVerificationException(errors, "File Reference validation resulted in failures");
         }
     }
-
+    
 }

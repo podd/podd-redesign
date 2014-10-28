@@ -419,12 +419,13 @@ public class OntologyUtils
         
     }
     
-    public static ConcurrentMap<URI, OWLOntologyID> mapVersions(Collection<? extends OWLOntologyID> ontologies)
+    public static ConcurrentMap<URI, OWLOntologyID> mapVersions(final Collection<? extends OWLOntologyID> ontologies)
     {
-        ConcurrentMap<URI, OWLOntologyID> result = new ConcurrentHashMap<>();
-        for(OWLOntologyID nextOntology : ontologies)
+        final ConcurrentMap<URI, OWLOntologyID> result = new ConcurrentHashMap<>();
+        for(final OWLOntologyID nextOntology : ontologies)
         {
-            OWLOntologyID putIfAbsent = result.putIfAbsent(nextOntology.getVersionIRI().toOpenRDFURI(), nextOntology);
+            final OWLOntologyID putIfAbsent =
+                    result.putIfAbsent(nextOntology.getVersionIRI().toOpenRDFURI(), nextOntology);
             if(putIfAbsent != null)
             {
                 throw new RuntimeException("Found duplicated version IRI in a set of ontologies: " + nextOntology + " "
@@ -744,7 +745,7 @@ public class OntologyUtils
             }
         }
         
-        recursiveFollowSchemaMap(importsMap);
+        OntologyUtils.recursiveFollowSchemaMap(importsMap);
         
         OntologyUtils.postSort(importOrder, importsMap);
         
@@ -752,28 +753,28 @@ public class OntologyUtils
         return importOrder;
     }
     
-    public static final void recursiveFollowSchemaMap(ConcurrentMap<URI, Set<URI>> importsMap)
+    public static final void recursiveFollowSchemaMap(final ConcurrentMap<URI, Set<URI>> importsMap)
         throws SchemaManifestException
     {
         // Iterate through at least as many times as the size of the importsMap to get all
         // dependencies
         for(int i = 0; i < importsMap.size(); i++)
         {
-            for(Entry<URI, Set<URI>> nextImportsMapEntry : importsMap.entrySet())
+            for(final Entry<URI, Set<URI>> nextImportsMapEntry : importsMap.entrySet())
             {
                 // Avoid ConcurrentModificationException by taking a copy and replacing it
                 // afterwards
-                Set<URI> nextSet = new LinkedHashSet<>(nextImportsMapEntry.getValue());
-                recursiveFollowSchemaMap(importsMap, nextImportsMapEntry.getKey(), nextSet);
+                final Set<URI> nextSet = new LinkedHashSet<>(nextImportsMapEntry.getValue());
+                OntologyUtils.recursiveFollowSchemaMap(importsMap, nextImportsMapEntry.getKey(), nextSet);
                 importsMap.put(nextImportsMapEntry.getKey(), nextSet);
             }
         }
     }
     
-    public static final void recursiveFollowSchemaMap(ConcurrentMap<URI, Set<URI>> importsMap, URI nextUri,
-            Set<URI> nextUriImports) throws SchemaManifestException
+    public static final void recursiveFollowSchemaMap(final ConcurrentMap<URI, Set<URI>> importsMap, final URI nextUri,
+            final Set<URI> nextUriImports) throws SchemaManifestException
     {
-        for(URI nextImportedUri : importsMap.get(nextUri))
+        for(final URI nextImportedUri : importsMap.get(nextUri))
         {
             nextUriImports.add(nextImportedUri);
             if(nextImportedUri.equals(nextUri))
@@ -781,7 +782,7 @@ public class OntologyUtils
                 throw new SchemaManifestException(IRI.create(nextUri), "Ontology recursively imported itself: "
                         + nextUriImports);
             }
-            recursiveFollowSchemaMap(importsMap, nextImportedUri, nextUriImports);
+            OntologyUtils.recursiveFollowSchemaMap(importsMap, nextImportedUri, nextUriImports);
         }
     }
     
@@ -1018,12 +1019,13 @@ public class OntologyUtils
         return false;
     }
     
-    public static Set<OWLOntologyID> mapFromVersions(Set<URI> nextMinimalImportsSet, List<OWLOntologyID> nextImportOrder)
+    public static Set<OWLOntologyID> mapFromVersions(final Set<URI> nextMinimalImportsSet,
+            final List<OWLOntologyID> nextImportOrder)
     {
-        Set<OWLOntologyID> result = new LinkedHashSet<>();
-        for(OWLOntologyID nextOrderedCandidate : nextImportOrder)
+        final Set<OWLOntologyID> result = new LinkedHashSet<>();
+        for(final OWLOntologyID nextOrderedCandidate : nextImportOrder)
         {
-            for(URI nextMinimalURI : nextMinimalImportsSet)
+            for(final URI nextMinimalURI : nextMinimalImportsSet)
             {
                 if(nextMinimalURI.equals(nextOrderedCandidate.getVersionIRI().toOpenRDFURI()))
                 {

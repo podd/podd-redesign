@@ -27,9 +27,9 @@ import org.semanticweb.owlapi.model.OWLOntology;
 public class EmptyOntologyException extends PoddException
 {
     private static final long serialVersionUID = 4654987743002073476L;
-
+    
     private final OWLOntology ontology;
-
+    
     /**
      *
      * @param ontology
@@ -42,7 +42,7 @@ public class EmptyOntologyException extends PoddException
         super(msg);
         this.ontology = ontology;
     }
-
+    
     /**
      * @param ontology
      *            The OWL Ontology which was found to be empty.
@@ -56,7 +56,7 @@ public class EmptyOntologyException extends PoddException
         super(msg, throwable);
         this.ontology = ontology;
     }
-
+    
     /**
      * @param ontology
      *            The OWL Ontology which was found to be empty.
@@ -68,7 +68,7 @@ public class EmptyOntologyException extends PoddException
         super(throwable);
         this.ontology = ontology;
     }
-
+    
     /**
      *
      * @return The OWL Ontology which was found to be empty.
@@ -77,5 +77,5 @@ public class EmptyOntologyException extends PoddException
     {
         return this.ontology;
     }
-
+    
 }

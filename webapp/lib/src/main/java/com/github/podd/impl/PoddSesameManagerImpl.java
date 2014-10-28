@@ -2514,7 +2514,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         final Model model = new LinkedHashModel();
         managementConnection.export(new StatementCollector(model), schemaManagementGraph);
         
-        ConcurrentMap<URI, Set<URI>> importsMap = new ConcurrentHashMap<>();
+        final ConcurrentMap<URI, Set<URI>> importsMap = new ConcurrentHashMap<>();
         final List<OWLOntologyID> schemaManifestImports =
                 OntologyUtils.schemaImports(model, dependentSchemaOntologies, importsMap);
         

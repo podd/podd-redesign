@@ -44,19 +44,19 @@ public class SPARQLDataRepositoryImplFactory implements PoddDataRepositoryFactor
     {
         return types.contains(PODD.PODD_SPARQL_DATA_REPOSITORY);
     }
-
+    
     @Override
     public PoddDataRepository<?> createDataRepository(final Resource nextDataRepository, final Model statements)
-            throws DataRepositoryException
-            {
+        throws DataRepositoryException
+    {
         if(statements.contains(null, RDF.TYPE, PODD.PODD_SPARQL_DATA_REPOSITORY))
         {
             return new SPARQLDataRepositoryImpl(nextDataRepository, statements);
         }
-
+        
         throw new DataRepositoryIncompleteException("Could not create SPARQL data repository from this configuration");
-            }
-
+    }
+    
     @Override
     public String getKey()
     {

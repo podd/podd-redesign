@@ -31,7 +31,7 @@ import com.github.podd.api.PoddProcessorStage;
 public class DataReferenceProcessorRegistry extends AbstractServiceLoader<String, DataReferenceProcessorFactory>
 {
     private static final DataReferenceProcessorRegistry instance = new DataReferenceProcessorRegistry();
-
+    
     /**
      * @return A static instance of this registry.
      */
@@ -39,12 +39,12 @@ public class DataReferenceProcessorRegistry extends AbstractServiceLoader<String
     {
         return DataReferenceProcessorRegistry.instance;
     }
-
+    
     public DataReferenceProcessorRegistry()
     {
         super(DataReferenceProcessorFactory.class);
     }
-
+    
     public final List<DataReferenceProcessorFactory> getByStage(final PoddProcessorStage nextStage)
     {
         final List<DataReferenceProcessorFactory> result = new ArrayList<DataReferenceProcessorFactory>();
@@ -55,13 +55,13 @@ public class DataReferenceProcessorRegistry extends AbstractServiceLoader<String
                 result.add(nextProcessor);
             }
         }
-
+        
         return result;
     }
-
+    
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see org.semanticweb.owlapi.util.AbstractServiceLoader#getKey(java.lang.Object)
      */
     @Override
@@ -69,5 +69,5 @@ public class DataReferenceProcessorRegistry extends AbstractServiceLoader<String
     {
         return nextFactory.getKey();
     }
-
+    
 }

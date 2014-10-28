@@ -27,9 +27,9 @@ import org.semanticweb.owlapi.model.IRI;
 public class ProfileNotFoundException extends PoddException
 {
     private static final long serialVersionUID = 6247991932378540548L;
-
+    
     private final IRI profileIRI;
-
+    
     /**
      *
      * @param profile
@@ -42,7 +42,7 @@ public class ProfileNotFoundException extends PoddException
         super(msg);
         this.profileIRI = profile;
     }
-
+    
     /**
      * @param profile
      *            The OWL profile IRI that was not found in the OWLAPI profile registry.
@@ -56,7 +56,7 @@ public class ProfileNotFoundException extends PoddException
         super(msg, throwable);
         this.profileIRI = profile;
     }
-
+    
     /**
      * @param profile
      *            The OWL profile IRI that was not found in the OWLAPI profile registry.
@@ -68,7 +68,7 @@ public class ProfileNotFoundException extends PoddException
         super(throwable);
         this.profileIRI = profile;
     }
-
+    
     /**
      *
      * @return The OWL profile IRI that was not found in the OWLAPI profile registry.
@@ -77,5 +77,5 @@ public class ProfileNotFoundException extends PoddException
     {
         return this.profileIRI;
     }
-
+    
 }

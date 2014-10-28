@@ -34,13 +34,13 @@ import com.github.podd.utils.PODD;
 public class UnmanagedArtifactVersionException extends UnmanagedSchemaException
 {
     private static final long serialVersionUID = 4395800605913179651L;
-
+    
     private final IRI artifactOntologyIRI;
-
+    
     private final IRI artifactVersionIRI;
-
+    
     private final IRI unmanagedVersionIRI;
-
+    
     /**
      * @param artifactOntologyIRI
      *            The OWL Ontology IRI that is managed.
@@ -59,7 +59,7 @@ public class UnmanagedArtifactVersionException extends UnmanagedSchemaException
         this.artifactVersionIRI = artifactVersionIRI;
         this.unmanagedVersionIRI = unmanagedVersionIRI;
     }
-
+    
     /**
      * @param artifactOntologyIRI
      *            The OWL Ontology IRI that is managed.
@@ -80,7 +80,7 @@ public class UnmanagedArtifactVersionException extends UnmanagedSchemaException
         this.artifactVersionIRI = artifactVersionIRI;
         this.unmanagedVersionIRI = unmanagedVersionIRI;
     }
-
+    
     /**
      * @param artifactOntologyIRI
      *            The OWL Ontology IRI that is managed.
@@ -99,7 +99,7 @@ public class UnmanagedArtifactVersionException extends UnmanagedSchemaException
         this.artifactVersionIRI = artifactVersionIRI;
         this.unmanagedVersionIRI = unmanagedVersionIRI;
     }
-
+    
     /**
      * @return The managed Ontology's current Version IRI.
      */
@@ -107,23 +107,23 @@ public class UnmanagedArtifactVersionException extends UnmanagedSchemaException
     {
         return this.artifactVersionIRI;
     }
-
+    
     @Override
     public Model getDetailsAsModel(final Resource errorResource)
     {
         final Model model = super.getDetailsAsModel(errorResource);
-
+        
         if(this.getOntologyID() != null)
         {
             model.add(errorResource, PODD.ERR_SOURCE, this.getUnmanagedVersionIRI().toOpenRDFURI());
-
+            
             model.add(errorResource, OWL.ONTOLOGY, this.getOntologyID().toOpenRDFURI());
             model.add(errorResource, OWL.VERSIONIRI, this.getArtifactVersion().toOpenRDFURI());
         }
-
+        
         return model;
     }
-
+    
     /**
      * @return The managed OWL Ontology IRI.
      */
@@ -131,7 +131,7 @@ public class UnmanagedArtifactVersionException extends UnmanagedSchemaException
     {
         return this.artifactOntologyIRI;
     }
-
+    
     /**
      * @return The unmanaged OWL Version IRI that caused this Exception.
      */
@@ -139,5 +139,5 @@ public class UnmanagedArtifactVersionException extends UnmanagedSchemaException
     {
         return this.unmanagedVersionIRI;
     }
-
+    
 }

@@ -38,12 +38,12 @@ import com.github.podd.restlet.PoddWebServiceApplication;
 public abstract class AbstractPoddResourceImpl extends ServerResource
 {
     protected final Logger log = LoggerFactory.getLogger(this.getClass());
-
+    
     public AbstractPoddResourceImpl()
     {
         super();
     }
-
+    
     /**
      * Checks the ability of the currently authenticated user to perform the given action and throws
      * an exception if the current user is not authorised for the given action.
@@ -59,7 +59,7 @@ public abstract class AbstractPoddResourceImpl extends ServerResource
         // throws an error on failure
         return this.checkAuthentication(action, null, true);
     }
-
+    
     /**
      * Checks the ability of the currently authenticated user to perform the given action and throws
      * an exception if the current user is not authorised for the given action.
@@ -74,12 +74,12 @@ public abstract class AbstractPoddResourceImpl extends ServerResource
      *             perform the given action
      */
     protected boolean checkAuthentication(final PoddAction action, final URI optionalObjectUri)
-            throws ResourceException
+        throws ResourceException
     {
         // throws an error on failure
         return this.checkAuthentication(action, optionalObjectUri, true);
     }
-
+    
     /**
      * Checks the ability of the currently authenticated user to perform the given action,
      * optionally throwing an exception instead of returning false in the case that the check fails.
@@ -141,7 +141,7 @@ public abstract class AbstractPoddResourceImpl extends ServerResource
             return false;
         }
     }
-
+    
     /**
      * Sets the data handler for this resource based on the application level data handler.
      *
@@ -153,7 +153,7 @@ public abstract class AbstractPoddResourceImpl extends ServerResource
     {
         super.doInit();
     }
-
+    
     /**
      * Determines the action to use based on whether there is a user currently logged in, and
      * whether that user matches the given user identifier parameter.
@@ -170,7 +170,7 @@ public abstract class AbstractPoddResourceImpl extends ServerResource
             final PoddAction currentUserAction)
     {
         PoddAction action = otherUserAction;
-
+        
         if(this.getRequest().getClientInfo().isAuthenticated())
         {
             if(requestedUserIdentifier != null
@@ -181,39 +181,39 @@ public abstract class AbstractPoddResourceImpl extends ServerResource
         }
         return action;
     }
-
+    
     public PoddWebServiceApplication getPoddApplication()
     {
         final PoddWebServiceApplication application = (PoddWebServiceApplication)super.getApplication();
-
+        
         return application;
     }
-
+    
     public PropertyUtil getPropertyUtil()
     {
         return this.getPoddApplication().getPropertyUtil();
     }
-
+    
     public PoddArtifactManager getPoddArtifactManager()
     {
         return this.getPoddApplication().getPoddArtifactManager();
     }
-
+    
     public PoddRepositoryManager getPoddRepositoryManager()
     {
         return this.getPoddApplication().getPoddRepositoryManager();
     }
-
+    
     public PoddSchemaManager getPoddSchemaManager()
     {
         return this.getPoddApplication().getPoddSchemaManager();
     }
-
+    
     public PoddSesameManager getPoddSesameManager()
     {
         return this.getPoddApplication().getPoddArtifactManager().getSesameManager();
     }
-
+    
     /**
      * Overriding broken ServerResource.getVariants method
      *
@@ -225,5 +225,5 @@ public abstract class AbstractPoddResourceImpl extends ServerResource
     {
         return super.getVariants(method);
     }
-
+    
 }

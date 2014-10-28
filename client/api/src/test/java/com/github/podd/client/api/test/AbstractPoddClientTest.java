@@ -175,7 +175,7 @@ public abstract class AbstractPoddClientTest
     @After
     public void tearDown() throws Exception
     {
-        if(isPoddTest)
+        if(this.isPoddTest)
         {
             this.resetTestServers();
         }
@@ -189,7 +189,7 @@ public abstract class AbstractPoddClientTest
     @Test
     public final void testAddRolesArtifact() throws Exception
     {
-        PoddClient testClient = this.getNewPoddClientInstance();
+        final PoddClient testClient = this.getNewPoddClientInstance();
         testClient.login(AbstractPoddClientTest.TEST_ADMIN_USER, AbstractPoddClientTest.TEST_ADMIN_PASSWORD);
         
         final InputStream input = this.getClass().getResourceAsStream("/test/artifacts/basicProject-1.rdf");
@@ -237,7 +237,7 @@ public abstract class AbstractPoddClientTest
     @Test
     public final void testAppendArtifact() throws Exception
     {
-        PoddClient testClient = this.getNewPoddClientInstance();
+        final PoddClient testClient = this.getNewPoddClientInstance();
         testClient.login(AbstractPoddClientTest.TEST_ADMIN_USER, AbstractPoddClientTest.TEST_ADMIN_PASSWORD);
         
         final InputStream input = this.getClass().getResourceAsStream("/test/artifacts/basicProject-3.rdf");
@@ -293,7 +293,7 @@ public abstract class AbstractPoddClientTest
     @Test
     public final void testAttachFileReference() throws Exception
     {
-        PoddClient testClient = this.getNewPoddClientInstance();
+        final PoddClient testClient = this.getNewPoddClientInstance();
         testClient.login(AbstractPoddClientTest.TEST_ADMIN_USER, AbstractPoddClientTest.TEST_ADMIN_PASSWORD);
         
         try
@@ -375,7 +375,7 @@ public abstract class AbstractPoddClientTest
     @Test
     public final void testCreateUser() throws Exception
     {
-        PoddClient testClient = this.getNewPoddClientInstance();
+        final PoddClient testClient = this.getNewPoddClientInstance();
         testClient.login(AbstractPoddClientTest.TEST_ADMIN_USER, AbstractPoddClientTest.TEST_ADMIN_PASSWORD);
         
         final PoddUser testUser =
@@ -396,7 +396,7 @@ public abstract class AbstractPoddClientTest
     @Test
     public final void testDeleteArtifact() throws Exception
     {
-        PoddClient testClient = this.getNewPoddClientInstance();
+        final PoddClient testClient = this.getNewPoddClientInstance();
         testClient.login(AbstractPoddClientTest.TEST_ADMIN_USER, AbstractPoddClientTest.TEST_ADMIN_PASSWORD);
         
         final InputStream input = this.getClass().getResourceAsStream("/test/artifacts/basicProject-1.rdf");
@@ -449,7 +449,7 @@ public abstract class AbstractPoddClientTest
     @Test
     public final void testDownloadArtifactNoVersion() throws Exception
     {
-        PoddClient testClient = this.getNewPoddClientInstance();
+        final PoddClient testClient = this.getNewPoddClientInstance();
         testClient.login(AbstractPoddClientTest.TEST_ADMIN_USER, AbstractPoddClientTest.TEST_ADMIN_PASSWORD);
         
         final InputStream input = this.getClass().getResourceAsStream("/test/artifacts/basicProject-1.rdf");
@@ -484,7 +484,7 @@ public abstract class AbstractPoddClientTest
     @Test
     public final void testGetPoddServerUrlNull() throws Exception
     {
-        PoddClient testClient = this.getNewPoddClientInstance();
+        final PoddClient testClient = this.getNewPoddClientInstance();
         Assert.assertNotNull(testClient.getPoddServerUrl());
         
         testClient.setPoddServerUrl(null);
@@ -500,7 +500,7 @@ public abstract class AbstractPoddClientTest
     @Test
     public final void testGetUserDetails() throws Exception
     {
-        PoddClient testClient = this.getNewPoddClientInstance();
+        final PoddClient testClient = this.getNewPoddClientInstance();
         testClient.login(AbstractPoddClientTest.TEST_ADMIN_USER, AbstractPoddClientTest.TEST_ADMIN_PASSWORD);
         
         final PoddUser userDetails = testClient.getUserDetails(AbstractPoddClientTest.TEST_ADMIN_USER);
@@ -516,7 +516,7 @@ public abstract class AbstractPoddClientTest
     @Test
     public final void testListDataReferenceRepositories() throws Exception
     {
-        PoddClient testClient = this.getNewPoddClientInstance();
+        final PoddClient testClient = this.getNewPoddClientInstance();
         testClient.login(AbstractPoddClientTest.TEST_ADMIN_USER, AbstractPoddClientTest.TEST_ADMIN_PASSWORD);
         
         final List<String> repositories = testClient.listDataReferenceRepositories();
@@ -533,7 +533,7 @@ public abstract class AbstractPoddClientTest
     @Test
     public final void testListPublishedArtifactsEmpty() throws Exception
     {
-        PoddClient testClient = this.getNewPoddClientInstance();
+        final PoddClient testClient = this.getNewPoddClientInstance();
         final Set<PoddArtifact> results = testClient.listPublishedArtifacts();
         Assert.assertTrue(results.isEmpty());
     }
@@ -548,7 +548,7 @@ public abstract class AbstractPoddClientTest
         // TODO: Create 50 artifacts
         Assert.fail("TODO: Implement me!");
         
-        PoddClient testClient = this.getNewPoddClientInstance();
+        final PoddClient testClient = this.getNewPoddClientInstance();
         testClient.login(AbstractPoddClientTest.TEST_ADMIN_USER, AbstractPoddClientTest.TEST_ADMIN_PASSWORD);
         
         final Set<PoddArtifact> results = testClient.listPublishedArtifacts();
@@ -562,7 +562,7 @@ public abstract class AbstractPoddClientTest
     @Test
     public final void testListPublishedArtifactsSingle() throws Exception
     {
-        PoddClient testClient = this.getNewPoddClientInstance();
+        final PoddClient testClient = this.getNewPoddClientInstance();
         testClient.login(AbstractPoddClientTest.TEST_ADMIN_USER, AbstractPoddClientTest.TEST_ADMIN_PASSWORD);
         
         final InputStream input = this.getClass().getResourceAsStream("/test/artifacts/basicProject-1.rdf");
@@ -594,7 +594,7 @@ public abstract class AbstractPoddClientTest
     @Test
     public final void testListRolesArtifact() throws Exception
     {
-        PoddClient testClient = this.getNewPoddClientInstance();
+        final PoddClient testClient = this.getNewPoddClientInstance();
         testClient.login(AbstractPoddClientTest.TEST_ADMIN_USER, AbstractPoddClientTest.TEST_ADMIN_PASSWORD);
         
         final InputStream input = this.getClass().getResourceAsStream("/test/artifacts/basicProject-1.rdf");
@@ -621,7 +621,7 @@ public abstract class AbstractPoddClientTest
     @Test
     public final void testListRolesUser() throws Exception
     {
-        PoddClient testClient = this.getNewPoddClientInstance();
+        final PoddClient testClient = this.getNewPoddClientInstance();
         testClient.login(AbstractPoddClientTest.TEST_ADMIN_USER, AbstractPoddClientTest.TEST_ADMIN_PASSWORD);
         
         final Map<RestletUtilRole, Collection<URI>> roles =
@@ -639,7 +639,7 @@ public abstract class AbstractPoddClientTest
     @Test
     public final void testListUnpublishedArtifactsEmpty() throws Exception
     {
-        PoddClient testClient = this.getNewPoddClientInstance();
+        final PoddClient testClient = this.getNewPoddClientInstance();
         testClient.login(AbstractPoddClientTest.TEST_ADMIN_USER, AbstractPoddClientTest.TEST_ADMIN_PASSWORD);
         
         final Set<PoddArtifact> results = testClient.listUnpublishedArtifacts();
@@ -657,7 +657,7 @@ public abstract class AbstractPoddClientTest
         // TODO: Create 50 artifacts
         Assert.fail("TODO: Implement me!");
         
-        PoddClient testClient = this.getNewPoddClientInstance();
+        final PoddClient testClient = this.getNewPoddClientInstance();
         final Set<PoddArtifact> results = testClient.listUnpublishedArtifacts();
         Assert.assertFalse(results.isEmpty());
         Assert.assertEquals(50, results.size());
@@ -669,7 +669,7 @@ public abstract class AbstractPoddClientTest
     @Test
     public final void testListUnpublishedArtifactsSingle() throws Exception
     {
-        PoddClient testClient = this.getNewPoddClientInstance();
+        final PoddClient testClient = this.getNewPoddClientInstance();
         testClient.login(AbstractPoddClientTest.TEST_ADMIN_USER, AbstractPoddClientTest.TEST_ADMIN_PASSWORD);
         
         final InputStream input = this.getClass().getResourceAsStream("/test/artifacts/basicProject-1.rdf");
@@ -697,7 +697,7 @@ public abstract class AbstractPoddClientTest
     @Test
     public final void testLogin() throws Exception
     {
-        PoddClient testClient = this.getNewPoddClientInstance();
+        final PoddClient testClient = this.getNewPoddClientInstance();
         Assert.assertFalse(testClient.isLoggedIn());
         
         Assert.assertTrue("Client was not successfully logged in",
@@ -712,7 +712,7 @@ public abstract class AbstractPoddClientTest
     @Test
     public final void testLogout() throws Exception
     {
-        PoddClient testClient = this.getNewPoddClientInstance();
+        final PoddClient testClient = this.getNewPoddClientInstance();
         
         Assert.assertFalse(testClient.isLoggedIn());
         
@@ -745,7 +745,7 @@ public abstract class AbstractPoddClientTest
     @Test
     public final void testRemoveRolesArtifact() throws Exception
     {
-        PoddClient testClient = this.getNewPoddClientInstance();
+        final PoddClient testClient = this.getNewPoddClientInstance();
         testClient.login(AbstractPoddClientTest.TEST_ADMIN_USER, AbstractPoddClientTest.TEST_ADMIN_PASSWORD);
         
         final InputStream input = this.getClass().getResourceAsStream("/test/artifacts/basicProject-1.rdf");
@@ -784,7 +784,7 @@ public abstract class AbstractPoddClientTest
     @Test
     public final void testSetPoddServerUrl() throws Exception
     {
-        PoddClient testClient = this.getNewPoddClientInstance();
+        final PoddClient testClient = this.getNewPoddClientInstance();
         Assert.assertNotNull(testClient.getPoddServerUrl());
         
         testClient.setPoddServerUrl(null);
@@ -825,7 +825,7 @@ public abstract class AbstractPoddClientTest
     @Test
     public final void testUploadNewArtifact() throws Exception
     {
-        PoddClient testClient = this.getNewPoddClientInstance();
+        final PoddClient testClient = this.getNewPoddClientInstance();
         testClient.login(AbstractPoddClientTest.TEST_ADMIN_USER, AbstractPoddClientTest.TEST_ADMIN_PASSWORD);
         
         final InputStream input = this.getClass().getResourceAsStream("/test/artifacts/basicProject-1.rdf");
@@ -847,7 +847,7 @@ public abstract class AbstractPoddClientTest
                 .getVersionIRI().toOpenRDFURI()));
     }
     
-    public void isPoddClientTest(boolean isPoddClientTest)
+    public void isPoddClientTest(final boolean isPoddClientTest)
     {
         this.isPoddTest = isPoddClientTest;
     }

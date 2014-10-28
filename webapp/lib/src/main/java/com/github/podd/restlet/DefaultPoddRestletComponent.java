@@ -50,94 +50,94 @@ public class DefaultPoddRestletComponent extends Component
     static
     {
         System.setProperty("org.restlet.engine.loggerFacadeClass", "org.restlet.ext.slf4j.Slf4jLoggerFacade");
-
+        
         // Optionally remove existing handlers attached to j.u.l root logger
         SLF4JBridgeHandler.removeHandlersForRootLogger(); // (since SLF4J 1.6.5)
-
+        
         // add SLF4JBridgeHandler to j.u.l's root logger, should be done once during
         // the initialization phase of your application
         SLF4JBridgeHandler.install();
     }
-
+    
     private static final Logger log = LoggerFactory.getLogger(DefaultPoddRestletComponent.class);
-
+    
     /**
      *
      */
     public DefaultPoddRestletComponent()
     {
         super();
-
+        
         this.getClients().add(Protocol.CLAP);
         this.getClients().add(Protocol.HTTP);
         this.initialise();
     }
-
+    
     /**
      * @param arg0
      */
     public DefaultPoddRestletComponent(final Reference arg0)
     {
         super(arg0);
-
+        
         this.getClients().add(Protocol.CLAP);
         this.getClients().add(Protocol.HTTP);
         this.initialise();
     }
-
+    
     /**
      * @param xmlConfigRepresentation
      */
     public DefaultPoddRestletComponent(final Representation xmlConfigRepresentation)
     {
         super(xmlConfigRepresentation);
-
+        
         this.getClients().add(Protocol.CLAP);
         this.getClients().add(Protocol.HTTP);
         this.initialise();
     }
-
+    
     /**
      * @param xmlConfigurationRef
      */
     public DefaultPoddRestletComponent(final String xmlConfigurationRef)
     {
         super(xmlConfigurationRef);
-
+        
         this.getClients().add(Protocol.CLAP);
         this.getClients().add(Protocol.HTTP);
         this.initialise();
     }
-
+    
     public void initialise()
     {
         // FIXME: Make this configurable
         final LocalReference localReference = LocalReference.createClapReference(LocalReference.CLAP_THREAD, "static/");
-
+        
         final CompositeClassLoader customClassLoader = new CompositeClassLoader();
         customClassLoader.addClassLoader(Thread.currentThread().getContextClassLoader());
         customClassLoader.addClassLoader(Router.class.getClassLoader());
-
+        
         final ClassLoaderDirectory directory =
                 new ClassLoaderDirectory(this.getContext().createChildContext(), localReference, customClassLoader);
-
+        
         directory.setListingAllowed(true);
-
+        
         final String resourcesPath = PoddWebConstants.PATH_RESOURCES;
-
+        
         DefaultPoddRestletComponent.log.info("attaching resource handler to path={}", resourcesPath);
-
+        
         // attach the resources first
         this.getDefaultHost().attach(resourcesPath, directory);
-
+        
         PoddWebServiceApplication nextApplication;
         try
         {
             nextApplication = new PoddWebServiceApplicationImpl();
-
+            
             // attach the web services application
             this.getDefaultHost().attach("/", nextApplication);
-
+            
             // setup the application after attaching it, as it requires Application.getContext() to
             // not be null during the setup process
             ApplicationUtils.setupApplication(nextApplication, nextApplication.getContext());
@@ -146,8 +146,8 @@ public class DefaultPoddRestletComponent extends Component
         {
             throw new RuntimeException("Could not setup application", e);
         }
-
+        
         DefaultPoddRestletComponent.log.info("routes={}", this.getDefaultHost().getRoutes().toString());
     }
-
+    
 }

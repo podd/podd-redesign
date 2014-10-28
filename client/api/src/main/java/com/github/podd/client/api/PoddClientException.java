@@ -25,7 +25,7 @@ package com.github.podd.client.api;
 public class PoddClientException extends RuntimeException
 {
     private static final long serialVersionUID = -2854524362938904344L;
-
+    
     /**
      *
      */
@@ -33,7 +33,7 @@ public class PoddClientException extends RuntimeException
     {
         super();
     }
-
+    
     /**
      * @param message
      */
@@ -41,7 +41,7 @@ public class PoddClientException extends RuntimeException
     {
         super(message);
     }
-
+    
     /**
      * @param message
      * @param cause
@@ -50,7 +50,7 @@ public class PoddClientException extends RuntimeException
     {
         super(message, cause);
     }
-
+    
     /**
      * @param cause
      */
@@ -58,5 +58,5 @@ public class PoddClientException extends RuntimeException
     {
         super(cause);
     }
-
+    
 }

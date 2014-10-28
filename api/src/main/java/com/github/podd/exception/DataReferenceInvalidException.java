@@ -32,45 +32,45 @@ import com.github.podd.utils.PODD;
  */
 public class DataReferenceInvalidException extends PoddException
 {
-
+    
     private static final long serialVersionUID = -9203219163144536259L;
-
+    
     private DataReference dataReference;
-
+    
     public DataReferenceInvalidException(final DataReference dataReference, final String msg)
     {
         super(msg);
         this.dataReference = dataReference;
     }
-
+    
     public DataReferenceInvalidException(final DataReference dataReference, final String msg, final Throwable throwable)
     {
         super(msg, throwable);
         this.dataReference = dataReference;
     }
-
+    
     public DataReferenceInvalidException(final DataReference dataReference, final Throwable throwable)
     {
         super(throwable);
         this.dataReference = dataReference;
     }
-
+    
     @Override
     public Model getDetailsAsModel(final Resource errorResource)
     {
         final Model model = super.getDetailsAsModel(errorResource);
-
+        
         // FIXME - untested and incomplete
         final URI fileRefUri = this.getFileReference().getObjectIri().toOpenRDFURI();
         model.add(errorResource, PODD.ERR_SOURCE, fileRefUri);
         model.add(fileRefUri, RDFS.LABEL, PODD.VF.createLiteral(this.getFileReference().getLabel()));
-
+        
         return model;
     }
-
+    
     public DataReference getFileReference()
     {
         return this.dataReference;
     }
-
+    
 }

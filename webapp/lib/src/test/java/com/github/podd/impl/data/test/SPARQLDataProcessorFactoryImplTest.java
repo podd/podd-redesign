@@ -53,17 +53,17 @@ import com.github.podd.utils.PoddRdfProcessorUtils;
  * @author kutila
  */
 public class SPARQLDataProcessorFactoryImplTest extends
-AbstractPoddRdfProcessorFactoryTest<DataReferenceProcessor<SPARQLDataReference>>
+        AbstractPoddRdfProcessorFactoryTest<DataReferenceProcessor<SPARQLDataReference>>
 {
-
+    
     protected final Logger log = LoggerFactory.getLogger(this.getClass());
-
+    
     @Override
     protected PoddRdfProcessorFactory getNewPoddRdfProcessorFactory()
     {
         return new SPARQLDataReferenceProcessorFactoryImpl();
     }
-
+    
     /**
      * Test that the SPARQL query which can be constructed based on the parts returned by this
      * factory can correctly execute against a test RDF graph.
@@ -75,11 +75,11 @@ AbstractPoddRdfProcessorFactoryTest<DataReferenceProcessor<SPARQLDataReference>>
     {
         final PoddRdfProcessorFactory<SPARQLDataReferenceProcessor> rdfProcessorFactory =
                 this.getNewPoddRdfProcessorFactory();
-
+        
         // build SPARQL query
         final String sparql = PoddRdfProcessorUtils.buildSparqlConstructQuery(rdfProcessorFactory);
         this.log.info("Generated SPARQL <{}> ", sparql);
-
+        
         final Repository repository = new SailRepository(new MemoryStore());
         RepositoryConnection repositoryConnection = null;
         try
@@ -87,7 +87,7 @@ AbstractPoddRdfProcessorFactoryTest<DataReferenceProcessor<SPARQLDataReference>>
             repository.initialize();
             repositoryConnection = repository.getConnection();
             repositoryConnection.begin();
-
+            
             // load RDF graph into Repository
             final String artifactResourcePath = TestConstants.TEST_ARTIFACT_PURLS_2_SPARQL_DATA_REFS;
             try (final InputStream inputStream = this.getClass().getResourceAsStream(artifactResourcePath);)
@@ -95,15 +95,15 @@ AbstractPoddRdfProcessorFactoryTest<DataReferenceProcessor<SPARQLDataReference>>
                 Assert.assertNotNull("Could not find resource", inputStream);
                 repositoryConnection.add(inputStream, "", RDFFormat.RDFXML);
             }
-
+            
             repositoryConnection.commit();
             repositoryConnection.begin();
-
+            
             final GraphQuery query = repositoryConnection.prepareGraphQuery(QueryLanguage.SPARQL, sparql);
-
+            
             // verify SPARQL generated a graph as expected
             final Model model = QueryResults.asModel(query.evaluate());
-
+            
             Assert.assertFalse("Empty Model, no file references found.", model.isEmpty());
             final Model type = model.filter(null, RDF.TYPE, PODD.PODD_BASE_DATA_REFERENCE_TYPE);
             Assert.assertEquals("Expected 2 file references", 2, type.size());
@@ -118,7 +118,7 @@ AbstractPoddRdfProcessorFactoryTest<DataReferenceProcessor<SPARQLDataReference>>
             repository.shutDown();
         }
     }
-
+    
     /**
      * Test that the SPARQL query which can be constructed based on the parts returned by this
      * factory, and a user specified "subject" can correctly execute against a test RDF graph.
@@ -130,14 +130,14 @@ AbstractPoddRdfProcessorFactoryTest<DataReferenceProcessor<SPARQLDataReference>>
     {
         final PoddRdfProcessorFactory<SPARQLDataReferenceProcessor> rdfProcessorFactory =
                 this.getNewPoddRdfProcessorFactory();
-
+        
         final String fileReference = "http://purl.org/podd-test/130326f/object-rice-scan-34343-a";
-
+        
         // build SPARQL query
         final URI subject = ValueFactoryImpl.getInstance().createURI(fileReference);
         final String sparql = PoddRdfProcessorUtils.buildSparqlConstructQuery(rdfProcessorFactory, subject);
         this.log.info("Generated SPARQL <{}> ", sparql);
-
+        
         // verify SPARQL generated a graph as expected
         final Repository repository = new SailRepository(new MemoryStore());
         RepositoryConnection repositoryConnection = null;
@@ -146,7 +146,7 @@ AbstractPoddRdfProcessorFactoryTest<DataReferenceProcessor<SPARQLDataReference>>
             repository.initialize();
             repositoryConnection = repository.getConnection();
             repositoryConnection.begin();
-
+            
             // load RDF graph into Repository
             final String artifactResourcePath = TestConstants.TEST_ARTIFACT_PURLS_2_SPARQL_DATA_REFS;
             try (final InputStream inputStream = this.getClass().getResourceAsStream(artifactResourcePath);)
@@ -154,12 +154,12 @@ AbstractPoddRdfProcessorFactoryTest<DataReferenceProcessor<SPARQLDataReference>>
                 Assert.assertNotNull("Could not find resource", inputStream);
                 repositoryConnection.add(inputStream, "", RDFFormat.RDFXML);
             }
-
+            
             repositoryConnection.commit();
             repositoryConnection.begin();
-
+            
             final GraphQuery query = repositoryConnection.prepareGraphQuery(QueryLanguage.SPARQL, sparql);
-
+            
             // verify SPARQL generated a graph as expected
             final Model model = QueryResults.asModel(query.evaluate());
             Assert.assertFalse("Empty Model, no file references found.", model.isEmpty());
@@ -171,7 +171,7 @@ AbstractPoddRdfProcessorFactoryTest<DataReferenceProcessor<SPARQLDataReference>>
         finally
         {
             repositoryConnection.rollback();
-
+            
             if(repositoryConnection != null)
             {
                 repositoryConnection.close();
@@ -179,5 +179,5 @@ AbstractPoddRdfProcessorFactoryTest<DataReferenceProcessor<SPARQLDataReference>>
             repository.shutDown();
         }
     }
-
+    
 }

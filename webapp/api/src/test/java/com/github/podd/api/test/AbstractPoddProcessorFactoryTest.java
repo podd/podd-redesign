@@ -36,25 +36,25 @@ import com.github.podd.api.PoddProcessorStage;
 public abstract class AbstractPoddProcessorFactoryTest<T extends PoddProcessor<I>, I>
 {
     private PoddProcessorFactory<T, I> processorFactory;
-
+    
     /**
      * @return A new PoddProcessorFactory instance for use in the test
      */
     protected abstract PoddProcessorFactory<T, I> getNewPoddProcessorFactory();
-
+    
     @Before
     public void setUp() throws Exception
     {
         this.processorFactory = this.getNewPoddProcessorFactory();
         Assert.assertNotNull("Null implementation of test processor factory", this.processorFactory);
     }
-
+    
     @After
     public void tearDown() throws Exception
     {
         this.processorFactory = null;
     }
-
+    
     /**
      * Tests that ProcessorFactory.getStages() returns an accurate representation of the stages
      * supported by a PoddProcessorFactory.
@@ -68,7 +68,7 @@ public abstract class AbstractPoddProcessorFactoryTest<T extends PoddProcessor<I
         {
             Assert.assertTrue(this.processorFactory.canHandleStage(supportedStage));
         }
-
+        
         for(final PoddProcessorStage aStage : PoddProcessorStage.values())
         {
             if(!this.processorFactory.getStages().contains(aStage))
@@ -77,7 +77,7 @@ public abstract class AbstractPoddProcessorFactoryTest<T extends PoddProcessor<I
             }
         }
     }
-
+    
     @Test
     public void testCanHandleStageWithNull() throws Exception
     {
@@ -91,13 +91,13 @@ public abstract class AbstractPoddProcessorFactoryTest<T extends PoddProcessor<I
             Assert.assertTrue(e.getMessage().toLowerCase().contains("null"));
         }
     }
-
+    
     @Test
     public void testGetKey() throws Exception
     {
         Assert.assertNotNull(this.processorFactory.getKey());
     }
-
+    
     /**
      * Test that no null processors are returned by processor factory.
      *
@@ -109,7 +109,7 @@ public abstract class AbstractPoddProcessorFactoryTest<T extends PoddProcessor<I
         final PoddProcessor<I> poddProcessor = this.processorFactory.getProcessor();
         Assert.assertNotNull("Podd Processor was null", poddProcessor);
     }
-
+    
     @Test
     public void testGetStagesNotEmpty() throws Exception
     {
@@ -117,5 +117,5 @@ public abstract class AbstractPoddProcessorFactoryTest<T extends PoddProcessor<I
         Assert.assertNotNull("getStages() returned a NULL Set", stages);
         Assert.assertFalse("Should not have returned an empty Set", stages.isEmpty());
     }
-
+    
 }

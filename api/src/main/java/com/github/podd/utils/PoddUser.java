@@ -76,7 +76,7 @@ public class PoddUser extends RestletUtilUser
             throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "User Identifier cannot be empty");
         }
         identifier = identifier.trim();
-        for(char nextChar : identifier.toCharArray())
+        for(final char nextChar : identifier.toCharArray())
         {
             if(Character.isWhitespace(nextChar))
             {

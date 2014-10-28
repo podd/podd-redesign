@@ -26,9 +26,9 @@ import org.semanticweb.owlapi.model.OWLOntologyID;
 public class DeleteArtifactException extends PoddException
 {
     private static final long serialVersionUID = 7736119378934264560L;
-
+    
     private final OWLOntologyID artifact;
-
+    
     /**
      * @param msg
      */
@@ -37,7 +37,7 @@ public class DeleteArtifactException extends PoddException
         super(msg);
         this.artifact = artifact;
     }
-
+    
     /**
      * @param msg
      * @param throwable
@@ -47,7 +47,7 @@ public class DeleteArtifactException extends PoddException
         super(msg, throwable);
         this.artifact = artifact;
     }
-
+    
     /**
      * @param throwable
      */
@@ -56,7 +56,7 @@ public class DeleteArtifactException extends PoddException
         super(throwable);
         this.artifact = artifact;
     }
-
+    
     /**
      * @return the artifact
      */
@@ -64,5 +64,5 @@ public class DeleteArtifactException extends PoddException
     {
         return this.artifact;
     }
-
+    
 }

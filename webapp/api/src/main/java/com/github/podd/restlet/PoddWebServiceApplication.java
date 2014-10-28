@@ -42,7 +42,7 @@ import freemarker.template.Configuration;
  */
 public abstract class PoddWebServiceApplication extends Application
 {
-
+    
     /**
      * Checks whether the client is authenticated for the given action, and if they are not, the
      * response will have challenges inserted and the status will be set to HTTP 401.
@@ -64,7 +64,7 @@ public abstract class PoddWebServiceApplication extends Application
      * @return True if the request is authenticated, and false otherwise.
      */
     public abstract boolean authenticate(PoddAction action, Request request, Response response, URI optionalObjectUri);
-
+    
     /**
      * Retrieves the data repository configuration used by this server.
      *
@@ -72,21 +72,21 @@ public abstract class PoddWebServiceApplication extends Application
      *         for this server.
      */
     public abstract Model getDataRepositoryConfig();
-
+    
     /**
      *
      * @return The ChallengeAuthenticator which is currently being used to respond to queries that
      *         require authentication.
      */
     public abstract ChallengeAuthenticator getAuthenticator();
-
+    
     /**
      * Get the {@link PoddArtifactManager} used by this application to manage artifacts.
      *
      * @return The {@link PoddArtifactManager} used by this application.
      */
     public abstract PoddArtifactManager getPoddArtifactManager();
-
+    
     /**
      * Get the {@link PoddDataRepositoryManager} used by this application to manage data repository
      * access and verification.
@@ -94,7 +94,7 @@ public abstract class PoddWebServiceApplication extends Application
      * @return The {@link PoddDataRepositoryManager} used by this application.
      */
     public abstract PoddDataRepositoryManager getPoddDataRepositoryManager();
-
+    
     /**
      * Get the {@link PoddRepositoryManager} used by this application to manage access to OpenRDF
      * Sesame {@link Repository} objects.
@@ -102,35 +102,35 @@ public abstract class PoddWebServiceApplication extends Application
      * @return The {@link PoddRepositoryManager} used by this application.
      */
     public abstract PoddRepositoryManager getPoddRepositoryManager();
-
+    
     /**
      * Get the {@link PoddSchemaManager} used by this application to manage schema ontologies.
      *
      * @return The {@link PoddSchemaManager} used by this application.
      */
     public abstract PoddSchemaManager getPoddSchemaManager();
-
+    
     /**
      * Get the {@link PropertyUtil} used by this application for contextual settings.
      *
      * @return The {@link PropertyUtil} instance for this {@link PoddWebServiceApplication}.
      */
     public abstract PropertyUtil getPropertyUtil();
-
+    
     /**
      * Gets the realm which is used to manage users and roles.
      *
      * @return
      */
     public abstract PoddSesameRealm getRealm();
-
+    
     /**
      * Returns the FreeMarker template configuration object for this application.
      *
      * @return
      */
     public abstract Configuration getTemplateConfiguration();
-
+    
     /**
      * Sets the {@link PoddDataRepository} mapping information for this application.
      *
@@ -138,7 +138,7 @@ public abstract class PoddWebServiceApplication extends Application
      *            The mappings for data repositories that are relevant to this application.
      */
     public abstract void setDataRepositoryConfig(Model aliasesConfiguration);
-
+    
     /**
      *
      * @param auth
@@ -146,7 +146,7 @@ public abstract class PoddWebServiceApplication extends Application
      *            authentication.
      */
     public abstract void setAuthenticator(ChallengeAuthenticator auth);
-
+    
     /**
      * Set a new {@link PoddArtifactManager} to use for managing PODD artifacts for this
      * application.
@@ -155,7 +155,7 @@ public abstract class PoddWebServiceApplication extends Application
      *            The artifact manager
      */
     public abstract void setPoddArtifactManager(PoddArtifactManager poddArtifactManager);
-
+    
     /**
      *
      * @param nextDataRepositoryManager
@@ -163,7 +163,7 @@ public abstract class PoddWebServiceApplication extends Application
      *            references for PODD Artifacts.
      */
     public abstract void setPoddDataRepositoryManager(PoddDataRepositoryManager nextDataRepositoryManager);
-
+    
     /**
      *
      * @param poddRepositoryManager
@@ -171,7 +171,7 @@ public abstract class PoddWebServiceApplication extends Application
      *            and retrieve data.
      */
     public abstract void setPoddRepositoryManager(PoddRepositoryManager poddRepositoryManager);
-
+    
     /**
      * Set a new {@link PoddSchemaManager} to use for managing schema ontologies for this
      * application.
@@ -180,7 +180,7 @@ public abstract class PoddWebServiceApplication extends Application
      *            The schema ontology manager
      */
     public abstract void setPoddSchemaManager(PoddSchemaManager poddSchemaManager);
-
+    
     /**
      * Set a new {@link PoddSesameRealm} to use for authentication for this application.
      *
@@ -188,7 +188,7 @@ public abstract class PoddWebServiceApplication extends Application
      *            The authentication realm.
      */
     public abstract void setRealm(PoddSesameRealm realm);
-
+    
     /**
      * Set a new Freemarker Template Configuration for this application.
      *

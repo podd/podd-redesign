@@ -1,22 +1,15 @@
 /**
- * 
+ *
  */
 package com.github.podd.restlet.test;
 
-import static org.junit.Assert.*;
-
-import java.io.IOException;
-
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.openrdf.OpenRDFException;
-import org.openrdf.rio.UnsupportedRDFormatException;
 import org.restlet.Context;
-import org.semanticweb.owlapi.model.OWLException;
 
-import com.github.podd.exception.PoddException;
 import com.github.podd.restlet.ApplicationUtils;
 import com.github.podd.restlet.PoddWebServiceApplication;
 import com.github.podd.restlet.PoddWebServiceApplicationImpl;
@@ -36,7 +29,7 @@ public class ApplicationUtilsTest
     @Before
     public void setUp() throws Exception
     {
-        application = new PoddWebServiceApplicationImpl();
+        this.application = new PoddWebServiceApplicationImpl();
     }
     
     /**
@@ -45,11 +38,11 @@ public class ApplicationUtilsTest
     @After
     public void tearDown() throws Exception
     {
-        if(application != null)
+        if(this.application != null)
         {
-            application.stop();
+            this.application.stop();
         }
-        application = null;
+        this.application = null;
     }
     
     /**
@@ -61,7 +54,7 @@ public class ApplicationUtilsTest
     @Test
     public final void testGetNewAuthenticator()
     {
-        fail("Not yet implemented"); // TODO
+        Assert.fail("Not yet implemented"); // TODO
     }
     
     /**
@@ -73,7 +66,7 @@ public class ApplicationUtilsTest
     @Test
     public final void testGetNewManagementRepository()
     {
-        fail("Not yet implemented"); // TODO
+        Assert.fail("Not yet implemented"); // TODO
     }
     
     /**
@@ -85,7 +78,7 @@ public class ApplicationUtilsTest
     @Test
     public final void testGetNewTemplateConfiguration()
     {
-        fail("Not yet implemented"); // TODO
+        Assert.fail("Not yet implemented"); // TODO
     }
     
     /**
@@ -96,7 +89,7 @@ public class ApplicationUtilsTest
     @Test
     public final void testSetupApplication() throws Exception
     {
-        ApplicationUtils.setupApplication(application, new Context());
+        ApplicationUtils.setupApplication(this.application, new Context());
     }
     
     /**
@@ -108,7 +101,7 @@ public class ApplicationUtilsTest
     @Test
     public final void testSetupSchemas() throws Exception
     {
-        ApplicationUtils.setupSchemas(application);
+        ApplicationUtils.setupSchemas(this.application);
     }
     
 }

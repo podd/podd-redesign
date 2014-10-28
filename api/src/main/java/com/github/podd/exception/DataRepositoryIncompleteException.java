@@ -25,7 +25,7 @@ package com.github.podd.exception;
 public class DataRepositoryIncompleteException extends DataRepositoryException
 {
     private static final long serialVersionUID = -689252740293644258L;
-
+    
     /**
      *
      * @param msg
@@ -35,7 +35,7 @@ public class DataRepositoryIncompleteException extends DataRepositoryException
     {
         super(msg);
     }
-
+    
     /**
      * @param msg
      *            The message for this exception.
@@ -46,7 +46,7 @@ public class DataRepositoryIncompleteException extends DataRepositoryException
     {
         super(msg, throwable);
     }
-
+    
     /**
      * @param throwable
      *            The cause for this exception.

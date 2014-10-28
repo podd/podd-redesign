@@ -43,27 +43,27 @@ import com.github.podd.test.TestUtils;
  */
 public class TestResetResourceImpl extends Restlet
 {
-
+    
     private final Logger log = LoggerFactory.getLogger(this.getClass());
     private PoddWebServiceApplication application;
-
+    
     /**
      */
     public TestResetResourceImpl()
     {
         super();
     }
-
+    
     public TestResetResourceImpl(final PoddWebServiceApplication nextApplication)
     {
         this.application = nextApplication;
     }
-
+    
     @Override
     public void handle(final Request request, final Response response)
     {
         super.handle(request, response);
-
+        
         this.log.info("========== Reset called ==========");
         try
         {
@@ -78,8 +78,8 @@ public class TestResetResourceImpl extends Restlet
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Could not reset application", e);
         }
         this.log.info("========== Reset complete ==========");
-
+        
         response.setStatus(Status.SUCCESS_NO_CONTENT);
     }
-
+    
 }

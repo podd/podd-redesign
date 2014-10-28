@@ -28,16 +28,16 @@ import com.github.podd.utils.PoddUserStatus;
  */
 public class PoddUserStatusTest
 {
-
+    
     @Test
     public void testPoddUserStatus() throws Exception
     {
         final PoddUserStatus[] allStatuses = PoddUserStatus.values();
         Assert.assertEquals(2, allStatuses.length);
-
+        
         Assert.assertNotNull(PoddUserStatus.valueOf("ACTIVE"));
         Assert.assertNotNull(PoddUserStatus.valueOf("INACTIVE"));
-
+        
         try
         {
             PoddUserStatus.valueOf("BUSY"); // invalid status
@@ -46,6 +46,6 @@ public class PoddUserStatusTest
         {
             Assert.assertNotNull(e);
         }
-
+        
     }
 }

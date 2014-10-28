@@ -50,7 +50,7 @@ public interface PoddOWLManager
      * @return True if the ontology is cached in memory and false otherwise.
      */
     boolean isCached(OWLOntologyID ontologyID, Set<? extends OWLOntologyID> dependentSchemaOntologies);
-
+    
     /**
      * Loads an ontology from the given {@link OWLOntologyDocumentSource} into the given
      * {@link RepositoryConnection}, using the optional {@link OWLOntologyID} to relabel the
@@ -73,7 +73,7 @@ public interface PoddOWLManager
             RepositoryConnection permanentRepositoryConnection, OWLOntologyID replacementOntologyID,
             Set<? extends OWLOntologyID> dependentSchemaOntologies, RepositoryConnection managementConnection,
             URI schemaManagementContext) throws OWLException, PoddException, OpenRDFException, IOException;
-
+    
     /**
      * Attempts to regain memory in the underlying OWLOntologyManager by removing the ontology from
      * the in-memory cache.
@@ -89,8 +89,8 @@ public interface PoddOWLManager
      *             If there was an error while attempting to retrieve the memory.
      */
     boolean removeCache(OWLOntologyID ontologyID, Set<? extends OWLOntologyID> dependentSchemaOntologies)
-            throws OWLException;
-
+        throws OWLException;
+    
     /**
      * Helper method to verify that a given {@link Model} represents an ontology which complies with
      * the given schema OWL Ontology.
@@ -100,5 +100,5 @@ public interface PoddOWLManager
      * @throws OntologyNotInProfileException
      */
     void verifyAgainstSchema(Model model, Model schemaModel) throws OntologyNotInProfileException;
-
+    
 }

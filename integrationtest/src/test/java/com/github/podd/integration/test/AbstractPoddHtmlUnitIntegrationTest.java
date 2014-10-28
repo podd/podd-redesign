@@ -35,9 +35,9 @@ import com.github.podd.utils.PoddWebConstants;
 public abstract class AbstractPoddHtmlUnitIntegrationTest
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractPoddHtmlUnitIntegrationTest.class);
-
+    
     private WebTester tester;
-
+    
     /**
      * Override this to return the http accept header for this test class.
      *
@@ -45,7 +45,7 @@ public abstract class AbstractPoddHtmlUnitIntegrationTest
      *         use the default Content Negotiation mechanism, which may produce random results.
      */
     protected abstract String getTestAcceptHeader();
-
+    
     /**
      *
      * @return The WebTester object for the current test
@@ -54,12 +54,12 @@ public abstract class AbstractPoddHtmlUnitIntegrationTest
     {
         return this.tester;
     }
-
+    
     protected void login(final String username, final char[] password)
     {
         this.login(username, new String(password));
     }
-
+    
     /**
      * Logs in the user with the given username and password using whatever method matches the
      * integration test implementing this method.
@@ -70,12 +70,12 @@ public abstract class AbstractPoddHtmlUnitIntegrationTest
      *            The password of the user to login.
      */
     protected abstract void login(String username, String password);
-
+    
     /**
      * Logs out any user that is currently logged in.
      */
     protected abstract void logout();
-
+    
     @Before
     public void setUp() throws Exception
     {
@@ -83,7 +83,7 @@ public abstract class AbstractPoddHtmlUnitIntegrationTest
         this.getWebTester().setBaseUrl("http://localhost:9090/podd-test/");
         this.setupTestAcceptHeader();
     }
-
+    
     /**
      * This method is called from tests where the accept header needs to be setup.
      *
@@ -99,7 +99,7 @@ public abstract class AbstractPoddHtmlUnitIntegrationTest
             this.getWebTester().getTestContext().addRequestHeader("Accept", acceptHeader);
         }
     }
-
+    
     /**
      *
      * @param tester
@@ -109,7 +109,7 @@ public abstract class AbstractPoddHtmlUnitIntegrationTest
     {
         this.tester = tester;
     }
-
+    
     /**
      * @throws java.lang.Exception
      */
@@ -117,7 +117,7 @@ public abstract class AbstractPoddHtmlUnitIntegrationTest
     public void tearDown() throws Exception
     {
         Exception e = null;
-
+        
         try
         {
             this.logout();
@@ -127,7 +127,7 @@ public abstract class AbstractPoddHtmlUnitIntegrationTest
             AbstractPoddHtmlUnitIntegrationTest.LOGGER.error("Found exception in logout after test", ex);
             e = ex;
         }
-
+        
         try
         {
             // Reset using the maven build configured reset key from oas.properties
@@ -139,7 +139,7 @@ public abstract class AbstractPoddHtmlUnitIntegrationTest
             AbstractPoddHtmlUnitIntegrationTest.LOGGER.error("Found exception resetting application after test", ex);
             e = ex;
         }
-
+        
         try
         {
             this.getWebTester().closeBrowser();
@@ -149,9 +149,9 @@ public abstract class AbstractPoddHtmlUnitIntegrationTest
             AbstractPoddHtmlUnitIntegrationTest.LOGGER.error("Found exception closing browser after test", ex);
             e = ex;
         }
-
+        
         this.setWebTester(null);
-
+        
         if(e != null)
         {
             throw e;

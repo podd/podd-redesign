@@ -30,10 +30,10 @@ import com.github.podd.api.purl.PoddPurlProcessor;
 public class PurlProcessorNotHandledException extends PoddException
 {
     private static final long serialVersionUID = -8569720976338731517L;
-
+    
     private final PoddPurlProcessor generator;
     private final URI inputUri;
-
+    
     /**
      *
      * @param generator
@@ -49,7 +49,7 @@ public class PurlProcessorNotHandledException extends PoddException
         this.generator = generator;
         this.inputUri = inputUri;
     }
-
+    
     /**
      * @param generator
      *            The PURL Generator that was not able to handle the given input URI.
@@ -67,7 +67,7 @@ public class PurlProcessorNotHandledException extends PoddException
         this.generator = generator;
         this.inputUri = inputUri;
     }
-
+    
     /**
      * @param generator
      *            The PURL Generator that was not able to handle the given input URI.
@@ -83,7 +83,7 @@ public class PurlProcessorNotHandledException extends PoddException
         this.generator = generator;
         this.inputUri = inputUri;
     }
-
+    
     /**
      * @return The PURL Generator that was not able to handle the given input URI.
      */
@@ -91,7 +91,7 @@ public class PurlProcessorNotHandledException extends PoddException
     {
         return this.generator;
     }
-
+    
     /**
      * @return The input URI that failed to be handled by the given PURL Generator.
      */
@@ -99,5 +99,5 @@ public class PurlProcessorNotHandledException extends PoddException
     {
         return this.inputUri;
     }
-
+    
 }

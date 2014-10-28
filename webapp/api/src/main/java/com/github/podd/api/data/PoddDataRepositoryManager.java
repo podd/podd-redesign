@@ -59,14 +59,14 @@ public interface PoddDataRepositoryManager
      * @throws DataRepositoryException
      */
     void addRepositoryMapping(String alias, PoddDataRepository<?> repositoryConfiguration) throws OpenRDFException,
-    DataRepositoryException;
-
+        DataRepositoryException;
+    
     void addRepositoryMapping(String alias, PoddDataRepository<?> repositoryConfiguration, boolean overwrite)
-            throws OpenRDFException, DataRepositoryException;
-
+        throws OpenRDFException, DataRepositoryException;
+    
     void downloadFileReference(DataReference nextFileReference, OutputStream outputStream) throws PoddException,
-    IOException;
-
+        IOException;
+    
     /**
      * Returns a list of all aliases that are currently mapped.
      *
@@ -75,7 +75,7 @@ public interface PoddDataRepositoryManager
      * @throws OpenRDFException
      */
     List<String> getAllAliases() throws DataRepositoryException, OpenRDFException;
-
+    
     /**
      * Given an alias returns all aliases, including the given one, that map to the same repository
      * configuration.
@@ -87,9 +87,9 @@ public interface PoddDataRepositoryManager
      * @throws OpenRDFException
      */
     List<String> getEquivalentAliases(String alias) throws DataRepositoryException, OpenRDFException;
-
+    
     PoddOWLManager getOWLManager();
-
+    
     /**
      * Returns the repository configuration that is currently mapped using the given alias.
      *
@@ -106,7 +106,7 @@ public interface PoddDataRepositoryManager
      * @throws OpenRDFException
      */
     PoddDataRepository<?> getRepository(String alias) throws OpenRDFException, DataRepositoryException;
-
+    
     /**
      * Returns the aliases that are currently being mapped using the given repository configuration.
      *
@@ -117,10 +117,10 @@ public interface PoddDataRepositoryManager
      * @throws DataRepositoryException
      */
     List<String> getRepositoryAliases(PoddDataRepository<?> repositoryConfiguration) throws DataRepositoryException,
-    OpenRDFException;
-
+        OpenRDFException;
+    
     PoddRepositoryManager getRepositoryManager();
-
+    
     /**
      * Checks to see if the File Repository Management Graph contains any data, and if empty loads a
      * default set of repository configurations and aliases from the specified model.
@@ -133,7 +133,7 @@ public interface PoddDataRepositoryManager
      * @throws PoddException
      */
     void initialise(Model defaultAliasesConfiguraton) throws OpenRDFException, IOException, PoddException;
-
+    
     /**
      * Removes the mapping for the given alias, returning the {@link PoddDataRepository} object that
      * was previously mapped to using the alias.
@@ -147,12 +147,12 @@ public interface PoddDataRepositoryManager
      * @throws DataRepositoryException
      */
     PoddDataRepository<?> removeRepositoryMapping(String alias) throws DataRepositoryMappingNotFoundException,
-    DataRepositoryException, OpenRDFException;
-
+        DataRepositoryException, OpenRDFException;
+    
     void setOWLManager(PoddOWLManager owlManager);
-
+    
     void setRepositoryManager(PoddRepositoryManager repositoryManager);
-
+    
     /**
      * Verifies that a given set of {@link DataReference} objects are valid by checking they can be
      * accessed from the remote Data Repository.
@@ -167,6 +167,6 @@ public interface PoddDataRepositoryManager
      *             failure.
      */
     void verifyDataReferences(Set<DataReference> dataReferenceResults) throws OpenRDFException, PoddException,
-    DataRepositoryMappingNotFoundException;
-
+        DataRepositoryMappingNotFoundException;
+    
 }

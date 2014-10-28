@@ -204,7 +204,7 @@ public class PoddObjectLabelImpl implements PoddObjectLabel
     @Override
     public String getBarcode()
     {
-        return barcode;
+        return this.barcode;
     }
     
     @Override

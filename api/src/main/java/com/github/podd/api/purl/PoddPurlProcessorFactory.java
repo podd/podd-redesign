@@ -26,7 +26,7 @@ public interface PoddPurlProcessorFactory extends PoddRdfProcessorFactory<PoddPu
 {
     /**
      * Sets an optional temporary URI prefix for the purl processor to use.
-     * 
+     *
      * @param prefix
      *            A prefix to use when recognising temporary URIs.
      */

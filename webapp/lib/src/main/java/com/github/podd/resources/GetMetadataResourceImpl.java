@@ -55,25 +55,25 @@ public class GetMetadataResourceImpl extends AbstractPoddResourceImpl
     {
         // - object Type (mandatory)
         this.log.info("Get Methadata GET query {}", this.getQuery());
-
+        
         final String objectType = this.getQuery().getFirstValue(PoddWebConstants.KEY_OBJECT_TYPE_IDENTIFIER, true);
         if(objectType == null)
         {
             throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Type of Object to create not specified");
         }
-
+        
         // - artifact URI (optional)
         final String artifactUri = this.getQuery().getFirstValue(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, true);
-
+        
         // - include Do-Not-Display properties (optional, defaults to false)
         final String includeDoNotDisplayPropertiesString =
                 this.getQuery().getFirstValue(PoddWebConstants.KEY_INCLUDE_DO_NOT_DISPLAY_PROPERTIES, true);
         final boolean includeDoNotDisplayProperties = Boolean.valueOf(includeDoNotDisplayPropertiesString);
-
+        
         // - metadata policy (optional, default is to exclude sub-properties of
         // poddBase:contains)
         final String metadataPolicyString = this.getQuery().getFirstValue(PoddWebConstants.KEY_METADATA_POLICY, true);
-
+        
         MetadataPolicy containsPropertyPolicy = MetadataPolicy.EXCLUDE_CONTAINS;
         if(metadataPolicyString != null)
         {
@@ -86,10 +86,10 @@ public class GetMetadataResourceImpl extends AbstractPoddResourceImpl
                 containsPropertyPolicy = MetadataPolicy.INCLUDE_ALL;
             }
         }
-
+        
         this.log.info("@Get Metadata: {}, {}, {}, {} ({})", objectType, containsPropertyPolicy,
                 includeDoNotDisplayProperties, artifactUri, variant.getMediaType().getName());
-
+        
         if(artifactUri == null)
         {
             // looks like adding a new Artifact (ie, a new Project)
@@ -99,10 +99,10 @@ public class GetMetadataResourceImpl extends AbstractPoddResourceImpl
         {
             this.checkAuthentication(PoddAction.ARTIFACT_EDIT, PODD.VF.createURI(artifactUri));
         }
-
+        
         final User user = this.getRequest().getClientInfo().getUser();
         this.log.info("authenticated user: {}", user);
-
+        
         final ByteArrayOutputStream output = new ByteArrayOutputStream();
         final RDFFormat format = Rio.getWriterFormatForMIMEType(variant.getMediaType().getName(), RDFFormat.TURTLE);
         try
@@ -125,8 +125,8 @@ public class GetMetadataResourceImpl extends AbstractPoddResourceImpl
         {
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Could not generate object metadata", e);
         }
-
+        
         return new ByteArrayRepresentation(output.toByteArray(), MediaType.valueOf(format.getDefaultMIMEType()));
     }
-
+    
 }

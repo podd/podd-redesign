@@ -24,5 +24,5 @@ package com.github.podd.api.data;
  */
 public interface SSHFileReferenceProcessor extends DataReferenceProcessor<SSHFileReference>
 {
-
+    
 }

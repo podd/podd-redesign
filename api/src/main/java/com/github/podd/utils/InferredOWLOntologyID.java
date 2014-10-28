@@ -38,9 +38,9 @@ import org.semanticweb.owlapi.model.OWLOntologyID;
 public class InferredOWLOntologyID extends OWLOntologyID
 {
     private static final long serialVersionUID = 30402L;
-
+    
     private final IRI inferredOntologyIRI;
-
+    
     /**
      * Creates an {@link InferredOWLOntologyID} using three OWLAPI {@link IRI}s.
      */
@@ -48,9 +48,9 @@ public class InferredOWLOntologyID extends OWLOntologyID
             final IRI inferredOntologyIRI)
     {
         super(baseOntologyIRI, baseOntologyVersionIRI);
-
+        
         this.inferredOntologyIRI = inferredOntologyIRI;
-
+        
         // Override hashcode if inferredOntologyIRI is not null, otherwise leave the hashcode to
         // match upstream
         if(inferredOntologyIRI != null)
@@ -59,7 +59,7 @@ public class InferredOWLOntologyID extends OWLOntologyID
             // this.hashCode += 41 * inferredOntologyIRI.hashCode();
         }
     }
-
+    
     /**
      * Creates an {@link InferredOWLOntologyID} using three OpenRDF {@link URI}s.
      */
@@ -67,7 +67,7 @@ public class InferredOWLOntologyID extends OWLOntologyID
             final URI inferredOntologyIRI)
     {
         super(baseOntologyIRI, baseOntologyVersionIRI);
-
+        
         if(inferredOntologyIRI != null)
         {
             this.inferredOntologyIRI = IRI.create(inferredOntologyIRI);
@@ -77,7 +77,7 @@ public class InferredOWLOntologyID extends OWLOntologyID
             this.inferredOntologyIRI = null;
         }
     }
-
+    
     /**
      * Returns the OWLOntologyID representing the base ontology, ie, without the inferred ontology,
      * so that the hashcode will match that of the real OWLOntologyID for the base ontology.
@@ -88,7 +88,7 @@ public class InferredOWLOntologyID extends OWLOntologyID
     {
         return new OWLOntologyID(this.getOntologyIRI(), this.getVersionIRI());
     }
-
+    
     /**
      * @return the inferredOntologyIRI
      */
@@ -96,7 +96,7 @@ public class InferredOWLOntologyID extends OWLOntologyID
     {
         return this.inferredOntologyIRI;
     }
-
+    
     /**
      * Returns the OWLOntologyID representing the inferred ontology. ie, without the base ontology,
      * so that the hashcode will match that of the real OWLOntologyID for the inferred ontology. <br/>
@@ -109,17 +109,17 @@ public class InferredOWLOntologyID extends OWLOntologyID
     {
         return new OWLOntologyID(this.getInferredOntologyIRI());
     }
-
+    
     public Model toRDF()
     {
         return this.toRDF(new LinkedHashModel());
     }
-
+    
     public Model toRDF(final Model result)
     {
         return OntologyUtils.ontologyIDToRDF(this, result, true);
     }
-
+    
     @Override
     public String toString()
     {

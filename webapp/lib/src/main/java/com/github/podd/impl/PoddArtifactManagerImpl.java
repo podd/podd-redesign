@@ -1630,7 +1630,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             // their original list
             // This is necessary to ensure that the repository ontology lists match the artifacts,
             // so the artifact can be discovered accurately given the artifact ontology imports
-            for(OWLOntologyID nextArtifactSchemaImport : schemaImports)
+            for(final OWLOntologyID nextArtifactSchemaImport : schemaImports)
             {
                 temporaryConnection.add(ontologyIDs.get(0).getOntologyIRI().toOpenRDFURI(), OWL.IMPORTS,
                         nextArtifactSchemaImport.getVersionIRI().toOpenRDFURI(), randomContext);
@@ -2366,14 +2366,14 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             
             // Rio.write(model, Rio.createWriter(RDFFormat.NQUADS, System.out));
             
-            LinkedHashSet<OWLOntologyID> newSchemaImports =
+            final LinkedHashSet<OWLOntologyID> newSchemaImports =
                     new LinkedHashSet<>(OntologyUtils.artifactImports(artifactID, importsModel));
             
             // Add in all of the imports that are actually imported, but the user did not include in
             // their original list
             // This is necessary to ensure that the repository ontology lists match the artifacts,
             // so the artifact can be discovered accurately given the artifact ontology imports
-            for(OWLOntologyID nextArtifactSchemaImport : newSchemaImports)
+            for(final OWLOntologyID nextArtifactSchemaImport : newSchemaImports)
             {
                 tempRepositoryConnection.add(artifactID.getOntologyIRI().toOpenRDFURI(), OWL.IMPORTS,
                         nextArtifactSchemaImport.getVersionIRI().toOpenRDFURI(), tempContext);
@@ -2615,7 +2615,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             this.getSesameManager().updateManagedPoddArtifactVersion(inferredOWLOntologyID, true, managementConnection,
                     this.getRepositoryManager().getArtifactManagementGraph());
             
-            //--------------------------------------
+            // --------------------------------------
             // TODO: Verify this code in this context
             managementConnection.remove(inferredOWLOntologyID.getOntologyIRI().toOpenRDFURI(), OWL.IMPORTS, null, this
                     .getRepositoryManager().getArtifactManagementGraph());
@@ -2626,7 +2626,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
                         nextSchemaImport.getVersionIRI().toOpenRDFURI(), this.getRepositoryManager()
                                 .getArtifactManagementGraph());
             }
-            //--------------------------------------
+            // --------------------------------------
             
             oldPermanentConnection.commit();
             newPermanentConnection.commit();

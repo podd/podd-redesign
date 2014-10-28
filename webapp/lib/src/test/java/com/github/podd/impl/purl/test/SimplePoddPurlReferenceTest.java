@@ -28,7 +28,7 @@ import com.github.podd.impl.purl.SimplePoddPurlReference;
  */
 public class SimplePoddPurlReferenceTest extends AbstractPoddPurlReferenceTest
 {
-
+    
     @Override
     protected PoddPurlReference getNewPoddPurlReference()
     {
@@ -36,5 +36,5 @@ public class SimplePoddPurlReferenceTest extends AbstractPoddPurlReferenceTest
         final URI purl = ValueFactoryImpl.getInstance().createURI("http://purl.org/this/is/supposed/to/be/a:purl");
         return new SimplePoddPurlReference(tempUri, purl);
     }
-
+    
 }

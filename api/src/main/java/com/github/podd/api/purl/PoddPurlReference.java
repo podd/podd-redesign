@@ -31,7 +31,7 @@ public interface PoddPurlReference
      * @return The PURL URI for this Purl Reference object.
      */
     URI getPurlURI();
-
+    
     /**
      *
      * @return The temporary PURL URI, if that information is available.

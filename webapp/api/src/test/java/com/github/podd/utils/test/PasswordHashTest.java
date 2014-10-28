@@ -31,14 +31,14 @@ public class PasswordHashTest
             final String password = Integer.toHexString(i);
             final String hash = PasswordHash.createHash(password);
             final String secondHash = PasswordHash.createHash(password);
-
+            
             Assert.assertNotNull(hash);
             Assert.assertNotNull(secondHash);
-
+            
             Assert.assertNotEquals(hash, secondHash);
         }
     }
-
+    
     @Test
     public final void testCreateHashCharArray() throws Exception
     {
@@ -47,14 +47,14 @@ public class PasswordHashTest
             final String password = Integer.toHexString(i);
             final String hash = PasswordHash.createHash(password.toCharArray());
             final String secondHash = PasswordHash.createHash(password.toCharArray());
-
+            
             Assert.assertNotNull(hash);
             Assert.assertNotNull(secondHash);
-
+            
             Assert.assertNotEquals(hash, secondHash);
         }
     }
-
+    
     @Test
     public final void testValidatePasswordStringString() throws Exception
     {
@@ -62,14 +62,14 @@ public class PasswordHashTest
         {
             final String password = Integer.toHexString(i);
             final String hash = PasswordHash.createHash(password);
-
+            
             Assert.assertNotNull(hash);
-
+            
             Assert.assertTrue(PasswordHash.validatePassword(password, hash));
             Assert.assertFalse(PasswordHash.validatePassword(Integer.toHexString(i + 1), hash));
         }
     }
-
+    
     @Test
     public final void testValidatePasswordCharArrayString() throws Exception
     {
@@ -77,13 +77,13 @@ public class PasswordHashTest
         {
             final String password = Integer.toHexString(i);
             final String hash = PasswordHash.createHash(password.toCharArray());
-
+            
             Assert.assertNotNull(hash);
-
+            
             Assert.assertTrue(PasswordHash.validatePassword(password.toCharArray(), hash));
-
+            
             Assert.assertFalse(PasswordHash.validatePassword(Integer.toHexString(i + 1).toCharArray(), hash));
         }
     }
-
+    
 }

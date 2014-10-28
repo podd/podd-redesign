@@ -28,14 +28,14 @@ import org.restlet.data.Protocol;
 
 public abstract class AbstractPoddRestletClientIntegrationTest extends AbstractSesameTest
 {
-
+    
     protected static String TEST_USERNAME = null;
     protected static String TEST_PASSWORD = null;
-
+    
     protected String BASE_URL = null;
-
+    
     protected Client client = null;
-
+    
     /**
      * Get a Restlet Client instance with which web service requests can be made.
      *
@@ -45,7 +45,7 @@ public abstract class AbstractPoddRestletClientIntegrationTest extends AbstractS
     {
         return this.client;
     }
-
+    
     /**
      * Logs in the user with the given username and password using whatever method matches the
      * integration test implementing this method.
@@ -56,17 +56,17 @@ public abstract class AbstractPoddRestletClientIntegrationTest extends AbstractS
      *            The password of the user to login.
      */
     protected abstract void login(String username, String password);
-
+    
     /**
      * Logs out any user that is currently logged in.
      */
     protected abstract void logout();
-
+    
     /**
      * Resets the web service so that any artifacts in the RDF store are wiped out.
      */
     protected abstract void resetWebService();
-
+    
     @Override
     @Before
     public void setUp() throws Exception
@@ -74,7 +74,7 @@ public abstract class AbstractPoddRestletClientIntegrationTest extends AbstractS
         super.setUp();
         this.BASE_URL = "http://localhost:9090/podd-test";
         this.client = new Client(Protocol.HTTP);
-
+        
         final InputStream passwdStream = this.getClass().getResourceAsStream("/integrationtest/passwd");
         Assert.assertNotNull("Test password file was not found", passwdStream);
         final Properties passwords = new Properties();
@@ -87,12 +87,12 @@ public abstract class AbstractPoddRestletClientIntegrationTest extends AbstractS
             AbstractPoddRestletClientIntegrationTest.TEST_PASSWORD =
                     passwords.getProperty(AbstractPoddRestletClientIntegrationTest.TEST_USERNAME);
         }
-
+        
         // Assert alias file exists
         final InputStream aliasStream = this.getClass().getResourceAsStream("/integrationtest/alias.ttl");
         Assert.assertNotNull("test alias file was not found", aliasStream);
     }
-
+    
     /**
      * @throws java.lang.Exception
      */

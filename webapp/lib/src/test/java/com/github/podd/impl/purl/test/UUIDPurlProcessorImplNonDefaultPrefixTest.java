@@ -32,15 +32,15 @@ import com.github.podd.impl.purl.UUIDPurlProcessorImpl;
  */
 public class UUIDPurlProcessorImplNonDefaultPrefixTest extends AbstractPoddPurlProcessorTest
 {
-
+    
     private final String purlPrefix = "urn:example:purl:";
-
+    
     @Override
     protected PoddPurlProcessor getNewPoddPurlProcessor()
     {
         return new UUIDPurlProcessorImpl(this.purlPrefix);
     }
-
+    
     @Override
     protected boolean isPurlGeneratedFromTemp(final URI purl, final URI tempUri)
     {
@@ -48,7 +48,7 @@ public class UUIDPurlProcessorImplNonDefaultPrefixTest extends AbstractPoddPurlP
         // multiple PurlProcessors use the same prefix
         return purl.stringValue().startsWith(this.purlPrefix);
     }
-
+    
     /**
      * Tests handleTranslation(inputUri, parentUri) with a valid Parent URI. Translation consists of
      * replacing the temporary URI prefix with the parent URI, which is a unique prefix.
@@ -61,15 +61,15 @@ public class UUIDPurlProcessorImplNonDefaultPrefixTest extends AbstractPoddPurlP
         this.purlProcessor.addTemporaryUriHandler(this.prefixUrnTemp);
         final URI tempUriUrnTemp = ValueFactoryImpl.getInstance().createURI(this.prefixUrnTemp + "artifact:1482");
         final URI parentUri = ValueFactoryImpl.getInstance().createURI(this.purlPrefix + "S0ME-UN1QUE-ID/");
-
+        
         final PoddPurlReference purlReference = this.purlProcessor.handleTranslation(tempUriUrnTemp, parentUri);
-
+        
         Assert.assertNotNull(purlReference);
         Assert.assertEquals(tempUriUrnTemp, purlReference.getTemporaryURI());
         Assert.assertTrue(this.isPurlGeneratedFromTemp(purlReference.getPurlURI(), tempUriUrnTemp));
-
+        
         Assert.assertEquals("Not the expected Purl", this.purlPrefix + "S0ME-UN1QUE-ID/artifact:1482", purlReference
                 .getPurlURI().stringValue());
     }
-
+    
 }

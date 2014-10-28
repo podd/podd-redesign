@@ -44,23 +44,23 @@ public class IndexResourceImpl extends AbstractPoddResourceImpl
         // getRequest(),
         // getResponse());
         // this.checkAuthentication(PoddAction.ROLE_EDIT);
-
+        
         this.log.info("getIndexPageHtml");
         final User user = this.getRequest().getClientInfo().getUser();
-
+        
         this.log.info("authenticated user: {}", user);
-
+        
         final Map<String, Object> dataModel = RestletUtils.getBaseDataModel(this.getRequest());
         dataModel.put("contentTemplate", "index.html.ftl");
         dataModel.put("pageTitle", "PODD Index Page");
-
+        
         // Output the base template, with contentTemplate from the dataModel
         // defining the
         // template to use for the content in the body of the page
         return RestletUtils.getHtmlRepresentation(
                 this.getPoddApplication().getPropertyUtil()
-                .get(PoddWebConstants.PROPERTY_TEMPLATE_BASE, PoddWebConstants.DEFAULT_TEMPLATE_BASE),
+                        .get(PoddWebConstants.PROPERTY_TEMPLATE_BASE, PoddWebConstants.DEFAULT_TEMPLATE_BASE),
                 dataModel, MediaType.TEXT_HTML, this.getPoddApplication().getTemplateConfiguration());
     }
-
+    
 }

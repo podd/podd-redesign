@@ -33,7 +33,7 @@ public class ManualShutdownRepository extends RepositoryWrapper
      * Wrap the given repository to make {@link Repository#shutDown()} a no-op, and replace it with
      * calls to {@link #realShutDown()} as necessary, to avoid user code shutting down the
      * repository at unexpected times.
-     * 
+     *
      * @param delegate
      *            The Repository to wrap.
      */

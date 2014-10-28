@@ -42,13 +42,13 @@ public class AboutResourceImplTest extends AbstractResourceImplTest
     public void testGetAboutWithAuthentication() throws Exception
     {
         final ClientResource aboutClientResource = new ClientResource(this.getUrl(PoddWebConstants.PATH_ABOUT));
-
+        
         final Representation results =
                 this.doTestAuthenticatedRequest(aboutClientResource, Method.GET, null, MediaType.TEXT_HTML,
                         Status.SUCCESS_OK, AbstractResourceImplTest.NO_ADMIN);
-
+        
     }
-
+    
     /**
      * Test unauthenticated access to /about
      */
@@ -56,11 +56,11 @@ public class AboutResourceImplTest extends AbstractResourceImplTest
     public void testGetAboutWithoutAuthentication() throws Exception
     {
         final ClientResource aboutClientResource = new ClientResource(this.getUrl(PoddWebConstants.PATH_ABOUT));
-
+        
         final Representation results =
                 PoddRestletTestUtils.doTestUnauthenticatedRequest(aboutClientResource, Method.GET, null,
                         MediaType.TEXT_HTML, Status.SUCCESS_OK);
-
+        
         final String body = this.getText(results);
         this.assertFreemarker(body);
         Assert.assertTrue(body.contains("The University of Queensland"));

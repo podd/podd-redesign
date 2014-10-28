@@ -27,13 +27,13 @@ import org.semanticweb.owlapi.model.OWLOntologyID;
  */
 public class ArtifactModifyException extends PoddException
 {
-
+    
     private static final long serialVersionUID = 4700265465760635697L;
-
+    
     private OWLOntologyID artifactId;
-
+    
     private URI objectUri;
-
+    
     /**
      * @param msg
      */
@@ -43,7 +43,7 @@ public class ArtifactModifyException extends PoddException
         this.artifactId = artifactId;
         this.objectUri = objectUri;
     }
-
+    
     /**
      * @param msg
      * @param throwable
@@ -55,7 +55,7 @@ public class ArtifactModifyException extends PoddException
         this.artifactId = artifactId;
         this.objectUri = objectUri;
     }
-
+    
     /**
      * @param throwable
      */
@@ -65,7 +65,7 @@ public class ArtifactModifyException extends PoddException
         this.artifactId = artifactId;
         this.objectUri = objectUri;
     }
-
+    
     /**
      *
      * @return The {@link OWLOntologyID} of the artifact that was not able to be published.
@@ -74,7 +74,7 @@ public class ArtifactModifyException extends PoddException
     {
         return this.artifactId;
     }
-
+    
     /**
      *
      * @return If available, the {@link URI} that caused the modification error.

@@ -39,42 +39,42 @@ import com.github.podd.utils.PODD;
  *
  */
 public abstract class AbstractSPARQLDataReferenceProcessorTest extends
-AbstractDataReferenceProcessorTest<SPARQLDataReference>
+        AbstractDataReferenceProcessorTest<SPARQLDataReference>
 {
     @Override
     protected Set<URI> getExpectedDataReferenceTypes()
     {
         return Collections.singleton(PODD.PODD_BASE_DATA_REFERENCE_TYPE_SPARQL);
     }
-
+    
     @Override
     protected final DataReferenceProcessor<SPARQLDataReference> getNewDataReferenceProcessor()
     {
         return this.getNewSPARQLDataReferenceProcessor();
     }
-
+    
     protected abstract SPARQLDataReferenceProcessor getNewSPARQLDataReferenceProcessor();
-
+    
     @Override
     protected String getPathToResourceWith2DataReferences()
     {
         return TestConstants.TEST_ARTIFACT_PURLS_2_SPARQL_DATA_REFS;
     }
-
+    
     @Override
     protected void verify2DataReferences(final Collection<SPARQLDataReference> fileReferences)
     {
         Assert.assertNotNull("NULL collection of file references", fileReferences);
         Assert.assertEquals("Expected 2 file references to verify", 2, fileReferences.size());
-
+        
         final List<String> objectIriList =
                 Arrays.asList("http://purl.org/podd-test/130326f/object-rice-scan-34343-a",
                         "http://purl.org/podd-test/130326f/object-rice-scan-34343-b");
-
+        
         final List<String> labelList = Arrays.asList("Rice tree scan 003454-98", "Rice tree scan 003454-99");
         final List<String> graphList =
                 Arrays.asList("urn:test:sparqldatareference:rice-scan:a", "urn:test:sparqldatareference:rice-scan:b");
-
+        
         for(final SPARQLDataReference sshFileReference : fileReferences)
         {
             Assert.assertNull("Artifact ID should be NULL", sshFileReference.getArtifactID());
@@ -86,5 +86,5 @@ AbstractDataReferenceProcessorTest<SPARQLDataReference>
             Assert.assertTrue("Graph is not an expected one", graphList.contains(sshFileReference.getGraph()));
         }
     }
-
+    
 }
