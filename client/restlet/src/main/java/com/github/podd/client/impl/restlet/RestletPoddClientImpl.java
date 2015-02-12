@@ -33,6 +33,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Set;
@@ -525,6 +526,16 @@ public class RestletPoddClientImpl implements PoddClient
     }
     
     @Override
+    public Model getObjectByURI(final URI objectURI, final Collection<InferredOWLOntologyID> artifacts)
+        throws PoddClientException
+    {
+        final String queryString =
+                String.format(PoddClient.TEMPLATE_SPARQL_BY_URI, RenderUtils.getSPARQLQueryString(objectURI));
+        this.log.debug("queryString={}", queryString);
+        return this.doSPARQL(queryString, artifacts);
+    }
+    
+    @Override
     public Model getObjectsByType(final URI type, final Collection<InferredOWLOntologyID> artifacts)
         throws PoddClientException
     {
@@ -623,6 +634,12 @@ public class RestletPoddClientImpl implements PoddClient
     public PropertyUtil getProps()
     {
         return this.props;
+    }
+    
+    public URI getTempURI(final String tempUriString)
+    {
+        return RestletPoddClientImpl.vf.createURI(RestletPoddClientImpl.TEMP_UUID_PREFIX + tempUriString
+                + UUID.randomUUID().toString());
     }
     
     /**

@@ -44,6 +44,14 @@ import com.github.podd.utils.PoddUser;
 public interface PoddClient
 {
     /**
+     * Fetch all of the properties for the given object URI.
+     */
+    public static final String TEMPLATE_SPARQL_BY_URI =
+            new StringBuilder()
+                    .append("CONSTRUCT { ?object ?predicate ?value . }")
+                    .append(" WHERE { ?object ?predicate ?value . }")
+                    .append(" VALUES ( ?object ) { ( %s ) }").toString();
+    /**
      * Fetch all of the properties for the given objects under the given parent with the given type.
      */
     public static final String TEMPLATE_SPARQL_BY_TYPE_AND_PARENT_ALL_PROPERTIES =
@@ -265,6 +273,19 @@ public interface PoddClient
      */
     void downloadArtifact(InferredOWLOntologyID artifactId, OutputStream outputStream, RDFFormat format)
         throws PoddClientException;
+    
+    /**
+     * Returns RDF statements containing all of the directly linked statements from the URI.
+     *
+     * @param object
+     *            The URI of the object to search for. Must not be null.
+     * @param artifacts
+     *            An optional list of artifacts which are to be searched.
+     * @return A {@link Model} containing the RDF statements which describe the matching object.
+     * @throws PoddClientException
+     *             If there is an exception while executing the query.
+     */
+    Model getObjectByURI(URI object, Collection<InferredOWLOntologyID> artifacts) throws PoddClientException;
     
     /**
      * Returns RDF statements containing the types and labels for all objects in the given artifacts
