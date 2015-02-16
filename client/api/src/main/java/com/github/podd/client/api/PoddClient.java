@@ -89,13 +89,13 @@ public interface PoddClient
     public static final String TEMPLATE_SPARQL_BY_BARCODE_STRSTARTS =
             new StringBuilder()
                     .append("CONSTRUCT { ?object a ?type . ?object <http://purl.org/podd/ns/poddScience#hasBarcode> ?barcode . ?object ?property ?value . }")
-                    .append(" WHERE { ?object a ?type . ?object <http://purl.org/podd/ns/poddScience#hasBarcode> ?barcode . FILTER(STRSTARTS(?barcode, \"%s\")) }")
+                    .append(" WHERE { ?object a ?type . ?object <http://purl.org/podd/ns/poddScience#hasBarcode> ?barcode . FILTER(STRSTARTS(?barcode, \"%s\")). ?object ?property ?value . }")
                     .append(" VALUES (?type) { ( %s ) }").toString();
     
     public static final String TEMPLATE_SPARQL_BY_BARCODE_MATCH_NO_TYPE =
             new StringBuilder()
                     .append("CONSTRUCT { ?object <http://purl.org/podd/ns/poddScience#hasBarcode> ?barcode . ?object ?property ?value . }")
-                    .append(" WHERE { ?object <http://purl.org/podd/ns/poddScience#hasBarcode> ?barcode . FILTER(STR(?barcode) = \"%s\") }")
+                    .append(" WHERE { ?object <http://purl.org/podd/ns/poddScience#hasBarcode> ?barcode . FILTER(STR(?barcode) = \"%s\"). ?object ?property ?value . }")
                     .toString();
     
     public static final String TEMPLATE_SPARQL_CONTAINERS_TO_MATERIAL_AND_GENOTYPE =
