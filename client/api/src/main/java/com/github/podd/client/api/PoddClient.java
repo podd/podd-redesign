@@ -100,8 +100,8 @@ public interface PoddClient
     
     public static final String TEMPLATE_SPARQL_CONTAINERS_TO_MATERIAL_AND_GENOTYPE =
             new StringBuilder()
-                    .append("CONSTRUCT { ?container <http://purl.org/podd/ns/poddScience#hasMaterial> ?material . ?material ?materialProperty ?materialValue . ?material <http://purl.org/podd/ns/poddScience#refersToGenotype> ?genotype . ?genotype ?property ?value . }")
-                    .append(" WHERE { ?container <http://purl.org/podd/ns/poddScience#hasMaterial> ?material . ?material ?materialProperty ?materialValue . ?material <http://purl.org/podd/ns/poddScience#refersToGenotype> ?genotype . ?genotype ?property ?value . }")
+                    .append("CONSTRUCT { ?container <http://purl.org/podd/ns/poddScience#hasMaterial> ?material . ?material <http://purl.org/podd/ns/poddScience#refersToGenotype> ?genotype . ?material ?materialProperty ?materialValue . ?genotype ?property ?value . }")
+                    .append(" WHERE { ?container <http://purl.org/podd/ns/poddScience#hasMaterial> ?material . ?material <http://purl.org/podd/ns/poddScience#refersToGenotype> ?genotype . ?material ?materialProperty ?materialValue . ?genotype ?property ?value . }")
                     .append(" VALUES (?container) { %s }").toString();
     
     /**
