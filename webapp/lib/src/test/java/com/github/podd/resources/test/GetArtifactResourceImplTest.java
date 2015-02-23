@@ -310,7 +310,7 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
             
             Assert.assertEquals(6, model.subjects().size());
             Assert.assertEquals(14, model.predicates().size());
-            Assert.assertEquals(26, model.objects().size());
+            Assert.assertEquals(24, model.objects().size());
             
             if(this.log.isDebugEnabled())
             {
@@ -356,7 +356,7 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
             
             Assert.assertEquals(6, model.subjects().size());
             Assert.assertEquals(14, model.predicates().size());
-            Assert.assertEquals(26, model.objects().size());
+            Assert.assertEquals(24, model.objects().size());
             
             if(this.log.isDebugEnabled())
             {
@@ -405,7 +405,7 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
             
             Assert.assertEquals(6, model.subjects().size());
             Assert.assertEquals(14, model.predicates().size());
-            Assert.assertEquals(26, model.objects().size());
+            Assert.assertEquals(24, model.objects().size());
             
             if(this.log.isDebugEnabled())
             {
@@ -535,7 +535,7 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
             
             Assert.assertEquals(6, model.subjects().size());
             Assert.assertEquals(14, model.predicates().size());
-            Assert.assertEquals(26, model.objects().size());
+            Assert.assertEquals(24, model.objects().size());
             
             if(this.log.isDebugEnabled())
             {
