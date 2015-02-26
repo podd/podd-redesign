@@ -83,13 +83,15 @@ public class PoddDigestUtils
                 {
                     // No processing needed
                 }
-                final byte[] shaDigest = shaStream.getMessageDigest().digest();
-                final byte[] md5Digest = md5Stream.getMessageDigest().digest();
-                final String shaDigestString = new BigInteger(1, shaDigest).toString(16);
-                final String md5DigestString = new BigInteger(1, md5Digest).toString(16);
                 final ConcurrentMap<Algorithm, String> nextMap = result.get(nextPath);
-                nextMap.putIfAbsent(Algorithm.MD5, md5DigestString);
-                nextMap.putIfAbsent(Algorithm.SHA1, shaDigestString);
+                nextMap.computeIfAbsent(Algorithm.MD5, k -> {
+                    final byte[] md5Digest = md5Stream.getMessageDigest().digest();
+                    return new BigInteger(1, md5Digest).toString(16);
+                });
+                nextMap.computeIfAbsent(Algorithm.SHA1, k -> {
+                    final byte[] shaDigest = shaStream.getMessageDigest().digest();
+                    return new BigInteger(1, shaDigest).toString(16);
+                });
             }
         }
         
