@@ -28,6 +28,8 @@ import java.util.Collection;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+import com.github.ansell.jdefaultdict.JDefaultDict;
+
 public class PoddDigestUtils
 {
     /**
@@ -65,7 +67,8 @@ public class PoddDigestUtils
     public static ConcurrentMap<Path, ConcurrentMap<Algorithm, String>> getDigests(final Collection<Path> pathsToDigest)
         throws IOException, NoSuchAlgorithmException
     {
-        final ConcurrentMap<Path, ConcurrentMap<Algorithm, String>> result = new ConcurrentHashMap<>();
+        final ConcurrentMap<Path, ConcurrentMap<Algorithm, String>> result =
+                new JDefaultDict<>(k -> new ConcurrentHashMap<>());
         
         for(final Path nextPath : pathsToDigest)
         {
@@ -84,12 +87,7 @@ public class PoddDigestUtils
                 final byte[] md5Digest = md5Stream.getMessageDigest().digest();
                 final String shaDigestString = new BigInteger(1, shaDigest).toString(16);
                 final String md5DigestString = new BigInteger(1, md5Digest).toString(16);
-                ConcurrentMap<Algorithm, String> nextMap = new ConcurrentHashMap<Algorithm, String>();
-                final ConcurrentMap<Algorithm, String> putIfAbsent = result.putIfAbsent(nextPath, nextMap);
-                if(putIfAbsent != null)
-                {
-                    nextMap = putIfAbsent;
-                }
+                final ConcurrentMap<Algorithm, String> nextMap = result.get(nextPath);
                 nextMap.putIfAbsent(Algorithm.MD5, md5DigestString);
                 nextMap.putIfAbsent(Algorithm.SHA1, shaDigestString);
             }

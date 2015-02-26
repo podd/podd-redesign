@@ -116,6 +116,10 @@
 			<groupId>com.github.podd</groupId>
 			<artifactId>podd-ontologies</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>com.github.ansell.jdefaultdict</groupId>
+			<artifactId>jdefaultdict</artifactId>
+		</dependency>
 	</dependencies>
 	<build>
 		<plugins>
