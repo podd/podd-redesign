@@ -46,11 +46,9 @@ public interface PoddClient
     /**
      * Fetch all of the properties for the given object URI.
      */
-    public static final String TEMPLATE_SPARQL_BY_URI =
-            new StringBuilder()
-                    .append("CONSTRUCT { ?object ?predicate ?value . }")
-                    .append(" WHERE { ?object ?predicate ?value . }")
-                    .append(" VALUES ( ?object ) { ( %s ) }").toString();
+    public static final String TEMPLATE_SPARQL_BY_URI = new StringBuilder()
+            .append("CONSTRUCT { ?object ?predicate ?value . }").append(" WHERE { ?object ?predicate ?value . }")
+            .append(" VALUES ( ?object ) { ( %s ) }").toString();
     /**
      * Fetch all of the properties for the given objects under the given parent with the given type.
      */
@@ -112,6 +110,13 @@ public interface PoddClient
             .append("CONSTRUCT { ?object a ?type . ?object %s ?label . }")
             .append(" WHERE { ?object a ?type . ?object %s ?label . FILTER(STRSTARTS(?label, \"%s\")) }")
             .append(" VALUES (?type) { ( %s ) }").toString();
+    
+    /**
+     * NOTE: Both the first and second arguments are the predicate, the first being the mapped
+     * predicate, and the second being the original predicate.
+     */
+    public static final String TEMPLATE_SPARQL_BY_PREDICATE = new StringBuilder()
+            .append("CONSTRUCT { ?object %s ?property . }").append(" WHERE { ?object %s ?property . }").toString();
     
     public static final String TEMPLATE_SPARQL_TRAY_POT_NUMBER_TO_BARCODE = new StringBuilder().append("CONSTRUCT { ")
             .append(" ?pot <http://purl.org/podd/ns/poddScience#hasPotNumberTray> ?potNumberTray . ")
@@ -301,6 +306,19 @@ public interface PoddClient
      *             If there is an exception while executing the query.
      */
     Model getObjectsByType(URI type, Collection<InferredOWLOntologyID> artifacts) throws PoddClientException;
+    
+    /**
+     * Returns RDF statements containing the predicate.
+     *
+     * @param predicate
+     *            The URI with the RDF predicate to search for. Must not be null.
+     * @param artifacts
+     *            An optional list of artifacts which are to be searched.
+     * @return A {@link Model} containing the RDF statements which describe the matching objects.
+     * @throws PoddClientException
+     *             If there is an exception while executing the query.
+     */
+    Model getObjectsByPredicate(URI predicate, Collection<InferredOWLOntologyID> artifacts) throws PoddClientException;
     
     /**
      * Returns RDF statements containing the types and labels for all objects in the given artifacts
