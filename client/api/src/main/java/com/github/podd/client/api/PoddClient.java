@@ -129,6 +129,23 @@ public interface PoddClient
             .append(" ?pot <http://purl.org/podd/ns/poddScience#hasBarcode> ?potBarcode . ")
             .append(" FILTER(STR(?trayBarcode) = \"%s\") }").toString();
     
+    public static final String TEMPLATE_SPARQL_TRAY_POT_NUMBER_TO_BARCODE_ALL = new StringBuilder().append("CONSTRUCT { ")
+            .append(" ?tray a ?trayType . ")
+            .append(" ?tray <http://purl.org/podd/ns/poddScience#hasBarcode> ?trayBarcode . ")
+            .append(" ?tray <http://purl.org/podd/ns/poddScience#hasPot> ?pot . ")
+            .append(" ?pot a ?potType . ")
+            .append(" ?pot <http://purl.org/podd/ns/poddScience#hasPotNumberTray> ?potNumberTray . ")
+            .append(" ?pot <http://purl.org/podd/ns/poddScience#hasPotNumber> ?potNumberOverall . ")
+            .append(" ?pot <http://purl.org/podd/ns/poddScience#hasBarcode> ?potBarcode . }")
+            .append(" WHERE { ")
+            .append(" ?tray a ?trayType . ")
+            .append(" ?tray <http://purl.org/podd/ns/poddScience#hasBarcode> ?trayBarcode . ")
+            .append(" ?tray <http://purl.org/podd/ns/poddScience#hasPot> ?pot . ")
+            .append(" ?pot a ?potType . ")
+            .append(" ?pot <http://purl.org/podd/ns/poddScience#hasPotNumberTray> ?potNumberTray . ")
+            .append(" ?pot <http://purl.org/podd/ns/poddScience#hasPotNumber> ?potNumberOverall . ")
+            .append(" ?pot <http://purl.org/podd/ns/poddScience#hasBarcode> ?potBarcode . }").toString();
+    
     /**
      * Adds the given role for the given user to the given artifact
      *
