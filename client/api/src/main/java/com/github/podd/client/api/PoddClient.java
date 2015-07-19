@@ -96,6 +96,12 @@ public interface PoddClient
                     .append(" WHERE { ?object <http://purl.org/podd/ns/poddScience#hasBarcode> ?barcode . FILTER(STR(?barcode) = \"%s\"). ?object ?property ?value . }")
                     .toString();
     
+    public static final String TEMPLATE_SPARQL_BY_BARCODE_MATCH_NO_TYPE_NO_BARCODE =
+            new StringBuilder()
+                    .append("CONSTRUCT { ?object <http://purl.org/podd/ns/poddScience#hasBarcode> ?barcode . ?object ?property ?value . }")
+                    .append(" WHERE { ?object <http://purl.org/podd/ns/poddScience#hasBarcode> ?barcode . ?object ?property ?value . }")
+                    .toString();
+    
     public static final String TEMPLATE_SPARQL_CONTAINERS_TO_MATERIAL_AND_GENOTYPE =
             new StringBuilder()
                     .append("CONSTRUCT { ?container <http://purl.org/podd/ns/poddScience#hasMaterial> ?material . ?material <http://purl.org/podd/ns/poddScience#refersToGenotype> ?genotype . ?material ?materialProperty ?materialValue . ?genotype ?property ?value . }")
@@ -129,19 +135,16 @@ public interface PoddClient
             .append(" ?pot <http://purl.org/podd/ns/poddScience#hasBarcode> ?potBarcode . ")
             .append(" FILTER(STR(?trayBarcode) = \"%s\") }").toString();
     
-    public static final String TEMPLATE_SPARQL_TRAY_POT_NUMBER_TO_BARCODE_ALL = new StringBuilder().append("CONSTRUCT { ")
-            .append(" ?tray a ?trayType . ")
+    public static final String TEMPLATE_SPARQL_TRAY_POT_NUMBER_TO_BARCODE_ALL = new StringBuilder()
+            .append("CONSTRUCT { ").append(" ?tray a ?trayType . ")
             .append(" ?tray <http://purl.org/podd/ns/poddScience#hasBarcode> ?trayBarcode . ")
-            .append(" ?tray <http://purl.org/podd/ns/poddScience#hasPot> ?pot . ")
-            .append(" ?pot a ?potType . ")
+            .append(" ?tray <http://purl.org/podd/ns/poddScience#hasPot> ?pot . ").append(" ?pot a ?potType . ")
             .append(" ?pot <http://purl.org/podd/ns/poddScience#hasPotNumberTray> ?potNumberTray . ")
             .append(" ?pot <http://purl.org/podd/ns/poddScience#hasPotNumber> ?potNumberOverall . ")
-            .append(" ?pot <http://purl.org/podd/ns/poddScience#hasBarcode> ?potBarcode . }")
-            .append(" WHERE { ")
+            .append(" ?pot <http://purl.org/podd/ns/poddScience#hasBarcode> ?potBarcode . }").append(" WHERE { ")
             .append(" ?tray a ?trayType . ")
             .append(" ?tray <http://purl.org/podd/ns/poddScience#hasBarcode> ?trayBarcode . ")
-            .append(" ?tray <http://purl.org/podd/ns/poddScience#hasPot> ?pot . ")
-            .append(" ?pot a ?potType . ")
+            .append(" ?tray <http://purl.org/podd/ns/poddScience#hasPot> ?pot . ").append(" ?pot a ?potType . ")
             .append(" ?pot <http://purl.org/podd/ns/poddScience#hasPotNumberTray> ?potNumberTray . ")
             .append(" ?pot <http://purl.org/podd/ns/poddScience#hasPotNumber> ?potNumberOverall . ")
             .append(" ?pot <http://purl.org/podd/ns/poddScience#hasBarcode> ?potBarcode . }").toString();
@@ -295,6 +298,17 @@ public interface PoddClient
      */
     void downloadArtifact(InferredOWLOntologyID artifactId, OutputStream outputStream, RDFFormat format)
         throws PoddClientException;
+    
+    /**
+     * Return all barcodes and all statements linked directly to objects that have barcodes assigned
+     * to them.
+     *
+     * @param artifacts
+     *            An optional list of artifacts which are to be searched.
+     * @return A {@link Model} containing the RDF statements which describe all of the matched
+     *         objects.
+     */
+    Model getAllBarcodes(Collection<InferredOWLOntologyID> artifacts);
     
     /**
      * Returns RDF statements containing all of the directly linked statements from the URI.

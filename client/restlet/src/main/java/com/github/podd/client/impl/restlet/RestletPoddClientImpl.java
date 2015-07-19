@@ -33,10 +33,10 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -557,8 +557,8 @@ public class RestletPoddClientImpl implements PoddClient
     }
     
     @Override
-    public Model getObjectsByPredicate(final URI predicate,
-            final Collection<InferredOWLOntologyID> artifacts) throws PoddClientException
+    public Model getObjectsByPredicate(final URI predicate, final Collection<InferredOWLOntologyID> artifacts)
+        throws PoddClientException
     {
         final String predicateString = RenderUtils.getSPARQLQueryString(predicate);
         // NOTE: predicateString must be both the second and third arguments sent into String.format
@@ -566,8 +566,7 @@ public class RestletPoddClientImpl implements PoddClient
         // Hypothetically the second could be different to the third for mapping predicates, but
         // that would cause confusion if not obvious
         final String queryString =
-                String.format(PoddClient.TEMPLATE_SPARQL_BY_PREDICATE, predicateString,
-                        predicateString);
+                String.format(PoddClient.TEMPLATE_SPARQL_BY_PREDICATE, predicateString, predicateString);
         this.log.debug("queryString={}", queryString);
         return this.doSPARQL(queryString, artifacts);
     }
@@ -597,6 +596,12 @@ public class RestletPoddClientImpl implements PoddClient
                         RenderUtils.getSPARQLQueryString(type));
         this.log.debug("queryString={}", queryString);
         return this.doSPARQL(queryString, artifacts);
+    }
+    
+    @Override
+    public Model getAllBarcodes(final Collection<InferredOWLOntologyID> artifacts)
+    {
+        return this.doSPARQL(PoddClient.TEMPLATE_SPARQL_BY_BARCODE_MATCH_NO_TYPE_NO_BARCODE, artifacts);
     }
     
     @Override
