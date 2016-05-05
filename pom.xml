@@ -618,9 +618,9 @@
 					<version>2.18.1</version>
 				</plugin>
 				<plugin>
-					<groupId>org.mortbay.jetty</groupId>
+					<groupId>org.eclipse.jetty</groupId>
 					<artifactId>jetty-maven-plugin</artifactId>
-					<version>8.1.15.v20140411</version>
+					<version>9.2.16.v20160414</version>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
