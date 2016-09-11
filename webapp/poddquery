@@ -1,0 +1,13 @@
+#!/bin/bash
+# This script runs the PlantScacn Results Full Analysis code.
+# Before running this script for the first time 
+# you may need to run:
+#     chmod +x plantscanfullanalysis
+#
+
+if [ ! -d "client/target/appassembler/bin" ]; then
+    mvn -quiet clean install -DskipTests -Djetty.skip
+fi
+
+chmod u+x lib/target/appassembler/bin/*
+lib/target/appassembler/bin/appfquerytool "$@"
