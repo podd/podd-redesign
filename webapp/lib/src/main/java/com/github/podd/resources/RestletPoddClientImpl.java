@@ -814,7 +814,7 @@ public class RestletPoddClientImpl implements PoddClient
     {
     	
         //final ClientResource resource = new ClientResource(this.getUrl(PoddWebConstants.DEF_PATH_LOGIN_SUBMIT));
-    	final ClientResource resource = new ClientResource("https://podd.plantphenomics.org.au/podd/login");
+    	final ClientResource resource = new ClientResource("https://poddtest.plantphenomics.org.au/podd/login");
     	
         resource.getCookies().addAll(this.currentCookies);
         
