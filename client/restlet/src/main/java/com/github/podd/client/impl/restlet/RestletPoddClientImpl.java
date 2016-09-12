@@ -78,6 +78,7 @@ import com.github.podd.api.data.DataReferenceConstants;
 import com.github.podd.client.api.PoddArtifact;
 import com.github.podd.client.api.PoddClient;
 import com.github.podd.client.api.PoddClientException;
+import com.github.podd.exception.PoddException;
 import com.github.podd.ontologies.PODDBASE;
 import com.github.podd.ontologies.PODDSCIENCE;
 import com.github.podd.utils.InferredOWLOntologyID;
@@ -128,6 +129,10 @@ public class RestletPoddClientImpl implements PoddClient
     {
         this();
         this.serverUrl = poddServerUrl;
+       
+            
+       
+        
     }
     
     @Override
@@ -235,8 +240,11 @@ public class RestletPoddClientImpl implements PoddClient
             {
                 final StringWriter writer = new StringWriter(4096);
                 Rio.write(nextUpload.getValue(), writer, RDFFormat.RDFJSON);
+                System.out.println("print art");
+                System.out.println(writer.toString());
+                
                 final InferredOWLOntologyID newID =
-                        this.appendArtifact(nextUpload.getKey(),
+                		this.appendArtifact(nextUpload.getKey(),
                                 new ByteArrayInputStream(writer.toString().getBytes(Charset.forName("UTF-8"))),
                                 RDFFormat.RDFJSON);
                 
@@ -390,12 +398,15 @@ public class RestletPoddClientImpl implements PoddClient
         
         final Form form = new Form();
         form.add(PoddWebConstants.KEY_SPARQLQUERY, queryString);
+        System.out.println(queryString);
         // TODO: Parse query to make sure it is syntactically valid before sending query
         // resource.addQueryParameter(PoddWebConstants.KEY_SPARQLQUERY, queryString);
         
         for(final InferredOWLOntologyID artifactId : artifactIds)
         {
             form.add(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactId.getOntologyIRI().toString());
+            System.out.println("artifactvidya");
+            System.out.println(artifactId.getOntologyIRI().toString());
             // resource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER,
             // artifactId.getOntologyIRI().toString());
         }
@@ -996,7 +1007,9 @@ public class RestletPoddClientImpl implements PoddClient
     @Override
     public boolean login(final String username, final String password) throws PoddClientException
     {
-        final ClientResource resource = new ClientResource(this.getUrl(PoddWebConstants.DEF_PATH_LOGIN_SUBMIT));
+        //final ClientResource resource = new ClientResource(this.getUrl(PoddWebConstants.DEF_PATH_LOGIN_SUBMIT));
+    	final ClientResource resource = new ClientResource("https://podd.plantphenomics.org.au/podd/login");
+    	System.out.println(this.getUrl(PoddWebConstants.DEF_PATH_LOGIN_SUBMIT));
         resource.getCookies().addAll(this.currentCookies);
         
         // TODO: when Cookies natively supported by Client Resource, or another method remove this
@@ -1008,7 +1021,8 @@ public class RestletPoddClientImpl implements PoddClient
         final Form form = new Form();
         form.add("username", username);
         form.add("password", password);
-        
+        System.out.println(username);
+        System.out.println(password);
         try
         {
             final Representation rep = resource.post(form.getWebRepresentation(CharacterSet.UTF_8));
@@ -1097,11 +1111,11 @@ public class RestletPoddClientImpl implements PoddClient
     {
         final RDFFormat format = Rio.getParserFormatForMIMEType(rep.getMediaType().getName());
         
-        if(format == null)
+        /* if(format == null)
         {
             throw new PoddClientException("Did not understand the format for the RDF response: "
                     + rep.getMediaType().getName());
-        }
+        } */
         
         try
         {
@@ -1258,10 +1272,26 @@ public class RestletPoddClientImpl implements PoddClient
         {
             resource.addQueryParameter(PoddWebConstants.KEY_EDIT_VERIFY_FILE_REFERENCES, "true");
         }
-        
+        Representation post = null;
         // Request the results in Turtle to reduce the bandwidth
-        final Representation post = resource.post(rep, MediaType.APPLICATION_RDF_TURTLE);
+        try {
+        	post = resource.post(rep, MediaType.APPLICATION_RDF_TURTLE);
+        	
+        }
+        catch (Exception e){
+        	if (e != null) {
+        	e.printStackTrace();
         
+        	e.getMessage();
+        	e.toString();
+        	}
+        }
+        try {
+			System.out.println(post.getText());
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
         try
         {
             final Model parsedStatements = this.parseRdf(post);
