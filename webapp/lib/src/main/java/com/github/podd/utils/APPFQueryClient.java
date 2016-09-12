@@ -143,8 +143,8 @@ public class APPFQueryClient
         	return;
         }
         String query = standardQuery.value(options);
-        String gene = genus.value(options);
-        String specie = species.value(options);
+        String gene = genus.value(options);      
+        String specie = species.value(options);        
         String keyword = keywordSearch.value(options);
         String treatmen = treatment.value(options);
         String expid = experimentId.value(options);
@@ -160,7 +160,7 @@ public class APPFQueryClient
         }
         if (query != null) {
         	if(query.equals("experiment")) {
-        		if (gene.length() > 0 || specie.length() > 0) {
+        		if (gene.length() > 0 || specie.length() > 0 || expid.length() > 0) {
         			List<Filter> filter = new ArrayList<Filter>();
         			Filter f1 = new Filter("genus", gene);
         			Filter f2 = new Filter("species", specie);
@@ -174,7 +174,7 @@ public class APPFQueryClient
         			client.listAllExperiments();
         		}
         	} else if (query.equals("plant")) {
-        		if (gene.length() > 0 || specie.length() > 0) {
+        		if (gene.length() > 0 || specie.length() > 0 || treatmen.length() > 0) {
         			List<Filter> filter = new ArrayList<Filter>();
         			Filter f1 = new Filter("genus", gene);
         			Filter f2 = new Filter("species", specie);
