@@ -364,6 +364,7 @@ public class RestletPoddClientImpl implements PoddClient
         return false;
     }
     
+    
     public Representation doSPARQL2(final String queryString, final Collection<InferredOWLOntologyID> artifactIds)
         throws PoddException
     {
