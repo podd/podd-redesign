@@ -134,7 +134,13 @@ public class RestletPoddClientImpl implements PoddClient
     public RestletPoddClientImpl(final String poddServerUrl)
     {
         this();
-        this.serverUrl = poddServerUrl;
+        String url = this.getProps().get(RestletPoddClientImpl.PROP_PODD_SERVER_URL, null);
+        
+        if (url == null) {
+        	this.serverUrl = poddServerUrl;
+        } else {
+        	this.serverUrl = url;
+        }
     }
     
     @Override
@@ -814,8 +820,8 @@ public class RestletPoddClientImpl implements PoddClient
     public boolean login(final String username, final String password) throws PoddException
     {
     	
-        //final ClientResource resource = new ClientResource(this.getUrl(PoddWebConstants.DEF_PATH_LOGIN_SUBMIT));
-    	final ClientResource resource = new ClientResource("https://poddtest.plantphenomics.org.au/podd/login");
+        final ClientResource resource = new ClientResource(this.getUrl(PoddWebConstants.DEF_PATH_LOGIN_SUBMIT));
+    	//final ClientResource resource = new ClientResource("https://poddtest.plantphenomics.org.au/podd/login");
     	
         resource.getCookies().addAll(this.currentCookies);
         
@@ -856,7 +862,11 @@ public class RestletPoddClientImpl implements PoddClient
         }
         catch(final Throwable e)
         {
-            this.currentCookies.clear();
+        	this.currentCookies.clear();
+        	System.out.println("");
+        	System.out.println("Error: Unable to login to server " + this.serverUrl + " with login credentials provided in ~/poddclient.properties, incorrect username or password.");
+            System.out.println("");
+            System.out.println("");
             this.log.warn("Error with request", e);
             
         }
