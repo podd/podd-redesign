@@ -862,13 +862,12 @@ public class RestletPoddClientImpl implements PoddClient
         }
         catch(final Throwable e)
         {
-        	this.currentCookies.clear();
         	System.out.println("");
         	System.out.println("Error: Unable to login to server " + this.serverUrl + " with login credentials provided in ~/poddclient.properties, incorrect username or password.");
             System.out.println("");
             System.out.println("");
             this.log.warn("Error with request", e);
-            
+            this.currentCookies.clear();
         }
         return false;
     }
