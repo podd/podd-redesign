@@ -413,14 +413,13 @@ public class RestletPoddClientImpl implements PoddClient
         {
             if(e.getStatus().equals(Status.CLIENT_ERROR_PRECONDITION_FAILED))
             {
+            	System.out.println("");
+            	System.out.println("Error: Access denied in server " + this.serverUrl + " with the login credentials provided in ~/poddclient.properties.");
                 // Precondition failed indicates that they do not have access to any artifacts, so
                 // return empty results set
                 return null;
             }
-            else
-            {
-               
-            }
+            
             System.out.println(e.toString());
         }
         catch(final UnsupportedRDFormatException e)
@@ -446,6 +445,8 @@ public class RestletPoddClientImpl implements PoddClient
             {
                 if(e1.getStatus().equals(Status.CLIENT_ERROR_PRECONDITION_FAILED))
                 {
+                	System.out.println("");
+                	System.out.println("Error: Access denied in server " + this.serverUrl + " with login credentials provided in ~/poddclient.properties.");
                     // Precondition failed indicates that they do not have access to any artifacts,
                     // so
                     // return empty results set
@@ -839,11 +840,10 @@ public class RestletPoddClientImpl implements PoddClient
         {
             final Representation rep = resource.post(form.getWebRepresentation(CharacterSet.UTF_8));
             
-            this.log.debug("login result status: {}", resource.getStatus());
             if(rep != null)
             {
                 // FIXME: Representation.getText may be implemented badly, so avoid calling it
-                // this.log.debug("login result: {}", rep.getText());
+                this.log.debug("login result: {}", rep.getText());
             }
             else
             {
@@ -862,12 +862,12 @@ public class RestletPoddClientImpl implements PoddClient
         }
         catch(final Throwable e)
         {
+        	this.currentCookies.clear();
         	System.out.println("");
         	System.out.println("Error: Unable to login to server " + this.serverUrl + " with login credentials provided in ~/poddclient.properties, incorrect username or password.");
             System.out.println("");
             System.out.println("");
             this.log.warn("Error with request", e);
-            this.currentCookies.clear();
         }
         return false;
     }
