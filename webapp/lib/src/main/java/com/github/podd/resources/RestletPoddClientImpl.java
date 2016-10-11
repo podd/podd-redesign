@@ -476,13 +476,19 @@ public class RestletPoddClientImpl implements PoddClient
     			// get node name and value
     			if (!tempNode.getNodeName().startsWith("rdf:") && tempNode.getTextContent().length() > 0) {
     				if (tempNode.getNodeName().startsWith("rdfs:label")) {
-    					System.out.println("");
+    					
     					System.out.println("Name" + ": " + tempNode.getTextContent());
     				} else if (tempNode.getNodeName().startsWith("rdfs:comment")) {
     					System.out.println("Description" + ": " + tempNode.getTextContent());
+    				} else if (tempNode.getNodeName().startsWith("hasPotColumnNumberOverall")) {
+    					System.out.println("Lane" + ": " + tempNode.getTextContent());
+    				} else if (tempNode.getNodeName().startsWith("hasPotPositionTray")) {
+    					System.out.println("Position" + ": " + tempNode.getTextContent());
     				} else {
     					System.out.println(tempNode.getNodeName() + ": " + tempNode.getTextContent());
     				}
+    				
+    				
     			}
 
     			if (tempNode.hasChildNodes()) {
