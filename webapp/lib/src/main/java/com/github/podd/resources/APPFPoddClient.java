@@ -57,7 +57,7 @@ import com.github.podd.utils.PoddWebConstants;
  */
 public class APPFPoddClient extends RestletPoddClientImpl
 {
-    public int limit = 100;
+    public int limit = 9000;
     
     public APPFPoddClient()
     {
@@ -85,7 +85,19 @@ public class APPFPoddClient extends RestletPoddClientImpl
     public Representation keywordSearch(String keyword) throws Exception {
 		
     	final String TEMPLATE = new StringBuilder()
-	            .append("CONSTRUCT { ?object ?predicate ?value . ?object ?pred ?val . }").append(" WHERE { {?object ?predicate ?value . FILTER(STRSTARTS(?value, \"" + keyword + "\"))} { ?object ?pred ?val .}}")
+	            .append("CONSTRUCT { ?object ?pred ?val . ?object ?predicate ?value . ?object ?p ?v .}")
+                
+        
+	            .append(" WHERE { { ?object ?predicate ?value . FILTER(STRSTARTS(?value, \"" + keyword + "\"))} { ?object ?pred ?val .} }")
+                    
+                    //.append(" {?genotype <http://purl.org/podd/ns/poddScience#hasLine> ?line .}}")
+                    /*.append(" OPTIONAL {?parent <http://purl.org/podd/ns/poddScience#hasTreatment> ?treatment . ?treatment <http://purl.org/podd/ns/poddScience#hasTreatmentType> ?treatmenttype . }")
+                    .append(" OPTIONAL {?parent <http://purl.org/podd/ns/poddScience#hasTreatment> ?treatment . ?treatment <http://purl.org/podd/ns/poddScience#hasTreatmentMaterial> ?tm . }}")
+                    .append(" OPTIONAL {?genotype <http://purl.org/podd/ns/poddScience#hasLine> ?line .}")
+                    .append(" OPTIONAL {?genotype <http://purl.org/podd/ns/poddScience#hasLineNumber> ?linenum .}")               
+                    .append(" OPTIONAL {?parent <http://purl.org/podd/ns/poddScience#hasControl> ?control .}")
+                    .append(" OPTIONAL {?parent <http://purl.org/podd/ns/poddScience#hasTreatment> ?treatment . ?treatment <http://purl.org/podd/ns/poddScience#hasTreatmentType> ?treatmenttype . }")
+                    .append(" OPTIONAL {?parent <http://purl.org/podd/ns/poddScience#hasTreatment> ?treatment . ?treatment <http://purl.org/podd/ns/poddScience#hasTreatmentMaterial> ?tm . }}") */
 	            .toString();
         
         
@@ -93,6 +105,42 @@ public class APPFPoddClient extends RestletPoddClientImpl
         return res;
 	}
     
+    public Representation keywordSearchMes(String keyword) throws Exception {
+		
+    	final String TEMPLATE = new StringBuilder()
+	            .append("CONSTRUCT { ?object ?pred ?val . ?object ?predicate ?value . ?object ?p ?v ."). append(" ?object <http://purl.org/podd/ns/poddScience#hasGenus> ?genus .")
+                .append(" ?object <http://purl.org/podd/ns/poddScience#hasSpecies> ?species .}")
+        
+	            .append(" WHERE { { ?parent ?p ?v .} {?parent <http://purl.org/podd/ns/poddScience#refersToGenotype> ?genotype .} {?parent <http://purl.org/podd/ns/poddScience#hasMeasurement> ?object . }  { ?object ?predicate ?value . FILTER(STRSTARTS(?value, \"" + keyword + "\"))} { ?object ?pred ?val .} ")
+                    .append(" { ?genotype <http://purl.org/podd/ns/poddScience#hasGenus> ?genus . }")
+                    .append(" { ?genotype <http://purl.org/podd/ns/poddScience#hasSpecies> ?species . }}")
+                    //.append(" {?genotype <http://purl.org/podd/ns/poddScience#hasLine> ?line .}}")
+                    /*.append(" OPTIONAL {?parent <http://purl.org/podd/ns/poddScience#hasTreatment> ?treatment . ?treatment <http://purl.org/podd/ns/poddScience#hasTreatmentType> ?treatmenttype . }")
+                    .append(" OPTIONAL {?parent <http://purl.org/podd/ns/poddScience#hasTreatment> ?treatment . ?treatment <http://purl.org/podd/ns/poddScience#hasTreatmentMaterial> ?tm . }}")
+                    .append(" OPTIONAL {?genotype <http://purl.org/podd/ns/poddScience#hasLine> ?line .}")
+                    .append(" OPTIONAL {?genotype <http://purl.org/podd/ns/poddScience#hasLineNumber> ?linenum .}")               
+                    .append(" OPTIONAL {?parent <http://purl.org/podd/ns/poddScience#hasControl> ?control .}")
+                    .append(" OPTIONAL {?parent <http://purl.org/podd/ns/poddScience#hasTreatment> ?treatment . ?treatment <http://purl.org/podd/ns/poddScience#hasTreatmentType> ?treatmenttype . }")
+                    .append(" OPTIONAL {?parent <http://purl.org/podd/ns/poddScience#hasTreatment> ?treatment . ?treatment <http://purl.org/podd/ns/poddScience#hasTreatmentMaterial> ?tm . }}") */
+	            .toString();
+        
+        
+        Representation res = this.doSPARQL2(TEMPLATE, null);
+        return res;
+	}
+public Representation keywordSearch2(String keyword) throws Exception {
+		
+    	final String TEMPLATE = new StringBuilder()
+	            .append("CONSTRUCT { ?object ?predicate ?value}").append(" WHERE { {?parent <http://purl.org/podd/ns/poddScience#hasMeasurement> ?object . } {?object ?predicate ?value. FILTER(STRSTARTS(?predicate, \"" + keyword + "\"))}}")
+	            .toString();
+        
+    	final String TEMPLAT = new StringBuilder()
+                .append("CONSTRUCT { ?object a ?type . ?object ?predicate ?value . }")
+                .append(" WHERE { ?object a ?type . ?object ?predicate ?value . }").append(" VALUES (?type) { ( <http://purl.org/podd/ns/poddScience#Genotype>  ) }").toString();
+    	final String ne = "CONSTRUCT { ?s a ?o } WHERE { ?s a ?o }";
+        Representation res = this.doSPARQL2(ne, null);
+        return res;
+	}
 	public Representation listAllExperiments() throws Exception {
 		
         final String TEMPLATE = new StringBuilder()
@@ -198,9 +246,11 @@ public class APPFPoddClient extends RestletPoddClientImpl
                 .append(" ?object <http://purl.org/podd/ns/poddScience#hasSpecies> ?species .}")
                 .append(" WHERE { ")
                 .append(" { ?object <http://www.w3.org/2000/01/rdf-schema#label> ?label . }")
+                .append(" { ?object <http://purl.org/podd/ns/poddScience#hasBarcode> ?barcode . FILTER(STRSTARTS(?barcode, \"" + barcode + "\"))}")
                 .append(" { ?object <http://purl.org/podd/ns/poddScience#hasGenotypes> ?genotypes . ?genotypes <http://purl.org/podd/ns/poddScience#hasGenotype> ?genotype. ?genotype <http://purl.org/podd/ns/poddScience#hasGenus> ?genus . FILTER(STRSTARTS(?genus, \"" + genus + "\"))}")
                 .append(" { ?object <http://purl.org/podd/ns/poddScience#hasGenotypes> ?genotypes . ?genotypes <http://purl.org/podd/ns/poddScience#hasGenotype> ?genotype. ?genotype <http://purl.org/podd/ns/poddScience#hasSpecies> ?species . FILTER(STRSTARTS(?species, \"" + species + "\"))}")
-                .append(" { ?object <http://purl.org/podd/ns/poddScience#hasBarcode> ?barcode . FILTER(STRSTARTS(?barcode, \"" + barcode + "\"))} } LIMIT " + limit).toString();
+                //.append(" OPTIONAL { ?object <http://purl.org/podd/ns/poddScience#hasExperiment> ?exp . ?exp <http://purl.org/podd/ns/poddScience#hasEnvironment> ?env . ?env <http://www.w3.org/2000/01/rdf-schema#label> ?la . }")
+                .append("  } LIMIT " + 200).toString();
 		final String TEMPLAT = new StringBuilder()
                 .append("CONSTRUCT { ")
                 .append(" ?object <http://www.w3.org/2000/01/rdf-schema#label> ?label .")
@@ -210,8 +260,8 @@ public class APPFPoddClient extends RestletPoddClientImpl
                 .append(" ?object <http://purl.org/podd/ns/poddScience#hasSpecies> ?species .}")
                 .append(" WHERE { ")
                 .append(" { ?object <http://www.w3.org/2000/01/rdf-schema#label> ?label . }")
-                .append(" { ?object <http://purl.org/podd/ns/poddScience#hasContainer> ?tray . ?tray <http://purl.org/podd/ns/poddScience#hasContainer> ?pot . ?pot <http://purl.org/podd/ns/poddScience#hasMaterial> ?mat . ?mat <http://purl.org/podd/ns/poddScience#refersToGenotype> ?genotype . ?genotype <http://purl.org/podd/ns/poddScience#hasGenus> ?genus . FILTER(STRSTARTS(?genus, \"" + genus + "\"))}")
-                .append(" { ?object <http://purl.org/podd/ns/poddScience#hasContainer> ?tray . ?tray <http://purl.org/podd/ns/poddScience#hasContainer> ?pot . ?pot <http://purl.org/podd/ns/poddScience#hasMaterial> ?mat . ?mat <http://purl.org/podd/ns/poddScience#refersToGenotype> ?genotype . ?genotype <http://purl.org/podd/ns/poddScience#hasSpecies> ?species . FILTER(STRSTARTS(?species, \"" + species + "\"))}")
+                .append(" { ?object <http://purl.org/podd/ns/poddScience#refersToGenotype> ?genotype . ?genotype <http://purl.org/podd/ns/poddScience#hasGenus> ?genus . FILTER(STRSTARTS(?genus, \"" + genus + "\"))}")
+                .append(" { ?genotype <http://purl.org/podd/ns/poddScience#hasSpecies> ?species . FILTER(STRSTARTS(?species, \"" + species + "\"))}")
                 .append(" { ?object <http://purl.org/podd/ns/poddScience#hasBarcode> ?barcode . FILTER(STRSTARTS(?barcode, \"" + barcode + "\"))} } LIMIT " + limit).toString();       
 		final String TEMPLAT1 = new StringBuilder()
                 .append("CONSTRUCT { ")
@@ -227,11 +277,224 @@ public class APPFPoddClient extends RestletPoddClientImpl
                 .append(" { ?object <http://purl.org/podd/ns/poddScience#hasContainer> ?tray . ?tray <http://purl.org/podd/ns/poddScience#hasPot> ?pot . ?pot <http://purl.org/podd/ns/poddScience#hasMaterial> ?mat . ?mat <http://purl.org/podd/ns/poddScience#refersToGenotype> ?genotype . ?genotype <http://purl.org/podd/ns/poddScience#hasSpecies> ?species . FILTER(STRSTARTS(?species, \"" + species + "\"))}")
                 .append(" OPTIONAL { ?object <http://purl.org/podd/ns/poddScience#hasBarcode> ?barcode . } } LIMIT " + limit)
                 .append(" VALUES (?type) { (<http://purl.org/podd/ns/poddScience#Experiment>) } ").toString();
-        Representation res = this.doSPARQL2(TEMPLAT, null);
+        Representation res = this.doSPARQL2(TEMPLATE, null);
         return res;
 	}
 	
+public Representation filterMeasurements(List<Filter> filter) throws Exception {
+		
+		String barcode = "";
+		String genus = "";
+		String species = "";
+		String type = "";
+		String unit = "";
+		String treatment = "";
+		float greatr = 0;
+		float lessthan = 0;
+		if (!filter.isEmpty()) {
+			for (int i = 0; i < filter.size(); ++i) {
+				
+				switch(filter.get(i).getField()) {
+				case "barcode": barcode = filter.get(i).getValue(); break;
+				case "genus": genus = filter.get(i).getValue(); break;
+				case "species" : species = filter.get(i).getValue(); break;
+				case "type" : type = filter.get(i).getValue(); break;
+				case "unit" : unit = filter.get(i).getValue(); break;
+				case "treatment" : treatment = filter.get(i).getValue(); break;
+				case "greatr" : greatr = Float.parseFloat(filter.get(i).getValue()); break;
+				case "lessthan" : lessthan = Float.parseFloat(filter.get(i).getValue()); break;
+				}
+			}
+		}
+	    
+		
+		final String TEMPLAT = new StringBuilder()
+                .append("CONSTRUCT { ")
+                .append(" ?object <http://www.w3.org/2000/01/rdf-schema#label> ?label .")
+                .append(" ?object <http://purl.org/podd/ns/poddScience#hasTreatment> ?treatment .")
+                .append(" ?object <http://purl.org/podd/ns/poddScience#hasTreatmentType> ?treatmenttype .")
+                .append(" ?object <http://purl.org/podd/ns/poddScience#hasGenotype> ?genotype .")
+                //.append(" ?object <http://purl.org/podd/ns/poddScience#hasTreatmentMaterial> ?tm .")
+                .append(" ?genotype <http://purl.org/podd/ns/poddScience#hasGenus> ?genus .")
+                .append(" ?genotype <http://purl.org/podd/ns/poddScience#hasSpecies> ?species .")
+                .append(" ?object <http://purl.org/podd/ns/poddScience#hasControl> ?control .")
+                .append(" ?genotype <http://purl.org/podd/ns/poddScience#hasLine> ?line .")
+                .append(" ?genotype <http://purl.org/podd/ns/poddScience#hasLineNumber> ?linenum .")
+                
+                
+                .append(" ?object <http://purl.org/podd/ns/poddScience#hasPlantingDate> ?date .")
+                .append(" ?object <http://purl.org/podd/ns/poddScience#hasMeasurement> ?m .")
+                .append(" ?m <http://www.w3.org/2000/01/rdf-schema#label> ?la .")
+                .append(" ?m <http://purl.org/podd/ns/poddScience#hasTimestamp> ?t .")
+                .append(" ?m <http://purl.org/podd/ns/poddScience#hasUnit> ?u .")
+                
+                
+                .append(" ?m <http://purl.org/podd/ns/poddScience#hasValue> ?val .")
+                
+                .append("}")
+                .append(" WHERE { ")
+                .append(" OPTIONAL {?object <http://purl.org/podd/ns/poddScience#hasTreatment> ?treatment . ?treatment <http://purl.org/podd/ns/poddScience#hasTreatmentType> ?treatmenttype . FILTER(STRSTARTS(?treatmenttype, \"" + treatment + "\"))}")
+                .append(" { ?object <http://www.w3.org/2000/01/rdf-schema#label> ?label . }")
+                
+                //.append(" OPTIONAL {?object <http://purl.org/podd/ns/poddScience#hasTreatment> ?treatment . ?treatment <http://purl.org/podd/ns/poddScience#hasTreatmentMaterial> ?tm .}")
+                .append(" { ?object <http://purl.org/podd/ns/poddScience#refersToGenotype> ?genotype . ?genotype <http://purl.org/podd/ns/poddScience#hasGenus> ?genus . FILTER(STRSTARTS(?genus, \"" + genus + "\"))}")
+                .append(" { ?object <http://purl.org/podd/ns/poddScience#refersToGenotype> ?genotype . ?genotype <http://purl.org/podd/ns/poddScience#hasSpecies> ?species . FILTER(STRSTARTS(?species, \"" + species + "\"))}")
+                .append(" {?genotype <http://purl.org/podd/ns/poddScience#hasLine> ?line .}")
+                .append(" OPTIONAL {?genotype <http://purl.org/podd/ns/poddScience#hasLineNumber> ?linenum .}")               
+                
+                //.append(" OPTIONAL {?object <http://purl.org/podd/ns/poddScience#hasControl> ?control .}")
+                
+                .append(" {?object <http://purl.org/podd/ns/poddScience#hasMeasurement> ?m . ?m <http://www.w3.org/2000/01/rdf-schema#label> ?la . FILTER(STRSTARTS(?la, \"" + type + "\"))}")
+                .append(" {?m <http://purl.org/podd/ns/poddScience#hasUnit> ?u . FILTER(STRSTARTS(?u, \"" + unit + "\"))}")
+                .append(" {?m <http://purl.org/podd/ns/poddBase#hasTimestamp> ?t .}")
+				.append("{?m <http://purl.org/podd/ns/poddScience#hasValue> ?val . FILTER(xsd:float(?val) > " + greatr + ")}}")
+				.toString();
+		
+		final String TEMPLAT2 = new StringBuilder()
+                .append("CONSTRUCT { ")
+                .append(" ?object <http://www.w3.org/2000/01/rdf-schema#label> ?label .")
+                .append(" ?object <http://purl.org/podd/ns/poddScience#hasTreatment> ?treatment .")
+                .append(" ?object <http://purl.org/podd/ns/poddScience#hasTreatmentType> ?treatmenttype .")
+                .append(" ?object <http://purl.org/podd/ns/poddScience#hasGenotype> ?genotype .")
+                //.append(" ?object <http://purl.org/podd/ns/poddScience#hasTreatmentMaterial> ?tm .")
+                .append(" ?genotype <http://purl.org/podd/ns/poddScience#hasGenus> ?genus .")
+                .append(" ?genotype <http://purl.org/podd/ns/poddScience#hasSpecies> ?species .")
+                .append(" ?object <http://purl.org/podd/ns/poddScience#hasControl> ?control .")
+                .append(" ?genotype <http://purl.org/podd/ns/poddScience#hasLine> ?line .")
+                .append(" ?genotype <http://purl.org/podd/ns/poddScience#hasLineNumber> ?linenum .")
+                
+                
+                .append(" ?object <http://purl.org/podd/ns/poddScience#hasPlantingDate> ?date .")
+                .append(" ?object <http://purl.org/podd/ns/poddScience#hasMeasurement> ?m .")
+                .append(" ?m <http://www.w3.org/2000/01/rdf-schema#label> ?la .")
+                .append(" ?m <http://purl.org/podd/ns/poddScience#hasTimestamp> ?t .")
+                .append(" ?m <http://purl.org/podd/ns/poddScience#hasUnit> ?u .")
+                
+                
+                .append(" ?m <http://purl.org/podd/ns/poddScience#hasValue> ?val .")
+                
+                .append("}")
+                .append(" WHERE { ")
+                .append(" {?object <http://purl.org/podd/ns/poddScience#hasTreatment> ?treatment . ?treatment <http://purl.org/podd/ns/poddScience#hasTreatmentType> ?treatmenttype . FILTER(STRSTARTS(?treatmenttype, \"" + treatment + "\"))}")
+                .append(" { ?object <http://www.w3.org/2000/01/rdf-schema#label> ?label . }")
+                
+                //.append(" OPTIONAL {?object <http://purl.org/podd/ns/poddScience#hasTreatment> ?treatment . ?treatment <http://purl.org/podd/ns/poddScience#hasTreatmentMaterial> ?tm .}")
+                .append(" { ?object <http://purl.org/podd/ns/poddScience#refersToGenotype> ?genotype . ?genotype <http://purl.org/podd/ns/poddScience#hasGenus> ?genus . FILTER(STRSTARTS(?genus, \"" + genus + "\"))}")
+                .append(" { ?object <http://purl.org/podd/ns/poddScience#refersToGenotype> ?genotype . ?genotype <http://purl.org/podd/ns/poddScience#hasSpecies> ?species . FILTER(STRSTARTS(?species, \"" + species + "\"))}")
+                .append(" {?genotype <http://purl.org/podd/ns/poddScience#hasLine> ?line .}")
+                .append(" OPTIONAL {?genotype <http://purl.org/podd/ns/poddScience#hasLineNumber> ?linenum .}")               
+                
+                //.append(" OPTIONAL {?object <http://purl.org/podd/ns/poddScience#hasControl> ?control .}")
+                
+                .append(" {?object <http://purl.org/podd/ns/poddScience#hasMeasurement> ?m . ?m <http://www.w3.org/2000/01/rdf-schema#label> ?la . FILTER(STRSTARTS(?la, \"" + type + "\"))}")
+                .append(" {?m <http://purl.org/podd/ns/poddScience#hasUnit> ?u . FILTER(STRSTARTS(?u, \"" + unit + "\"))}")
+                .append(" {?m <http://purl.org/podd/ns/poddBase#hasTimestamp> ?t .}")
+				.append("{?m <http://purl.org/podd/ns/poddScience#hasValue> ?val . FILTER(xsd:float(?val) > " + greatr + ")}}")
+				.toString();
+		
+		final String TEMPLAT3 = new StringBuilder()
+                .append("CONSTRUCT { ")
+                .append(" ?object <http://www.w3.org/2000/01/rdf-schema#label> ?label .")
+                .append(" ?object <http://purl.org/podd/ns/poddScience#hasTreatment> ?treatment .")
+                .append(" ?object <http://purl.org/podd/ns/poddScience#hasTreatmentType> ?treatmenttype .")
+                .append(" ?object <http://purl.org/podd/ns/poddScience#hasGenotype> ?genotype .")
+                //.append(" ?object <http://purl.org/podd/ns/poddScience#hasTreatmentMaterial> ?tm .")
+                .append(" ?genotype <http://purl.org/podd/ns/poddScience#hasGenus> ?genus .")
+                .append(" ?genotype <http://purl.org/podd/ns/poddScience#hasSpecies> ?species .")
+                .append(" ?object <http://purl.org/podd/ns/poddScience#hasControl> ?control .")
+                .append(" ?genotype <http://purl.org/podd/ns/poddScience#hasLine> ?line .")
+                .append(" ?genotype <http://purl.org/podd/ns/poddScience#hasLineNumber> ?linenum .")
+                
+                
+                .append(" ?object <http://purl.org/podd/ns/poddScience#hasPlantingDate> ?date .")
+                .append(" ?object <http://purl.org/podd/ns/poddScience#hasMeasurement> ?m .")
+                .append(" ?m <http://www.w3.org/2000/01/rdf-schema#label> ?la .")
+                .append(" ?m <http://purl.org/podd/ns/poddScience#hasTimestamp> ?t .")
+                .append(" ?m <http://purl.org/podd/ns/poddScience#hasUnit> ?u .")
+                
+                
+                .append(" ?m <http://purl.org/podd/ns/poddScience#hasValue> ?val .")
+                
+                .append("}")
+                .append(" WHERE { ")
+                .append(" {?object <http://purl.org/podd/ns/poddScience#hasTreatment> ?treatment . ?treatment <http://purl.org/podd/ns/poddScience#hasTreatmentType> ?treatmenttype . FILTER(STRSTARTS(?treatmenttype, \"" + treatment + "\"))}")
+                .append(" { ?object <http://www.w3.org/2000/01/rdf-schema#label> ?label . }")
+                
+                //.append(" OPTIONAL {?object <http://purl.org/podd/ns/poddScience#hasTreatment> ?treatment . ?treatment <http://purl.org/podd/ns/poddScience#hasTreatmentMaterial> ?tm .}")
+                .append(" { ?object <http://purl.org/podd/ns/poddScience#refersToGenotype> ?genotype . ?genotype <http://purl.org/podd/ns/poddScience#hasGenus> ?genus . FILTER(STRSTARTS(?genus, \"" + genus + "\"))}")
+                .append(" { ?object <http://purl.org/podd/ns/poddScience#refersToGenotype> ?genotype . ?genotype <http://purl.org/podd/ns/poddScience#hasSpecies> ?species . FILTER(STRSTARTS(?species, \"" + species + "\"))}")
+                .append(" {?genotype <http://purl.org/podd/ns/poddScience#hasLine> ?line .}")
+                .append(" OPTIONAL {?genotype <http://purl.org/podd/ns/poddScience#hasLineNumber> ?linenum .}")               
+                
+                //.append(" OPTIONAL {?object <http://purl.org/podd/ns/poddScience#hasControl> ?control .}")
+                
+                .append(" {?object <http://purl.org/podd/ns/poddScience#hasMeasurement> ?m . ?m <http://www.w3.org/2000/01/rdf-schema#label> ?la . FILTER(STRSTARTS(?la, \"" + type + "\"))}")
+                .append(" {?m <http://purl.org/podd/ns/poddScience#hasUnit> ?u . FILTER(STRSTARTS(?u, \"" + unit + "\"))}")
+                .append(" {?m <http://purl.org/podd/ns/poddBase#hasTimestamp> ?t .}")
+				.append("{?m <http://purl.org/podd/ns/poddScience#hasValue> ?val . FILTER(xsd:float(?val) > " + greatr + ")}")
+				.append("{?m <http://purl.org/podd/ns/poddScience#hasValue> ?val . FILTER(xsd:float(?val) < " + lessthan + ")}}").toString();
+		
+		final String TEMPLAT4 = new StringBuilder()
+                .append("CONSTRUCT { ")
+                .append(" ?object <http://www.w3.org/2000/01/rdf-schema#label> ?label .")
+                .append(" ?object <http://purl.org/podd/ns/poddScience#hasTreatment> ?treatment .")
+                .append(" ?object <http://purl.org/podd/ns/poddScience#hasTreatmentType> ?treatmenttype .")
+                .append(" ?object <http://purl.org/podd/ns/poddScience#hasGenotype> ?genotype .")
+                //.append(" ?object <http://purl.org/podd/ns/poddScience#hasTreatmentMaterial> ?tm .")
+                .append(" ?genotype <http://purl.org/podd/ns/poddScience#hasGenus> ?genus .")
+                .append(" ?genotype <http://purl.org/podd/ns/poddScience#hasSpecies> ?species .")
+                .append(" ?object <http://purl.org/podd/ns/poddScience#hasControl> ?control .")
+                .append(" ?genotype <http://purl.org/podd/ns/poddScience#hasLine> ?line .")
+                .append(" ?genotype <http://purl.org/podd/ns/poddScience#hasLineNumber> ?linenum .")
+                
+                
+                .append(" ?object <http://purl.org/podd/ns/poddScience#hasPlantingDate> ?date .")
+                .append(" ?object <http://purl.org/podd/ns/poddScience#hasMeasurement> ?m .")
+                .append(" ?m <http://www.w3.org/2000/01/rdf-schema#label> ?la .")
+                .append(" ?m <http://purl.org/podd/ns/poddScience#hasTimestamp> ?t .")
+                .append(" ?m <http://purl.org/podd/ns/poddScience#hasUnit> ?u .")
+                
+                
+                .append(" ?m <http://purl.org/podd/ns/poddScience#hasValue> ?val .")
+                
+                .append("}")
+                .append(" WHERE { ")
+                .append(" OPTIONAL {?object <http://purl.org/podd/ns/poddScience#hasTreatment> ?treatment . ?treatment <http://purl.org/podd/ns/poddScience#hasTreatmentType> ?treatmenttype . FILTER(STRSTARTS(?treatmenttype, \"" + treatment + "\"))}")
+                .append(" { ?object <http://www.w3.org/2000/01/rdf-schema#label> ?label . }")
+                
+                //.append(" OPTIONAL {?object <http://purl.org/podd/ns/poddScience#hasTreatment> ?treatment . ?treatment <http://purl.org/podd/ns/poddScience#hasTreatmentMaterial> ?tm .}")
+                .append(" { ?object <http://purl.org/podd/ns/poddScience#refersToGenotype> ?genotype . ?genotype <http://purl.org/podd/ns/poddScience#hasGenus> ?genus . FILTER(STRSTARTS(?genus, \"" + genus + "\"))}")
+                .append(" { ?object <http://purl.org/podd/ns/poddScience#refersToGenotype> ?genotype . ?genotype <http://purl.org/podd/ns/poddScience#hasSpecies> ?species . FILTER(STRSTARTS(?species, \"" + species + "\"))}")
+                .append(" {?genotype <http://purl.org/podd/ns/poddScience#hasLine> ?line .}")
+                .append(" OPTIONAL {?genotype <http://purl.org/podd/ns/poddScience#hasLineNumber> ?linenum .}")               
+                
+                //.append(" OPTIONAL {?object <http://purl.org/podd/ns/poddScience#hasControl> ?control .}")
+                
+                .append(" {?object <http://purl.org/podd/ns/poddScience#hasMeasurement> ?m . ?m <http://www.w3.org/2000/01/rdf-schema#label> ?la . FILTER(STRSTARTS(?la, \"" + type + "\"))}")
+                .append(" {?m <http://purl.org/podd/ns/poddScience#hasUnit> ?u . FILTER(STRSTARTS(?u, \"" + unit + "\"))}")
+                .append(" {?m <http://purl.org/podd/ns/poddBase#hasTimestamp> ?t .}")
+				.append("{?m <http://purl.org/podd/ns/poddScience#hasValue> ?val . FILTER(xsd:float(?val) > " + greatr + ")}")
+				.append("{?m <http://purl.org/podd/ns/poddScience#hasValue> ?val . FILTER(xsd:float(?val) < " + lessthan + ")}}").toString(); 
+				
+                //.append(" {?m <http://purl.org/podd/ns/poddScience#hasUnit> ?u .}}")
+                //.append(" {?m <http://purl.org/podd/ns/poddBase#hasTimestamp> ?t .} }")
+		Representation res;
+		if (treatment.length() > 0 && lessthan > 0) {
+        	res = this.doSPARQL2(TEMPLAT3, null);
+        } else if (treatment.length() > 0){
+        	res = this.doSPARQL2(TEMPLAT2, null);
+        } else if (lessthan > 0) {
+        	res = this.doSPARQL2(TEMPLAT4, null);
+        } else {
+        	res = this.doSPARQL2(TEMPLAT, null);
+        }
+                      
+		
+        
+        return res;
+	}
 	public Representation listAllPlants() throws Exception {
+		
 		
 		
         final String TEMPLATE = new StringBuilder()
@@ -292,6 +555,7 @@ public class APPFPoddClient extends RestletPoddClientImpl
                 .append(" ?object <http://purl.org/podd/ns/poddScience#hasSpecies> ?species . ")
                 .append(" ?object <http://purl.org/podd/ns/poddScience#hasTreatmentType> ?treatmenttype .")
                 .append(" ?object <http://purl.org/podd/ns/poddScience#hasTreatmentMaterial> ?tm .")
+                
                 .append(" ?object <http://purl.org/podd/ns/poddScience#hasPlantingDate> ?date .}")
                 
                 .append(" WHERE {?object <http://purl.org/podd/ns/poddScience#refersToGenotype> ?genotype .")
@@ -300,9 +564,10 @@ public class APPFPoddClient extends RestletPoddClientImpl
                 .append(" {?genotype <http://purl.org/podd/ns/poddScience#hasLine> ?line .}")
                 .append(" OPTIONAL {?genotype <http://purl.org/podd/ns/poddScience#hasLineNumber> ?linenum .}")               
                 .append(" {?object <http://www.w3.org/2000/01/rdf-schema#label> ?label . }")
-                .append(" OPTIONAL {?object <http://purl.org/podd/ns/poddScience#hasControl> ?control .}")
+                .append(" {?object <http://purl.org/podd/ns/poddScience#hasControl> ?control .}")
                 .append(" {?object <http://purl.org/podd/ns/poddScience#hasTreatment> ?treatment . ?treatment <http://purl.org/podd/ns/poddScience#hasTreatmentType> ?treatmenttype . FILTER(STRSTARTS(?treatmenttype, \"" + treatment + "\"))}")
                 .append(" OPTIONAL {?object <http://purl.org/podd/ns/poddScience#hasTreatment> ?treatment . ?treatment <http://purl.org/podd/ns/poddScience#hasTreatmentMaterial> ?tm}")
+                
                 .append(" OPTIONAL {?object <http://purl.org/podd/ns/poddScience#hasPlantingDate> ?date . }} LIMIT " + limit)               
                 .toString();
         
@@ -316,17 +581,23 @@ public class APPFPoddClient extends RestletPoddClientImpl
                 .append(" ?object <http://purl.org/podd/ns/poddScience#hasSpecies> ?species . ")
                 .append(" ?object <http://purl.org/podd/ns/poddScience#hasTreatmentType> ?treatmenttype .")
                 .append(" ?object <http://purl.org/podd/ns/poddScience#hasTreatmentMaterial> ?tm .")
+                
                 .append(" ?object <http://purl.org/podd/ns/poddScience#hasPlantingDate> ?date .}")
                 
-                .append(" WHERE {?object <http://purl.org/podd/ns/poddScience#refersToGenotype> ?genotype .")
+                .append(" WHERE {")
+                .append(" {?object <http://www.w3.org/2000/01/rdf-schema#label> ?label . }")
+                 .append("{ ?object <http://purl.org/podd/ns/poddScience#refersToGenotype> ?genotype .}")
                 .append(" { ?genotype <http://purl.org/podd/ns/poddScience#hasGenus> ?genus . FILTER(STRSTARTS(?genus, \"" + genus + "\"))}")
                 .append(" { ?genotype <http://purl.org/podd/ns/poddScience#hasSpecies> ?species . FILTER(STRSTARTS(?species, \"" + species + "\"))}")                
                 .append(" {?genotype <http://purl.org/podd/ns/poddScience#hasLine> ?line .}")
                 .append(" OPTIONAL {?genotype <http://purl.org/podd/ns/poddScience#hasLineNumber> ?linenum .}")               
-                .append(" {?object <http://www.w3.org/2000/01/rdf-schema#label> ?label . }")
-                .append(" OPTIONAL {?object <http://purl.org/podd/ns/poddScience#hasControl> ?control .}")
+               
+                .append(" {?object <http://purl.org/podd/ns/poddScience#hasControl> ?control .}")
                 .append(" OPTIONAL {?object <http://purl.org/podd/ns/poddScience#hasTreatment> ?treatment . ?treatment <http://purl.org/podd/ns/poddScience#hasTreatmentType> ?treatmenttype . FILTER(STRSTARTS(?treatmenttype, \"" + treatment + "\"))}")
                 .append(" OPTIONAL {?object <http://purl.org/podd/ns/poddScience#hasTreatment> ?treatment . ?treatment <http://purl.org/podd/ns/poddScience#hasTreatmentMaterial> ?tm . }")
+                //.append(" {?object <http://purl.org/podd/ns/poddScience#hasMeasurement> ?mes . ?mes  <http://www.w3.org/2000/01/rdf-schema#label> ?la . FILTER(STRSTARTS(?la, \"" + "weight before" + "\"))}")
+                
+                //.append(" {?object <http://purl.org/podd/ns/poddScience#hasMeasurement> ?mes . }")
                 .append(" OPTIONAL {?object <http://purl.org/podd/ns/poddScience#hasPlantingDate> ?date . }} LIMIT " + limit).toString();
         Representation res;
         if (treatment.length() > 0) {
