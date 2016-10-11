@@ -110,6 +110,18 @@ public class APPFQueryClient
         final OptionSpec<String> genus =
                 parser.accepts("genus").withOptionalArg().ofType(String.class).defaultsTo("").describedAs(
                         "The genus to filter by");
+        final OptionSpec<String> typ =
+                parser.accepts("type").withOptionalArg().ofType(String.class).defaultsTo("").describedAs(
+                        "The type of measurement to filter by");
+        final OptionSpec<String> greatrthan =
+                parser.accepts("greatrthan").withOptionalArg().ofType(String.class).defaultsTo("").describedAs(
+                        "The min measurement value to filter by");
+        final OptionSpec<String> lessthan =
+                parser.accepts("lessthan").withOptionalArg().ofType(String.class).defaultsTo("").describedAs(
+                        "The max measurement value to filter by");
+        final OptionSpec<String> uni =
+                parser.accepts("unit").withOptionalArg().ofType(String.class).defaultsTo("").describedAs(
+                        "The unit of measurement to filter by");
         final OptionSpec<String> species =
                 parser.accepts("species").withOptionalArg().ofType(String.class).defaultsTo("").describedAs(
                         "The species to filter by");
@@ -149,12 +161,17 @@ public class APPFQueryClient
         String treatmen = treatment.value(options);
         String expid = experimentId.value(options);
         String sparql = sparqlQuery.value(options);
+        String type = typ.value(options);
+        String unit = uni.value(options);
+        String greatrThan = greatrthan.value(options);
+        String lessThan = lessthan.value(options);
+        
         Integer lim = limit.value(options);
         if (query == null && keyword == null && sparql == null) {
         	parser.printHelpOn(System.out);
         	return;
         }
-        final APPFPoddClient client = new APPFPoddClient("https://poddtest.plantphenomics.org.au/podd");
+        final APPFPoddClient client = new APPFPoddClient("https://podd.plantphenomics.org.au/podd");
         if (limit != null) {
         	client.setLimit(lim);
         }
@@ -189,7 +206,44 @@ public class APPFQueryClient
 
         		}
 
-        	} else if (query.equals("genotype")) {
+        	} else if (query.equals("measurement")) {
+        		if (gene.length() > 0 || specie.length() > 0 || treatmen.length() > 0) {
+        			List<Filter> filter = new ArrayList<Filter>();
+        			Filter f1 = new Filter("genus", gene);
+        			Filter f2 = new Filter("species", specie);
+        			Filter f3 = new Filter("treatment", treatmen);
+        			
+        		
+        			Filter f4 = new Filter("type", type);
+        			Filter f5 = new Filter("unit", unit);
+        			
+        			
+        			if(lessThan.length() > 0) {
+        				Filter f6 = new Filter("lessthan", lessThan);
+        				filter.add(f6);
+        			}
+        			if (greatrThan.length() > 0) {
+        				Filter f7 = new Filter("greatr", greatrThan);
+        				filter.add(f7);
+        			}
+        			
+        			
+        			filter.add(f1);
+        			filter.add(f2);
+        			filter.add(f3);
+        			
+        			filter.add(f4);
+        			filter.add(f5);
+        			
+        			
+        			client.filterMeasurements(filter);
+        			
+        		} 
+
+        	} 
+        	
+        	
+        	else if (query.equals("genotype")) {
 
         		if (query.length() > 0) {
         			List<Filter> filter = new ArrayList<Filter>();
@@ -205,7 +259,7 @@ public class APPFQueryClient
         		parser.printHelpOn(System.out);
         		return;
         	}
-        }
+        } 
         if (sparql != null) {
         	client.doSPARQL2(sparql, null);
 
