@@ -421,7 +421,7 @@ public interface PODD
     
     /** http://purl.org/podd/ns/poddScience#Pot */
     public static final URI PODD_SCIENCE_POT = PODD.VF.createURI(PODD.PODD_SCIENCE, "Pot");
-    
+    public static final URI PODD_SCIENCE_SEED = PODD.VF.createURI(PODD.PODD_SCIENCE, "Seed");
     /** http://purl.org/podd/ns/poddScience#Material */
     public static final URI PODD_SCIENCE_MATERIAL = PODD.VF.createURI(PODD.PODD_SCIENCE, "Material");
     
