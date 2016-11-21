@@ -106,7 +106,8 @@ public class APPFQueryClient
                         + "experiment to list and filter all experiments, plant to list and filter all plants, genotype to list and filter all genotypes");
         final OptionSpec<String> keywordSearch =
                 parser.accepts("keyword").withOptionalArg().ofType(String.class).describedAs(
-                        "The keyword to search against");                
+                        "The keyword to search against");
+         
         final OptionSpec<String> genus =
                 parser.accepts("genus").withOptionalArg().ofType(String.class).defaultsTo("").describedAs(
                         "The genus to filter by");
@@ -122,6 +123,7 @@ public class APPFQueryClient
         final OptionSpec<String> uni =
                 parser.accepts("unit").withOptionalArg().ofType(String.class).defaultsTo("").describedAs(
                         "The unit of measurement to filter by");
+        
         final OptionSpec<String> species =
                 parser.accepts("species").withOptionalArg().ofType(String.class).defaultsTo("").describedAs(
                         "The species to filter by");
@@ -136,6 +138,23 @@ public class APPFQueryClient
         final OptionSpec<Integer> limit =
                 parser.accepts("limit").withOptionalArg().ofType(Integer.class).defaultsTo(50).describedAs(
                         "The number of results to limit by");
+        /*
+        final OptionSpec<String> typ2 =
+                parser.accepts("type2").withOptionalArg().ofType(String.class).defaultsTo("").describedAs(
+                        "The type of measurement to filter by");
+        final OptionSpec<String> greatrthan2 =
+                parser.accepts("greatrthan2").withOptionalArg().ofType(String.class).defaultsTo("").describedAs(
+                        "The min measurement value to filter by");
+        final OptionSpec<String> lessthan2 =
+                parser.accepts("lessthan2").withOptionalArg().ofType(String.class).defaultsTo("").describedAs(
+                        "The max measurement value to filter by");
+        final OptionSpec<String> uni2 =
+                parser.accepts("unit2").withOptionalArg().ofType(String.class).defaultsTo("").describedAs(
+                        "The unit of measurement to filter by");
+        final OptionSpec<String> counts =
+                parser.accepts("counts").withOptionalArg().ofType(String.class).describedAs(
+                        "counts");
+        */
         OptionSet options = null;
 
         try
@@ -165,8 +184,15 @@ public class APPFQueryClient
         String unit = uni.value(options);
         String greatrThan = greatrthan.value(options);
         String lessThan = lessthan.value(options);
-        
         Integer lim = limit.value(options);
+        /*
+        String type2 = typ2.value(options);
+        String unit2 = uni2.value(options);
+        String greatrThan2 = greatrthan2.value(options);
+        String lessThan2 = lessthan2.value(options);
+        String count = counts.value(options);
+        
+        */
         if (query == null && keyword == null && sparql == null) {
         	parser.printHelpOn(System.out);
         	return;
@@ -196,9 +222,11 @@ public class APPFQueryClient
         			Filter f1 = new Filter("genus", gene);
         			Filter f2 = new Filter("species", specie);
         			Filter f3 = new Filter("treatment", treatmen);
+        			Filter f4 = new Filter("barcode", expid);
         			filter.add(f1);
         			filter.add(f2);
         			filter.add(f3);
+        			filter.add(f4);
         			client.filterAllPlants(filter);
         			
         		} else {
@@ -207,12 +235,12 @@ public class APPFQueryClient
         		}
 
         	} else if (query.equals("measurement")) {
-        		if (gene.length() > 0 || specie.length() > 0 || treatmen.length() > 0) {
+        		        		
         			List<Filter> filter = new ArrayList<Filter>();
         			Filter f1 = new Filter("genus", gene);
         			Filter f2 = new Filter("species", specie);
         			Filter f3 = new Filter("treatment", treatmen);
-        			
+        			Filter f8 = new Filter("barcode", expid);
         		
         			Filter f4 = new Filter("type", type);
         			Filter f5 = new Filter("unit", unit);
@@ -225,21 +253,38 @@ public class APPFQueryClient
         			if (greatrThan.length() > 0) {
         				Filter f7 = new Filter("greatr", greatrThan);
         				filter.add(f7);
+        			} 
+        			if (expid.length() == 0) {
+        				if(gene.length() > 0 || specie.length() > 0|| treatmen.length() > 0 ) {
+        					System.out.println("This query would take approximately 5 minutes to execute");
+        				} else {
+        					System.out.println("This query would take approximately 1 minute to execute");
+        				}
         			}
+        			/*
+        			Filter f8 = new Filter("type2", type2);
+        			Filter f9 = new Filter("unit2", unit2);
+        			filter.add(f8);
+        			filter.add(f9);
         			
-        			
+        			if(lessThan.length() > 0) {
+        				Filter f10 = new Filter("lessthan2", lessThan2);
+        				filter.add(f10);
+        			}
+        			if (greatrThan2.length() > 0) {
+        				Filter f11 = new Filter("greatr2", greatrThan2);
+        				filter.add(f11);
+        			}
+        			*/
         			filter.add(f1);
         			filter.add(f2);
         			filter.add(f3);
         			
         			filter.add(f4);
         			filter.add(f5);
-        			
-        			
-        			client.filterMeasurements(filter);
-        			
-        		} 
-
+        			filter.add(f8);
+        		
+        			client.filterMeasurements4(filter);        			
         	} 
         	
         	
@@ -268,8 +313,16 @@ public class APPFQueryClient
         if (keyword != null) {
         	client.keywordSearch(keyword);
         }
-        
-        
+        /*
+        if (count != null) {
+        	List<Filter> filter = new ArrayList<Filter>();
+			Filter f1 = new Filter("genus", gene);
+			Filter f2 = new Filter("species", specie);
+			filter.add(f1);
+			filter.add(f2);
+        	client.countMeasurements(filter);
+        }
+        */
  
     }
     
