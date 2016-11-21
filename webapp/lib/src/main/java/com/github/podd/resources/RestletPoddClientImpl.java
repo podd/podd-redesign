@@ -23,6 +23,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.net.SocketTimeoutException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -36,12 +37,19 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Set;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
 
 import org.apache.commons.io.IOUtils;
 //import org.apache.commons.io.IOUtils;
@@ -58,6 +66,7 @@ import org.openrdf.rio.RDFHandlerException;
 import org.openrdf.rio.RDFParseException;
 import org.openrdf.rio.Rio;
 import org.openrdf.rio.UnsupportedRDFormatException;
+import org.restlet.Context;
 import org.restlet.data.CharacterSet;
 import org.restlet.data.CookieSetting;
 import org.restlet.data.Form;
@@ -99,7 +108,7 @@ import com.github.podd.utils.PoddWebConstants;
  *
  * @author Peter Ansell p_ansell@yahoo.com
  */
-public class RestletPoddClientImpl implements PoddClient
+public class RestletPoddClientImpl implements PoddClient, Runnable
 {
     protected final Logger log = LoggerFactory.getLogger(this.getClass());
     
@@ -114,7 +123,7 @@ public class RestletPoddClientImpl implements PoddClient
     public static final String PROP_PODD_PASSWORD = "podd.password";
     
     public final static String TEMP_UUID_PREFIX = "urn:temp:uuid:";
-    
+    public final static String PATH_SPARQL2 = "sparql2";
     private Series<CookieSetting> currentCookies = new Series<CookieSetting>(CookieSetting.class);
     
     private PropertyUtil props;
@@ -369,14 +378,123 @@ public class RestletPoddClientImpl implements PoddClient
         }
         return false;
     }
-    
-    
     public Representation doSPARQL2(final String queryString, final Collection<InferredOWLOntologyID> artifactIds)
+            throws PoddException
+        {
+            this.log.debug("cookies: {}", this.currentCookies);
+            
+            final ClientResource resource = new ClientResource(this.getUrl(PoddWebConstants.PATH_SPARQL));
+            resource.getCookies().addAll(this.currentCookies);
+            
+            final Form form = new Form();
+            form.add(PoddWebConstants.KEY_SPARQLQUERY, queryString);
+            
+            // TODO: Parse query to make sure it is syntactically valid before sending query
+            resource.addQueryParameter(PoddWebConstants.KEY_SPARQLQUERY, queryString);
+            
+            try
+            {
+            	final Representation get = resource.get(MediaType.APPLICATION_ALL_XML);
+            	/*
+            	try {
+    				String d = get.getText().replaceAll("(.*)version=(.*)", "");
+    				String f = d.replaceAll("(.*)sparql(.*)", "").replaceAll("(.*)result(.*)", "");
+    				System.out.println(f);
+    			} catch (IOException e) {
+    				// TODO Auto-generated catch block
+    				e.printStackTrace();
+    			}
+            	*/
+            	
+            	
+            	 try {        		
+            		DocumentBuilder dBuilder = DocumentBuilderFactory.newInstance()
+            	                             .newDocumentBuilder();
+            		
+            		InputStream in = IOUtils.toInputStream(get.getText());
+            		Document doc = dBuilder.parse(in);
+            		System.out.println("\r\n" + "============================== \r\n" + " PODD Query Results \r\n"
+                            + "==============================");
+            		System.out.println(doc.getChildNodes().getLength());
+
+            		if (doc.hasChildNodes()) {
+            			printNote(doc.getChildNodes());
+            		}
+
+            	 } catch (Exception e) {
+            		 System.out.println(e.getMessage());
+            	 }
+            	 
+                return get;
+                
+            }
+            catch(final ResourceException e)
+            {
+                if(e.getStatus().equals(Status.CLIENT_ERROR_PRECONDITION_FAILED))
+                {
+                	System.out.println("");
+                	System.out.println("Error: Access denied in server " + this.serverUrl + " with the login credentials provided in ~/poddclient.properties.");
+                    // Precondition failed indicates that they do not have access to any artifacts, so
+                    // return empty results set
+                    return null;
+                }
+                
+                System.out.println(e.toString());
+            }
+            catch(final UnsupportedRDFormatException e)
+            {
+                // Attempt to retry the request once to avoid random restlet failures stopping the
+                // entire process
+                try
+                {
+                    final Representation get =
+                            resource.post(form.getWebRepresentation(CharacterSet.UTF_8),
+                                    RestletUtilMediaType.APPLICATION_RDF_JSON);
+                    
+                    // Pass the desired format to the get method of the ClientResource
+                    // final Representation get =
+                    // resource.get(RestletUtilMediaType.APPLICATION_RDF_JSON);
+                    
+                    final StringWriter writer = new StringWriter(4096);
+                    
+                    get.write(writer);
+                    return null;
+                }
+                catch(final ResourceException e1)
+                {
+                    if(e1.getStatus().equals(Status.CLIENT_ERROR_PRECONDITION_FAILED))
+                    {
+                    	System.out.println("");
+                    	System.out.println("Error: Access denied in server " + this.serverUrl + " with login credentials provided in ~/poddclient.properties.");
+                        // Precondition failed indicates that they do not have access to any artifacts,
+                        // so
+                        // return empty results set
+                        return null;
+                    }
+                    else
+                    {
+                    	System.out.println(e.toString());
+                    }
+                }
+                catch(final IOException | UnsupportedRDFormatException e1)
+                {
+                	System.out.println(e.toString());
+                }
+            }
+            return null;
+        }
+    
+    public Representation doSPARQL3(final String queryString, final Collection<InferredOWLOntologyID> artifactIds)
         throws PoddException
     {
         this.log.debug("cookies: {}", this.currentCookies);
+        //final Context context = new Context();
+        //context.getParameters().add("socketTimeout", "10000");
+        //context.getParameters().add("connectionTimeout", "10000"); 
+        final ClientResource resource = new ClientResource(this.getUrl(PATH_SPARQL2));
         
-        final ClientResource resource = new ClientResource(this.getUrl(PoddWebConstants.PATH_SPARQL));
+       
+        
         resource.getCookies().addAll(this.currentCookies);
         
         final Form form = new Form();
@@ -384,22 +502,36 @@ public class RestletPoddClientImpl implements PoddClient
         
         // TODO: Parse query to make sure it is syntactically valid before sending query
         resource.addQueryParameter(PoddWebConstants.KEY_SPARQLQUERY, queryString);
-        
+       
+        	    
         try
         {
         	final Representation get = resource.get(MediaType.APPLICATION_ALL_XML);
+        	/*
+        	try {
+				String d = get.getText().replaceAll("(.*)version=(.*)", "");
+				String f = d.replaceAll("(.*)sparql(.*)", "").replaceAll("(.*)result(.*)", "");
+				System.out.println(f);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+        	*/
+        	
         	
         	 try {        		
         		DocumentBuilder dBuilder = DocumentBuilderFactory.newInstance()
         	                             .newDocumentBuilder();
-        		InputStream in = IOUtils.toInputStream(get.getText(), "UTF-8");
+        		String d = get.getText().replaceAll("(.*)version=(.*)", "");
+        		String f = d.replaceAll("(.*)sparql(.*)", "");
+        		InputStream in = IOUtils.toInputStream("<?xml version='1.0' encoding='UTF-8'?>"+" <r>"+f+" </r>", "UTF-8");
         		Document doc = dBuilder.parse(in);
         		System.out.println("\r\n" + "============================== \r\n" + " PODD Query Results \r\n"
                         + "==============================");
         		
 
         		if (doc.hasChildNodes()) {
-        			printNote(doc.getChildNodes());
+        			printNote3(doc.getChildNodes());
         		}
 
         	 } catch (Exception e) {
@@ -454,14 +586,21 @@ public class RestletPoddClientImpl implements PoddClient
                 }
                 else
                 {
+                	System.out.println("Error: Unable to find the requested data in PODD");
                 	System.out.println(e.toString());
                 }
             }
             catch(final IOException | UnsupportedRDFormatException e1)
             {
+            	System.out.println("Error: Unable to find the requested data in PODD");
             	System.out.println(e.toString());
+            	return null;
             }
+            
         }
+        
+     // Your database code here
+        	  
         return null;
     }
     private static void printNote(NodeList nodeList) {
@@ -503,7 +642,97 @@ public class RestletPoddClientImpl implements PoddClient
     		
     	}
     }
+    private static void printNote3(NodeList nodeList) {
+    	
+    	for (int count = 0; count < nodeList.getLength(); count++) {
 
+    		Node tempNode = nodeList.item(count);
+
+    		// make sure it's element node.
+    		if (tempNode.getNodeType() == Node.ELEMENT_NODE) {
+
+    			// get node name and value
+    			
+    				if (tempNode.getNodeName().startsWith("binding")) {
+    					
+    					
+    					if (tempNode.getAttributes().getNamedItem("name").getTextContent().equals("Experiment")) {
+    						
+    						System.out.println("");
+    						System.out.print(tempNode.getAttributes().getNamedItem("name").getTextContent() + " :  \t");
+    					} else {
+    						System.out.print(tempNode.getAttributes().getNamedItem("name").getTextContent() + " :  \t");
+    					}
+    				} else if (tempNode.getNodeName().startsWith("literal")) {
+    					System.out.println(tempNode.getTextContent());
+    					System.out.println("");
+    				} else if (tempNode.getNodeName().startsWith("hasPotColumnNumberOverall")) {
+    					System.out.println("Lane" + ": " + tempNode.getTextContent());
+    				} else if (tempNode.getNodeName().startsWith("hasPotPositionTray")) {
+    					System.out.println("Position" + ": " + tempNode.getTextContent());
+    				} else {
+    					//System.out.println(tempNode.getNodeName() + ": " + tempNode.getTextContent());
+    				}
+    				
+    				
+    			
+
+    			if (tempNode.hasChildNodes()) {
+    				// loop again if has child node
+    				
+    				printNote3(tempNode.getChildNodes());
+    				//System.out.println("");
+    				
+    			}
+    			
+    		} 
+    		
+    	}
+    	
+    }
+    private static void printNote2(NodeList nodeList, int prevValue) {
+
+    	for (int count = 0; count < nodeList.getLength(); count++) {
+
+    		Node tempNode = nodeList.item(count);
+    		
+    		// make sure it's element node.
+    		if (tempNode.getNodeType() == Node.ELEMENT_NODE) {
+
+    			// get node name and value
+    			if (!tempNode.getNodeName().startsWith("rdf:") && tempNode.getTextContent().length() > 0) {
+    				if (tempNode.getNodeName().startsWith("rdfs:label")) {
+    					
+    					System.out.println("Name" + ": " + tempNode.getTextContent());
+    				} else if (tempNode.getNodeName().startsWith("rdfs:comment")) {
+    					System.out.println("Description" + ": " + tempNode.getTextContent());
+    				} else if (tempNode.getNodeName().startsWith("hasPotColumnNumberOverall")) {
+    					System.out.println("Lane" + ": " + tempNode.getTextContent());
+    				} else if (tempNode.getNodeName().startsWith("hasPotPositionTray")) {
+    					System.out.println("Position" + ": " + tempNode.getTextContent());
+    				} else if (tempNode.getNodeName().startsWith("hasValue")) {
+    					//if 
+    					//prevValue = Integer.parseInt(tempNode.getNodeValue());
+    				} 
+    				else {
+    					System.out.println(tempNode.getNodeName() + ": " + tempNode.getTextContent());
+    				}
+    				
+    				
+    			}
+
+    			if (tempNode.hasChildNodes()) {
+    				// loop again if has child node
+    				
+    				printNote(tempNode.getChildNodes());
+    				System.out.println("");
+    				
+    			}
+    			
+    		} 
+    		
+    	}
+    }
     @Override
     public Model downloadArtifact(final InferredOWLOntologyID artifactId) throws PoddException
     {
@@ -1125,6 +1354,12 @@ public class RestletPoddClientImpl implements PoddClient
 	public Model doSPARQL(String queryString, Collection<InferredOWLOntologyID> artifacts) throws PoddException {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public void run() {
+		// TODO Auto-generated method stub
+		
 	}
     
 }
