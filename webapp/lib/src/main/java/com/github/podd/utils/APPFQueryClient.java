@@ -197,7 +197,7 @@ public class APPFQueryClient
         	parser.printHelpOn(System.out);
         	return;
         }
-        final APPFPoddClient client = new APPFPoddClient("https://podd.plantphenomics.org.au/podd");
+        final APPFPoddClient client = new APPFPoddClient("https://poddtest.plantphenomics.org.au/podd");
         if (limit != null) {
         	client.setLimit(lim);
         }
@@ -244,7 +244,10 @@ public class APPFQueryClient
         		
         			Filter f4 = new Filter("type", type);
         			Filter f5 = new Filter("unit", unit);
-        			
+        			if (!(unit.equals("mL") || unit.equals("mg") || unit.equals("Days") || unit.equals("pixels"))) {
+        				System.out.println("Unit " + unit + " does not exist in current PODD projects, please search against units mL, mg, Days, or pixels.");
+        				return;
+        			}
         			
         			if(lessThan.length() > 0) {
         				Filter f6 = new Filter("lessthan", lessThan);
