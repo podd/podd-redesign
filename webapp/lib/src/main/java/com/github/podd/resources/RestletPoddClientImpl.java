@@ -415,7 +415,7 @@ public class RestletPoddClientImpl implements PoddClient, Runnable
             		Document doc = dBuilder.parse(in);
             		System.out.println("\r\n" + "============================== \r\n" + " PODD Query Results \r\n"
                             + "==============================");
-            		System.out.println(doc.getChildNodes().getLength());
+            		
 
             		if (doc.hasChildNodes()) {
             			printNote(doc.getChildNodes());
